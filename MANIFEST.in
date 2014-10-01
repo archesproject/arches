@@ -1,0 +1,5 @@
+exclude .hgignore
+exclude .hgtags
+recursive-exclude tests *
+recursive-exclude packages *
+recursive-exclude virtualenv *

@@ -1,0 +1,796 @@
+﻿{% extends "base_page.htm" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/jqtree/jqtree.css" />
+<!-- CSS Global Compulsory -->
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/style.css">
+
+<!-- Arches CSS Global Compulsory -->
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/arches.css">
+
+<!-- SmartAdmin Styles : Please note (smartadmin-production.css) was created using LESS variables -->
+<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/smartadmin-production.css">
+
+
+<!-- CSS Implementing Plugins -->
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/line-icons/line-icons.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/sky-forms/version-2.0.1/css/custom-sky-forms.css">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/sky-forms-ie8.css">
+<![endif]-->
+
+<!-- CSS Page Style -->    
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/pages/page_search.css">
+
+<!-- CSS Theme -->    
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/themes/dark-blue.css" id="style_color">
+
+<!-- CSS Customization -->
+<link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/custom.css">
+
+{% endblock css %}
+
+{% block content %}
+    <!--=== Content Part ===-->
+    <div class="block-description" style="background: #f4f4f4;">
+        <div class="container content padding-top-20">      
+            
+            <!-- RDM Toolbar -->
+            <div class="arches-toolbar rounded">
+                <div class="row">
+
+                    <!-- Buttons -->
+                    <div class="col-md-5 col-lg-4">
+                        <div class="">
+                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green active"> Manage Thesauri</button>
+                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green"> Manage Graphs</button>
+                            <div class="margin-top-5 hidden-xs hidden-sm hidden-md hidden-lg"></div>
+                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green"> <i class="fa fa-gears"></i></button>                           
+                        </div>
+                    </div>
+                    <!-- End Buttons -->
+
+                    <!-- Spacer for small screens -->
+                    <div class="margin-top-5 hidden-md hidden-lg"></div>
+
+                    <!-- Concept Search Widget -->
+                    <div class="col-md-7 col-lg-8">
+
+                        <div class="input-group animated">
+                            <input type="text" class="form-control" placeholder="Find a concept">
+                            <span class="input-group-btn">
+                                <button class="btn-u" style="background: #117DB0;" type="button">Go</button>
+                            </span>
+                        </div>
+                       
+                    </div>
+                    <!-- End Concept Search Widget -->
+
+                </div>
+            </div>    
+            <!-- End RDM Toolbar -->
+
+
+            <!-- RDM Tree and CRUD Forms -->
+            <div class="row">
+                
+                <!-- Begin RDM Tree -->
+                <div class="col-md-5 col-lg-4">
+                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" style="background: #ffffff;">
+                        
+                        <div class="headline">
+                            <h4>RDM Thesauri</h4>
+                            <span>
+                                 <a href="#" class="pull-right"><strong>Add Thesaurus</strong></a>
+                            </span>
+                        </div>
+                    
+                        <!-- RDM Tree Container -->
+                        <section id="widget-grid" class="" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                            
+                            <!-- Widget ID (each widget will need unique ID)-->
+                            <div class="jarviswidget" id="wid-id-0">
+                                <!-- widget options:
+                                usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+                
+                                data-widget-colorbutton="false"
+                                data-widget-editbutton="false"
+                                data-widget-togglebutton="false"
+                                data-widget-deletebutton="false"
+                                data-widget-fullscreenbutton="false"
+                                data-widget-custombutton="false"
+                                data-widget-collapsed="true"
+                                data-widget-sortable="false"
+                
+                                -->
+
+                                <!-- widget content div-->
+                                <div style="border-width: 0px;">
+                
+                                    <!-- widget edit box -->
+                                    <div class="jarviswidget-editbox">
+                                        <!-- This area used as dropdown edit box -->
+                
+                                    </div>
+                                    <!-- end widget edit box -->
+                
+                                    <!-- widget body content -->
+                                    <div class="widget-body">
+                
+                                        <div class="row">
+                
+                                            <div class="col-xs-12">
+                
+                                                <div class="concept_tree" id="jqtree">
+                                                </div>
+                
+                                            </div>
+                
+                                        </div>
+                
+                                    </div>
+                                    <!-- end widget body content -->
+                
+                                </div>
+                                <!-- end widget content div -->
+                
+                            </div>
+                            <!-- end Jarvis widget -->
+                        
+                        </section>
+                        <!-- End RDM Tree Container -->
+
+                    </div>
+                </div>
+                <!-- End RDM Tree -->
+
+                <!-- Spacer for small screens -->
+                <div class="margin-top-10 hidden-md hidden-lg"></div>
+
+                <!-- Concept CRUD Form -->
+                <div class="col-md-7 col-lg-8">            
+
+                    <!-- Concept Summary -->
+                    <div class="right-inner arches-box-grey-border padding-10" style="background: #ffffff;">
+                                    
+                        <div class="row margin-bottom-30">
+                            
+                            <!-- Concept Managment Tools -->
+                            <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading"></div>
+                            <div class="col-xs-12" id="concept_report">
+                                Loading...
+                            </div>
+                            <!-- End Concept Managment Tools -->
+                            
+                        </div><!--/row-->
+                        
+
+                    </div>
+                    <!-- End Descriptions and Lists -->
+                    
+                    <div class="clearfix margin-bottom-10"></div>
+
+                    
+                </div>
+                <!-- End Content -->
+            </div>          
+        </div><!--/container-->     
+
+    </div>
+    <!--=== End Content Part ===-->
+
+    <!-- Modal editing window for labels -->
+    <form action="" class="modal fade" id="labelmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="labelmodaltitle">Manage Labels</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Label</h4>
+                            <p><input class="form-control" id="label_value" type="text" required/><input id="label_id" type="hidden"/></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <h4>Type</h4>
+                                <p> 
+                                    <select style="width:100%" class="select2" name="label_valuetype_dd" id="label_valuetype_dd" required>
+                                        {% for label in valuetype_labels %}
+                                          <option value="{{label.valuetype}}">{{label.valuetype}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Language</h4>
+                            <p> 
+                                <select style="width:100%" class="select2" name="label_language_dd" id="label_language_dd" required>
+                                    {% for language in languages %}
+                                      <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                    {% endfor %}
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- End Modal editing window for labels -->
+
+    <!-- Modal editing window for notes -->
+    <form action="" class="modal fade" id="notemodal" tabindex="-1" role="dialog" aria-labelledby="notemodal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="notemodaltitle">Manage notes</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Note</h4>
+                            <p><textarea class="form-control textarea textarea-resizable" rows="3" id="note_value" type="text" required></textarea><input id="note_id" type="hidden"/></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <h4>Type</h4>
+                                <p> 
+                                    <select style="width:100%" class="select2" name="note_valuetype_dd" id="note_valuetype_dd" required>
+                                        {% for note in valuetype_notes %}
+                                          <option value="{{note.valuetype}}">{{note.valuetype}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Language</h4>
+                            <p> 
+                                <select style="width:100%" class="select2" name="note_language_dd" id="note_language_dd" required>
+                                    {% for language in languages %}
+                                      <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                    {% endfor %}
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- End Modal editing window for notes -->
+
+    <!-- Modal editing window for related_value -->
+    <form action="" class="modal fade" id="related_valuemodal" tabindex="-1" role="dialog" aria-labelledby="related_valuemodal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="related_valuemodaltitle">Manage Related Values</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Value</h4>
+                            <p><textarea class="form-control textarea textarea-resizable" rows="3" id="related_value_value" type="text" required></textarea><input id="related_value_id" type="hidden"/></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <h4>Type</h4>
+                                <p> 
+                                    <select style="width:100%" class="select2" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required>
+                                        {% for related_value in valuetype_related_values %}
+                                          <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Language</h4>
+                            <p> 
+                                <select style="width:100%" class="select2" name="related_value_language_dd" id="related_value_language_dd" required>
+                                    {% for language in languages %}
+                                      <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                    {% endfor %}
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- End Modal editing window for related_value -->
+
+    <div action="" class="modal fade" id="confirm_delete_modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog confirm-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Are you ready to delete this?</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
+                    <button id="confirm_delete_yes" class="btn-u btn-u-primary" href="#" data-id="" data-action="delete">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% include "add_concept.htm" %}
+
+{% endblock content %}
+
+{% block javascript %}
+<!-- JS Global Compulsory -->           
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/bootstrap/js/bootstrap.min.js"></script> 
+
+<!-- JS Implementing Plugins -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/back-to-top.js"></script>
+
+<!-- JS Page Level -->           
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/unify/js/app.js"></script>
+
+<!-- JQUERY SELECT2 INPUT -->
+<script src="{{ STATIC_URL }}js/ui_frameworks/select2/select2.min.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+    });
+
+    if (typeof Arches != 'object') {Arches = {};}
+    Arches.createNamespace = function(stringToParse) {var parts = [], root = window, part, i, j, ln, subLn;parts = parts.concat(stringToParse.split('.'));for (j = 0, subLn = parts.length; j < subLn; j++) {part = parts[j];if (typeof part !== 'string') {root = part;} else {if (!root[part]) {root[part] = {};}root = root[part];}}return root;}
+
+
+    //Select2 Simple Search initialize
+    $(".select2").each(function(index, ele){
+        if(this.id === 'SimpleSearch'){
+            $(this).select2({
+                minimumResultsForSearch: 10
+            });
+        }else{
+            $(this).select2({
+                minimumResultsForSearch: -1
+            });
+        }
+    });
+
+
+
+</script>
+<!--[if lt IE 9]>
+    <script src="{{ STATIC_URL }}js/ui_frameworks/respond.js"></script>
+<![endif]-->
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/jqtree/tree.jquery.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/sky-forms/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/unify/js/plugins/validation.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        Arches.createNamespace('Arches.RDM.concept.report');
+        Arches.createNamespace('Arches.RDM.concept.label');
+        Arches.createNamespace('Arches.RDM.concept.note');
+        Arches.createNamespace('Arches.RDM.concept.related_value');
+
+        Arches.RDM.tree = $('#jqtree').tree({
+            dragAndDrop: true,
+            dataUrl: "{% url 'concept_tree' %}" + ('{{conceptid}}' === ''?'':"?node={{conceptid}}"),
+            data: [],
+            autoOpen: true
+        });
+
+        Arches.RDM.loadConceptReport = function(conceptid){
+            $('#concept_report_loading').removeClass('hidden');
+            $('#concept_report').addClass('hidden');
+            $.ajax({
+                url:'../Concepts/' + conceptid + '?f=html',
+                success:function(response){
+                    $('#concept_report_loading').addClass('hidden');
+                    $('#concept_report').removeClass('hidden');
+                    $('#concept_report').html(response);
+                }
+            });
+        };
+
+        Arches.RDM._selectedConcept = '{{conceptid}}';
+        Arches.RDM.getSelectedConcept = function(){
+            //return Arches.RDM.tree.tree('getSelectedNode');
+            return Arches.RDM._selectedConcept;
+        };
+        Arches.RDM.setSelectedConcept = function(conceptid){
+            var node = Arches.RDM.tree.tree('getNodeById', conceptid);
+            if(node){
+                // collapse the node while it's loading
+                if (!node.load_on_demand){
+                    Arches.RDM.tree.tree('toggle', node);                     
+                }
+                $(node.element).addClass('jqtree-loading');
+            }
+
+            if(conceptid !== ''){
+                Arches.RDM._selectedConcept = conceptid;
+                window.history.pushState({}, "conceptid", conceptid);
+                Arches.RDM.loadConceptReport(conceptid);                
+            }
+
+            Arches.RDM.tree.tree(
+                'loadDataFromUrl', 
+                "{% url 'concept_tree' %}" + "?node=" + conceptid,
+                null,
+                function() {
+                    var tree = Arches.RDM.tree.tree('getTree');
+                    var conceptid = Arches.RDM.getSelectedConcept()
+                    if (conceptid === ''){
+                        // get the top level concept from the tree
+                        conceptid = tree.children[0].id;
+                        Arches.RDM._selectedConcept = conceptid;
+                        window.history.pushState({}, "conceptid", conceptid);
+                        Arches.RDM.loadConceptReport(conceptid);
+                    }
+                    
+                    var node = Arches.RDM.tree.tree('getNodeById', conceptid);
+                    Arches.RDM.tree.tree('selectNode', node);
+                    Arches.RDM.tree.tree('scrollToNode', node);
+                }
+            );
+        };
+
+        Arches.RDM.setSelectedConcept('{{conceptid}}');
+
+
+        Arches.RDM.saveValue = function(data, successCallback, errorCallback){
+            $.ajax({
+                type: "POST",
+                url: "{% url 'concept_value' '' %}",
+                data: {'json': JSON.stringify(data)},
+                success: successCallback,
+                error: errorCallback
+            });
+        };
+        Arches.RDM.deleteValue = function(valueid, successCallback, errorCallback){
+            $.ajax({
+                type: "DELETE",
+                url: "{% url 'concept_value' '' %}" + valueid,
+                success: successCallback,
+                error: errorCallback
+            });
+        };
+        Arches.RDM.addConcept = function(data, successCallback, errorCallback){
+            $.ajax({
+                type: "POST",
+                url: "{% url 'concept' '' %}" ,
+                data: JSON.stringify(data),
+                success: successCallback,
+                error: errorCallback
+            });                
+        };
+        Arches.RDM.deleteConcept = function(data, successCallback, errorCallback){
+            $.ajax({
+                type: "DELETE",
+                url: "{% url 'concept' '' %}" + data,
+                success: successCallback,
+                error: errorCallback
+            });                
+        };
+        Arches.RDM.moveConcept = function(event, successCallback, errorCallback){
+            console.log('moved_node', event.move_info.moved_node);
+            console.log('target_node', event.move_info.target_node);
+            console.log('position', event.move_info.position); // possible values: inside, before, after
+            console.log('previous_parent', event.move_info.previous_parent);
+
+            var move_info = event.move_info;
+            if((move_info.position !== 'inside' && move_info.previous_parent.id === move_info.target_node.parent.id) || 
+                (move_info.position === 'inside' && move_info.previous_parent.id === move_info.target_node.id)){
+                // here we're just re-ordering nodes
+            }else{
+                event.preventDefault();
+                if (confirm('Are you sure you want to move this concept to a new parent?')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'concept_relation' %}" ,
+                        data: JSON.stringify({
+                            'conceptid': move_info.moved_node.id, 
+                            'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id, 
+                            'current_parent_conceptid': move_info.previous_parent.id
+                        }),
+                        success: function(){
+                            successCallback();
+                            var data = JSON.parse(this.data);
+
+                            if(Arches.RDM.getSelectedConcept() === data.conceptid){
+                                Arches.RDM.concept.report.reload();
+                            }
+                        },
+                        error: errorCallback
+                    });   
+                }
+            }             
+        };
+
+        Arches.RDM.concept.report.reload = function(){
+            Arches.RDM.loadConceptReport(Arches.RDM.getSelectedConcept());
+        };
+
+        Arches.RDM.concept.reload = function(){
+            Arches.RDM.setSelectedConcept(Arches.RDM.getSelectedConcept());
+        };
+
+        // bind 'tree.click' event
+        Arches.RDM.tree.bind(
+            'tree.click',
+            function(event) {
+                // The clicked node is 'event.node'
+                var node = event.node;
+                if (Arches.RDM.getSelectedConcept() !== node.id){
+                    Arches.RDM.setSelectedConcept(node.id);                    
+                }else{
+                    event.preventDefault();
+                }
+            }
+        );
+
+        // bind 'tree.click' event
+        Arches.RDM.tree.bind(
+            'tree.move',
+            function(event) {
+                Arches.RDM.moveConcept(event, function(){
+                    event.move_info.do_move();
+                }, function(){
+                    alert('well that didn\'t work...');
+                });
+            }
+        );
+
+        // LABEL EDITOR 
+
+        Arches.RDM.concept.label.editor = $('#labelmodal');
+        Arches.RDM.concept.label.editor.on('show.bs.modal', function (e) {
+            var data = $(e.relatedTarget).data();
+            if(data.action === 'edit'){
+                $('#labelmodaltitle').text('Edit Label');
+                $('#label_value').val(data.label_value);
+                $('#label_id').val(data.label_id);
+                $('#label_valuetype_dd').select2("val", data.label_type);
+                $('#label_language_dd').select2("val", data.label_language);
+            }
+
+            if(data.action === 'add'){
+                $('#labelmodaltitle').text('Add New Label');
+                $('#label_value').val('');
+                $('#label_id').val('');
+                $('#label_valuetype_dd').select2("val", '');
+                //$('#label_language_dd').select2("val", '');
+            }
+        });
+        Arches.RDM.concept.label.editor.validate({
+            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+            rules: {
+                // element_name: value
+                label_value: "required",
+                label_valuetype_dd: "required",
+                label_language_dd: "required"
+            },
+            submitHandler: function(form) {
+                var data = {};
+                data.value = $('#label_value').val();
+                data.id = $('#label_id').val();
+                data.conceptid = Arches.RDM.getSelectedConcept();
+                data.valuetype = $('#label_valuetype_dd').select2('val');
+                data.datatype = 'text';
+                data.language = $('#label_language_dd').select2('val');
+
+                Arches.RDM.saveValue(data, function(data){
+                    Arches.RDM.concept.label.editor.modal('hide');
+                    Arches.RDM.concept.reload();
+                }, null);
+            }
+        });
+
+
+        // NOTE EDITOR 
+        
+        Arches.RDM.concept.note.editor = $('#notemodal');
+        Arches.RDM.concept.note.editor.on('show.bs.modal', function (e) {
+            var data = $(e.relatedTarget).data();
+            if(data.action === 'edit'){
+                $('#notemodaltitle').text('Edit Note');
+                $('#note_value').val(data.note_value);
+                $('#note_id').val(data.note_id);
+                $('#note_valuetype_dd').select2("val", data.note_type);
+                $('#note_language_dd').select2("val", data.note_language);
+            }
+
+            if(data.action === 'add'){
+                $('#notemodaltitle').text('Add New Note');
+                $('#note_value').val('');
+                $('#note_id').val('');
+                $('#note_valuetype_dd').select2("val", '');
+                //$('#note_language_dd').select2("val", '');
+            }
+        });
+        Arches.RDM.concept.note.editor.validate({
+            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+            rules: {
+                // element_name: value
+                note_value: "required",
+                note_valuetype_dd: "required",
+                note_language_dd: "required"
+            },
+            submitHandler: function(form) {
+                var data = {};
+                data.value = $('#note_value').val();
+                data.id = $('#note_id').val();
+                data.conceptid = Arches.RDM.getSelectedConcept();
+                data.valuetype = $('#note_valuetype_dd').select2('val');
+                data.datatype = 'text';
+                data.language = $('#note_language_dd').select2('val');
+
+                Arches.RDM.saveValue(data, function(data){
+                    Arches.RDM.concept.note.editor.modal('hide');
+                    Arches.RDM.concept.report.reload();
+                }, null);
+            }
+        });
+
+        // RELATED VALUE EDITOR 
+        
+        Arches.RDM.concept.related_value.editor = $('#related_valuemodal');
+        Arches.RDM.concept.related_value.editor.on('show.bs.modal', function (e) {
+            var data = $(e.relatedTarget).data();
+            if(data.action === 'edit'){
+                $('#related_valuemodaltitle').text('Edit Related Value');
+                $('#related_value_value').val(data.related_value_value);
+                $('#related_value_id').val(data.related_value_id);
+                $('#related_value_valuetype_dd').select2("val", data.related_value_type);
+                $('#related_value_language_dd').select2("val", data.related_value_language);
+            }
+
+            if(data.action === 'add'){
+                $('#related_valuemodaltitle').text('Add Related Value');
+                $('#related_value_value').val('');
+                $('#related_value_id').val('');
+                $('#related_value_valuetype_dd').select2("val", '');
+                //$('#related_value_language_dd').select2("val", '');
+            }
+        });
+        Arches.RDM.concept.related_value.editor.validate({
+            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+            rules: {
+                // element_name: value
+                related_value_value: "required",
+                related_value_valuetype_dd: "required",
+                related_value_language_dd: "required"
+            },
+            submitHandler: function(form) {
+                var data = {};
+                data.value = $('#related_value_value').val();
+                data.id = $('#related_value_id').val();
+                data.conceptid = Arches.RDM.getSelectedConcept();
+                data.valuetype = $('#related_value_valuetype_dd').select2('val');
+                data.datatype = 'text';
+                data.language = $('#related_value_language_dd').select2('val');
+
+                Arches.RDM.saveValue(data, function(data){
+                    Arches.RDM.concept.related_value.editor.modal('hide');
+                    Arches.RDM.concept.report.reload();
+                }, null);
+            }
+        });
+
+        // ADD CHILD CONCEPT EDITOR 
+        
+        Arches.RDM.concept.editor = $('#conceptmodal');
+        // Arches.RDM.concept.add_child.editor.on('show.bs.modal', function (e) {
+        //     var data = $(e.relatedTarget).data();
+        //     if(data.action === 'edit'){
+        //         $('#add_childmodaltitle').text('Edit Related Value');
+        //         $('#add_child_value').val(data.add_child_value);
+        //         $('#add_child_id').val(data.add_child_id);
+        //         $('#add_child_valuetype_dd').select2("val", data.add_child_type);
+        //         $('#add_child_language_dd').select2("val", data.add_child_language);
+        //     }
+
+        //     if(data.action === 'add'){
+        //         $('#add_childmodaltitle').text('Add Related Value');
+        //         $('#add_child_value').val('');
+        //         $('#add_child_id').val('');
+        //         $('#add_child_valuetype_dd').select2("val", '');
+        //         //$('#add_child_language_dd').select2("val", '');
+        //     }
+        // });
+        Arches.RDM.concept.editor.validate({
+            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+            rules: {
+                // element_name: value
+                label: "required",
+                language_dd: "required"
+            },
+            submitHandler: function(form) {
+                var data = {};
+                data.label = $(form).find("[name=label]").val();
+                data.note = $(form).find("[name=note]").val();
+                data.language = $(form).find("[name=language_dd]").select2('val');
+                data.parentconceptid = Arches.RDM.getSelectedConcept();
+
+                Arches.RDM.addConcept(data, function(data){
+                    Arches.RDM.concept.editor.modal('hide');
+                    Arches.RDM.concept.reload();
+                }, null);
+            }
+        });
+    
+
+        // CLICK LISTENER 
+
+        $(document).on('click', '#concept_report a' , function() {
+            var data = $(this).data();
+            if(data.action === 'delete' || data.action === 'delete_concept'){
+                $('#confirm_delete_modal .modal-title').text($(this).attr('title'));
+                $('#confirm_delete_modal .modal-body').text(data.message);
+                $('#confirm_delete_modal').modal('show');
+                $('#confirm_delete_yes').data('id', data.id);
+                $('#confirm_delete_yes').data('action', data.action);
+            }
+
+            if(data.action === 'viewconcept'){
+                Arches.RDM.setSelectedConcept(data.conceptid);
+            }
+        });
+        $('#confirm_delete_yes').on('click', function() {
+            var data = $(this).data();
+            if(data.action === 'delete'){
+                Arches.RDM.deleteValue(data.id, function(data){
+                    $('#confirm_delete_modal').modal('hide');
+                    Arches.RDM.concept.report.reload();
+                }, null);
+            }
+            if(data.action === 'delete_concept'){
+                Arches.RDM.deleteConcept(data.id, function(data){
+                    $('#confirm_delete_modal').modal('hide');
+                    Arches.RDM.concept.reload();
+                }, null);
+            }
+        });
+        $('#add_child_concept').on('click', function() {
+            Arches.RDM.addConcept()
+        });
+
+    });
+
+
+</script>
+
+
+{% endblock javascript %}

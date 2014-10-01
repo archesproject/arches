@@ -1,0 +1,132 @@
+﻿<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>ARCHES</title>
+    <link href="{{ STATIC_URL }}js/resources/css/my-ext-theme.css" type="text/css" rel="stylesheet"/>
+    <link href="{{ STATIC_URL }}css/Splash.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+    <div id="wrapper">
+
+	    <div id="header">
+            <div style="width:50%;float:left;">
+		        <div id="title-area">
+                    <div id="title">Arches</div>
+                    <div id="sub-title">Cultural Heritage Asset Management</div>
+                </div>
+            </div>
+            <div style="width:50%;float:left;text-align:right;">
+                <div id="header-nav-links">
+                    <div class="nav-link-container" style="width:55px;">
+                        <a href="#" class="nav-link">Help</a>
+                    </div>
+                    <div class="nav-link-container" style="width:95px;">
+                        <a href="#" class="nav-link">Feedback</a>
+                    </div>
+                    <div class="nav-link-container" style="width:75px;">
+                        <a href="#" class="nav-link">About</a>
+                    </div>
+                    <div class="nav-link-container" style="width:75px;">
+                        <a href="#" class="nav-link">Sign In</a>
+                    </div>
+                </div>
+            </div>    
+        </div><!-- #header-->
+
+	    <div id="content">
+            <div id="content-main">
+                <div class="desc-area">
+		            <div style="height:34px;">Uncover the Cultural Heritage</div>
+                    <div style="padding-bottom:5px;height:34px;">of Los Angeles</div>
+	            </div>
+                <div class="x-btn x-btn-fgi_button_orange-large x-icon-text-right x-btn-icon-text-right x-btn-fgi_button_orange-large-icon-text-right" style="width: 158px;height:36px;" onmouseover="this.className += 'x-over x-btn-over x-btn-fgi_button_orange-large-over over'" onmouseout="this.className = 'x-btn x-btn-fgi_button_orange-large x-icon-text-right x-btn-icon-text-right x-btn-fgi_button_orange-large-icon-text-right'">
+                    <em>
+                        <button type="button" hidefocus="true" role="button" autocomplete="off" style="width: 150px; " onclick="window.location='../Arches/index.htm'">
+                            <span id="launch-btn-text">Heritage Map</span>
+                        </button>
+                    </em>
+                </div>
+            </div>
+            <div id="content-news">
+                <div id="news-header">Latest News</div>
+                <div id="news-content"><table width="100%"><tbody><tr>
+                    <td width="33%" style="padding-right:20px;">
+                        <div class="news-date">June 10, 2012</div>
+                        <div class="news-title">GCI Hosts Arches Summit</div>
+                        <div class="news-description">This is where some text goes. This is where some text goes. This is where some text goes. This is where some text goes...</div>
+                    </td>
+                    <td width="33%" style="padding-right:20px;">
+                        <div class="news-date">June 1, 2012</div>
+                        <div class="news-title">Farallon Finishes Mockup</div>
+                        <div class="news-description">This is where some text goes. This is where some text goes. This is where some text goes. This is where some text goes...</div>
+                    </td>
+                    <td width="33%" style="padding-right:20px;">
+                        <div class="news-date">May 21, 2012</div>
+                        <div class="news-title">Belgian Beer Powers Devs</div>
+                        <div class="news-description">This is where some text goes. This is where some text goes. This is where some text goes. This is where some text goes...</div>
+                    </td>
+                </tr></tbody></table></div>
+            </div>
+        </div><!-- #content-->
+
+	    <div id="footer"><table width="100%"><tbody><tr>
+		    <td width="33%" style="vertical-align:top;"><div id="footer-logos-left">
+                <div id="arches-footer-logo">
+                    <div class="footer-logo-title">Arches is Open Source!</div>
+                    <div class="footer-logo-link"><a href="#">Download the source code</a></div>
+                </div>
+                <div id="farallon-footer-logo">
+                    <div>Initial Arches development by</div>
+                    <div>Farallon Geographics</div>
+                </div>
+            </div></td>
+            <td width="33%" style="vertical-align:top;">
+                <div id="footer-nav-links">
+                    <div class="nav-link-container" style="width:65px;">
+                        <a href="#" class="nav-link">About</a>
+                    </div>
+                    <div class="nav-link-container" style="width:85px;">
+                        <a href="#" class="nav-link">Feedback</a>
+                    </div>
+                    <div class="nav-link-container" style="width:55px;">
+                        <a href="#" class="nav-link">Help</a>
+                    </div>
+                </div>
+            </td>
+            <td width="33%" style="vertical-align:top;"><div>
+                <div class="footer-logo-title">Partners:</div>
+                <div style="padding:5px;">
+                    <div id="getty-logo"></div>
+                    <div id="wmf-logo"></div>
+                </div>
+            </div></td>
+	    </tr></tbody></table></div><!-- #footer -->
+
+    </div><!-- #wrapper -->
+</body>
+<script type="text/javascript">
+    if (navigator.userAgent.indexOf("MSIE 9.0") > -1) {
+        document.body.className += " x-ie9";
+    }
+</script>
+</html>

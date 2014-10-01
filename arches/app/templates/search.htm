@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->  
+<head>
+    <title>Arches v3.0  |  HIP v1.0</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <!-- CSS Global Compulsory -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/style.css">
+
+    <!-- Arches CSS Global Compulsory -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/arches.css">
+
+    <!-- SmartAdmin Styles : Please note (smartadmin-production.css) was created using LESS variables -->
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/smartadmin-production.css">
+
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/line-icons/line-icons.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/sky-forms/version-2.0.1/css/custom-sky-forms.css">
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/sky-forms/version-2.0.1/css/sky-forms-ie8.css">
+    <![endif]-->
+
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/pages/page_search.css">
+
+    <!-- CSS Theme -->    
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/themes/dark-blue.css" id="style_color">
+
+    <!-- CSS Customization -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/unify/css/custom.css">
+
+    <!-- Mapping Library -->
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+
+</head> 
+
+<body class="scroll-y">
+
+    <div class="wrapper">
+        
+        <!--=== Header ===-->    
+        <div class="header">
+            
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="container">
+                    
+                    <!-- Topbar Message -->
+                    <div class="arches-loginbar pull-left">
+                        
+                        <a href="http://www.archesproject.org">Arches</a>
+                        Cultural Heritage Inventory
+
+                    </div>
+
+                    <!-- Topbar Navigation -->
+                    <ul class="loginbar pull-right">
+                        <li>
+                            <i class="fa fa-globe"></i>
+                            <a>Languages</a>
+                            <ul class="lenguages">
+                                <li class="active">
+                                    <a href="#">English <i class="fa fa-check"></i></a> 
+                                </li>
+                                <li><a href="#">Spanish</a></li>
+                                <li><a href="#">Russian</a></li>
+                                <li><a href="#">German</a></li>
+                            </ul>
+                        </li>
+                        <li class="topbar-devider"></li>   
+                        <li><a href="page_faq.html">Help</a></li>  
+                        <li class="topbar-devider"></li>   
+                        <li><a href="page_login.html">Login</a></li>   
+                    </ul>
+                    <!-- End Topbar Navigation -->
+                </div>
+            </div>
+            <!-- End Topbar -->
+        
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="fa fa-bars"></span>
+                        </button>
+                        <a class="navbar-brand" href="index.html">
+                            <img id="logo-header" class="arches-logo" src="assets/img/arches_logo.png" alt="Logo">
+                        </a>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse navbar-responsive-collapse">
+                        <ul class="nav navbar-nav">
+                            
+                            <!-- Home -->
+                            <li class="">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Home
+                                </a>
+                            </li>
+                            <!-- End Home -->
+
+                            <!-- New Project-->
+                            <li class="active">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Search
+                                </a>
+                            </li>
+                            <!-- End Project-->
+
+                            <!-- Search-->
+                            <li class="">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Inventory
+                                </a>
+                            </li>
+                            <!-- End Search-->
+
+                             <!-- RDM-->
+                            <li class="">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reference Data Manager
+                                </a>
+                            </li>
+                            <!-- End Search-->
+
+                            <!-- Reports-->
+                            <li class="">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports
+                                </a>
+                            </li>
+                            <!-- End Reports -->
+
+                            <!-- Search Block -->
+                            <li>
+                                <i class="search fa fa-search search-btn"></i>
+                                <div class="search-open arches-search">
+
+                                    <div class="input-group animated fadeInDown">
+                                        <!-- Project Dropdown -->
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
+                                                    <select style="width:100%" class="select2" id="SimpleSearch">
+                                                        <option value="00">Find a Heritage Resource</option>
+                                                        <option value="AK">Resource 1</option>
+                                                        <option value="HI">Resource 2</option>
+                                                        <option value="CA">Resource 3</option>    
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>  
+                                        <!-- End Project Dropdown -->
+                                    </div>
+                                </div>    
+                            </li>
+                            <!-- End Search Block -->
+                        </ul>
+                    </div><!--/navbar-collapse-->
+                </div>    
+            </div>            
+            <!-- End Navbar -->
+
+        </div>
+        <!--=== End Header ===-->     
+
+        
+        <!--=== Search Block ===-->
+        <div class="search-block" style="padding-bottom: 38px; padding-top: 38px;">
+            
+            <!-- Search Terms -->
+            <div class="container">
+                <div class="col-xs-12 col-md-8 col-md-offset-2">
+                    
+                    <!-- Filter Selector -->
+                    <h2><span class="pull-left">Filter By</span></h2>&nbsp;
+
+                    <!-- Filter Input -->
+                    <div class="input-group pull-left">
+                        <input type="text" class="form-control" placeholder="Try something like... Castle">
+                        <span class="input-group-btn">
+                            <button class="btn-u" type="button" title="Add Filter"><i class="fa fa-plus"></i></button>
+                        </span>
+                    </div>
+                    <!-- End FIlter Input -->
+                </div>
+            </div>
+            <!-- End Search Terms -->  
+
+
+            <!-- Counters -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="arches-counters">
+                            <span class="counter">52147</span>   
+                            <h4 class="arches-counter-category">Historic Resources</h4>
+                        </div>    
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="arches-counters">
+                            <span class="counter">24583</span> 
+                            <h4 class="arches-counter-category">Activities</h4>
+                        </div>    
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="arches-counters">
+                            <span class="counter">7349</span>
+                            <h4 class="arches-counter-category">Actors</h4>
+                        </div>    
+                    </div>
+                    <div class="col-xs-6 col-sm-3">
+                        <div class="arches-counters">
+                            <span class="counter">87904</span>
+                            <h4 class="arches-counter-category">Information Resources</h4>
+                        </div>    
+                    </div>
+                </div>            
+            </div>
+            <!-- End COunters -->
+
+        </div>    
+        <!--=== End Search Block ===-->
+            
+
+        <!-- AJAX Search Term Results Panel -->
+        <div class="container hidden">
+            <div class="row">
+                <div class="col-xs-12 col-md-8 col-md-offset-2">
+                    <div class="right-inner arches-box-grey-border arches-search-terms-panel">
+                    
+                        <!-- Name/Address Term -->
+                        <div class="margin-bottom-0">
+                            <dl class="">
+                                <dt class="">Name/Address Terms</dt>
+                                <dd class="">
+                                    <a href="#">1122 Castle Avenue</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">566 Castle Street</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">Castle Wolfenstein</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">Castle Anthrax</a>
+                                </dd>
+                            </dl>
+                        </div>
+                        <!-- End Name/Address Term -->
+
+                        <hr class="margin-10 margin-right-10">
+
+                        <!-- Archetectural Type Term -->
+                        <div class="margin-bottom-10">
+                            <dl>
+                                <dt>Architectural Types </dt>
+                                <dd class="">
+                                    <a href="#" title="Edit this label">Castle</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">Castlation</a>
+                                </dd>
+                            </dl>
+                        </div>
+                        <!-- Archetectural Type Term -->
+
+                        <hr class="margin-10 margin-right-10">
+
+                        <!-- Archetectural Type Term -->
+                        <div class="margin-bottom-10">
+                            <dl>
+                                <dt>Material Types </dt>
+                                <dd class="">
+                                    <a href="#" title="Edit this label">Castle Limestone</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">Castle Hill Gneiss</a>
+                                </dd>
+                                <dd class="">
+                                    <a href="#">Harbor Castle Granite</a>
+                                </dd>
+                            </dl>
+                        </div>
+                        <!-- Archetectural Type Term -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End AJAX Search Term Results Panel -->
+        
+
+            
+        <!--=== Search Results ===-->
+        <div class="container s-results margin-bottom-50">
+            <div class="row">
+                
+                <!-- Filters -->
+                <div class=" col-xs-12 col-md-4 related-search" style="border-right-width: 0px;">
+                    <div class="row">
+                        
+                        <!-- Applied Filters -->
+                        <div class="col-sm-6 col-md-12">
+                            <h3>Resource Filters</h3>
+                            <ul class="list-unstyled sky-form" style="border-width: 0px;">
+                                <li>
+                                    <label class="toggle"><input type="checkbox" name="checkbox-toggle-1" checked><i class="rounded-4x"></i></label>
+                                    <a href="#" title="Remove this filter"><i class="color-green fa fa-times-circle"></i></a>
+                                    <a href="#" title="Inverse this filter"><i class="color-red fa fa-minus-circle"></i></a>
+                                    <span class="color-red"><strong>Not</strong></span>
+                                    <span class="arches-filter-style">Type: Castle</span>
+
+                                </li>     
+                                 <li>
+                                    <label class="toggle"><input type="checkbox" name="checkbox-toggle-2" checked><i class="rounded-4x"></label>
+                                    <a href="#" title="Remove this filter"><i class="color-green fa fa-times-circle"></i></a>
+                                    <a href="#" title="Inverse this filter"><i class="color-green fa fa-minus-circle"></i></a>
+                                    <span class="hidden"> &nbsp; <strong>Not</strong></span> &nbsp;
+                                    <span class="arches-filter-style">Period: Early Middle Ages</span>
+                                </li>     
+                                <li>
+                                    <label class="toggle"><input type="checkbox" name="checkbox-toggle-3"><i class="rounded-4x"></label>
+                                    <a href="#" title="Remove this filter"><i class="color-green fa fa-times-circle"></i></a>
+                                    <a href="#" title="Inverse this filter"><i class="color-grey fa fa-minus-circle"></i></a>
+                                    <span class="hidden"> &nbsp; <strong>Not</strong></span> &nbsp;
+                                    <span class="arches-filter-style color-grey">Material: Cambrian Sandstone</span>
+                                </li>  
+                            </ul>
+                            <hr>
+                        </div> 
+                        <!-- End Applied Filters -->   
+
+                        <!-- Date Filters -->
+                        <div class="col-sm-6 col-md-12 arches-filter-style">
+                            <h3>Date Filters</h3>
+                            
+                            <form action="" id="" class="sky-form label-rounded arches-date-filter" style="border-width: 0px;">                                  
+                                <fieldset class="" style="padding: 0px;">                                  
+                                    
+                                    <!-- Date Slider -->
+                                    <section>
+                                        <label class="label rounded-x" style="margin-top: 0px;">Find Resources between (years before present): <span id="slider2-value1-rounded">-7500</span> to <span id="slider2-value2-rounded">0</span></label>  
+                                        <div id="slider2-rounded"></div>
+                                    </section>
+                                    <!-- End Date Slider -->
+
+                                    <!-- Start/End Date Calendars -->
+                                    <div class="row">   
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                <i class="icon-append fa fa-calendar"></i>
+                                                <input type="text" name="start" id="start" placeholder="Start date">
+                                            </label>
+                                        </section>
+                                        <section class="col col-6">
+                                            <label class="input">
+                                                <i class="icon-append fa fa-calendar"></i>
+                                                <input type="text" name="finish" id="finish" placeholder="End date">
+                                            </label>
+                                        </section>
+
+                                        <!-- Clear Dates Control -->
+                                        <div class="">
+                                            
+                                            <a href="#" title="Remove Date filter"><i class="color-green fa fa-times-circle" style="padding-left: 15px;"></i></a> &nbsp; <span class="arches-filter-style color-grey">Remove Date Filter</span>
+                                            
+                                            <span class="pull-right" style="margin-left: 0px;">
+                                                
+                                                <label class="toggle"><input type="checkbox" name="checkbox-toggle-1" checked><i class="rounded-4x" style="margin-top: -4px;"></i></label>
+                                            </span>
+
+                                        </div>
+
+                                    </div> 
+                                    <!-- End Calendars -->
+
+                                </fieldset>
+                            </form>
+
+                            <hr>
+                        </div> 
+                        <!-- End Date Filter -->
+
+                        <!-- Download -->
+                        <div class="hidden-xs hidden-sm col-md-12 arches-filter-style">
+                            <h3>Download</h3>
+                            <ul class="list-unstyled">
+                                <li><a href="#">CSV</a></li>     
+                                <li><a href="#">KML</a></li>        
+                            </ul>
+                        </div>  
+                        <!-- End Download -->  
+
+                    </div>        
+                </div>
+                <!--End Filters -->
+
+                <!-- Search Results -->
+                <div class="col-xs-12 col-md-8">
+                    
+                    <div class="tab-v1">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#searchresults" data-toggle="tab">Search Results</a></li>
+                            <li><a href="#searchmap" data-toggle="tab">Map</a></li>
+                        </ul>                
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="searchresults">
+                                
+                                <!-- Begin Inner Results -->
+                                <div class="inner-results">
+
+                                    <!-- Search Item -->
+                                    <h3><a href="#">Castle Wolfenstein</a></h3>
+                                    <ul class="list-inline up-ul">
+                                        <li><i class="color-sea glyphicon glyphicon-tower"></i>&nbsp;<span class="color-sea">Historic Resource</span></li>
+                                        <li><i class="color-green glyphicon fa fa-pencil"></i>&nbsp;<a href="#"><span class="color-green">Edit</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-book"></i>&nbsp;<a href="#"><span class="color-green">Report</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-sitemap"></i>&nbsp;<a href="#"><span class="color-green">Related Resources</span></a></li>
+                                        <li class="btn-group hidden">
+                                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                                <span class="color-green">More<i class="fa fa-caret-down"></i></span>&nbsp;
+                                                <span class="sr-only">Toggle Dropdown</span>                            
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="#">Share</a></li>
+                                                <li><a href="#">Similar</a></li>
+                                                <li><a href="#">Advanced search</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi, tempus in placerat non, auctor eu purus. Morbi suscipit... </p>
+                                    <ul class="list-inline down-ul">
+                                        <li>Entered April 14, 2014 by <a href="#">adalgity@getty.edu</a></li>
+                                        <li>Last Updated: June 1, 2014 by <a href="#">phil.carlisle@eh.com</a></li>
+                                    </ul>    
+                                </div>
+                                <!-- End Search Item -->
+
+                                <hr>
+
+                                <!-- Begin Inner Results -->
+                                <div class="inner-results">
+                                
+                                <!-- Search Item -->
+                                    <h3><a href="#">Castle Anthrax</a></h3>
+                                    <ul class="list-inline up-ul">
+                                        <li><i class="color-sea glyphicon glyphicon-tower"></i>&nbsp;<span class="color-sea">Historic Resource</span></li>
+                                        <li><i class="color-green glyphicon fa fa-pencil"></i>&nbsp;<a href="#"><span class="color-green">Edit</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-book"></i>&nbsp;<a href="#"><span class="color-green">Report</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-sitemap"></i>&nbsp;<a href="#"><span class="color-green">Related Resources</span></a></li>
+                                        <li class="btn-group hidden">
+                                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                                <span class="color-green">More<i class="fa fa-caret-down"></i></span>&nbsp;
+                                                <span class="sr-only">Toggle Dropdown</span>                            
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="#">Share</a></li>
+                                                <li><a href="#">Similar</a></li>
+                                                <li><a href="#">Advanced search</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi, tempus in placerat non, auctor eu purus. Morbi suscipit... </p>
+                                    <ul class="list-inline down-ul">
+                                        <li>Entered April 14, 2014 by <a href="#">adalgity@getty.edu</a></li>
+                                        <li>Last Updated: June 1, 2014 by <a href="#">phil.carlisle@eh.com</a></li>
+                                    </ul>    
+                                </div>
+                                <!-- End Search Item -->
+
+                                <hr>
+
+                                <!-- Begin Inner Results -->
+                                <div class="inner-results">
+                                    
+                                    <!-- Search Item -->
+                                    <h3><a href="#">George R. Castle</a></h3>
+                                    <ul class="list-inline up-ul">
+                                        <li><i class="color-sea fa fa-group"></i>&nbsp;<span class="color-sea">Actor</span></li>
+                                        <li><i class="color-green glyphicon fa fa-pencil"></i>&nbsp;<a href="#"><span class="color-green">Edit</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-book"></i>&nbsp;<a href="#"><span class="color-green">Report</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-sitemap"></i>&nbsp;<a href="#"><span class="color-green">Related Resources</span></a></li>
+                                        <li class="btn-group hidden">
+                                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                                <span class="color-green">More<i class="fa fa-caret-down"></i></span>&nbsp;
+                                                <span class="sr-only">Toggle Dropdown</span>                            
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="#">Share</a></li>
+                                                <li><a href="#">Similar</a></li>
+                                                <li><a href="#">Advanced search</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi, tempus in placerat non, auctor eu purus. Morbi suscipit... </p>
+                                    <ul class="list-inline down-ul">
+                                        <li>Entered April 14, 2014 by <a href="#">adalgity@getty.edu</a></li>
+                                        <li>Last Updated: June 1, 2014 by <a href="#">phil.carlisle@eh.com</a></li>
+                                    </ul>    
+                                </div>
+                                <!-- End Search Item -->
+
+                                <hr>
+
+                                <!-- Begin Inner Results -->
+                                <div class="inner-results">
+                                    
+                                    <!-- Search Item -->
+                                    <h3><a href="#">Avory Castle Designation</a></h3>
+                                    <ul class="list-inline up-ul">
+                                        <li><i class="color-sea fa fa-calendar-o"></i>&nbsp;<span class="color-sea">Activity</span></li>
+                                        <li><i class="color-green glyphicon fa fa-pencil"></i>&nbsp;<a href="#"><span class="color-green">Edit</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-book"></i>&nbsp;<a href="#"><span class="color-green">Report</span></a></li>
+                                        <li><i class="color-green glyphicon fa fa-sitemap"></i>&nbsp;<a href="#"><span class="color-green">Related Resources</span></a></li>
+                                        <li class="btn-group hidden">
+                                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                                                <span class="color-green">More<i class="fa fa-caret-down"></i></span>&nbsp;
+                                                <span class="sr-only">Toggle Dropdown</span>                            
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="#">Share</a></li>
+                                                <li><a href="#">Similar</a></li>
+                                                <li><a href="#">Advanced search</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi, tempus in placerat non, auctor eu purus. Morbi suscipit... </p>
+                                    <ul class="list-inline down-ul">
+                                        <li>Entered April 14, 2014 by <a href="#">adalgity@getty.edu</a></li>
+                                        <li>Last Updated: June 1, 2014 by <a href="#">phil.carlisle@eh.com</a></li>
+                                    </ul>    
+                                </div>
+                                <!-- End Search Item -->
+
+                                <div class="margin-bottom-30"></div>
+
+                                <div class="text-left">
+                                    <ul class="pagination">
+                                        <li><a href="#">«</a></li>
+                                        <li class="active"><a href="#">1</a></li>
+                                        <li><a href="#">2</a></li>
+                                        <li><a href="#">3</a></li>
+                                        <li><a href="#">...</a></li>
+                                        <li><a href="#">157</a></li>
+                                        <li><a href="#">158</a></li>
+                                        <li><a href="#">»</a></li>
+                                    </ul>                                                            
+                                </div>
+                            </div>
+                            
+
+
+                            <div class="tab-pane fade in" id="searchmap">
+                                
+                                <!-- Basic Map -->
+                                <div>
+                                    Import GPS
+                                </div>
+
+                                <div id="map" class="map margin-bottom-50"></div>
+                                <!-- End Basic Map -->
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Tab v1 -->  
+                  
+                </div><!--/col-md-10-->
+            </div>        
+        </div><!--/container-->     
+        <!--=== End Search Results ===-->
+
+        <!--=== Footer ===-->
+        <div class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 md-margin-bottom-40">
+                        <!-- About -->
+                        <div class="headline"><h2>About</h2></div>  
+                        <p class="margin-bottom-25 md-margin-bottom-40">Unify is an incredibly beautiful responsive Bootstrap Template for corporate and creative professionals.</p>    
+                        <!-- End About -->
+
+                        <!-- Monthly Newsletter -->
+                        <div class="headline"><h2>Monthly Newsletter</h2></div> 
+                        <p>Subscribe to our newsletter and stay up to date with the latest news and deals!</p>
+                        <form class="footer-subsribe">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Email Address">                            
+                                <span class="input-group-btn">
+                                    <button class="btn-u" type="button">Subscribe</button>
+                                </span>
+                            </div>                  
+                        </form>                         
+                        <!-- End Monthly Newsletter -->
+                    </div><!--/col-md-4-->  
+                    
+                    <div class="col-md-4 md-margin-bottom-40">
+                        <!-- Recent Blogs -->
+                        <div class="posts">
+                            <div class="headline"><h2>Recent Blog Entries</h2></div>
+                            <dl class="dl-horizontal">
+                                <dt><a href="#"><img src="assets/img/sliders/elastislide/6.jpg" alt="" /></a></dt>
+                                <dd>
+                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                </dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                            <dt><a href="#"><img src="assets/img/sliders/elastislide/10.jpg" alt="" /></a></dt>
+                                <dd>
+                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                </dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                            <dt><a href="#"><img src="assets/img/sliders/elastislide/11.jpg" alt="" /></a></dt>
+                                <dd>
+                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                </dd>
+                            </dl>
+                        </div>
+                        <!-- End Recent Blogs -->                    
+                    </div><!--/col-md-4-->
+
+                    <div class="col-md-4">
+                        <!-- Contact Us -->
+                        <div class="headline"><h2>Contact Us</h2></div> 
+                        <address class="md-margin-bottom-40">
+                            25, Lorem Lis Street, Orange <br />
+                            California, US <br />
+                            Phone: 800 123 3456 <br />
+                            Fax: 800 123 3456 <br />
+                            Email: <a href="mailto:info@anybiz.com" class="">info@anybiz.com</a>
+                        </address>
+                        <!-- End Contact Us -->
+
+                        <!-- Social Links -->
+                        <div class="headline"><h2>Stay Connected</h2></div> 
+                        <ul class="social-icons">
+                            <li><a href="#" data-original-title="Feed" class="social_rss"></a></li>
+                            <li><a href="#" data-original-title="Facebook" class="social_facebook"></a></li>
+                            <li><a href="#" data-original-title="Twitter" class="social_twitter"></a></li>
+                            <li><a href="#" data-original-title="Goole Plus" class="social_googleplus"></a></li>
+                            <li><a href="#" data-original-title="Pinterest" class="social_pintrest"></a></li>
+                            <li><a href="#" data-original-title="Linkedin" class="social_linkedin"></a></li>
+                            <li><a href="#" data-original-title="Vimeo" class="social_vimeo"></a></li>
+                        </ul>
+                        <!-- End Social Links -->
+                    </div><!--/col-md-4-->
+                </div>
+            </div> 
+        </div><!--/footer-->
+        <!--=== End Footer ===-->
+
+        <!--=== Copyright ===-->
+        <div class="copyright">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">                     
+                        <p>
+                            2014 &copy; Unify. ALL Rights Reserved. 
+                            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">  
+                        <a href="index.html">
+                            <img class="pull-right" style="height: 32px;" id="logo-footer" src="assets/img/arches_logo.png" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div> 
+        </div><!--/copyright--> 
+        <!--=== End Copyright ===-->
+    </div><!--/End Wrapepr-->
+
+<!-- JS Global Compulsory -->           
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/bootstrap/js/bootstrap.min.js"></script> 
+
+<!-- JS Page Level -->                    
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/unify/js/app.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/unify/js/plugins/form-sliders.js"></script>
+
+<script src="assets/plugins/bootstrap-slider/bootstrap-slider.min.js"></script>
+
+<script src="{{ STATIC_URL }}js/ui_frameworks/sky-forms/version-2.0.1/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui_frameworks/unify/js/plugins/datepicker.js"></script>
+
+<!-- JQUERY SELECT2 INPUT -->
+<script src="assets/plugins/select2/select2.min.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+        FormSliders.initFormSliders();
+        Datepicker.initDatepicker();
+
+    });
+
+
+    //Select2 Simple Search initialize
+    $("#SimpleSearch").select2({
+    minimumResultsForSearch: 10
+    });
+
+</script>
+
+<!-- Mapping Plugins --> 
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script type="text/javascript" src="assets/plugins/gmap/gmap.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+    });
+</script>
+<!--[if lt IE 9]>
+    <script src="assets/plugins/respond.js"></script>
+<![endif]-->
+
+</body>
+</html> 
