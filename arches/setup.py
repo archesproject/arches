@@ -56,7 +56,7 @@ def install():
             pass
 
         download_elasticsearch()
-        arches_version()
+        get_version()
 
 def confirm_system_requirements():
     # CHECK PYTHON VERSION
