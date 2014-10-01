@@ -75,7 +75,7 @@ class Command(BaseCommand):
 
         """
 
-        module = import_module('arches.app.packages.%s.setup' % package_name)
+        module = import_module('%s.setup' % package_name)
         install = getattr(module, 'install')
 
         install(settings.ROOT_DIR) 
