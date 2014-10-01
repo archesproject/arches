@@ -2,5 +2,10 @@ syntax: glob
 
 *.pyc
 *.zip
+*.sublime*
+*.egg
 version.py
 virtualenv/ENV
+install_db.sql
+truncate_db.sql
+arches.egg-info
