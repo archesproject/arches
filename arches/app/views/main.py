@@ -23,7 +23,6 @@ from django.conf import settings
 def index(request):
     return render_to_response('pages/index.htm', {
             'main_script': 'index',
-            'main_css': 'css/main.css',
             'active_page': 'Home'
         },
         context_instance=RequestContext(request))
@@ -31,8 +30,6 @@ def index(request):
 
 def login_page(request):
     return render_to_response('pages/login.htm', {
-            'main_script': 'login',
-            'main_css': 'css/main.css'
         },
         context_instance=RequestContext(request))
 

@@ -18,7 +18,11 @@
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
+    {% if main_css %}
     <link rel="stylesheet" href="{% static main_css %}">
+    {% else %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% endif %}
     {% endblock css%}
 
 </head> 
@@ -346,8 +350,10 @@
                     };
                 });
 
+                {% if main_script %}
                 // main page script require
                 require(["{{ main_script }}"]);
+                {% endif %}
             });
         });
     </script>
