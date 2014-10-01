@@ -3,7 +3,7 @@ from setuptools import setup, find_packages  # Always prefer setuptools over dis
 from codecs import open  # To use a consistent encoding
 from os import path
 from setuptools.command.install import install
-from arches.setup import import get_version
+from arches.setup import get_version
 
 try:
     from arches.setup import install as arches_install
