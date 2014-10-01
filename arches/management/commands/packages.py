@@ -22,11 +22,9 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.importlib import import_module
-import os, sys, zipfile, subprocess
+import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
-from arches.management.commands import utils
-from fabric.api import local, lcd
 
 class Command(BaseCommand):
     """
@@ -46,7 +44,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
-        package_name = settings.PACKAGE
+        package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'setup':
@@ -146,22 +144,24 @@ class Command(BaseCommand):
         """
 
         db_settings = settings.DATABASES['default']
-        db_settings['truncate_path'] = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        db_settings['install_path'] = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')        
+        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
+        install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
+        db_settings['truncate_path'] = truncate_path
+        db_settings['install_path'] = install_path   
         
-        truncate_db.create_sqlfile(db_settings)
-        install_db.create_sqlfile(db_settings)
+        truncate_db.create_sqlfile(db_settings, truncate_path)
+        install_db.create_sqlfile(db_settings, install_path)
         
-        local('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-        local('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
 
     def generate_procfile(self, package_name):
         """
         Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
 
         """
+
         python_exe = os.path.abspath(sys.executable)
-        print python_exe
 
         with open(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), 'w') as f:
             f.write('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))

@@ -6,7 +6,7 @@ from django.template import Context
 from django.conf import settings
 from arches.management.commands import utils
 
-def create_sqlfile(database_settings):
+def create_sqlfile(database_settings, path_to_file):
 	context = Context(database_settings)
 
 	postgres_version = subprocess.check_output(["psql", "--version"])
@@ -30,7 +30,7 @@ def create_sqlfile(database_settings):
 	"\n"
 	)
 
-	utils.write_to_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql'), t.render(context));
+	utils.write_to_file(path_to_file, t.render(context));
 
 
 
