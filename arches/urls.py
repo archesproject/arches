@@ -27,7 +27,7 @@ from django.conf.urls.i18n import patterns
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns += patterns('',
+urlpatterns = patterns('',
     url(r'^$', 'arches.app.views.main.index'),
     url(r'^index.htm', 'arches.app.views.main.index'),
     url(r'^login_page/', 'arches.app.views.main.login_page', name='login_page'),

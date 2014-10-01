@@ -171,7 +171,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, 'media'),
+    os.path.join(ROOT_DIR, 'app', 'media'),
 )
 
 # List of finder classes that know how to find static files in
@@ -226,7 +226,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, 'arches', 'app', 'templates'),
+    os.path.join(ROOT_DIR, 'app', 'templates'),
 
     # Adding a reference to error page templates because of issues we were seeing in amazon aws instances
     # http://stackoverflow.com/questions/13284443/django-template-error-500-html-on-amazon-ec2?rq=1
