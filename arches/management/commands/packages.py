@@ -77,8 +77,7 @@ class Command(BaseCommand):
 
         module = import_module('%s.setup' % package_name)
         install = getattr(module, 'install')
-
-        install(settings.ROOT_DIR) 
+        install() 
 
     def setup_elasticsearch(self, package_name, port=9200):
         """
