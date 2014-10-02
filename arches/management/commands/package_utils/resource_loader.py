@@ -12,7 +12,7 @@ from arches.app.models.models import RelatedResource
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 import collections
-# import ipdb
+
 
 class Row(object):
     def __init__(self, *args):
