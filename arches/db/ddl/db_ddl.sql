@@ -1811,6 +1811,34 @@ CREATE TABLE "values" (
 
 ALTER TABLE concepts."values" OWNER TO postgres;
 
+
+
+CREATE TABLE data.resource_x_resource
+(
+  resourcexid serial NOT NULL,
+  entityid1 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+  entityid2 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+  reason text,
+  relationshiptype uuid,
+  datestarted date,
+  dateended date,
+  CONSTRAINT pk_rsrc_x_rsrc PRIMARY KEY (resourcexid)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE data.resource_x_resource
+  OWNER TO postgres;
+
+
+
+
+
+-- TOC entry 213 (class 1259 OID 15704263)
+-- Dependencies: 8
+-- Name: information_themes; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
+--
+
 --
 -- TOC entry 230 (class 1259 OID 15704349)
 -- Dependencies: 3320 9
@@ -3069,3 +3097,16 @@ ALTER TABLE ONLY mapping_steps
 -- PostgreSQL database dump complete
 --
 
+-- Add keys for table data.resource_x_resource
+--
+-- TOC entry 3471 (class 0 OID 0)
+-- Dependencies: 240
+-- Name: relations_relationid_seq; Type: SEQUENCE OWNED BY; Schema: data; Owner: postgres
+--
+
+
+ALTER TABLE data.resource_x_resource ADD CONSTRAINT "fk_entities_entityid2.rsrc_x_rsrc" FOREIGN KEY ("entityid2") REFERENCES "data"."entities" ("entityid") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE data.resource_x_resource ADD CONSTRAINT "fk_entities_x_entities1.rsrc_x_rsrc" FOREIGN KEY ("entityid1") REFERENCES "data"."entities" ("entityid") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE data.resource_x_resource ADD CONSTRAINT "value_x_rsrc_x_rsrc" FOREIGN KEY ("relationshiptype") REFERENCES "concepts"."values" ("valueid") ON DELETE NO ACTION ON UPDATE NO ACTION;

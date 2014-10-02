@@ -35,6 +35,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
         if options['operation'] == 'build':
-            staticfiles.generate_files(rootpath)
+            staticfiles.generate_files(settings.PACKAGE_ROOT)
             if settings.STATIC_ROOT != '':
                 management.call_command('collectstatic', interactive=False)

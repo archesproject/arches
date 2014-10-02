@@ -758,3 +758,14 @@ class Relations(models.Model):
             return # can't insert duplicate values
         else:
             super(Relations, self).save(*args, **kwargs) # Call the "real" save() method.
+
+class RelatedResource(models.Model):
+    resourcexid = models.AutoField(primary_key=True)
+    entityid1 = models.TextField()
+    entityid2 = models.TextField()
+    reason = models.TextField()
+    relationshiptype = models.TextField()
+    datestarted = models.DateField()
+    dateended = models.DateField()
+    class Meta:
+        db_table = u'data"."resource_x_resource'
