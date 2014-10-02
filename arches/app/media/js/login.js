@@ -1,5 +1,6 @@
 require([
-    'jquery'
+    'jquery',
+    'bootstrap'
 ], function () {
     setTimeout(function() {
         $("#login-failed-alert").alert('close');
