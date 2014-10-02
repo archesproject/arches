@@ -47,27 +47,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-4 col-sm-offset-4">
+                        <form action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                            <div class="col-sm-4 col-sm-offset-4">
 
-                            <div class="input-group margin-bottom-20">
-                                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                                <input type="text" class="form-control" placeholder="Email">
-                            </div>
-
-                            <div class="input-group margin-bottom-20">
-                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                <input type="text" class="form-control" placeholder="Password">
-                            </div>
-              
-                            <div class="row">
-                                <div class="col-md-10 col-md-offset-1">
-                                    <button type="submit" class="btn-u btn-block margin-bottom-10">Log In</button>
-                                    <span>Don't Have Account? <a class="color-green margin-top-10 text-center" href="page_registration1.html">Sign Up!</a></span> 
+                                <div class="input-group margin-bottom-20">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" class="form-control" placeholder="Username" name='username'>
                                 </div>
-                            </div>
 
-                            <hr>
-                        </div>
+                                <div class="input-group margin-bottom-20">
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                    <input type="text" class="form-control" placeholder="Password" name='password'>
+                                </div>
+                  
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <button type="submit" class="btn-u btn-block margin-bottom-10">Log In</button>
+                                        <!-- Uncomment the below when automated sign up is made available -->
+                                        <!-- <span>Don't Have Account? <a class="color-green margin-top-10 text-center" href="page_registration1.html">Sign Up!</a></span>  -->
+                                    </div>
+                                </div>
+
+                                <div class="row" style="height:60px;">
+                                    <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger" role="alert">Invalid username and/or password.</div>
+                                </div>
+
+                                <hr>
+                            </div>
+                        </form>
                     </div>
 
                 </div>

@@ -29,8 +29,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'arches.app.views.main.index'),
-    url(r'^index.htm', 'arches.app.views.main.index'),
-    url(r'^login_page/', 'arches.app.views.main.login_page', name='login_page'),
+    url(r'^index.htm', 'arches.app.views.main.index', name='home'),
+    url(r'^auth/', 'arches.app.views.main.auth', name='auth'),
     url(r'^rdm/(?P<conceptid>.*)$', 'arches.app.views.concept.rdm', name='rdm'),
     
     url(r'^Entities/(?P<entityid>.*)$', 'arches.app.views.entity.Entities'),
@@ -43,11 +43,6 @@ urlpatterns = patterns('',
     url(r'^MapLayers/(?P<entitytypeid>.*)$', 'arches.app.views.maplayers.MapLayers', name="map_layers"),
     url(r'^Search', 'arches.app.views.main.search'),
     url(r'^TermSearch', 'arches.app.views.search.search_terms'),
-
-    url(r'^User/Login', 'arches.app.views.user.Login'),
-    url(r'^User/Logout', 'arches.app.views.user.Logout'),
-    url(r'^User/GetUser', 'arches.app.views.user.GetUser'),
-
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
