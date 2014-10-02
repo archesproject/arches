@@ -53,12 +53,9 @@ INSERT INTO d_relationtypes VALUES ('has authority document');
 INSERT INTO d_relationtypes VALUES ('includes');
 INSERT INTO d_relationtypes VALUES ('has collection');
 
-
-INSERT INTO conceptschemes(name, conceptschemeid) VALUES ('CORE ARCHES', '00000000-0000-0000-0000-000000000000');
-
-INSERT INTO concepts(conceptid, conceptschemeid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'CONCEPTS');
-INSERT INTO concepts(conceptid, conceptschemeid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'ENTITY TYPES');
-INSERT INTO concepts(conceptid, conceptschemeid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'AUTHORITY FILES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'AUTHORITY FILES');
 
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'has narrower concept');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'has narrower concept');

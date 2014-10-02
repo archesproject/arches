@@ -18,7 +18,11 @@
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
+    {% if main_css %}
     <link rel="stylesheet" href="{% static main_css %}">
+    {% else %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% endif %}
     {% endblock css%}
 
 </head> 
@@ -57,7 +61,10 @@
                         <li class="topbar-devider"></li>   
                         <li><a href="page_faq.html">Help</a></li>  
                         <li class="topbar-devider"></li>   
-                        <li><a href="{% url 'login_page' %}">Login</a></li>   
+                        <li>
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
+                        </li>
+                        
                     </ul>
                     <!-- End Topbar Navigation -->
                 </div>
@@ -88,7 +95,7 @@
                             {% block navitems %}
                             <!-- Home -->
                             <li class="{% if active_page = 'Home' %}active{% endif %}">
-                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="{% url 'home' %}">
                                     Home
                                 </a>
                             </li>
@@ -346,8 +353,10 @@
                     };
                 });
 
+                {% if main_script %}
                 // main page script require
                 require(["{{ main_script }}"]);
+                {% endif %}
             });
         });
     </script>

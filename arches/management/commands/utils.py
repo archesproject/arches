@@ -1,8 +1,9 @@
 import os
+import codecs
 
-def write_to_file(fileName, contents, mode = 'w'):
+def write_to_file(fileName, contents, mode='w', encoding='utf-8-sig', **kwargs):
     ensure_dir(fileName)
-    file = open(fileName, mode)
+    file = codecs.open(fileName, mode=mode, encoding=encoding, **kwargs)
     file.write(contents)
     file.close()
 
