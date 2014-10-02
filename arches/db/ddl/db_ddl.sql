@@ -196,58 +196,6 @@ ALTER FUNCTION app_metadata.get_i18n_value(p_key text, p_language text, p_widget
 SET search_path = concepts, pg_catalog;
 
 --
--- TOC entry 1258 (class 1255 OID 15704199)
--- Dependencies: 9 1863
--- Name: delete_conceptscheme(text); Type: FUNCTION; Schema: concepts; Owner: postgres
---
-
-CREATE FUNCTION delete_conceptscheme(p_conceptscheme text) RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-    Declare 
-	deletecount int = (select count(*) from concepts.concepts 
-			where conceptschemeid in 
-				(select conceptschemeid 
-				from concepts.conceptschemes 
-				where name = p_conceptscheme));
-    
-BEGIN
-
-
-delete from concepts.values
-where conceptid in (
-   select conceptid from concepts.concepts
-   where conceptschemeid in (
-	select conceptschemeid from concepts.conceptschemes
-	where name = p_conceptscheme));
-
-delete from concepts.relations
-where 
-   conceptidfrom in (
-   select conceptid from concepts.concepts
-   where conceptschemeid in (
-	select conceptschemeid from concepts.conceptschemes
-	where name = p_conceptscheme))
-   or
-   conceptidto in (
-   select conceptid from concepts.concepts
-   where conceptschemeid in (
-	select conceptschemeid from concepts.conceptschemes
-	where name = p_conceptscheme));
-
-delete from concepts.concepts
-where conceptschemeid in (select conceptschemeid from concepts.conceptschemes
-	where name = p_conceptscheme);
-
-
-    return deletecount::text||' concepts deleted from concept schema!';
-END;
-$$;
-
-
-ALTER FUNCTION concepts.delete_conceptscheme(p_conceptscheme text) OWNER TO postgres;
-
---
 -- TOC entry 1259 (class 1255 OID 15704200)
 -- Dependencies: 9 1863
 -- Name: get_conceptid(text); Type: FUNCTION; Schema: concepts; Owner: postgres
@@ -280,38 +228,6 @@ End;
 
 
 ALTER FUNCTION concepts.get_conceptid(p_label text) OWNER TO postgres;
-
---
--- TOC entry 1260 (class 1255 OID 15704201)
--- Dependencies: 9 1863
--- Name: get_conceptscheme_name(uuid); Type: FUNCTION; Schema: concepts; Owner: postgres
---
-
-CREATE FUNCTION get_conceptscheme_name(p_conceptid uuid) RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-
-Declare
-v_return text;
-
-BEGIN
-
- v_return = (
-select b.name 
-from concepts.concepts a, concepts.conceptschemes b
-where 1=1
-and a.conceptid = p_conceptid
-and a.conceptschemeid = b.conceptschemeid
-);
-
-Return v_return;
-
-End;
-
-  $$;
-
-
-ALTER FUNCTION concepts.get_conceptscheme_name(p_conceptid uuid) OWNER TO postgres;
 
 --
 -- TOC entry 1261 (class 1255 OID 15704202)
@@ -447,112 +363,42 @@ End;
 ALTER FUNCTION concepts.get_preferred_label(p_conceptid uuid, p_languageid text) OWNER TO postgres;
 
 --
--- TOC entry 1265 (class 1255 OID 15704206)
--- Dependencies: 9 1863
--- Name: insert_concept(text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
---
-
-CREATE FUNCTION insert_concept(p_conceptschemename text, p_label text, p_note text, p_legacyid text) RETURNS uuid
-    LANGUAGE plpgsql
-    AS $$
-    Declare 
-    v_conceptschemeid uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename);
-    v_conceptid uuid = public.uuid_generate_v1mc();
-    v_valueid uuid = public.uuid_generate_v1mc();
-    --user does not pass in languageid - default language used
-	v_languageid text = (select languageid from concepts.d_languages where isdefault = TRUE);
-    
-BEGIN
-
-  INSERT INTO concepts.concepts(conceptid, conceptschemeid, legacyoid)
-  VALUES (v_conceptid,v_conceptschemeid, p_legacyid);
-
-  INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-  VALUES (v_valueid, v_conceptid, 'prefLabel', 'text', p_label, v_languageid);
-
-  INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-  VALUES (v_valueid, v_conceptid, 'scopeNote', 'text', p_note, v_languageid);
-
-  return v_conceptid;
-    
-END;
-$$;
-
-
-ALTER FUNCTION concepts.insert_concept(p_conceptschemename text, p_label text, p_note text, p_legacyid text) OWNER TO postgres;
-
---
 -- TOC entry 1266 (class 1255 OID 15704207)
 -- Dependencies: 9 1863
 -- Name: insert_concept(text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
 --
 
-CREATE FUNCTION insert_concept(p_conceptschemename text, p_label text, p_note text, p_languageid text, p_legacyid text) RETURNS uuid
+CREATE FUNCTION insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text) RETURNS uuid
     LANGUAGE plpgsql
     AS $$
-    Declare 
-    v_conceptschemeid uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename);
+    Declare
     v_conceptid uuid = public.uuid_generate_v1mc();
-    v_valueid uuid = public.uuid_generate_v1mc();
-    --user passes in the language for label and note language
-  v_languageid text = p_languageid;
-    
-BEGIN
-
-  INSERT INTO concepts.concepts(conceptid, conceptschemeid, legacyoid)
-  VALUES (v_conceptid,v_conceptschemeid, p_legacyid);
-
-IF trim(p_label) is not null and p_label<>'' then
-  INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-  VALUES (v_valueid, v_conceptid, 'prefLabel', 'text', trim(initcap(p_label)), v_languageid);
-END IF;
-
-IF trim(p_note) is not null and p_note <> '' then 
-  INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-  VALUES (v_valueid, v_conceptid, 'scopeNote', 'text', p_note, v_languageid);
-END IF;  
-
-  return v_conceptid;
--- END IF;
-    
-END;
-$$;
-
-
-ALTER FUNCTION concepts.insert_concept(p_conceptschemename text, p_label text, p_note text, p_languageid text, p_legacyid text) OWNER TO postgres;
-
---
--- TOC entry 1267 (class 1255 OID 15704208)
--- Dependencies: 9 1863
--- Name: insert_label(text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
---
-
-CREATE FUNCTION insert_label(p_conceptschemename text, p_legacyid text, p_label text, p_labeltype text, p_languageid text) RETURNS uuid
-    LANGUAGE plpgsql
-    AS $$
-    Declare 
-    v_conceptschemeid uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename);
-    v_conceptid uuid = (select conceptid from concepts.concepts a where conceptschemeid = v_conceptschemeid and a.legacyoid = p_legacyid) ;
     v_valueid uuid = public.uuid_generate_v1mc();
     --user passes in the language for label and note language
     v_languageid text = p_languageid;
     
 BEGIN
 
-If v_languageid = '' then v_languageid = (select languageid from concepts.d_languages
-            where isdefault = true);
-end if;
+    INSERT INTO concepts.concepts(conceptid, legacyoid) VALUES (v_conceptid, p_legacyid);
 
-    INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-    VALUES (v_valueid, v_conceptid, p_labeltype, 'text', trim(initcap(p_label)), v_languageid);
+    IF trim(p_label) is not null and p_label<>'' then
+      INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
+      VALUES (v_valueid, v_conceptid, 'prefLabel', 'text', trim(initcap(p_label)), v_languageid);
+    END IF;
 
-    return v_labelid;
+    IF trim(p_note) is not null and p_note <> '' then 
+      INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
+      VALUES (v_valueid, v_conceptid, 'scopeNote', 'text', p_note, v_languageid);
+    END IF;  
+
+    return v_conceptid;
+-- END IF;
     
 END;
 $$;
 
 
-ALTER FUNCTION concepts.insert_label(p_conceptschemename text, p_legacyid text, p_label text, p_labeltype text, p_languageid text) OWNER TO postgres;
+ALTER FUNCTION concepts.insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text) OWNER TO postgres;
 
 --
 -- TOC entry 1268 (class 1255 OID 15704209)
@@ -560,42 +406,37 @@ ALTER FUNCTION concepts.insert_label(p_conceptschemename text, p_legacyid text, 
 -- Name: insert_relation(text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
 --
 
-CREATE FUNCTION insert_relation(p_conceptschemename1 text, p_legacyid1 text, p_relationtype text, p_conceptschemename2 text, p_legacyid2 text) RETURNS text
+CREATE FUNCTION insert_relation(p_legacyid1 text, p_relationtype text, p_legacyid2 text) RETURNS text
     LANGUAGE plpgsql
     AS $$
 
---!!! USE THIS FUNCTION WHEN EACH CONCEPT LIVE IN SEPERATE CONCEPTSCHEMES
-
     Declare 
-    v_conceptschemeid1 uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename1);
-    v_conceptschemeid2 uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename2);
     v_conceptidfrom uuid = null;
     v_conceptidto uuid = null;
     
 BEGIN
 
     v_conceptidfrom = (select conceptid from concepts.concepts c
-         where trim(legacyoid) = trim(p_legacyid1)
-           and c.conceptschemeid = v_conceptschemeid1);
-    v_conceptidto = (select conceptid from concepts.concepts c
-         where trim(legacyoid) = trim(p_legacyid2)
-           and c.conceptschemeid = v_conceptschemeid2);
+         where trim(legacyoid) = trim(p_legacyid1));
 
-  IF v_conceptidfrom is not null and v_conceptidto is not null and v_conceptidto <> v_conceptidfrom and v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM concepts.relations) then
-    INSERT INTO concepts.relations(relationid, conceptidfrom, conceptidto, relationtype)
-    VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype);
+    v_conceptidto = (select conceptid from concepts.concepts c
+         where trim(legacyoid) = trim(p_legacyid2));
+
+    IF v_conceptidfrom is not null and v_conceptidto is not null and v_conceptidto <> v_conceptidfrom and v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM concepts.relations) then
+      INSERT INTO concepts.relations(relationid, conceptidfrom, conceptidto, relationtype)
+      VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype);
     
-    return 'success!';
+      return 'success!';
   
-  ELSE
-    return 'fail! no relation inserted.';
-  END IF;
+    ELSE
+      return 'fail! no relation inserted.';
+    END IF;
 
 END;
 $$;
 
 
-ALTER FUNCTION concepts.insert_relation(p_conceptschemename1 text, p_legacyid1 text, p_relationtype text, p_conceptschemename2 text, p_legacyid2 text) OWNER TO postgres;
+ALTER FUNCTION concepts.insert_relation(p_legacyid1 text, p_relationtype text, p_legacyid2 text) OWNER TO postgres;
 
 --
 -- TOC entry 1269 (class 1255 OID 15704210)
@@ -603,12 +444,11 @@ ALTER FUNCTION concepts.insert_relation(p_conceptschemename1 text, p_legacyid1 t
 -- Name: insert_value(text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
 --
 
-CREATE FUNCTION insert_value(p_conceptschemename text, p_legacyid text, p_value text, p_valuetype text, p_datatype text) RETURNS uuid
+CREATE FUNCTION insert_value(p_legacyid text, p_value text, p_valuetype text, p_datatype text) RETURNS uuid
     LANGUAGE plpgsql
     AS $$
     Declare 
-    v_conceptschemeid uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename);
-    v_conceptid uuid = (select conceptid from concepts.concepts a where conceptschemeid = v_conceptschemeid and a.legacyoid = p_legacyid) ;
+    v_conceptid uuid = (select conceptid from concepts.concepts a where a.legacyoid = p_legacyid) ;
     v_valueid uuid = public.uuid_generate_v1mc();
     v_languageid text = (select languageid from concepts.d_languages where isdefault = TRUE limit 1);
     
@@ -634,36 +474,7 @@ END;
 $$;
 
 
-ALTER FUNCTION concepts.insert_value(p_conceptschemename text, p_legacyid text, p_value text, p_valuetype text, p_datatype text) OWNER TO postgres;
-
---
--- TOC entry 1270 (class 1255 OID 15704211)
--- Dependencies: 9 1863
--- Name: insert_value(text, text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
---
-
-CREATE FUNCTION insert_value(p_conceptschemename text, p_legacyid text, p_value text, p_valuetype text, p_datatype text, languageid text) RETURNS uuid
-    LANGUAGE plpgsql
-    AS $$
-    Declare 
-    v_conceptschemeid uuid = (select conceptschemeid from concepts.conceptschemes where name = p_conceptschemename);
-    v_conceptid uuid = (select conceptid from concepts.concepts a where conceptschemeid = v_conceptschemeid and a.legacyoid = p_legacyid) ;
-    v_valueid uuid = public.uuid_generate_v1mc();
-        
-BEGIN
-
-    
-
-    INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-    VALUES (v_valueid, v_conceptid, p_valuetype, p_datatype, p_value, p_languageid);
-
-    return v_valueid;
-    
-END;
-$$;
-
-
-ALTER FUNCTION concepts.insert_value(p_conceptschemename text, p_legacyid text, p_value text, p_valuetype text, p_datatype text, languageid text) OWNER TO postgres;
+ALTER FUNCTION concepts.insert_value(p_legacyid text, p_value text, p_valuetype text, p_datatype text) OWNER TO postgres;
 
 --
 -- TOC entry 1271 (class 1255 OID 15704212)
@@ -971,10 +782,10 @@ ALTER FUNCTION data.get_primaryname(p_entityid uuid) OWNER TO postgres;
 --
 -- TOC entry 1282 (class 1255 OID 15704223)
 -- Dependencies: 1863 10
--- Name: insert_entitytype(text, text, boolean, text, text, text, text, text, text, text, text, text); Type: FUNCTION; Schema: data; Owner: postgres
+-- Name: insert_entitytype(text, text, boolean, text, text, text, text, text, text, text, text); Type: FUNCTION; Schema: data; Owner: postgres
 --
 
-CREATE FUNCTION insert_entitytype(p_entitytypeid text, p_businesstablename text, p_publishbydefault boolean, p_icon text, p_defaultvectorcolor text, p_asset_entity text, p_conceptschemename text, p_note text, p_notelanguage text, p_entitynamelanguage text, p_entitynametype text, p_parentconceptlabel text) RETURNS text
+CREATE FUNCTION insert_entitytype(p_entitytypeid text, p_businesstablename text, p_publishbydefault boolean, p_icon text, p_defaultvectorcolor text, p_asset_entity text, p_note text, p_notelanguage text, p_entitynamelanguage text, p_entitynametype text, p_parentconceptlabel text) RETURNS text
     LANGUAGE plpgsql
     AS $$
     Declare 
@@ -991,7 +802,7 @@ BEGIN
     IF split_part(p_entitytypeid, '.', 1) != '' and split_part(p_entitytypeid, '.', 2) != '' THEN
         IF NOT EXISTS(SELECT entitytypeid FROM data.entity_types WHERE entitytypeid = p_entitytypeid) THEN
 
-        v_conceptid = (select concepts.insert_concept (p_conceptschemename, split_part(p_entitytypeid, '.', 1), p_note, p_notelanguage, upper(p_entitytypeid)));
+        v_conceptid = (select concepts.insert_concept (split_part(p_entitytypeid, '.', 1), p_note, p_notelanguage, upper(p_entitytypeid)));
 
         IF v_parentconceptid in (select conceptid from concepts.concepts) then
             INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
@@ -1019,7 +830,7 @@ END;
 $$;
 
 
-ALTER FUNCTION data.insert_entitytype(p_entitytypeid text, p_businesstablename text, p_publishbydefault boolean, p_icon text, p_defaultvectorcolor text, p_asset_entity text, p_conceptschemename text, p_note text, p_notelanguage text, p_entitynamelanguage text, p_entitynametype text, p_parentconceptlabel text) OWNER TO postgres;
+ALTER FUNCTION data.insert_entitytype(p_entitytypeid text, p_businesstablename text, p_publishbydefault boolean, p_icon text, p_defaultvectorcolor text, p_asset_entity text, p_note text, p_notelanguage text, p_entitynamelanguage text, p_entitynametype text, p_parentconceptlabel text) OWNER TO postgres;
 
 --
 -- TOC entry 1283 (class 1255 OID 15704224)
@@ -1170,9 +981,9 @@ $$;
 ALTER FUNCTION ontology.check_entitytypeid(p_entitytypeidfrom text, p_entitytypeidto text) OWNER TO postgres;
 
 --
--- TOC entry 1288 (class 1255 OID 15704229)
--- Dependencies: 11 1863
--- Name: insert_mapping(text, text, text, boolean, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- TOC entry 1289 (class 1255 OID 15704230)
+-- Dependencies: 1863 11
+-- Name: insert_mapping(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
 CREATE FUNCTION insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) RETURNS integer
@@ -1189,8 +1000,8 @@ BEGIN
 
     p_entitytypefrom = btrim(p_entitytypefrom);
     p_entitytypeto = btrim(p_entitytypeto);
-    PERFORM data.insert_entitytype(p_entitytypefrom, '', 'True', '', '', p_entitytypefrom, 'CORE DATA STANDARD', '', 'en-us', 'en-us', 'UNK', '');
-    PERFORM data.insert_entitytype(p_entitytypeto, '', 'True', '', '', p_entitytypefrom, 'CORE DATA STANDARD', '', 'en-us', 'en-us', 'UNK', '');
+    PERFORM data.insert_entitytype(p_entitytypefrom, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    PERFORM data.insert_entitytype(p_entitytypeto, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
     v_mappingid = (SELECT ontology.populate_mappings(p_entitytypefrom, p_entitytypeto, p_default, p_mergenodeid));
 
     WHILE v_index < ((array_length(v_steps,1)-1)/2)
@@ -1199,8 +1010,8 @@ BEGIN
         v_property = btrim(v_steps[(v_index*2+1)+1]);
         v_range = btrim(v_steps[(v_index*2+2)+1]);
         
-        PERFORM data.insert_entitytype(v_domain, '', 'True', '', '', p_entitytypefrom, 'CORE DATA STANDARD', '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM data.insert_entitytype(v_range, '', 'True', '', '', p_entitytypefrom, 'CORE DATA STANDARD', '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM data.insert_entitytype(v_domain, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM data.insert_entitytype(v_range, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
         PERFORM ontology.populate_rules(v_domain, v_property, v_range);
         PERFORM ontology.populate_mapping_steps(v_mappingid, v_domain, v_property, v_range, p_entitytypefrom, p_entitytypeto, v_index+1);  
 
@@ -1216,54 +1027,6 @@ $$;
 
 
 ALTER FUNCTION ontology.insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) OWNER TO postgres;
-
---
--- TOC entry 1289 (class 1255 OID 15704230)
--- Dependencies: 1863 11
--- Name: insert_mapping(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
---
-
-CREATE FUNCTION insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text, p_conceptschemename text) RETURNS integer
-    LANGUAGE plpgsql
-    AS $$
-DECLARE 
-  v_domain text;
-  v_property text;
-  v_range text;
-  v_mappingid text;
-  v_index integer := 0;
-  v_steps text[] := regexp_split_to_array(p_mapping, ',');
-BEGIN 
-
-    p_entitytypefrom = btrim(p_entitytypefrom);
-    p_entitytypeto = btrim(p_entitytypeto);
-    PERFORM data.insert_entitytype(p_entitytypefrom, '', 'True', '', '', p_entitytypefrom, p_conceptschemename, '', 'en-us', 'en-us', 'UNK', '');
-    PERFORM data.insert_entitytype(p_entitytypeto, '', 'True', '', '', p_entitytypefrom, p_conceptschemename, '', 'en-us', 'en-us', 'UNK', '');
-    v_mappingid = (SELECT ontology.populate_mappings(p_entitytypefrom, p_entitytypeto, p_default, p_mergenodeid));
-
-    WHILE v_index < ((array_length(v_steps,1)-1)/2)
-    LOOP
-        v_domain = btrim(v_steps[(v_index*2)+1]);
-        v_property = btrim(v_steps[(v_index*2+1)+1]);
-        v_range = btrim(v_steps[(v_index*2+2)+1]);
-        
-        PERFORM data.insert_entitytype(v_domain, '', 'True', '', '', p_entitytypefrom, p_conceptschemename, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM data.insert_entitytype(v_range, '', 'True', '', '', p_entitytypefrom, p_conceptschemename, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM ontology.populate_rules(v_domain, v_property, v_range);
-        PERFORM ontology.populate_mapping_steps(v_mappingid, v_domain, v_property, v_range, p_entitytypefrom, p_entitytypeto, v_index+1);  
-
-        raise notice 'mapping step: % % %',v_domain, v_property, v_range;
-        v_index := v_index + 1;
-
-    END LOOP;
-  
-    RETURN v_index;
-
-END;
-$$;
-
-
-ALTER FUNCTION ontology.insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text, p_conceptschemename text) OWNER TO postgres;
 
 --
 -- TOC entry 1290 (class 1255 OID 15704231)
@@ -1697,26 +1460,11 @@ SET search_path = concepts, pg_catalog;
 
 CREATE TABLE concepts (
     conceptid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    conceptschemeid uuid NOT NULL,
     legacyoid text
 );
 
 
 ALTER TABLE concepts.concepts OWNER TO postgres;
-
---
--- TOC entry 223 (class 1259 OID 15704309)
--- Dependencies: 3342 9
--- Name: conceptschemes; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE conceptschemes (
-    conceptschemeid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE concepts.conceptschemes OWNER TO postgres;
 
 --
 -- TOC entry 224 (class 1259 OID 15704316)
@@ -1818,7 +1566,7 @@ ALTER TABLE concepts."values" OWNER TO postgres;
 --
 
 CREATE VIEW vw_concepts AS
-    SELECT a.conceptid, get_preferred_label(a.conceptid) AS conceptlabel, a.legacyoid, b.name AS conceptschemename FROM concepts a, conceptschemes b WHERE (a.conceptschemeid = b.conceptschemeid) ORDER BY get_preferred_label(a.conceptid);
+    SELECT a.conceptid, get_preferred_label(a.conceptid) AS conceptlabel, a.legacyoid FROM concepts a ORDER BY get_preferred_label(a.conceptid);
 
 
 ALTER TABLE concepts.vw_concepts OWNER TO postgres;
@@ -1842,7 +1590,7 @@ ALTER TABLE concepts.vw_edges OWNER TO postgres;
 --
 
 CREATE VIEW vw_nodes AS
-    SELECT a.conceptid AS id, get_preferred_label(a.conceptid) AS label, b.name AS conceptschemename, 'concept'::text AS nodetype FROM concepts a, conceptschemes b WHERE (a.conceptschemeid = b.conceptschemeid) UNION SELECT a.valueid AS id, a.value AS label, c.name AS conceptschemename, a.valuetype AS nodetype FROM "values" a, concepts b, conceptschemes c WHERE ((a.conceptid = b.conceptid) AND (b.conceptschemeid = c.conceptschemeid));
+    SELECT a.conceptid AS id, get_preferred_label(a.conceptid) AS label, 'concept'::text AS nodetype FROM concepts a UNION SELECT a.valueid AS id, a.value AS label, a.valuetype AS nodetype FROM "values" a;
 
 
 ALTER TABLE concepts.vw_nodes OWNER TO postgres;
@@ -2402,16 +2150,6 @@ ALTER TABLE ONLY concepts
 
 
 --
--- TOC entry 3377 (class 2606 OID 15704515)
--- Dependencies: 223 223
--- Name: pk_conceptschemes; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY conceptschemes
-    ADD CONSTRAINT pk_conceptschemes PRIMARY KEY (conceptschemeid);
-
-
---
 -- TOC entry 3379 (class 2606 OID 15704517)
 -- Dependencies: 224 224
 -- Name: pk_d_languages; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
@@ -2459,16 +2197,6 @@ ALTER TABLE ONLY relations
 
 ALTER TABLE ONLY "values"
     ADD CONSTRAINT pk_values PRIMARY KEY (valueid);
-
-
---
--- TOC entry 3375 (class 2606 OID 15704527)
--- Dependencies: 222 222 222
--- Name: uk_concepts; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY concepts
-    ADD CONSTRAINT uk_concepts UNIQUE (conceptid, conceptschemeid);
 
 
 SET search_path = data, pg_catalog;
@@ -2747,16 +2475,6 @@ SET search_path = concepts, pg_catalog;
 
 ALTER TABLE ONLY "values"
     ADD CONSTRAINT fk_concepts_x_values FOREIGN KEY (conceptid) REFERENCES concepts(conceptid);
-
-
---
--- TOC entry 3430 (class 2606 OID 15704594)
--- Dependencies: 223 3376 222
--- Name: fk_conceptschemes_x_concepts; Type: FK CONSTRAINT; Schema: concepts; Owner: postgres
---
-
-ALTER TABLE ONLY concepts
-    ADD CONSTRAINT fk_conceptschemes_x_concepts FOREIGN KEY (conceptschemeid) REFERENCES conceptschemes(conceptschemeid);
 
 
 --
