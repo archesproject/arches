@@ -2,6 +2,6 @@ require([
     'jquery'
 ], function () {
     setTimeout(function() {
-        $( "#login-failed-alert" ).fadeOut( "slow" );
+        $("#login-failed-alert").alert('close');
     },1000);
 });
