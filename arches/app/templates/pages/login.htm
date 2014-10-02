@@ -57,7 +57,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <div class="input-group margin-bottom-20">
                                     <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                    <input type="text" class="form-control" placeholder="Password" name='password'>
+                                    <input type="password" class="form-control" placeholder="Password" name='password'>
                                 </div>
                   
                                 <div class="row">
@@ -68,11 +68,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
                                 </div>
 
-                                <div class="row" style="height:60px;">
-                                    <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger" role="alert">Invalid username and/or password.</div>
+                                <div class="row" style="padding-top:10px;">
+                                    <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                        <h4>Login failed</h4>
+                                        <span>Invalid username and/or password.</span>
+                                    </div>
                                 </div>
 
-                                <hr>
                             </div>
                         </form>
                     </div>
