@@ -6,7 +6,7 @@ require([
     'plugins/layer_slider/js/layerslider.transitions',
     'plugins/layer_slider/js/layerslider.kreaturamedia.jquery',
     'flexslider'
-], function ($, arches, scrollToTop, simpleSearch) {
+], function($, arches, scrollToTop, simpleSearch) {
     $(document).ready(function() {
         $('#photo-flexslider').flexslider({
             animation: "slide",
@@ -17,13 +17,13 @@ require([
         });
 
         $('#layerslider').layerSlider({
-            skinsPath : arches.urls.media + 'plugins/layer_slider/skins/',
-            skin : 'fullwidth',
-            thumbnailNavigation : 'hover',
-            hoverPrevNext : true,
-            responsive : true,
-            responsiveUnder : 960,
-            sublayerContainer : 960
+            skinsPath: arches.urls.media + 'plugins/layer_slider/skins/',
+            skin: 'fullwidth',
+            thumbnailNavigation: 'hover',
+            hoverPrevNext: true,
+            responsive: true,
+            responsiveUnder: 960,
+            sublayerContainer: 960
         });
     });
 });

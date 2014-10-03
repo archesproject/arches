@@ -1,4 +1,4 @@
-﻿{% extends "base_page.htm" %}
+﻿{% extends "pages/base.htm" %}
 
 {% block css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}js/ui_frameworks/jqtree/jqtree.css" />
@@ -345,7 +345,7 @@
         </div>
     </div>
 
-{% include "add_concept.htm" %}
+{% include "partials/add_concept.htm" %}
 
 {% endblock content %}
 

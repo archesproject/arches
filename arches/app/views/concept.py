@@ -39,7 +39,7 @@ def rdm(request, conceptid):
         else:
             othertypes.append(type)
 
-    return render_to_response('rdm.htm', {'conceptid': conceptid, 'languages': languages, 'valuetype_labels': valuetypes.filter(category='label'), 'valuetype_notes': valuetypes.filter(pk='scopeNote'),'valuetype_related_values': othertypes}, context_instance=RequestContext(request))
+    return render_to_response('pages/rdm.htm', {'conceptid': conceptid, 'languages': languages, 'valuetype_labels': valuetypes.filter(category='label'), 'valuetype_notes': valuetypes.filter(pk='scopeNote'),'valuetype_related_values': othertypes}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def concept(request, ids):
@@ -76,7 +76,7 @@ def concept(request, ids):
                     languages = archesmodels.DLanguages.objects.all()
                     valuetypes = archesmodels.ValueTypes.objects.all()
                     prefLabel = concept_graph.get_preflabel(lang=lang)
-                    return render_to_response('rdm_item.htm', {'lang': lang, 'prefLabel': prefLabel, 'concept': concept_graph , 'languages': languages}, context_instance=RequestContext(request))
+                    return render_to_response('partials/rdm_item.htm', {'lang': lang, 'prefLabel': prefLabel, 'concept': concept_graph , 'languages': languages}, context_instance=RequestContext(request))
                 
                 if f == 'skos':
                     skos = SKOSWriter()
