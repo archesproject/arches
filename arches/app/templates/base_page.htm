@@ -83,7 +83,7 @@
                             <span class="sr-only">Toggle navigation</span>
                             <span class="fa fa-bars"></span>
                         </button>
-                        <a class="navbar-brand" href="index.html">
+                        <a class="navbar-brand" href="{% url 'home' %}">
                             <img id="logo-header" class="arches-logo" src="{{ STATIC_URL }}img/arches_logo.png" alt="Logo">
                         </a>
                     </div>
@@ -178,7 +178,7 @@
 
                 <h1 class="pull-left arches-breadcrumb-title">Reference Data Manager (RDM)</h1>
                 <ul class="pull-right breadcrumb">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="">Reference Data Manager</a></li>
                 </ul>
             </div>
@@ -294,7 +294,7 @@
                         </p>
                     </div>
                     <div class="col-md-6">  
-                        <a href="index.html">
+                        <a href="{% url 'home' %}">
                             <img class="pull-right arches-logo" id="logo-footer" src="{{ STATIC_URL }}img/arches_logo.png" alt="">
                         </a>
                     </div>
