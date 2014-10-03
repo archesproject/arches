@@ -1151,6 +1151,19 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
+
+
+CREATE TABLE public.user_profile
+(
+  user_id integer,
+  details text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.user_profile OWNER TO postgres;
+
+
 --
 -- TOC entry 207 (class 1259 OID 15704235)
 -- Dependencies: 8
@@ -1167,6 +1180,7 @@ CREATE TABLE app_config (
 
 
 ALTER TABLE app_metadata.app_config OWNER TO postgres;
+
 
 --
 -- TOC entry 208 (class 1259 OID 15704241)

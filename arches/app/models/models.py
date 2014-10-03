@@ -32,15 +32,17 @@ from django.contrib.gis.db import models
 import uuid
 import types
 import os
+import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.contrib.auth.models import User
 
 # from django.contrib.auth.models import User
 
 # def _func(self):
 #     return 'you did it'
 
-# User.get_mapping = types.MethodType(_func, None, User)
 
+# User.get_mapping = types.MethodType(_func, None, User)
 class AppConfig(models.Model):
     name = models.TextField(primary_key=True)
     defaultvalue = models.TextField()
@@ -769,3 +771,21 @@ class RelatedResource(models.Model):
     dateended = models.DateField()
     class Meta:
         db_table = u'data"."resource_x_resource'
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, primary_key=True)
+    details = models.TextField()
+
+    class Meta:
+        db_table = u'user_profile'
+
+    def __unicode__(self):
+        return str(self.user.username)
+
+    def save(self, *args, **kwargs):
+        """Validates JSON prior to saving"""
+        try:
+            json.loads(self.details)
+            super(UserProfile, self).save(*args, **kwargs) # Call the "real" save() method.
+        except:
+            return #'json invalid'
