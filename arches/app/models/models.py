@@ -304,7 +304,6 @@ class AuthPermission(models.Model):
 
 class Concepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
-    conceptschemeid = models.ForeignKey('Conceptschemes', db_column='conceptschemeid')
     legacyoid = models.TextField()
     class Meta:
         db_table = u'concepts'
@@ -454,6 +453,7 @@ class Concepts(models.Model):
                         include_parentconcepts=include_parentconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
                         up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
         return ret
+
 class ConceptRelations(models.Model):
     relationid = models.TextField(primary_key=True)
     conceptidfrom = models.ForeignKey('Concepts', db_column='conceptidfrom', related_name='concept_relation_from')
@@ -690,7 +690,7 @@ class Domains(models.Model):
                     value = Values.objects.get(valueid = value)
                 except(ValueError, TypeError):
                     # print value, 'attr value'
-                    concepts = Concepts.objects.filter(legacyoid = value, conceptschemeid__name = settings.DATA_CONCEPT_SCHEME)
+                    concepts = Concepts.objects.filter(legacyoid = value)
                     if len(concepts) == 1:
                         value = Values.objects.get(conceptid = concepts[0], valuetype = 'prefLabel')
                     else:
