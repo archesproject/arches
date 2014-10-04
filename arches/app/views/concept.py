@@ -39,7 +39,14 @@ def rdm(request, conceptid):
         else:
             othertypes.append(type)
 
-    return render_to_response('pages/rdm.htm', {'conceptid': conceptid, 'languages': languages, 'valuetype_labels': valuetypes.filter(category='label'), 'valuetype_notes': valuetypes.filter(pk='scopeNote'),'valuetype_related_values': othertypes}, context_instance=RequestContext(request))
+    return render_to_response('pages/rdm.htm', {
+            'active_page': 'RDM',
+            'conceptid': conceptid,
+            'languages': languages,
+            'valuetype_labels': valuetypes.filter(category='label'),
+            'valuetype_notes': valuetypes.filter(pk='scopeNote'),
+            'valuetype_related_values': othertypes
+        }, context_instance=RequestContext(request))
 
 @csrf_exempt
 def concept(request, ids):
