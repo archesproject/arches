@@ -117,8 +117,8 @@
                             <!-- End Inventory-->
 
                              <!-- RDM-->
-                            <li class="{% if active_page = 'RDM' %}active{% endif %}">
-                                <a href="{% url 'rdm' '' %}">
+                            <li class="{% if user.is_anonymous %}disabled{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
+                                <a href="{% if user.is_anonymous %}javascript:void(0);{% else %}{% url 'rdm' '' %}{% endif %}">
                                     Reference Data Manager
                                 </a>
                             </li>

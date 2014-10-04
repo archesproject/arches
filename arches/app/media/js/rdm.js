@@ -5,7 +5,7 @@ require([
     'plugins/jqtree/tree.jquery'
 ], function($, arches) {
     $(document).ready(function() {
-        var selectedConcept,
+        var selectedConcept = '',
             conceptTree = $('#jqtree').tree({
                 dragAndDrop: true,
                 dataUrl: arches.urls.concept_tree + (selectedConcept === '' ? '' : "?node=" + selectedConcept),
