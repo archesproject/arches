@@ -82,7 +82,7 @@ require([
         var saveValue = function(data, successCallback, errorCallback){
             $.ajax({
                 type: "POST",
-                url: "{% url 'concept_value' '' %}",
+                url: arches.urls.concept_value,
                 data: {'json': JSON.stringify(data)},
                 success: successCallback,
                 error: errorCallback
@@ -91,7 +91,7 @@ require([
         var deleteValue = function(valueid, successCallback, errorCallback){
             $.ajax({
                 type: "DELETE",
-                url: "{% url 'concept_value' '' %}" + valueid,
+                url: arches.urls.concept_value + valueid,
                 success: successCallback,
                 error: errorCallback
             });
@@ -99,7 +99,7 @@ require([
         var addConcept = function(data, successCallback, errorCallback){
             $.ajax({
                 type: "POST",
-                url: "{% url 'concept' '' %}" ,
+                url: arches.urls.concept,
                 data: JSON.stringify(data),
                 success: successCallback,
                 error: errorCallback
@@ -108,7 +108,7 @@ require([
         var deleteConcept = function(data, successCallback, errorCallback){
             $.ajax({
                 type: "DELETE",
-                url: "{% url 'concept' '' %}" + data,
+                url: arches.urls.concept + data,
                 success: successCallback,
                 error: errorCallback
             });                
@@ -128,7 +128,7 @@ require([
                 if (confirm('Are you sure you want to move this concept to a new parent?')) {
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'concept_relation' %}" ,
+                        url: arches.urls.concept_relation,
                         data: JSON.stringify({
                             'conceptid': move_info.moved_node.id, 
                             'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id, 

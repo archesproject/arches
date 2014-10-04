@@ -336,7 +336,10 @@
                 return {
                     urls: {
                         media: "{{ STATIC_URL }}",
-                        concept_tree: "{% url 'concept_tree' %}"
+                        concept_tree: "{% url 'concept_tree' %}",
+                        concept_value: "{% url 'concept_value' '' %}",
+                        concept: "{% url 'concept' '' %}",
+                        concept_relation: "{% url 'concept_relation' %}"
                     }
                 };
             });
