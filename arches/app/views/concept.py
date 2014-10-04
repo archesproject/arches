@@ -40,6 +40,7 @@ def rdm(request, conceptid):
             othertypes.append(type)
 
     return render_to_response('pages/rdm.htm', {
+            'main_script': 'rdm',
             'active_page': 'RDM',
             'conceptid': conceptid,
             'languages': languages,

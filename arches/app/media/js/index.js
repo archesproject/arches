@@ -6,7 +6,7 @@ require([
     'plugins/layer_slider/js/layerslider.transitions',
     'plugins/layer_slider/js/layerslider.kreaturamedia.jquery',
     'flexslider'
-], function($, arches, scrollToTop, simpleSearch) {
+], function($, arches) {
     $(document).ready(function() {
         $('#photo-flexslider').flexslider({
             animation: "slide",

@@ -17,6 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "pages/base.htm" %}
 {% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
+{{ block.super }}
+{% endblock css %}
+
 {% block content %}
 <!--=== Slider ===-->
 <div class="layer_slider">

@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
     {% if main_css %}
     <link rel="stylesheet" href="{% static main_css %}">
@@ -323,7 +322,8 @@
                 'openlayers': 'http://openlayers.org/en/v3.0.0/build/ol',
                 'easing': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
                 'backbone': 'http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
-                'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min'
+                'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min'
             }
         });
 
@@ -335,7 +335,8 @@
             define('arches', [], function () {
                 return {
                     urls: {
-                        media: "{{ STATIC_URL }}"
+                        media: "{{ STATIC_URL }}",
+                        concept_tree: "{% url 'concept_tree' %}"
                     }
                 };
             });
