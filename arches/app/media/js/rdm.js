@@ -11,7 +11,7 @@ require([
             note = {},
             related_value = {},
             concept = {},
-            _selectedConcept = '';
+            _selectedConcept = $('#selected-conceptid').val();
 
         tree = $('#jqtree').tree({
             dragAndDrop: true,
