@@ -5,10 +5,10 @@ require([
     'plugins/jqtree/tree.jquery'
 ], function($, arches) {
     $(document).ready(function() {
-        var _selectedConcept = $('#selected-conceptid').val(),
+        var selectedConcept,
             tree = $('#jqtree').tree({
                 dragAndDrop: true,
-                dataUrl: arches.urls.concept_tree + (_selectedConcept === '' ? '' : "?node=" + _selectedConcept),
+                dataUrl: arches.urls.concept_tree + (selectedConcept === '' ? '' : "?node=" + selectedConcept),
                 data: [],
                 autoOpen: true
             }),
@@ -28,10 +28,6 @@ require([
                     }
                 });
             },
-            getSelectedConcept = function() {
-                //return tree.tree('getSelectedNode');
-                return _selectedConcept;
-            },
             setSelectedConcept = function(conceptid) {
                 var node = tree.tree('getNodeById', conceptid);
                 if (node) {
@@ -43,7 +39,7 @@ require([
                 }
 
                 if (conceptid !== '') {
-                    _selectedConcept = conceptid;
+                    selectedConcept = conceptid;
                     window.history.pushState({}, "conceptid", conceptid);
                     loadConceptReport(conceptid);
                 }
@@ -53,17 +49,15 @@ require([
                     arches.urls.concept_tree + "?node=" + conceptid,
                     null,
                     function() {
-                        data_tree = tree.tree('getTree');
-                        var conceptid = getSelectedConcept()
-                        if (conceptid === '') {
+                        var dataTree = tree.tree('getTree');
+                        if (selectedConcept === '') {
                             // get the top level concept from the tree
-                            conceptid = data_tree.children[0].id;
-                            _selectedConcept = conceptid;
-                            window.history.pushState({}, "conceptid", conceptid);
-                            loadConceptReport(conceptid);
+                            selectedConcept = dataTree.children[0].id;
+                            window.history.pushState({}, "conceptid", selectedConcept);
+                            loadConceptReport(selectedConcept);
                         }
 
-                        var node = tree.tree('getNodeById', conceptid);
+                        var node = tree.tree('getNodeById', selectedConcept);
                         tree.tree('selectNode', node);
                         tree.tree('scrollToNode', node);
                     }
@@ -130,7 +124,7 @@ require([
                                 successCallback();
                                 var data = JSON.parse(this.data);
 
-                                if (getSelectedConcept() === data.conceptid) {
+                                if (selectedConcept === data.conceptid) {
                                     reloadReport();
                                 }
                             },
@@ -140,13 +134,13 @@ require([
                 }
             },
             reloadReport = function() {
-                loadConceptReport(getSelectedConcept());
+                loadConceptReport(selectedConcept);
             },
             reloadConcept = function() {
-                setSelectedConcept(getSelectedConcept());
+                setSelectedConcept(selectedConcept);
             };
 
-        setSelectedConcept(_selectedConcept);
+        setSelectedConcept($('#selected-conceptid').val());
 
         // bind 'tree.click' event
         tree.bind(
@@ -154,7 +148,7 @@ require([
             function(event) {
                 // The clicked node is 'event.node'
                 var node = event.node;
-                if (getSelectedConcept() !== node.id) {
+                if (selectedConcept !== node.id) {
                     setSelectedConcept(node.id);
                 } else {
                     event.preventDefault();
@@ -205,7 +199,7 @@ require([
                 var data = {};
                 data.value = $('#label_value').val();
                 data.id = $('#label_id').val();
-                data.conceptid = getSelectedConcept();
+                data.conceptid = selectedConcept;
                 data.valuetype = $('#label_valuetype_dd').select2('val');
                 data.datatype = 'text';
                 data.language = $('#label_language_dd').select2('val');
@@ -249,7 +243,7 @@ require([
                 var data = {};
                 data.value = $('#note_value').val();
                 data.id = $('#note_id').val();
-                data.conceptid = getSelectedConcept();
+                data.conceptid = selectedConcept;
                 data.valuetype = $('#note_valuetype_dd').select2('val');
                 data.datatype = 'text';
                 data.language = $('#note_language_dd').select2('val');
@@ -292,7 +286,7 @@ require([
                 var data = {};
                 data.value = $('#related_value_value').val();
                 data.id = $('#related_value_id').val();
-                data.conceptid = getSelectedConcept();
+                data.conceptid = selectedConcept;
                 data.valuetype = $('#related_value_valuetype_dd').select2('val');
                 data.datatype = 'text';
                 data.language = $('#related_value_language_dd').select2('val');
@@ -317,7 +311,7 @@ require([
                 data.label = $(form).find("[name=label]").val();
                 data.note = $(form).find("[name=note]").val();
                 data.language = $(form).find("[name=language_dd]").select2('val');
-                data.parentconceptid = getSelectedConcept();
+                data.parentconceptid = selectedConcept;
 
                 addConcept(data, function(data) {
                     conceptEditor.modal('hide');
