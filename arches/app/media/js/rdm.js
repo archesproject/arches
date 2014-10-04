@@ -6,7 +6,7 @@ require([
 ], function($, arches) {
     $(document).ready(function() {
         var selectedConcept,
-            tree = $('#jqtree').tree({
+            conceptTree = $('#jqtree').tree({
                 dragAndDrop: true,
                 dataUrl: arches.urls.concept_tree + (selectedConcept === '' ? '' : "?node=" + selectedConcept),
                 data: [],
@@ -29,11 +29,11 @@ require([
                 });
             },
             setSelectedConcept = function(conceptid) {
-                var node = tree.tree('getNodeById', conceptid);
+                var node = conceptTree.tree('getNodeById', conceptid);
                 if (node) {
                     // collapse the node while it's loading
                     if (!node.load_on_demand) {
-                        tree.tree('toggle', node);
+                        conceptTree.tree('toggle', node);
                     }
                     $(node.element).addClass('jqtree-loading');
                 }
@@ -44,12 +44,12 @@ require([
                     loadConceptReport(conceptid);
                 }
 
-                tree.tree(
+                conceptTree.tree(
                     'loadDataFromUrl',
                     arches.urls.concept_tree + "?node=" + conceptid,
                     null,
                     function() {
-                        var dataTree = tree.tree('getTree');
+                        var dataTree = conceptTree.tree('getTree');
                         if (selectedConcept === '') {
                             // get the top level concept from the tree
                             selectedConcept = dataTree.children[0].id;
@@ -57,9 +57,9 @@ require([
                             loadConceptReport(selectedConcept);
                         }
 
-                        var node = tree.tree('getNodeById', selectedConcept);
-                        tree.tree('selectNode', node);
-                        tree.tree('scrollToNode', node);
+                        var node = conceptTree.tree('getNodeById', selectedConcept);
+                        conceptTree.tree('selectNode', node);
+                        conceptTree.tree('scrollToNode', node);
                     }
                 );
             },
@@ -138,7 +138,7 @@ require([
         setSelectedConcept($('#selected-conceptid').val());
 
         // bind 'tree.click' event
-        tree.bind(
+        conceptTree.bind(
             'tree.click',
             function(event) {
                 // The clicked node is 'event.node'
@@ -152,13 +152,11 @@ require([
         );
 
         // bind 'tree.click' event
-        tree.bind(
+        conceptTree.bind(
             'tree.move',
             function(event) {
                 moveConcept(event, function() {
                     event.move_info.do_move();
-                }, function() {
-                    alert('well that didn\'t work...');
                 });
             }
         );
