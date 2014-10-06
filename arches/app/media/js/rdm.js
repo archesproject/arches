@@ -1,9 +1,11 @@
 require([
     'jquery',
     'arches',
+    'models/value',
+    'views/value-editor',
     'jquery-validate',
     'plugins/jqtree/tree.jquery'
-], function($, arches) {
+], function($, arches, ValueModel, ValueEditor) {
     $(document).ready(function() {
         var selectedConcept = '',
             conceptTree = $('#jqtree').tree({
@@ -12,9 +14,6 @@ require([
                 data: [],
                 autoOpen: true
             }),
-            labelEditor = $('#labelmodal'),
-            noteEditor = $('#notemodal'),
-            relatedValueEditor = $('#related_valuemodal'),
             conceptEditor = $('#conceptmodal'),
             loadConceptReport = function(conceptid) {
                 $('#concept_report_loading').removeClass('hidden');
@@ -25,6 +24,18 @@ require([
                         $('#concept_report_loading').addClass('hidden');
                         $('#concept_report').removeClass('hidden');
                         $('#concept_report').html(response);
+                        $('.edit-value').click(function (e) {
+                            var data = $.extend({conceptid: selectedConcept}, $(e.target).data()),
+                                model = new ValueModel(data),
+                                editor = new ValueEditor({
+                                    el: $(data.target)[0],
+                                    model: model
+                                });
+
+                            editor.on('submit', function () {
+                                model.save(reloadConcept);
+                            });
+                        });
                     }
                 });
             },
@@ -62,25 +73,6 @@ require([
                         conceptTree.tree('scrollToNode', node);
                     }
                 );
-            },
-            saveValue = function(data, successCallback, errorCallback) {
-                $.ajax({
-                    type: "POST",
-                    url: arches.urls.concept_value,
-                    data: {
-                        'json': JSON.stringify(data)
-                    },
-                    success: successCallback,
-                    error: errorCallback
-                });
-            },
-            deleteValue = function(valueid, successCallback, errorCallback) {
-                $.ajax({
-                    type: "DELETE",
-                    url: arches.urls.concept_value + valueid,
-                    success: successCallback,
-                    error: errorCallback
-                });
             },
             addConcept = function(data, successCallback, errorCallback) {
                 $.ajax({
@@ -161,136 +153,6 @@ require([
             }
         );
 
-        // LABEL EDITOR
-        labelEditor.on('show.bs.modal', function(e) {
-            var data = $(e.relatedTarget).data();
-            if (data.action === 'edit') {
-                $('#labelmodaltitle').text('Edit Label');
-                $('#label_value').val(data.label_value);
-                $('#label_id').val(data.label_id);
-                $('#label_valuetype_dd').select2("val", data.label_type);
-                $('#label_language_dd').select2("val", data.label_language);
-            }
-
-            if (data.action === 'add') {
-                $('#labelmodaltitle').text('Add New Label');
-                $('#label_value').val('');
-                $('#label_id').val('');
-                $('#label_valuetype_dd').select2("val", '');
-                //$('#label_language_dd').select2("val", '');
-            }
-        });
-        labelEditor.validate({
-            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
-            rules: {
-                // element_name: value
-                label_value: "required",
-                label_valuetype_dd: "required",
-                label_language_dd: "required"
-            },
-            submitHandler: function(form) {
-                var data = {};
-                data.value = $('#label_value').val();
-                data.id = $('#label_id').val();
-                data.conceptid = selectedConcept;
-                data.valuetype = $('#label_valuetype_dd').select2('val');
-                data.datatype = 'text';
-                data.language = $('#label_language_dd').select2('val');
-
-                saveValue(data, function(data) {
-                    labelEditor.modal('hide');
-                    reloadConcept();
-                }, null);
-            }
-        });
-
-
-        // NOTE EDITOR 
-        noteEditor.on('show.bs.modal', function(e) {
-            var data = $(e.relatedTarget).data();
-            if (data.action === 'edit') {
-                $('#notemodaltitle').text('Edit Note');
-                $('#note_value').val(data.note_value);
-                $('#note_id').val(data.note_id);
-                $('#note_valuetype_dd').select2("val", data.note_type);
-                $('#note_language_dd').select2("val", data.note_language);
-            }
-
-            if (data.action === 'add') {
-                $('#notemodaltitle').text('Add New Note');
-                $('#note_value').val('');
-                $('#note_id').val('');
-                $('#note_valuetype_dd').select2("val", '');
-                //$('#note_language_dd').select2("val", '');
-            }
-        });
-        noteEditor.validate({
-            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
-            rules: {
-                // element_name: value
-                note_value: "required",
-                note_valuetype_dd: "required",
-                note_language_dd: "required"
-            },
-            submitHandler: function(form) {
-                var data = {};
-                data.value = $('#note_value').val();
-                data.id = $('#note_id').val();
-                data.conceptid = selectedConcept;
-                data.valuetype = $('#note_valuetype_dd').select2('val');
-                data.datatype = 'text';
-                data.language = $('#note_language_dd').select2('val');
-
-                saveValue(data, function(data) {
-                    noteEditor.modal('hide');
-                    reloadReport();
-                }, null);
-            }
-        });
-
-        // RELATED VALUE EDITOR 
-        relatedValueEditor.on('show.bs.modal', function(e) {
-            var data = $(e.relatedTarget).data();
-            if (data.action === 'edit') {
-                $('#related_valuemodaltitle').text('Edit Related Value');
-                $('#related_value_value').val(data.related_value_value);
-                $('#related_value_id').val(data.related_value_id);
-                $('#related_value_valuetype_dd').select2("val", data.related_value_type);
-                $('#related_value_language_dd').select2("val", data.related_value_language);
-            }
-
-            if (data.action === 'add') {
-                $('#related_valuemodaltitle').text('Add Related Value');
-                $('#related_value_value').val('');
-                $('#related_value_id').val('');
-                $('#related_value_valuetype_dd').select2("val", '');
-                //$('#related_value_language_dd').select2("val", '');
-            }
-        });
-        relatedValueEditor.validate({
-            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
-            rules: {
-                // element_name: value
-                related_value_value: "required",
-                related_value_valuetype_dd: "required",
-                related_value_language_dd: "required"
-            },
-            submitHandler: function(form) {
-                var data = {};
-                data.value = $('#related_value_value').val();
-                data.id = $('#related_value_id').val();
-                data.conceptid = selectedConcept;
-                data.valuetype = $('#related_value_valuetype_dd').select2('val');
-                data.datatype = 'text';
-                data.language = $('#related_value_language_dd').select2('val');
-
-                saveValue(data, function(data) {
-                    relatedValueEditor.modal('hide');
-                    reloadReport();
-                }, null);
-            }
-        });
-
         // ADD CHILD CONCEPT EDITOR 
         conceptEditor.validate({
             ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
@@ -300,11 +162,12 @@ require([
                 language_dd: "required"
             },
             submitHandler: function(form) {
-                var data = {};
-                data.label = $(form).find("[name=label]").val();
-                data.note = $(form).find("[name=note]").val();
-                data.language = $(form).find("[name=language_dd]").select2('val');
-                data.parentconceptid = selectedConcept;
+                var data = {
+                    label: $(form).find("[name=label]").val(),
+                    note: $(form).find("[name=note]").val(),
+                    language: $(form).find("[name=language_dd]").select2('val'),
+                    parentconceptid: selectedConcept
+                };
 
                 addConcept(data, function(data) {
                     conceptEditor.modal('hide');
@@ -331,10 +194,11 @@ require([
         $('#confirm_delete_yes').on('click', function() {
             var data = $(this).data();
             if (data.action === 'delete') {
-                deleteValue(data.id, function(data) {
+                var model = new ValueModel(data);
+                model.delete(function () {
                     $('#confirm_delete_modal').modal('hide');
                     reloadReport();
-                }, null);
+                });
             }
             if (data.action === 'delete_concept') {
                 deleteConcept(data.id, function(data) {

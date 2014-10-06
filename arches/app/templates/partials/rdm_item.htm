@@ -32,11 +32,11 @@
 <div class="margin-bottom-10 padding-left-10">
     <dl>
         <dt>Concept Labels</dt>
-        <dd class="arches-RDM-labels"><a href="#" data-action="add" data-toggle="modal" data-target="#labelmodal"><strong>Add new label</strong></a></dd>
+        <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#labelmodal">Add new label</a></dd>
         {% for label in concept.labels %}
         <dd class="arches-RDM-labels">
             <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}"><i class="color-green fa fa-times-circle"></i></a>
-            <a href="#" title="Edit this label" data-action="edit" data-toggle="modal" data-target="#labelmodal" data-label_id="{{label.id}}" data-label_datatype="{{label.datatype}}" data-label_type="{{label.type}}" data-label_category="{{label.category}}" data-label_value="{{label.value}}" data-label_language="{{label.language}}">{{label.value}}</a>&nbsp; {% if label.type == 'prefLabel' %} (preferred) {% endif %} ({{label.language}})
+            <a href="#" title="Edit this label" data-action="edit" class="edit-value" data-target="#labelmodal" data-id="{{label.id}}" data-datatype="{{label.datatype}}" data-type="{{label.type}}" data-category="{{label.category}}" data-value="{{label.value}}" data-language="{{label.language}}">{{label.value}}</a>&nbsp; {% if label.type == 'prefLabel' %} (preferred) {% endif %} ({{label.language}})
         </dd>{% endfor %}
     </dl>
 </div>
@@ -45,11 +45,11 @@
 <div class="margin-bottom-10 padding-left-10">
     <dl>
         <dt>Scope Note</dt>
-        <dd class="margin-left-10" style="margin-le"><a href="#" class="" data-action="add" data-toggle="modal" data-target="#notemodal"><strong>Add new note</strong></a></dd>
+        <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#notemodal">Add new note</a></dd>
         {% for note in concept.notes %}{% if note.type == 'scopeNote' %}
         <dd class="margin-left-10 txt-color-blue">
             <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}"><i class="color-green fa fa-times-circle"></i></a>
-            <a href="#" data-action="edit" data-toggle="modal" data-target="#notemodal" data-note_id="{{note.id}}" data-note_datatype="{{note.datatype}}" data-note_type="{{note.type}}" data-note_category="{{note.category}}" data-note_value="{{note.value}}" data-note_language="{{note.language}}">{{note.value}} ({{note.language}})</a>
+            <a href="#" data-action="edit" class="edit-value" data-target="#notemodal" data-id="{{note.id}}" data-datatype="{{note.datatype}}" data-type="{{note.type}}" data-category="{{note.category}}" data-value="{{note.value}}" data-language="{{note.language}}">{{note.value}} ({{note.language}})</a>
         </dd>{% endif %}{% endfor %}
     </dl>
 </div>
@@ -84,11 +84,11 @@
 <div class="margin-bottom-10 padding-left-10">
     <dl>
         <dt>Related Values</dt>
-        <dd class="arches-RDM-labels"><a href="#" data-action="add" data-toggle="modal" data-target="#related_valuemodal"><strong>Add new value</strong></a></dd>
+        <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#related_valuemodal">Add new value</a></dd>
         {% for related_value in concept.metadata %}
         <dd class="arches-RDM-labels">
             <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"><i class="color-green fa fa-times-circle"></i></a>
-            <a href="#" data-action="edit" data-toggle="modal" data-target="#related_valuemodal" data-related_value_id="{{related_value.id}}" data-related_value_datatype="{{related_value.datatype}}" data-related_value_type="{{related_value.type}}" data-related_value_category="{{related_value.category}}" data-related_value_value="{{related_value.value}}" data-related_value_language="{{related_value.language}}">{{related_value.type}}: {{related_value.value}} {% if related_value.language != None %}({{related_value.language}}){% endif %}</a>
+            <a href="#" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{related_value.id}}" data-datatype="{{related_value.datatype}}" data-type="{{related_value.type}}" data-category="{{related_value.category}}" data-value="{{related_value.value}}" data-language="{{related_value.language}}">{{related_value.type}}: {{related_value.value}} {% if related_value.language != None %}({{related_value.language}}){% endif %}</a>
         </dd>{% endfor %}
     </dl>
 </div>

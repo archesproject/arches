@@ -167,7 +167,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h4>Label</h4>
-                            <p><input class="form-control" id="label_value" type="text" required/><input id="label_id" type="hidden"/></p>
+                            <p><input class="form-control value-input" id="label_value" type="text" required/><input id="label_id" class="id-input" type="hidden"/></p>
                         </div>
                     </div>
                     <div class="row">
@@ -175,7 +175,7 @@
                             <div class="form-group">
                                 <h4>Type</h4>
                                 <p> 
-                                    <select style="width:100%" class="select2" name="label_valuetype_dd" id="label_valuetype_dd" required>
+                                    <select style="width:100%" class="select2 value-type-input" name="label_valuetype_dd" id="label_valuetype_dd" required>
                                         {% for label in valuetype_labels %}
                                           <option value="{{label.valuetype}}">{{label.valuetype}}</option>
                                         {% endfor %}
@@ -186,7 +186,7 @@
                         <div class="col-md-6">
                             <h4>Language</h4>
                             <p> 
-                                <select style="width:100%" class="select2" name="label_language_dd" id="label_language_dd" required>
+                                <select style="width:100%" class="select2 language-input" name="label_language_dd" id="label_language_dd" required>
                                     {% for language in languages %}
                                       <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                     {% endfor %}
@@ -216,7 +216,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h4>Note</h4>
-                            <p><textarea class="form-control textarea textarea-resizable" rows="3" id="note_value" type="text" required></textarea><input id="note_id" type="hidden"/></p>
+                            <p><textarea class="form-control value-input textarea textarea-resizable" rows="3" id="note_value" type="text" required></textarea><input id="note_id" class="id-input" type="hidden"/></p>
                         </div>
                     </div>
                     <div class="row">
@@ -224,7 +224,7 @@
                             <div class="form-group">
                                 <h4>Type</h4>
                                 <p> 
-                                    <select style="width:100%" class="select2" name="note_valuetype_dd" id="note_valuetype_dd" required>
+                                    <select style="width:100%" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required>
                                         {% for note in valuetype_notes %}
                                           <option value="{{note.valuetype}}">{{note.valuetype}}</option>
                                         {% endfor %}
@@ -235,7 +235,7 @@
                         <div class="col-md-6">
                             <h4>Language</h4>
                             <p> 
-                                <select style="width:100%" class="select2" name="note_language_dd" id="note_language_dd" required>
+                                <select style="width:100%" class="select2 language-input" name="note_language_dd" id="note_language_dd" required>
                                     {% for language in languages %}
                                       <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                     {% endfor %}
@@ -265,7 +265,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h4>Value</h4>
-                            <p><textarea class="form-control textarea textarea-resizable" rows="3" id="related_value_value" type="text" required></textarea><input id="related_value_id" type="hidden"/></p>
+                            <p><textarea class="form-control value-input textarea textarea-resizable" rows="3" id="related_value_value" type="text" required></textarea><input id="related_value_id" class="id-input" type="hidden"/></p>
                         </div>
                     </div>
                     <div class="row">
@@ -273,7 +273,7 @@
                             <div class="form-group">
                                 <h4>Type</h4>
                                 <p> 
-                                    <select style="width:100%" class="select2" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required>
+                                    <select style="width:100%" class="select2 value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required>
                                         {% for related_value in valuetype_related_values %}
                                           <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
                                         {% endfor %}
@@ -284,7 +284,7 @@
                         <div class="col-md-6">
                             <h4>Language</h4>
                             <p> 
-                                <select style="width:100%" class="select2" name="related_value_language_dd" id="related_value_language_dd" required>
+                                <select style="width:100%" class="select2 language-input" name="related_value_language_dd" id="related_value_language_dd" required>
                                     {% for language in languages %}
                                       <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                     {% endfor %}
