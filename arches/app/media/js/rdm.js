@@ -1,18 +1,17 @@
 require([
     'jquery',
     'arches',
+    'models/concept',
     'models/value',
+    'views/concept-tree',
     'views/value-editor',
     'jquery-validate',
-    'plugins/jqtree/tree.jquery'
-], function($, arches, ValueModel, ValueEditor) {
+], function($, arches, ConceptModel, ValueModel, ConceptTree, ValueEditor) {
     $(document).ready(function() {
-        var selectedConcept = '',
-            conceptTree = $('#jqtree').tree({
-                dragAndDrop: true,
-                dataUrl: arches.urls.concept_tree + (selectedConcept === '' ? '' : "?node=" + selectedConcept),
-                data: [],
-                autoOpen: true
+        var conceptModel = new ConceptModel(),
+            conceptTree = new ConceptTree({
+                el: $('#jqtree')[0],
+                model: conceptModel
             }),
             conceptEditor = $('#conceptmodal'),
             loadConceptReport = function(conceptid) {
@@ -24,55 +23,8 @@ require([
                         $('#concept_report_loading').addClass('hidden');
                         $('#concept_report').removeClass('hidden');
                         $('#concept_report').html(response);
-                        $('.edit-value').click(function (e) {
-                            var data = $.extend({conceptid: selectedConcept}, $(e.target).data()),
-                                model = new ValueModel(data),
-                                editor = new ValueEditor({
-                                    el: $(data.target)[0],
-                                    model: model
-                                });
-
-                            editor.on('submit', function () {
-                                model.save(reloadConcept);
-                            });
-                        });
                     }
                 });
-            },
-            setSelectedConcept = function(conceptid) {
-                var node = conceptTree.tree('getNodeById', conceptid);
-                if (node) {
-                    // collapse the node while it's loading
-                    if (!node.load_on_demand) {
-                        conceptTree.tree('toggle', node);
-                    }
-                    $(node.element).addClass('jqtree-loading');
-                }
-
-                if (conceptid !== '') {
-                    selectedConcept = conceptid;
-                    window.history.pushState({}, "conceptid", conceptid);
-                    loadConceptReport(conceptid);
-                }
-
-                conceptTree.tree(
-                    'loadDataFromUrl',
-                    arches.urls.concept_tree + "?node=" + conceptid,
-                    null,
-                    function() {
-                        var dataTree = conceptTree.tree('getTree');
-                        if (selectedConcept === '') {
-                            // get the top level concept from the tree
-                            selectedConcept = dataTree.children[0].id;
-                            window.history.pushState({}, "conceptid", selectedConcept);
-                            loadConceptReport(selectedConcept);
-                        }
-
-                        var node = conceptTree.tree('getNodeById', selectedConcept);
-                        conceptTree.tree('selectNode', node);
-                        conceptTree.tree('scrollToNode', node);
-                    }
-                );
             },
             addConcept = function(data, successCallback, errorCallback) {
                 $.ajax({
@@ -91,67 +43,23 @@ require([
                     error: errorCallback
                 });
             },
-            moveConcept = function(event, successCallback, errorCallback) {
-                var move_info = event.move_info;
-                if ((move_info.position !== 'inside' && move_info.previous_parent.id === move_info.target_node.parent.id) ||
-                    (move_info.position === 'inside' && move_info.previous_parent.id === move_info.target_node.id)) {
-                    // here we're just re-ordering nodes
-                } else {
-                    event.preventDefault();
-                    if (confirm('Are you sure you want to move this concept to a new parent?')) {
-                        $.ajax({
-                            type: "POST",
-                            url: arches.urls.concept_relation,
-                            data: JSON.stringify({
-                                'conceptid': move_info.moved_node.id,
-                                'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id,
-                                'current_parent_conceptid': move_info.previous_parent.id
-                            }),
-                            success: function() {
-                                successCallback();
-                                var data = JSON.parse(this.data);
-
-                                if (selectedConcept === data.conceptid) {
-                                    reloadReport();
-                                }
-                            },
-                            error: errorCallback
-                        });
-                    }
-                }
-            },
             reloadReport = function() {
-                loadConceptReport(selectedConcept);
+                loadConceptReport(conceptModel.get('id'));
             },
             reloadConcept = function() {
-                setSelectedConcept(selectedConcept);
+                conceptTree.render();
             };
 
-        setSelectedConcept($('#selected-conceptid').val());
+        conceptModel.on('change', function () {
+            window.history.pushState({}, "conceptid", conceptModel.get('id'));
+            loadConceptReport(conceptModel.get('id'));
+        });
 
-        // bind 'tree.click' event
-        conceptTree.bind(
-            'tree.click',
-            function(event) {
-                // The clicked node is 'event.node'
-                var node = event.node;
-                if (selectedConcept !== node.id) {
-                    setSelectedConcept(node.id);
-                } else {
-                    event.preventDefault();
-                }
+        conceptTree.on('conceptMoved', function (conceptid) {
+            if (conceptModel.get('id') === conceptid) {
+                reloadReport();
             }
-        );
-
-        // bind 'tree.click' event
-        conceptTree.bind(
-            'tree.move',
-            function(event) {
-                moveConcept(event, function() {
-                    event.move_info.do_move();
-                });
-            }
-        );
+        });
 
         // ADD CHILD CONCEPT EDITOR 
         conceptEditor.validate({
@@ -166,7 +74,7 @@ require([
                     label: $(form).find("[name=label]").val(),
                     note: $(form).find("[name=note]").val(),
                     language: $(form).find("[name=language_dd]").select2('val'),
-                    parentconceptid: selectedConcept
+                    parentconceptid: conceptModel.get('id')
                 };
 
                 addConcept(data, function(data) {
@@ -188,8 +96,20 @@ require([
             }
 
             if (data.action === 'viewconcept') {
-                setSelectedConcept(data.conceptid);
+                conceptModel.set({id: data.conceptid });
             }
+        });
+        $(document).on('click', 'a.edit-value', function (e) {
+            var data = $.extend({ conceptid: conceptModel.get('id') }, $(e.target).data()),
+                model = new ValueModel(data),
+                editor = new ValueEditor({
+                    el: $(data.target)[0],
+                    model: model
+                });
+
+            editor.on('submit', function () {
+                model.save(reloadConcept);
+            });
         });
         $('#confirm_delete_yes').on('click', function() {
             var data = $(this).data();
