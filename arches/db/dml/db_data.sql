@@ -55,14 +55,17 @@ INSERT INTO d_relationtypes VALUES ('has collection');
 
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'AUTHORITY FILES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'THESAURI');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ARCHES');
 
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'has narrower concept');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'has narrower concept');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'has narrower concept');
 
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Authority Files', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Thesauri', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'text', 'Arches', 'en-us');
 
 SET search_path = ontology, pg_catalog;
 
@@ -158,111 +161,6 @@ INSERT INTO classes VALUES ('E69', 'Death', true, 'entities');
 INSERT INTO classes VALUES ('E7', 'Activity', true, 'entities');
 INSERT INTO classes VALUES ('E74', 'Group', true, 'entities');
 INSERT INTO classes VALUES ('E82', 'Actor Appellation', true, 'strings');
-
-
---
--- TOC entry 3330 (class 0 OID 11001132)
--- Dependencies: 257 3331 3331
--- Data for Name: class_inheritance; Type: TABLE DATA; Schema: ontology; Owner: postgres
---
-
-INSERT INTO class_inheritance VALUES ('E2', 'E1');
-INSERT INTO class_inheritance VALUES ('E3', 'E2');
-INSERT INTO class_inheritance VALUES ('E4', 'E2');
-INSERT INTO class_inheritance VALUES ('E6', 'E64');
-INSERT INTO class_inheritance VALUES ('E7', 'E5');
-INSERT INTO class_inheritance VALUES ('E8', 'E7');
-INSERT INTO class_inheritance VALUES ('E9', 'E7');
-INSERT INTO class_inheritance VALUES ('E10', 'E7');
-INSERT INTO class_inheritance VALUES ('E11', 'E7');
-INSERT INTO class_inheritance VALUES ('E12', 'E11');
-INSERT INTO class_inheritance VALUES ('E12', 'E63');
-INSERT INTO class_inheritance VALUES ('E13', 'E7');
-INSERT INTO class_inheritance VALUES ('E14', 'E13');
-INSERT INTO class_inheritance VALUES ('E15', 'E13');
-INSERT INTO class_inheritance VALUES ('E16', 'E13');
-INSERT INTO class_inheritance VALUES ('E17', 'E13');
-INSERT INTO class_inheritance VALUES ('E18', 'E72');
-INSERT INTO class_inheritance VALUES ('E19', 'E18');
-INSERT INTO class_inheritance VALUES ('E20', 'E19');
-INSERT INTO class_inheritance VALUES ('E21', 'E20');
-INSERT INTO class_inheritance VALUES ('E21', 'E39');
-INSERT INTO class_inheritance VALUES ('E22', 'E19');
-INSERT INTO class_inheritance VALUES ('E22', 'E24');
-INSERT INTO class_inheritance VALUES ('E24', 'E18');
-INSERT INTO class_inheritance VALUES ('E24', 'E71');
-INSERT INTO class_inheritance VALUES ('E25', 'E24');
-INSERT INTO class_inheritance VALUES ('E25', 'E26');
-INSERT INTO class_inheritance VALUES ('E26', 'E18');
-INSERT INTO class_inheritance VALUES ('E27', 'E26');
-INSERT INTO class_inheritance VALUES ('E29', 'E73');
-INSERT INTO class_inheritance VALUES ('E30', 'E89');
-INSERT INTO class_inheritance VALUES ('E31', 'E73');
-INSERT INTO class_inheritance VALUES ('E32', 'E31');
-INSERT INTO class_inheritance VALUES ('E33', 'E73');
-INSERT INTO class_inheritance VALUES ('E34', 'E33');
-INSERT INTO class_inheritance VALUES ('E34', 'E37');
-INSERT INTO class_inheritance VALUES ('E35', 'E33');
-INSERT INTO class_inheritance VALUES ('E35', 'E41');
-INSERT INTO class_inheritance VALUES ('E36', 'E73');
-INSERT INTO class_inheritance VALUES ('E37', 'E36');
-INSERT INTO class_inheritance VALUES ('E37', 'E33');
-INSERT INTO class_inheritance VALUES ('E38', 'E36');
-INSERT INTO class_inheritance VALUES ('E39', 'E77');
-INSERT INTO class_inheritance VALUES ('E40', 'E74');
-INSERT INTO class_inheritance VALUES ('E41', 'E90');
-INSERT INTO class_inheritance VALUES ('E42', 'E41');
-INSERT INTO class_inheritance VALUES ('E44', 'E41');
-INSERT INTO class_inheritance VALUES ('E45', 'E44');
-INSERT INTO class_inheritance VALUES ('E45', 'E51');
-INSERT INTO class_inheritance VALUES ('E46', 'E44');
-INSERT INTO class_inheritance VALUES ('E47', 'E44');
-INSERT INTO class_inheritance VALUES ('E48', 'E44');
-INSERT INTO class_inheritance VALUES ('E49', 'E41');
-INSERT INTO class_inheritance VALUES ('E50', 'E49');
-INSERT INTO class_inheritance VALUES ('E51', 'E41');
-INSERT INTO class_inheritance VALUES ('E52', 'E1');
-INSERT INTO class_inheritance VALUES ('E53', 'E1');
-INSERT INTO class_inheritance VALUES ('E54', 'E1');
-INSERT INTO class_inheritance VALUES ('E55', 'E28');
-INSERT INTO class_inheritance VALUES ('E56', 'E55');
-INSERT INTO class_inheritance VALUES ('E57', 'E55');
-INSERT INTO class_inheritance VALUES ('E58', 'E55');
-INSERT INTO class_inheritance VALUES ('E60', 'E59');
-INSERT INTO class_inheritance VALUES ('E61', 'E59');
-INSERT INTO class_inheritance VALUES ('E62', 'E59');
-INSERT INTO class_inheritance VALUES ('E63', 'E5');
-INSERT INTO class_inheritance VALUES ('E64', 'E5');
-INSERT INTO class_inheritance VALUES ('E65', 'E7');
-INSERT INTO class_inheritance VALUES ('E65', 'E63');
-INSERT INTO class_inheritance VALUES ('E66', 'E7');
-INSERT INTO class_inheritance VALUES ('E66', 'E63');
-INSERT INTO class_inheritance VALUES ('E67', 'E63');
-INSERT INTO class_inheritance VALUES ('E68', 'E64');
-INSERT INTO class_inheritance VALUES ('E69', 'E64');
-INSERT INTO class_inheritance VALUES ('E70', 'E77');
-INSERT INTO class_inheritance VALUES ('E71', 'E70');
-INSERT INTO class_inheritance VALUES ('E71', 'E77');
-INSERT INTO class_inheritance VALUES ('E72', 'E70');
-INSERT INTO class_inheritance VALUES ('E73', 'E90');
-INSERT INTO class_inheritance VALUES ('E73', 'E89');
-INSERT INTO class_inheritance VALUES ('E74', 'E39');
-INSERT INTO class_inheritance VALUES ('E75', 'E41');
-INSERT INTO class_inheritance VALUES ('E77', 'E1');
-INSERT INTO class_inheritance VALUES ('E78', 'E24');
-INSERT INTO class_inheritance VALUES ('E79', 'E11');
-INSERT INTO class_inheritance VALUES ('E80', 'E11');
-INSERT INTO class_inheritance VALUES ('E81', 'E63');
-INSERT INTO class_inheritance VALUES ('E81', 'E64');
-INSERT INTO class_inheritance VALUES ('E82', 'E41');
-INSERT INTO class_inheritance VALUES ('E83', 'E65');
-INSERT INTO class_inheritance VALUES ('E84', 'E22');
-INSERT INTO class_inheritance VALUES ('E85', 'E7');
-INSERT INTO class_inheritance VALUES ('E86', 'E7');
-INSERT INTO class_inheritance VALUES ('E87', 'E7');
-INSERT INTO class_inheritance VALUES ('E89', 'E28');
-INSERT INTO class_inheritance VALUES ('E90', 'E72');
-INSERT INTO class_inheritance VALUES ('E90', 'E28');
 
 
 --
