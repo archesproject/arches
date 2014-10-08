@@ -8,21 +8,23 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
             'language': null,
             'conceptid': ''
         },
-        save: function(successCallback) {
+
+        save: function(callback) {
             $.ajax({
                 type: "POST",
                 url: arches.urls.concept_value,
                 data: {
                     'json': JSON.stringify(this.toJSON())
                 },
-                success: successCallback
+                callback: callback
             });
         },
-        delete: function(successCallback) {
+        
+        delete: function(callback) {
             $.ajax({
                 type: "DELETE",
                 url: arches.urls.concept_value + this.get('id'),
-                success: successCallback
+                callback: callback
             });
         }
     });

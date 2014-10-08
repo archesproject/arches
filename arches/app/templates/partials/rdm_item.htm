@@ -35,7 +35,7 @@
         <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#labelmodal">Add new label</a></dd>
         {% for label in concept.labels %}
         <dd class="arches-RDM-labels">
-            <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}"><i class="color-green fa fa-times-circle"></i></a>
+            <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}" class="color-green fa fa-times-circle"></a>
             <a href="#" title="Edit this label" data-action="edit" class="edit-value" data-target="#labelmodal" data-id="{{label.id}}" data-datatype="{{label.datatype}}" data-type="{{label.type}}" data-category="{{label.category}}" data-value="{{label.value}}" data-language="{{label.language}}">{{label.value}}</a>&nbsp; {% if label.type == 'prefLabel' %} (preferred) {% endif %} ({{label.language}})
         </dd>{% endfor %}
     </dl>
@@ -48,7 +48,7 @@
         <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#notemodal">Add new note</a></dd>
         {% for note in concept.notes %}{% if note.type == 'scopeNote' %}
         <dd class="margin-left-10 txt-color-blue">
-            <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}"><i class="color-green fa fa-times-circle"></i></a>
+            <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}" class="color-green fa fa-times-circle"></a>
             <a href="#" data-action="edit" class="edit-value" data-target="#notemodal" data-id="{{note.id}}" data-datatype="{{note.datatype}}" data-type="{{note.type}}" data-category="{{note.category}}" data-value="{{note.value}}" data-language="{{note.language}}">{{note.value}} ({{note.language}})</a>
         </dd>{% endif %}{% endfor %}
     </dl>
@@ -72,7 +72,7 @@
         <dt>Sub Concepts</dt>
         {% for subconcept in concept.subconcepts %}
         <dd class="arches-RDM-labels">
-            <a href="#" title="Delete Concept" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts."><i class="color-green fa fa-times-circle"></i></a>
+            <a href="#" title="Delete Concept" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." class="color-green fa fa-times-circle"></a>
             <a href="#" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for label in subconcept.labels %}{% if label.type == 'prefLabel' %}{{label.value}}{% endif %}{% endfor %} ({{subconcept.id}})</a>
         </dd>{% endfor %}
 
@@ -87,7 +87,7 @@
         <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#related_valuemodal">Add new value</a></dd>
         {% for related_value in concept.metadata %}
         <dd class="arches-RDM-labels">
-            <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"><i class="color-green fa fa-times-circle"></i></a>
+            <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"class="color-green fa fa-times-circle"></a>
             <a href="#" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{related_value.id}}" data-datatype="{{related_value.datatype}}" data-type="{{related_value.type}}" data-category="{{related_value.category}}" data-value="{{related_value.value}}" data-language="{{related_value.language}}">{{related_value.type}}: {{related_value.value}} {% if related_value.language != None %}({{related_value.language}}){% endif %}</a>
         </dd>{% endfor %}
     </dl>
