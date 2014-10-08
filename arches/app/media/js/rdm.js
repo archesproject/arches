@@ -8,22 +8,22 @@ require([
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport) {
     $(document).ready(function() {
-        var activeConcept = new ConceptModel(),
+        var concept = new ConceptModel(),
             conceptTree = new ConceptTree({
                 el: $('#jqtree')[0],
-                model: activeConcept
+                model: concept
             }),
             conceptReport = new ConceptReport({
                 el: $('#concept_report')[0],
-                model: activeConcept
+                model: concept
             });
 
-        activeConcept.on('change', function() {
-            window.history.pushState({}, "conceptid", activeConcept.get('id'));
+        concept.on('change', function() {
+            window.history.pushState({}, "conceptid", concept.get('id'));
         });
 
         conceptTree.on('conceptMoved', function(conceptid) {
-            if (activeConcept.get('id') === conceptid) {
+            if (concept.get('id') === conceptid) {
                 conceptReport.render();
             }
         });
@@ -46,10 +46,10 @@ require([
                         label: $(form).find("[name=label]").val(),
                         note: $(form).find("[name=note]").val(),
                         language: $(form).find("[name=language_dd]").select2('val'),
-                        parentconceptid: activeConcept.get('id')
+                        parentconceptid: concept.get('id')
                     },
-                    concept = new ConceptModel(data);
-                concept.save(function(data) {
+                    childConcept = new ConceptModel(data);
+                childConcept.save(function(data) {
                     $('#conceptmodal').modal('hide');
                     conceptTree.render();
                 });
