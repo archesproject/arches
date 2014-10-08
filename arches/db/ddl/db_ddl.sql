@@ -809,6 +809,10 @@ BEGIN
             VALUES (v_parentconceptid, v_conceptid, 'has narrower concept', public.uuid_generate_v1mc());
         END IF;
         
+            IF p_businesstablename = '' THEN
+              p_businesstablename = null;
+            END IF;
+
             INSERT INTO data.entity_types(
                     classid, conceptid, businesstablename, publishbydefault, icon, 
                     defaultvectorcolor, entitytypeid, isresource)
@@ -983,40 +987,52 @@ ALTER FUNCTION ontology.check_entitytypeid(p_entitytypeidfrom text, p_entitytype
 --
 -- TOC entry 1289 (class 1255 OID 15704230)
 -- Dependencies: 1863 11
--- Name: insert_mapping(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mappings(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) RETURNS integer
+CREATE FUNCTION insert_mappings(p_mapping text, p_mergenodeid text) RETURNS integer
     LANGUAGE plpgsql
     AS $$
 DECLARE 
   v_domain text;
   v_property text;
+  v_entitytypefrom text;
+  v_entitytypeto text;
+  v_businesstablename_from text;
+  v_businesstablename_to text;
   v_range text;
   v_mappingid text;
-  v_index integer := 0;
+  v_index integer := 1;
+  -- p_mapping is a comma separated string in the form:
+  -- entitytypeid_from,businesstable,property_name,entitytypeid_to,businesstable,entitytypeid_from,...
+  -- 'HISTORICAL_RESOURCE.E1,,P1,NAME.E41,strings,P2,NAMETYPE.E55,domains'
   v_steps text[] := regexp_split_to_array(p_mapping, ',');
 BEGIN 
 
-    p_entitytypefrom = btrim(p_entitytypefrom);
-    p_entitytypeto = btrim(p_entitytypeto);
-    PERFORM data.insert_entitytype(p_entitytypefrom, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-    PERFORM data.insert_entitytype(p_entitytypeto, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-    v_mappingid = (SELECT ontology.populate_mappings(p_entitytypefrom, p_entitytypeto, p_default, p_mergenodeid));
+    v_entitytypefrom = btrim(v_steps[1]);
+    v_entitytypeto = btrim(v_steps[array_upper(v_steps, 1)-1]);
+    v_businesstablename_from = btrim(v_steps[2]);
+    v_businesstablename_to = btrim(v_steps[array_upper(v_steps, 1)]);
+    PERFORM data.insert_entitytype(v_entitytypefrom, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    PERFORM data.insert_entitytype(v_entitytypeto, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    v_mappingid = (SELECT ontology.insert_mapping(v_entitytypefrom, v_entitytypeto, p_mergenodeid));
 
-    WHILE v_index < ((array_length(v_steps,1)-1)/2)
+    --WHILE v_index < ((array_length(v_steps,1)-1)/2)
+    WHILE v_index < (array_length(v_steps,1)-1)
     LOOP
-        v_domain = btrim(v_steps[(v_index*2)+1]);
-        v_property = btrim(v_steps[(v_index*2+1)+1]);
-        v_range = btrim(v_steps[(v_index*2+2)+1]);
-        
-        PERFORM data.insert_entitytype(v_domain, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM data.insert_entitytype(v_range, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM ontology.populate_rules(v_domain, v_property, v_range);
-        PERFORM ontology.populate_mapping_steps(v_mappingid, v_domain, v_property, v_range, p_entitytypefrom, p_entitytypeto, v_index+1);  
+        v_domain = btrim(v_steps[v_index]);
+        v_businesstablename_from = btrim(v_steps[v_index+1]);
+        v_property = btrim(v_steps[v_index+2]);
+        v_range = btrim(v_steps[v_index+3]);
+        v_businesstablename_to = btrim(v_steps[v_index+4]);
+
+        PERFORM data.insert_entitytype(v_domain, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM data.insert_entitytype(v_range, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM ontology.insert_rule(v_domain, v_property, v_range);
+        PERFORM ontology.insert_mapping_step(v_mappingid, v_domain, v_property, v_range, v_entitytypefrom, v_entitytypeto, ((v_index+2)/3));  
 
         raise notice 'mapping step: % % %',v_domain, v_property, v_range;
-        v_index := v_index + 1;
+        v_index := v_index + 3;
 
     END LOOP;
   
@@ -1026,15 +1042,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mappings(p_mapping text, p_mergenodeid text) OWNER TO postgres;
 
 --
 -- TOC entry 1290 (class 1255 OID 15704231)
 -- Dependencies: 1863 11
--- Name: populate_mapping_steps(text, text, text, text, text, text, integer); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mapping_step(text, text, text, text, text, text, integer); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_mapping_steps(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) RETURNS text
+CREATE FUNCTION insert_mapping_step(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE 
@@ -1053,15 +1069,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_mapping_steps(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mapping_step(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) OWNER TO postgres;
 
 --
 -- TOC entry 1291 (class 1255 OID 15704232)
 -- Dependencies: 1863 11
--- Name: populate_mappings(text, text, boolean, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mapping(text, text, boolean, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_mappings(p_entityfrom text, p_entityto text, p_default boolean, p_mergenodeid text) RETURNS text
+CREATE FUNCTION insert_mapping(p_entityfrom text, p_entityto text, p_mergenodeid text) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE v_newmappingid uuid = uuid_generate_v1mc();
@@ -1071,8 +1087,8 @@ BEGIN
     THEN
         RETURN (SELECT mappingid FROM ontology.mappings WHERE entitytypeidfrom = p_entityfrom AND entitytypeidto = p_entityto);
     ELSE
-        INSERT INTO ontology.mappings (mappingid, entitytypeidfrom, entitytypeidto, "default", mergenodeid)
-        VALUES(v_newmappingid, p_entityfrom, p_entityto, p_default, p_mergenodeid);
+        INSERT INTO ontology.mappings (mappingid, entitytypeidfrom, entitytypeidto, mergenodeid)
+        VALUES(v_newmappingid, p_entityfrom, p_entityto, p_mergenodeid);
 
         RETURN v_newmappingid;
     END IF; 
@@ -1081,15 +1097,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_mappings(p_entityfrom text, p_entityto text, p_default boolean, p_mergenodeid text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mapping(p_entityfrom text, p_entityto text, p_mergenodeid text) OWNER TO postgres;
 
 --
 -- TOC entry 1292 (class 1255 OID 15704233)
 -- Dependencies: 1863 11
--- Name: populate_rules(text, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_rule(text, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_rules(p_domain text, p_property text, p_range text) RETURNS text
+CREATE FUNCTION insert_rule(p_domain text, p_property text, p_range text) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE 
@@ -1108,7 +1124,7 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_rules(p_domain text, p_property text, p_range text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_rule(p_domain text, p_property text, p_range text) OWNER TO postgres;
 
 --
 -- TOC entry 1293 (class 1255 OID 15704234)
@@ -1896,19 +1912,6 @@ ALTER TABLE data.vw_resources_poly OWNER TO postgres;
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 249 (class 1259 OID 15704442)
--- Dependencies: 11
--- Name: class_inheritance; Type: TABLE; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE class_inheritance (
-    classid text NOT NULL,
-    inheritsfrom text NOT NULL
-);
-
-
-ALTER TABLE ontology.class_inheritance OWNER TO postgres;
 
 --
 -- TOC entry 250 (class 1259 OID 15704448)
@@ -1952,7 +1955,6 @@ CREATE TABLE mappings (
     mappingid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     entitytypeidfrom text,
     entitytypeidto text,
-    "default" boolean DEFAULT false NOT NULL,
     mergenodeid text
 );
 
@@ -2335,15 +2337,6 @@ ALTER TABLE ONLY strings
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 3412 (class 2606 OID 15704545)
--- Dependencies: 249 249 249
--- Name: pk_class_inheritance; Type: CONSTRAINT; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT pk_class_inheritance PRIMARY KEY (classid, inheritsfrom);
-
 
 --
 -- TOC entry 3414 (class 2606 OID 15704547)
@@ -2712,26 +2705,6 @@ ALTER TABLE ONLY domains
 
 
 SET search_path = ontology, pg_catalog;
-
---
--- TOC entry 3453 (class 2606 OID 15704689)
--- Dependencies: 250 249 3413
--- Name: fk_classes_class_inheritance_classid; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_classid FOREIGN KEY (classid) REFERENCES classes(classid);
-
-
---
--- TOC entry 3454 (class 2606 OID 15704694)
--- Dependencies: 3413 249 250
--- Name: fk_classes_class_inheritance_inheritsfrom; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_inheritsfrom FOREIGN KEY (inheritsfrom) REFERENCES classes(classid);
-
 
 --
 -- TOC entry 3459 (class 2606 OID 15704699)

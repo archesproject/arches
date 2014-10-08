@@ -1,8 +1,8 @@
 from django.db import connection, transaction
 
-cursor = connection.cursor()
-
 def insert_concept_relations(sourcelegacyid, relationshiptype, targetlegacyid):
+    cursor = connection.cursor()
+
     sql = """
         SELECT concepts.insert_relation('%s','%s','%s');
     """ % (sourcelegacyid, relationshiptype.replace("'","''"), targetlegacyid)
@@ -13,6 +13,8 @@ def insert_concept_relations(sourcelegacyid, relationshiptype, targetlegacyid):
     transaction.commit_unless_managed()
 
 def insert_concept(label, note, languageid, legacyid):
+    cursor = connection.cursor()
+
     sql = """
         SELECT concepts.insert_concept('%s','%s','%s','%s');
     """ % (label.replace("'","''"), note, languageid, legacyid)
@@ -23,6 +25,8 @@ def insert_concept(label, note, languageid, legacyid):
     transaction.commit_unless_managed()
 
 def insert_concept_value(legacyid, label, labeltype, datatype=''):
+    cursor = connection.cursor()
+    
     label_is_timestamp = 'N'
     try:
         timestamp_result = ''
