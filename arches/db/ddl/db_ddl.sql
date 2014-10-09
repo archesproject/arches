@@ -1198,6 +1198,18 @@ CREATE TABLE app_config (
 ALTER TABLE app_metadata.app_config OWNER TO postgres;
 
 
+CREATE TABLE app_metadata.edit_log
+(
+  editlogid uuid NOT NULL DEFAULT uuid_generate_v1mc(),
+  resourceid uuid,
+  entityid uuid,
+  userid text,
+  "timestamp" timestamp,
+  oldvalue text,
+  newvalue text,
+  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid ));
+
+ALTER TABLE app_metadata.edit_log OWNER TO postgres;
 --
 -- TOC entry 208 (class 1259 OID 15704241)
 -- Dependencies: 8
