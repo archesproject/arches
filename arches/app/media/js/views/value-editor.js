@@ -3,7 +3,27 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
         modal: null,
         initialize: function(options) {
             var self = this,
-                rules = {};
+                rules = {},
+                title = 'Add New ';
+            
+            if (this.model.get('id')) {
+                title = 'Edit ';
+            }
+            switch($(this.el).attr('id')) {
+                case 'labelmodal':
+                    title += 'Label';
+                    break;
+                case 'notemodal':
+                    title += 'Note';
+                    break;
+                case 'related_valuemodal':
+                    title += 'Related Value';
+                    break;
+                default:
+                    title += 'Value';
+            }
+
+            $(this.el).find('.modal-title').text(title);
             
             this.valueInput = $(this.el).find('.value-input');
             this.idInput = $(this.el).find('.id-input');
@@ -30,30 +50,15 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 }
             });
 
+            this.model.on('change', function () {
+                self.render();
+            });
+
             this.render();
             $(this.el).modal('show');
         },
+        
         render: function () {
-            var title = 'Add New ';
-            
-            if (this.model.get('id')) {
-                title = 'Edit ';
-            }
-            switch($(this.el).attr('id')) {
-                case 'labelmodal':
-                    title += 'Label';
-                    break;
-                case 'notemodal':
-                    title += 'Note';
-                    break;
-                case 'related_valuemodal':
-                    title += 'Related Value';
-                    break;
-                default:
-                    title += 'Value';
-            }
-
-            $(this.el).find('.modal-title').text(title);
             this.valueInput.val(this.model.get('value'));
             this.idInput.val(this.model.get('id'));
             this.valueTypeInput.select2("val", this.model.get('type'));

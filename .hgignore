@@ -4,6 +4,7 @@ syntax: glob
 *.zip
 *.sublime*
 *.egg
+build/*
 version.py
 virtualenv/ENV
 install_db.sql
