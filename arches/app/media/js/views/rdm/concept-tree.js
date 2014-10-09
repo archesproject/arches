@@ -80,22 +80,20 @@ define([
                 // here we're just re-ordering nodes
             } else {
                 event.preventDefault();
-                if (confirm('Are you sure you want to move this concept to a new parent?')) {
-                    $.ajax({
-                        type: "POST",
-                        url: arches.urls.concept_relation,
-                        data: JSON.stringify({
-                            'conceptid': move_info.moved_node.id,
-                            'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id,
-                            'current_parent_conceptid': move_info.previous_parent.id
-                        }),
-                        success: function() {
-                            var data = JSON.parse(this.data);
-                            event.move_info.do_move();
-                            self.trigger('conceptMoved', data.conceptid);
-                        }
-                    });
-                }
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.concept_relation,
+                    data: JSON.stringify({
+                        'conceptid': move_info.moved_node.id,
+                        'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id,
+                        'current_parent_conceptid': move_info.previous_parent.id
+                    }),
+                    success: function() {
+                        var data = JSON.parse(this.data);
+                        event.move_info.do_move();
+                        self.trigger('conceptMoved', data.conceptid);
+                    }
+                });
             }
         }
     });

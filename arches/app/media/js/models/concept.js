@@ -1,4 +1,4 @@
-define(['backbone'], function (Backbone) {
+define(['backbone', 'arches'], function (Backbone, arches) {
     return Backbone.Model.extend({
         defaults: {
             'id': '',

@@ -46,11 +46,12 @@ define([
                                 var childConcept = new ConceptModel({
                                         label: $(form).find("[name=label]").val(),
                                         note: $(form).find("[name=note]").val(),
-                                        language: $(form).find("[name=language_dd]").select2('val'),
-                                        parentconceptid: concept.get('id')
+                                        language: $(form).find("[name=language_dd]").val(),
+                                        parentconceptid: self.model.get('id')
                                     });
                                 childConcept.save(function() {
                                     self.$el.find('#conceptmodal').modal('hide');
+                                    self.$el.find("input[type=text], textarea").val("");
                                     self.trigger('conceptAdded', childConcept);
                                 });
                             }

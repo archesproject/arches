@@ -113,7 +113,6 @@ def concept(request, ids):
             with transaction.atomic():
                 concept = archesmodels.Concepts()
                 concept.pk = str(uuid.uuid4())
-                concept.conceptschemeid = archesmodels.Conceptschemes.objects.get(pk='00000000-0000-0000-0000-000000000000')
                 concept.save()
 
                 conceptrelation = archesmodels.ConceptRelations()
