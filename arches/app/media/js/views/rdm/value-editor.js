@@ -9,7 +9,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             if (this.model.get('id')) {
                 title = 'Edit ';
             }
-            switch($(this.el).attr('id')) {
+            switch(this.$el.attr('id')) {
                 case 'labelmodal':
                     title += 'Label';
                     break;
@@ -23,29 +23,29 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                     title += 'Value';
             }
 
-            $(this.el).find('.modal-title').text(title);
+            this.$el.find('.modal-title').text(title);
             
-            this.valueInput = $(this.el).find('.value-input');
-            this.idInput = $(this.el).find('.id-input');
-            this.valueTypeInput = $(this.el).find('.value-type-input');
-            this.languageInput = $(this.el).find('.language-input');
+            this.valueInput = this.$el.find('.value-input');
+            this.idInput = this.$el.find('.id-input');
+            this.valueTypeInput = this.$el.find('.value-type-input');
+            this.languageInput = this.$el.find('.language-input');
             
             rules[this.valueInput.attr('id')] = "required";
             rules[this.valueTypeInput.attr('id')] = "required";
             rules[this.languageInput.attr('id')] = "required";
 
-            $(this.el).validate({
+            this.$el.validate({
                 ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
                 rules: rules,
                 submitHandler: function(form) {
                     self.model.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
-                        valuetype: self.valueTypeInput.select2('val'),
+                        valuetype: self.valueTypeInput.val(),
                         datatype: 'text',
-                        language: self.languageInput.select2('val')
+                        language: self.languageInput.val()
                     });
-                    $(this.el).modal('hide');
+                    self.$el.modal('hide');
                     self.trigger('submit');
                 }
             });
@@ -55,7 +55,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             });
 
             this.render();
-            $(this.el).modal('show');
+            this.$el.modal('show');
         },
         
         render: function () {

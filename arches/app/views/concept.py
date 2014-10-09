@@ -39,7 +39,7 @@ def rdm(request, conceptid):
         else:
             othertypes.append(type)
 
-    return render_to_response('pages/rdm.htm', {
+    return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'conceptid': conceptid,
@@ -84,7 +84,7 @@ def concept(request, ids):
                     languages = archesmodels.DLanguages.objects.all()
                     valuetypes = archesmodels.ValueTypes.objects.all()
                     prefLabel = concept_graph.get_preflabel(lang=lang)
-                    return render_to_response('partials/rdm_item.htm', {'lang': lang, 'prefLabel': prefLabel, 'concept': concept_graph , 'languages': languages}, context_instance=RequestContext(request))
+                    return render_to_response('views/rdm/concept-report.htm', {'lang': lang, 'prefLabel': prefLabel, 'concept': concept_graph , 'languages': languages}, context_instance=RequestContext(request))
                 
                 if f == 'skos':
                     skos = SKOSWriter()
@@ -113,7 +113,6 @@ def concept(request, ids):
             with transaction.atomic():
                 concept = archesmodels.Concepts()
                 concept.pk = str(uuid.uuid4())
-                concept.conceptschemeid = archesmodels.Conceptschemes.objects.get(pk='00000000-0000-0000-0000-000000000000')
                 concept.save()
 
                 conceptrelation = archesmodels.ConceptRelations()

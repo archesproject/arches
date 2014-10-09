@@ -1,4 +1,4 @@
-﻿{% extends "pages/base.htm" %}
+﻿{% extends "base.htm" %}
 {% load staticfiles %}
 
 {% block css %}
@@ -129,15 +129,8 @@
                     <!-- Concept Summary -->
                     <div class="right-inner arches-box-grey-border padding-10" style="background: #ffffff;">
                                     
-                        <div class="row margin-bottom-30">
-                            
-                            <!-- Concept Managment Tools -->
-                            <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading"></div>
-                            <div class="col-xs-12" id="concept_report">
-                                Loading...
-                            </div>
-                            <!-- End Concept Managment Tools -->
-                            
+                        <div class="row margin-bottom-30" id="concept_report">
+                            <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading">Loading...</div>
                         </div><!--/row-->
                         
 
@@ -302,27 +295,8 @@
     </form>
     <!-- End Modal editing window for related_value -->
 
-    <div action="" class="modal fade" id="confirm_delete_modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
-        <div class="modal-dialog confirm-delete">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">Are you ready to delete this?</h4>
-                </div>
-                <div class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
-                    <button id="confirm_delete_yes" class="btn-u btn-u-primary" href="#" data-id="" data-action="delete">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div style="display:none;" id="concept-data">
         <input type="hidden" id="selected-conceptid" value="{{conceptid}}">
     </div>
-
-{% include "partials/add_concept.htm" %}
 
 {% endblock content %}

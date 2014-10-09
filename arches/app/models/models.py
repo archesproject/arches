@@ -76,12 +76,6 @@ class Classes(models.Model):
     def __unicode__(self):
         return self.classname
 
-class Conceptschemes(models.Model):
-    conceptschemeid = models.TextField(primary_key=True) # This field type is a guess.
-    name = models.TextField()
-    class Meta:
-        db_table = u'conceptschemes'
-
 class DLanguages(models.Model):
     languageid = models.TextField(primary_key=True)
     languagename = models.TextField()

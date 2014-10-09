@@ -16,7 +16,7 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
                 data: {
                     'json': JSON.stringify(this.toJSON())
                 },
-                callback: callback
+                complete: callback
             });
         },
         
@@ -24,7 +24,7 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
             $.ajax({
                 type: "DELETE",
                 url: arches.urls.concept_value + this.get('id'),
-                callback: callback
+                complete: callback
             });
         }
     });

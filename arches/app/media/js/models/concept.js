@@ -1,4 +1,4 @@
-define(['backbone'], function (Backbone) {
+define(['backbone', 'arches'], function (Backbone, arches) {
     return Backbone.Model.extend({
         defaults: {
             'id': '',
@@ -13,7 +13,7 @@ define(['backbone'], function (Backbone) {
                 type: "POST",
                 url: arches.urls.concept,
                 data: JSON.stringify(this.toJSON()),
-                callback: callback
+                complete: callback
             });
         },
 
@@ -21,7 +21,7 @@ define(['backbone'], function (Backbone) {
             $.ajax({
                 type: "DELETE",
                 url: arches.urls.concept + this.get('id'),
-                callback: callback
+                complete: callback
             });
         }
     });

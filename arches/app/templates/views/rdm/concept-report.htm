@@ -1,0 +1,170 @@
+﻿ {% load i18n %}
+<div class="col-xs-12 hidden arches-RDM-loading" class="concept-report-loading">Loading...</div>
+<div class="col-xs-12" class="concept-report-content">
+    <!-- Concept Preferred Label -->
+    <div class="headline margin-bottom-10 padding-left-10"><h4>{{prefLabel}} ({{lang}})</h4>
+        
+    </div>
+    <!-- End Concept Preferred Label -->
+
+    <!-- Concept Management Tools -->
+    <div class="margin-bottom-10 padding-left-10">
+
+        <!-- Manage Concept -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary">Manage Concept</button>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-chevron-down"></i>
+                <span class="sr-only">Toggle Dropdown</span>                            
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">Add Child</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Import Children from SKOS</a></li>
+                <li><a href="#">Import Children from .CSV</a></li>
+                <li class="divider"></li>
+                <li><a href="{%url 'concept' concept.id %}?f=skos" target="_blank">Export to SKOS</a></li>
+                <li><a href="#">Export to .CSV</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Concept Labels -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>Concept Labels</dt>
+            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#labelmodal">Add new label</a></dd>
+            {% for label in concept.labels %}
+            <dd class="arches-RDM-labels">
+                <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}" class="color-green fa fa-times-circle"></a>
+                <a href="#" title="Edit this label" data-action="edit" class="edit-value" data-target="#labelmodal" data-id="{{label.id}}" data-datatype="{{label.datatype}}" data-type="{{label.type}}" data-category="{{label.category}}" data-value="{{label.value}}" data-language="{{label.language}}">{{label.value}}</a>&nbsp; {% if label.type == 'prefLabel' %} (preferred) {% endif %} ({{label.language}})
+            </dd>{% endfor %}
+        </dl>
+    </div>
+
+    <!-- Scope Notes -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>Scope Note</dt>
+            <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#notemodal">Add new note</a></dd>
+            {% for note in concept.notes %}{% if note.type == 'scopeNote' %}
+            <dd class="margin-left-10 txt-color-blue">
+                <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}" class="color-green fa fa-times-circle"></a>
+                <a href="#" data-action="edit" class="edit-value" data-target="#notemodal" data-id="{{note.id}}" data-datatype="{{note.datatype}}" data-type="{{note.type}}" data-category="{{note.category}}" data-value="{{note.value}}" data-language="{{note.language}}">{{note.value}} ({{note.language}})</a>
+            </dd>{% endif %}{% endfor %}
+        </dl>
+    </div>
+
+    <!-- Parent Concepts-->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>Parent Concepts</dt>
+            {% for parentconcept in concept.parentconcepts %}
+            <dd class="arches-RDM-labels">
+                <a href="#" data-action="viewconcept" data-conceptid="{{parentconcept.id}}">{% for label in parentconcept.labels %}{% if label.type == 'prefLabel' %}{{label.value}}{% endif %}{% endfor %} ({{parentconcept.id}})</a>
+            </dd>{% endfor %}
+        </dl>
+    </div>
+    <!-- End Parent Concepts -->
+
+    <!-- Sub Concepts-->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>Sub Concepts</dt>
+            {% for subconcept in concept.subconcepts %}
+            <dd class="arches-RDM-labels">
+                <a href="#" title="Delete Concept" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." class="color-green fa fa-times-circle"></a>
+                <a href="#" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for label in subconcept.labels %}{% if label.type == 'prefLabel' %}{{label.value}}{% endif %}{% endfor %} ({{subconcept.id}})</a>
+            </dd>{% endfor %}
+
+        </dl>
+    </div>
+    <!-- End Sub Concepts -->
+
+    <!-- Related Values-->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>Related Values</dt>
+            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#related_valuemodal">Add new value</a></dd>
+            {% for related_value in concept.metadata %}
+            <dd class="arches-RDM-labels">
+                <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"class="color-green fa fa-times-circle"></a>
+                <a href="#" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{related_value.id}}" data-datatype="{{related_value.datatype}}" data-type="{{related_value.type}}" data-category="{{related_value.category}}" data-value="{{related_value.value}}" data-language="{{related_value.language}}">{{related_value.type}}: {{related_value.value}} {% if related_value.language != None %}({{related_value.language}}){% endif %}</a>
+            </dd>{% endfor %}
+        </dl>
+    </div>
+    <!-- End Related Concepts -->
+
+    <!-- Scope Notes -->
+    <div class="padding-left-10">
+        <dl>
+            <dt>Identifiers</dt>
+            <dd class="margin-left-10 txt-color-blue">
+                Arches Concept ID: {{concept.id}} </br>
+                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+            </dd>
+        </dl>
+    </div>
+
+    <div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog confirm-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Are you ready to delete this?</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
+                    <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal window for adding a new concept -->
+    <form action="" class="modal fade" id="conceptmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans "Add Concept" %}</h4>
+                    
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>{% trans "Label" %}</h4>
+                            <p><input class="form-control" type="text" name="label" required/></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>{% trans "Note" %}</h4>
+                            <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>{% trans "Language" %}</h4>
+                            <p> 
+                                <select style="width:100%" class="select2" name="language_dd" required>
+                                    {% for language in languages %}
+                                      <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                    {% endfor %}
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                    <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- End Modal window for adding a new concept -->
+</div>
