@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from app.models.models import Domains, EntityTypes, Classes, Maplayers, I18N, AppConfig, UserProfile
+from app.models.models import Domains, EntityTypes, Classes, UserProfile
 from django.contrib import admin
 
-admin.site.register([Maplayers, AppConfig, I18N, UserProfile])
+admin.site.register([UserProfile])

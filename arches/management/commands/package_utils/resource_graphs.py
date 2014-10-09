@@ -33,7 +33,7 @@ def load_graphs(packagepath, break_on_error=True):
                 print name
                 node_list = get_list_dict(path_to_resource_graphs, name + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
                 edge_list = get_list_dict(path_to_resource_graphs, name + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
-                mods = append_arches_record_branch(node_list, edge_list)
+                mods = append_branch('ARCHES_RECORD.E31', os.path.join(settings.ROOT_DIR, 'management', 'resource_graphs'), node_list, edge_list)
                 node_list = mods['node_list']
                 edge_list = mods['edge_list']
 
@@ -58,20 +58,33 @@ def load_graphs(packagepath, break_on_error=True):
         if break_on_error:
             sys.exit(101)
 
-def append_arches_record_branch(node_list, edge_list):
-    name = 'ARCHES_RECORD.E31'
-    path_to_resource_graphs = os.path.join(settings.ROOT_DIR, 'management', 'resource_graphs')
-    nodes_to_append = get_list_dict(path_to_resource_graphs, name + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
-    edges_to_append = get_list_dict(path_to_resource_graphs, name + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
+def append_branch(name, path_to_branch, node_list, edge_list):
+    """
+    Appends a branch to the root of the passed in graph (represented as the node_list and edge_list)
+
+    Args:
+       path_to_branch (str):  path to the directory where the branch graph lives
+       name (str): entity type name of the branch to append 
+            (eg: 'ARCHES_RECORD.E31', where the actual nodes and edges files look like ARCHES_RECORD.E31_nodes.csv and ARCHES_RECORD.E31_edges.csv)
+
+    Returns:
+       {'node_list': node_list_with_added_branch, 'edge_list': edge_list_with_added_branch}
+
+    """
+
+    nodes_to_append = get_list_dict(path_to_branch, name + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
+    edges_to_append = get_list_dict(path_to_branch, name + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
 
     root_node_id_of_main_graph = get_root_node_id(edge_list)
     root_node_id_of_branch = get_root_node_id(edges_to_append)
+    
+    # rename branch root (which is a dummy value) to the graph root value
+    for edge in edges_to_append:
+        if edge['SOURCE'] == root_node_id_of_branch:
+            edge['SOURCE'] = root_node_id_of_main_graph
 
     node_list = node_list + nodes_to_append
     edge_list = edge_list + edges_to_append
-
-    edge_list.append({'SOURCE': '%s' % (root_node_id_of_main_graph), 'TARGET': '%s' % (root_node_id_of_branch), 
-        'TYPE': 'Directed', 'ID': 'A09WROSIFEJAEF9ASKDLFKSJ', 'LABEL': 'P70', 'WEIGHT': '1.0'})
     
     return {'node_list': node_list, 'edge_list': edge_list}
 

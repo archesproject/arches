@@ -43,17 +43,6 @@ from django.contrib.auth.models import User
 
 
 # User.get_mapping = types.MethodType(_func, None, User)
-class AppConfig(models.Model):
-    name = models.TextField(primary_key=True)
-    defaultvalue = models.TextField()
-    datatype = models.TextField()
-    notes = models.TextField()
-    isprivate = models.BooleanField()
-    class Meta:
-        db_table = u'app_config'
-    
-    def __unicode__(self):
-        return self.name
 
 class AuthGroup(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -139,13 +128,6 @@ class DjangoSite(models.Model):
     class Meta:
         db_table = u'django_site'
 
-class Forms(models.Model):
-    formid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    widgetname = models.TextField()
-    class Meta:
-        db_table = u'forms'
-
 class GeographyColumns(models.Model):
     f_table_catalog = models.TextField() # This field type is a guess.
     f_table_schema = models.TextField() # This field type is a guess.
@@ -167,36 +149,6 @@ class GeometryColumns(models.Model):
     type = models.CharField(max_length=30)
     class Meta:
         db_table = u'geometry_columns'
-
-class I18N(models.Model):
-    key = models.TextField()
-    value = models.TextField()
-    languageid = models.TextField()
-    widgetname = models.TextField(blank=True)
-    class Meta:
-        db_table = u'i18n'
-
-    def __unicode__(self):
-        return self.widgetname + '-' + self.key + ': ' + self.value
-
-class Maplayers(models.Model):
-    id = models.IntegerField(primary_key=True)
-    active = models.BooleanField()
-    on_map = models.BooleanField()
-    selectable = models.BooleanField()
-    basemap = models.BooleanField()
-    name_i18n_key = models.TextField()
-    icon = models.TextField(blank=True)
-    symbology = models.TextField(blank=True)
-    description_i18n_key = models.TextField(blank=True)
-    layergroup_i18n_key = models.TextField()
-    layer = models.TextField()
-    sortorder = models.IntegerField(blank=True)
-    class Meta:
-        db_table = u'maplayers'
-
-    def __unicode__(self):
-        return ('%s') % (self.name_i18n_key)
 
 class RasterColumns(models.Model):
     r_table_catalog = models.TextField() # This field type is a guess.
@@ -231,20 +183,6 @@ class RasterOverviews(models.Model):
     overview_factor = models.IntegerField()
     class Meta:
         db_table = u'raster_overviews'
-
-class Reports(models.Model):
-    reportid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    widgetname = models.TextField()
-    class Meta:
-        db_table = u'reports'
-
-class ResourceGroups(models.Model):
-    groupid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    displayclass = models.TextField()
-    class Meta:
-        db_table = u'resource_groups'
 
 class SpatialRefSys(models.Model):
     srid = models.IntegerField(primary_key=True)
@@ -514,12 +452,6 @@ class AuthUserUserPermissions(models.Model):
     class Meta:
         db_table = u'auth_user_user_permissions'
 
-class ClassInheritance(models.Model):
-    classid = models.ForeignKey('Classes', db_column='classid', related_name='classinheritance_classid')
-    inheritsfrom = models.ForeignKey('Classes', db_column='inheritsfrom', related_name='classinheritance_inheritsfrom')
-    class Meta:
-        db_table = u'class_inheritance'
-
 class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
     classdomain = models.ForeignKey('Classes', db_column='classdomain', related_name='properties_classdomain')
@@ -537,18 +469,13 @@ class EntityTypes(models.Model):
     defaultvectorcolor = models.TextField()
     entitytypeid = models.TextField(primary_key=True)
     isresource = models.BooleanField()
-    groupid = models.ForeignKey('ResourceGroups', db_column='groupid')
     class Meta:
         db_table = u'data"."entity_types'
 
     def getcolumnname(self):
         ret = None
-        #businesstablename = self.classid.defaultbusinesstable
         if self.businesstablename is not None and self.businesstablename != 'entities':
-            if self.businesstablename == 'geometries':
-                ret = 'geometry'
-            else:
-                ret = 'val'
+            ret = 'val'
 
         return ret     
 
@@ -557,8 +484,6 @@ class EntityTypes(models.Model):
 
 class Entities(models.Model):
     entityid = models.TextField(primary_key=True) # This field type is a guess.
-    createtms = models.DateTimeField()
-    retiretms = models.DateTimeField()
     entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
     class Meta:
         db_table = u'data"."entities'
@@ -638,27 +563,21 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class Geometries(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
-    geometry = models.GeometryField()
+    val = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
         db_table = u'geometries'
 
-class InformationThemes(models.Model):
-    informationthemeid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    displayclass = models.TextField()
-    entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
+class EditLog(models.Model):
+    editlogid = models.TextField(primary_key=True)
+    resourceid = models.TextField()
+    entityid = models.TextField()
+    userid = models.TextField()
+    timestamp = models.DateTimeField()
+    oldvalue = models.TextField()
+    newvalue = models.TextField()
     class Meta:
-        db_table = u'information_themes'
-
-# class Log(models.Model):
-#     logid = models.IntegerField(primary_key=True)
-#     entityid = models.ForeignKey('Entities', db_column='entityid')
-#     logtype = models.TextField()
-#     userid = models.TextField() # This field type is a guess.
-#     createtms = models.DateTimeField()
-#     class Meta:
-#         db_table = u'log'
+        db_table = u'edit_log'
 
 class Domains(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
@@ -700,19 +619,6 @@ class Domains(models.Model):
                         value = None
 
         super(Domains, self).__setattr__(name, value)
-
-class EntityTypeXReports(models.Model):
-    reportid = models.ForeignKey('Reports', db_column='reportid')
-    entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
-    class Meta:
-        db_table = u'entity_type_x_reports'
-
-class InformationThemesXForms(models.Model):
-    formid = models.ForeignKey('Forms', db_column='formid')
-    sortorder = models.IntegerField()
-    informationthemeid = models.ForeignKey('InformationThemes', db_column='informationthemeid')
-    class Meta:
-        db_table = u'information_themes_x_forms'
 
 class Mappings(models.Model):
     mappingid = models.TextField(primary_key=True) # This field type is a guess.
