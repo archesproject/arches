@@ -599,7 +599,7 @@ CREATE FUNCTION get_geometry(p_entityid uuid) RETURNS text
   FOR relations IN SELECT r.entityidrange FROM data.relations r WHERE r.entityiddomain = p_entityid
   LOOP
     IF EXISTS(SELECT * FROM data.geometries g WHERE g.entityid = relations) THEN
-      ret = (select st_astext(st_multi(st_collect(g.geometry))) FROM data.geometries g WHERE g.entityid = relations);
+      ret = (select st_astext(st_multi(st_collect(g.val))) FROM data.geometries g WHERE g.entityid = relations);
       EXIT;
     ELSE
       ret = (SELECT data.get_geometry(relations));
@@ -1675,8 +1675,6 @@ ALTER TABLE data.domains OWNER TO postgres;
 
 CREATE TABLE entities (
     entityid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    createtms timestamp without time zone NOT NULL,
-    retiretms timestamp without time zone,
     entitytypeid text
 );
 
@@ -1726,7 +1724,7 @@ ALTER TABLE data.files OWNER TO postgres;
 
 CREATE TABLE geometries (
     entityid uuid NOT NULL,
-    geometry public.geometry(Geometry,4326)
+    val public.geometry(Geometry,4326)
 );
 
 
@@ -1809,7 +1807,7 @@ ALTER TABLE data.strings OWNER TO postgres;
 --
 
 CREATE VIEW vw_nodes AS
-    SELECT a.entitytypeid AS label, a.entityid AS id, b.val FROM (entities a LEFT JOIN ((((SELECT strings.entityid, strings.val FROM strings UNION SELECT dates.entityid, (dates.val)::text AS val FROM dates) UNION SELECT numbers.entityid, (numbers.val)::text AS val FROM numbers) UNION SELECT geometries.entityid, public.st_astext(geometries.geometry) AS val FROM geometries) UNION SELECT d.entityid, lbl.value AS val FROM domains d, concepts."values" lbl WHERE (((1 = 1) AND (d.val = lbl.valueid)) AND (lbl.valuetype = 'prefLabel'::text))) b ON ((a.entityid = b.entityid)));
+    SELECT a.entitytypeid AS label, a.entityid AS id, b.val FROM (entities a LEFT JOIN ((((SELECT strings.entityid, strings.val FROM strings UNION SELECT dates.entityid, (dates.val)::text AS val FROM dates) UNION SELECT numbers.entityid, (numbers.val)::text AS val FROM numbers) UNION SELECT geometries.entityid, public.st_astext(geometries.val) AS val FROM geometries) UNION SELECT d.entityid, lbl.value AS val FROM domains d, concepts."values" lbl WHERE (((1 = 1) AND (d.val = lbl.valueid)) AND (lbl.valuetype = 'prefLabel'::text))) b ON ((a.entityid = b.entityid)));
 
 
 ALTER TABLE data.vw_nodes OWNER TO postgres;
@@ -1853,7 +1851,7 @@ ALTER TABLE data.vw_edges OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid)));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid)));
 
 
 ALTER TABLE data.vw_resources OWNER TO postgres;
@@ -1865,7 +1863,7 @@ ALTER TABLE data.vw_resources OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_line AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiLineString'::text, 'ST_Linestring'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiLineString'::text, 'ST_Linestring'::text]));
 
 
 ALTER TABLE data.vw_resources_line OWNER TO postgres;
@@ -1877,7 +1875,7 @@ ALTER TABLE data.vw_resources_line OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_point AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiPoint'::text, 'ST_Point'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiPoint'::text, 'ST_Point'::text]));
 
 
 ALTER TABLE data.vw_resources_point OWNER TO postgres;
@@ -1889,26 +1887,13 @@ ALTER TABLE data.vw_resources_point OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_poly AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiPolygon'::text, 'ST_Polygon'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiPolygon'::text, 'ST_Polygon'::text]));
 
 
 ALTER TABLE data.vw_resources_poly OWNER TO postgres;
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 249 (class 1259 OID 15704442)
--- Dependencies: 11
--- Name: class_inheritance; Type: TABLE; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE class_inheritance (
-    classid text NOT NULL,
-    inheritsfrom text NOT NULL
-);
-
-
-ALTER TABLE ontology.class_inheritance OWNER TO postgres;
 
 --
 -- TOC entry 250 (class 1259 OID 15704448)
@@ -2335,14 +2320,6 @@ ALTER TABLE ONLY strings
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 3412 (class 2606 OID 15704545)
--- Dependencies: 249 249 249
--- Name: pk_class_inheritance; Type: CONSTRAINT; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT pk_class_inheritance PRIMARY KEY (classid, inheritsfrom);
 
 
 --
@@ -2712,26 +2689,6 @@ ALTER TABLE ONLY domains
 
 
 SET search_path = ontology, pg_catalog;
-
---
--- TOC entry 3453 (class 2606 OID 15704689)
--- Dependencies: 250 249 3413
--- Name: fk_classes_class_inheritance_classid; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_classid FOREIGN KEY (classid) REFERENCES classes(classid);
-
-
---
--- TOC entry 3454 (class 2606 OID 15704694)
--- Dependencies: 3413 249 250
--- Name: fk_classes_class_inheritance_inheritsfrom; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_inheritsfrom FOREIGN KEY (inheritsfrom) REFERENCES classes(classid);
-
 
 --
 -- TOC entry 3459 (class 2606 OID 15704699)
