@@ -718,7 +718,6 @@ class Mappings(models.Model):
     mappingid = models.TextField(primary_key=True) # This field type is a guess.
     entitytypeidfrom = models.ForeignKey('EntityTypes', db_column='entitytypeidfrom', related_name='mappings_entitytypeidfrom')
     entitytypeidto = models.ForeignKey('EntityTypes', db_column='entitytypeidto', related_name='mappings_entitytypeidto')
-    default = models.BooleanField()
     mergenodeid = models.TextField()
     class Meta:
         db_table = u'ontology"."mappings'
