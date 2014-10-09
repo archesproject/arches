@@ -74,7 +74,6 @@ class Entity(object):
                 self = args[0]
             elif isinstance(args[0], object):
                 self.load(args[0])  
-        #print self
 
     def __repr__(self):
         return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, self.value)
@@ -152,7 +151,6 @@ class Entity(object):
             self.entityid = str(uuid.uuid4())
 
         domainentity = archesmodels.Entities()
-        domainentity.createtms = datetime.now()
         domainentity.entitytypeid = entitytype
         domainentity.entityid = self.entityid
         domainentity.save()
@@ -178,12 +176,15 @@ class Entity(object):
 
         for entity in self.relatedentities:
             rangeentity = entity._save()
-            rule = archesmodels.Rules.objects.get(entitytypedomain = domainentity.entitytypeid, entitytyperange = rangeentity.entitytypeid, propertyid = entity.property)
-            newrelationship = archesmodels.Relations()
-            newrelationship.entityiddomain = domainentity
-            newrelationship.entityidrange = rangeentity
-            newrelationship.ruleid = rule
-            newrelationship.save()
+            try:
+                rule = archesmodels.Rules.objects.get(entitytypedomain = domainentity.entitytypeid, entitytyperange = rangeentity.entitytypeid, propertyid = entity.property)
+                newrelationship = archesmodels.Relations()
+                newrelationship.entityiddomain = domainentity
+                newrelationship.entityidrange = rangeentity
+                newrelationship.ruleid = rule
+                newrelationship.save()
+            except:
+                print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(domainentity.entitytypeid, rangeentity.entitytypeid, entity.property)
 
         return domainentity
 
@@ -467,7 +468,7 @@ class Entity(object):
         entities = self.find_entities_by_type_id(entitytypeid)
 
         if append or len(entities) == 0:
-            schema = Entity.get_mapping_schema(self.entitytypeid)
+            schema = Entity.get_mapping_schem2a(self.entitytypeid)
             entity = Entity()
             entity.create_from_mapping(self.entitytypeid, schema[entitytypeid]['steps'], entitytypeid, value)
             self.merge_at(entity, schema[entitytypeid]['mergenodeid'])

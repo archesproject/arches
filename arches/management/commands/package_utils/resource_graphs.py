@@ -131,8 +131,8 @@ def validate_graph(node_list, edge_list):
             node_types.append(node['LABEL'])
 
         # validate no spaces in node label
-        if node['LABEL'].strip().replace(' ','') != node['LABEL']:
-            append_error('Spaces are not allowed in labels, use underscores instead', node)
+        # if node['LABEL'].strip().replace(' ','') != node['LABEL']:
+        #     append_error('Spaces are not allowed in labels, use underscores instead', node)
 
         # validate uppercase convention in node label
         if node['LABEL'].upper() != node['LABEL']:
