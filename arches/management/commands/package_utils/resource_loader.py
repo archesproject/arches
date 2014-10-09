@@ -11,7 +11,11 @@ from arches.app.models.models import Values
 from arches.app.models.models import RelatedResource
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
+import glob
 import collections
+import json
+from django.contrib.gis.gdal import DataSource
+
 
 
 class Row(object):
@@ -72,36 +76,46 @@ class Resource(object):
         return '{0},{1}'.format(self.resource_id, self.entitytypeid)
 
 
-class Command(BaseCommand): 
+class ResourceLoader(): 
 
     option_list = BaseCommand.option_list + (
         make_option('--source',
-            action='store_true',
+            action='store',
             dest='source',
             default='',
             help='.arches file containing resource records'),
          make_option('--truncate',
             action='store_true',
-            default=True,
+            default='False',
             help='Truncate existing resource records - this is the default'),
         )
 
 
-    def handle(self, *args, **options):
+    def load(self, source, truncate='False'):
+
+        if truncate == 'True':
+            cursor = connection.cursor()
+            cursor.execute("""TRUNCATE data.entities CASCADE;""" )
+
+        arches_files = glob.glob(source + '//*.arches')
+        shapefiles = glob.glob(source + '//*.shp')
+
+        for f in arches_files:
+            self.load_arches_file(f)
+
+        for f in shapefiles:
+            self.load_shapefile(f)
+
+
+    def load_arches_file(self, arches_file):
         '''Reads an arches data file and creates resource graphs'''
 
         start = time()
-        resource_info = open(options['source'], 'rb')
+        resource_info = open(arches_file, 'rb')
         rows = [line.split("|") for line in resource_info]
         resource_list = []
         resource_id = ''
         group_id = ''
-
-        if options['truncate']:
-            cursor = connection.cursor()
-            cursor.execute("""
-                TRUNCATE data.entities CASCADE;
-            """ )
 
         for row in rows[1:]:
             group_val = row[4].strip()
@@ -127,11 +141,11 @@ class Command(BaseCommand):
         elapsed = (time() - start)
         print 'time to parse input file = %s' % (elapsed)
 
-        self.resource_list_to_entities(resource_list, cursor)
+        self.resource_list_to_entities(resource_list)
         print 'resources loaded'
     
 
-    def resource_list_to_entities(self, resource_list, cursor):
+    def resource_list_to_entities(self, resource_list):
         '''Takes a collection of imported resource records and saves them as arches entities'''
 
         start = time()
@@ -257,3 +271,212 @@ class Command(BaseCommand):
         return resource_entity._get_mappings(cursor.fetchone()[0])
 
 
+    def load_shapefile(self, shapefile):
+        '''
+        At this stage we assume,
+        [1] a shapefile contains resources that belong to only one resource_type (Eg.ARCHEOLOGICAL HERITAGE). 
+        So we pass the entity_type as an argument to the load method. 
+        '''
+        config_json = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.json') #get the configuration json file 
+        self.configs = json.load(open(config_json,'r'))
+        self.attr_map = self.configs['SHAPE_CONFIGS']['SHP_MAP']
+        self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['SHAPE_CONFIGS']['AUXILIARY_MAP']))
+        self.entitytypeid = self.configs['SHAPE_CONFIGS']['RESOURCE_TYPE']
+        self.geom_type = self.configs['SHAPE_CONFIGS']['GEOM_TYPE']
+        
+        start = time()
+
+        self.shp_data = self.read_shapefile(shapefile)
+        
+        """
+        shp output type - list (say x)
+        x[0] --> a list of attribute names as specified in the dbf file. size = # of attr specified in the dbf file 
+        x[1] --> a list containing value lists for the said attributes. x[1][n-1] is the set of values for the nth attr. Can be seen as a matrix 
+        x[2] --> a list of geom data expressed in WKT. Size = # of resources. Can be seen as  a vector
+        """
+
+        shp_resource_info = self.build_dictionary(attr_mapping=self.attr_map, auth_mapping= self.auth_map, reader_output= self.shp_data, geom_type=self.geom_type)
+
+        resourceList = []
+        resource_id = ''
+        group_id = ''
+            
+        for shp_dictionary in shp_resource_info:
+            
+            if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
+                #take 1 dictionary at a time, and build a ShpResource from it
+                resource = Resource()
+                # populate the row with attributename and attributevalue
+                for key in shp_dictionary.keys():
+                    if key is not None:
+                        row = Row()
+                        row.resource_id = resource_id
+                        row.resourcetype = self.entitytypeid
+                        row.attributename = key
+                        row.attributevalue = shp_dictionary[key]
+                        resource.appendrow(row)
+                resource.entitytypeid = self.entitytypeid
+                resourceList.append(resource)
+
+        elapsed = (time() - start)
+        print 'time to parse shapefile = %s' % (elapsed)
+        return self.resource_list_to_entities(resourceList)
+    
+
+    def get_concept_uuid_for_aux_map_entry(self,concept_name,concept_value):
+        '''
+        Reads concept labels(prefLabels) given in AUXILIARY_MAP and returns a list of conceptids.
+
+        '''
+        concept = None
+        try:
+            concept = Concepts.objects.get(legacyoid = concept_name)
+        except:
+            print "No Concept found with the name %s"%concept_name
+        if concept is not None:
+            concept_graph = concept.toObject(full_graph=True, exclude_subconcepts=False, 
+                                         exclude_parentconcepts=False, exclude_notes=False, 
+                                         exclude_labels=False, exclude_metadata=False)
+            
+            if concept_graph.subconcepts:
+                for subconcept  in concept_graph.subconcepts[0].subconcepts:
+                    for label in subconcept.labels:
+
+                        if label.type == "prefLabel" and label.value == concept_value:
+                            return subconcept.id
+
+                print '[ERROR]: %s is not found in %s'%(concept_value,concept_name)
+            return
+        
+
+    def convert_aux_map_to_uuid_map(self,aux_map):
+        '''
+        converts the AUX_MAP values into uuid
+        '''
+        converted_aux_map = {}
+        for entry in aux_map.keys():
+            value = self.get_concept_uuid_for_aux_map_entry(entry, aux_map[entry])
+            if value is not None:
+                converted_aux_map[entry] = value
+        
+        return converted_aux_map  
+    
+
+    def convert_uuid_map_to_conceptid_map(self,uuid_map):
+        '''
+        convert an uuid dictionary into conceptId dictionary because
+        data.domains should be populated with conceptId values
+        ''' 
+        conceptid_map = {}
+        sql_template = """'SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '"""
+        cursor = connection.cursor()
+        for key in uuid_map.keys():
+            cursor.execute(sql_template+uuid_map[key]+"'")
+            conceptid_map[key] = cursor.fetchone()[0]
+            
+        return conceptid_map  
+
+
+    # Now build a list of dictionaries, one per record
+    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type):
+        dict_list=[] # list of dictionaries
+        attr_names = reader_output[0]
+        attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values
+        geom_values = reader_output[1][-1] # last index because we append wkt values at the end
+
+        '''
+            first, add the attribute values to the dictionary
+            and then add authority details. Because shapefile data does not 
+            contain authority details but the authority mapping
+            is defined by the user and passed in a separate dictionary
+        '''      
+        for record_index in range (0,len(attr_vals[0])): #len(attr_vals[0]) equals to the number of records
+            record_dictionary= {} # i th dictionary
+            for attr in attr_names[0]: # loops for (number of attributes) times
+                #get the index of the selected attribute
+                attr_index = attr_names[0].index(attr)
+                #add the key/value pair retrieved from the attr_mapping
+                record_dictionary[attr_mapping.get(attr)] = attr_vals[attr_index][record_index]
+            
+            #now add key/value pairs retrieved from auth_mapping
+            record_dictionary.update(auth_mapping)
+            
+            #add geometry values as a WKT string
+            record_dictionary[geom_type] = geom_values[record_index] 
+            dict_list.append(record_dictionary)
+            
+        return dict_list
+
+
+    def read_shapefile(self, shp_path):
+        '''
+        The following method uses shpreader and return all data associated with 
+        the given shapefile as a single tuple.
+        '''
+        shp_reader = ShpReader()
+        file = shp_reader.read(shp_path)
+        field_names = shp_reader.get_field_names(file)
+        field_values_and_geom_wkt = shp_reader.get_values(file)
+        geom_wkt_values = shp_reader.get_wkt_values(file)
+        
+        # since it is desirable to pass field_values and wkt data in a single list, we combine the two lists
+        field_values_and_geom_wkt.append(geom_wkt_values) #the last item of field_values is a list containing wkt geom values
+        
+        return (field_names, field_values_and_geom_wkt)
+
+
+class ShpReader:
+
+    def read(self, path):
+        '''
+        return the read shapefile
+        '''
+        shp_file = DataSource(os.path.abspath(path))
+        return shp_file
+        
+    def get_layer_details(self, shp_file):
+        '''
+        Returns layer details of the given shapefile.
+        Note that, we return a list even though 
+            shapefiles are only allowed to have one layer
+        '''
+        layer_list = []
+        for layer in shp_file:
+            layer_list.append(layer)
+        return layer_list
+    
+    def get_field_names(self, shp_file):
+        '''
+        return available fields of the passed shp file 
+        '''
+        fields = []
+        # we get fields for all the layers
+        layers = self.get_layer_details(shp_file)
+        for layer in layers:
+            fields.append(layer.fields)
+        # returns a list of lists
+        return fields
+    
+    def get_values(self, shp_file):
+        '''
+        returns a list of data associated with each field.
+        field_values[n] is a list containing all the values for the 'n'th attribute
+        '''
+        field_names = self.get_field_names(shp_file)
+        layer_0 = self.get_layer_details(shp_file)[0]
+        field_values = []
+    
+        for field in field_names[0]: #consider the 0th layer
+            field_values.append(layer_0.get_fields(field))
+        return field_values
+    
+    def get_wkt_values(self, shp_file):
+        '''
+        returns geographic data associated with the shapefile(shapes) in WKT format.
+        These value will be added to the json file 
+        '''
+        wkt_list=[]
+        #return geo_data in wkt format
+        for resource in self.get_layer_details(shp_file)[0]:
+            wkt_list.append(resource.geom.wkt)
+        return wkt_list

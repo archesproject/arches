@@ -25,6 +25,7 @@ from django.utils.importlib import import_module
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
+from package_utils.resource_loader import ResourceLoader
 
 class Command(BaseCommand):
     """
@@ -34,16 +35,21 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions'],
+            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'load_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'),
+        make_option('-s', '--source', action='store', dest='source', default='',
+            help='Directory containing a .arches or .shp file containing resource records'),
+        make_option('-t', '--truncate', action='store', dest='truncate', default='False',
+            help='Boolean to indicate if you want to clear all of the business data before loading. The default is False'),
     )
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
+
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
@@ -58,7 +64,12 @@ class Command(BaseCommand):
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
-                
+
+        if options['operation'] == 'load_resources':     
+            self.load_resources(options['source'], options['truncate'])
+            
+
+
     def setup(self, package_name):
         """
         Installs Elasticsearch into the package directory and 
@@ -193,3 +204,12 @@ class Command(BaseCommand):
             Permission.objects.create(codename='update_%s' % mapping.entitytypeidto, name='%s - update' % mapping.entitytypeidto , content_type=content_type[0])
             Permission.objects.create(codename='read_%s' % mapping.entitytypeidto, name='%s - read' % mapping.entitytypeidto , content_type=content_type[0])
             Permission.objects.create(codename='delete_%s' % mapping.entitytypeidto, name='%s - delete' % mapping.entitytypeidto , content_type=content_type[0])
+
+
+    def load_resources(self, data_source, truncate):
+        """
+        Runs the resource_loader command found in package_utils
+
+        """
+        resource_loader = ResourceLoader()
+        resource_loader.load(data_source, truncate)
