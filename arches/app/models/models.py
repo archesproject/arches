@@ -514,12 +514,6 @@ class AuthUserUserPermissions(models.Model):
     class Meta:
         db_table = u'auth_user_user_permissions'
 
-class ClassInheritance(models.Model):
-    classid = models.ForeignKey('Classes', db_column='classid', related_name='classinheritance_classid')
-    inheritsfrom = models.ForeignKey('Classes', db_column='inheritsfrom', related_name='classinheritance_inheritsfrom')
-    class Meta:
-        db_table = u'class_inheritance'
-
 class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
     classdomain = models.ForeignKey('Classes', db_column='classdomain', related_name='properties_classdomain')
@@ -543,12 +537,8 @@ class EntityTypes(models.Model):
 
     def getcolumnname(self):
         ret = None
-        #businesstablename = self.classid.defaultbusinesstable
         if self.businesstablename is not None and self.businesstablename != 'entities':
-            if self.businesstablename == 'geometries':
-                ret = 'geometry'
-            else:
-                ret = 'val'
+            ret = 'val'
 
         return ret     
 
@@ -557,8 +547,6 @@ class EntityTypes(models.Model):
 
 class Entities(models.Model):
     entityid = models.TextField(primary_key=True) # This field type is a guess.
-    createtms = models.DateTimeField()
-    retiretms = models.DateTimeField()
     entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
     class Meta:
         db_table = u'data"."entities'
@@ -638,7 +626,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class Geometries(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
-    geometry = models.GeometryField()
+    val = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
         db_table = u'geometries'
