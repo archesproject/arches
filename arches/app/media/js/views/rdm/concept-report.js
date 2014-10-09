@@ -27,15 +27,15 @@ define([
             var self = this,
                 conceptid = this.model.get('id');
             if (conceptid) {
-                $(self.el).find('.concept-report-loading').removeClass('hidden');
-                $(self.el).find('.concept-report-content').addClass('hidden');
+                self.$el.find('.concept-report-loading').removeClass('hidden');
+                self.$el.find('.concept-report-content').addClass('hidden');
                 $.ajax({
                     url: '../Concepts/' + conceptid + '?f=html',
                     success: function(response) {
-                        $(self.el).find('.concept-report-loading').addClass('hidden');
-                        $(self.el).html(response);
+                        self.$el.find('.concept-report-loading').addClass('hidden');
+                        self.$el.html(response);
                         // ADD CHILD CONCEPT EDITOR 
-                        $(self.el).find('#conceptmodal').validate({
+                        self.$el.find('#conceptmodal').validate({
                             ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
                             rules: {
                                 // element_name: value
@@ -50,7 +50,7 @@ define([
                                         parentconceptid: concept.get('id')
                                     });
                                 childConcept.save(function() {
-                                    $(self.el).find('#conceptmodal').modal('hide');
+                                    self.$el.find('#conceptmodal').modal('hide');
                                     self.trigger('conceptAdded', childConcept);
                                 });
                             }
@@ -64,11 +64,11 @@ define([
             var self = this,
                 data = $(e.target).data();
             if (data.action === 'delete' || data.action === 'delete_concept') {
-                $(self.el).find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
-                $(self.el).find('.confirm-delete-modal .modal-body').text(data.message);
-                $(self.el).find('.confirm-delete-modal').modal('show');
-                $(self.el).find('.confirm-delete-yes').data('id', data.id);
-                $(self.el).find('.confirm-delete-yes').data('action', data.action);
+                self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
+                self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
+                self.$el.find('.confirm-delete-modal').modal('show');
+                self.$el.find('.confirm-delete-yes').data('id', data.id);
+                self.$el.find('.confirm-delete-yes').data('action', data.action);
             }
 
             if (data.action === 'viewconcept') {
@@ -91,6 +91,7 @@ define([
 
             editor.on('submit', function() {
                 model.save(function() {
+                    self.render();
                     self.trigger('valueSaved', model);
                 });
             });
@@ -101,7 +102,7 @@ define([
                 data = $(e.target).data(),
                 model;
 
-            $(self.el).find('.confirm-delete-modal').modal('hide');
+            self.$el.find('.confirm-delete-modal').modal('hide');
             if (data.action === 'delete') {
                 model = new ValueModel(data);
                 model.delete(function() {

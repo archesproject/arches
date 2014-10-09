@@ -14,7 +14,7 @@ define([
         initialize: function(options) {
             var self = this;
 
-            $(this.el).tree({
+            this.$el.tree({
                 dragAndDrop: true,
                 dataUrl: arches.urls.concept_tree,
                 data: [],
@@ -33,17 +33,16 @@ define([
                 return;
             }
             var self = this,
-                tree = $(this.el),
-                node = tree.tree('getNodeById', this.model.get('id'));
+                node = self.$el.tree('getNodeById', this.model.get('id'));
             if (node) {
                 // collapse the node while it's loading
                 if (!node.load_on_demand) {
-                    tree.tree('toggle', node);
+                    self.$el.tree('toggle', node);
                 }
                 $(node.element).addClass('jqtree-loading');
             }
 
-            tree.tree(
+            self.$el.tree(
                 'loadDataFromUrl',
                 arches.urls.concept_tree + "?node=" + this.model.get('id'),
                 null,
@@ -52,13 +51,13 @@ define([
                     if (self.model.get('id') === '') {
                         // get the top level concept from the tree
                         self._doNotRender = true;
-                        self.model.set({ 'id': tree.tree('getTree').children[0].id });
+                        self.model.set({ 'id': self.$el.tree('getTree').children[0].id });
                         self._doNotRender = undefined;
                     }
 
-                    node = tree.tree('getNodeById', self.model.get('id'));
-                    tree.tree('selectNode', node);
-                    tree.tree('scrollToNode', node);
+                    node = self.$el.tree('getNodeById', self.model.get('id'));
+                    self.$el.tree('selectNode', node);
+                    self.$el.tree('scrollToNode', node);
                 }
             );
         },
