@@ -25,7 +25,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 def index(request):
-    return render_to_response('pages/index.htm', {
+    return render_to_response('index.htm', {
             'main_script': 'index',
             'active_page': 'Home',
         },
@@ -55,7 +55,7 @@ def auth(request):
         if request.GET.get('logout', None) is not None:
             logout(request)
 
-        return render_to_response('pages/login.htm', {
+        return render_to_response('login.htm', {
                 'main_script': 'login',
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next

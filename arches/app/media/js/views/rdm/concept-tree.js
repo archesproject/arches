@@ -63,8 +63,19 @@ define([
             );
         },
 
-        moveConcept: function(event, successCallback) {
-            var move_info = event.move_info;
+        treeClick: function(event) {
+            // The clicked node is 'event.node'
+            var node = event.node;
+            if (this.model.get('id') !== node.id) {
+                this.model.set(node);
+            } else {
+                event.preventDefault();
+            }
+        },
+
+        moveNode: function(event) {
+            var self = this,
+                move_info = event.move_info;
             if ((move_info.position !== 'inside' && move_info.previous_parent.id === move_info.target_node.parent.id) ||
                 (move_info.position === 'inside' && move_info.previous_parent.id === move_info.target_node.id)) {
                 // here we're just re-ordering nodes
@@ -81,28 +92,12 @@ define([
                         }),
                         success: function() {
                             var data = JSON.parse(this.data);
-                            successCallback();
-                            this.trigger('conceptMoved', data.conceptid);
+                            event.move_info.do_move();
+                            self.trigger('conceptMoved', data.conceptid);
                         }
                     });
                 }
             }
-        },
-
-        treeClick: function(event) {
-            // The clicked node is 'event.node'
-            var node = event.node;
-            if (this.model.get('id') !== node.id) {
-                this.model.set(node);
-            } else {
-                event.preventDefault();
-            }
-        },
-
-        moveNode: function(event) {
-            moveConcept(event, function() {
-                event.move_info.do_move();
-            });
         }
     });
 });

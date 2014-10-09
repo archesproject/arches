@@ -3,12 +3,14 @@ require([
     'backbone',
     'arches',
     'models/concept',
-    'views/concept-tree',
-    'views/concept-report',
+    'views/rdm/concept-tree',
+    'views/rdm/concept-report',
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport) {
     $(document).ready(function() {
-        var concept = new ConceptModel(),
+        var concept = new ConceptModel({
+                id: $('#selected-conceptid').val()
+            }),
             conceptTree = new ConceptTree({
                 el: $('#jqtree')[0],
                 model: concept
@@ -22,37 +24,19 @@ require([
             window.history.pushState({}, "conceptid", concept.get('id'));
         });
 
-        conceptTree.on('conceptMoved', function(conceptid) {
-            if (concept.get('id') === conceptid) {
-                conceptReport.render();
-            }
+        conceptTree.on('conceptMoved', function (){
+            conceptReport.render();
         });
 
         conceptReport.on({
-            'valueSaved': conceptTree.render,
-            'conceptDeleted': conceptTree.render
-        });
-
-        // ADD CHILD CONCEPT EDITOR 
-        $('#conceptmodal').validate({
-            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
-            rules: {
-                // element_name: value
-                label: "required",
-                language_dd: "required"
+            'valueSaved': function () {
+                conceptTree.render();
             },
-            submitHandler: function(form) {
-                var data = {
-                        label: $(form).find("[name=label]").val(),
-                        note: $(form).find("[name=note]").val(),
-                        language: $(form).find("[name=language_dd]").select2('val'),
-                        parentconceptid: concept.get('id')
-                    },
-                    childConcept = new ConceptModel(data);
-                childConcept.save(function(data) {
-                    $('#conceptmodal').modal('hide');
-                    conceptTree.render();
-                });
+            'conceptDeleted': function () {
+                conceptTree.render();
+            },
+            'conceptAdded': function () {
+                conceptTree.render();
             }
         });
     });
