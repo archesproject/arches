@@ -21,20 +21,18 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from django.conf import settings
-import staticfiles
 
 class Command(BaseCommand):
     """A general command used in compiling all the required static data files and js file in Arches."""
     
     option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='build',
-            type='choice', choices=['build'],
-            help='Operation Type; build=Compiles the files in just the P4 folder and compile all the js files'),
+        make_option('-o', '--operation', action='store', dest='operation', default='collectstatic',
+            type='choice', choices=['collectstatic'],
+            help='Operation Type; collectstatic=Alias for the collectstatic command provided by django'),
     )
     
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
-        if options['operation'] == 'build':
-            staticfiles.generate_files(settings.PACKAGE_ROOT)
+        if options['operation'] == 'collectstatic':
             if settings.STATIC_ROOT != '':
                 management.call_command('collectstatic', interactive=False)
