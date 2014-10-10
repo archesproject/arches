@@ -1,0 +1,93 @@
+/* Tree Panel
+------------------------------------*/
+
+
+.concept_tree{
+    padding: 13px;
+}
+
+ul.jqtree-tree div.jqtree_common { 
+    display: block; 
+    margin: 5px 0; 
+    padding: 5px 10px;
+    color: #333; 
+    border: 1px solid #ccc;
+    text-decoration: none; 
+    font-weight: bold; 
+    background: #fafafa;
+    background: -webkit-linear-gradient(top, #fafafa 0%, #eee 100%);
+    background:    -moz-linear-gradient(top, #fafafa 0%, #eee 100%);
+    background:         linear-gradient(top, #fafafa 0%, #eee 100%);
+    -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+    box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+}
+
+ul.jqtree-tree div.jqtree_common:hover { 
+    color: #2ea8e5; 
+    background: #fff; 
+}
+
+ul.jqtree-tree .jqtree-toggler {
+    position: absolute;
+}
+
+.jqtree-tree li.jqtree-folder {
+    display: block;
+    position: relative; 
+    margin: 0; 
+    padding: 0; 
+    font-size: 13px; 
+    line-height: 20px; 
+}
+
+.jqtree-tree .jqtree-title.jqtree-title-folder {
+    position: relative;
+    left: 1.5em;
+}
+
+.jqtree-tree .jqtree-title {
+    color: #1C4257;
+    vertical-align: middle;
+    margin-left: 0em;
+}
+
+/*
+.concept_tree.jqtree-loading:after {
+    content: url(../../unify/img/select2-spinner.gif);
+}
+*/
+
+.jqtree-tree .jqtree-loading > div a {
+    content: url(../img/select2-spinner.gif);
+}
+
+ul.jqtree-tree li.jqtree-ghost {
+    margin: 0px;
+}
+
+.jqtree-border {
+    padding: 0px 5px;
+    border: dashed 1px #0000ff;
+    border-radius: 3px;
+    -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+    box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+}
+
+ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
+    background-color: #fff;
+    opacity: 0.6;
+    border: dashed 1px #0000ff;
+    height: 35px;
+    width: 100%;
+    position: relative;
+    left: 0px;
+    top: 0px;
+}
+
+ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
+    display:none;
+}

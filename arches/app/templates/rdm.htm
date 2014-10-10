@@ -2,8 +2,8 @@
 {% load staticfiles %}
 
 {% block css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/jqtree/jqtree.css' %}">
+    {{ block.super }}
 {% endblock css %}
 
 {% block content %}
