@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -30,15 +30,15 @@ INSERT INTO d_languages VALUES ('en-us', 'ENGLISH', true);
 -- Data for Name: d_valuetypes; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_valuetypes VALUES ('scopeNote', 'note');
-INSERT INTO d_valuetypes VALUES ('definition');
-INSERT INTO d_valuetypes VALUES ('example');
-INSERT INTO d_valuetypes VALUES ('historyNote', 'note');
-INSERT INTO d_valuetypes VALUES ('editorialNote', 'note');
-INSERT INTO d_valuetypes VALUES ('changeNote', 'note');
-INSERT INTO d_valuetypes VALUES ('prefLabel', 'label');
-INSERT INTO d_valuetypes VALUES ('altLabel', 'label');
-INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label');
+INSERT INTO d_valuetypes VALUES ('scopeNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('definition', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('example', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('historyNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('editorialNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('changeNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('prefLabel', 'label',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('altLabel', 'label',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label',null,TRUE);
 
 
 --
@@ -57,15 +57,19 @@ INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-0000
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'THESAURI');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ARCHES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'RSRC_X_RSRC RELATIONSHIP TYPES');
 
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'has narrower concept');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'has narrower concept');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'has narrower concept');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'has authority document');
+
 
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Thesauri', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'text', 'Arches', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'text', 'Resource To Resrouce Relationship Types', 'en-us');
 
 SET search_path = ontology, pg_catalog;
 
