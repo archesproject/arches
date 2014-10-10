@@ -15,8 +15,7 @@ import glob
 import collections
 import json
 from django.contrib.gis.gdal import DataSource
-
-
+import csv
 
 class Row(object):
     def __init__(self, *args):
@@ -271,18 +270,50 @@ class ResourceLoader():
         return resource_entity._get_mappings(cursor.fetchone()[0])
 
 
+    def parse_configs(self, shapefile):
+        '''
+        Takes a shapefile and reads a config file with the same basename.
+        Returns a dictionary with configuration for creating resources from shapefile records
+        '''
+        result = {
+            'GEOM_TYPE':'',
+            'RESOURCE_TYPE':'',
+            'FIELD_MAP':{},
+            'AUXILIARY_MAP':{}
+            }
+
+        try:
+            config_file = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.config')
+            with open(config_file, 'r') as f:
+                configs = csv.DictReader(f, delimiter='|')
+                for config in configs:
+
+                    if config['CONFIG_TYPE'] == 'HEADER_INFO':
+                        result[config['CONFIG_NAME']] = config['CONFIG_VALUE']
+
+                    if config['CONFIG_TYPE'] == 'AUXILIARY_MAP':
+                        result['AUXILIARY_MAP'][config['CONFIG_NAME']] = config['CONFIG_VALUE'] 
+
+                    if config['CONFIG_TYPE'] == 'FIELD_MAP':
+                        result['FIELD_MAP'][config['CONFIG_NAME']] = config['CONFIG_VALUE']
+
+        except:
+            print "config file is missing or improperly named. Make sure you have config file with the same basename as your shapefile and the extension .config"
+
+        return result
+
+
     def load_shapefile(self, shapefile):
         '''
         At this stage we assume,
         [1] a shapefile contains resources that belong to only one resource_type (Eg.ARCHEOLOGICAL HERITAGE). 
         So we pass the entity_type as an argument to the load method. 
         '''
-        config_json = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.json') #get the configuration json file 
-        self.configs = json.load(open(config_json,'r'))
-        self.attr_map = self.configs['SHAPE_CONFIGS']['SHP_MAP']
-        self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['SHAPE_CONFIGS']['AUXILIARY_MAP']))
-        self.entitytypeid = self.configs['SHAPE_CONFIGS']['RESOURCE_TYPE']
-        self.geom_type = self.configs['SHAPE_CONFIGS']['GEOM_TYPE']
+        self.configs = self.parse_configs(shapefile)
+        self.attr_map = self.configs['FIELD_MAP']
+        self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['AUXILIARY_MAP']))
+        self.entitytypeid = self.configs['RESOURCE_TYPE']
+        self.geom_type = self.configs['GEOM_TYPE']
         
         start = time()
 
