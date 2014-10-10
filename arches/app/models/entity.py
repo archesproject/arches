@@ -126,8 +126,9 @@ class Entity(object):
         because of the recursive nature of the save process
 
         """
-        now = datetime.now()
+
         # first we remove any entities from the current entity graph that have been deleted
+
         if self.entityid != '':
             entity_pre_save = Entity().get(self.entityid)
             diff = entity_pre_save.diff(self)
@@ -135,7 +136,42 @@ class Entity(object):
             for entity in diff['deleted_nodes']:             
                 entity.delete()
 
-        self._save()
+        self._save(username, self.entityid, datetime.now())
+
+        # log the edit
+        timestamp = datetime.now()
+        if self.entityid != '':
+            for entity in diff['deleted_nodes']:
+                edit = EditLog()        
+                edit.resourceid = self.entityid
+                edit.entityid = entity.entityid
+                edit.userid = username
+                edit.timestamp = timestamp
+                edit.oldvalue = entity.value
+                edit.newvalue = None
+                edit.save() 
+
+            for entity in diff['updated_nodes']:
+                edit = EditLog()        
+                edit.resourceid = self.entityid
+                edit.entityid = entity.entityid
+                edit.userid = username
+                edit.timestamp = timestamp
+                edit.oldvalue = entity['from'].value
+                edit.newvalue = entity['to'].value
+                edit.save()    
+        else:
+            for entity in self.flatten():
+                if entity.value != '':
+                    edit = EditLog()        
+                    edit.resourceid = self.entityid
+                    edit.entityid = entity.entityid
+                    edit.userid = username
+                    edit.timestamp = timestamp
+                    edit.oldvalue = None
+                    edit.newvalue = entity.value
+                    edit.save() 
+
         return self
 
     def _save(self):
@@ -149,6 +185,8 @@ class Entity(object):
             uuid.UUID(self.entityid)
         except(ValueError):
             self.entityid = str(uuid.uuid4())
+            if resourceid == '': # should only be blank for the the root node of a new resource graph
+                resourceid = self.entityid
 
         domainentity = archesmodels.Entities()
         domainentity.entitytypeid = entitytype
