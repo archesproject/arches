@@ -34,7 +34,7 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>Concept Labels</dt>
-            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#labelmodal">Add new label</a></dd>
+            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="label" data-target="#labelmodal">Add new label</a></dd>
             {% for label in concept.labels %}
             <dd class="arches-RDM-labels">
                 <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}" class="color-green fa fa-times-circle"></a>
@@ -47,7 +47,7 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>Scope Note</dt>
-            <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#notemodal">Add new note</a></dd>
+            <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="note" data-target="#notemodal">Add new note</a></dd>
             {% for note in concept.notes %}{% if note.type == 'scopeNote' %}
             <dd class="margin-left-10 txt-color-blue">
                 <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}" class="color-green fa fa-times-circle"></a>
@@ -86,7 +86,7 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>Related Values</dt>
-            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-target="#related_valuemodal">Add new value</a></dd>
+            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="" data-target="#related_valuemodal">Add new value</a></dd>
             {% for related_value in concept.metadata %}
             <dd class="arches-RDM-labels">
                 <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"class="color-green fa fa-times-circle"></a>
@@ -169,3 +169,6 @@
     </div>
 </form>
 <!-- End Modal window for adding a new concept -->
+<div id="value-editor">
+    {% include "views/rdm/value-editor.htm" %}
+</div>

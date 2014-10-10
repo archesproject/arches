@@ -4,40 +4,39 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
         initialize: function(options) {
             var self = this,
                 rules = {},
-                title = 'Add New ';
-            
-            if (this.model.get('id')) {
-                title = 'Edit ';
-            }
-            switch(this.$el.attr('id')) {
-                case 'labelmodal':
-                    title += 'Label';
+                title;
+
+            switch(this.model.get('category')) {
+                case 'label':
+                    this.modal = this.$el.find('#labelmodal');
                     break;
-                case 'notemodal':
-                    title += 'Note';
-                    break;
-                case 'related_valuemodal':
-                    title += 'Related Value';
+                case 'note':
+                    this.modal = this.$el.find('#notemodal');
                     break;
                 default:
-                    title += 'Value';
+                    this.modal = this.$el.find('#related_valuemodal');
+            }
+            title = this.modal.find('.modal-title').data()['addTitle'];
+            if (this.model.get('id')) {
+                title = this.modal.find('.modal-title').data()['editTitle'];
             }
 
-            this.$el.find('.modal-title').text(title);
+            this.modal.find('.modal-title').text(title);
             
-            this.valueInput = this.$el.find('.value-input');
-            this.idInput = this.$el.find('.id-input');
-            this.valueTypeInput = this.$el.find('.value-type-input');
-            this.languageInput = this.$el.find('.language-input');
+            this.valueInput = this.modal.find('.value-input');
+            this.idInput = this.modal.find('.id-input');
+            this.valueTypeInput = this.modal.find('.value-type-input');
+            this.languageInput = this.modal.find('.language-input');
             
             rules[this.valueInput.attr('id')] = "required";
             rules[this.valueTypeInput.attr('id')] = "required";
             rules[this.languageInput.attr('id')] = "required";
 
-            this.$el.validate({
+            this.modal.validate({
                 ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
                 rules: rules,
                 submitHandler: function(form) {
+                    self.modal.modal('hide');
                     self.model.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
@@ -45,7 +44,6 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                         datatype: 'text',
                         language: self.languageInput.val()
                     });
-                    self.$el.modal('hide');
                     self.trigger('submit');
                 }
             });
@@ -55,7 +53,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             });
 
             this.render();
-            this.$el.modal('show');
+            this.modal.modal('show');
         },
         
         render: function () {
