@@ -145,7 +145,10 @@ def concept(request, ids):
 
     if request.method == 'DELETE':
         for id in ids.split(','):
-            ret = []
+            ret = {
+                'deleted': [],
+                'success': False
+            }
 
             if ".E" in id:
                 entitytype = archesmodels.EntityTypes.objects.get(pk = id)
@@ -157,10 +160,10 @@ def concept(request, ids):
 
             with transaction.atomic():
                 for concept in concepts:
-                    ret.append(concept.get_preflabel())
+                    ret['deleted'].append(concept.get_preflabel())
                     concept.delete()
 
-            ret.success = True
+            ret['success'] = True
 
     return JSONResponse(ret, indent=(4 if pretty else None))
 

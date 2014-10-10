@@ -8,7 +8,7 @@ define([
 ], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor) {
     return Backbone.View.extend({
         events: {
-            'click': 'click',
+            'click .concept-report-content *': 'contentClick',
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed'
         },
@@ -61,15 +61,15 @@ define([
             }
         },
 
-        click: function(e) {
+        contentClick: function(e) {
             var self = this,
                 data = $(e.target).data();
             if (data.action === 'delete' || data.action === 'delete_concept') {
                 self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
                 self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-                self.$el.find('.confirm-delete-modal').modal('show');
                 self.$el.find('.confirm-delete-yes').data('id', data.id);
                 self.$el.find('.confirm-delete-yes').data('action', data.action);
+                self.$el.find('.confirm-delete-modal').modal('show');
             }
 
             if (data.action === 'viewconcept') {
@@ -101,22 +101,22 @@ define([
         deleteConfirmed: function(e) {
             var self = this,
                 data = $(e.target).data(),
-                model;
+                Model, model, eventName;
 
-            self.$el.find('.confirm-delete-modal').modal('hide');
             if (data.action === 'delete') {
-                model = new ValueModel(data);
-                model.delete(function() {
-                    self.render();
-                    self.trigger('valueDeleted', model);
-                });
+                Model = ValueModel;
+                eventName = 'valueDeleted';
             }
             if (data.action === 'delete_concept') {
-                model = new ConceptModel(data);
-                model.delete(function(data) {
-                    self.trigger('conceptDeleted', model);
-                });
+                Model = ConceptModel;
+                eventName = 'conceptDeleted';
             }
+
+            model = new Model(data);
+            model.delete(function() {
+                self.render();
+                self.trigger(eventName, model);
+            });
         }
     });
 });

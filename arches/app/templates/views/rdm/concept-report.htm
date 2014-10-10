@@ -1,6 +1,6 @@
 ﻿ {% load i18n %}
-<div class="col-xs-12 hidden arches-RDM-loading" class="concept-report-loading">Loading...</div>
-<div class="col-xs-12" class="concept-report-content">
+<div class="col-xs-12 concept-report-loading hidden">Loading...</div>
+<div class="col-xs-12 concept-report-content">
     <!-- Concept Preferred Label -->
     <div class="headline margin-bottom-10 padding-left-10"><h4>{{prefLabel}} ({{lang}})</h4>
         
@@ -106,65 +106,66 @@
             </dd>
         </dl>
     </div>
+</div>
 
-    <div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
-        <div class="modal-dialog confirm-delete">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">Are you ready to delete this?</h4>
-                </div>
-                <div class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
-                    <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete">Yes</button>
-                </div>
+
+<div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+    <div class="modal-dialog confirm-delete">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Are you ready to delete this?</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
+                <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete" data-dismiss="modal">Yes</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal window for adding a new concept -->
-    <form action="" class="modal fade" id="conceptmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">{% trans "Add Concept" %}</h4>
-                    
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>{% trans "Label" %}</h4>
-                            <p><input class="form-control" type="text" name="label" required/></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>{% trans "Note" %}</h4>
-                            <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h4>{% trans "Language" %}</h4>
-                            <p> 
-                                <select style="width:100%" class="select2" name="language_dd" required>
-                                    {% for language in languages %}
-                                      <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
-                                    {% endfor %}
-                                </select>
-                            </p>
-                        </div>
+<!-- Modal window for adding a new concept -->
+<form action="" class="modal fade" id="conceptmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans "Add Concept" %}</h4>
+                
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>{% trans "Label" %}</h4>
+                        <p><input class="form-control" type="text" name="label" required/></p>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
-                    <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>{% trans "Note" %}</h4>
+                        <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>{% trans "Language" %}</h4>
+                        <p> 
+                            <select style="width:100%" class="select2" name="language_dd" required>
+                                {% for language in languages %}
+                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+            </div>
         </div>
-    </form>
-    <!-- End Modal window for adding a new concept -->
-</div>
+    </div>
+</form>
+<!-- End Modal window for adding a new concept -->
