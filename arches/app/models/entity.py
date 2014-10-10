@@ -136,7 +136,7 @@ class Entity(object):
             for entity in diff['deleted_nodes']:             
                 entity.delete()
 
-        self._save(username, self.entityid, datetime.now())
+        self._save()
 
         # log the edit
         timestamp = datetime.now()
