@@ -1163,18 +1163,29 @@ ALTER TABLE data.resource_x_resource
   OWNER TO postgres;
 
 
-CREATE TABLE data.edit_log
+  CREATE TABLE data.edit_log
 (
-  editlogid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+  editlogid uuid NOT NULL DEFAULT uuid_generate_v1mc(),
+  resourceentitytypeid text,	
   resourceid uuid,
-  entityid uuid,
-  userid text,
-  "timestamp" timestamp,
+  attributeentitytypeid text,
+  edittype text,
   oldvalue text,
   newvalue text,
-  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid ));
+  "timestamp" timestamp with time zone,  
+  userid text,
+  user_firstname text,
+  user_lastname text,  
+  user_email text,
+  note text,
 
-ALTER TABLE data.edit_log OWNER TO postgres;
+  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid )
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE data.edit_log
+  OWNER TO postgres;
 
 --
 -- TOC entry 230 (class 1259 OID 15704349)
@@ -2274,4 +2285,5 @@ CREATE INDEX parcels_sidx
   ON aux.parcels
   USING gist
   (geometry );
+
 
