@@ -90,11 +90,9 @@ define([
                     model: model
                 });
 
-            editor.on('submit', function() {
-                model.save(function() {
-                    self.render();
-                    self.trigger('valueSaved', model);
-                });
+            editor.on('save', function() {
+                self.render();
+                self.trigger('valueSaved', model);
             });
         },
 
