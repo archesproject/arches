@@ -7,145 +7,128 @@
 {% endblock css %}
 
 {% block content %}
-    <!--=== Content Part ===-->
-    <div class="block-description" style="background: #f4f4f4;">
-        <div class="container content padding-top-20">      
-            
-            <!-- RDM Toolbar -->
-            <div class="arches-toolbar rounded">
-                <div class="row">
 
-                    <!-- Buttons -->
-                    <div class="col-md-5 col-lg-4">
-                        <div class="">
-                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green active"> Manage Thesauri</button>
-                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green"> Manage Graphs</button>
-                            <div class="margin-top-5 hidden-xs hidden-sm hidden-md hidden-lg"></div>
-                            <button type="button" class="btn-u btn-bordered btn-u btn-u-green"> <i class="fa fa-gears"></i></button>                           
-                        </div>
-                    </div>
-                    <!-- End Buttons -->
 
-                    <!-- Spacer for small screens -->
-                    <div class="margin-top-5 hidden-md hidden-lg"></div>
+    <!--=== App Header ===-->
+    <div class="breadcrumbs sticky" id="appheader" style="">
+        
+        <!-- Search Terms -->
+        <div class="container">
+            <div class="row">
 
-                    <!-- Concept Search Widget -->
-                    <div class="col-md-7 col-lg-8">
-
-                        <div class="input-group animated">
-                            <input type="text" class="form-control" placeholder="Find a concept">
-                            <span class="input-group-btn">
-                                <button class="btn-u" style="background: #117DB0;" type="button">Go</button>
-                            </span>
-                        </div>
-                       
-                    </div>
-                    <!-- End Concept Search Widget -->
-
+                <!-- App Name for larger screens -->
+                <div class="col-sm-5 col-lg-4 hidden-xs">
+                    <h1 class="pull-left arches-breadcrumb-title" style="margin-top: -5px;">Reference Data Manager (RDM)</h1>
                 </div>
-            </div>    
-            <!-- End RDM Toolbar -->
+
+                <!-- App Name for xs screens -->
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
+                    <h1 class="arches-breadcrumb-title margin-top-minus-10">Reference Data Manager (RDM)</h1>
+                </div>
+
+                <!-- Concept Search -->
+                <div class="col-xs-12 col-sm-7 col-lg-8">
+
+                    <div class="">
+                        <div class="form-group margin-bottom-20">       
+                            <input class="searchwidget" id="searchwidget" name="" style="width:100%"  value="">
+                        </div>
+                    </div>
+                </div>
+                <!-- End Concept Search -->
 
 
+            </div>
+        </div>
+        <!-- End Search Terms -->  
+
+    </div>    
+    <!--=== End App Header ===-->
+
+    <!-- Main Content -->
+    <div class="block-description arches-secondary-header" id="main-container">
+                     
+        <div class="container content arches-forms-container" id="forms-container">      
+            
             <!-- RDM Tree and CRUD Forms -->
             <div class="row">
                 
                 <!-- Begin RDM Tree -->
                 <div class="col-md-5 col-lg-4">
-                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" style="background: #ffffff;">
-                        
-                        <div class="headline">
-                            <h4>RDM Thesauri</h4>
-                            <span>
-                                 <a href="#" class="pull-right"><strong>Add Thesaurus</strong></a>
-                            </span>
-                        </div>
                     
-                        <!-- RDM Tree Container -->
-                        <section id="widget-grid" class="" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
+                        
+                        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">RDM Schemes</h3>
                             
-                            <!-- Widget ID (each widget will need unique ID)-->
-                            <div class="jarviswidget" id="wid-id-0">
-                                <!-- widget options:
-                                usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
-                
-                                data-widget-colorbutton="false"
-                                data-widget-editbutton="false"
-                                data-widget-togglebutton="false"
-                                data-widget-deletebutton="false"
-                                data-widget-fullscreenbutton="false"
-                                data-widget-custombutton="false"
-                                data-widget-collapsed="true"
-                                data-widget-sortable="false"
-                
-                                -->
-
-                                <!-- widget content div-->
-                                <div style="border-width: 0px;">
-                
-                                    <!-- widget edit box -->
-                                    <div class="jarviswidget-editbox">
-                                        <!-- This area used as dropdown edit box -->
-                
-                                    </div>
-                                    <!-- end widget edit box -->
-                
-                                    <!-- widget body content -->
-                                    <div class="widget-body">
-                
-                                        <div class="row">
-                
-                                            <div class="col-xs-12">
-                
-                                                <div class="concept_tree" id="jqtree">
-                                                </div>
-                
-                                            </div>
-                
-                                        </div>
-                
-                                    </div>
-                                    <!-- end widget body content -->
-                
-                                </div>
-                                <!-- end widget content div -->
-                
+                            <!-- Scheme Tools for larger screens -->
+                            <div class="btn-group pull-right hidden-xs">
+                                <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
+                                    Tools &nbsp;
+                                    <i class="fa fa-chevron-down"></i>
+                                    <span class="sr-only">Toggle Dropdown</span>                            
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#AddNewScheme" data-toggle="modal">Add Scheme</a></li>
+                                    <li><a href="#ImportNewScheme" data-toggle="modal">Import Scheme</a></li>
+                                    <li><a href="#" data-toggle="modal">Export Scheme</a></li>
+                                    <li><a href="#DeleteScheme" data-toggle="modal">Delete Scheme</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Close</a></li>
+                                </ul>
                             </div>
-                            <!-- end Jarvis widget -->
+
+
+                        </div>
+
+                        <!-- RDM Tree Container -->
+                        <section style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                            
+                            <div class="concept_tree" id="jqtree">
+                            </div>
                         
                         </section>
                         <!-- End RDM Tree Container -->
-
+                    
                     </div>
                 </div>
                 <!-- End RDM Tree -->
 
+
                 <!-- Spacer for small screens -->
                 <div class="margin-top-10 hidden-md hidden-lg"></div>
 
+                
                 <!-- Concept CRUD Form -->
                 <div class="col-md-7 col-lg-8">            
 
                     <!-- Concept Summary -->
-                    <div class="right-inner arches-box-grey-border padding-10" style="background: #ffffff;">
-                                    
-                        <div class="row margin-bottom-30" id="concept_report">
-                            <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading">Loading...</div>
-                        </div><!--/row-->
-                        
+                    <div class="right-inner arches-box-grey-border padding-10" id="crud" style="background: #ffffff;">        
+                        <div class="row">
+                            
+                            <!-- Concept Managment Tools -->
+                            <div class="col-xs-12">
 
+                            <div class="row margin-bottom-30" id="concept_report">
+                                <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading">Loading...</div>
+                            </div><!--/row-->
+                            
+                            </div>
+                            <!-- End Concept Managment Tools -->
+                            
+                        </div>
                     </div>
                     <!-- End Descriptions and Lists -->
                     
-                    <div class="clearfix margin-bottom-10"></div>
+                    <div class="clearfix"></div>
 
-                    
                 </div>
-                <!-- End Content -->
-            </div>          
-        </div><!--/container-->     
+                <!-- End CRUD Form -->
 
-    </div>
+            </div> 
+            <!-- End RDM Tree and CRUD Forms -->
+
+        </div>
+    </div>     
     <!--=== End Content Part ===-->
 
     <!-- Modal editing window for labels -->
