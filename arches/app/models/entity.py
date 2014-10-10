@@ -185,8 +185,6 @@ class Entity(object):
             uuid.UUID(self.entityid)
         except(ValueError):
             self.entityid = str(uuid.uuid4())
-            if resourceid == '': # should only be blank for the the root node of a new resource graph
-                resourceid = self.entityid
 
         domainentity = archesmodels.Entities()
         domainentity.entitytypeid = entitytype
