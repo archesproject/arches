@@ -245,8 +245,18 @@ class ResourceLoader():
                         relationship_type_legacyoid = entity.find_entities_by_type_id('ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPE.E55')[0].value
                         rel_type_concept_id = Concepts.objects.get(legacyoid=relationship_type_legacyoid).conceptid
                         related['relationship_type_id'] = Values.objects.get(conceptid=rel_type_concept_id, valuetype='prefLabel').valueid
-                        related['date_started'] = entity.find_entities_by_type_id('DATE RESOURCE ASSOCIATION STARTED.E50')[0].value
-                        related['date_ended'] = entity.find_entities_by_type_id('DATE RESOURCE ASSOCIATION ENDED.E50')[0].value
+
+                        date_entity_types = [{
+                            'entitytypeid': 'DATE RESOURCE ASSOCIATION STARTED.E50',
+                            'key': 'date_started' 
+                        },{
+                            'entitytypeid': 'DATE RESOURCE ASSOCIATION ENDED.E50',
+                            'key': 'date_ended' 
+                        }]
+                        for date_entity_type in date_entity_types:
+                            started_entities = entity.find_entities_by_type_id(date_entity_type['entitytypeid'])
+                            related[date_entity_type['key']] = None if started_entities == [] else started_entities[0].value
+
                         related_resources.append(related)
                 except:
                     pass
