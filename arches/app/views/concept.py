@@ -31,22 +31,11 @@ from arches.app.utils.skos import SKOSWriter
 
 def rdm(request, conceptid):
     languages = archesmodels.DLanguages.objects.all()
-    valuetypes = archesmodels.ValueTypes.objects.all()
-    othertypes = []
-    for type in valuetypes:
-        if type.category == 'label' or type.pk == 'scopeNote':
-            pass
-        else:
-            othertypes.append(type)
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
-            'conceptid': conceptid,
-            'languages': languages,
-            'valuetype_labels': valuetypes.filter(category='label'),
-            'valuetype_notes': valuetypes.filter(pk='scopeNote'),
-            'valuetype_related_values': othertypes
+            'conceptid': conceptid
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
@@ -83,8 +72,22 @@ def concept(request, ids):
                 if f == 'html':
                     languages = archesmodels.DLanguages.objects.all()
                     valuetypes = archesmodels.ValueTypes.objects.all()
+                    othertypes = []
+                    for type in valuetypes:
+                        if type.category == 'label' or type.pk == 'scopeNote':
+                            pass
+                        else:
+                            othertypes.append(type)
                     prefLabel = concept_graph.get_preflabel(lang=lang)
-                    return render_to_response('views/rdm/concept-report.htm', {'lang': lang, 'prefLabel': prefLabel, 'concept': concept_graph , 'languages': languages}, context_instance=RequestContext(request))
+                    return render_to_response('views/rdm/concept-report.htm', {
+                        'lang': lang,
+                        'prefLabel': prefLabel,
+                        'concept': concept_graph,
+                        'languages': languages,
+                        'valuetype_labels': valuetypes.filter(category='label'),
+                        'valuetype_notes': valuetypes.filter(pk='scopeNote'),
+                        'valuetype_related_values': othertypes
+                    }, context_instance=RequestContext(request))
                 
                 if f == 'skos':
                     skos = SKOSWriter()

@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -1074,19 +1074,24 @@ CREATE TABLE d_relationtypes (
 ALTER TABLE concepts.d_relationtypes OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 15704328)
--- Dependencies: 9
--- Name: d_valuetypes; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
---
+-- Table: concepts.d_valuetypes
 
-CREATE TABLE d_valuetypes (
-    valuetype text NOT NULL,
-    category text,
-    description text
+-- DROP TABLE concepts.d_valuetypes;
+
+CREATE TABLE concepts.d_valuetypes
+(
+  valuetype text NOT NULL,
+  category text,
+  description text,
+  skoscompliant boolean NOT NULL DEFAULT false,
+  CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype )
+)
+WITH (
+  OIDS=FALSE
 );
+ALTER TABLE concepts.d_valuetypes
+  OWNER TO postgres;
 
-
-ALTER TABLE concepts.d_valuetypes OWNER TO postgres;
 
 --
 -- TOC entry 227 (class 1259 OID 15704334)
@@ -1158,18 +1163,29 @@ ALTER TABLE data.resource_x_resource
   OWNER TO postgres;
 
 
-CREATE TABLE data.edit_log
+  CREATE TABLE data.edit_log
 (
-  editlogid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+  editlogid uuid NOT NULL DEFAULT uuid_generate_v1mc(),
+  resourceentitytypeid text,	
   resourceid uuid,
-  entityid uuid,
-  userid text,
-  "timestamp" timestamp,
+  attributeentitytypeid text,
+  edittype text,
   oldvalue text,
   newvalue text,
-  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid ));
+  "timestamp" timestamp with time zone,  
+  userid text,
+  user_firstname text,
+  user_lastname text,  
+  user_email text,
+  note text,
 
-ALTER TABLE data.edit_log OWNER TO postgres;
+  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid )
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE data.edit_log
+  OWNER TO postgres;
 
 --
 -- TOC entry 230 (class 1259 OID 15704349)
@@ -1473,8 +1489,7 @@ SET search_path = ontology, pg_catalog;
 CREATE TABLE classes (
     classid text NOT NULL,
     classname text NOT NULL,
-    isactive boolean DEFAULT true NOT NULL,
-    defaultbusinesstable text
+    isactive boolean DEFAULT true NOT NULL
 );
 
 
@@ -1606,15 +1621,6 @@ ALTER TABLE ONLY d_languages
 ALTER TABLE ONLY d_relationtypes
     ADD CONSTRAINT pk_d_relationtypes PRIMARY KEY (relationtype);
 
-
---
--- TOC entry 3383 (class 2606 OID 15704521)
--- Dependencies: 226 226
--- Name: pk_d_valuetypes; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY d_valuetypes
-    ADD CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype);
 
 
 --
@@ -2233,7 +2239,9 @@ CREATE TABLE aux.addresses
   addressnum text,
   addressstreet text,
   vintage text,
-  geometry public.geometry(MultiPoint,4326)
+  geometry public.geometry(MultiPoint,4326),
+  city text,
+  postalcode text
 )
 WITH (
   OIDS=FALSE
@@ -2249,6 +2257,9 @@ CREATE INDEX addresses_sidx
   ON aux.addresses
   USING gist
   (geometry );
+
+
+-- Index: aux.addresses_sidx
 
   -- Table: aux.parcels
 
@@ -2274,4 +2285,5 @@ CREATE INDEX parcels_sidx
   ON aux.parcels
   USING gist
   (geometry );
+
 

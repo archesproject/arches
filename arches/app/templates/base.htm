@@ -143,14 +143,9 @@
                                         <!-- Project Dropdown -->
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="input-group">
+                                                <div class="input-group" id="simple-search">
                                                     <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
-                                                    <select style="width:100%" class="select2" id="SimpleSearch">
-                                                        <option value="00">Find a Heritage Resource</option>
-                                                        <option value="AK">Resource 1</option>
-                                                        <option value="HI">Resource 2</option>
-                                                        <option value="CA">Resource 3</option>    
-                                                    </select>
+                                                    {% include "views/simple-search.htm" %}
                                                 </div>
                                             </div>
                                         </div>  
@@ -345,8 +340,8 @@
                 };
             });
 
-            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, simpleSearch) {
-                var search = new simpleSearch({ id: 'SimpleSearch' });
+            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
+                var search = new SimpleSearch({ el: $('#simple-search')[0] });
                 scrollToTop.init();
 
                 // include all base_page instances here that page scripts may need access to

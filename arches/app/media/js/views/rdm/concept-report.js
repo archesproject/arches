@@ -86,7 +86,7 @@ define([
                 }, $(e.target).data()),
                 model = new ValueModel(data),
                 editor = new ValueEditor({
-                    el: $(data.target)[0],
+                    el: this.$el.find('#value-editor')[0],
                     model: model
                 });
 
