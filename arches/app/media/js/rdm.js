@@ -7,48 +7,14 @@ require([
     'views/rdm/concept-report',
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport) {
-    jQuery(document).ready(function() {
-        var header_offset = $("#appheader").offset(),
-            sidebar = $("#sidebar"),
-            crud = $("#crud"),
-            sidebar_bottom = sidebar.offset().top + sidebar.height(),
-            menu_width = $("#sidebar").outerWidth();
-
-
-        $(window).scroll(function() {
-            var sidebar_height = sidebar.height(),
-                crud_height = crud.height(),
-                footer_top = $(".footer").offset().top - $(window).scrollTop();
-
-            if (window.scrollY >= header_offset.top) {
-                $(".sticky").addClass("fixed");
-                
-                if (crud_height > sidebar_height) {
-                    $("#sidebar").addClass("fixed-menu");
-                    $("#sidebar").css("width", menu_width);
-                    
-                    if (footer_top < sidebar_bottom) {
-                        $("#sidebar").css("margin-top", footer_top - sidebar_bottom);
-                    } else {
-                        $("#sidebar").css("margin-top", "10px");
-                    }
-                }
-
-            } else {
-                $(".sticky").removeClass("fixed");
-                $("#sidebar").removeClass("fixed-menu");
-                $("#sidebar").css("margin-top", "0px");
-                $("#crud").removeClass("fixed-spacer");
-                $("#crud").css("margin-top", "0px");
-            }
-
-        });
-    });
-
-
-
     $(document).ready(function() {
-        var concept = new ConceptModel({
+        var appHeader = $("#appheader"),
+            sidebar = $("#sidebar"),
+            topToHeaderPx = appHeader.offset().top,
+            topToSidebarBottomPx = sidebar.offset().top + sidebar.height(),
+            sidebarWidth = sidebar.outerWidth(),
+            // Models and views
+            concept = new ConceptModel({
                 id: $('#selected-conceptid').val()
             }),
             conceptTree = new ConceptTree({
@@ -77,6 +43,29 @@ require([
             },
             'conceptAdded': function() {
                 conceptTree.render();
+            }
+        });
+
+        $(window).scroll(function() {
+            var topToFooterPx = $(".footer").offset().top - $(window).scrollTop();
+
+            if (window.scrollY >= topToHeaderPx) {
+                appHeader.addClass("fixed");
+                if (conceptReport.$el.height() > sidebar.height()) {
+                    sidebar.addClass("fixed-menu");
+                    sidebar.css("width", sidebarWidth);
+                    if (topToFooterPx < topToSidebarBottomPx) {
+                        sidebar.css("margin-top", topToFooterPx - topToSidebarBottomPx);
+                    } else {
+                        sidebar.css("margin-top", "10px");
+                    }
+                }
+            } else {
+                appHeader.removeClass("fixed");
+                sidebar.removeClass("fixed-menu");
+                sidebar.css("margin-top", "0px");
+                conceptReport.$el.removeClass("fixed-spacer");
+                conceptReport.$el.css("margin-top", "0px");
             }
         });
     });
