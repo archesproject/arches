@@ -1,22 +1,23 @@
-<!-- Modal editing window for labels -->
+{% load i18n %}
+ <!-- Modal editing window for labels -->
 <form action="" class="modal fade" id="labelmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="labelmodaltitle" data-edit-title="Edit Label" data-add-title="Add New Label">Manage Labels</h4>
+                <h4 class="modal-title" id="labelmodaltitle" data-edit-title="Edit Label" data-add-title="{% trans "Add New Label" %}">{% trans "Manage Labels" %}</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4>Label</h4>
+                        <h4>{% trans "Label" %}</h4>
                         <p><input class="form-control value-input" id="label_value" type="text" required/><input id="label_id" class="id-input" type="hidden"/></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <h4>Type</h4>
+                            <h4>{% trans "Type" %}</h4>
                             <p> 
                                 <select style="width:100%" class="select2 value-type-input" name="label_valuetype_dd" id="label_valuetype_dd" required>
                                     {% for label in valuetype_labels %}
@@ -27,7 +28,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h4>Language</h4>
+                        <h4>{% trans "Language" %}</h4>
                         <p> 
                             <select style="width:100%" class="select2 language-input" name="label_language_dd" id="label_language_dd" required>
                                 {% for language in languages %}
@@ -39,8 +40,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
             </div>
         </div>
     </div>
@@ -53,19 +54,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="notemodaltitle" data-edit-title="Edit Note" data-add-title="Add New Note">Manage notes</h4>
+                <h4 class="modal-title" id="notemodaltitle" data-edit-title="Edit Note" data-add-title="{% trans "Add New Note" %}">{% trans "Manage notes" %}</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4>Note</h4>
+                        <h4>{% trans "Note" %}</h4>
                         <p><textarea class="form-control value-input textarea textarea-resizable" rows="3" id="note_value" type="text" required></textarea><input id="note_id" class="id-input" type="hidden"/></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <h4>Type</h4>
+                            <h4>{% trans "Type" %}</h4>
                             <p> 
                                 <select style="width:100%" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required>
                                     {% for note in valuetype_notes %}
@@ -76,7 +77,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h4>Language</h4>
+                        <h4>{% trans "Language" %}</h4>
                         <p> 
                             <select style="width:100%" class="select2 language-input" name="note_language_dd" id="note_language_dd" required>
                                 {% for language in languages %}
@@ -88,8 +89,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
             </div>
         </div>
     </div>
@@ -102,19 +103,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="related_valuemodaltitle" data-edit-title="Edit Related Value" data-add-title="Add New Related Value">Manage Related Values</h4>
+                <h4 class="modal-title" id="related_valuemodaltitle" data-edit-title="Edit Related Value" data-add-title="{% trans "Add New Related Value" %}">{% trans "Manage Related Values" %}</h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4>Value</h4>
+                        <h4>{% trans "Value" %}</h4>
                         <p><textarea class="form-control value-input textarea textarea-resizable" rows="3" id="related_value_value" type="text" required></textarea><input id="related_value_id" class="id-input" type="hidden"/></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <h4>Type</h4>
+                            <h4>{% trans "Type" %}</h4>
                             <p> 
                                 <select style="width:100%" class="select2 value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required>
                                     {% for related_value in valuetype_related_values %}
@@ -125,7 +126,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h4>Language</h4>
+                        <h4>{% trans "Language" %}</h4>
                         <p> 
                             <select style="width:100%" class="select2 language-input" name="related_value_language_dd" id="related_value_language_dd" required>
                                 {% for language in languages %}
@@ -137,8 +138,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn-u btn-u-primary">Save changes</button>
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
             </div>
         </div>
     </div>
