@@ -1163,7 +1163,7 @@ ALTER TABLE data.resource_x_resource
   OWNER TO postgres;
 
 
-  CREATE TABLE data.edit_log
+CREATE TABLE data.edit_log
 (
   editlogid uuid NOT NULL DEFAULT uuid_generate_v1mc(),
   resourceentitytypeid text,	
@@ -1184,8 +1184,7 @@ ALTER TABLE data.resource_x_resource
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE data.edit_log
-  OWNER TO postgres;
+ALTER TABLE data.edit_log OWNER TO postgres;
 
 --
 -- TOC entry 230 (class 1259 OID 15704349)
