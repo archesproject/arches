@@ -73,6 +73,7 @@ define([
             }
 
             if (data.action === 'viewconcept') {
+                this.model.clear({slient: true});
                 this.model.set({
                     id: data.conceptid
                 });

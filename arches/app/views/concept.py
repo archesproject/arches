@@ -229,7 +229,7 @@ def concept_value(request, id=None):
     #  need to check user credentials here
 
     if request.method == 'POST':
-        json = request.POST.get('json', None)
+        json = request.body
 
         if json != None:
             value = JSONDeserializer().deserialize(json)
