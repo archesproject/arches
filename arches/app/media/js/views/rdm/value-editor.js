@@ -33,7 +33,6 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
                 rules: rules,
                 submitHandler: function(form) {
-                    self.$el.find('.modal.in').modal('hide');
                     self.model.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
@@ -42,7 +41,10 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                         language: self.languageInput.val()
                     });
                     self.model.save(function() {
-                        self.trigger('save', self.model);
+                        modal.on('hidden.bs.modal', function () {
+                            self.trigger('save', self.model);
+                        });
+                        modal.modal('hide');
                     });
                 }
             });

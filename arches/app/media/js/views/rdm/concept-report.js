@@ -73,7 +73,6 @@ define([
             }
 
             if (data.action === 'viewconcept') {
-                this.model.clear({slient: true});
                 this.model.set({
                     id: data.conceptid
                 });
@@ -92,8 +91,9 @@ define([
                 });
 
             editor.on('save', function() {
-                self.render();
                 self.trigger('valueSaved', model);
+
+                self.render();
             });
         },
 

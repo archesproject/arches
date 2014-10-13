@@ -66,7 +66,6 @@ define([
             // The clicked node is 'event.node'
             var node = event.node;
             if (this.model.get('id') !== node.id) {
-                this.model.clear({slient: true});
                 this.model.set(node);
             } else {
                 event.preventDefault();
