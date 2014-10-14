@@ -1165,7 +1165,7 @@ ALTER TABLE data.resource_x_resource
 
 CREATE TABLE data.edit_log
 (
-  editlogid uuid NOT NULL DEFAULT uuid_generate_v1mc(),
+  editlogid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
   resourceentitytypeid text,	
   resourceid uuid,
   attributeentitytypeid text,

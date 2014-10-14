@@ -564,14 +564,19 @@ class Geometries(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.TextField(primary_key=True)
+    resourceentitytypeid = models.TextField()
     resourceid = models.TextField()
-    entityid = models.TextField()
+    attributeentitytypeid = models.TextField()
+    edittype = models.TextField()
     userid = models.TextField()
     timestamp = models.DateTimeField()
     oldvalue = models.TextField()
     newvalue = models.TextField()
+    user_firstname = models.TextField()
+    user_lastname = models.TextField()
+    note = models.TextField()
     class Meta:
-        db_table = u'edit_log'
+        db_table = u'data"."edit_log'
 
 class Domains(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
