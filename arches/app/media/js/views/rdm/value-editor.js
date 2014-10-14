@@ -30,7 +30,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             rules[this.languageInput.attr('id')] = "required";
 
             modal.validate({
-                ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+                ignore: null,
                 rules: rules,
                 submitHandler: function(form) {
                     self.model.set({
