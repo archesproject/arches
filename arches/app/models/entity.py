@@ -128,7 +128,7 @@ class Entity(object):
         """
 
         # first we remove any entities from the current entity graph that have been deleted
-
+        diff = ''
         if self.entityid != '':
             entity_pre_save = Entity().get(self.entityid)
             diff = entity_pre_save.diff(self)
@@ -140,9 +140,10 @@ class Entity(object):
 
         # log the edit
         timestamp = datetime.now()
-        if self.entityid != '':
+        if self.entityid != '' and diff != '':
             for entity in diff['deleted_nodes']:
-                edit = EditLog()        
+                edit = archesmodels.EditLog()        
+                edit.editlogid = str(uuid.uuid4())
                 edit.resourceid = self.entityid
                 edit.entityid = entity.entityid
                 edit.userid = username
@@ -152,7 +153,8 @@ class Entity(object):
                 edit.save() 
 
             for entity in diff['updated_nodes']:
-                edit = EditLog()        
+                edit = archesmodels.EditLog()        
+                edit.editlogid = str(uuid.uuid4())
                 edit.resourceid = self.entityid
                 edit.entityid = entity.entityid
                 edit.userid = username
@@ -163,7 +165,8 @@ class Entity(object):
         else:
             for entity in self.flatten():
                 if entity.value != '':
-                    edit = EditLog()        
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
                     edit.resourceid = self.entityid
                     edit.entityid = entity.entityid
                     edit.userid = username
