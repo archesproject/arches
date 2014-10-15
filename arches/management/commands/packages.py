@@ -26,6 +26,8 @@ import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
 from package_utils.resource_loader import ResourceLoader
+from arches.management.commands import utils
+from arches.app.search.search_engine_factory import SearchEngineFactory
 
 class Command(BaseCommand):
     """
@@ -57,7 +59,7 @@ class Command(BaseCommand):
             self.setup(package_name)
 
         if options['operation'] == 'install':
-            self.install(package_name)
+            self.install(package_name, options['source'])
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
@@ -79,8 +81,9 @@ class Command(BaseCommand):
         self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)  
         self.setup_db(package_name)
         self.generate_procfile(package_name)
+        self.register(package_name)
 
-    def install(self, package_name):
+    def install(self, package_name, source=None):
         """
         Runs the setup.py file found in the package root
 
@@ -88,7 +91,7 @@ class Command(BaseCommand):
 
         module = import_module('%s.setup' % package_name)
         install = getattr(module, 'install')
-        install() 
+        install(source) 
 
     def setup_elasticsearch(self, package_name, port=9200):
         """
@@ -131,6 +134,23 @@ class Command(BaseCommand):
             os.system("./plugin -install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
+        self.setup_indexes(package_name)
+
+    def setup_indexes(self, package_name):
+        import time, signal
+        # p = self.start_elasticsearch(package_name)
+        # time.sleep(10)
+        se = SearchEngineFactory().create()
+        #create_mapping(self, index, type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
+        se.create_mapping('concept', 'Arches', 'label', 'string', 'analyzed')
+        #os.kill(p.pid, signal.CTRL_C_EVENT)
+        # print p.pid
+        # os.system('taskkill /F /PID %s' % p.pid)
+        #p = subprocess.Popen(['service.bat', 'remove'], cwd=es_start, shell=True) 
+        
+        # es_start = os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'service.bat')
+        # os.system('%s remove' % (es_start))
+
     def start_elasticsearch(self, package_name):
         """
         Starts the Elasticsearch process (blocking)
@@ -142,9 +162,14 @@ class Command(BaseCommand):
         
         # use this instead to start in a non-blocking way
         if sys.platform == 'win32':
-            p = subprocess.Popen('elasticsearch.bat', cwd=es_start, shell=True)  
+            import time
+            p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)  
+            time.sleep(10)
+            p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True) 
         else:
             p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)  
+        return p
+        #os.system('honcho start')
 
     def setup_db(self, package_name):
         """
@@ -187,6 +212,16 @@ class Command(BaseCommand):
         file_name = url.split('/')[-1]
         file_name_wo_extention = file_name[:-4]
         return os.path.join(settings.PACKAGE_ROOT, 'elasticsearch', file_name_wo_extention)
+
+    def register(self, package_name):
+        """
+        Registers a package with Arches and writes a file into the package the location of the virtualenv used by Arches
+
+        """
+
+        python_exe = os.path.abspath(sys.executable)
+
+        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'arches_env'), python_exe)
 
     def build_permissions(self):
         """

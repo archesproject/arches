@@ -130,18 +130,20 @@ class Match(Dsl):
         self.field = kwargs.pop('field', '_all')
         self.fuzziness = kwargs.pop('fuzziness', None)
         self.operator = kwargs.pop('operator', 'or')
+        self.max_expansions = kwargs.pop('max_expansions', 10)
 
         self.dsl = {
             'match' : {
                 self.field : {
                     'query' : self.query,
                     'type' : self.type,
-                    'operator': self.operator
+                    'operator': self.operator,
+                    'max_expansions' : self.max_expansions
                 }
             }
         }
 
-        if self.fuzziness:
+        if self.fuzziness and self.type != 'phrase_prefix':
             self.dsl['match'][self.field]['fuzziness'] = self.fuzziness   
 
 class Nested(Dsl):
@@ -253,3 +255,33 @@ class Range(Dsl):
             self.dsl['range'][self.field]['lte'] = self.lte
         if self.lt is not None:
             self.dsl['range'][self.field]['lt'] = self.lt
+
+class SimpleQueryString(Dsl):
+    """
+    http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop('field', '_all') # can be a list of fields
+        self.query = kwargs.pop('query', '')
+        self.operator = kwargs.pop('operator', 'or')
+        self.analyzer = kwargs.pop('analyzer', 'snowball')
+        self.flags = kwargs.pop('flags', 'OR|AND|PREFIX')
+        #The available flags are: ALL, NONE, AND, OR, PREFIX, PHRASE, PRECEDENCE, ESCAPE, WHITESPACE, FUZZY, NEAR, and SLOP.
+
+        # if not isinstance(self.field, list):
+        #     self.field = [self.field]
+
+        self.dsl = {
+            'simple_query_string' : {
+                'fields' : self.field,
+                'query': self.query,
+                'default_operator': self.operator,
+                'flags': self.flags
+            }
+        }
+
+        self.dsl = {
+            "prefix" : { self.field : self.query }
+        }
