@@ -286,8 +286,8 @@
             {% for value in concept.values %}
                 {% if value.category == None %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="#" title="Remove this value" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"class="color-green fa fa-times-circle"></a>
-                    <a href="#" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}: {{value.value}} {% if value.language != None %}({{value.language}}){% endif %}</a>
+                    <a href="#" title="Remove this value" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="Edit this value" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                     <span class="arches-RDM-note">{{value.value}}</span>
                 </dd>
                 {% endif %}
