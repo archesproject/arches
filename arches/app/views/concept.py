@@ -72,12 +72,6 @@ def concept(request, ids):
                 if f == 'html':
                     languages = archesmodels.DLanguages.objects.all()
                     valuetypes = archesmodels.ValueTypes.objects.all()
-                    othertypes = []
-                    for type in valuetypes:
-                        if type.category == 'label' or type.pk == 'scopeNote':
-                            pass
-                        else:
-                            othertypes.append(type)
                     prefLabel = concept_graph.get_preflabel(lang=lang)
                     return render_to_response('views/rdm/concept-report.htm', {
                         'lang': lang,
@@ -85,8 +79,8 @@ def concept(request, ids):
                         'concept': concept_graph,
                         'languages': languages,
                         'valuetype_labels': valuetypes.filter(category='label'),
-                        'valuetype_notes': valuetypes.filter(pk='scopeNote'),
-                        'valuetype_related_values': othertypes
+                        'valuetype_notes': valuetypes.filter(category='note'),
+                        'valuetype_related_values': valuetypes.filter(category=None)
                     }, context_instance=RequestContext(request))
                 
                 if f == 'skos':
