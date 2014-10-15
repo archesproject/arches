@@ -17,13 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 import arches.app.models.models as archesmodels
+from arches.app.models.concept import Concept, ConceptValue
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter
@@ -66,18 +69,12 @@ def concept(request, ids):
                 else:
                     concept = archesmodels.Concepts.objects.get(conceptid = id)
 
-                concept_graph = concept.graph(include_subconcepts=include_subconcepts, 
+                concept_graph = Concept().get(id=concept.pk, include_subconcepts=include_subconcepts, 
                     include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=1)
                 
                 if f == 'html':
                     languages = archesmodels.DLanguages.objects.all()
                     valuetypes = archesmodels.ValueTypes.objects.all()
-                    othertypes = []
-                    for type in valuetypes:
-                        if type.category == 'label' or type.pk == 'scopeNote':
-                            pass
-                        else:
-                            othertypes.append(type)
                     prefLabel = concept_graph.get_preflabel(lang=lang)
                     return render_to_response('views/rdm/concept-report.htm', {
                         'lang': lang,
@@ -85,8 +82,8 @@ def concept(request, ids):
                         'concept': concept_graph,
                         'languages': languages,
                         'valuetype_labels': valuetypes.filter(category='label'),
-                        'valuetype_notes': valuetypes.filter(pk='scopeNote'),
-                        'valuetype_related_values': othertypes
+                        'valuetype_notes': valuetypes.filter(category='note'),
+                        'valuetype_related_values': valuetypes.filter(category=None)
                     }, context_instance=RequestContext(request))
                 
                 if f == 'skos':
@@ -229,24 +226,13 @@ def concept_value(request, id=None):
     #  need to check user credentials here
 
     if request.method == 'POST':
-        json = request.POST.get('json', None)
+        json = request.body
 
         if json != None:
-            value = JSONDeserializer().deserialize(json)
-            
-            newvalue = archesmodels.Values()
-            newvalue.pk = str(uuid.uuid4())
-            if value['id'] != '':
-                newvalue = archesmodels.Values.objects.get(pk=value['id'])
+            value = ConceptValue(json)
+            value.save()
 
-            newvalue.value = value['value']
-            newvalue.conceptid = archesmodels.Concepts.objects.get(pk=value['conceptid'])
-            newvalue.valuetype = archesmodels.ValueTypes.objects.get(pk=value['valuetype'])
-            newvalue.datatype = value['datatype']
-            newvalue.languageid = archesmodels.DLanguages.objects.get(pk=value['language'])
-            newvalue.save()
-
-            return JSONResponse(newvalue)
+            return JSONResponse(value)
 
     if request.method == 'DELETE':
         if id != None:
@@ -278,10 +264,15 @@ def update_relation(request):
 
     return JSONResponse({'success': False})
 
+@csrf_exempt
+def search(request):
+    se = SearchEngineFactory().create()
+    searchString = request.GET['q']
+    query = Query(se, start=0, limit=100)
+    phrase = Match(field='labels.value', query=searchString.lower(), type='phrase_prefix')
+    query.add_query(phrase)
 
-# class ConceptValueViewModel(object):
     
-#     def __init__(self, data=None):
-#         self.
-#         if data:
-#         self. 
+    # concept_graph = Concept().get('26dd8a8a-542a-11e4-910b-a3add06d00f9', include=['label'])
+    # return JSONResponse(concept_graph, indent=4)
+    return JSONResponse(query.search(index='concept', type='None'))

@@ -54,11 +54,15 @@ require([
                 if (conceptReport.$el.height() > sidebar.height()) {
                     sidebar.addClass("fixed-menu");
                     sidebar.css("width", sidebarWidth);
+                    conceptReport.$el.css("margin-top", "95px");
                     if (topToFooterPx < topToSidebarBottomPx) {
                         sidebar.css("margin-top", topToFooterPx - topToSidebarBottomPx);
                     } else {
                         sidebar.css("margin-top", "10px");
                     }
+                } else {
+                    sidebar.css("margin-top", "90px");
+                    conceptReport.$el.css("margin-top", "90px");
                 }
             } else {
                 appHeader.removeClass("fixed");

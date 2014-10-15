@@ -98,14 +98,11 @@ class SKOSWriter(object):
             for parentconcept in graph.parentconcepts:
                 rdf_graph.add((arches[graph.id],skos['broader'],arches[parentconcept.id]))
             
-            for label in graph.labels:
-                rdf_graph.add((arches[graph.id], skos[label.type], Literal(label.value, lang = label.language)))
-
-            for note in graph.notes:
-                rdf_graph.add((arches[graph.id], skos[note.type], Literal(note.value, lang = note.language)))
-
-            for metadata in graph.metadata:
-                rdf_graph.add((arches[graph.id], arches[metadata.type.replace(' ', '_')], Literal(metadata.value, lang = metadata.language)))
+            for value in graph.values:
+                if value.category == 'label' or value.category == 'note':
+                    rdf_graph.add((arches[graph.id], skos[value.type], Literal(value.value, lang = value.language)))
+                else:
+                    rdf_graph.add((arches[graph.id], arches[value.type.replace(' ', '_')], Literal(value.value, lang = value.language)))
 
             for concept in graph.subconcepts:
                 traverse(concept)

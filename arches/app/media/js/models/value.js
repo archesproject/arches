@@ -1,31 +1,14 @@
-define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
-    return Backbone.Model.extend({
+define(['arches', 'models/abstract'], function (arches, AbstractModel) {
+    return AbstractModel.extend({
+        url: arches.urls.concept_value,
+
         defaults: {
             'value': '',
             'id': null,
-            'valuetype': null,
+            'type': null,
             'datatype': 'text',
             'language': null,
             'conceptid': ''
-        },
-
-        save: function(callback) {
-            $.ajax({
-                type: "POST",
-                url: arches.urls.concept_value,
-                data: {
-                    'json': JSON.stringify(this.toJSON())
-                },
-                complete: callback
-            });
-        },
-        
-        delete: function(callback) {
-            $.ajax({
-                type: "DELETE",
-                url: arches.urls.concept_value + this.get('id'),
-                complete: callback
-            });
         }
     });
 });
