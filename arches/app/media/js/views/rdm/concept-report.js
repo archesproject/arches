@@ -97,22 +97,26 @@ define([
         deleteConfirmed: function(e) {
             var self = this,
                 data = $(e.target).data(),
+                modal = self.$el.find('.confirm-delete-modal'),
                 Model, model, eventName;
 
-            if (data.action === 'delete') {
-                Model = ValueModel;
-                eventName = 'valueDeleted';
-            }
-            if (data.action === 'delete_concept') {
-                Model = ConceptModel;
-                eventName = 'conceptDeleted';
-            }
+            modal.on('hidden.bs.modal', function () {
+                if (data.action === 'delete') {
+                    Model = ValueModel;
+                    eventName = 'valueDeleted';
+                }
+                if (data.action === 'delete_concept') {
+                    Model = ConceptModel;
+                    eventName = 'conceptDeleted';
+                }
 
-            model = new Model(data);
-            model.delete(function() {
-                self.render();
-                self.trigger(eventName, model);
+                model = new Model(data);
+                model.delete(function() {
+                    self.render();
+                    self.trigger(eventName, model);
+                });
             });
+            modal.modal('hide');
         }
     });
 });
