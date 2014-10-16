@@ -16,6 +16,8 @@ import collections
 import json
 from django.contrib.gis.gdal import DataSource
 import csv
+import yaml
+
 
 class Row(object):
     def __init__(self, *args):
@@ -180,6 +182,7 @@ class ResourceLoader():
             resource.legacyid = self.get_legacy_id(master_graph)
 
             ret['successfully_saved'] += 1
+            print 'saved', master_graph.entityid
             master_graph.index()
             ret['successfully_indexed'] += 1
 
@@ -285,27 +288,10 @@ class ResourceLoader():
         Takes a shapefile and reads a config file with the same basename.
         Returns a dictionary with configuration for creating resources from shapefile records
         '''
-        result = {
-            'GEOM_TYPE':'',
-            'RESOURCE_TYPE':'',
-            'FIELD_MAP':{},
-            'AUXILIARY_MAP':{}
-            }
-
         try:
             config_file = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.config')
-            with open(config_file, 'r') as f:
-                configs = csv.DictReader(f, delimiter='|')
-                for config in configs:
-
-                    if config['CONFIG_TYPE'] == 'HEADER_INFO':
-                        result[config['CONFIG_NAME']] = config['CONFIG_VALUE']
-
-                    if config['CONFIG_TYPE'] == 'AUXILIARY_MAP':
-                        result['AUXILIARY_MAP'][config['CONFIG_NAME']] = config['CONFIG_VALUE'] 
-
-                    if config['CONFIG_TYPE'] == 'FIELD_MAP':
-                        result['FIELD_MAP'][config['CONFIG_NAME']] = config['CONFIG_VALUE']
+            result = yaml.load(open(config_file, 'r'))
+            result['AUXILIARY_MAP'] = {}
 
         except:
             print "config file is missing or improperly named. Make sure you have config file with the same basename as your shapefile and the extension .config"
