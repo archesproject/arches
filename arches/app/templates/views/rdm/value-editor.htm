@@ -1,49 +1,67 @@
 {% load i18n %}
  <!-- Modal editing window for labels -->
-<form action="" class="modal fade" id="labelmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="labelmodaltitle" data-edit-title="Edit Label" data-add-title="{% trans "Add New Label" %}">{% trans "Manage Labels" %}</h4>
+<form class="modal fade" id="labelmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title" id="labelmodaltitle" data-edit-title="{% trans "Edit Concept Label" %}" data-add-title="{% trans "Add Concept Label" %}">{% trans "Manage Concept Label" %}</h4>
             </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
             <div class="modal-body">
+
                 <div class="row">
-                    <div class="col-md-12">
-                        <h4>{% trans "Label" %}</h4>
-                        <p><input class="form-control value-input" id="label_value" type="text" required/><input id="label_id" class="id-input" type="hidden"/></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <h4>{% trans "Type" %}</h4>
-                            <p> 
-                                <select style="width:100%" class="select2 value-type-input" name="label_valuetype_dd" id="label_valuetype_dd" required>
-                                    {% for label in valuetype_labels %}
-                                      <option value="{{label.valuetype}}">{{label.valuetype}}</option>
-                                    {% endfor %}
-                                </select>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h4>{% trans "Language" %}</h4>
-                        <p> 
-                            <select style="width:100%" class="select2 language-input" name="label_language_dd" id="label_language_dd" required>
-                                {% for language in languages %}
-                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
-                                {% endfor %}
-                            </select>
-                        </p>
+                    <div class="col-xs-12">
+                        
+                        <form class="form-inline" role="form">
+                            
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 id="" class="arches-modal-section">Label Information</h5>
+                                <input class="form-control value-input" style="width: 100%;" id="concept-label" placeholder="Concept Label">
+                                <input id="label_id" class="id-input" type="hidden"/>
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+                                
+                                <div class="row">
+
+                                    <!-- Label Type -->
+                                    <div class="col-xs-6">
+                                        <select multiple style="width:100%;" class="select2 value-type-input" id="label-type" name="label-type" placeholder="Label type">
+                                            {% for label in valuetype_labels %}
+                                              <option value="{{label.valuetype}}">{{label.valuetype}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Label Type -->
+
+                                    <!-- Language -->
+                                    <div class="col-xs-6">
+                                        <select multiple style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder="Language">
+                                            {% for language in languages %}
+                                              <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Language -->
+                                </div>
+
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+            <!-- End Form (modal body) -->
+
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
-                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
+                <button class="btn-u" type="submit">Save</button>
             </div>
-        </div>
+          </div>
     </div>
 </form>
 <!-- End Modal editing window for labels -->
