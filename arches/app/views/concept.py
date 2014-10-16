@@ -83,7 +83,7 @@ def concept(request, ids):
                         'languages': languages,
                         'valuetype_labels': valuetypes.filter(category='label'),
                         'valuetype_notes': valuetypes.filter(category='note'),
-                        'valuetype_related_values': valuetypes.filter(category=None)
+                        'valuetype_related_values': valuetypes.filter(category='')
                     }, context_instance=RequestContext(request))
                 
                 if f == 'skos':

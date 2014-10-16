@@ -284,7 +284,7 @@
                 </h5>
             </dt>
             {% for value in concept.values %}
-                {% if value.category == None %}
+                {% if value.category == '' %}
                 <dd class="arches-RDM-label-highlighted">
                     <a href="#" title="Remove this value" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
                     <a href="#" title="Edit this value" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>

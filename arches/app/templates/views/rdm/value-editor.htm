@@ -139,6 +139,74 @@
 <!-- End Modal editing window for notes -->
 
 <!-- Modal editing window for related_value -->
+<form class="modal fade" id="related_valuemodal" tabindex="-1" role="dialog" aria-labelledby="related_valuemodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title" id="related_valuemodaltitle" data-edit-title="Edit Concept Value" data-add-title="{% trans "Add Concept Value" %}">{% trans "Manage Concept Values" %}</h4>
+            </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        
+                        <form class="form-inline" role="form">
+                            
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 id="" class="arches-modal-section">Define a value</h5>
+
+                                <input class="form-control value-input" style="width: 100%;" id="related_value_value" placeholder="Value">
+                                <input id="related_value_id" class="id-input" type="hidden"/>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+                                
+                                <div class="row">
+
+                                    <!-- Value Type -->
+                                    <div class="col-xs-6">
+                                        <select multiple style="width:100%;" class="select2 value value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required placeholder="Value type">
+                                        {% for related_value in valuetype_related_values %}
+                                          <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Value Type -->
+
+                                    <!-- Language -->
+                                    <div class="col-xs-6">
+                                        <select multiple style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder="Language">
+                                        {% for language in languages %}
+                                          <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Language -->
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
+                <button class="btn-u" type="submit">Save</button>
+            </div>
+          </div>
+    </div>
+</form>
+
+
 <form action="" class="modal fade" id="related_valuemodal" tabindex="-1" role="dialog" aria-labelledby="related_valuemodal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
