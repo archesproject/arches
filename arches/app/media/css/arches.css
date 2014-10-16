@@ -91,3 +91,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     display:none;
 }
+
+/* Concept search widget
+------------------------------------*/
+
+.concept_result {
+    font-weight:bold;
+}
+
+.concept_result_schemaname {
+    font-size: 11px;
+    padding-left: 10px;
+}

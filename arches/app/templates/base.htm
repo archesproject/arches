@@ -312,7 +312,7 @@
                 'plugins': '{{ STATIC_URL }}plugins',
                 'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
                 'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
-                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2',
+                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2',
                 'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min',
                 'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
                 'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
@@ -336,7 +336,8 @@
                         concept_tree: "{% url 'concept_tree' %}",
                         concept_value: "{% url 'concept_value' '' %}",
                         concept: "{% url 'concept' '' %}",
-                        concept_relation: "{% url 'concept_relation' %}"
+                        concept_relation: "{% url 'concept_relation' %}",
+                        concept_search: "{% url 'concept_search' %}"
                     }
                 };
             });

@@ -169,6 +169,7 @@ def concept(request, ids):
 
 def concept_tree(request):
     conceptid = request.GET.get('node', None)
+    top_concept = '00000000-0000-0000-0000-000000000003'
     class concept(object):
         def __init__(self, *args, **kwargs):
             self.label = ''
@@ -199,7 +200,7 @@ def concept_tree(request):
 
     def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
         conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptidto = conceptid)
-        if len(conceptrealations) > 0:
+        if len(conceptrealations) > 0 and conceptid != top_concept:
             labels = archesmodels.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
             ret = concept()          
             for label in labels:
@@ -214,9 +215,9 @@ def concept_tree(request):
             return child_concept
     
     if conceptid == None or conceptid == '':
-        concepts = [_findNarrowerConcept('00000000-0000-0000-0000-000000000001', depth_limit=2)]
+        concepts = [_findNarrowerConcept(top_concept, depth_limit=1)]
     else:
-        concepts = _findNarrowerConcept(conceptid, depth_limit=2)
+        concepts = _findNarrowerConcept(conceptid, depth_limit=1)
         concepts = [_findBroaderConcept(conceptid, concepts, depth_limit=1)]
 
     return JSONResponse(concepts, indent=4)
@@ -269,10 +270,27 @@ def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
     query = Query(se, start=0, limit=100)
-    phrase = Match(field='labels.value', query=searchString.lower(), type='phrase_prefix')
+    phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
-
+    results = query.search(index='concept_labels')
+    # for result in results['hits']['hits']:
+    #     concept = Concept({'id': result['_id']})
+    #     result['_source']['scheme'] = concept.get_auth_doc_concept()
     
-    # concept_graph = Concept().get('26dd8a8a-542a-11e4-910b-a3add06d00f9', include=['label'])
-    # return JSONResponse(concept_graph, indent=4)
-    return JSONResponse(query.search(index='concept', type='None'))
+    cached_scheme_names = {}
+
+    for result in results['hits']['hits']:
+        # first look to see if we've already retrieved the scheme name
+        # else look up the scheme name with ES and cache the result
+        if result['_type'] in cached_scheme_names:
+            result['_type'] = cached_scheme_names[result['_type']]
+        else:
+            query = Query(se, start=0, limit=100)
+            phrase = Match(field='conceptid', query=result['_type'])
+            query.add_query(phrase)
+            scheme = query.search(index='concept_labels')
+            for label in scheme['hits']['hits']:
+                if label['_source']['type'] == 'prefLabel':
+                    cached_scheme_names[result['_type']] = label['_source']['value']
+                    result['_type'] = label['_source']['value']
+    return JSONResponse(results)

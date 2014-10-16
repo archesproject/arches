@@ -96,33 +96,34 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
+            self.id = self.id if self.id != '' else str(uuid.uuid4())
             concept = models.Concepts()
-            concept.pk = str(uuid.uuid4())
+            concept.pk = self.id
             concept.legacyoid = self.legacyoid
             concept.save()
-            self.id = concept.pk
 
             for parentconcept in self.parentconcepts:
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
-                conceptrelation.conceptidfrom = models.Concepts.objects.get(pk=parentconcept.id)
+                conceptrelation.conceptidfrom_id = parentconcept.id #models.Concepts.objects.get(pk=parentconcept.id)
                 conceptrelation.conceptidto = concept
-                conceptrelation.relationtype = models.DRelationtypes.objects.get(pk=parentconcept.relationshiptype)
+                conceptrelation.relationtype_id = parentconcept.relationshiptype #models.DRelationtypes.objects.get(pk=parentconcept.relationshiptype)
                 conceptrelation.save()
 
             for subconcept in self.subconcepts:
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom = concept
-                conceptrelation.conceptidto = models.Concepts.objects.get(pk=subconcept.id)
-                conceptrelation.relationtype = models.DRelationtypes.objects.get(pk=self.relationshiptype)
+                conceptrelation.conceptidto_id = subconcept.id #models.Concepts.objects.get(pk=subconcept.id)
+                conceptrelation.relationtype_id = self.relationshiptype #models.DRelationtypes.objects.get(pk=self.relationshiptype)
                 conceptrelation.save()
 
             for value in self.values:
                 if not isinstance(value, ConceptValue): 
                     value = ConceptValue(value)
-                value.conceptid = concept.pk
+                value.conceptid = self.id
                 value.save()
+
 
     def get_sortkey(self, lang='en-us'):
         for value in self.values:
@@ -136,8 +137,8 @@ class Concept(object):
        
         def find_auth_doc(concept):
             for parentconcept in concept.parentconcepts:
-                if parentconcept.id == '00000000-0000-0000-0000-000000000003':
-                    return concept
+                if parentconcept.id == '00000000-0000-0000-0000-000000000004':
+                    return concept.get_preflabel(lang=lang)
 
             for parentconcept in concept.parentconcepts:
                 return find_auth_doc(parentconcept)
@@ -206,18 +207,16 @@ class Concept(object):
 
     def addvalue(self, value):
         if isinstance(value, dict):
+            value['conceptid'] = self.id
             self.values.append(ConceptValue(value))
-        elif isinstance(value, Concept):
+        elif isinstance(value, ConceptValue):
             self.values.append(value)
         else:
             raise Exception('Invalid value definition: %s' % (value))
 
     def index(self, scheme=''):
-        se = SearchEngineFactory().create()
-        data = JSONSerializer().serializeToPython(self)
-        se.index_data('concept', self.get_auth_doc_concept(), data, 'id')
-        # for label in self.values:
-        #     label.index(scheme=scheme)
+        for label in self.values:
+            label.index(scheme=scheme)
 
 
 class ConceptValue(object):
@@ -242,31 +241,20 @@ class ConceptValue(object):
 
 
     def get(self, id=''):
-        value = models.Values.objects.get(pk = id)
-        self.id = value.pk
-        self.conceptid = value.conceptid.pk
-        self.datatype = value.datatype
-        self.type = value.valuetype.pk
-        self.category = value.valuetype.category
-        self.value = value.value
-        self.language = value.languageid_id
-
+        self.load(models.Values.objects.get(pk = id))
         return self
 
     def save(self):
+        self.id = self.id if self.id != '' else str(uuid.uuid4())
         value = models.Values()
-        value.pk = str(uuid.uuid4())
-        if self.id != '':
-            value = models.Values.objects.get(pk=self.id)
+        value.pk = self.id
         value.value = self.value
-        value.conceptid = models.Concepts.objects.get(pk=self.conceptid)
-        value.valuetype = models.ValueTypes.objects.get(pk=self.type)
+        value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
+        value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
         value.datatype = self.datatype
         if self.language != '':
-            value.languageid = models.DLanguages.objects.get(pk=self.language)
+            value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
         value.save()
-        # update the id after save
-        self.id = value.pk
 
     def load(self, value):
         if isinstance(value, models.Values):
@@ -286,4 +274,9 @@ class ConceptValue(object):
             self.category = value['category'] if 'category' in value else ''
             self.value = value['value'] if 'value' in value else ''
             self.language = value['language'] if 'language' in value else ''
-    
+
+    def index(self, scheme=''):
+        se = SearchEngineFactory().create()
+        if self.category == 'label':
+            data = JSONSerializer().serializeToPython(self)
+            se.index_data('concept_labels', scheme, data, 'id')
