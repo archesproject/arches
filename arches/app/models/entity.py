@@ -288,7 +288,6 @@ class Entity(object):
         self.value = E.get('value', '')
         for entity in E.get('relatedentities', []):
             relatedentity = Entity()
-            if entity['entitytypeid'] == 'PLACE.E53': print 'in load'
             self.append_child(relatedentity.load(entity))
         return self
 

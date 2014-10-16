@@ -34,11 +34,9 @@ define([
                     success: function(response) {
                         self.$el.find('.concept-report-loading').addClass('hidden');
                         self.$el.html(response);
-                        // ADD CHILD CONCEPT EDITOR 
                         self.$el.find('#conceptmodal').validate({
-                            ignore: null, // required so that the select2 dropdowns will be visible to the validate plugin
+                            ignore: null,
                             rules: {
-                                // element_name: value
                                 label: "required",
                                 language_dd: "required"
                             },
@@ -91,31 +89,34 @@ define([
                 });
 
             editor.on('save', function() {
-                self.trigger('valueSaved', model);
-
                 self.render();
+                self.trigger('valueSaved', model);
             });
         },
 
         deleteConfirmed: function(e) {
             var self = this,
                 data = $(e.target).data(),
+                modal = self.$el.find('.confirm-delete-modal'),
                 Model, model, eventName;
 
-            if (data.action === 'delete') {
-                Model = ValueModel;
-                eventName = 'valueDeleted';
-            }
-            if (data.action === 'delete_concept') {
-                Model = ConceptModel;
-                eventName = 'conceptDeleted';
-            }
+            modal.on('hidden.bs.modal', function () {
+                if (data.action === 'delete') {
+                    Model = ValueModel;
+                    eventName = 'valueDeleted';
+                }
+                if (data.action === 'delete_concept') {
+                    Model = ConceptModel;
+                    eventName = 'conceptDeleted';
+                }
 
-            model = new Model(data);
-            model.delete(function() {
-                self.render();
-                self.trigger(eventName, model);
+                model = new Model(data);
+                model.delete(function() {
+                    self.render();
+                    self.trigger(eventName, model);
+                });
             });
+            modal.modal('hide');
         }
     });
 });

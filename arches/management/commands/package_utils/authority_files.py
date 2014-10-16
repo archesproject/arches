@@ -7,6 +7,8 @@ from time import time
 from os import listdir
 from os.path import isfile, join
 from django.db import connection, transaction
+from arches.app.models import models
+from arches.app.models.concept import Concept, ConceptValue
 from .. import utils
 
 def load_authority_files(path_to_authority_files, break_on_error=True):
@@ -22,8 +24,13 @@ def load_authority_files(path_to_authority_files, break_on_error=True):
     errors = []
     print '\nLOADING AUTHORITY FILES'
     print '------------------------'
+    count = 1
     for file_name in file_list:
         errors = errors + load_authority_file(cursor, path_to_authority_files, file_name)
+        if count > 0:
+            pass
+            #break
+        count = count + 1
     errors = errors + create_link_to_entity_types(cursor, path_to_authority_files)
 
     utils.write_to_file(os.path.join(path_to_authority_files, 'authority_file_errors.txt'), '')
@@ -33,6 +40,8 @@ def load_authority_files(path_to_authority_files, break_on_error=True):
         print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(path_to_authority_files, 'authority_file_errors.txt'))
         if break_on_error:
             sys.exit(101)
+
+    #index_concepts()
     
 def load_authority_file(cursor, path_to_authority_files, filename):
     start = time()
@@ -137,3 +146,14 @@ def create_link_to_entity_types(cursor, path_to_authority_files):
         errors.insert(0, 'ERRORS IN FILE: %s\n' % (filepath))
         errors.append('\n\n\n\n')
     return errors
+
+def index_concepts():
+    start = time()
+    from arches.app.utils.betterJSONSerializer import JSONSerializer
+    concepts = models.Concepts.objects.all()
+    for concept in concepts:
+        concept_graph = Concept().get(concept.pk, include=['label'])
+        #print JSONSerializer().serialize(concept_graph)
+        concept_graph.index()
+    print 'Time to index = %s' % ("{0:.2f}".format(time() - start)) 
+    print 'Time per concept: %s' % ((time() - start)/len(concepts))

@@ -77,7 +77,7 @@ class Resource(object):
         return '{0},{1}'.format(self.resource_id, self.entitytypeid)
 
 
-class ResourceLoader(): 
+class ResourceLoader(object): 
 
     option_list = BaseCommand.option_list + (
         make_option('--source',
@@ -164,6 +164,8 @@ class ResourceLoader():
 
             related_resources = self.update_related_resources(master_graph, resource_list)
 
+            self.pre_save(master_graph)
+
             master_graph.save(username=settings.ETL_USERNAME)
 
             for related_resource in related_resources:
@@ -224,6 +226,10 @@ class ResourceLoader():
                 master_graph.merge_at(mapping_graph, node_type_to_merge_at)
 
         return master_graph
+
+
+    def pre_save(self, master_graph):
+        pass
 
 
     def get_legacy_id(self, entity):

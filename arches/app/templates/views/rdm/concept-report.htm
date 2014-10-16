@@ -2,59 +2,109 @@
 <div class="col-xs-12 concept-report-loading hidden">Loading...</div>
 <div class="col-xs-12 concept-report-content">
     <!-- Concept Preferred Label -->
-    <div class="headline margin-bottom-10 padding-left-10"><h4>{{prefLabel}} ({{lang}})</h4>
-        
-    </div>
-    <!-- End Concept Preferred Label -->
+    <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{{prefLabel}} ({{lang}})</h3>
 
-    <!-- Concept Management Tools -->
-    <div class="margin-bottom-10 padding-left-10">
+        <!-- Spacer for xs screens -->
+        <div class="divider hidden-sm hidden-md hidden-lg"></div>
 
-        <!-- Manage Concept -->
-        <div class="btn-group">
-            <button type="button" class="btn btn-primary">Manage Concept</button>
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+        <!-- Concept Type Label -->
+        <span class="arches-search-filter-font text-muted" style="">
+            (member)
+        </span>
+
+        <!-- Spacer for xs screens -->
+        <div class="divider hidden-sm hidden-md hidden-lg"></div>
+
+        <!-- Concept Management Tools for larger screens -->
+        <div class="btn-group pull-right hidden-xs">
+            <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
+                Manage &nbsp;
                 <i class="fa fa-chevron-down"></i>
                 <span class="sr-only">Toggle Dropdown</span>                            
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#" data-toggle="modal" data-target="#conceptmodal">Add Child</a></li>
+                <li><a href="#">Import Child from AAT</a></li>
+                <li><a href="#NewParent" data-toggle="modal">Manage Parents</a></li>
+                <li><a href="#ChangeConceptType" data-toggle="modal">Change Concept Type</a></li>
                 <li class="divider"></li>
-                <li><a href="#">Import Children from SKOS</a></li>
-                <li><a href="#">Import Children from .CSV</a></li>
+                <li><a href="#">Close</a></li>
+            </ul>
+        </div>
+
+        <!-- Concept Management Tools for xs screens -->
+        <div class="btn-group hidden-sm hidden-md hidden-lg">
+            <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button-xs" data-toggle="dropdown">
+                Manage &nbsp;
+                <i class="fa fa-chevron-down"></i>
+                <span class="sr-only">Toggle Dropdown</span>                            
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">Add Child</a></li>
+                <li><a href="#">Import Child from AAT</a></li>
+                <li><a href="#NewParent" data-toggle="modal">Manage Parents</a></li>
+                <li><a href="#ChangeConceptType" data-toggle="modal">Change Concept Type</a></li>
                 <li class="divider"></li>
-                <li><a href="{%url 'concept' concept.id %}?f=skos" target="_blank">Export to SKOS</a></li>
-                <li><a href="#">Export to .CSV</a></li>
+                <li><a href="#">Close</a></li>
             </ul>
         </div>
 
     </div>
+    <!-- End Concept Preferred Label -->
 
     <!-- Concept Labels -->
     <div class="margin-bottom-10 padding-left-10">
         <dl>
-            <dt>Concept Labels</dt>
-            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="label" data-target="#labelmodal">Add new label</a></dd>
-            {% for label in concept.labels %}
-            <dd class="arches-RDM-labels">
-                <a href="#" title="Remove this label" data-id="{{label.id}}" data-action="delete" data-message="{{label.value}}" class="color-green fa fa-times-circle"></a>
-                <a href="#" title="Edit this label" data-action="edit" class="edit-value" data-target="#labelmodal" data-id="{{label.id}}" data-datatype="{{label.datatype}}" data-type="{{label.type}}" data-category="{{label.category}}" data-value="{{label.value}}" data-language="{{label.language}}">{{label.value}}</a>&nbsp; {% if label.type == 'prefLabel' %} (preferred) {% endif %} ({{label.language}})
-            </dd>{% endfor %}
+            <dt>
+                <h5 id="" class="section-headline">Concept Labels &nbsp;
+                    <span>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="label" data-target="#labelmodal">  Add label</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in concept.values %}
+                {% if value.category == 'label' %}
+                <dd class="arches-RDM-label-highlighted">
+                    <a href="#" title="Remove this label" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
+                    <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
+                </dd>
+                {% endif %}
+            {% endfor %}
+
         </dl>
     </div>
+
+    <hr class="devider arches-RDM-divider">
 
     <!-- Scope Notes -->
     <div class="margin-bottom-10 padding-left-10">
         <dl>
-            <dt>Scope Note</dt>
-            <dd class="margin-left-10" style="margin-le"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="note" data-target="#notemodal">Add new note</a></dd>
-            {% for note in concept.notes %}{% if note.type == 'scopeNote' %}
-            <dd class="margin-left-10 txt-color-blue">
-                <a href="#" title="Remove this note" data-id="{{note.id}}" data-action="delete" data-message="{{note.value}}" class="color-green fa fa-times-circle"></a>
-                <a href="#" data-action="edit" class="edit-value" data-target="#notemodal" data-id="{{note.id}}" data-datatype="{{note.datatype}}" data-type="{{note.type}}" data-category="{{note.category}}" data-value="{{note.value}}" data-language="{{note.language}}">{{note.value}} ({{note.language}})</a>
-            </dd>{% endif %}{% endfor %}
+            <dt>
+                <h5 id="" class="section-headline">Concept Notes &nbsp;
+                    <span>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="note" data-target="#notemodal">  Add note</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in concept.values %}
+                {% if value.category == 'note' %}
+                <dd class="arches-RDM-label">
+                    <a href="#" title="Remove this note" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a> 
+                    <span class="text-muted"> ({{value.language}})</span>
+                </dd>
+
+                <dd class="arches-RDM-note">
+                    {{value.value}}{{value.category}}
+                </dd>
+                {% endif %}
+            {% endfor %}
         </dl>
     </div>
+    <!-- End Scope Notes -->
+
+    <hr class="devider arches-RDM-divider">
 
     <!-- Parent Concepts-->
     <div class="margin-bottom-10 padding-left-10">
@@ -62,7 +112,7 @@
             <dt>Parent Concepts</dt>
             {% for parentconcept in concept.parentconcepts %}
             <dd class="arches-RDM-labels">
-                <a href="#" data-action="viewconcept" data-conceptid="{{parentconcept.id}}">{% for label in parentconcept.labels %}{% if label.type == 'prefLabel' %}{{label.value}}{% endif %}{% endfor %} ({{parentconcept.id}})</a>
+                <a href="#" data-action="viewconcept" data-conceptid="{{parentconcept.id}}">{% for value in parentconcept.vlaues %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %} ({{parentconcept.id}})</a>
             </dd>{% endfor %}
         </dl>
     </div>
@@ -75,37 +125,327 @@
             {% for subconcept in concept.subconcepts %}
             <dd class="arches-RDM-labels">
                 <a href="#" title="Delete Concept" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." class="color-green fa fa-times-circle"></a>
-                <a href="#" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for label in subconcept.labels %}{% if label.type == 'prefLabel' %}{{label.value}}{% endif %}{% endfor %} ({{subconcept.id}})</a>
+                <a href="#" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %} ({{subconcept.id}})</a>
             </dd>{% endfor %}
 
         </dl>
     </div>
     <!-- End Sub Concepts -->
 
-    <!-- Related Values-->
+    <!--  **********************************************************************  -->
+    <!--  ************************START MOCK UP CONTENT*************************  -->
+    <!--  **********************************************************************  -->
+    
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Broader/Narrower Concepts-->
     <div class="margin-bottom-10 padding-left-10">
         <dl>
-            <dt>Related Values</dt>
-            <dd class="arches-RDM-labels"><a href="#" data-action="add" style="font-weight:bold;" class="edit-value" data-category="" data-target="#related_valuemodal">Add new value</a></dd>
-            {% for related_value in concept.metadata %}
-            <dd class="arches-RDM-labels">
-                <a href="#" title="Remove this value" data-id="{{related_value.id}}" data-action="delete" data-message="{{related_value.value}}"class="color-green fa fa-times-circle"></a>
-                <a href="#" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{related_value.id}}" data-datatype="{{related_value.datatype}}" data-type="{{related_value.type}}" data-category="{{related_value.category}}" data-value="{{related_value.value}}" data-language="{{related_value.language}}">{{related_value.type}}: {{related_value.value}} {% if related_value.language != None %}({{related_value.language}}){% endif %}</a>
-            </dd>{% endfor %}
+
+            <dt>
+                <h5 id="" class="section-headline">Broader/Narrower Concepts 
+                    <span>
+                        <a href="" id="show_tree" class="arches-RDM-link pull-right" style="display: none;"> Show tree</a>
+                        <a href="" id="show_graph" class="arches-RDM-link pull-right"> Show graph</a>
+                    <span>
+                </h5>
+            </dt>
+
+            <!-- Broader/Narrower as Heirarchy (for single parent concepts) -->
+            <div class="" style="" id="tree">
+                <dl>
+                    <dd class="arches-concept-heirarchy">
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Arches Scheme</a>&nbsp; 
+                        <span class="text-muted">(Broader)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">...</span>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Ancestor Concept</a>&nbsp; 
+                        <span class="text-muted">(Broader)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">......</span>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Ancestor Concept</a>&nbsp; 
+                        <span class="text-muted">(Broader Transitive)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy selected-concept">
+                        <span class="text-muted">.........</span>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Currently Selected Concept</a>&nbsp;    
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">............</span>
+                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Child Concept</a>&nbsp; 
+                        <span class="text-muted">(Narrower)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">............</span>
+                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Another Child Concept</a>&nbsp; 
+                        <span class="text-muted">(Narrower Transitive)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">............</span>
+                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> More Child Concept</a>&nbsp; 
+                        <span class="text-muted">(Narrower Transitive)</span>  
+                    </dd>
+
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">............</span>
+                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Another Child Concept</a>&nbsp; 
+                        <span class="text-muted">(Narrower)</span>  
+                    </dd>
+                </dl>
+            </div>
+            <!-- End Broader/Narrower as Heirarchy (for single parent concepts) -->
+
+
+            <!-- Broader/Narrower as Graph (for multi-parent concepts) -->
+            <div class="" style="display: none; margin-top: 10px;" id="graph">
+                    
+                <!-- Graph -->
+                <div style="background: #ffffff; border: 1px solid rgba(0,0,0,.1); height: 600px;" id="svg"></div>
+
+                <!-- Panel to display selected node info -->
+                <div class="row">
+
+                    <div class="col-xs-4 col-xs-offset-6">
+                        <div class="hidden" id="nodeCrud" style="margin-top: -580px; margin-right: 40px;">
+                            
+                            <button aria-hidden="true" class="close" type="button">×</button>
+                            <h6 style="margin-top: 0px; margin-bottom: 5px;">Concept</h6>
+                            
+                            <dl>
+                                <dd class="arches-concept-heirarchy">
+                                    
+                                    <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="#" id="concept-label" class="arches-CRUD-child" title="Jump to this concept"> More Child Concept</a>&nbsp; 
+                                    
+                                </dd>
+                            </dl>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <!-- End Broader/Narrower as Graph (for multi-parent concepts) -->
+
         </dl>
     </div>
-    <!-- End Related Concepts -->
+    <!-- End Broader/Narrower Concepts -->
 
-    <!-- Scope Notes -->
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Associative Concepts-->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">Related Concepts &nbsp;
+                    <span>
+                        <a href="#ManageRelatedConcepts" class="arches-RDM-link pull-right" data-toggle="modal">  Add related concept</a>
+                    <span>
+                </h5>
+            </dt>
+
+            <dd class="arches-RDM-label-highlighted">
+                <a href="#" title="Remove this concept"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                <a href="#" class="arches-CRUD-child" title="Jump to this concept">Related Concept Label 1</a> 
+                <span class="text-muted"> (preferred, en)</span>
+            </dd>
+            
+        </dl>
+    </div>
+    <!-- End Associative Concepts -->
+
+
+    <!--  **********************************************************************  -->
+    <!--  *****************END MOCK UP CONTENT**********************************  -->
+    <!--  **********************************************************************  -->
+    
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Related Values -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">Related Values &nbsp;
+                    <span>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="" data-target="#related_valuemodal">  Add value</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in concept.values %}
+                {% if value.category == None %}
+                <dd class="arches-RDM-label-highlighted">
+                    <a href="#" title="Remove this value" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="Edit this value" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
+                    <span class="arches-RDM-note">{{value.value}}</span>
+                </dd>
+                {% endif %}
+            {% endfor %}
+       </dl>
+
+    </div>
+    <!-- End Related Values -->
+
+    <hr class="devider arches-RDM-divider">
+
+    <!--  **********************************************************************  -->
+    <!--  ************************START MOCK UP CONTENT*************************  -->
+    <!--  **********************************************************************  -->
+
+    <!-- Images -->
     <div class="padding-left-10">
         <dl>
-            <dt>Identifiers</dt>
-            <dd class="margin-left-10 txt-color-blue">
-                Arches Concept ID: {{concept.id}} </br>
-                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+            <dt>
+                <h5 id="" class="section-headline">Images&nbsp;
+                    <span>
+                        <a href="#UploadFileModal" class="arches-RDM-link pull-right" data-toggle="modal"> Add image</a>
+                    <span>
+                </h5>
+            </dt>
+
+            <dd class="arches-RDM-labels">
+                
+                <!-- Images -->
+                <div class="row margin-top-10">
+                    <div class="col-xs-12 shadow-wrapper margin-bottom-10">
+                        <div class="box-shadow shadow-effect-1">
+                            <img style="width: 100%;" src="img/superbox/superbox-full-2.jpg" data-img="img/superbox/superbox-full-2.jpg" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                        </div>
+
+                        <div class="margin-left-5 margin-top-10">
+                            <a href="#" class="btn-u btn-u-small">Delete Image</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spacer -->
+                <div class="margin-top-10"></div>
+
+                <div class="row">
+                    <div class="col-xs-12 shadow-wrapper margin-bottom-10">
+                        <div class="box-shadow shadow-effect-1">
+                            <img style="width: 100%;" src="img/superbox/superbox-full-3.jpg" data-img="img/superbox/superbox-full-2.jpg" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                        </div>
+
+                        <div class="margin-left-5 margin-top-10">
+                            <a href="#" class="btn-u btn-u-small">Delete Image</a></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Images -->
+
             </dd>
         </dl>
     </div>
+    <!-- End Images -->
+
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Geometries -->
+    <div class="padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">Geometries
+                    <span>
+                        <a href="" id="hide_map" class="arches-RDM-link pull-right" style="display: none;"> Hide geometry</a>
+                        <a href="" id="show_map" class="arches-RDM-link pull-right"> Show geometry</a>
+                    <span>
+                </h5>
+            </dt>
+
+
+            <dd class="">
+
+                <div class="" style="display: none;" id="geometry_form">
+                    <!-- Data entry buttons -->
+                    <div class="row margin-top-5 margin-bottom-5">
+                        <div class="col-xs-12">
+                            <button class="btn btn-primary"> <i class="fa fa-dot-circle-o"></i>&nbsp; Add Point</button>
+                            <button class="btn btn-primary"> <i class="fa fa-minus"></i>&nbsp; Add Line</button>
+                            
+                            <!-- Spacer for XS screens -->
+                            <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+
+                            <button class="btn btn-primary"> <i class="fa fa-square-o"></i>&nbsp; Add Polygon</button>
+
+                            <!-- Spacer for XS screens -->
+                            <div class="margin-top-5 hidden-sm hidden-md hidden-lg"></div>
+                        </div>
+                    </div>
+
+                    <div class="row arches-RDM-map-container">
+                        <div id="map" class="map arches-RDM-map"></div>
+                    </div>
+
+                    <!-- Geometries -->
+                    <div class="margin-top-minus-10">
+                        <dl>
+                            <dd class="arches-CRUD-child margin-left-5 text-muted">
+                                This concept is represented by the following geometries:
+                            </dd>
+
+                            <dd class="margin-left-5">
+                                <div class="arches-RDM-label-highlighted">
+                                    <a href="#" title="Remove this geometry"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="#" class="arches-CRUD-child" title="Edit this geometry">Point</a>&nbsp; <span class="text-muted">(Entry Point)</span>
+                                </div>
+                            </dd>
+
+                            <dd class="margin-left-5">
+                                <div class="arches-RDM-label-highlighted">
+                                    <a href="#" title="Remove this geometry"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                    <a href="#" class="arches-CRUD-child" title="Edit this geometry">Polygon</a>&nbsp; <span class="text-muted">(Footprint Polygon)</span>
+                                </div>
+                            </dd>
+
+                        </dl>
+                    </div>
+
+                    <script>
+
+                    </script>
+
+                </div>
+
+            </dd>
+        </dl>
+    </div>
+    <!-- End Geometries -->
+
+    <!--  **********************************************************************  -->
+    <!--  *****************END MOCK UP CONTENT**********************************  -->
+    <!--  **********************************************************************  -->
+
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Concept Unique Ids -->
+    <div class="padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="arches-names-form" class="section-headline">
+                    Identifiers  
+                </h5>
+            </dt>
+            
+            <dd class="arches-RDM-note">
+                Arches Concept ID: {{concept.id}} </br>
+                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+            </dd>
+
+        </dl>
+    </div>
+    <!-- End Concept Unique Ids -->
 </div>
 
 
@@ -120,7 +460,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
-                <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete" data-dismiss="modal">Yes</button>
+                <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete">Yes</button>
             </div>
         </div>
     </div>
