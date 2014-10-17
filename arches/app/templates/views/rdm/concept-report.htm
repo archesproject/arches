@@ -121,6 +121,7 @@
             </dt>
 
             {% for path in concept_paths%}
+            {% with forloop.last as show_children %}
             <div class="" style="">
                 <dl>
                 {% for parent_concept in path %}
@@ -131,33 +132,27 @@
                         <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
                         {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                     </dd>
-                {% if forloop.last %}
+                {% if forloop.last %}{% with ''|center:forloop.counter as range %}
                     <dd class="arches-concept-heirarchy selected-concept">
-                        {% with ''|center:forloop.counter as range %}
                         <span class="text-muted">{% for i in range %}...{% endfor %}</span>
-                        {% endwith %}
                         <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
                     </dd>
-                {% endif %}
+                    {% if show_children%}
+                        {% for subconcept in concept.subconcepts %}
+                        <dd class="arches-concept-heirarchy">
+                            <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
+                            <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                            <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
+                            {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
+                        </dd>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}{% endif %}
                 {% endfor %}
                 </dl>
             </div>
+            {% endwith %}
             {% endfor %}
-            <div class="" style="">
-                <dl>
-                    <dd class="arches-concept-heirarchy selected-concept">
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
-                    </dd>
-                    {% for subconcept in concept.subconcepts %}
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">...</span>
-                        <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
-                        {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
-                    </dd>
-                    {% endfor %}
-                </dl>
-            </div>
 
             <!-- Broader/Narrower as Graph (for multi-parent concepts) -->
             <div class="" style="display: none; margin-top: 10px;" id="graph">
@@ -195,7 +190,7 @@
     <!-- End Broader/Narrower Concepts -->
 
     <hr class="devider arches-RDM-divider">
-    
+
     <!--  **********************************************************************  -->
     <!--  ************************START MOCK UP CONTENT*************************  -->
     <!--  **********************************************************************  -->
