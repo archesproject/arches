@@ -107,38 +107,6 @@
 
     <hr class="devider arches-RDM-divider">
 
-    <!-- Parent Concepts-->
-    <div class="margin-bottom-10 padding-left-10">
-        <dl>
-            <dt>Parent Concepts</dt>
-            {% for parentconcept in concept.parentconcepts %}
-            <dd class="arches-RDM-labels">
-                <a href="#" data-action="viewconcept" data-conceptid="{{parentconcept.id}}">{% for value in parentconcept.vlaues %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %} ({{parentconcept.id}})</a>
-            </dd>{% endfor %}
-        </dl>
-    </div>
-    <!-- End Parent Concepts -->
-
-    <!-- Sub Concepts-->
-    <div class="margin-bottom-10 padding-left-10">
-        <dl>
-            <dt>Sub Concepts</dt>
-            {% for subconcept in concept.subconcepts %}
-            <dd class="arches-RDM-labels">
-                <a href="#" title="Delete Concept" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." class="color-green fa fa-times-circle"></a>
-                <a href="#" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %} ({{subconcept.id}})</a>
-            </dd>{% endfor %}
-
-        </dl>
-    </div>
-    <!-- End Sub Concepts -->
-
-    <!--  **********************************************************************  -->
-    <!--  ************************START MOCK UP CONTENT*************************  -->
-    <!--  **********************************************************************  -->
-    
-    <hr class="devider arches-RDM-divider">
-
     <!-- Broader/Narrower Concepts-->
     <div class="margin-bottom-10 padding-left-10">
         <dl>
@@ -227,6 +195,11 @@
     <!-- End Broader/Narrower Concepts -->
 
     <hr class="devider arches-RDM-divider">
+    
+    <!--  **********************************************************************  -->
+    <!--  ************************START MOCK UP CONTENT*************************  -->
+    <!--  **********************************************************************  -->
+    
 
     <!-- Associative Concepts-->
     <div class="margin-bottom-10 padding-left-10">
