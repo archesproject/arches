@@ -334,9 +334,8 @@
                     urls: {
                         media: "{{ STATIC_URL }}",
                         concept_tree: "{% url 'concept_tree' %}",
+                        concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         concept_value: "{% url 'concept_value' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                        concept: "{% url 'concept' '' %}",
-                        concept_relation: "{% url 'concept_relation' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         concept_search: "{% url 'concept_search' %}"
                     }
                 };

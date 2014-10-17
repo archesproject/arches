@@ -4,10 +4,11 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
 
         defaults: {
             'id': '',
-            'label': null,
-            'note': null,
-            'language': null,
-            'parentconceptid': null
+            'legacyoid': '',
+            'relationshiptype': '',
+            'values': [],
+            'subconcepts': [],
+            'parentconcepts': []
         }
     });
 });

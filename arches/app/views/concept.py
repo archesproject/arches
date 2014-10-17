@@ -42,59 +42,55 @@ def rdm(request, conceptid):
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
-def concept(request, ids):
-    include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
-    include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
-    emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
-    fromdb = request.GET.get('fromdb', 'false') == 'true'
-    f = request.GET.get('f', 'json')
-    lang = request.GET.get('lang', 'en-us')
-    depth_limit = request.GET.get('depth_limit', None)
-    pretty = request.GET.get('pretty', False)
+def concept(request, conceptid):
+    ret = {'success': False}
 
-    if f == 'html':
-        fromdb = True
-        depth_limit = 1
-
-    if f == 'skos':
-        fromdb = True
-
-    ret = []
     if request.method == 'GET':
+        include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
+        include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
+        emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
+        fromdb = request.GET.get('fromdb', 'false') == 'true'
+        f = request.GET.get('f', 'json')
+        lang = request.GET.get('lang', 'en-us')
+        depth_limit = request.GET.get('depth_limit', None)
+        pretty = request.GET.get('pretty', False)
+
+        if f == 'html':
+            fromdb = True
+            depth_limit = 1
+
+        if f == 'skos':
+            fromdb = True
+
+        ret = []
+
         if fromdb:
-            for id in ids.split(','):
-                if ".E" in id:
-                    entitytype = archesmodels.EntityTypes.objects.get(pk = id)
-                    concept = entitytype.conceptid
-                else:
-                    concept = archesmodels.Concepts.objects.get(conceptid = id)
+            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
+                include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=1)
+            
+            if f == 'html':
+                languages = archesmodels.DLanguages.objects.all()
+                valuetypes = archesmodels.ValueTypes.objects.all()
+                prefLabel = concept_graph.get_preflabel(lang=lang)
+                return render_to_response('views/rdm/concept-report.htm', {
+                    'lang': lang,
+                    'prefLabel': prefLabel,
+                    'concept': concept_graph,
+                    'languages': languages,
+                    'valuetype_labels': valuetypes.filter(category='label'),
+                    'valuetype_notes': valuetypes.filter(category='note'),
+                    'valuetype_related_values': valuetypes.filter(category='')
+                }, context_instance=RequestContext(request))
+            
+            if f == 'skos':
+                skos = SKOSWriter()
+                response = HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
+                return response
 
-                concept_graph = Concept().get(id=concept.pk, include_subconcepts=include_subconcepts, 
-                    include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=1)
-                
-                if f == 'html':
-                    languages = archesmodels.DLanguages.objects.all()
-                    valuetypes = archesmodels.ValueTypes.objects.all()
-                    prefLabel = concept_graph.get_preflabel(lang=lang)
-                    return render_to_response('views/rdm/concept-report.htm', {
-                        'lang': lang,
-                        'prefLabel': prefLabel,
-                        'concept': concept_graph,
-                        'languages': languages,
-                        'valuetype_labels': valuetypes.filter(category='label'),
-                        'valuetype_notes': valuetypes.filter(category='note'),
-                        'valuetype_related_values': valuetypes.filter(category='')
-                    }, context_instance=RequestContext(request))
-                
-                if f == 'skos':
-                    skos = SKOSWriter()
-                    response = HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
-                    return response
-
-                if emulate_elastic_search:
-                    ret.append({'_type': id, '_source': concept_graph})
-                else:
-                    ret.append(concept_graph)       
+            if emulate_elastic_search:
+                ret.append({'_type': id, '_source': concept_graph})
+            else:
+                ret.append(concept_graph)       
 
             if emulate_elastic_search:
                 ret = {'hits':{'hits':ret}}    
@@ -103,59 +99,73 @@ def concept(request, ids):
             se = SearchEngineFactory().create()
             ret = se.search('', index='concept', type=ids, search_field='value', use_wildcard=True)
 
-
     if request.method == 'POST':
         json = request.body
 
         if json != None:
             data = JSONDeserializer().deserialize(json)
 
-            with transaction.atomic():
-                concept = archesmodels.Concepts()
-                concept.pk = str(uuid.uuid4())
-                concept.save()
+            if conceptid == '':
+                with transaction.atomic():
+                    concept = archesmodels.Concepts()
+                    concept.pk = str(uuid.uuid4())
+                    concept.save()
 
-                conceptrelation = archesmodels.ConceptRelations()
-                conceptrelation.pk = str(uuid.uuid4())
-                conceptrelation.conceptidfrom = archesmodels.Concepts.objects.get(pk=data['parentconceptid'])
-                conceptrelation.conceptidto = concept
-                conceptrelation.relationtype = archesmodels.DRelationtypes.objects.get(pk='has narrower concept')
-                conceptrelation.save()
+                    conceptrelation = archesmodels.ConceptRelations()
+                    conceptrelation.pk = str(uuid.uuid4())
+                    conceptrelation.conceptidfrom = archesmodels.Concepts.objects.get(pk=data['parentconceptid'])
+                    conceptrelation.conceptidto = concept
+                    conceptrelation.relationtype = archesmodels.DRelationtypes.objects.get(pk='has narrower concept')
+                    conceptrelation.save()
 
-                if 'label' in data:
-                    value = archesmodels.Values()
-                    value.pk = str(uuid.uuid4())
-                    value.conceptid = concept
-                    value.valuetype = archesmodels.ValueTypes.objects.get(pk='prefLabel')
-                    value.value = data['label']
-                    value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                    value.save()
+                    if 'label' in data:
+                        value = archesmodels.Values()
+                        value.pk = str(uuid.uuid4())
+                        value.conceptid = concept
+                        value.valuetype = archesmodels.ValueTypes.objects.get(pk='prefLabel')
+                        value.value = data['label']
+                        value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
+                        value.save()
 
-                if 'note' in data:
-                    value = archesmodels.Values()
-                    value.pk = str(uuid.uuid4())
-                    value.conceptid = concept
-                    value.valuetype = archesmodels.ValueTypes.objects.get(pk='scopeNote')
-                    value.value = data['note']
-                    value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                    value.save()
+                    if 'note' in data:
+                        value = archesmodels.Values()
+                        value.pk = str(uuid.uuid4())
+                        value.conceptid = concept
+                        value.valuetype = archesmodels.ValueTypes.objects.get(pk='scopeNote')
+                        value.value = data['note']
+                        value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
+                        value.save()
 
-            ret = concept.graph(include_subconcepts=False, include_parentconcepts=False, include=['label'])
+                ret = concept.graph(include_subconcepts=False, include_parentconcepts=False, include=['label'])
+                return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
+
+            elif data['action'] == 'manage_related_concept':
+                relation = None
+                if 'related_concept' in data:
+                    relation = archesmodels.ConceptRelations()
+                    relation.pk = str(uuid.uuid4())
+                    relation.conceptidfrom_id = conceptid
+                    relation.conceptidto_id = data['related_concept']
+                    relation.relationtype_id = 'has related concept'
+                    relation.save()
+                else:
+                    conceptid = data['conceptid']
+                    target_parent_conceptid = data['target_parent_conceptid']
+                    current_parent_conceptid = data['current_parent_conceptid']
+
+                    relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                    relation.conceptidfrom_id = target_parent_conceptid
+                    relation.save()
+
+                return JSONResponse(relation)
 
 
     if request.method == 'DELETE':
-        for id in ids.split(','):
             ret = {
                 'deleted': [],
                 'success': False
             }
-
-            if ".E" in id:
-                entitytype = archesmodels.EntityTypes.objects.get(pk = id)
-                concept = entitytype.conceptid
-            else:
-                concept = archesmodels.Concepts.objects.get(conceptid = id)
-
+            concept = archesmodels.Concepts.objects.get(conceptid = conceptid)
             concepts = concept.graph(exclude=['note','label',None], include_parentconcepts=False).flatten()
 
             with transaction.atomic():
@@ -166,6 +176,53 @@ def concept(request, ids):
             ret['success'] = True
 
     return JSONResponse(ret, indent=(4 if pretty else None))
+
+@csrf_exempt
+def concept_value(request, valueid):
+    #  need to check user credentials here
+
+    if request.method == 'POST':
+        json = request.body
+
+        if json != None:
+            value = ConceptValue(json)
+            value.save()
+
+            return JSONResponse(value)
+
+    if request.method == 'DELETE':
+        value = ConceptValue({'id': valueid})
+        value.delete()
+        
+        return JSONResponse(value)
+
+    return JSONResponse({'success': False})
+
+@csrf_exempt
+def search(request):
+    se = SearchEngineFactory().create()
+    searchString = request.GET['q']
+    query = Query(se, start=0, limit=100)
+    phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
+    query.add_query(phrase)
+    results = query.search(index='concept_labels')
+
+    cached_scheme_names = {}
+    for result in results['hits']['hits']:
+        # first look to see if we've already retrieved the scheme name
+        # else look up the scheme name with ES and cache the result
+        if result['_type'] in cached_scheme_names:
+            result['_type'] = cached_scheme_names[result['_type']]
+        else:
+            query = Query(se, start=0, limit=100)
+            phrase = Match(field='conceptid', query=result['_type'], type='phrase')
+            query.add_query(phrase)
+            scheme = query.search(index='concept_labels')
+            for label in scheme['hits']['hits']:
+                if label['_source']['type'] == 'prefLabel':
+                    cached_scheme_names[result['_type']] = label['_source']['value']
+                    result['_type'] = label['_source']['value']
+    return JSONResponse(results)
 
 def concept_tree(request):
     conceptid = request.GET.get('node', None)
@@ -221,81 +278,3 @@ def concept_tree(request):
         concepts = [_findBroaderConcept(conceptid, concepts, depth_limit=1)]
 
     return JSONResponse(concepts, indent=4)
-
-@csrf_exempt
-def concept_value(request, id=None):
-    #  need to check user credentials here
-
-    if request.method == 'POST':
-        json = request.body
-
-        if json != None:
-            value = ConceptValue(json)
-            value.save()
-
-            return JSONResponse(value)
-
-    if request.method == 'DELETE':
-        if id != None:
-            newvalue = archesmodels.Values.objects.get(pk=id)
-            newvalue.delete();
-
-            return JSONResponse(newvalue)
-
-    return JSONResponse({'success': False})
-
-@csrf_exempt
-def concept_relation(request, conceptid):
-    if request.method == 'POST':
-        json = request.body
-        print json
-
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
-            relation = None
-            print data
-            if 'related_concept' in data:
-                relation = archesmodels.ConceptRelations()
-                relation.pk = str(uuid.uuid4())
-                relation.conceptidfrom_id = conceptid
-                relation.conceptidto_id = data['related_concept']
-                relation.relationtype_id = 'has related concept'
-                relation.save()
-            else:
-                conceptid = data['conceptid']
-                target_parent_conceptid = data['target_parent_conceptid']
-                current_parent_conceptid = data['current_parent_conceptid']
-
-                relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                relation.conceptidfrom_id = target_parent_conceptid
-                relation.save()
-
-            return JSONResponse(relation)
-
-    return JSONResponse({'success': False})
-
-@csrf_exempt
-def search(request):
-    se = SearchEngineFactory().create()
-    searchString = request.GET['q']
-    query = Query(se, start=0, limit=100)
-    phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
-    query.add_query(phrase)
-    results = query.search(index='concept_labels')
-
-    cached_scheme_names = {}
-    for result in results['hits']['hits']:
-        # first look to see if we've already retrieved the scheme name
-        # else look up the scheme name with ES and cache the result
-        if result['_type'] in cached_scheme_names:
-            result['_type'] = cached_scheme_names[result['_type']]
-        else:
-            query = Query(se, start=0, limit=100)
-            phrase = Match(field='conceptid', query=result['_type'], type='phrase')
-            query.add_query(phrase)
-            scheme = query.search(index='concept_labels')
-            for label in scheme['hits']['hits']:
-                if label['_source']['type'] == 'prefLabel':
-                    cached_scheme_names[result['_type']] = label['_source']['value']
-                    result['_type'] = label['_source']['value']
-    return JSONResponse(results)

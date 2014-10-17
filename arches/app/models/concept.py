@@ -256,6 +256,13 @@ class ConceptValue(object):
             value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
         value.save()
 
+    def delete(self):
+        if self.id != '':
+            newvalue = models.Values.objects.get(pk=self.id)
+            newvalue.delete()
+            self = ConceptValue()
+            return self
+    
     def load(self, value):
         if isinstance(value, models.Values):
             self.id = value.pk
