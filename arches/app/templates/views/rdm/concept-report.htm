@@ -114,49 +114,51 @@
             <dt>
                 <h5 id="" class="section-headline">Broader/Narrower Concepts 
                     <span>
-                        <a href="" id="show_tree" class="arches-RDM-link pull-right" style="display: none;"> Show tree</a>
-                        <a href="" id="show_graph" class="arches-RDM-link pull-right"> Show graph</a>
+                        <a href="#" class="arches-RDM-link pull-right graph-toggle"> Show graph</a>
+                        <a href="#" class="arches-RDM-link pull-right graph-toggle" style="display: none;"> Show tree</a>
                     <span>
                 </h5>
             </dt>
 
-            {% for path in concept_paths%}
-            {% with forloop.last as show_children %}
-            <div class="" style="">
-                <dl>
-                {% for parent_concept in path %}
-                    <dd class="arches-concept-heirarchy">
-                        {% with ''|center:forloop.counter0 as range %}
-                        <span class="text-muted">{% for i in range %}...{% endfor %}</span>
-                        {% endwith %}
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
-                        {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
-                    </dd>
-                {% if forloop.last %}{% with ''|center:forloop.counter as range %}
-                    <dd class="arches-concept-heirarchy selected-concept">
-                        <span class="text-muted">{% for i in range %}...{% endfor %}</span>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
-                    </dd>
-                    {% if show_children%}
-                        {% for subconcept in concept.subconcepts %}
+            <div class="concept-tree">
+                {% for path in concept_paths%}
+                {% with forloop.last as show_children %}
+                <div>
+                    <dl>
+                    {% for parent_concept in path %}
                         <dd class="arches-concept-heirarchy">
-                            <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
-                            <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                            <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
-                            {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
+                            {% with ''|center:forloop.counter0 as range %}
+                            <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                            {% endwith %}
+                            <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
+                            {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                         </dd>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}{% endif %}
+                    {% if forloop.last %}{% with ''|center:forloop.counter as range %}
+                        <dd class="arches-concept-heirarchy selected-concept">
+                            <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                            <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
+                        </dd>
+                        {% if show_children%}
+                            {% for subconcept in concept.subconcepts %}
+                            <dd class="arches-concept-heirarchy">
+                                <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
+                                <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
+                                {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
+                            </dd>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}{% endif %}
+                    {% endfor %}
+                    </dl>
+                </div>
+                {% endwith %}
                 {% endfor %}
-                </dl>
             </div>
-            {% endwith %}
-            {% endfor %}
 
             <!-- Broader/Narrower as Graph (for multi-parent concepts) -->
-            <div class="" style="display: none; margin-top: 10px;" id="graph">
-                    
+            <div style="display: none; margin-top: 10px;" class="concept-graph">
+
                 <!-- Graph -->
                 <div style="background: #ffffff; border: 1px solid rgba(0,0,0,.1); height: 600px;" id="svg"></div>
 
@@ -461,3 +463,5 @@
 </div>
 
 {% include "views/rdm/modals/related-concept-form.htm" %}
+
+<div style="display:none;" class="graph_json_content">{{graph_json}}</div>

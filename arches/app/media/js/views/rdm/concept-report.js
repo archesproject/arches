@@ -5,8 +5,9 @@ define([
     'models/concept',
     'models/value',
     'views/rdm/modals/value-form',
-    'views/rdm/modals/related-concept-form'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept) {
+    'views/rdm/modals/related-concept-form',
+    'views/concept-graph'
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *': 'contentClick',
@@ -55,10 +56,19 @@ define([
                                 });
                             }
                         });
-                        var add_related_concept_modal = new RelatedConcept({ 
+                        var add_related_concept_modal = new RelatedConcept({
                             el: $('#related-concept-form')[0],
                             model: self.model
-                        });   
+                        });
+                        //Toggle Concept Heirarchy.  
+                        self.$el.find(".graph-toggle").click(function(){
+                            self.$el.find(".concept-tree").toggle(300);
+                            self.$el.find(".concept-graph").toggle(300);
+                            self.$el.find(".graph-toggle").toggle();
+                        });
+                        new ConceptGraph({
+                            el: self.$el.find(".concept-graph")
+                        });
                     }
                 });
             }

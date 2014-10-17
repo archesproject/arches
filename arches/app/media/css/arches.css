@@ -103,3 +103,320 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     font-size: 11px;
     padding-left: 10px;
 }
+
+/*.sticky {
+    position: fixed!important;
+    width: 100%;
+    margin-top: -62px;
+    z-index: 400;
+    margin-bottom: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+*/
+
+.sticky {
+    z-index: 200;
+    padding-top: 0px;
+    padding-bottom: 10px; 
+    padding-top: 30px;
+}
+
+.fixed {
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  padding-bottom: 10px; 
+}
+
+.fixed-menu {
+    margin-top: 15px;
+    position: fixed;
+}
+
+.fixed-spacer {
+    margin-top: 95px;
+}
+
+.menu-top {
+    margin-top: 15px;
+}
+
+.menu-spacer {
+    margin-top: 90px;
+}
+
+.scrolling-spacer {
+    margin-top: 15px;
+}
+
+
+
+/*D3 Concept Graph Classes*/
+.node {
+    stroke: #b3b3b3;
+    fill: #f4f4f4;
+    opacity: 1.;
+    stroke-width: 1.5px;
+}
+
+.node-current {
+    stroke: #3275b1; /*#ffa293;*/
+    stroke-width: 4px;
+    fill: #dcecfa; /*#d7f2af;*/
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-current-over {
+    stroke: #115fa5;
+    stroke-width: 4px;
+    fill: #dcecfa; /*#7cadd8;*/
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-current-label {
+    stroke: #999; /*#3275b1;*/
+    font-size: 36px;
+    font-weight: 900;
+    fill: #fcfcfc; /*#fdfdfd; */
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+
+.node-descendent {
+    stroke: #ededed; /*#7cadd8;*/
+    fill: #fefefe; /*#ccedd6;*/
+    opacity: 1.;
+    stroke-width: 4px;
+    cursor: pointer;
+}
+
+.node-descendent-over {
+    stroke: #115fa5;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-descendent-label {
+    font-size: 12px;
+    font-weight: 400;
+    fill: #c2c2c2;
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.node-ancestor {
+    stroke: #ededed; /*#ffa293;*/
+    fill: #fefefe; /*#ebf9d6;*/
+    opacity: 1.;
+    stroke-width: 4px;
+    cursor: pointer;
+}
+
+.node-ancestor-over {
+    stroke: #115fa5;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-ancestor-label {
+    font-size: 16px;
+    font-weight: 400;
+    fill: #a2a2a2;
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+ 
+.link {
+    stroke: #ededed;
+    stroke-width: 6px;
+}
+
+
+.linkMouseover {
+    stroke: #b0b0b0;
+    stroke-width: 6px;
+    stroke-opacity: .6;
+}
+
+
+.nodeLabels {
+    font-size: 11px;
+    fill: #454545;
+    text-anchor: middle;
+}
+
+#nodeCrud {
+    width: 320px;
+    height: auto;
+    padding: 15px;
+    background-color: white;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#nodeCrud.hidden {
+    display: none;
+}
+
+#nodeCrud p {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.node-selected {
+    fill: #aacdec;
+    stroke: #115fa5;
+}
+
+
+/* Inventory Map Tools Buttons and panels*/
+.arches-map-tools {
+    width: 175px;
+    height: 46px;
+    background: #F5F7FB;
+    color: #3A67A6;
+    font-size: 15px;
+    font-weight: 400;
+    border: 1px solid rgba(206,217,233,.95);
+}
+
+.arches-map-tools:active {
+    top: 0px;
+    left: 0px;
+    color: #3A67A6;
+    background: #F5F7FB;
+    border: 1px solid rgba(206,217,233,.95);
+    z-index: 0;
+    box-shadow: none;
+}
+
+.arches-map-tools:focus {
+    top: 0px;
+    left: 0px;
+    background: #F5F7FB;
+    color: #3A67A6;
+    border: 1px solid rgba(206,217,233,.95);
+    z-index: 0;
+    box-shadow: none;
+}
+
+.arches-map-tools:hover {
+    background: #fdfdfd;
+    color: #645699;
+    border: 1px solid rgba(206,217,233,.95);
+}
+
+.arches-map-tools-pressed {
+    width: 175px;
+    height: 46px;
+    font-size: 15px;
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    color: #3A67A6;
+    font-weight: 400;
+}
+
+.arches-map-tools-pressed:hover {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+}
+
+.arches-map-tools-pressed:active {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+    top: 0px;
+    left: 0px;
+    /*box-shadow: inset 0 0px 0px rgba(0,0,0,.125);*/
+    box-shadow: none;
+}
+
+.arches-map-tools-pressed:focus {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+}
+
+.btn:active {
+    top: 0px;
+}
+
+.tools-panel {
+    margin-top: -518px;
+    height: 400px; 
+    width: 349px; 
+    margin-left: -1px;
+    background: #ffffff; 
+    border: 1px solid rgba(0,0,0,.15); 
+    opacity: 1.0; 
+    border-top-left-radius: 3px; 
+    border-top-right-radius: 3px;
+}
+
+.overlay-entry {
+    color: #555;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.15;
+}
+
+.overlay-entry-icon {
+    color: #428BCA;
+    font-size: 19px;
+}
+
+.font-120 {
+    font-size: 120%;
+}
+
+
+/*
+.sidebar-nav-v1 > li.active > a {
+  color: #333;
+}
+*/
+
+/*Scroll bar mods for Chrome/Safari
+------------------------------------*/
+/*
+::-webkit-scrollbar {
+    width: 5px;
+    background: #ededed;
+}
+
+::-webkit-scrollbar-thumb 
+    background: #a3a3a3;
+    -webkit-border-radius: 1ex;
+    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+    background: #ededed;
+}
+*/

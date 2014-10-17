@@ -67,14 +67,17 @@ def concept(request, conceptid):
         if fromdb:
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=None)
-
+            nodes = [{'concept_id': concept_graph.id, 'name': concept_graph.get_preflabel(lang=lang),'type': 'Current'}]
+            links = []
             path = []
             path_list = [path]
 
-            def graph_to_paths(concept_graph, path, path_list):
-                parents = concept_graph.parentconcepts
+            def graph_to_paths(current_concept, path, path_list):
+                parents = current_concept.parentconcepts
                 path_for_clone = list(path)
                 for i in range(len(parents)):
+                    nodes.append({'concept_id': parents[i].id, 'name': parents[i].get_preflabel(lang=lang),'type': 'Ancestor' })
+                    links.append({'source': current_concept.id, 'target': parents[i].id, 'relationship': 'broader' })
                     if i == 0:
                         my_path = path
                     else:
@@ -83,7 +86,20 @@ def concept(request, conceptid):
                     my_path.insert(0, {'label': parents[i].get_preflabel(lang=lang), 'relationshiptype': parents[i].relationshiptype, 'id': parents[i].id})
                     graph_to_paths(parents[i], my_path, path_list)
                 return path_list
+
+            path_list = graph_to_paths(concept_graph, path, path_list)
+            for child in concept_graph.subconcepts:
+                nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang),'type': 'Descendant' })
+                links.append({'source': concept_graph.id, 'target': child.id, 'relationship': 'narrower' })
+            nodes = {node['concept_id']:node for node in nodes}.values()
+            for i in range(len(nodes)):
+                nodes[i]['id'] = i
+                for link in links:
+                    link['source'] = i if link['source'] == nodes[i]['concept_id'] else link['source']
+                    link['target'] = i if link['target'] == nodes[i]['concept_id'] else link['target']
             
+            graph_json = JSONSerializer().serialize({'nodes': nodes, 'links': links})
+
             if f == 'html':
                 languages = archesmodels.DLanguages.objects.all()
                 valuetypes = archesmodels.ValueTypes.objects.all()
@@ -96,7 +112,8 @@ def concept(request, conceptid):
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category=''),
-                    'concept_paths': graph_to_paths(concept_graph, path, path_list)
+                    'concept_paths': path_list,
+                    'graph_json': graph_json
                 }, context_instance=RequestContext(request))
             
             if f == 'skos':
