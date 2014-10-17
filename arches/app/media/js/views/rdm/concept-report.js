@@ -4,8 +4,9 @@ define([
     'arches',
     'models/concept',
     'models/value',
-    'views/rdm/value-editor'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor) {
+    'views/rdm/value-editor',
+    'views/concept-search'
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, ConceptSearch) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *': 'contentClick',
@@ -54,6 +55,10 @@ define([
                                 });
                             }
                         });
+                        var add_related_concept_modal = new ConceptSearch({ 
+                            el: $('#add-related-concept-modal')[0],
+                            model: self.model
+                        });   
                     }
                 });
             }

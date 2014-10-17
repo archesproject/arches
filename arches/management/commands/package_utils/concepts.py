@@ -9,4 +9,3 @@ def insert_concept_relations(sourcelegacyid, relationshiptype, targetlegacyid):
 
     # print sql
     cursor.execute(sql)
-    #cursor.fetchone()

@@ -245,21 +245,30 @@ def concept_value(request, id=None):
     return JSONResponse({'success': False})
 
 @csrf_exempt
-def update_relation(request):
+def concept_relation(request, conceptid):
     if request.method == 'POST':
         json = request.body
         print json
 
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            
-            conceptid = data['conceptid']
-            target_parent_conceptid = data['target_parent_conceptid']
-            current_parent_conceptid = data['current_parent_conceptid']
+            relation = None
+            print data
+            if 'related_concept' in data:
+                relation = archesmodels.ConceptRelations()
+                relation.pk = str(uuid.uuid4())
+                relation.conceptidfrom_id = conceptid
+                relation.conceptidto_id = data['related_concept']
+                relation.relationtype_id = 'has related concept'
+                relation.save()
+            else:
+                conceptid = data['conceptid']
+                target_parent_conceptid = data['target_parent_conceptid']
+                current_parent_conceptid = data['current_parent_conceptid']
 
-            relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-            relation.conceptidfrom_id = target_parent_conceptid
-            relation.save()
+                relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                relation.conceptidfrom_id = target_parent_conceptid
+                relation.save()
 
             return JSONResponse(relation)
 
@@ -273,12 +282,8 @@ def search(request):
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
     results = query.search(index='concept_labels')
-    # for result in results['hits']['hits']:
-    #     concept = Concept({'id': result['_id']})
-    #     result['_source']['scheme'] = concept.get_auth_doc_concept()
-    
-    cached_scheme_names = {}
 
+    cached_scheme_names = {}
     for result in results['hits']['hits']:
         # first look to see if we've already retrieved the scheme name
         # else look up the scheme name with ES and cache the result
@@ -286,7 +291,7 @@ def search(request):
             result['_type'] = cached_scheme_names[result['_type']]
         else:
             query = Query(se, start=0, limit=100)
-            phrase = Match(field='conceptid', query=result['_type'])
+            phrase = Match(field='conceptid', query=result['_type'], type='phrase')
             query.add_query(phrase)
             scheme = query.search(index='concept_labels')
             for label in scheme['hits']['hits']:

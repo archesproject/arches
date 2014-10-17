@@ -29,7 +29,7 @@ require([
         var conceptsearch = new ConceptSearch({ 
             el: $('#rdm-concept-search-container')[0],
             model: concept
-        });        
+        });       
 
         concept.on('change', function() {
             window.history.pushState({}, "conceptid", concept.get('id'));
@@ -50,6 +50,10 @@ require([
                 conceptTree.render();
             }
         });
+
+        conceptsearch.on("select2-selecting", function(e, el) {
+            this.model.set('id', e.val);
+        }, conceptsearch);
 
         $(window).scroll(function() {
             var topToFooterPx = $(".footer").offset().top - $(window).scrollTop();

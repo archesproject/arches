@@ -1,9 +1,14 @@
 define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arches, Select2) {
     return Backbone.View.extend({
+
+        events: {
+            'click .modal-footer .savebtn': 'saveRelated'
+        },
+
         initialize: function() {
         	var self = this;
 
-            this.$el.find('input.concept_search_widget').select2({
+            this.select2 = this.$el.find('input.concept_search_widget').select2({
 				placeholder: "Add search terms...",
 				multiple: false,
 				maximumselectionsize: 1,
@@ -37,8 +42,24 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
 				},
 				escapeMarkup: function(m) { return m; }
 			}).on("select2-selecting", function(e, el) {
-				self.model.set('id', e.val);
+				self.trigger("select2-selecting", e, el);
 			});
-        }
+        },
+
+		saveRelated: function(){
+			$.ajax({
+                type: "POST",
+                url: arches.urls.concept_relation.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
+                data: JSON.stringify({
+                    'related_concept': this.select2.val()
+                }),
+                success: function() {
+                    var data = JSON.parse(this.data);
+                    console.log(data)
+                    self.trigger('conceptMoved', data.conceptid);
+                }
+            });
+		}
+
     });
 });
