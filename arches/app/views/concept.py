@@ -66,7 +66,23 @@ def concept(request, conceptid):
 
         if fromdb:
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
-                include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=1)
+                include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=None)
+
+            path = []
+            path_list = [path]
+
+            def graph_to_paths(concept_graph, path, path_list):
+                parents = concept_graph.parentconcepts
+                path_for_clone = list(path)
+                for i in range(len(parents)):
+                    if i == 0:
+                        my_path = path
+                    else:
+                        my_path = list(path_for_clone)
+                        path_list.append(my_path)
+                    my_path.insert(0, {'label': parents[i].get_preflabel(lang=lang), 'relationshiptype': parents[i].relationshiptype, 'id': parents[i].id})
+                    graph_to_paths(parents[i], my_path, path_list)
+                return path_list
             
             if f == 'html':
                 languages = archesmodels.DLanguages.objects.all()
@@ -79,7 +95,8 @@ def concept(request, conceptid):
                     'languages': languages,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category='')
+                    'valuetype_related_values': valuetypes.filter(category=''),
+                    'concept_paths': graph_to_paths(concept_graph, path, path_list)
                 }, context_instance=RequestContext(request))
             
             if f == 'skos':

@@ -1,4 +1,5 @@
 ﻿ {% load i18n %}
+ {% load staticfiles %}
 <div class="col-xs-12 concept-report-loading hidden">Loading...</div>
 <div class="col-xs-12 concept-report-content">
     <!-- Concept Preferred Label -->
@@ -151,62 +152,44 @@
                 </h5>
             </dt>
 
-            <!-- Broader/Narrower as Heirarchy (for single parent concepts) -->
-            <div class="" style="" id="tree">
+            {% for path in concept_paths%}
+            <div class="" style="">
                 <dl>
+                {% for parent_concept in path %}
                     <dd class="arches-concept-heirarchy">
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Arches Scheme</a>&nbsp; 
-                        <span class="text-muted">(Broader)</span>  
+                        {% with ''|center:forloop.counter0 as range %}
+                        <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                        {% endwith %}
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
+                        {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                     </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">...</span>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Ancestor Concept</a>&nbsp; 
-                        <span class="text-muted">(Broader)</span>  
-                    </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">......</span>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Ancestor Concept</a>&nbsp; 
-                        <span class="text-muted">(Broader Transitive)</span>  
-                    </dd>
-
+                {% if forloop.last %}
                     <dd class="arches-concept-heirarchy selected-concept">
-                        <span class="text-muted">.........</span>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Currently Selected Concept</a>&nbsp;    
+                        {% with ''|center:forloop.counter as range %}
+                        <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                        {% endwith %}
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
                     </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">............</span>
-                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Child Concept</a>&nbsp; 
-                        <span class="text-muted">(Narrower)</span>  
-                    </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">............</span>
-                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Another Child Concept</a>&nbsp; 
-                        <span class="text-muted">(Narrower Transitive)</span>  
-                    </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">............</span>
-                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> More Child Concept</a>&nbsp; 
-                        <span class="text-muted">(Narrower Transitive)</span>  
-                    </dd>
-
-                    <dd class="arches-concept-heirarchy">
-                        <span class="text-muted">............</span>
-                        <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> Another Child Concept</a>&nbsp; 
-                        <span class="text-muted">(Narrower)</span>  
-                    </dd>
+                {% endif %}
+                {% endfor %}
                 </dl>
             </div>
-            <!-- End Broader/Narrower as Heirarchy (for single parent concepts) -->
-
+            {% endfor %}
+            <div class="" style="">
+                <dl>
+                    <dd class="arches-concept-heirarchy selected-concept">
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept"> {{prefLabel}}</a>&nbsp;    
+                    </dd>
+                    {% for subconcept in concept.subconcepts %}
+                    <dd class="arches-concept-heirarchy">
+                        <span class="text-muted">...</span>
+                        <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                        <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
+                        {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
+                    </dd>
+                    {% endfor %}
+                </dl>
+            </div>
 
             <!-- Broader/Narrower as Graph (for multi-parent concepts) -->
             <div class="" style="display: none; margin-top: 10px;" id="graph">
@@ -320,7 +303,7 @@
                 <div class="row margin-top-10">
                     <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                         <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="img/superbox/superbox-full-2.jpg" data-img="img/superbox/superbox-full-2.jpg" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-2.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
                         </div>
 
                         <div class="margin-left-5 margin-top-10">
@@ -335,7 +318,7 @@
                 <div class="row">
                     <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                         <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="img/superbox/superbox-full-3.jpg" data-img="img/superbox/superbox-full-2.jpg" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-3.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
                         </div>
 
                         <div class="margin-left-5 margin-top-10">
