@@ -55,7 +55,7 @@ INSERT INTO d_relationtypes VALUES ('has collection');
 
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'THESAURI');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'CONCEPT SCHEMES');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ARCHES');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
 
@@ -67,7 +67,7 @@ INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('0000000
 
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Thesauri', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Concept Schemes', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'text', 'Arches', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'text', 'Resource To Resrouce Relationship Types', 'en-us');
 
