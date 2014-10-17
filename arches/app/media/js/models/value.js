@@ -3,12 +3,13 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         url: arches.urls.concept_value,
 
         defaults: {
-            'value': '',
             'id': null,
+            'value': '',            
             'type': null,
+            'category': '',
             'datatype': 'text',
             'language': null,
             'conceptid': ''
-        }
+        }  
     });
 });

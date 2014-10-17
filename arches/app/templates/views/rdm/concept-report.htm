@@ -251,7 +251,7 @@
             <dt>
                 <h5 id="" class="section-headline">Related Concepts &nbsp;
                     <span>
-                        <a href="#add-related-concept-modal" class="arches-RDM-link pull-right" data-toggle="modal">  Add related concept</a>
+                        <a href="#related-concept-form" class="arches-RDM-link pull-right" data-toggle="modal">  Add related concept</a>
                     <span>
                 </h5>
             </dt>
@@ -505,8 +505,8 @@
     </div>
 </form>
 <!-- End Modal window for adding a new concept -->
-<div id="value-editor">
-    {% include "views/rdm/value-editor.htm" %}
+<div id="value-form">
+    {% include "views/rdm/modals/value-form.htm" %}
 </div>
 
-{% include "views/rdm/add-related-concept-modal.htm" %}
+{% include "views/rdm/modals/related-concept-form.htm" %}

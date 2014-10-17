@@ -4,9 +4,9 @@ define([
     'arches',
     'models/concept',
     'models/value',
-    'views/rdm/value-editor',
-    'views/concept-search'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, ConceptSearch) {
+    'views/rdm/modals/value-form',
+    'views/rdm/modals/related-concept-form'
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *': 'contentClick',
@@ -55,8 +55,8 @@ define([
                                 });
                             }
                         });
-                        var add_related_concept_modal = new ConceptSearch({ 
-                            el: $('#add-related-concept-modal')[0],
+                        var add_related_concept_modal = new RelatedConcept({ 
+                            el: $('#related-concept-form')[0],
                             model: self.model
                         });   
                     }
@@ -89,7 +89,7 @@ define([
                 }, $(e.target).data()),
                 model = new ValueModel(data),
                 editor = new ValueEditor({
-                    el: this.$el.find('#value-editor')[0],
+                    el: this.$el.find('#value-form')[0],
                     model: model
                 });
 
@@ -107,15 +107,15 @@ define([
 
             modal.on('hidden.bs.modal', function () {
                 if (data.action === 'delete') {
-                    Model = ValueModel;
+                    model = new ValueModel(data);
                     eventName = 'valueDeleted';
                 }
                 if (data.action === 'delete_concept') {
-                    Model = ConceptModel;
+                    model = new ConceptModel(data);
+                    model.set('id', self.model.get('id'));
                     eventName = 'conceptDeleted';
                 }
 
-                model = new Model(data);
                 model.delete(function() {
                     self.render();
                     self.trigger(eventName, model);

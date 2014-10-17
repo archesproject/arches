@@ -1,10 +1,6 @@
 define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arches, Select2) {
     return Backbone.View.extend({
 
-        events: {
-            'click .modal-footer .savebtn': 'saveRelated'
-        },
-
         initialize: function() {
         	var self = this;
 
@@ -44,22 +40,7 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
 			}).on("select2-selecting", function(e, el) {
 				self.trigger("select2-selecting", e, el);
 			});
-        },
-
-		saveRelated: function(){
-			$.ajax({
-                type: "POST",
-                url: arches.urls.concept_relation.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-                data: JSON.stringify({
-                    'related_concept': this.select2.val()
-                }),
-                success: function() {
-                    var data = JSON.parse(this.data);
-                    console.log(data)
-                    self.trigger('conceptMoved', data.conceptid);
-                }
-            });
-		}
+        }
 
     });
 });
