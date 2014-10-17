@@ -142,7 +142,7 @@
                             {% for subconcept in concept.subconcepts %}
                             <dd class="arches-concept-heirarchy">
                                 <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
-                                <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
+                                <a href="#" title="Delete this concept"  data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{subconcept.id}}" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts." ></i></a>
                                 <a href="#" class="arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>&nbsp; 
                                 {% if subconcept.relationshiptype %}<span class="text-muted">({{subconcept.relationshiptype}})</span>{% endif %}
                             </dd>
@@ -174,8 +174,8 @@
                             <dl>
                                 <dd class="arches-concept-heirarchy">
                                     
-                                    <a href="#DeleteConcept" title="Delete this concept" data-toggle="modal"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                    <a href="#" id="concept-label" class="arches-CRUD-child" title="Jump to this concept"> More Child Concept</a>&nbsp; 
+                                    <a href="#" title="Delete this concept"><i class="arches-CRUD-delete fa fa-times-circle graph-concept-delete-link" data-id="" data-action="delete_concept" data-message="Delete this concept and all of it's sub concepts."></i></a>
+                                    <a href="#" class="concept-label arches-CRUD-child" title="Jump to this concept" data-action="viewconcept" data-conceptid=""> More Child Concept</a>&nbsp; 
                                     
                                 </dd>
                             </dl>

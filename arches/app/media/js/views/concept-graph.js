@@ -141,8 +141,15 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone, d3) {
                     var nodeName = d.name;
                     
                     d3.select("#nodeCrud")                  
-                    .select("#concept-label")
+                    .select(".concept-label")
                     .text(nodeName);
+                    $('.concept-label').data('conceptid', d.concept_id);
+
+                    $('.graph-concept-delete-link').hide();
+                    if (d.type === "Descendant") {
+                        $('.graph-concept-delete-link').data('id', d.concept_id);
+                        $('.graph-concept-delete-link').show();
+                    }
 
                     //Show the form
                     d3.select("#nodeCrud").classed("hidden", false);
