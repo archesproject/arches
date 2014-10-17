@@ -22,6 +22,7 @@ define(['backbone', 'jquery'], function (Backbone, $) {
             this._doRequest({
                 type: "DELETE",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
+                data: JSON.stringify(this.toJSON())
             }, callback);
         },
 

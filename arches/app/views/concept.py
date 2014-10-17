@@ -44,16 +44,17 @@ def rdm(request, conceptid):
 @csrf_exempt
 def concept(request, conceptid):
     ret = {'success': False}
+    f = request.GET.get('f', 'json')
+    lang = request.GET.get('lang', 'en-us')
+    pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
         include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
+        include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
         emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
         fromdb = request.GET.get('fromdb', 'false') == 'true'
-        f = request.GET.get('f', 'json')
-        lang = request.GET.get('lang', 'en-us')
         depth_limit = request.GET.get('depth_limit', None)
-        pretty = request.GET.get('pretty', False)
 
         if f == 'html':
             fromdb = True
@@ -66,7 +67,8 @@ def concept(request, conceptid):
 
         if fromdb:
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
-                include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=None)
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None)
 
             path = []
             path_list = [path]
@@ -80,14 +82,14 @@ def concept(request, conceptid):
                     else:
                         my_path = list(path_for_clone)
                         path_list.append(my_path)
-                    my_path.insert(0, {'label': parents[i].get_preflabel(lang=lang), 'relationshiptype': parents[i].relationshiptype, 'id': parents[i].id})
+                    my_path.insert(0, {'label': parents[i].get_preflabel(lang=lang).value, 'relationshiptype': parents[i].relationshiptype, 'id': parents[i].id})
                     graph_to_paths(parents[i], my_path, path_list)
                 return path_list
             
             if f == 'html':
                 languages = archesmodels.DLanguages.objects.all()
                 valuetypes = archesmodels.ValueTypes.objects.all()
-                prefLabel = concept_graph.get_preflabel(lang=lang)
+                prefLabel = concept_graph.get_preflabel(lang=lang).value
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -114,7 +116,7 @@ def concept(request, conceptid):
 
         else:
             se = SearchEngineFactory().create()
-            ret = se.search('', index='concept', type=ids, search_field='value', use_wildcard=True)
+            ret = se.search('', index='concept', search_field='value', use_wildcard=True)
 
     if request.method == 'POST':
         json = request.body
@@ -153,10 +155,10 @@ def concept(request, conceptid):
                         value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
                         value.save()
 
-                ret = concept.graph(include_subconcepts=False, include_parentconcepts=False, include=['label'])
+                ret = concept.graph(include=['label'])
                 return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
 
-            elif data['action'] == 'manage_related_concept':
+            elif data['action'] == 'manage-related-concept':
                 relation = None
                 if 'related_concept' in data:
                     relation = archesmodels.ConceptRelations()
@@ -177,20 +179,32 @@ def concept(request, conceptid):
                 return JSONResponse(relation)
 
 
-    if request.method == 'DELETE':
+    if request.method == 'DELETE':        
+        json = request.body
+        if json != None:
+            data = JSONDeserializer().deserialize(json)
+            if 'action' in data:
+                action = data['action']
+                if data['action'] == 'delete-relationship':
+                    relatedconceptid = data['relatedconceptid']
+                    concept = Concept({'id':conceptid})
+                    concept.addrelatedconcept({'id': relatedconceptid})
+                    concept.delete_related_concept()
+
             ret = {
                 'deleted': [],
                 'success': False
             }
-            concept = archesmodels.Concepts.objects.get(conceptid = conceptid)
-            concepts = concept.graph(exclude=['note','label',None], include_parentconcepts=False).flatten()
 
-            with transaction.atomic():
-                for concept in concepts:
-                    ret['deleted'].append(concept.get_preflabel())
-                    concept.delete()
 
-            ret['success'] = True
+
+            # concept = Concept().get(id=conceptid, exclude=['note','label',None]).flatten()
+
+            # with transaction.atomic():
+            #     ret['deleted'].append(concept.get_preflabel().value)
+            #     concept.delete()
+
+            # ret['success'] = True
 
     return JSONResponse(ret, indent=(4 if pretty else None))
 
@@ -243,55 +257,5 @@ def search(request):
 
 def concept_tree(request):
     conceptid = request.GET.get('node', None)
-    top_concept = '00000000-0000-0000-0000-000000000003'
-    class concept(object):
-        def __init__(self, *args, **kwargs):
-            self.label = ''
-            self.labelid = ''
-            self.id = ''
-            self.load_on_demand = False
-            self.children = []    
-
-    def _findNarrowerConcept(conceptid, depth_limit=None, level=0):
-        labels = archesmodels.Values.objects.filter(conceptid = conceptid)
-        ret = concept()          
-        for label in labels:
-            if label.valuetype_id == 'prefLabel':
-                ret.label = label.value
-                ret.id = label.conceptid_id
-                ret.labelid = label.valueid
-
-        conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptidfrom = conceptid)
-        if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
-            ret.load_on_demand = True
-        else:
-            if depth_limit != None:
-                level = level + 1                
-            for relation in conceptrealations:
-                ret.children.append(_findNarrowerConcept(relation.conceptidto_id, depth_limit=depth_limit, level=level))   
-
-        return ret 
-
-    def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
-        conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptidto = conceptid)
-        if len(conceptrealations) > 0 and conceptid != top_concept:
-            labels = archesmodels.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
-            ret = concept()          
-            for label in labels:
-                if label.valuetype_id == 'prefLabel':
-                    ret.label = label.value
-                    ret.id = label.conceptid_id
-                    ret.labelid = label.valueid
-
-            ret.children.append(child_concept)
-            return _findBroaderConcept(conceptrealations[0].conceptidfrom_id, ret, depth_limit=depth_limit, level=level)
-        else:
-            return child_concept
-    
-    if conceptid == None or conceptid == '':
-        concepts = [_findNarrowerConcept(top_concept, depth_limit=1)]
-    else:
-        concepts = _findNarrowerConcept(conceptid, depth_limit=1)
-        concepts = [_findBroaderConcept(conceptid, concepts, depth_limit=1)]
-
+    concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)
