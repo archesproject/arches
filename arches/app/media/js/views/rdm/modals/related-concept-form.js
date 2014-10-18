@@ -11,7 +11,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search'], function ($, Ba
                 type: "POST",
                 url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
                 data: JSON.stringify({
-                	'action': 'manage_related_concept',
+                	'action': 'manage-related-concept',
                     'related_concept': this.select2.val()
                 }),
                 success: function() {
