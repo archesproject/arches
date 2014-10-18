@@ -81,7 +81,6 @@ class Command(BaseCommand):
         self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)  
         self.setup_db(package_name)
         self.generate_procfile(package_name)
-        self.register(package_name)
 
     def install(self, package_name, source=None):
         """
@@ -198,9 +197,11 @@ class Command(BaseCommand):
 
         python_exe = os.path.abspath(sys.executable)
 
-        with open(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), 'w') as f:
-            f.write('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
-            f.write('\ndjango: %s manage.py runserver' % (python_exe))
+        contents = []
+        contents.append('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
+        contents.append('django: %s manage.py runserver' % (python_exe))
+
+        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
 
     def get_elasticsearch_install_location(self, package_name):
         """
@@ -212,16 +213,6 @@ class Command(BaseCommand):
         file_name = url.split('/')[-1]
         file_name_wo_extention = file_name[:-4]
         return os.path.join(settings.PACKAGE_ROOT, 'elasticsearch', file_name_wo_extention)
-
-    def register(self, package_name):
-        """
-        Registers a package with Arches and writes a file into the package the location of the virtualenv used by Arches
-
-        """
-
-        python_exe = os.path.abspath(sys.executable)
-
-        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'arches_env'), python_exe)
 
     def build_permissions(self):
         """

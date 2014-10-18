@@ -27,20 +27,21 @@ from django.conf.urls.i18n import patterns
 from django.contrib import admin
 admin.autodiscover()
 
+uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+
 urlpatterns = patterns('',
     url(r'^$', 'arches.app.views.main.index'),
     url(r'^index.htm', 'arches.app.views.main.index', name='home'),
     url(r'^auth/', 'arches.app.views.main.auth', name='auth'),
-    url(r'^rdm/(?P<conceptid>.*)$', 'arches.app.views.concept.rdm', name='rdm'),
+    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.rdm', name='rdm'),
     
-    url(r'^Entities/(?P<entityid>.*)$', 'arches.app.views.entity.Entities'),
-    url(r'^Entities/(?P<entityid>.*)/(?P<labeled>.*)/$', 'arches.app.views.entity.Entities'),
+    url(r'^Entities/(?P<entityid>%s)$' % uuid_regex , 'arches.app.views.entity.Entities'),
+    url(r'^Entities/(?P<entityid>%s)/(?P<labeled>.*)/$' % uuid_regex , 'arches.app.views.entity.Entities'),
     url(r'^EntityTypes/(?P<entitytypeid>.*)$', 'arches.app.views.entity.EntityTypes'),
-    url(r'^Concepts/tree', 'arches.app.views.concept.concept_tree', name="concept_tree"),     
-    url(r'^Concepts/relation', 'arches.app.views.concept.update_relation', name="concept_relation"),
+    url(r'^Concepts/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.concept', name="concept"),
+    url(r'^Concepts/tree', 'arches.app.views.concept.concept_tree', name="concept_tree"),      
     url(r'^Concepts/search', 'arches.app.views.concept.search', name="concept_search"),        
-    url(r'^Concepts/value/(?P<id>.*)$', 'arches.app.views.concept.concept_value', name="concept_value"),   
-    url(r'^Concepts/(?P<ids>.*)$', 'arches.app.views.concept.concept', name="concept"),
+    url(r'^ConceptsValue/(?P<valueid>%s|())$' % uuid_regex, 'arches.app.views.concept.concept_value', name="concept_value"),   
     url(r'^MapLayers/(?P<entitytypeid>.*)$', 'arches.app.views.maplayers.MapLayers', name="map_layers"),
     url(r'^Search', 'arches.app.views.main.search'),
     url(r'^TermSearch', 'arches.app.views.search.search_terms'),

@@ -312,7 +312,7 @@
                 'plugins': '{{ STATIC_URL }}plugins',
                 'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
                 'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
-                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2',
+                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2',
                 'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min',
                 'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
                 'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
@@ -320,7 +320,8 @@
                 'easing': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
                 'backbone': 'http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
                 'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
-                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min'
+                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
+                'd3': 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min'
             }
         });
 
@@ -334,9 +335,9 @@
                     urls: {
                         media: "{{ STATIC_URL }}",
                         concept_tree: "{% url 'concept_tree' %}",
-                        concept_value: "{% url 'concept_value' '' %}",
-                        concept: "{% url 'concept' '' %}",
-                        concept_relation: "{% url 'concept_relation' %}"
+                        concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        concept_value: "{% url 'concept_value' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        concept_search: "{% url 'concept_search' %}"
                     }
                 };
             });

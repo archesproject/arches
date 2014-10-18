@@ -6,14 +6,14 @@ define(['backbone', 'jquery'], function (Backbone, $) {
                 data: {
                     'format': 'json'
                 },
-                url: this.url + this.get('id')
+                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
             }, callback);
         },
 
         save: function (callback) {
             this._doRequest({
                 type: "POST",
-                url: this.url,
+                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
                 data: JSON.stringify(this.toJSON())
             }, callback);
         },
@@ -21,7 +21,8 @@ define(['backbone', 'jquery'], function (Backbone, $) {
         delete: function (callback) {
             this._doRequest({
                 type: "DELETE",
-                url: this.url + this.get('id')
+                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
+                data: JSON.stringify(this.toJSON())
             }, callback);
         },
 

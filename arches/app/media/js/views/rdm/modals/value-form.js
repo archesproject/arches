@@ -22,8 +22,16 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             
             this.valueInput = modal.find('.value-input');
             this.idInput = modal.find('.id-input');
-            this.valueTypeInput = modal.find('.value-type-input');
-            this.languageInput = modal.find('.language-input');
+            this.valueTypeInput = modal.find('select.value-type-input');
+            this.languageInput = modal.find('select.language-input');
+            this.languageInput.select2({
+                minimumResultsForSearch: 10,
+                maximumSelectionSize: 1
+            });
+            this.valueTypeInput.select2({
+                minimumResultsForSearch: 10,
+                maximumSelectionSize: 1
+            });
             
             rules[this.valueInput.attr('id')] = "required";
             rules[this.valueTypeInput.attr('id')] = "required";
@@ -36,9 +44,9 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                     self.model.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
-                        type: self.valueTypeInput.val(),
+                        type: self.valueTypeInput.select2("val")[0],
                         datatype: 'text',
-                        language: self.languageInput.val()
+                        language: self.languageInput.select2("val")[0]
                     });
                     self.model.save(function() {
                         modal.on('hidden.bs.modal', function () {

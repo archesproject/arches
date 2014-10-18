@@ -82,9 +82,8 @@ define([
                 event.preventDefault();
                 $.ajax({
                     type: "POST",
-                    url: arches.urls.concept_relation,
+                    url: arches.urls.concept_relation.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', move_info.moved_node.id),
                     data: JSON.stringify({
-                        'conceptid': move_info.moved_node.id,
                         'target_parent_conceptid': move_info.position === 'inside' ? move_info.target_node.id : move_info.target_node.parent.id,
                         'current_parent_conceptid': move_info.previous_parent.id
                     }),

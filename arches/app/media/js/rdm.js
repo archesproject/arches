@@ -5,26 +5,31 @@ require([
     'models/concept',
     'views/rdm/concept-tree',
     'views/rdm/concept-report',
+    'views/concept-search',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch) {
     $(document).ready(function() {
-        var appHeader = $("#appheader"),
-            sidebar = $("#sidebar"),
-            topToHeaderPx = appHeader.offset().top,
-            topToSidebarBottomPx = sidebar.offset().top + sidebar.height(),
-            sidebarWidth = sidebar.outerWidth(),
+        var appHeader = $("#appheader");
+        var sidebar = $("#sidebar");
+        var topToHeaderPx = appHeader.offset().top;
+        var topToSidebarBottomPx = sidebar.offset().top + sidebar.height();
+        var sidebarWidth = sidebar.outerWidth();
             // Models and views
-            concept = new ConceptModel({
-                id: $('#selected-conceptid').val()
-            }),
-            conceptTree = new ConceptTree({
-                el: $('#jqtree')[0],
-                model: concept
-            }),
-            conceptReport = new ConceptReport({
-                el: $('#concept_report')[0],
-                model: concept
-            });
+        var concept = new ConceptModel({
+            id: $('#selected-conceptid').val()
+        });
+        var conceptTree = new ConceptTree({
+            el: $('#jqtree')[0],
+            model: concept
+        });
+        var conceptReport = new ConceptReport({
+            el: $('#concept_report')[0],
+            model: concept
+        });
+        var conceptsearch = new ConceptSearch({ 
+            el: $('#rdm-concept-search-container')[0],
+            model: concept
+        });       
 
         concept.on('change', function() {
             window.history.pushState({}, "conceptid", concept.get('id'));
@@ -45,6 +50,10 @@ require([
                 conceptTree.render();
             }
         });
+
+        conceptsearch.on("select2-selecting", function(e, el) {
+            this.model.set('id', e.val);
+        }, conceptsearch);
 
         $(window).scroll(function() {
             var topToFooterPx = $(".footer").offset().top - $(window).scrollTop();

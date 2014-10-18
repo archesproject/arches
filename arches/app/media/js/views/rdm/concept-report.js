@@ -4,8 +4,10 @@ define([
     'arches',
     'models/concept',
     'models/value',
-    'views/rdm/value-editor'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor) {
+    'views/rdm/modals/value-form',
+    'views/rdm/modals/related-concept-form',
+    'views/concept-graph'
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *': 'contentClick',
@@ -51,8 +53,22 @@ define([
                                     self.$el.find('#conceptmodal').modal('hide');
                                     self.$el.find("input[type=text], textarea").val("");
                                     self.trigger('conceptAdded', childConcept);
+                                    self.render();
                                 });
                             }
+                        });
+                        var add_related_concept_modal = new RelatedConcept({
+                            el: $('#related-concept-form')[0],
+                            model: self.model
+                        });
+                        //Toggle Concept Heirarchy.  
+                        self.$el.find(".graph-toggle").click(function(){
+                            self.$el.find(".concept-tree").toggle(300);
+                            self.$el.find(".concept-graph").toggle(300);
+                            self.$el.find(".graph-toggle").toggle();
+                        });
+                        new ConceptGraph({
+                            el: self.$el.find(".concept-graph")
                         });
                     }
                 });
@@ -62,10 +78,18 @@ define([
         contentClick: function(e) {
             var self = this,
                 data = $(e.target).data();
-            if (data.action === 'delete' || data.action === 'delete_concept') {
+            if (data.action === 'delete-value' || data.action === 'delete-concept') {
                 self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
                 self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
                 self.$el.find('.confirm-delete-yes').data('id', data.id);
+                self.$el.find('.confirm-delete-yes').data('action', data.action);
+                self.$el.find('.confirm-delete-modal').modal('show');
+            }
+
+            if (data.action === 'delete-relationship') {
+                self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
+                self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
+                self.$el.find('.confirm-delete-yes').data('relatedconceptid', data.id);
                 self.$el.find('.confirm-delete-yes').data('action', data.action);
                 self.$el.find('.confirm-delete-modal').modal('show');
             }
@@ -84,7 +108,7 @@ define([
                 }, $(e.target).data()),
                 model = new ValueModel(data),
                 editor = new ValueEditor({
-                    el: this.$el.find('#value-editor')[0],
+                    el: this.$el.find('#value-form')[0],
                     model: model
                 });
 
@@ -101,16 +125,20 @@ define([
                 Model, model, eventName;
 
             modal.on('hidden.bs.modal', function () {
-                if (data.action === 'delete') {
-                    Model = ValueModel;
+                if (data.action === 'delete-value') {
+                    model = new ValueModel(data);
                     eventName = 'valueDeleted';
                 }
-                if (data.action === 'delete_concept') {
-                    Model = ConceptModel;
+                if (data.action === 'delete-relationship') {
+                    model = new ConceptModel(data);
+                    model.set('id', self.model.get('id'));
+                    eventName = 'relationshipDeleted';
+                }
+                if (data.action === 'delete-concept') {
+                    model = new ConceptModel(data);
                     eventName = 'conceptDeleted';
                 }
 
-                model = new Model(data);
                 model.delete(function() {
                     self.render();
                     self.trigger(eventName, model);
