@@ -17,7 +17,7 @@ import json
 from django.contrib.gis.gdal import DataSource
 import csv
 import yaml
-
+# import ipdb
 
 class Row(object):
     def __init__(self, *args):
@@ -294,15 +294,21 @@ class ResourceLoader(object):
         Takes a shapefile and reads a config file with the same basename.
         Returns a dictionary with configuration for creating resources from shapefile records
         '''
+        result = None
         try:
             config_file = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.config')
-            result = yaml.load(open(config_file, 'r'))
-            result['AUXILIARY_MAP'] = {}
-
+            print config_file
+            if os.path.exists(config_file):
+                result = yaml.load(open(config_file, 'r'))
+                result['AUXILIARY_MAP'] = {}
+            #AUXILIARY_MAP = {"NAME TYPE.E55" : "Primary","EXTERNAL XREF TYPE.E55" : "Legacy System"}
+            #The auxiliary_map was Tharindus strategy to map concepts to their labels. This is not being implemented yet
         except:
             print "config file is missing or improperly named. Make sure you have config file with the same basename as your shapefile and the extension .config"
 
         return result
+
+
 
 
     def load_shapefile(self, shapefile):
@@ -311,49 +317,65 @@ class ResourceLoader(object):
         [1] a shapefile contains resources that belong to only one resource_type (Eg.ARCHEOLOGICAL HERITAGE). 
         So we pass the entity_type as an argument to the load method. 
         '''
+
         self.configs = self.parse_configs(shapefile)
-        self.attr_map = self.configs['FIELD_MAP']
-        self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['AUXILIARY_MAP']))
-        self.entitytypeid = self.configs['RESOURCE_TYPE']
-        self.geom_type = self.configs['GEOM_TYPE']
-        
-        start = time()
+        if self.configs:
+            self.attr_map = self.configs['FIELD_MAP']
 
-        self.shp_data = self.read_shapefile(shapefile)
-        
-        """
-        shp output type - list (say x)
-        x[0] --> a list of attribute names as specified in the dbf file. size = # of attr specified in the dbf file 
-        x[1] --> a list containing value lists for the said attributes. x[1][n-1] is the set of values for the nth attr. Can be seen as a matrix 
-        x[2] --> a list of geom data expressed in WKT. Size = # of resources. Can be seen as  a vector
-        """
-
-        shp_resource_info = self.build_dictionary(attr_mapping=self.attr_map, auth_mapping= self.auth_map, reader_output= self.shp_data, geom_type=self.geom_type)
-
-        resourceList = []
-        resource_id = ''
-        group_id = ''
+            self.concept_value_mappings = {}
+            for field, entitytypeid in self.attr_map.iteritems():
+                if entitytypeid.endswith('.E55'):
+                    key, mapping = self.get_e55_concept_legacyoids(entitytypeid)
+                    self.concept_value_mappings[key] = mapping
+                else:
+                    pass      
             
-        for shp_dictionary in shp_resource_info:
+            self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['AUXILIARY_MAP']))
+            self.entitytypeid = self.configs['RESOURCE_TYPE']
+            self.geom_type = self.configs['GEOM_TYPE']
             
-            if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
-                #take 1 dictionary at a time, and build a ShpResource from it
-                resource = Resource()
-                # populate the row with attributename and attributevalue
-                for key in shp_dictionary.keys():
-                    if key is not None:
-                        row = Row()
-                        row.resource_id = resource_id
-                        row.resourcetype = self.entitytypeid
-                        row.attributename = key
-                        row.attributevalue = shp_dictionary[key]
-                        resource.appendrow(row)
-                resource.entitytypeid = self.entitytypeid
-                resourceList.append(resource)
+            start = time()
 
-        elapsed = (time() - start)
-        print 'time to parse shapefile = %s' % (elapsed)
-        return self.resource_list_to_entities(resourceList)
+            self.shp_data = self.read_shapefile(shapefile)
+            
+            """
+            shp output type - list (say x)
+            x[0] --> a list of attribute names as specified in the dbf file. size = # of attr specified in the dbf file 
+            x[1] --> a list containing value lists for the said attributes. x[1][n-1] is the set of values for the nth attr. Can be seen as a matrix 
+            x[2] --> a list of geom data expressed in WKT. Size = # of resources. Can be seen as  a vector
+            """
+
+            shp_resource_info = self.build_dictionary(
+                    attr_mapping=self.attr_map,
+                    auth_mapping=self.auth_map,
+                    reader_output=self.shp_data,
+                    geom_type=self.geom_type,
+                    value_to_concept_label_mappings=self.concept_value_mappings)
+
+            resourceList = []
+            resource_id = ''
+            group_id = ''
+                
+            for shp_dictionary in shp_resource_info:
+                
+                if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
+                    #take 1 dictionary at a time, and build a ShpResource from it
+                    resource = Resource()
+                    # populate the row with attributename and attributevalue
+                    for key in shp_dictionary.keys():
+                        if key is not None:
+                            row = Row()
+                            row.resource_id = resource_id
+                            row.resourcetype = self.entitytypeid
+                            row.attributename = key
+                            row.attributevalue = shp_dictionary[key]
+                            resource.appendrow(row)
+                    resource.entitytypeid = self.entitytypeid
+                    resourceList.append(resource)
+
+            elapsed = (time() - start)
+            print 'time to parse shapefile = %s' % (elapsed)
+            return self.resource_list_to_entities(resourceList)
     
 
     def get_concept_uuid_for_aux_map_entry(self,concept_name,concept_value):
@@ -410,18 +432,36 @@ class ResourceLoader(object):
         return conceptid_map  
 
 
+    def get_e55_concept_legacyoids(self, e55_type):
+        concept = Concepts.objects.get(legacyoid = e55_type)
+        concept_graph = concept.toObject(full_graph=True, exclude_subconcepts=False, 
+            exclude_parentconcepts=False, exclude_notes=False, 
+            exclude_labels=False, exclude_metadata=False)
+        values_to_legacy = []
+        cursor = connection.cursor()
+        if len(concept_graph.subconcepts) > 0:
+            for subconcept in concept_graph.subconcepts[0].subconcepts:
+                for label in subconcept.labels:
+                    if label.type == "prefLabel":
+                        sql = "SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '{0}'".format(subconcept.id)
+                        cursor.execute(sql)
+                        legacyoid = str(cursor.fetchone()[0])
+                        values_to_legacy.append({label.value:legacyoid})
+        return e55_type, values_to_legacy
+
+
     # Now build a list of dictionaries, one per record
-    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type):
+    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings):
         dict_list=[] # list of dictionaries
         attr_names = reader_output[0]
         attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values
         geom_values = reader_output[1][-1] # last index because we append wkt values at the end
 
         '''
-            first, add the attribute values to the dictionary
-            and then add authority details. Because shapefile data does not 
-            contain authority details but the authority mapping
-            is defined by the user and passed in a separate dictionary
+        first, add the attribute values to the dictionary
+        and then add authority details. Because shapefile data does not 
+        contain authority details but the authority mapping
+        is defined by the user and passed in a separate dictionary
         '''      
         for record_index in range (0,len(attr_vals[0])): #len(attr_vals[0]) equals to the number of records
             record_dictionary= {} # i th dictionary
@@ -429,7 +469,21 @@ class ResourceLoader(object):
                 #get the index of the selected attribute
                 attr_index = attr_names[0].index(attr)
                 #add the key/value pair retrieved from the attr_mapping
-                record_dictionary[attr_mapping.get(attr)] = attr_vals[attr_index][record_index]
+                # ipdb.set_trace()
+                entitytypeid = attr_mapping.get(attr)
+                label = attr_vals[attr_index][record_index]
+
+                if type(entitytypeid) == str:
+                    if entitytypeid.endswith('.E55'):
+                        for mapping in value_to_concept_label_mappings[entitytypeid]:
+                            try:
+                                if mapping[label]:
+                                    label = mapping[label]
+                            except KeyError:
+                                pass
+
+
+                record_dictionary[entitytypeid] = label
             
             #now add key/value pairs retrieved from auth_mapping
             record_dictionary.update(auth_mapping)
