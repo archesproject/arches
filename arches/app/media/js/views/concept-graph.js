@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'd3'], function ($, Backbone, d3) {
+define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
     return Backbone.View.extend({
 
         initialize: function() {
