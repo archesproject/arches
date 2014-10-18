@@ -135,7 +135,6 @@ define([
                 }
                 if (data.action === 'delete-concept') {
                     model = new ConceptModel(data);
-                    model.set('id', self.model.get('id'));
                     eventName = 'conceptDeleted';
                 }
 

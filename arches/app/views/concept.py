@@ -67,6 +67,7 @@ def concept(request, conceptid):
         if fromdb:
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, depth_limit=depth_limit, up_depth_limit=None)
+            
             nodes = [{'concept_id': concept_graph.id, 'name': concept_graph.get_preflabel(lang=lang).value,'type': 'Current'}]
             links = []
             path = []
