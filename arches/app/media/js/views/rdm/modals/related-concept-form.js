@@ -16,8 +16,8 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search'], function ($, Ba
                 }),
                 success: function() {
                     var data = JSON.parse(this.data);
-                    console.log(data)
-                    self.trigger('conceptMoved', data.conceptid);
+                    self.trigger('relatedConceptSaved');
+                    self.$el.modal('hide');
                 }
             });
 		}

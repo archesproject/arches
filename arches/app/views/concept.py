@@ -144,36 +144,58 @@ def concept(request, conceptid):
 
             if conceptid == '':
                 with transaction.atomic():
-                    concept = archesmodels.Concepts()
-                    concept.pk = str(uuid.uuid4())
-                    concept.save()
+                    concept = Concept()
 
-                    conceptrelation = archesmodels.ConceptRelations()
-                    conceptrelation.pk = str(uuid.uuid4())
-                    conceptrelation.conceptidfrom = archesmodels.Concepts.objects.get(pk=data['parentconceptid'])
-                    conceptrelation.conceptidto = concept
-                    conceptrelation.relationtype = archesmodels.DRelationtypes.objects.get(pk='has narrower concept')
-                    conceptrelation.save()
-
-                    if 'label' in data:
-                        value = archesmodels.Values()
-                        value.pk = str(uuid.uuid4())
-                        value.conceptid = concept
-                        value.valuetype = archesmodels.ValueTypes.objects.get(pk='prefLabel')
+                    if 'label' in data and data['label'].strip() != '':
+                        value = ConceptValue()
+                        value.type = 'prefLabel'
                         value.value = data['label']
-                        value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                        value.save()
+                        value.language = data['language']
+                        concept.addvalue(value)
+                    else:
+                         return JSONResponse(SaveFailed(message='A label is required'))
 
                     if 'note' in data:
-                        value = archesmodels.Values()
-                        value.pk = str(uuid.uuid4())
-                        value.conceptid = concept
-                        value.valuetype = archesmodels.ValueTypes.objects.get(pk='scopeNote')
+                        value = ConceptValue()
+                        value.type = 'scopeNote'
                         value.value = data['note']
-                        value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                        value.save()
+                        value.language = data['language']
+                        concept.addvalue(value)
 
-                ret = concept.graph(include_subconcepts=False, include_parentconcepts=False, include=['label'])
+                    concept.addparent({'id': data['parentconceptid'], 'relationshiptype': 'has narrower concept'})    
+                    concept.save()
+                    ret = concept
+
+                #     concept = archesmodels.Concepts()
+                #     concept.pk = str(uuid.uuid4())
+                #     concept.save()
+
+                #     conceptrelation = archesmodels.ConceptRelations()
+                #     conceptrelation.pk = str(uuid.uuid4())
+                #     conceptrelation.conceptidfrom = archesmodels.Concepts.objects.get(pk=data['parentconceptid'])
+                #     conceptrelation.conceptidto = concept
+                #     conceptrelation.relationtype = archesmodels.DRelationtypes.objects.get(pk='has narrower concept')
+                #     conceptrelation.save()
+
+                #     if 'label' in data:
+                #         value = archesmodels.Values()
+                #         value.pk = str(uuid.uuid4())
+                #         value.conceptid = concept
+                #         value.valuetype = archesmodels.ValueTypes.objects.get(pk='prefLabel')
+                #         value.value = data['label']
+                #         value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
+                #         value.save()
+
+                #     if 'note' in data:
+                #         value = archesmodels.Values()
+                #         value.pk = str(uuid.uuid4())
+                #         value.conceptid = concept
+                #         value.valuetype = archesmodels.ValueTypes.objects.get(pk='scopeNote')
+                #         value.value = data['note']
+                #         value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
+                #         value.save()
+
+                # ret = Concept().get(id=concept.pk, include=['label'])
                 return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
 
             elif data['action'] == 'manage-related-concept':
@@ -268,3 +290,9 @@ def concept_tree(request):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)
+
+class SaveFailed(object):
+    def __init__(self, message='', additionaldata=None):
+        self.success = False
+        self.message = message
+        self.additionaldata = additionaldata

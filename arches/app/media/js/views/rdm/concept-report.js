@@ -53,6 +53,7 @@ define([
                                     self.$el.find('#conceptmodal').modal('hide');
                                     self.$el.find("input[type=text], textarea").val("");
                                     self.trigger('conceptAdded', childConcept);
+                                    self.render();
                                 });
                             }
                         });

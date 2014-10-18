@@ -26,8 +26,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class Concept(object):
     def __init__(self, *args, **kwargs):
-        self.id = id
-        self.legacyoid = ''
+        self.id = ''
+        self.legacyoid = None
         self.relationshiptype = ''
         self.values = []
         self.subconcepts = []
@@ -46,6 +46,24 @@ class Concept(object):
 
     def __unicode__(self):
         return ('%s - %s') % (self.get_preflabel().value, self.id)
+    
+    def load(self, value):
+        if isinstance(value, dict):
+            self.id = value['id'] if 'id' in value else ''
+            self.legacyoid = value['legacyoid'] if 'legacyoid' in value else ''
+            self.relationshiptype = value['relationshiptype'] if 'relationshiptype' in value else ''            
+            if 'values' in value:
+                for value in value['values']:
+                    self.addvalue(value)
+            if 'subconcepts' in value:
+                for subconcept in value['subconcepts']:
+                    self.addsubconcept(subconcept)
+            if 'parentconcepts' in value:
+                for parentconcept in value['parentconcepts']:
+                    self.addparent(parentconcept)
+            if 'relatedconcepts' in value:
+                for relatedconcept in value['relatedconcepts']:
+                    self.addrelatedconcept(relatedconcept)
 
     def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, **kwargs):
         if id != '' or legacyoid != '':
@@ -104,13 +122,17 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
-            self.id = self.id if self.id != '' else str(uuid.uuid4())
-            concept = models.Concepts()
-            concept.pk = self.id
-            concept.legacyoid = self.legacyoid
-            concept.save()
+            if self.id == '':
+                concept = models.Concepts()
+                concept.pk = str(uuid.uuid4())
+                concept.legacyoid = self.legacyoid
+                concept.save()
+                self.id = concept.pk
+            else:
+                concept = models.Concepts.objects.get(pk=self.id)
 
             for parentconcept in self.parentconcepts:
+                parentconcept.save()
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom_id = parentconcept.id #models.Concepts.objects.get(pk=parentconcept.id)
@@ -119,6 +141,7 @@ class Concept(object):
                 conceptrelation.save()
 
             for subconcept in self.subconcepts:
+                subconcept.save()
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom = concept
@@ -131,6 +154,8 @@ class Concept(object):
                     value = ConceptValue(value)
                 value.conceptid = self.id
                 value.save()
+
+            return concept
 
     def delete(self):
         concept = models.Concepts.objects.get(pk=self.id)
@@ -203,23 +228,6 @@ class Concept(object):
             subconcept.flatten(ret)
             
         return ret
-
-    def load(self, value):
-        if isinstance(value, dict):
-            self.id = value['id'] if 'id' in value else ''
-            self.legacyoid = value['legacyoid'] if 'legacyoid' in value else ''
-            self.relationshiptype = value['relationshiptype'] if 'relationshiptype' in value else ''            
-            if self.id == '' and self.legacyoid != '':
-                self.id = models.Concepts.objects.get(legacyoid=self.legacyoid).pk
-            if 'values' in value:
-                for value in value['values']:
-                    self.addvalue(value)
-            if 'subconcepts' in value:
-                for subconcept in value['subconcepts']:
-                    self.addsubconcept(subconcept)
-            if 'parentconcepts' in value:
-                for parentconcept in value['parentconcepts']:
-                    self.addparent(parentconcept)
 
     def addparent(self, value):
         if isinstance(value, dict):
