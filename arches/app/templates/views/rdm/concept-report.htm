@@ -1,6 +1,6 @@
 ﻿ {% load i18n %}
  {% load staticfiles %}
-<div class="col-xs-12 concept-report-loading hidden">Loading...</div>
+<div class="col-xs-12 concept-report-loading hidden">{% trans "Loading..." %}</div>
 <div class="col-xs-12 concept-report-content">
     <!-- Concept Preferred Label -->
     <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{{prefLabel}} ({{lang}})</h3>
@@ -19,34 +19,34 @@
         <!-- Concept Management Tools for larger screens -->
         <div class="btn-group pull-right hidden-xs">
             <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
-                Manage &nbsp;
+                {% trans "Manage" %}
                 <i class="fa fa-chevron-down"></i>
-                <span class="sr-only">Toggle Dropdown</span>                            
+                <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">Add Child</a></li>
-                <li><a href="#">Import Child from AAT</a></li>
-                <li><a href="#NewParent" data-toggle="modal">Manage Parents</a></li>
-                <li><a href="#ChangeConceptType" data-toggle="modal">Change Concept Type</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">{% trans "Add Child" %}</a></li>
+                <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
+                <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
+                <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                 <li class="divider"></li>
-                <li><a href="#">Close</a></li>
+                <li><a href="#">{% trans "Close" %}</a></li>
             </ul>
         </div>
 
         <!-- Concept Management Tools for xs screens -->
         <div class="btn-group hidden-sm hidden-md hidden-lg">
             <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button-xs" data-toggle="dropdown">
-                Manage &nbsp;
+                {% trans "Manage" %}
                 <i class="fa fa-chevron-down"></i>
-                <span class="sr-only">Toggle Dropdown</span>                            
+                <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">Add Child</a></li>
-                <li><a href="#">Import Child from AAT</a></li>
-                <li><a href="#NewParent" data-toggle="modal">Manage Parents</a></li>
-                <li><a href="#ChangeConceptType" data-toggle="modal">Change Concept Type</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">{% trans "Add Child" %}</a></li>
+                <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
+                <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
+                <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                 <li class="divider"></li>
-                <li><a href="#">Close</a></li>
+                <li><a href="#">{% trans "Close" %}</a></li>
             </ul>
         </div>
 
@@ -57,16 +57,16 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>
-                <h5 id="" class="section-headline">Concept Labels &nbsp;
+                <h5 id="" class="section-headline">{% trans "Concept Labels" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="label" data-target="#labelmodal">  Add label</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
                     <span>
                 </h5>
             </dt>
             {% for value in concept.values %}
                 {% if value.category == 'label' %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="#" title="Remove this label" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="{% trans "Remove this label" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"></i></a>
                     <a href="#" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
                     <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                 </dd>
@@ -82,16 +82,16 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>
-                <h5 id="" class="section-headline">Concept Notes &nbsp;
+                <h5 id="" class="section-headline">{% trans "Concept Notes" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="note" data-target="#notemodal">  Add note</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
                     <span>
                 </h5>
             </dt>
             {% for value in concept.values %}
                 {% if value.category == 'note' %}
                 <dd class="arches-RDM-label">
-                    <a href="#" title="Remove this note" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="{% trans "Remove this note" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"></i></a>
                     <a href="#" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a> 
                     <span class="text-muted"> ({{value.language}})</span>
                 </dd>
@@ -202,18 +202,20 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>
-                <h5 id="" class="section-headline">Related Concepts &nbsp;
+                <h5 id="" class="section-headline">{% trans "Related Concepts" %}
                     <span>
-                        <a href="#related-concept-form" class="arches-RDM-link pull-right" data-toggle="modal">  Add related concept</a>
+                        <a href="#related-concept-form" class="arches-RDM-link pull-right" data-toggle="modal">{% trans "Add related concept" %}</a>
                     <span>
                 </h5>
             </dt>
 
-            <dd class="arches-RDM-label-highlighted">
-                <a href="#" title="Remove this concept"><i class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                <a href="#" class="arches-CRUD-child" title="Jump to this concept">Related Concept Label 1</a> 
-                <span class="text-muted"> (preferred, en)</span>
-            </dd>
+            {% for value in concept.relatedconcepts %}
+                <dd class="arches-RDM-label-highlighted">
+                    <a href="#" title="{% trans "Remove the relationship to this concept" %}" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{value.conceptid}}">{{value.value}} </a>
+                    <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
+                </dd>
+            {% endfor %}
             
         </dl>
     </div>
@@ -230,16 +232,16 @@
     <div class="margin-bottom-10 padding-left-10">
         <dl>
             <dt>
-                <h5 id="" class="section-headline">Related Values &nbsp;
+                <h5 id="" class="section-headline">{% trans "Related Values" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="" data-target="#related_valuemodal">  Add value</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
                     <span>
                 </h5>
             </dt>
             {% for value in concept.values %}
                 {% if value.category == '' %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="#" title="Remove this value" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete" data-message="{{value.value}}"></i></a>
+                    <a href="#" title="{% trans "Remove this value" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"></i></a>
                     <a href="#" title="Edit this value" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                     <span class="arches-RDM-note">{{value.value}}</span>
                 </dd>
@@ -260,9 +262,9 @@
     <div class="padding-left-10">
         <dl>
             <dt>
-                <h5 id="" class="section-headline">Images&nbsp;
+                <h5 id="" class="section-headline">{% trans "Images" %}
                     <span>
-                        <a href="#UploadFileModal" class="arches-RDM-link pull-right" data-toggle="modal"> Add image</a>
+                        <a href="#UploadFileModal" class="arches-RDM-link pull-right" data-toggle="modal">{% trans "Add image" %}</a>
                     <span>
                 </h5>
             </dt>
@@ -273,11 +275,11 @@
                 <div class="row margin-top-10">
                     <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                         <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-2.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-2.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="{% trans "Image Name" %}" title="" class="superbox-img img-bordered arches-RDM-image">
                         </div>
 
                         <div class="margin-left-5 margin-top-10">
-                            <a href="#" class="btn-u btn-u-small">Delete Image</a></p>
+                            <a href="#" class="btn-u btn-u-small">{% trans "Delete Image" %}</a></p>
                         </div>
                     </div>
                 </div>
@@ -288,11 +290,11 @@
                 <div class="row">
                     <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                         <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-3.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-3.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="{% trans "Image Name" %}" title="" class="superbox-img img-bordered arches-RDM-image">
                         </div>
 
                         <div class="margin-left-5 margin-top-10">
-                            <a href="#" class="btn-u btn-u-small">Delete Image</a></p>
+                            <a href="#" class="btn-u btn-u-small">{% trans "Delete Image" %}</a></p>
                         </div>
                     </div>
                 </div>
@@ -383,12 +385,12 @@
         <dl>
             <dt>
                 <h5 id="arches-names-form" class="section-headline">
-                    Identifiers  
+                    {% trans "Identifiers" %}  
                 </h5>
             </dt>
             
             <dd class="arches-RDM-note">
-                Arches Concept ID: {{concept.id}} </br>
+                {% trans "Arches Concept ID:" %} {{concept.id}} </br>
                 <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
             </dd>
 
@@ -403,13 +405,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Are you ready to delete this?</h4>
+                <h4 class="modal-title">{% trans "Are you ready to delete this?" %}</h4>
             </div>
             <div class="modal-body">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">No</button>
-                <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete">Yes</button>
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                <button class="btn-u btn-u-primary confirm-delete-yes" href="#" data-id="" data-action="delete">{% trans "Yes" %}</button>
             </div>
         </div>
     </div>

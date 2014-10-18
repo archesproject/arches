@@ -77,10 +77,18 @@ define([
         contentClick: function(e) {
             var self = this,
                 data = $(e.target).data();
-            if (data.action === 'delete' || data.action === 'delete_concept') {
+            if (data.action === 'delete-value' || data.action === 'delete-concept') {
                 self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
                 self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
                 self.$el.find('.confirm-delete-yes').data('id', data.id);
+                self.$el.find('.confirm-delete-yes').data('action', data.action);
+                self.$el.find('.confirm-delete-modal').modal('show');
+            }
+
+            if (data.action === 'delete-relationship') {
+                self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
+                self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
+                self.$el.find('.confirm-delete-yes').data('relatedconceptid', data.id);
                 self.$el.find('.confirm-delete-yes').data('action', data.action);
                 self.$el.find('.confirm-delete-modal').modal('show');
             }
@@ -116,11 +124,16 @@ define([
                 Model, model, eventName;
 
             modal.on('hidden.bs.modal', function () {
-                if (data.action === 'delete') {
+                if (data.action === 'delete-value') {
                     model = new ValueModel(data);
                     eventName = 'valueDeleted';
                 }
-                if (data.action === 'delete_concept') {
+                if (data.action === 'delete-relationship') {
+                    model = new ConceptModel(data);
+                    model.set('id', self.model.get('id'));
+                    eventName = 'relationshipDeleted';
+                }
+                if (data.action === 'delete-concept') {
                     model = new ConceptModel(data);
                     model.set('id', self.model.get('id'));
                     eventName = 'conceptDeleted';
