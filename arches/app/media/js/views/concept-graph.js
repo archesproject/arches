@@ -32,7 +32,7 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
             var svg = d3.select("#svg").append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                //.call(d3.behavior.zoom().on("zoom", redraw))
+                .call(d3.behavior.zoom().on("zoom", redraw))
                 .append('svg:g');
 
             //Zoom support: Redraw Graph on zoom
