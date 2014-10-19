@@ -18,7 +18,7 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
 
             //Set up D3 Force Directed Graph as the visualization, define basic parameters
             var force = d3.layout.force()
-                .charge(-750)
+                .charge(-1550)
                 .linkDistance(90)
                 .gravity(0.05)
                 .friction(.55)
