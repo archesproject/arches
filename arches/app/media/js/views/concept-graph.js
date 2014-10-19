@@ -32,32 +32,52 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
             var svg = d3.select("#svg").append("svg")
                 .attr("width", width)
                 .attr("height", height)
-                .call(d3.behavior.zoom().on("zoom", redraw))
+                //.call(d3.behavior.zoom().on("zoom", redraw))
                 .append('svg:g');
 
-                //Zoom support: Redraw Graph on zoom
-                function redraw() {
-                    //console.log("here", d3.event.translate, d3.event.scale);
-                    svg.attr("transform",
-                        "translate(" + d3.event.translate + ")"
-                        + " scale(" + d3.event.scale + ")");
-                }
+            //Zoom support: Redraw Graph on zoom
+            function redraw() {
+                //console.log("here", d3.event.translate, d3.event.scale);
+                svg.attr("transform",
+                    "translate(" + d3.event.translate + ")"
+                    + " scale(" + d3.event.scale + ")");
+            }
 
 
             //Get Graph data
             var data = JSON.parse($('.graph_json_content').html());
 
 
-            //pin current node to center of svg
-            data.nodes[0].fixed = true;
-            data.nodes[0].x = width/2;
-            data.nodes[0].y = height/2;
+            //pin a few nodes to specific locations
+            var n = data.nodes.length;
+            data.nodes.forEach(function(d, i) {
+                if(d.type === 'Current'){
+                    d.fixed = true;
+                    d.x = width * .55;
+                    d.y = height * .55;
+                }
+                if(d.type === 'Root'){
+                    d.fixed = true;
+                    d.x = width * .1;
+                    d.y = height * .1;
+                }
+            });
 
 
             var canvasd3 = $("#svg"),
                 aspect = canvasd3.width() / canvasd3.height(),
                 containerd3 = canvasd3.parent();
 
+            var drag = force.drag()
+                .on("dragstart", dragstart);
+
+            function dblclick(d) {
+              d3.select(this).classed("fixed", d.fixed = false);
+            }
+
+            function dragstart(d) {
+              d3.select(this).classed("fixed", d.fixed = true);
+            }
 
             //Manage D3 graph on resize of window
             $(window).on("resize", function() {
@@ -81,33 +101,63 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
                 .data(data.links)
                 .enter().append("line")
                 .attr("class", "link")
+                .attr("marker-end", "url(#arrowGray)")
+                //add interactivity
+                .on("mouseover", function(d) {
+                    d3.select(this)
+                    .attr("class", "linkMouseover")
 
-                    //add interactivity
-                    .on("mouseover", function(d) {
-                        d3.select(this)
-                        .attr("class", "linkMouseover")
+                    //add tooltup to show edge property
+                    link.append("title")
+                    .text(function(d) { return d.relationship; })
 
-                        //add tooltup to show edge property
-                        link.append("title")
-                        .text(function(d) { return d.relationship; })
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this)
+                    .attr("class", "link");
+                })
 
-                    })
+            var defs = svg.append('defs');
+            defs.append("svg:marker")
+                .attr("id", "arrowGray")
+                .attr("viewBox","0 0 10 10")
+                .attr("refX","28")
+                .attr("refY","5")
+                .attr("markerUnits","strokeWidth")
+                .attr("markerWidth","5")
+                .attr("markerHeight","2")
+                .attr("orient","auto")
+                .append("svg:path")
+                .attr("d","M 0 0 L 10 5 L 0 10 z")
+                .attr("fill", "#BBBBBB");
 
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                        .attr("class", "link");
-                    })
 
 
             //Enter nodes, style as circles
             var node = svg.selectAll(".node") 
                 .data(data.nodes)
                 .enter().append("circle")
-                .attr("r",function(d){if(d.type == "Current"){ return currentNode } else if (d.type == "Ancestor"){ return ancestorNode }else { return descendentNode }})
-
+                .attr("r",function(d){
+                    if(d.type == "Current"){ 
+                        return currentNode 
+                    } 
+                    else if (d.type == "Ancestor" || d.type == "Root"){ 
+                        return ancestorNode 
+                    }else { 
+                        return descendentNode 
+                    }
+                })
                 //.attr("class", "node")
-                .attr("class", function(d){if(d.type == "Current"){ return "node-current"} else if (d.type == "Ancestor"){ return "node-ancestor" } else { return "node-descendent" } })
-                
+                .attr("class", function(d){
+                    if(d.type == "Current"){ 
+                        return "node-current"
+                    } 
+                    else if (d.type == "Ancestor" || d.type == "Root"){ 
+                        return "node-ancestor" 
+                    } else { 
+                        return "node-descendent" 
+                    } 
+                })
                 .on("mouseover", function(){
 
                     d3.select(this).attr("class", function(d) { 
@@ -168,8 +218,8 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
                     }
 
                 })
-
-                .call(force.drag);
+                .on("dblclick", dblclick)
+                .call(drag);
 
 
             //Label Nodes
@@ -179,7 +229,7 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
                 .attr("class", function(d){
 
                     if (d.type == "Current") { return "node-current-label"} 
-                    else if (d.type == "Ancestor") { return "node-ancestor-label"} 
+                    else if (d.type == "Ancestor" || d.type == "Root") { return "node-ancestor-label"} 
                     else { return "node-descendent-label"};
 
                 })
@@ -202,9 +252,22 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
             //Tooltip on nodes
             // node.append("title")
             //     .text(function(d) { return d.type; });
-         
 
-            force.on("tick", function() {
+            var foci = {
+                "Root":{x: 0, y: 0}, // set to fixed above
+                "Ancestor":{x: width*.1, y: height*.1}, 
+                "Current": {x: 150, y: 250}, // set to fixed above
+                "Descendant": {x: width*.55, y: height*1.4}
+            };
+
+            force.on("tick", function(e) {
+                //Push nodes toward their designated focus.
+                var k = .1 * e.alpha;
+                data.nodes.forEach(function(o, i) {
+                     o.y += (foci[o.type].y - o.y) * k;
+                     o.x += (foci[o.type].x - o.x) * k;
+                });
+
                 link
                     .attr("x1", function(d) { return d.source.x; })
                     .attr("y1", function(d) { return d.source.y; })
@@ -213,7 +276,7 @@ define(['jquery', 'backbone', 'd3'], function ($, Backbone) {
          
                 node
                     .attr("cx", function(d) { return d.x; })
-                    .attr("cy", function(d) { return d.y; });
+                    .attr("cy", function(d) {  return d.y; });
          
                 texts
                     //.attr("x", function(d) { console.log(d); return d.x + 15; })

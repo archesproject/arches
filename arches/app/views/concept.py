@@ -72,25 +72,26 @@ def concept(request, conceptid):
             
             nodes = [{'concept_id': concept_graph.id, 'name': concept_graph.get_preflabel(lang=lang).value,'type': 'Current'}]
             links = []
-            path = []
-            path_list = [path]
+            # path = []
+            # path_list = [path]
 
-            def graph_to_paths(current_concept, path, path_list):
+            def graph_to_paths(current_concept, path=[], path_list=[[]]):
                 parents = current_concept.parentconcepts
-                path_for_clone = list(path)
-                for i in range(len(parents)):
-                    nodes.append({'concept_id': parents[i].id, 'name': parents[i].get_preflabel(lang=lang).value,'type': 'Ancestor' })
-                    links.append({'source': current_concept.id, 'target': parents[i].id, 'relationship': 'broader' })
-                    if i == 0:
-                        my_path = path
+                for i, parent in enumerate(parents):
+                    if len(parent.parentconcepts) == 0:
+                        type = 'Root'
                     else:
-                        my_path = list(path_for_clone)
-                        path_list.append(my_path)
-                    my_path.insert(0, {'label': parents[i].get_preflabel(lang=lang).value, 'relationshiptype': parents[i].relationshiptype, 'id': parents[i].id})
-                    graph_to_paths(parents[i], my_path, path_list)
+                        type = 'Ancestor'
+                    nodes.append({'concept_id': parent.id, 'name': parent.get_preflabel(lang=lang).value,'type': type })
+                    links.append({'target': current_concept.id, 'source': parent.id, 'relationship': 'broader' })
+                    if i != 0:
+                        path = list(list(path))
+                        path_list.append(path)
+                    path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
+                    graph_to_paths(parent, path, path_list)
                 return path_list
 
-            path_list = graph_to_paths(concept_graph, path, path_list)
+            path_list = graph_to_paths(concept_graph)
             for child in concept_graph.subconcepts:
                 nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value,'type': 'Descendant' })
                 links.append({'source': concept_graph.id, 'target': child.id, 'relationship': 'narrower' })
@@ -166,36 +167,6 @@ def concept(request, conceptid):
                     concept.save()
                     ret = concept
 
-                #     concept = archesmodels.Concepts()
-                #     concept.pk = str(uuid.uuid4())
-                #     concept.save()
-
-                #     conceptrelation = archesmodels.ConceptRelations()
-                #     conceptrelation.pk = str(uuid.uuid4())
-                #     conceptrelation.conceptidfrom = archesmodels.Concepts.objects.get(pk=data['parentconceptid'])
-                #     conceptrelation.conceptidto = concept
-                #     conceptrelation.relationtype = archesmodels.DRelationtypes.objects.get(pk='has narrower concept')
-                #     conceptrelation.save()
-
-                #     if 'label' in data:
-                #         value = archesmodels.Values()
-                #         value.pk = str(uuid.uuid4())
-                #         value.conceptid = concept
-                #         value.valuetype = archesmodels.ValueTypes.objects.get(pk='prefLabel')
-                #         value.value = data['label']
-                #         value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                #         value.save()
-
-                #     if 'note' in data:
-                #         value = archesmodels.Values()
-                #         value.pk = str(uuid.uuid4())
-                #         value.conceptid = concept
-                #         value.valuetype = archesmodels.ValueTypes.objects.get(pk='scopeNote')
-                #         value.value = data['note']
-                #         value.languageid = archesmodels.DLanguages.objects.get(pk=data['language'])
-                #         value.save()
-
-                # ret = Concept().get(id=concept.pk, include=['label'])
                 return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
 
             elif data['action'] == 'manage-related-concept':
