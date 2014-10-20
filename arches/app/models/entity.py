@@ -139,41 +139,41 @@ class Entity(object):
         self._save()
 
         # log the edit
-        timestamp = datetime.now()
-        if self.entityid != '' and diff != '':
-            for entity in diff['deleted_nodes']:
-                edit = archesmodels.EditLog()        
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceid = self.entityid
-                edit.entityid = entity.entityid
-                edit.userid = username
-                edit.timestamp = timestamp
-                edit.oldvalue = entity.value
-                edit.newvalue = None
-                edit.save() 
+        # timestamp = datetime.now()
+        # if self.entityid != '' and diff != '':
+        #     for entity in diff['deleted_nodes']:
+        #         edit = archesmodels.EditLog()        
+        #         edit.editlogid = str(uuid.uuid4())
+        #         edit.resourceid = self.entityid
+        #         edit.entityid = entity.entityid
+        #         edit.userid = username
+        #         edit.timestamp = timestamp
+        #         edit.oldvalue = entity.value
+        #         edit.newvalue = None
+        #         edit.save() 
 
-            for entity in diff['updated_nodes']:
-                edit = archesmodels.EditLog()        
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceid = self.entityid
-                edit.entityid = entity.entityid
-                edit.userid = username
-                edit.timestamp = timestamp
-                edit.oldvalue = entity['from'].value
-                edit.newvalue = entity['to'].value
-                edit.save()    
-        else:
-            for entity in self.flatten():
-                if entity.value != '':
-                    edit = archesmodels.EditLog()        
-                    edit.editlogid = str(uuid.uuid4())
-                    edit.resourceid = self.entityid
-                    edit.entityid = entity.entityid
-                    edit.userid = username
-                    edit.timestamp = timestamp
-                    edit.oldvalue = None
-                    edit.newvalue = entity.value
-                    edit.save() 
+        #     for entity in diff['updated_nodes']:
+        #         edit = archesmodels.EditLog()        
+        #         edit.editlogid = str(uuid.uuid4())
+        #         edit.resourceid = self.entityid
+        #         edit.entityid = entity.entityid
+        #         edit.userid = username
+        #         edit.timestamp = timestamp
+        #         edit.oldvalue = entity['from'].value
+        #         edit.newvalue = entity['to'].value
+        #         edit.save()    
+        # else:
+        #     for entity in self.flatten():
+        #         if entity.value != '':
+        #             edit = archesmodels.EditLog()        
+        #             edit.editlogid = str(uuid.uuid4())
+        #             edit.resourceid = self.entityid
+        #             edit.entityid = entity.entityid
+        #             edit.userid = username
+        #             edit.timestamp = timestamp
+        #             edit.oldvalue = None
+        #             edit.newvalue = entity.value
+        #             edit.save() 
 
         return self
 
