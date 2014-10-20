@@ -158,30 +158,7 @@
             <!-- Broader/Narrower as Graph (for multi-parent concepts) -->
             <div style="display: none; margin-top: 10px;" class="concept-graph">
 
-                <!-- Graph -->
-                <div style="background: #ffffff; border: 1px solid rgba(0,0,0,.1); height: 600px;" id="svg"></div>
-
-                <!-- Panel to display selected node info -->
-                <div class="row">
-
-                    <div class="col-xs-4 col-xs-offset-6">
-                        <div class="hidden" id="nodeCrud" style="margin-top: -580px; margin-right: 40px;">
-                            
-                            <button aria-hidden="true" class="close" type="button">{% trans "×" %}</button>
-                            <h6 style="margin-top: 0px; margin-bottom: 5px;">{% trans "Concept" %}</h6>
-                            
-                            <dl>
-                                <dd class="arches-concept-heirarchy">
-                                    
-                                    <a href="#" title="{% trans "Delete this concept" %}"><i class="arches-CRUD-delete fa fa-times-circle graph-concept-delete-link" data-id="" data-action="delete-concept" data-message="{% trans "Delete this concept and all of it''s sub concepts." %}"></i></a>
-                                    <a href="#" class="concept-label arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="">{% trans "More Child Concept" %}</a>
-                                    
-                                </dd>
-                            </dl>
-                            
-                        </div>
-                    </div>
-                </div>
+               {% include "views/concept-graph.htm" %}
                 
             </div>
             <!-- End Broader/Narrower as Graph (for multi-parent concepts) -->
@@ -464,5 +441,3 @@
 </div>
 
 {% include "views/rdm/modals/related-concept-form.htm" %}
-
-<div style="display:none;" class="graph_json_content">{{graph_json}}</div>

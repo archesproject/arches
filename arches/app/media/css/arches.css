@@ -257,7 +257,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     text-anchor: middle;
 }
 
-#nodeCrud {
+.node_info {
     width: 320px;
     height: auto;
     padding: 15px;
@@ -270,11 +270,11 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
 }
 
-#nodeCrud.hidden {
+.node_info.hidden {
     display: none;
 }
 
-#nodeCrud p {
+.node_info p {
     margin: 0;
     font-family: sans-serif;
     font-size: 16px;
