@@ -66,8 +66,8 @@ class Concept(object):
                     self.addrelatedconcept(relatedconcept)
 
     def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, **kwargs):
-        if id != '' or legacyoid != '':
-            self.id = id
+        self.id = id if id != '' else self.id
+        if self.id != '' or legacyoid != '':
             self.legacyoid = legacyoid
             uplevel = kwargs.pop('uplevel', 0)
             downlevel = kwargs.pop('downlevel', 0)
@@ -122,14 +122,13 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
-            if self.id == '':
+            try:
+                concept = models.Concepts.objects.get(pk=self.id)
+            except models.Concepts.DoesNotExist:
                 concept = models.Concepts()
-                concept.pk = str(uuid.uuid4())
+                concept.pk = self.id if self.id != '' else str(uuid.uuid4())
                 concept.legacyoid = self.legacyoid
                 concept.save()
-                self.id = concept.pk
-            else:
-                concept = models.Concepts.objects.get(pk=self.id)
 
             for parentconcept in self.parentconcepts:
                 parentconcept.save()
@@ -192,7 +191,7 @@ class Concept(object):
         def find_auth_doc(concept):
             for parentconcept in concept.parentconcepts:
                 if parentconcept.id == '00000000-0000-0000-0000-000000000004':
-                    return concept.get_preflabel(lang=lang).value
+                    return concept
 
             for parentconcept in concept.parentconcepts:
                 return find_auth_doc(parentconcept)
