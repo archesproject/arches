@@ -133,7 +133,7 @@ class Command(BaseCommand):
             os.system("./plugin -install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
-        self.setup_indexes(package_name)
+        #self.setup_indexes(package_name)
 
     def setup_indexes(self, package_name):
         import time, signal
