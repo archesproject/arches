@@ -3,10 +3,9 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
 
         initialize: function() {
             var self = this,
-                width = self.$el.parent().width() - 20, //A hack to get a dynamic width because the #svg doesn't exist until the user opens it
-                svgDiv = this.$el.find(".svg")[0],
-                height = $(svgDiv).height(),
-
+                canvasd3 = this.$el.find(".svg"),
+                width = self.$el.parent().width(),
+                height = canvasd3.height(),
                 force = d3.layout.force()
                     .charge(-1550)
                     .linkDistance(90)
@@ -18,7 +17,7 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     .theta(0.8)
                     .size([width, height]),
 
-                svg = d3.select(svgDiv).append("svg")
+                svg = d3.select(canvasd3[0]).append("svg")
                     .attr("width", width)
                     .attr("height", height)
                     .call(d3.behavior.zoom().on("zoom", function() {
@@ -28,10 +27,7 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     .append('svg:g'),
 
                 data = JSON.parse(this.$el.find('.graph_json_content').html()),
-                n = data.nodes.length,
-                canvasd3 = $(svgDiv),
-                aspect = canvasd3.width() / canvasd3.height(),
-                containerd3 = canvasd3.parent(),
+
                 drag = force.drag()
                     .on("dragstart", self.dragstart),
 
@@ -56,7 +52,6 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                             .attr("class", "link");
                     }),
 
-                defs = svg.append('defs'),
                 node = svg.selectAll(".node").data(data.nodes)
                     .enter().append("circle")
                     .attr("r", function(d) {
@@ -172,8 +167,8 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
 
             //Manage D3 graph on resize of window
             $(window).on("resize", function() {
-                var targetWidth = containerd3.width();
-                var targetHeight = containerd3.height();
+                var targetWidth = self.$el.width(),
+                    targetHeight = self.$el.height();
                 canvasd3.attr("width", targetWidth);
                 canvasd3.attr("height", targetHeight);
 
@@ -183,7 +178,8 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     .start();
             }).trigger("resize");
 
-            defs.append("svg:marker")
+            svg.append('defs')
+                .append("svg:marker")
                 .attr("id", "arrowGray")
                 .attr("viewBox", "0 0 10 10")
                 .attr("refX", "28")
