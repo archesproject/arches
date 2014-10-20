@@ -24,6 +24,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
 import arches.app.models.models as archesmodels
+from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
@@ -157,7 +158,8 @@ class Command(BaseCommand):
 
     def index_concepts_by_entitytypeid(self, entitytypeid):
         entitytype = archesmodels.EntityTypes.objects.get(pk = entitytypeid)
-        concept_graph = entitytype.conceptid.graph(include_parentconcepts=False, exclude=['note'])
+        conceptid = entitytype.conceptid_id
+        concept_graph = Concept().get(id=conceptid, include_subconcepts=True, exclude=['note'])
         if len(concept_graph.subconcepts) > 0:
             data = JSONSerializer().serializeToPython(concept_graph, ensure_ascii=True, indent=4)
             self.index(data, 'concept', entitytypeid, 'id', processdoc=None, getid=None, bulk=False)  
