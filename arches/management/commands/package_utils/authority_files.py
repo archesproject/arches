@@ -47,8 +47,8 @@ def load_authority_files(path_to_authority_files, break_on_error=True):
     for file_name in file_list:
         errors = errors + load_authority_file(cursor, path_to_authority_files, file_name)
         if count > 10:
-            #pass
-            break
+            pass
+            #break
         count = count + 1
     errors = errors + create_link_to_entity_types(cursor, path_to_authority_files)
 
@@ -81,7 +81,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
     scheme_id = concept.id
 
     lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='has narrower concept', target=concept.id)
-    lookups.add_lookup(concept=concept)
+    lookups.add_lookup(concept=concept, rownum=0)
     
     try:
         with open(filepath, 'rU') as f:
@@ -163,7 +163,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
         try:
             lookups.lookup[key]['concept'].save()
         except Exception as e:
-            errors.append('ERROR in row %s (%s)' % (lookups.lookup[key]['rownum'], str(e)))
+            errors.append('ERROR in row %s (%s):\n%s\n' % (lookups.lookup[key]['rownum'], str(e), traceback.format_exc()))
         
         lookups.lookup[key]['concept'].index(scheme=scheme_id)            
 
@@ -177,7 +177,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
         try:
             cursor.execute(sql)
         except Exception as e:
-            errors.append('ERROR in row %s (%s)' % (relation['rownum'], str(e)))
+            errors.append('ERROR in row %s (%s):\n%s\n' % (relation['rownum'], str(e), traceback.format_exc()))
     
     if len(errors) > 0:
         errors.insert(0, 'ERRORS IN FILE: %s\n' % (filename))
