@@ -201,7 +201,9 @@ class Command(BaseCommand):
         contents.append('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
         contents.append('django: %s manage.py runserver' % (python_exe))
 
-        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
+        procfile = open(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'),'w')
+        procfile.write('\n'.join(contents))
+        procfile.close()
 
     def get_elasticsearch_install_location(self, package_name):
         """
