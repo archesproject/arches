@@ -460,35 +460,41 @@ class ResourceLoader(object):
         contain authority details but the authority mapping
         is defined by the user and passed in a separate dictionary
         '''      
-        for record_index in range (0,len(attr_vals[0])): #len(attr_vals[0]) equals to the number of records
+        errors = []
+        for record_index in range (0, len(attr_vals[0])): #len(attr_vals[0]) equals to the number of records
             record_dictionary= {} # i th dictionary
             for attr in attr_names[0]: # loops for (number of attributes) times
                 #get the index of the selected attribute
                 attr_index = attr_names[0].index(attr)
                 #add the key/value pair retrieved from the attr_mapping
-                # ipdb.set_trace()
                 entitytypeid = attr_mapping.get(attr)
                 label = attr_vals[attr_index][record_index]
+                found_match = False
 
                 if type(entitytypeid) == str:
                     if entitytypeid.endswith('.E55'):
+                        count = 0
                         for mapping in value_to_concept_label_mappings[entitytypeid]:
-                            try:
-                                if mapping[label]:
-                                    label = mapping[label]
-                            except KeyError:
-                                pass
-
-
+                            count += 1
+                            if unicode(label) == mapping.keys()[0]:
+                                label = mapping[label]
+                                count = 0
+                                break
+                        if count == len(value_to_concept_label_mappings[entitytypeid]):
+                            errors.append({'label':label, 'type': entitytypeid})
+                        
                 record_dictionary[entitytypeid] = label
             
-            #now add key/value pairs retrieved from auth_mapping
             record_dictionary.update(auth_mapping)
-            
-            #add geometry values as a WKT string
+
             record_dictionary[geom_type] = geom_values[record_index] 
             dict_list.append(record_dictionary)
-            
+
+        if len(errors) > 0:
+            print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'tmp', 'shapefile_loading_errors.txt'))
+            with open (os.path.join(settings.PACKAGE_ROOT, 'tmp', 'shapefile_loading_errors.txt'), 'w') as log:
+                for error in errors:
+                    log.write(('"{0}", Does not match available {1} concept value\n').format(error['label'], error['type']))
         return dict_list
 
 
