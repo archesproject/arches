@@ -144,35 +144,50 @@ class Entity(object):
         #     for entity in diff['deleted_nodes']:
         #         edit = archesmodels.EditLog()        
         #         edit.editlogid = str(uuid.uuid4())
+        #         edit.resourceentitytypeid = self.entitytypeid
         #         edit.resourceid = self.entityid
-        #         edit.entityid = entity.entityid
+        #         edit.attributeentitytypeid = entity.entitytypeid
+        #         edit.edittype = 'delete'
         #         edit.userid = username
         #         edit.timestamp = timestamp
         #         edit.oldvalue = entity.value
         #         edit.newvalue = None
+        #         edit.user_firstname = username
+        #         edit.user_lastname = username
+        #         edit.note = ''
         #         edit.save() 
 
         #     for entity in diff['updated_nodes']:
         #         edit = archesmodels.EditLog()        
         #         edit.editlogid = str(uuid.uuid4())
+        #         edit.resourceentitytypeid = self.entitytypeid
         #         edit.resourceid = self.entityid
-        #         edit.entityid = entity.entityid
+        #         edit.attributeentitytypeid = entity.entitytypeid
+        #         edit.edittype = 'update'
         #         edit.userid = username
         #         edit.timestamp = timestamp
         #         edit.oldvalue = entity['from'].value
         #         edit.newvalue = entity['to'].value
+        #         edit.user_firstname = username
+        #         edit.user_lastname = username
+        #         edit.note = ''
         #         edit.save()    
         # else:
         #     for entity in self.flatten():
         #         if entity.value != '':
         #             edit = archesmodels.EditLog()        
         #             edit.editlogid = str(uuid.uuid4())
+        #             edit.resourceentitytypeid = self.entitytypeid
         #             edit.resourceid = self.entityid
-        #             edit.entityid = entity.entityid
+        #             edit.attributeentitytypeid = entity.entitytypeid
+        #             edit.edittype = 'insert'
         #             edit.userid = username
         #             edit.timestamp = timestamp
         #             edit.oldvalue = None
         #             edit.newvalue = entity.value
+        #             edit.user_firstname = username
+        #             edit.user_lastname = username
+        #             edit.note = ''
         #             edit.save() 
 
         return self
