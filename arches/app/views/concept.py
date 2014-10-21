@@ -78,15 +78,16 @@ def concept(request, conceptid):
             def graph_to_paths(current_concept, path=[], path_list=[[]]):
                 parents = current_concept.parentconcepts
                 for i, parent in enumerate(parents):
+                    current_path = path[:]
                     if len(parent.parentconcepts) == 0:
                         type = 'Root'
-                        path_list.append(path)
+                        path_list.append(current_path)
                     else:
                         type = 'Ancestor'
                     nodes.append({'concept_id': parent.id, 'name': parent.get_preflabel(lang=lang).value,'type': type })
                     links.append({'target': current_concept.id, 'source': parent.id, 'relationship': 'broader' })
-                    path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
-                    graph_to_paths(parent, path[:], path_list)
+                    current_path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
+                    graph_to_paths(parent, current_path, path_list)
                 return path_list
 
             path_list = graph_to_paths(concept_graph)
