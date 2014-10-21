@@ -150,6 +150,8 @@ def concept(request, conceptid):
                         value.type = 'prefLabel'
                         value.value = data['label']
                         value.language = data['language']
+                        value.category = 'label'
+                        value.datatype = 'text'
                         concept.addvalue(value)
                     else:
                          return JSONResponse(SaveFailed(message='A label is required'))
@@ -159,10 +161,13 @@ def concept(request, conceptid):
                         value.type = 'scopeNote'
                         value.value = data['note']
                         value.language = data['language']
+                        value.category = 'note'
+                        value.datatype = 'text'
                         concept.addvalue(value)
 
                     concept.addparent({'id': data['parentconceptid'], 'relationshiptype': 'has narrower concept'})    
                     concept.save()
+                    concept.index()
                     ret = concept
 
                 return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
