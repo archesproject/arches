@@ -9,6 +9,7 @@ from arches.app.models.entity import Entity
 from arches.app.models.models import Concepts
 from arches.app.models.models import Values
 from arches.app.models.models import RelatedResource
+from arches.app.models.concept import Concept
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 import glob
@@ -389,15 +390,13 @@ class ResourceLoader(object):
         except:
             print "No Concept found with the name %s"%concept_name
         if concept is not None:
-            concept_graph = concept.toObject(full_graph=True, exclude_subconcepts=False, 
-                                         exclude_parentconcepts=False, exclude_notes=False, 
-                                         exclude_labels=False, exclude_metadata=False)
-            
+            concept_graph = Concept().get(id=concept.pk, include_subconcepts=True, include=['label'])
+   
             if concept_graph.subconcepts:
                 for subconcept  in concept_graph.subconcepts[0].subconcepts:
-                    for label in subconcept.labels:
+                    for value in subconcept.values:
 
-                        if label.type == "prefLabel" and label.value == concept_value:
+                        if value.type == "prefLabel" and value.value == concept_value:
                             return subconcept.id
 
                 print '[ERROR]: %s is not found in %s'%(concept_value,concept_name)
@@ -434,19 +433,17 @@ class ResourceLoader(object):
 
     def get_e55_concept_legacyoids(self, e55_type):
         concept = Concepts.objects.get(legacyoid = e55_type)
-        concept_graph = concept.toObject(full_graph=True, exclude_subconcepts=False, 
-            exclude_parentconcepts=False, exclude_notes=False, 
-            exclude_labels=False, exclude_metadata=False)
+        concept_graph = Concept().get(id=concept.pk, include_subconcepts=True, include=['label'])
         values_to_legacy = []
         cursor = connection.cursor()
         if len(concept_graph.subconcepts) > 0:
             for subconcept in concept_graph.subconcepts[0].subconcepts:
-                for label in subconcept.labels:
-                    if label.type == "prefLabel":
+                for value in subconcept.values:
+                    if value.type == "prefLabel":
                         sql = "SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '{0}'".format(subconcept.id)
                         cursor.execute(sql)
                         legacyoid = str(cursor.fetchone()[0])
-                        values_to_legacy.append({label.value:legacyoid})
+                        values_to_legacy.append({value.value:legacyoid})
         return e55_type, values_to_legacy
 
 
