@@ -27,7 +27,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class Concept(object):
     def __init__(self, *args, **kwargs):
         self.id = ''
-        self.legacyoid = None
+        self.legacyoid = ''
         self.relationshiptype = ''
         self.values = []
         self.subconcepts = []
@@ -122,13 +122,16 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
-            try:
-                concept = models.Concepts.objects.get(pk=self.id)
-            except models.Concepts.DoesNotExist:
-                concept = models.Concepts()
-                concept.pk = self.id if self.id != '' else str(uuid.uuid4())
-                concept.legacyoid = self.legacyoid
-                concept.save()
+            #try:
+            self.id = self.id if self.id != '' else str(uuid.uuid4())
+            concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid})
+            # except:
+                
+            #     concept = models.Concepts()
+            #     concept.pk = self.id
+            #     concept.legacyoid = self.legacyoid
+            #     #concept.save()
+            #     concept.save(force_insert=True)
 
             for parentconcept in self.parentconcepts:
                 parentconcept.save()
@@ -262,6 +265,8 @@ class Concept(object):
             raise Exception('Invalid value definition: %s' % (value))
 
     def index(self, scheme=''):
+        if scheme == '':
+            scheme = self.get_auth_doc_concept().id
         for label in self.values:
             label.index(scheme=scheme)
 

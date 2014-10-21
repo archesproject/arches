@@ -133,7 +133,7 @@ class Command(BaseCommand):
             os.system("./plugin -install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
-        self.setup_indexes(package_name)
+        #self.setup_indexes(package_name)
 
     def setup_indexes(self, package_name):
         import time, signal
@@ -201,7 +201,9 @@ class Command(BaseCommand):
         contents.append('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
         contents.append('django: %s manage.py runserver' % (python_exe))
 
-        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
+        procfile = open(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'),'w')
+        procfile.write('\n'.join(contents))
+        procfile.close()
 
     def get_elasticsearch_install_location(self, package_name):
         """

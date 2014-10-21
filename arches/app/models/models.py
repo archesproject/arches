@@ -243,7 +243,7 @@ class Concepts(models.Model):
         db_table = u'concepts'
 
     def __unicode__(self):
-        return ('%s - %s') % (self.get_preflabel(), self.conceptid)
+        return ('%s') % (self.conceptid)
 
 class ConceptRelations(models.Model):
     relationid = models.TextField(primary_key=True)
