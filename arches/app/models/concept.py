@@ -399,5 +399,6 @@ class ConceptValue(object):
 
     def delete_index(self):
         se = SearchEngineFactory().create()
-        result = se.search(index='concept_labels', id=self.id)
-        se.delete(index='concept_labels', type=result['_type'], id=self.id)
+        if self.category == 'label':
+            result = se.search(index='concept_labels', id=self.id)
+            se.delete(index='concept_labels', type=result['_type'], id=self.id)
