@@ -50,10 +50,13 @@ define([
                                         parentconceptid: self.model.get('id')
                                     });
                                 childConcept.save(function() {
-                                    self.$el.find('#conceptmodal').modal('hide');
-                                    self.$el.find("input[type=text], textarea").val("");
-                                    self.trigger('conceptAdded', childConcept);
-                                    self.render();
+                                    var modal = self.$el.find('#conceptmodal');
+                                    modal.on('hidden.bs.modal', function () {
+                                        self.$el.find("input[type=text], textarea").val("");
+                                        self.trigger('conceptAdded', childConcept);
+                                        self.render();
+                                    });
+                                    modal.modal('hide');
                                 });
                             }
                         });
