@@ -208,7 +208,9 @@ def concept(request, conceptid):
                     concept.delete_related_concept()
                 
                 elif data['action'] == 'delete-concept':
-                    concept = Concept({'id':conceptid})
+                    concept = Concept()
+                    concept.get(id=conceptid)
+                    concept.delete_index()
                     concept.delete()
                     ret['success'] = True
 
