@@ -319,6 +319,43 @@ class Concept(object):
 
         return concepts
 
+    def get_paths(self, lang='en-us'):
+        def graph_to_paths(current_concept, path=[], path_list=[[]]):
+            parents = current_concept.parentconcepts
+            for i, parent in enumerate(parents):
+                current_path = path[:]
+                if len(parent.parentconcepts) == 0:
+                    path_list.append(current_path)
+                current_path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
+                graph_to_paths(parent, current_path, path_list)
+            return path_list
+
+        return graph_to_paths(self)
+
+    def get_node_and_links(self, lang='en-us'):
+        nodes = [{'concept_id': self.id, 'name': self.get_preflabel(lang=lang).value,'type': 'Current'}]
+        links = []
+
+        def get_parent_nodes_and_links(current_concept):
+            parents = current_concept.parentconcepts
+            for i, parent in enumerate(parents):
+                nodes.append({'concept_id': parent.id, 'name': parent.get_preflabel(lang=lang).value, 'type': 'Root' if len(parent.parentconcepts) == 0 else 'Ancestor'})
+                links.append({'target': current_concept.id, 'source': parent.id, 'relationship': 'broader' })
+                get_parent_nodes_and_links(parent)
+
+        get_parent_nodes_and_links(self)
+        for child in self.subconcepts:
+            nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value,'type': 'Descendant' })
+            links.append({'source': self.id, 'target': child.id, 'relationship': 'narrower' })
+        nodes = {node['concept_id']:node for node in nodes}.values()
+        for i in range(len(nodes)):
+            nodes[i]['id'] = i
+            for link in links:
+                link['source'] = i if link['source'] == nodes[i]['concept_id'] else link['source']
+                link['target'] = i if link['target'] == nodes[i]['concept_id'] else link['target']
+        
+        return {'nodes': nodes, 'links': links}
+
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):
