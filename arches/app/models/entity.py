@@ -190,7 +190,7 @@ class Entity(object):
         #             edit.note = ''
         #             edit.save() 
 
-        # return self
+        return self
 
     def _save(self):
         """
