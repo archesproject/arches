@@ -231,6 +231,7 @@ def concept_value(request, valueid):
 
     if request.method == 'DELETE':
         value = ConceptValue({'id': valueid})
+        value.delete_index()
         value.delete()
         
         return JSONResponse(value)
