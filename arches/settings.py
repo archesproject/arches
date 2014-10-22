@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-import version
+#import version
 import inspect
 from django.utils.importlib import import_module
 # Django settings for Arches project.
@@ -98,7 +98,7 @@ ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 #######################################
 
 
-ARCHES_VERSION = version.__VERSION__
+# ARCHES_VERSION = version.__VERSION__
 # BUILD = version.__BUILD__
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
