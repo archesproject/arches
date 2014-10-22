@@ -433,10 +433,10 @@ class ConceptValue(object):
     def delete_index(self):
         se = SearchEngineFactory().create()
         if self.category == 'label':
-        scheme = self.get_scheme_id()
-        if scheme == None:
-            raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
-        se.delete(index='concept_labels', type=scheme, id=self.id)
+            scheme = self.get_scheme_id()
+            if scheme == None:
+                raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
+            se.delete(index='concept_labels', type=scheme, id=self.id)
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
