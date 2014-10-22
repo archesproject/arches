@@ -208,7 +208,9 @@ def concept(request, conceptid):
                     concept.delete_related_concept()
                 
                 elif data['action'] == 'delete-concept':
-                    concept = Concept({'id':conceptid})
+                    concept = Concept()
+                    concept.get(id=conceptid)
+                    concept.delete_index()
                     concept.delete()
                     ret['success'] = True
 
@@ -229,6 +231,7 @@ def concept_value(request, valueid):
 
     if request.method == 'DELETE':
         value = ConceptValue({'id': valueid})
+        value.delete_index()
         value.delete()
         
         return JSONResponse(value)

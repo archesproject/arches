@@ -270,6 +270,10 @@ class Concept(object):
         for label in self.values:
             label.index(scheme=scheme)
 
+    def delete_index(self):
+        for value in self.values:
+            value.delete_index()
+
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
         class concept(object):
             def __init__(self, *args, **kwargs):
@@ -392,3 +396,8 @@ class ConceptValue(object):
         if self.category == 'label':
             data = JSONSerializer().serializeToPython(self)
             se.index_data('concept_labels', scheme, data, 'id')
+
+    def delete_index(self):
+        se = SearchEngineFactory().create()
+        result = se.search(index='concept_labels', id=self.id)
+        se.delete(index='concept_labels', type=result['_type'], id=self.id)
