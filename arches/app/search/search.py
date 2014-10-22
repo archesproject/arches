@@ -47,18 +47,23 @@ class SearchEngine(object):
 
         return self.conn.delete(path)
 
-    def search(self, q, **kwargs):
+    def search(self, q='', **kwargs):
         search_type = kwargs.pop('search_type', None)
         index = kwargs.pop('index', None)
-        type = kwargs.pop('type', '')
+        type = kwargs.pop('type', '_all')
+        id = kwargs.pop('id', None)
 
         if index is None:
             raise NotImplementedError("You must specify an 'index' in your call to search")
 
-        path = '%s/%s' % (index, type)
-        if search_type == None:
-            #path = path + '/_search?q="%s"' % q
-            path = '%s/%s' % (path, '_search')
+        if id:
+            path = '%s/%s/%s' % (index, type, id)
+            return self.conn.get(path)
+        else:
+            path = '%s/%s' % (index, type)
+            if search_type == None:
+                #path = path + '/_search?q="%s"' % q
+                path = '%s/%s' % (path, '_search')
 
         data = kwargs.pop('data', None)
         if data == None:

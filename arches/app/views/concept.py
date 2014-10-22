@@ -208,11 +208,12 @@ def concept(request, conceptid):
                     concept.delete_related_concept()
                 
                 elif data['action'] == 'delete-concept':
-                    concept = Concept()
-                    concept.get(id=conceptid)
-                    concept.delete_index()
-                    concept.delete()
-                    ret['success'] = True
+                    with transaction.atomic():
+                        concept = Concept()
+                        concept.get(id=conceptid)
+                        concept.delete_index()
+                        concept.delete()
+                        ret['success'] = True
 
     return JSONResponse(ret, indent=(4 if pretty else None))
 
@@ -224,15 +225,18 @@ def concept_value(request, valueid):
         json = request.body
 
         if json != None:
-            value = ConceptValue(json)
-            value.save()
+            with transaction.atomic():
+                value = ConceptValue(json)
+                value.save()
+                value.index()
 
             return JSONResponse(value)
 
     if request.method == 'DELETE':
-        value = ConceptValue({'id': valueid})
-        value.delete_index()
-        value.delete()
+        with transaction.atomic():
+            value = ConceptValue({'id': valueid})
+            value.delete()
+            value.delete_index()
         
         return JSONResponse(value)
 

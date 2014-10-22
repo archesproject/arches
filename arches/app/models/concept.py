@@ -122,24 +122,16 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
-            #try:
             self.id = self.id if self.id != '' else str(uuid.uuid4())
             concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid})
-            # except:
-                
-            #     concept = models.Concepts()
-            #     concept.pk = self.id
-            #     concept.legacyoid = self.legacyoid
-            #     #concept.save()
-            #     concept.save(force_insert=True)
 
             for parentconcept in self.parentconcepts:
                 parentconcept.save()
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
-                conceptrelation.conceptidfrom_id = parentconcept.id #models.Concepts.objects.get(pk=parentconcept.id)
+                conceptrelation.conceptidfrom_id = parentconcept.id 
                 conceptrelation.conceptidto = concept
-                conceptrelation.relationtype_id = parentconcept.relationshiptype #models.DRelationtypes.objects.get(pk=parentconcept.relationshiptype)
+                conceptrelation.relationtype_id = parentconcept.relationshiptype
                 conceptrelation.save()
 
             for subconcept in self.subconcepts:
@@ -147,8 +139,8 @@ class Concept(object):
                 conceptrelation = models.ConceptRelations()
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom = concept
-                conceptrelation.conceptidto_id = subconcept.id #models.Concepts.objects.get(pk=subconcept.id)
-                conceptrelation.relationtype_id = self.relationshiptype #models.DRelationtypes.objects.get(pk=self.relationshiptype)
+                conceptrelation.conceptidto_id = subconcept.id
+                conceptrelation.relationtype_id = self.relationshiptype
                 conceptrelation.save()
 
             for value in self.values:
@@ -391,14 +383,29 @@ class ConceptValue(object):
             self.value = value['value'] if 'value' in value else ''
             self.language = value['language'] if 'language' in value else ''
 
-    def index(self, scheme=''):
-        se = SearchEngineFactory().create()
+    def index(self, scheme=None):
         if self.category == 'label':
-            data = JSONSerializer().serializeToPython(self)
+            se = SearchEngineFactory().create()
+            data = JSONSerializer().serializeToPython(self)            
+            if scheme == None:
+                scheme = self.get_scheme_id()
+            if scheme == None:
+                raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
             se.index_data('concept_labels', scheme, data, 'id')
-
+    
     def delete_index(self):
         se = SearchEngineFactory().create()
         if self.category == 'label':
-            result = se.search(index='concept_labels', id=self.id)
-            se.delete(index='concept_labels', type=result['_type'], id=self.id)
+        scheme = self.get_scheme_id()
+        if scheme == None:
+            raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
+        se.delete(index='concept_labels', type=scheme, id=self.id)
+
+    def get_scheme_id(self):
+        se = SearchEngineFactory().create()
+        result = se.search(index='concept_labels', id=self.conceptid)
+        print result
+        if not result['found']:
+            return None
+        else:
+            return result['_type']
