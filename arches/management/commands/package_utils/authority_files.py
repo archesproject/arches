@@ -9,6 +9,7 @@ from time import time
 from os import listdir
 from os.path import isfile, join, exists
 from django.db import connection, transaction
+from django.conf import settings
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue
 from .. import utils
@@ -30,33 +31,38 @@ class Lookups(object):
     def add_relationship(self, source=None, type=None, target=None, rownum=None):
         self.concept_relationships.append({'source': source, 'type': type, 'target': target, 'rownum': rownum})
 
-def load_authority_files(path_to_authority_files, break_on_error=True):
+def load_authority_files(break_on_error=True):
     cursor = connection.cursor()
     file_list = []
-    
-    for f in listdir(path_to_authority_files):
-        if isfile(join(path_to_authority_files, f)) and '.values.csv' not in f and f != 'ENTITY_TYPE_X_ADOC.csv' and f[-4:] == '.csv':
-            file_list.append(f)
-    
-    file_list.sort()
-    
     errors = []
-    print '\nLOADING AUTHORITY FILES'
-    print '------------------------'
-    count = 1
-    for file_name in file_list:
-        errors = errors + load_authority_file(cursor, path_to_authority_files, file_name)
-        if count > 10:
-            pass
-            #break
-        count = count + 1
-    errors = errors + create_link_to_entity_types(cursor, path_to_authority_files)
+    
+    for path in settings.CONCEPT_SCHEME_LOCATIONS:
+        if os.path.exists(path):
+            print '\nLOADING AUTHORITY FILES (%s)' % (path)
+            print '-----------------------'            
+            
+            for f in listdir(path):
+                if isfile(join(path,f)) and '.values.csv' not in f and f != 'ENTITY_TYPE_X_ADOC.csv' and f[-4:] == '.csv':
+                    file_list.append(f)
+            
+            file_list.sort()
 
-    utils.write_to_file(os.path.join(path_to_authority_files, 'authority_file_errors.txt'), '')
+            count = 1
+            for file_name in file_list:
+                errors = errors + load_authority_file(cursor, path, file_name)
+                if count > 10:
+                    pass
+                    #break
+                count = count + 1
+            errors = errors + create_link_to_entity_types(cursor, path)
+        else:
+            errors.append('\n\nPath in settings.CONCEPT_SCHEME_LOCATIONS doesn\'t exist (%s)' % (path))  
+
+    utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'authority_file_errors.txt'), '')
     if len(errors) > 0:
-        utils.write_to_file(os.path.join(path_to_authority_files, 'authority_file_errors.txt'), '\n'.join(errors))
+        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'authority_file_errors.txt'), '\n'.join(errors))
         print "\n\nERROR: There were errors in some of the authority files."
-        print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(path_to_authority_files, 'authority_file_errors.txt'))
+        print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'authority_file_errors.txt'))
         if break_on_error:
             sys.exit(101)
 

@@ -9,71 +9,73 @@ from django.db import connection, transaction
 import concepts
 from .. import utils
 
-def load_graphs(packagepath, break_on_error=True):
+def load_graphs(break_on_error=True):
     """
     Iterates through the resource node and edge files to load entitytypes and mappings into the database.
 
     """
 
-    print '\nLOADING GRAPHS'
-    print '---------------'
+  
     suffix = '_nodes.csv'
     errors = []
-    path_to_resource_graphs = os.path.join(packagepath, 'source_data', 'resource_graphs')
-    
-    file_list = []
-    for f in listdir(path_to_resource_graphs):
-        if isfile(join(path_to_resource_graphs,f)):
-            file_list.append(f)
+    #file_list = []
 
-    for filename in file_list:
-        if filename.endswith(suffix):
-            name = filename[:-10]
-            if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or name in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
-                print name
-                node_list = get_list_dict(path_to_resource_graphs, name + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
-                edge_list = get_list_dict(path_to_resource_graphs, name + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
-                mods = append_branch('ARCHES_RECORD.E31', os.path.join(settings.ROOT_DIR, 'management', 'resource_graphs'), node_list, edge_list)
-                node_list = mods['node_list']
-                edge_list = mods['edge_list']
+    for path in settings.RESOURCE_GRAPH_LOCATIONS:
+        if os.path.exists(path):
+            print '\nLOADING GRAPHS (%s)' % (path)
+            print '---------------'
+            for f in listdir(path):
+                if isfile(join(path,f)) and f.endswith(suffix):
+                    #file_list.append(join(path,f))
+                    path_to_file = join(path,f)
+                    basepath = path_to_file[:-10]
+                    name = basepath.split(os.sep)[-1]
+                    if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or name in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
+                        print name
+                        node_list = get_list_dict(basepath + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
+                        edge_list = get_list_dict(basepath + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
+                        mods = append_branch(os.path.join(settings.ROOT_DIR, 'management', 'resource_graphs', 'ARCHES_RECORD.E31'), node_list, edge_list)
+                        node_list = mods['node_list']
+                        edge_list = mods['edge_list']
 
-                file_errors = validate_graph(node_list, edge_list)
-                try:
-                    insert_mappings(node_list, edge_list)
-                    link_entitytypes_to_concepts(node_list)
-                except Exception as e:
-                    file_errors.append('\nERROR: %s\n%s' % (str(e), traceback.format_exc()))
-                    pass
+                        file_errors = validate_graph(node_list, edge_list)
+                        try:
+                            insert_mappings(node_list, edge_list)
+                            link_entitytypes_to_concepts(node_list)
+                        except Exception as e:
+                            file_errors.append('\nERROR: %s\n%s' % (str(e), traceback.format_exc()))
+                            pass
 
-                if len(file_errors) > 0:
-                    file_errors.insert(0, 'ERRORS IN FILE: %s\n' % (filename))
-                    file_errors.append('\n\n\n\n')
-                    errors = errors + file_errors                    
+                        if len(file_errors) > 0:
+                            file_errors.insert(0, 'ERRORS IN FILE: %s\n' % (basepath))
+                            file_errors.append('\n\n\n\n')
+                            errors = errors + file_errors  
+        else:
+            errors.append('\n\nPath in settings.RESOURCE_GRAPH_LOCATIONS doesn\'t exist (%s)' % (path))                 
 
-    utils.write_to_file(os.path.join(path_to_resource_graphs, 'resource_graph_errors.txt'), '')
+    utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '')
     if len(errors) > 0:
-        utils.write_to_file(os.path.join(path_to_resource_graphs, 'resource_graph_errors.txt'), '\n'.join(errors))
+        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '\n'.join(errors))
         print "\n\nERROR: There were errors in some of the resource graphs."
-        print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(path_to_resource_graphs, 'resource_graph_errors.txt'))
+        print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'))
         if break_on_error:
             sys.exit(101)
 
-def append_branch(name, path_to_branch, node_list, edge_list):
+def append_branch(path_to_branch, node_list, edge_list):
     """
     Appends a branch to the root of the passed in graph (represented as the node_list and edge_list)
 
     Args:
-       path_to_branch (str):  path to the directory where the branch graph lives
-       name (str): entity type name of the branch to append 
-            (eg: 'ARCHES_RECORD.E31', where the actual nodes and edges files look like ARCHES_RECORD.E31_nodes.csv and ARCHES_RECORD.E31_edges.csv)
+       path_to_branch (str):  path to the file where the branch graph lives(minus the _nodes.csv or _edges.csv suffix) 
+            (eg: '<path>/ARCHES_RECORD.E31', where the actual nodes and edges files look like ARCHES_RECORD.E31_nodes.csv and ARCHES_RECORD.E31_edges.csv)
 
     Returns:
        {'node_list': node_list_with_added_branch, 'edge_list': edge_list_with_added_branch}
 
     """
 
-    nodes_to_append = get_list_dict(path_to_branch, name + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
-    edges_to_append = get_list_dict(path_to_branch, name + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
+    nodes_to_append = get_list_dict(path_to_branch + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
+    edges_to_append = get_list_dict(path_to_branch + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
 
     root_node_id_of_main_graph = get_root_node_id(edge_list)
     root_node_id_of_branch = get_root_node_id(edges_to_append)
@@ -88,14 +90,14 @@ def append_branch(name, path_to_branch, node_list, edge_list):
     
     return {'node_list': node_list, 'edge_list': edge_list}
 
-def get_list_dict(pathtofile, filename, fieldnames):
+def get_list_dict(pathtofile, fieldnames):
     """
     Gets a list of dictionaries from a csv file
 
     """
 
     ret = []
-    with open(os.path.join(pathtofile, filename), 'rU') as f:
+    with open(pathtofile, 'rU') as f:
         rows = unicodecsv.DictReader(f, fieldnames=fieldnames, 
             encoding='utf-8-sig', delimiter=',', restkey='ADDITIONAL', restval='MISSING')
         rows.next() # skip header row

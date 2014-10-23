@@ -82,7 +82,7 @@ class Command(BaseCommand):
         self.setup_db(package_name)
         self.generate_procfile(package_name)
 
-    def install(self, package_name, source=None):
+    def install(self, package_name):
         """
         Runs the setup.py file found in the package root
 
@@ -90,7 +90,7 @@ class Command(BaseCommand):
 
         module = import_module('%s.setup' % package_name)
         install = getattr(module, 'install')
-        install(source) 
+        install() 
 
     def setup_elasticsearch(self, package_name, port=9200):
         """
