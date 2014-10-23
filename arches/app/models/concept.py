@@ -322,7 +322,7 @@ class Concept(object):
     def get_paths(self, lang='en-us'):
         def graph_to_paths(current_concept, path=[], path_list=[[]]):
             parents = current_concept.parentconcepts
-            for i, parent in enumerate(parents):
+            for parent in parents:
                 current_path = path[:]
                 if len(parent.parentconcepts) == 0:
                     path_list.append(current_path)
@@ -338,7 +338,7 @@ class Concept(object):
 
         def get_parent_nodes_and_links(current_concept):
             parents = current_concept.parentconcepts
-            for i, parent in enumerate(parents):
+            for parent in parents:
                 nodes.append({'concept_id': parent.id, 'name': parent.get_preflabel(lang=lang).value, 'type': 'Root' if len(parent.parentconcepts) == 0 else 'Ancestor'})
                 links.append({'target': current_concept.id, 'source': parent.id, 'relationship': 'broader' })
                 get_parent_nodes_and_links(parent)
@@ -347,6 +347,8 @@ class Concept(object):
         for child in self.subconcepts:
             nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value,'type': 'Descendant' })
             links.append({'source': self.id, 'target': child.id, 'relationship': 'narrower' })
+
+        # get unique node list and assign unique integer ids for each node (required by d3)
         nodes = {node['concept_id']:node for node in nodes}.values()
         for i in range(len(nodes)):
             nodes[i]['id'] = i
