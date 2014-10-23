@@ -27,7 +27,8 @@ define([
 
         render: function() {
             var self = this,
-                conceptid = this.model.get('id');
+                conceptid = this.model.get('id'),
+                showGraph = self.$el.find(".concept-graph").is(":visible");
             if (conceptid) {
                 self.$el.find('.concept-report-loading').removeClass('hidden');
                 self.$el.find('.concept-report-content').addClass('hidden');
@@ -73,6 +74,10 @@ define([
                         new ConceptGraph({
                             el: self.$el.find(".concept-graph")
                         });
+                        if (showGraph) {
+                            self.$el.find(".concept-tree").toggle(0);
+                            self.$el.find(".concept-graph").toggle(0);
+                        }
                     }
                 });
             }
