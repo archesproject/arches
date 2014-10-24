@@ -59,7 +59,7 @@ class Command(BaseCommand):
             self.setup(package_name)
 
         if options['operation'] == 'install':
-            self.install(package_name, options['source'])
+            self.install(package_name)
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
