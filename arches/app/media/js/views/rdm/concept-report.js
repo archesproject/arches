@@ -75,6 +75,7 @@ define([
                             el: self.$el.find(".concept-graph")
                         });
                         if (showGraph) {
+                            self.$el.find(".graph-toggle").toggle();
                             self.$el.find(".concept-tree").toggle(0);
                             self.$el.find(".concept-graph").toggle(0);
                         }
