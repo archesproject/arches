@@ -121,21 +121,25 @@ define([
 
                 if (data.action === 'delete-value') {
                     model = new ValueModel(data);
-                    eventName = 'valueDeleted';
+                    self.model.set('values', [model]);
+                    //eventName = 'valueDeleted';
                 }
                 if (data.action === 'delete-relationship') {
                     model = new ConceptModel(data);
                     model.set('id', self.model.get('id'));
-                    eventName = 'relationshipDeleted';
+                    self.model.set('relatedconcepts', [model]);
+
+                    //eventName = 'relationshipDeleted';
                 }
                 if (data.action === 'delete-concept') {
-                    model = new ConceptModel(data);
-                    eventName = 'conceptDeleted';
+                    model = new ConceptModel(data)
+                    self.model.set('subconcepts', [model]);
+                    //eventName = 'conceptDeleted';
                 }
 
-                model.delete(function() {
-                    self.render();
-                    self.trigger(eventName, model);
+                self.model.delete(function() {
+                    // self.render();
+                    // self.trigger(eventName, model);
                 });
             });
             modal.modal('hide');

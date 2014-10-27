@@ -6,9 +6,9 @@ require([
     'views/rdm/concept-tree',
     'views/rdm/concept-report',
     'views/concept-search',
-        'views/rdm/modals/add-child-form',
+        'views/rdm/modals/add-scheme-form',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddChildForm) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm) {
     $(document).ready(function() {
         var appHeader = $("#appheader");
         var sidebar = $("#sidebar");
@@ -42,6 +42,13 @@ require([
                 conceptid = concept.get('id');
                 concept.clear();
                 concept.set('id', conceptid);
+            },
+            'delete': function(){
+                conceptTree.render();
+                conceptReport.render();
+                conceptid = concept.get('id');
+                concept.clear();
+                concept.set('id', conceptid);
             }
         });
 
@@ -63,13 +70,13 @@ require([
                 concept.set('id', conceptid);
                 conceptTree.render();
                 conceptReport.render();
-            },
-            'conceptDeleted': function() {
-                //conceptTree.render();
-            },
-            'conceptAdded': function() {
-                //conceptTree.render();
-            }
+            }//,
+            // 'conceptDeleted': function() {
+            //     conceptTree.render();
+            // },
+            // 'conceptAdded': function() {
+            //     conceptTree.render();
+            // }
         });
 
         conceptsearch.on("select2-selecting", function(e, el) {
@@ -79,15 +86,18 @@ require([
             conceptReport.render();
         }, conceptsearch);
 
-        $('a[data-toggle="#add-concept-form"]').on( "click", function(){
+        $('a[data-toggle="#add-scheme-form"]').on( "click", function(){
             var self = this;
-            var form = new AddChildForm({
-                el: $('#add-child-form')[0],
-                model: new ConceptModel({
-                    id: '00000000-0000-0000-0000-000000000003'
-                })
+            var form = new AddSchemeForm({
+                el: $('#add-child-form')[0]
             });
             form.modal.modal('show');
+            form.on({
+                'conceptSchemeAdded': function(){
+                    conceptTree.render();
+                    conceptReport.render();
+                }
+            })
         });
 
         $(window).scroll(function() {
