@@ -121,8 +121,9 @@ class Concept(object):
         return self
             
     def save(self):
+
         with transaction.atomic():
-            self.id = self.id if self.id != '' else str(uuid.uuid4())
+            self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
             concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid})
 
             for parentconcept in self.parentconcepts:
@@ -140,8 +141,16 @@ class Concept(object):
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom = concept
                 conceptrelation.conceptidto_id = subconcept.id
-                conceptrelation.relationtype_id = self.relationshiptype
+                conceptrelation.relationtype_id = subconcept.relationshiptype
                 conceptrelation.save()
+
+            for relatedconcept in self.relatedconcepts:
+                relation = models.ConceptRelations()
+                relation.pk = str(uuid.uuid4())
+                relation.conceptidfrom_id = self.id
+                relation.conceptidto_id = relatedconcept.id
+                relation.relationtype_id = 'has related concept'
+                relation.save()
 
             for value in self.values:
                 if not isinstance(value, ConceptValue): 
@@ -385,7 +394,7 @@ class ConceptValue(object):
         return self
 
     def save(self):
-        self.id = self.id if self.id != '' else str(uuid.uuid4())
+        self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
         value = models.Values()
         value.pk = self.id
         value.value = self.value

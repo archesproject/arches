@@ -6,7 +6,9 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 rules = {},
                 modal, titles;
 
-            switch(this.model.get('category')) {
+            this.valuemodel = this.model.get('values')[0];
+
+            switch(this.valuemodel.get('category')) {
                 case 'label':
                     modal = this.$el.find('#labelmodal');
                     break;
@@ -18,7 +20,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             }
 
             titles = modal.find('.modal-title').data();
-            modal.find('.modal-title').text(titles[this.model.get('id') ? 'editTitle' : 'addTitle']);
+            modal.find('.modal-title').text(titles[this.valuemodel.get('id') ? 'editTitle' : 'addTitle']);
             
             this.valueInput = modal.find('.value-input');
             this.idInput = modal.find('.id-input');
@@ -41,24 +43,21 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 ignore: null,
                 rules: rules,
                 submitHandler: function(form) {
-                    self.model.set({
+                    self.valuemodel.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
                         type: self.valueTypeInput.select2("val")[0],
                         datatype: 'text',
                         language: self.languageInput.select2("val")[0]
                     });
+                    self.model.set('values', [self.valuemodel]);
                     self.model.save(function() {
-                        modal.on('hidden.bs.modal', function () {
-                            self.trigger('save', self.model);
-                        });
                         modal.modal('hide');
                     });
-                }
-            });
 
-            this.model.on('change', function () {
-                self.render();
+                    // keep the model clean by removing any data that you save
+                    self.model.set('values', []);
+                }
             });
 
             this.render();
@@ -66,10 +65,10 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
         },
         
         render: function () {
-            this.valueInput.val(this.model.get('value'));
-            this.idInput.val(this.model.get('id'));
-            this.valueTypeInput.select2("val", this.model.get('type'));
-            this.languageInput.select2("val", this.model.get('language'));
+            this.valueInput.val(this.valuemodel.get('value'));
+            this.idInput.val(this.valuemodel.get('id'));
+            this.valueTypeInput.select2("val", this.valuemodel.get('type'));
+            this.languageInput.select2("val", this.valuemodel.get('language'));
         }
     });
 });

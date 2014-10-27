@@ -24,7 +24,7 @@
                 <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">{% trans "Add Child" %}</a></li>
+                <li><a href="#" data-toggle="#add-concept-form" data-title="{% trans "Add Concept" %}">{% trans "Add Child" %}</a></li>
                 <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
                 <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
                 <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
@@ -41,7 +41,7 @@
                 <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="#" data-toggle="modal" data-target="#conceptmodal">{% trans "Add Child" %}</a></li>
+                <li><a href="#" data-toggle="#add-concept-form" data-title="{% trans "Add Concept" %}">{% trans "Add Child" %}</a></li>
                 <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
                 <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
                 <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
@@ -59,7 +59,7 @@
             <dt>
                 <h5 id="" class="section-headline">{% trans "Concept Labels" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
                     <span>
                 </h5>
             </dt>
@@ -84,7 +84,7 @@
             <dt>
                 <h5 id="" class="section-headline">{% trans "Concept Notes" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
                     <span>
                 </h5>
             </dt>
@@ -180,7 +180,7 @@
             <dt>
                 <h5 id="" class="section-headline">{% trans "Related Concepts" %}
                     <span>
-                        <a href="#related-concept-form" class="arches-RDM-link pull-right" data-toggle="modal">{% trans "Add related concept" %}</a>
+                        <a href="#" class="arches-RDM-link pull-right" data-toggle="#related-concept-form">{% trans "Add related concept" %}</a>
                     <span>
                 </h5>
             </dt>
@@ -210,7 +210,7 @@
             <dt>
                 <h5 id="" class="section-headline">{% trans "Related Values" %}
                     <span>
-                        <a href="#" class="arches-RDM-link pull-right edit-value" data-action="add" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
+                        <a href="#" class="arches-RDM-link pull-right edit-value" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
                     <span>
                 </h5>
             </dt>
@@ -218,7 +218,7 @@
                 {% if value.category == '' %}
                 <dd class="arches-RDM-label-highlighted">
                     <a href="#" title="{% trans "Remove this value" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"></i></a>
-                    <a href="#" title="Edit this value" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
+                    <a href="#" title="{% trans "Edit this value" %}" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                     <span class="arches-RDM-note">{{value.value}}</span>
                 </dd>
                 {% endif %}
@@ -393,48 +393,7 @@
     </div>
 </div>
 
-<!-- Modal window for adding a new concept -->
-<form action="" class="modal fade" id="conceptmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">{% trans "Add Concept" %}</h4>
-                
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4>{% trans "Label" %}</h4>
-                        <p><input class="form-control" type="text" name="label" required/></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4>{% trans "Note" %}</h4>
-                        <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4>{% trans "Language" %}</h4>
-                        <p> 
-                            <select style="width:100%" class="select2" name="language_dd" required>
-                                {% for language in languages %}
-                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
-                                {% endfor %}
-                            </select>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
-                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
-            </div>
-        </div>
-    </div>
-</form>
+
 <!-- End Modal window for adding a new concept -->
 <div id="value-form">
     {% include "views/rdm/modals/value-form.htm" %}

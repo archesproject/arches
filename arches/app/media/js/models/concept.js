@@ -8,7 +8,8 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
             'relationshiptype': '',
             'values': [],
             'subconcepts': [],
-            'parentconcepts': []
+            'parentconcepts': [],
+            'relatedconcepts': []
         }
     });
 });

@@ -6,8 +6,9 @@ require([
     'views/rdm/concept-tree',
     'views/rdm/concept-report',
     'views/concept-search',
+        'views/rdm/modals/add-child-form',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddChildForm) {
     $(document).ready(function() {
         var appHeader = $("#appheader");
         var sidebar = $("#sidebar");
@@ -31,29 +32,63 @@ require([
             model: concept
         });       
 
-        concept.on('change', function() {
-            window.history.pushState({}, "conceptid", concept.get('id'));
+        concept.on({
+            'change': function(){
+                window.history.pushState({}, "conceptid", concept.get('id'));
+            },
+            'save': function(){
+                conceptTree.render();
+                conceptReport.render();
+                conceptid = concept.get('id');
+                concept.clear();
+                concept.set('id', conceptid);
+            }
         });
 
-        conceptTree.on('conceptMoved', function() {
-            conceptReport.render();
+        conceptTree.on({
+            'conceptMoved': function() {
+                conceptReport.render();
+            },
+            'conceptSelected': function(conceptid){
+                concept.clear();
+                concept.set('id', conceptid);
+                conceptTree.render();
+                conceptReport.render();
+            }
         });
 
         conceptReport.on({
-            'valueSaved': function() {
+            'conceptSelected': function(conceptid) {
+                concept.clear();
+                concept.set('id', conceptid);
                 conceptTree.render();
+                conceptReport.render();
             },
             'conceptDeleted': function() {
-                conceptTree.render();
+                //conceptTree.render();
             },
             'conceptAdded': function() {
-                conceptTree.render();
+                //conceptTree.render();
             }
         });
 
         conceptsearch.on("select2-selecting", function(e, el) {
-            this.model.set('id', e.val);
+            concept.clear();
+            concept.set('id', e.val);
+            conceptTree.render();
+            conceptReport.render();
         }, conceptsearch);
+
+        $('a[data-toggle="#add-concept-form"]').on( "click", function(){
+            var self = this;
+            var form = new AddChildForm({
+                el: $('#add-child-form')[0],
+                model: new ConceptModel({
+                    id: '00000000-0000-0000-0000-000000000003'
+                })
+            });
+            form.modal.modal('show');
+        });
 
         $(window).scroll(function() {
             var topToFooterPx = $(".footer").offset().top - $(window).scrollTop();

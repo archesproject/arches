@@ -6,29 +6,27 @@ define([
     'models/value',
     'views/rdm/modals/value-form',
     'views/rdm/modals/related-concept-form',
+    'views/rdm/modals/add-child-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *': 'contentClick',
             'click a.edit-value': 'editValueClicked',
-            'click .confirm-delete-yes': 'deleteConfirmed'
+            'click .confirm-delete-yes': 'deleteConfirmed',
+            'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
+            'click a[data-toggle="#add-concept-form"]': 'addChildConcept'
         },
 
         initialize: function() {
-            var self = this;
-
-            self.model.on('change', function() {
-                self.render();
-            });
-
-            self.render();
+            this.render();
         },
 
         render: function() {
-            var self = this,
-                conceptid = this.model.get('id'),
-                showGraph = self.$el.find(".concept-graph").is(":visible");
+            var self = this;
+            var conceptid = this.model.get('id');
+            var showGraph = self.$el.find(".concept-graph").is(":visible");
+
             if (conceptid) {
                 self.$el.find('.concept-report-loading').removeClass('hidden');
                 self.$el.find('.concept-report-content').addClass('hidden');
@@ -37,34 +35,7 @@ define([
                     success: function(response) {
                         self.$el.find('.concept-report-loading').addClass('hidden');
                         self.$el.html(response);
-                        self.$el.find('#conceptmodal').validate({
-                            ignore: null,
-                            rules: {
-                                label: "required",
-                                language_dd: "required"
-                            },
-                            submitHandler: function(form) {
-                                var childConcept = new ConceptModel({
-                                        label: $(form).find("[name=label]").val(),
-                                        note: $(form).find("[name=note]").val(),
-                                        language: $(form).find("[name=language_dd]").val(),
-                                        parentconceptid: self.model.get('id')
-                                    });
-                                childConcept.save(function() {
-                                    var modal = self.$el.find('#conceptmodal');
-                                    modal.on('hidden.bs.modal', function () {
-                                        self.$el.find("input[type=text], textarea").val("");
-                                        self.trigger('conceptAdded', childConcept);
-                                        self.render();
-                                    });
-                                    modal.modal('hide');
-                                });
-                            }
-                        });
-                        var add_related_concept_modal = new RelatedConcept({
-                            el: $('#related-concept-form')[0],
-                            model: self.model
-                        });
+                        
                         //Toggle Concept Heirarchy.  
                         self.$el.find(".graph-toggle").click(function(){
                             self.$el.find(".concept-tree").toggle(300);
@@ -85,8 +56,9 @@ define([
         },
 
         contentClick: function(e) {
-            var self = this,
-                data = $(e.target).data();
+            var self = this;
+            var data = $(e.target).data();
+
             if (data.action === 'delete-value' || data.action === 'delete-concept') {
                 self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
                 self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
@@ -104,36 +76,49 @@ define([
             }
 
             if (data.action === 'viewconcept') {
-                this.model.set({
-                    id: data.conceptid
-                });
+                self.trigger('conceptSelected', data.conceptid);
             }
         },
 
-        editValueClicked: function(e) {
-            var self = this,
-                data = $.extend({
-                    conceptid: this.model.get('id')
-                }, $(e.target).data()),
-                model = new ValueModel(data),
-                editor = new ValueEditor({
-                    el: this.$el.find('#value-form')[0],
-                    model: model
-                });
+        addChildConcept: function(e){
+            var self = this;
+            var form = new AddChildForm({
+                el: $('#add-child-form')[0],
+                model: this.model
+            });
 
-            editor.on('save', function() {
-                self.render();
-                self.trigger('valueSaved', model);
+            form.modal.modal('show');
+        },
+
+        addRelatedConceptClicked: function(e){
+            var add_related_concept_modal = new RelatedConcept({
+                el: $('#related-concept-form')[0],
+                model: this.model
+            });
+            add_related_concept_modal.modal.modal('show');
+        },
+
+        editValueClicked: function(e) {
+            var data = $.extend({
+                    conceptid: this.model.get('id')
+                }, 
+                $(e.target).data()
+            );
+            this.model.set('values', [new ValueModel(data)]);
+            var editor = new ValueEditor({
+                el: this.$el.find('#value-form')[0],
+                model: this.model
             });
         },
 
         deleteConfirmed: function(e) {
-            var self = this,
-                data = $(e.target).data(),
-                modal = self.$el.find('.confirm-delete-modal'),
-                Model, model, eventName;
+            var self = this;
+            var data = $(e.target).data();
+            var modal = self.$el.find('.confirm-delete-modal');
 
             modal.on('hidden.bs.modal', function () {
+                var model, eventName;
+
                 if (data.action === 'delete-value') {
                     model = new ValueModel(data);
                     eventName = 'valueDeleted';

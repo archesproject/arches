@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
@@ -38,6 +38,7 @@ def rdm(request, conceptid):
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
+            'languages': languages,
             'conceptid': conceptid
         }, context_instance=RequestContext(request))
 
@@ -108,57 +109,43 @@ def concept(request, conceptid):
 
         if json != None:
             data = JSONDeserializer().deserialize(json)
+            
+            #try:
+            with transaction.atomic():
+                concept = Concept(data)
+                concept.save()
 
-            if conceptid == '':
-                with transaction.atomic():
-                    concept = Concept()
-
-                    if 'label' in data and data['label'].strip() != '':
-                        value = ConceptValue()
-                        value.type = 'prefLabel'
-                        value.value = data['label']
-                        value.language = data['language']
-                        value.category = 'label'
-                        value.datatype = 'text'
-                        concept.addvalue(value)
-                    else:
-                         return JSONResponse(SaveFailed(message='A label is required'))
-
-                    if 'note' in data:
-                        value = ConceptValue()
-                        value.type = 'scopeNote'
-                        value.value = data['note']
-                        value.language = data['language']
-                        value.category = 'note'
-                        value.datatype = 'text'
-                        concept.addvalue(value)
-
-                    concept.addparent({'id': data['parentconceptid'], 'relationshiptype': 'has narrower concept'})    
-                    concept.save()
-                    concept.index()
-                    ret = concept
-
-                return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
-
-            elif data['action'] == 'manage-related-concept':
-                relation = None
-                if 'related_concept' in data:
-                    relation = archesmodels.ConceptRelations()
-                    relation.pk = str(uuid.uuid4())
-                    relation.conceptidfrom_id = conceptid
-                    relation.conceptidto_id = data['related_concept']
-                    relation.relationtype_id = 'has related concept'
-                    relation.save()
+                if conceptid == '00000000-0000-0000-0000-000000000003':
+                    # we're adding a top level scheme so we don't index
+                    pass
                 else:
-                    conceptid = data['conceptid']
-                    target_parent_conceptid = data['target_parent_conceptid']
-                    current_parent_conceptid = data['current_parent_conceptid']
+                    concept.index()
 
-                    relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                    relation.conceptidfrom_id = target_parent_conceptid
-                    relation.save()
+                # if 'relatedconcepts' in data:
+                #     for relatedconcept in data['relatedconcepts']:
+                #         relation = archesmodels.ConceptRelations()
+                #         relation.pk = str(uuid.uuid4())
+                #         relation.conceptidfrom_id = conceptid
+                #         relation.conceptidto_id = relatedconcept['id']
+                #         relation.relationtype_id = 'has related concept'
+                #         relation.save()
+                # else:
+                #     conceptid = data['conceptid']
+                #     target_parent_conceptid = data['target_parent_conceptid']
+                #     current_parent_conceptid = data['current_parent_conceptid']
 
-                return JSONResponse(relation)
+                #     relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                #     relation.conceptidfrom_id = target_parent_conceptid
+                #     relation.save()
+
+                #     return JSONResponse(relation)
+
+
+                ret['success'] = True
+            
+            # except IntegrityError:
+            #     return JSONResponse(SaveFailed())
+
 
 
     if request.method == 'DELETE':
