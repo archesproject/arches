@@ -338,13 +338,6 @@ class ResourceLoader(object):
             start = time()
 
             self.shp_data = self.read_shapefile(shapefile)
-            
-            """
-            shp output type - list (say x)
-            x[0] --> a list of attribute names as specified in the dbf file. size = # of attr specified in the dbf file 
-            x[1] --> a list containing value lists for the said attributes. x[1][n-1] is the set of values for the nth attr. Can be seen as a matrix 
-            x[2] --> a list of geom data expressed in WKT. Size = # of resources. Can be seen as  a vector
-            """
 
             shp_resource_info = self.build_dictionary(
                     attr_mapping=self.attr_map,
@@ -448,7 +441,7 @@ class ResourceLoader(object):
 
 
     # Now build a list of dictionaries, one per record
-    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings):
+    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=True):
         dict_list=[] # list of dictionaries
         attr_names = reader_output[0]
         attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values
@@ -481,7 +474,7 @@ class ResourceLoader(object):
                                 count = 0
                                 break
                         if count == len(value_to_concept_label_mappings[entitytypeid]):
-                            errors.append({'label':label, 'type': entitytypeid})
+                            errors.append({'shape_record': record_index, 'label':label, 'type': entitytypeid})
                         
                 record_dictionary[entitytypeid] = label
             
@@ -491,10 +484,12 @@ class ResourceLoader(object):
             dict_list.append(record_dictionary)
 
         if len(errors) > 0:
-            print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'tmp', 'shapefile_loading_errors.txt'))
-            with open (os.path.join(settings.PACKAGE_ROOT, 'tmp', 'shapefile_loading_errors.txt'), 'w') as log:
+            print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'))
+            with open (os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'), 'w') as log:
                 for error in errors:
-                    log.write(('"{0}", Does not match available {1} concept value\n').format(error['label'], error['type']))
+                    log.write(('shapefile record {0}: "{1}", Does not match any available {2} concept value\n').format(error['shape_record'], error['label'], error['type']))
+            if break_on_error:
+                sys.exit(101)
         return dict_list
 
 
