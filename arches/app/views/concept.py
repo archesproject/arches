@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
@@ -38,6 +38,7 @@ def rdm(request, conceptid):
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
+            'languages': languages,
             'conceptid': conceptid
         }, context_instance=RequestContext(request))
 
@@ -108,79 +109,74 @@ def concept(request, conceptid):
 
         if json != None:
             data = JSONDeserializer().deserialize(json)
-
-            if conceptid == '':
+            
+            try:
                 with transaction.atomic():
-                    concept = Concept()
-
-                    if 'label' in data and data['label'].strip() != '':
-                        value = ConceptValue()
-                        value.type = 'prefLabel'
-                        value.value = data['label']
-                        value.language = data['language']
-                        value.category = 'label'
-                        value.datatype = 'text'
-                        concept.addvalue(value)
-                    else:
-                         return JSONResponse(SaveFailed(message='A label is required'))
-
-                    if 'note' in data:
-                        value = ConceptValue()
-                        value.type = 'scopeNote'
-                        value.value = data['note']
-                        value.language = data['language']
-                        value.category = 'note'
-                        value.datatype = 'text'
-                        concept.addvalue(value)
-
-                    concept.addparent({'id': data['parentconceptid'], 'relationshiptype': 'has narrower concept'})    
+                    concept = Concept(data)
                     concept.save()
-                    concept.index()
-                    ret = concept
 
-                return JSONResponse(ret, indent=(4 if request.GET.get('pretty', False) else None))
+                    if conceptid == '00000000-0000-0000-0000-000000000003':
+                        # we're adding a top level scheme so we don't index
+                        pass
+                    else:
+                        concept.index()
 
-            elif data['action'] == 'manage-related-concept':
-                relation = None
-                if 'related_concept' in data:
-                    relation = archesmodels.ConceptRelations()
-                    relation.pk = str(uuid.uuid4())
-                    relation.conceptidfrom_id = conceptid
-                    relation.conceptidto_id = data['related_concept']
-                    relation.relationtype_id = 'has related concept'
-                    relation.save()
-                else:
-                    conceptid = data['conceptid']
-                    target_parent_conceptid = data['target_parent_conceptid']
-                    current_parent_conceptid = data['current_parent_conceptid']
+                    # if 'relatedconcepts' in data:
+                    #     for relatedconcept in data['relatedconcepts']:
+                    #         relation = archesmodels.ConceptRelations()
+                    #         relation.pk = str(uuid.uuid4())
+                    #         relation.conceptidfrom_id = conceptid
+                    #         relation.conceptidto_id = relatedconcept['id']
+                    #         relation.relationtype_id = 'has related concept'
+                    #         relation.save()
+                    # else:
+                    #     conceptid = data['conceptid']
+                    #     target_parent_conceptid = data['target_parent_conceptid']
+                    #     current_parent_conceptid = data['current_parent_conceptid']
 
-                    relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                    relation.conceptidfrom_id = target_parent_conceptid
-                    relation.save()
+                    #     relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                    #     relation.conceptidfrom_id = target_parent_conceptid
+                    #     relation.save()
 
-                return JSONResponse(relation)
+                    #     return JSONResponse(relation)
+
+
+                    ret['success'] = True
+            
+            except IntegrityError as e:
+                return JSONResponse(SaveFailed(message=str(e)))
+
 
 
     if request.method == 'DELETE':
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            if 'action' in data:
-                action = data['action']
+            try:
+                with transaction.atomic():
+                    concept = Concept(data)
+                    concept.delete_index()                    
+                    concept.delete()
+                    print 'here'
+                    ret['success'] = True
+            except IntegrityError:
+                return JSONResponse(SaveFailed())
+            # if 'action' in data:
+            #     action = data['action']
 
-                if data['action'] == 'delete-relationship':
-                    relatedconceptid = data['relatedconceptid']
-                    concept = Concept({'id':conceptid})
-                    concept.addrelatedconcept({'id': relatedconceptid})
-                    concept.delete_related_concept()
+            #     if data['action'] == 'delete-relationship':
+            #         relatedconceptid = data['relatedconceptid']
+            #         concept = Concept({'id':conceptid})
+            #         concept.addrelatedconcept({'id': relatedconceptid})
+            #         concept.delete_related_concept()
                 
-                elif data['action'] == 'delete-concept':
-                    with transaction.atomic():
-                        concept = Concept()
-                        concept.get(id=conceptid)
-                        concept.delete_index()
-                        concept.delete()
-                        ret['success'] = True
+            #     elif data['action'] == 'delete-concept':
+            #         with transaction.atomic():
+            #             concept = Concept()
+            #             concept.get(id=conceptid)
+            #             concept.delete_index()
+            #             concept.delete()
+            #             ret['success'] = True
 
     return JSONResponse(ret, indent=(4 if pretty else None))
 

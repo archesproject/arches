@@ -1,39 +1,43 @@
 define(['backbone', 'jquery'], function (Backbone, $) {
     return Backbone.Model.extend({
-        read: function (callback) {
+        read: function (callback, scope) {
             this._doRequest({
                 type: "GET",
                 data: {
                     'format': 'json'
                 },
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
-            }, callback);
+            }, callback, scope, 'read');
         },
 
-        save: function (callback) {
+        save: function (callback, scope) {
             this._doRequest({
                 type: "POST",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
                 data: JSON.stringify(this.toJSON())
-            }, callback);
+            }, callback, scope, 'save');
         },
 
-        delete: function (callback) {
+        delete: function (callback, scope) {
             this._doRequest({
                 type: "DELETE",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
                 data: JSON.stringify(this.toJSON())
-            }, callback);
+            }, callback, scope, 'delete');
         },
 
-        _doRequest: function (config, callback) {
+        _doRequest: function (config, callback, scope, eventname) {
             var self = this;
+            if (! scope){
+                scope = self;
+            }
             $.ajax($.extend({
                 complete: function (request, status) {
                     if (status === 'success' &&  request.responseJSON) {
                         self.set(request.responseJSON);
+                        self.trigger(eventname, self);
                     }
-                    callback(request, status, self);
+                    callback.call(scope, request, status, self);
                 }
             }, config));
         }

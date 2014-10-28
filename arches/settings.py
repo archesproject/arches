@@ -24,6 +24,7 @@ from django.utils.importlib import import_module
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+INTERNAL_IPS = ('127.0.0.1',)
 
 #########################################
 ###  START PACKAGE SPECIFIC SETTINGS  ###
@@ -92,6 +93,8 @@ LIMIT_ENTITY_TYPES_TO_LOAD = None #(
 DATA_CONCEPT_SCHEME = ''
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
+
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
 
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
@@ -246,6 +249,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    'arches.app.utils.context_processors.livereload',
 )
 
 

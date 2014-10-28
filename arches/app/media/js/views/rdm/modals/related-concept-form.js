@@ -1,26 +1,28 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search'], function ($, Backbone, arches, ConceptSearch) {
+define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
     return ConceptSearch.extend({
 
         events: {
-            'click .modal-footer .savebtn': 'saveRelated'
+            'click .modal-footer .savebtn': 'save'
         },
 
-		saveRelated: function(){
-			var self = this;
-			$.ajax({
-                type: "POST",
-                url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-                data: JSON.stringify({
-                	'action': 'manage-related-concept',
-                    'related_concept': this.select2.val()
-                }),
-                success: function() {
-                    var data = JSON.parse(this.data);
-                    self.trigger('relatedConceptSaved');
-                    self.$el.modal('hide');
-                }
-            });
-		}
-
+        initialize: function(){
+            ConceptSearch.prototype.initialize.apply(this, arguments);
+            this.modal = $('#related-concept-form');
+            this.conceptsearchbox = this.modal.find('.concept_search_widget');
+        },
+        
+		save: function(){
+            if (this.select2.val() !== ''){
+                var modal = this.$el.find('#related-concept-form');
+                var relatedConcept = new ConceptModel({
+                    id: this.select2.val()
+                });
+                this.model.set('relatedconcepts', [relatedConcept]);
+                this.model.save(function() {
+                    modal.modal('hide');
+                    $('.modal-backdrop.fade.in').remove();  // a hack for now
+                });
+            }
+        }
     });
 });

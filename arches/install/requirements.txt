@@ -6,6 +6,7 @@ rdflib
 sphinx==1.2.2
 fabric
 honcho
+livereload
 unicodecsv
 pyyaml
 

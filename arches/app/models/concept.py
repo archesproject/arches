@@ -122,7 +122,7 @@ class Concept(object):
             
     def save(self):
         with transaction.atomic():
-            self.id = self.id if self.id != '' else str(uuid.uuid4())
+            self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
             concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid})
 
             for parentconcept in self.parentconcepts:
@@ -140,8 +140,17 @@ class Concept(object):
                 conceptrelation.pk = str(uuid.uuid4())
                 conceptrelation.conceptidfrom = concept
                 conceptrelation.conceptidto_id = subconcept.id
-                conceptrelation.relationtype_id = self.relationshiptype
+                conceptrelation.relationtype_id = subconcept.relationshiptype
                 conceptrelation.save()
+
+            for relatedconcept in self.relatedconcepts:
+                relation = models.ConceptRelations()
+                relation.pk = str(uuid.uuid4())
+                relation.conceptidfrom_id = self.id
+                relation.conceptidto_id = relatedconcept.id
+                relation.relationtype_id = 'has related concept'
+                relation.save()
+                print relation
 
             for value in self.values:
                 if not isinstance(value, ConceptValue): 
@@ -151,27 +160,54 @@ class Concept(object):
 
             return concept
 
-    def delete(self):
-        concept = models.Concepts.objects.get(pk=self.id)
-        concept.delete()
+    def delete(self, delete_self=False):
+        with transaction.atomic():
+            for subconcept in self.subconcepts:
+                subconcept.delete(delete_self=True)
 
-    def delete_related_concept(self):
-        deletedrelatedconcepts = []
-        for relatedconcept in self.relatedconcepts:
-            print relatedconcept.id
-            conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidto = relatedconcept.id, conceptidfrom = self.id)
-            for relation in conceptrelations:
-                relation.delete()
-                deletedrelatedconcepts.append(relatedconcept)
+            for relatedconcept in self.relatedconcepts:
+                deletedrelatedconcepts = []
+                for relatedconcept in self.relatedconcepts:
+                    conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidto = relatedconcept.id, conceptidfrom = self.id)
+                    for relation in conceptrelations:
+                        relation.delete()
+                        deletedrelatedconcepts.append(relatedconcept)
 
-            conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidfrom = relatedconcept.id, conceptidto = self.id)
-            for relation in conceptrelations:
-                relation.delete()
-                deletedrelatedconcepts.append(relatedconcept)
+                    conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidfrom = relatedconcept.id, conceptidto = self.id)
+                    for relation in conceptrelations:
+                        relation.delete()
+                        deletedrelatedconcepts.append(relatedconcept)
 
-        for deletedrelatedconcept in deletedrelatedconcepts:
-            if deletedrelatedconcept in self.relatedconcepts:
-                self.relatedconcepts.remove(deletedrelatedconcept)
+                for deletedrelatedconcept in deletedrelatedconcepts:
+                    if deletedrelatedconcept in self.relatedconcepts:
+                        self.relatedconcepts.remove(deletedrelatedconcept)
+
+            for value in self.values:
+                if not isinstance(value, ConceptValue): 
+                    value = ConceptValue(value)
+                value.delete()
+
+            if delete_self:
+                concept = models.Concepts.objects.get(pk=self.id)
+                concept.delete()
+        return
+
+    # def delete_related_concept(self):
+    #     deletedrelatedconcepts = []
+    #     for relatedconcept in self.relatedconcepts:
+    #         conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidto = relatedconcept.id, conceptidfrom = self.id)
+    #         for relation in conceptrelations:
+    #             relation.delete()
+    #             deletedrelatedconcepts.append(relatedconcept)
+
+    #         conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidfrom = relatedconcept.id, conceptidto = self.id)
+    #         for relation in conceptrelations:
+    #             relation.delete()
+    #             deletedrelatedconcepts.append(relatedconcept)
+
+    #     for deletedrelatedconcept in deletedrelatedconcepts:
+    #         if deletedrelatedconcept in self.relatedconcepts:
+    #             self.relatedconcepts.remove(deletedrelatedconcept)
 
     def get_sortkey(self, lang='en-us'):
         for value in self.values:
@@ -259,12 +295,23 @@ class Concept(object):
     def index(self, scheme=''):
         if scheme == '':
             scheme = self.get_auth_doc_concept().id
-        for label in self.values:
-            label.index(scheme=scheme)
+        for value in self.values:
+            value.index(scheme=scheme)        
+        for subconcept in self.subconcepts:
+            subconcept.index(scheme=scheme)
 
-    def delete_index(self):
+
+    def delete_index(self, delete_self=False):
         for value in self.values:
             value.delete_index()
+
+        for subconcept in self.subconcepts:
+            subconcept.delete_index(delete_self=True)
+                    
+        if delete_self:
+            self.get(id=self.id)
+            for value in self.values:
+                value.delete_index()
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
         class concept(object):
@@ -385,7 +432,7 @@ class ConceptValue(object):
         return self
 
     def save(self):
-        self.id = self.id if self.id != '' else str(uuid.uuid4())
+        self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
         value = models.Values()
         value.pk = self.id
         value.value = self.value
@@ -425,7 +472,7 @@ class ConceptValue(object):
     def index(self, scheme=None):
         if self.category == 'label':
             se = SearchEngineFactory().create()
-            data = JSONSerializer().serializeToPython(self)            
+            data = JSONSerializer().serializeToPython(self)          
             if scheme == None:
                 scheme = self.get_scheme_id()
             if scheme == None:
@@ -442,8 +489,8 @@ class ConceptValue(object):
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
-        result = se.search(index='concept_labels', id=self.conceptid)
-        print result
+        result = se.search(index='concept_labels', id=self.id)
+        #print result
         if not result['found']:
             return None
         else:

@@ -67,7 +67,7 @@
                                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a href="#AddNewScheme" data-toggle="modal">{% trans "Add Scheme" %}</a></li>
+                                    <li><a data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
                                     <li><a href="#ImportNewScheme" data-toggle="modal">{% trans "Import Scheme" %}</a></li>
                                     <li><a href="#" data-toggle="modal">{% trans "Export Scheme" %}</a></li>
                                     <li><a href="#DeleteScheme" data-toggle="modal">{% trans "Delete Scheme" %}</a></li>
@@ -133,5 +133,7 @@
     <div style="display:none;" id="concept-data">
         <input type="hidden" id="selected-conceptid" value="{{conceptid}}">
     </div>
+
+{% include "views/rdm/modals/add-scheme-form.htm" %}
 
 {% endblock content %}

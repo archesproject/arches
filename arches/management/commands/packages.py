@@ -28,6 +28,7 @@ from arches.db.install import truncate_db, install_db
 from package_utils.resource_loader import ResourceLoader
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from livereload import Server
 
 class Command(BaseCommand):
     """
@@ -37,12 +38,13 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'load_resources'],
+            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
-            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'),
+            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
+            '\'livereload\'=Starts livereload for this package on port 35729'),
         make_option('-s', '--source', action='store', dest='source', default='',
             help='Directory containing a .arches or .shp file containing resource records'),
         make_option('-t', '--truncate', action='store', dest='truncate', default='False',
@@ -63,6 +65,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
+
+        if options['operation'] == 'livereload':
+            self.start_livereload()
 
         if options['operation'] == 'build_permissions':
             self.build_permissions()
@@ -200,6 +205,7 @@ class Command(BaseCommand):
         contents = []
         contents.append('\nelasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
         contents.append('django: %s manage.py runserver' % (python_exe))
+        contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
 
         utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
 
@@ -239,3 +245,12 @@ class Command(BaseCommand):
         """
         resource_loader = ResourceLoader()
         resource_loader.load(data_source, truncate)
+
+
+    def start_livereload(self):
+        server = Server()
+        for path in settings.STATICFILES_DIRS:
+            server.watch(path)
+        for path in settings.TEMPLATE_DIRS:
+            server.watch(path)
+        server.serve(port=settings.LIVERELOAD_PORT)

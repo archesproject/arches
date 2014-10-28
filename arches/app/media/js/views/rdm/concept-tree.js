@@ -21,10 +21,6 @@ define([
                 autoOpen: true
             });
 
-            this.model.on('change', function () {
-                self.render();
-            });
-
             this.render();
         },
 
@@ -66,7 +62,7 @@ define([
             // The clicked node is 'event.node'
             var node = event.node;
             if (this.model.get('id') !== node.id) {
-                this.model.set(node);
+                this.trigger('conceptSelected', node.id);
             } else {
                 event.preventDefault();
             }
