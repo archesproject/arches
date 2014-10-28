@@ -1,6 +1,5 @@
 define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
     return Backbone.View.extend({
-        modal: null,
         initialize: function(options) {
             var self = this,
                 rules = {},
@@ -51,12 +50,13 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                         language: self.languageInput.select2("val")[0]
                     });
                     self.model.set('values', [self.valuemodel]);
-                    self.model.save(function() {
-                        modal.modal('hide');
+                    modal.on('hidden.bs.modal', function () {
+                        self.model.save(function() {
+                            self.model.set('values', []);
+                        });    
                     });
 
-                    // keep the model clean by removing any data that you save
-                    self.model.set('values', []);
+                    modal.modal('hide');
                 }
             });
 
