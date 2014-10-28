@@ -11,7 +11,10 @@ define([
 ], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
-            'click .concept-report-content *': 'contentClick',
+            'click .concept-report-content *[data-action="delete-relationship"]': 'deleteRelationship',
+            'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
+            'click .concept-report-content *[data-action="delete-value"]': 'deleteValueOrConcept',
+            'click .concept-report-content *[data-action="delete-concept"]': 'deleteValueOrConcept',
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
@@ -55,29 +58,34 @@ define([
             }
         },
 
-        contentClick: function(e) {
-            var self = this;
+        deleteValueOrConcept: function(e) {
             var data = $(e.target).data();
 
             if (data.action === 'delete-value' || data.action === 'delete-concept') {
-                self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
-                self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-                self.$el.find('.confirm-delete-yes').data('id', data.id);
-                self.$el.find('.confirm-delete-yes').data('action', data.action);
-                self.$el.find('.confirm-delete-modal').modal('show');
+                this.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
+                this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
+                this.$el.find('.confirm-delete-yes').data('id', data.id);
+                this.$el.find('.confirm-delete-yes').data('action', data.action);
+                this.$el.find('.confirm-delete-modal').modal('show');
             }
+        },
+        
+        deleteRelationship: function(e) {
+            var data = $(e.target).data();
 
             if (data.action === 'delete-relationship') {
-                self.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
-                self.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-                self.$el.find('.confirm-delete-yes').data('relatedconceptid', data.id);
-                self.$el.find('.confirm-delete-yes').data('action', data.action);
-                self.$el.find('.confirm-delete-modal').modal('show');
+                this.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
+                this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
+                this.$el.find('.confirm-delete-yes').data('relatedconceptid', data.id);
+                this.$el.find('.confirm-delete-yes').data('action', data.action);
+                this.$el.find('.confirm-delete-modal').modal('show');
             }
+        },
 
-            if (data.action === 'viewconcept') {
-                self.trigger('conceptSelected', data.conceptid);
-            }
+        conceptSelected: function(e) {
+            var data = $(e.target).data();
+
+            this.trigger('conceptSelected', data.conceptid);
         },
 
         addChildConcept: function(e){
