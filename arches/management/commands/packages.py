@@ -253,4 +253,4 @@ class Command(BaseCommand):
             server.watch(path)
         for path in settings.TEMPLATE_DIRS:
             server.watch(path)
-        server.serve(port=35729)
+        server.serve(port=settings.LIVERELOAD_PORT)

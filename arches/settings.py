@@ -93,6 +93,8 @@ DATA_CONCEPT_SCHEME = ''
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
