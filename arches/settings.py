@@ -24,6 +24,7 @@ from django.utils.importlib import import_module
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+INTERNAL_IPS = ('127.0.0.1',)
 
 #########################################
 ###  START PACKAGE SPECIFIC SETTINGS  ###
