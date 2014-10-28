@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.template import RequestContext
 
 def livereload(request):
 	return {
