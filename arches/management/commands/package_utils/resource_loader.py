@@ -18,7 +18,7 @@ import json
 from django.contrib.gis.gdal import DataSource
 import csv
 import yaml
-# import ipdb
+from .. import utils
 
 class Row(object):
     def __init__(self, *args):
@@ -474,7 +474,7 @@ class ResourceLoader(object):
                                 count = 0
                                 break
                         if count == len(value_to_concept_label_mappings[entitytypeid]):
-                            errors.append({'shape_record': record_index, 'label':label, 'type': entitytypeid})
+                            errors.append('shapefile record {0}: "{1}", Does not match any available {2} concept value\n'.format(str(record_index), label, entitytypeid))
                         
                 record_dictionary[entitytypeid] = label
             
@@ -484,10 +484,8 @@ class ResourceLoader(object):
             dict_list.append(record_dictionary)
 
         if len(errors) > 0:
+            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'), '\n'.join(errors))
             print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'))
-            with open (os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'), 'w') as log:
-                for error in errors:
-                    log.write(('shapefile record {0}: "{1}", Does not match any available {2} concept value\n').format(error['shape_record'], error['label'], error['type']))
             if break_on_error:
                 sys.exit(101)
         return dict_list
