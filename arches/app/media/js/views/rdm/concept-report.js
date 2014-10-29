@@ -7,14 +7,16 @@ define([
     'views/rdm/modals/value-form',
     'views/rdm/modals/related-concept-form',
     'views/rdm/modals/add-child-form',
+    'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, AddImageForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
             'click .concept-report-content *[data-action="delete-relationship"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-value"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-concept"]': 'deleteClicked',
+            'click a.add-image-link': 'addImageClicked',
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
@@ -80,7 +82,6 @@ define([
         },
 
         addChildConcept: function(e){
-            var self = this;
             var form = new AddChildForm({
                 el: $('#add-child-form')[0],
                 model: this.model
@@ -95,6 +96,13 @@ define([
                 model: this.model
             });
             add_related_concept_modal.modal.modal('show');
+        },
+
+        addImageClicked: function (e) {
+            new AddImageForm({
+                el: this.$el.find('#add-image-form')[0],
+                model: this.model
+            });
         },
 
         editValueClicked: function(e) {
