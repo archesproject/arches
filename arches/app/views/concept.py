@@ -213,6 +213,15 @@ def manage_parents(request, conceptid):
 
     return JSONResponse(ret)
 
+
+@csrf_exempt
+def concept_image(request, conceptid):
+    value = archesmodels.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'AreaofSignificance', datatype = 'text', languageid_id = 'en-us')
+    value.save()
+
+    return JSONResponse({'success': True})
+
+
 @csrf_exempt
 def search(request):
     se = SearchEngineFactory().create()
