@@ -119,7 +119,7 @@ class Entity(object):
         return self
 
     @transaction.commit_on_success
-    def save(self, username=''):
+    def save(self, username='', note=''):
         """
         Saves an entity back to the db wrapped in a transaction
         We can't simply apply the decorator to the _save method 
@@ -129,6 +129,7 @@ class Entity(object):
 
         # first we remove any entities from the current entity graph that have been deleted
         diff = ''
+
         if self.entityid != '':
             entity_pre_save = Entity().get(self.entityid)
             diff = entity_pre_save.diff(self)
@@ -139,70 +140,72 @@ class Entity(object):
         self._save()
 
         # log the edit
-        # timestamp = datetime.now()
-        # if self.entityid != '' and diff != '':
-        #     for entity in diff['deleted_nodes']:
-        #         edit = archesmodels.EditLog()        
-        #         edit.editlogid = str(uuid.uuid4())
-        #         edit.resourceentitytypeid = self.entitytypeid
-        #         edit.resourceid = self.entityid
-        #         edit.attributeentitytypeid = entity.entitytypeid
-        #         edit.edittype = 'delete'
-        #         edit.userid = username
-        #         edit.timestamp = timestamp
-        #         edit.oldvalue = entity.value
-        #         edit.newvalue = None
-        #         edit.user_firstname = username
-        #         edit.user_lastname = username
-        #         edit.note = ''
-        #         edit.save() 
+        timestamp = datetime.now()
+        if self.entityid != '' and diff != '':
+            for entity in diff['deleted_nodes']:
+                edit = archesmodels.EditLog()    
+                edit.editlogid = str(uuid.uuid4())
+                edit.resourceentitytypeid = self.entitytypeid
+                edit.resourceid = self.entityid
+                edit.attributeentitytypeid = entity.entitytypeid
+                edit.edittype = 'delete'
+                edit.userid = username
+                edit.timestamp = timestamp
+                edit.oldvalue = entity.value
+                edit.newvalue = None
+                edit.user_firstname = username
+                edit.user_lastname = username
+                edit.note = note
+                edit.save() 
 
-        #     for entity in diff['updated_nodes']:
-        #         edit = archesmodels.EditLog()        
-        #         edit.editlogid = str(uuid.uuid4())
-        #         edit.resourceentitytypeid = self.entitytypeid
-        #         edit.resourceid = self.entityid
-        #         edit.attributeentitytypeid = entity.entitytypeid
-        #         edit.edittype = 'update'
-        #         edit.userid = username
-        #         edit.timestamp = timestamp
-        #         edit.oldvalue = entity['from'].value
-        #         edit.newvalue = entity['to'].value
-        #         edit.user_firstname = username
-        #         edit.user_lastname = username
-        #         edit.note = ''
-        #         edit.save()    
-        # else:
-        #     for entity in self.flatten():
-        #         if entity.value != '':
-        #             edit = archesmodels.EditLog()        
-        #             edit.editlogid = str(uuid.uuid4())
-        #             edit.resourceentitytypeid = self.entitytypeid
-        #             edit.resourceid = self.entityid
-        #             edit.attributeentitytypeid = entity.entitytypeid
-        #             edit.edittype = 'insert'
-        #             edit.userid = username
-        #             edit.timestamp = timestamp
-        #             edit.oldvalue = None
-        #             edit.newvalue = entity.value
-        #             edit.user_firstname = username
-        #             edit.user_lastname = username
-        #             edit.note = ''
-        #             edit.save() 
+            for entity in diff['updated_nodes']:
+                edit = archesmodels.EditLog()        
+                edit.editlogid = str(uuid.uuid4())
+                edit.resourceentitytypeid = self.entitytypeid
+                edit.resourceid = self.entityid
+                edit.attributeentitytypeid = entity['from'].entitytypeid
+                edit.edittype = 'update'
+                edit.userid = username
+                edit.timestamp = timestamp
+                edit.oldvalue = entity['from'].value
+                edit.newvalue = entity['to'].value
+                edit.user_firstname = username
+                edit.user_lastname = username
+                edit.note = note
+                edit.save()    
+        else:
+
+            for entity in self.flatten():
+                if entity.value != '':
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
+                    edit.resourceentitytypeid = self.entitytypeid
+                    edit.resourceid = self.entityid
+                    edit.attributeentitytypeid = entity.entitytypeid
+                    edit.edittype = 'insert'
+                    edit.userid = username
+                    edit.timestamp = timestamp
+                    edit.oldvalue = None
+                    edit.newvalue = entity.value
+                    edit.user_firstname = username
+                    edit.user_lastname = username
+                    edit.note = note
+                    edit.save()
 
         return self
+
 
     def _save(self):
         """
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
-
         entitytype = archesmodels.EntityTypes.objects.get(pk = self.entitytypeid)
         try:
             uuid.UUID(self.entityid)
         except(ValueError):
             self.entityid = str(uuid.uuid4())
+
 
         domainentity = archesmodels.Entities()
         domainentity.entitytypeid = entitytype
@@ -437,16 +440,27 @@ class Entity(object):
         flattens the graph into a list of unordered entities
 
         """
+
         ret = []
         def gather_entities(entity):
-            entity.relatedentities = []
             if entity.get_rank() != 0:
                 entity.parentid = entity.get_parent().entityid
             else:
                 entity.parentid = None
-            ret.append(entity)
+            flat_entity = Entity(entity.entityid)
+            flat_entity.relatedentities = []
+            ret.append(flat_entity)
+
+        # def gather_entities_inplace(entity):
+        #     entity.relatedentities = []
+        #     if entity.get_rank() != 0:
+        #         entity.parentid = entity.get_parent().entityid
+        #     else:
+        #         entity.parentid = None
+        #     ret.append(entity)
 
         self.traverse(gather_entities)
+
         return ret
 
     def find_entities_by_type_id(self, entitytypeid):
@@ -624,6 +638,7 @@ class Entity(object):
         Used for populating the search index with searchable entity information
 
         """
+
 
         if self.get_rank() == 0:
             se = SearchEngineFactory().create()
