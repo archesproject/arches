@@ -26,7 +26,7 @@
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                 <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
-                <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
+                <li><a href="#" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
                 <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                 <li class="divider"></li>
                 <li><a href="#">{% trans "Close" %}</a></li>
@@ -43,7 +43,7 @@
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                 <li><a href="#">{% trans "Import Child from AAT" %}</a></li>
-                <li><a href="#NewParent" data-toggle="modal">{% trans "Manage Parents" %}</a></li>
+                <li><a href="#" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
                 <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                 <li class="divider"></li>
                 <li><a href="#">{% trans "Close" %}</a></li>
@@ -404,3 +404,5 @@
 </div>
 
 {% include "views/rdm/modals/related-concept-form.htm" %}
+
+{% include "views/rdm/modals/manage-parent-form.htm" %}

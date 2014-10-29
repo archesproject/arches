@@ -253,6 +253,9 @@ class ConceptRelations(models.Model):
     class Meta:
         db_table = u'concepts"."relations'
 
+    def __unicode__(self):
+        return ('%s') % (self.relationid)
+
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
     category = models.TextField()

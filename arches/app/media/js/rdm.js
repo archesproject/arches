@@ -70,10 +70,11 @@ require([
                 concept.set('id', conceptid);
                 conceptTree.render();
                 conceptReport.render();
+            },
+            'parentsChanged': function() {
+                conceptTree.render();
+                conceptReport.render();
             }//,
-            // 'conceptDeleted': function() {
-            //     conceptTree.render();
-            // },
             // 'conceptAdded': function() {
             //     conceptTree.render();
             // }

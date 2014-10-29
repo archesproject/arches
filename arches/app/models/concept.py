@@ -41,6 +41,8 @@ class Concept(object):
                     self.get(args[0])
                 except(ValueError):
                     self.load(JSONDeserializer().deserialize(args[0]))  
+            elif isinstance(args[0], dict):
+                self.load(args[0])  
             elif isinstance(args[0], object):
                 self.load(args[0])  
 
@@ -150,7 +152,6 @@ class Concept(object):
                 relation.conceptidto_id = relatedconcept.id
                 relation.relationtype_id = 'has related concept'
                 relation.save()
-                print relation
 
             for value in self.values:
                 if not isinstance(value, ConceptValue): 
@@ -162,6 +163,12 @@ class Concept(object):
 
     def delete(self, delete_self=False):
         with transaction.atomic():
+
+            for parentconcept in self.parentconcepts:
+                conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has narrower concept', conceptidfrom = parentconcept.id, conceptidto = self.id)
+                for relation in conceptrelations:
+                    relation.delete()
+
             for subconcept in self.subconcepts:
                 subconcept.delete(delete_self=True)
 

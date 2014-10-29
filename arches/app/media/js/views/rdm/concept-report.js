@@ -4,12 +4,14 @@ define([
     'arches',
     'models/concept',
     'models/value',
+    'models/concept-parents',
     'views/rdm/modals/value-form',
     'views/rdm/modals/related-concept-form',
+    'views/rdm/modals/manage-parent-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, AddImageForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -20,7 +22,8 @@ define([
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
-            'click a[data-toggle="#add-concept-form"]': 'addChildConcept'
+            'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
+            'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
 
         initialize: function() {
@@ -35,6 +38,8 @@ define([
             if (conceptid) {
                 self.$el.find('.concept-report-loading').removeClass('hidden');
                 self.$el.find('.concept-report-content').addClass('hidden');
+
+
                 $.ajax({
                     url: '../Concepts/' + conceptid + '?f=html',
                     success: function(response) {
@@ -91,12 +96,29 @@ define([
         },
 
         addRelatedConceptClicked: function(e){
-            var add_related_concept_modal = new RelatedConcept({
+            var modal = new RelatedConcept({
                 el: $('#related-concept-form')[0],
                 model: this.model
             });
-            add_related_concept_modal.modal.modal('show');
+            modal.modal.modal('show');
         },
+
+        manageParentConcepts: function(e){
+            var self = this;
+            var parentmodel = new ConceptParentModel();
+            parentmodel.set('id', this.model.get('id'));
+            var modal = new ManageParentForm({
+                el: $('#manage-parent-form')[0],
+                model: parentmodel
+            });
+            modal.modal.modal('show');
+
+            parentmodel.on({
+                'save': function(){
+                    self.trigger('parentsChanged');
+                }
+            });
+        },        
 
         addImageClicked: function (e) {
             new AddImageForm({

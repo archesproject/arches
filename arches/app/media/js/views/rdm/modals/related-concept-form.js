@@ -8,14 +8,13 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
         initialize: function(){
             ConceptSearch.prototype.initialize.apply(this, arguments);
             this.modal = $('#related-concept-form');
-            this.conceptsearchbox = this.modal.find('.concept_search_widget');
         },
         
 		save: function(){
-            if (this.select2.val() !== ''){
+            if (this.searchbox.val() !== ''){
                 var modal = this.$el.find('#related-concept-form');
                 var relatedConcept = new ConceptModel({
-                    id: this.select2.val()
+                    id: this.searchbox.val()
                 });
                 this.model.set('relatedconcepts', [relatedConcept]);
                 this.model.save(function() {

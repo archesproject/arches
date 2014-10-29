@@ -75,6 +75,7 @@ def concept(request, conceptid):
                 languages = archesmodels.DLanguages.objects.all()
                 valuetypes = archesmodels.ValueTypes.objects.all()
                 prefLabel = concept_graph.get_preflabel(lang=lang).value
+                direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -84,7 +85,8 @@ def concept(request, conceptid):
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category=''),
                     'concept_paths': concept_graph.get_paths(lang=lang),
-                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang))
+                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                    'direct_parents': direct_parents
                 }, context_instance=RequestContext(request))
             
             if f == 'skos':
@@ -157,10 +159,9 @@ def concept(request, conceptid):
                     concept = Concept(data)
                     concept.delete_index()                    
                     concept.delete()
-                    print 'here'
                     ret['success'] = True
-            except IntegrityError:
-                return JSONResponse(SaveFailed())
+            except IntegrityError as e:
+                return JSONResponse(SaveFailed(message=str(e)))
             # if 'action' in data:
             #     action = data['action']
 
@@ -180,30 +181,37 @@ def concept(request, conceptid):
 
     return JSONResponse(ret, indent=(4 if pretty else None))
 
+
 @csrf_exempt
-def concept_value(request, valueid):
+def manage_parents(request, conceptid):
     #  need to check user credentials here
+    ret = {}
 
     if request.method == 'POST':
         json = request.body
-
         if json != None:
-            with transaction.atomic():
-                value = ConceptValue(json)
-                value.save()
-                value.index()
-
-            return JSONResponse(value)
-
-    if request.method == 'DELETE':
-        with transaction.atomic():
-            value = ConceptValue({'id': valueid})
-            value.delete()
-            value.delete_index()
+            data = JSONDeserializer().deserialize(json)
+            try:
+                with transaction.atomic():
+                    if len(data['deleted']) > 0:
+                        concept = Concept({'id':conceptid})
+                        for deleted in data['deleted']:
+                            concept.addparent(deleted)  
         
-        return JSONResponse(value)
+                        concept.delete()
+                    
+                    if len(data['added']) > 0:
+                        concept = Concept({'id':conceptid})
+                        for added in data['added']:
+                            concept.addparent(added)   
+                
+                        concept.save()
 
-    return JSONResponse({'success': False})
+                    ret['success'] = True
+            except IntegrityError as e:
+                return JSONResponse(SaveFailed(message=str(e)))
+
+    return JSONResponse(ret)
 
 @csrf_exempt
 def search(request):
