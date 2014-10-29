@@ -26,6 +26,7 @@ import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
 from package_utils.resource_loader import ResourceLoader
+import package_utils.resource_remover as resource_remover
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from livereload import Server
@@ -38,7 +39,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources'],
+            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'install\'=Runs the setup file defined in your package root' + 
@@ -49,6 +50,8 @@ class Command(BaseCommand):
             help='Directory containing a .arches or .shp file containing resource records'),
         make_option('-t', '--truncate', action='store', dest='truncate', default='False',
             help='Boolean to indicate if you want to clear all of the business data before loading. The default is False'),
+        make_option('-l', '--load_id', action='store', dest='load_id',
+            help='Text string identifying the resources in the data load you want to delete.'),
     )
 
     def handle(self, *args, **options):
@@ -73,8 +76,10 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'load_resources':     
-            self.load_resources(options['source'], options['truncate'])
+            self.load_resources(options['source'])
             
+        if options['operation'] == 'remove_resources':     
+            self.remove_resources(options['load_id'])
 
 
     def setup(self, package_name):
@@ -238,13 +243,21 @@ class Command(BaseCommand):
             Permission.objects.create(codename='delete_%s' % mapping.entitytypeidto, name='%s - delete' % mapping.entitytypeidto , content_type=content_type[0])
 
 
-    def load_resources(self, data_source, truncate):
+    def load_resources(self, data_source, truncate=False):
         """
         Runs the resource_loader command found in package_utils
 
         """
         resource_loader = ResourceLoader()
         resource_loader.load(data_source, truncate)
+
+
+    def remove_resources(self, load_id):
+        """
+        Runs the resource_remover command found in package_utils
+
+        """
+        resource_remover.delete_resources(load_id)
 
 
     def start_livereload(self):

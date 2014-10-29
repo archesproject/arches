@@ -1,8 +1,8 @@
 import os
-import csv
 import types
 import sys
 from time import time
+import datetime
 from django.conf import settings
 from django.db import connection, transaction
 from arches.app.models.entity import Entity
@@ -151,6 +151,9 @@ class ResourceLoader(object):
         '''Takes a collection of imported resource records and saves them as arches entities'''
 
         start = time()
+        d = datetime.datetime.now()
+        load_id = 'LOADID:{0}-{1}-{2}-{3}-{4}-{5}'.format(d.year, d.month, d.day, d.hour, d.minute, d.microsecond) #Should we append the timestamp to the exported filename?
+
         ret = {'successfully_saved':0, 'successfully_indexed':0, 'failed_to_save':[], 'failed_to_index':[]}
         schema = None
         current_entitiy_type = None
@@ -167,7 +170,7 @@ class ResourceLoader(object):
 
             self.pre_save(master_graph)
 
-            master_graph.save(username=settings.ETL_USERNAME)
+            master_graph.save(username=settings.ETL_USERNAME, note=load_id)
 
             for related_resource in related_resources:
                 related_resource_record = RelatedResource(
@@ -192,6 +195,7 @@ class ResourceLoader(object):
         elapsed = (time() - start)
         print 'total time to etl = %s' % (elapsed)
         print 'average time per entity = %s' % (elapsed/len(resource_list))
+        print 'Load Identifier = ', load_id
         print ret
         return ret
 
@@ -310,8 +314,6 @@ class ResourceLoader(object):
         return result
 
 
-
-
     def load_shapefile(self, shapefile):
         '''
         At this stage we assume,
@@ -339,7 +341,7 @@ class ResourceLoader(object):
 
             self.shp_data = self.read_shapefile(shapefile)
 
-            shp_resource_info = self.build_dictionary(
+            shp_resource_info = self.collect_resource_info(
                     attr_mapping=self.attr_map,
                     auth_mapping=self.auth_map,
                     reader_output=self.shp_data,
@@ -441,7 +443,7 @@ class ResourceLoader(object):
 
 
     # Now build a list of dictionaries, one per record
-    def build_dictionary(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=True):
+    def collect_resource_info(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=False):
         dict_list=[] # list of dictionaries
         attr_names = reader_output[0]
         attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values
