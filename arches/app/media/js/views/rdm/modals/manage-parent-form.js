@@ -9,7 +9,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
 
         initialize: function(){
             ConceptSearch.prototype.initialize.apply(this, arguments);
-            this.modal = this.$el;
+            this.modal = this.$el.find('.modal');
             this.relationshiptype = this.modal.find('#parent-relation-type').select2({
                 minimumResultsForSearch: 10,
                 maximumSelectionSize: 1

@@ -3,7 +3,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
 
         initialize: function(e){
             var self = this;
-            this.modal = $('#add-concept-form');
+            this.modal = this.$el.find('form');
             this.modal.on('hidden.bs.modal', function () {
                 self.$el.find("input[type=text], textarea").val("");
                 // self.trigger('conceptAdded', subconcept);

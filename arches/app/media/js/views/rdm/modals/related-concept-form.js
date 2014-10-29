@@ -7,18 +7,18 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
 
         initialize: function(){
             ConceptSearch.prototype.initialize.apply(this, arguments);
-            this.modal = $('#related-concept-form');
+            this.modal = this.$el.find('.modal');
         },
         
 		save: function(){
+            var self = this;
             if (this.searchbox.val() !== ''){
-                var modal = this.$el.find('#related-concept-form');
                 var relatedConcept = new ConceptModel({
                     id: this.searchbox.val()
                 });
                 this.model.set('relatedconcepts', [relatedConcept]);
                 this.model.save(function() {
-                    modal.modal('hide');
+                    self.modal.modal('hide');
                     $('.modal-backdrop.fade.in').remove();  // a hack for now
                 });
             }

@@ -66,16 +66,11 @@ define([
         },
 
         deleteClicked: function(e) {
-            var data = $(e.target).data(),
-                idField = 'id';
-
-            if (data.action === 'delete-relationship') {
-                idField = 'relatedconceptid';
-            }
+            var data = $(e.target).data();
 
             this.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
             this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-            this.$el.find('.confirm-delete-yes').data(idField, data.id);
+            this.$el.find('.confirm-delete-yes').data('id', data.id);
             this.$el.find('.confirm-delete-yes').data('action', data.action);
             this.$el.find('.confirm-delete-modal').modal('show');
         },
@@ -151,25 +146,17 @@ define([
                 if (data.action === 'delete-value') {
                     model = new ValueModel(data);
                     self.model.set('values', [model]);
-                    //eventName = 'valueDeleted';
                 }
                 if (data.action === 'delete-relationship') {
                     model = new ConceptModel(data);
-                    model.set('id', self.model.get('id'));
                     self.model.set('relatedconcepts', [model]);
-
-                    //eventName = 'relationshipDeleted';
                 }
                 if (data.action === 'delete-concept') {
                     model = new ConceptModel(data)
                     self.model.set('subconcepts', [model]);
-                    //eventName = 'conceptDeleted';
                 }
 
-                self.model.delete(function() {
-                    // self.render();
-                    // self.trigger(eventName, model);
-                });
+                self.model.delete();
             });
             modal.modal('hide');
         }
