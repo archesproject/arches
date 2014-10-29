@@ -29,7 +29,6 @@ from package_utils.resource_loader import ResourceLoader
 import package_utils.resource_remover as resource_remover
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from livereload import Server
 
 class Command(BaseCommand):
     """
@@ -261,6 +260,7 @@ class Command(BaseCommand):
 
 
     def start_livereload(self):
+        from livereload import Server
         server = Server()
         for path in settings.STATICFILES_DIRS:
             server.watch(path)
