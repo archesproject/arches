@@ -71,6 +71,7 @@ INSERT INTO d_relationtypes VALUES ('broaderTransitive', 'Semantic Relations', T
 INSERT INTO d_relationtypes VALUES ('narrower', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('narrowerTransitive', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('related', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', TRUE);
 
 
 -- legacy relationshiptypes (should be removed before v3)
