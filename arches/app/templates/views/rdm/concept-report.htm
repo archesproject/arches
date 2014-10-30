@@ -215,7 +215,7 @@
                 </h5>
             </dt>
             {% for value in concept.values %}
-                {% if value.category == '' %}
+                {% if value.category == '' and value.type != 'image' %}
                 <dd class="arches-RDM-label-highlighted">
                     <a href="#" title="{% trans "Remove this value" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}"></i></a>
                     <a href="#" title="{% trans "Edit this value" %}" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
@@ -246,12 +246,13 @@
             </dt>
 
             <dd class="arches-RDM-labels">
-                
-                <!-- Images -->
+            <!-- Images -->
+            {% for value in concept.values %}
+                {% if value.type == 'image' %}
                 <div class="row margin-top-10">
                     <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                         <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-2.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="{% trans "Image Name" %}" title="" class="superbox-img img-bordered arches-RDM-image">
+                            <img style="width: 100%;" src="{{STATIC_URL}}{{value.value}}" data-img="{{STATIC_URL}}{{value.value}}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
                         </div>
 
                         <div class="margin-left-5 margin-top-10">
@@ -259,22 +260,12 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Spacer -->
                 <div class="margin-top-10"></div>
-
-                <div class="row">
-                    <div class="col-xs-12 shadow-wrapper margin-bottom-10">
-                        <div class="box-shadow shadow-effect-1">
-                            <img style="width: 100%;" src="{% static 'img/superbox/superbox-full-3.jpg' %}" data-img="{% static 'img/superbox/superbox-full-2.jpg' %}" alt="{% trans "Image Name" %}" title="" class="superbox-img img-bordered arches-RDM-image">
-                        </div>
-
-                        <div class="margin-left-5 margin-top-10">
-                            <a href="#" class="btn-u btn-u-small">{% trans "Delete Image" %}</a></p>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Images -->
+                {% endif %}
+            {% endfor %}
+            <!-- End Images -->
+                
 
             </dd>
         </dl>

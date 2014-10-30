@@ -39,6 +39,7 @@ INSERT INTO d_valuetypes VALUES ('changeNote', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('prefLabel', 'label',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('altLabel', 'label',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('image', '','',FALSE);
 
 
 --

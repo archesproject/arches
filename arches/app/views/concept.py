@@ -83,7 +83,7 @@ def concept(request, conceptid):
                     'languages': languages,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category=''),
+                    'valuetype_related_values': valuetypes.filter(category='').exclude(valuetype='image'),
                     'concept_paths': concept_graph.get_paths(lang=lang),
                     'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                     'direct_parents': direct_parents
@@ -216,7 +216,7 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def concept_image(request, conceptid):
-    value = archesmodels.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'AreaofSignificance', datatype = 'text', languageid_id = 'en-us')
+    value = archesmodels.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
     value.save()
 
     return JSONResponse({'success': True})
