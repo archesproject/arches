@@ -24,6 +24,12 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+CORE_CONCEPTS = (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000003'
+)
+
 class Concept(object):
     def __init__(self, *args, **kwargs):
         self.id = ''
@@ -76,17 +82,18 @@ class Concept(object):
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
             up_depth_limit = up_depth_limit if up_depth_limit == None else int(up_depth_limit)
 
-            if len(include) > 0 and len(exclude) > 0:
-                raise Exception('Only include values for include or exclude, but not both')
-            include = include if len(include) != 0 else models.ValueTypes.objects.distinct('category').values_list('category', flat=True)
-            include = set(include).difference(exclude)
-            exclude = []
+            if include != None:
+                if len(include) > 0 and len(exclude) > 0:
+                    raise Exception('Only include values for include or exclude, but not both')
+                include = include if len(include) != 0 else models.ValueTypes.objects.distinct('category').values_list('category', flat=True)
+                include = set(include).difference(exclude)
+                exclude = []
 
-            if len(include) > 0:
-                values = models.Values.objects.filter(conceptid = self.id)
-                for value in values:
-                    if value.valuetype.category in include:
-                        self.values.append(ConceptValue(value))
+                if len(include) > 0:
+                    values = models.Values.objects.filter(conceptid = self.id)
+                    for value in values:
+                        if value.valuetype.category in include:
+                            self.values.append(ConceptValue(value))
 
             if include_subconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), ~Q(relationtype = 'has related concept'))
@@ -199,23 +206,6 @@ class Concept(object):
                 concept.delete()
         return
 
-    # def delete_related_concept(self):
-    #     deletedrelatedconcepts = []
-    #     for relatedconcept in self.relatedconcepts:
-    #         conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidto = relatedconcept.id, conceptidfrom = self.id)
-    #         for relation in conceptrelations:
-    #             relation.delete()
-    #             deletedrelatedconcepts.append(relatedconcept)
-
-    #         conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidfrom = relatedconcept.id, conceptidto = self.id)
-    #         for relation in conceptrelations:
-    #             relation.delete()
-    #             deletedrelatedconcepts.append(relatedconcept)
-
-    #     for deletedrelatedconcept in deletedrelatedconcepts:
-    #         if deletedrelatedconcept in self.relatedconcepts:
-    #             self.relatedconcepts.remove(deletedrelatedconcept)
-
     def get_sortkey(self, lang='en-us'):
         for value in self.values:
             if value.type == 'sortorder':
@@ -224,11 +214,12 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_auth_doc_concept(self, lang='en-us'):
+        scheme_collections = [collection.id for collection in Concept.get_scheme_collections()]
         concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=True)
        
         def find_auth_doc(concept):
             for parentconcept in concept.parentconcepts:
-                if parentconcept.id == '00000000-0000-0000-0000-000000000004':
+                if parentconcept.id in scheme_collections:
                     return concept
 
             for parentconcept in concept.parentconcepts:
@@ -411,7 +402,21 @@ class Concept(object):
                 link['target'] = i if link['target'] == nodes[i]['concept_id'] else link['target']
         
         return {'nodes': nodes, 'links': links}
+ 
+    def is_scheme(self):
+        scheme_collection_ids = []
+        for concept in Concept.get_scheme_collections(depth=2):
+            for subconcepts in concept.subconcepts:
+                scheme_collection_ids.append(subconcepts.id)
 
+        if self.id in scheme_collection_ids:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_scheme_collections(include=None, depth=1):
+        return Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=depth, include=include).subconcepts
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):

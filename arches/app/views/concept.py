@@ -24,27 +24,26 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from arches.app.models import models
-from arches.app.models.concept import Concept, ConceptValue
+from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter
 
-
 def rdm(request, conceptid):
     lang = request.GET.get('lang', 'en-us')    
     
     languages = models.DLanguages.objects.all()
-    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
-    concept_schemes = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
+    concept_schemes = Concept.get_scheme_collections(include=['label'])
+    concept_scheme_labels = [concept.get_preflabel(lang=lang) for concept in concept_schemes]
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
-            'concept_schemes': concept_schemes
+            'concept_schemes': concept_scheme_labels
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
@@ -127,11 +126,11 @@ def concept(request, conceptid):
                     concept = Concept(data)
                     concept.save()
 
-                    if conceptid == '00000000-0000-0000-0000-000000000003':
-                        # we're adding a top level scheme so we don't index
-                        pass
-                    else:
-                        concept.index()
+                    if conceptid not in CORE_CONCEPTS:
+                        if concept.subconcepts[0].is_scheme():
+                            concept.index(scheme=concept.subconcepts[0].id)
+                        else:
+                            concept.index()
 
                     return JSONResponse(concept)
 
@@ -143,7 +142,8 @@ def concept(request, conceptid):
             
             with transaction.atomic():
                 concept = Concept(data)
-                concept.delete_index()                    
+                if concept.id not in CORE_CONCEPTS:
+                    concept.delete_index()                    
                 concept.delete()
 
                 return JSONResponse(concept)
@@ -213,15 +213,3 @@ def concept_tree(request):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)
-
-def schemes(request):
-    lang = request.GET.get('lang', 'en-us')
-    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
-    ret = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
-    return JSONResponse(ret, indent=4)
-
-class SaveFailed(object):
-    def __init__(self, message='', additionaldata=None):
-        self.success = False
-        self.message = message
-        self.additionaldata = additionaldata
