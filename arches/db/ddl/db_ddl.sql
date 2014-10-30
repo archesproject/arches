@@ -1067,7 +1067,9 @@ ALTER TABLE concepts.d_languages OWNER TO postgres;
 --
 
 CREATE TABLE d_relationtypes (
-    relationtype text NOT NULL
+    relationtype text NOT NULL,
+	category text NOT NULL,
+	skoscompliant BOOLEAN NOT NULL
 );
 
 
@@ -1503,8 +1505,7 @@ ALTER TABLE ontology.classes OWNER TO postgres;
 CREATE TABLE mapping_steps (
     mappingid uuid NOT NULL,
     ruleid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    "order" integer NOT NULL,
-    defaultvalue text
+    "order" integer NOT NULL
 );
 
 
