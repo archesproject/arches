@@ -37,7 +37,9 @@ define(['backbone', 'jquery'], function (Backbone, $) {
                         self.set(request.responseJSON);
                         self.trigger(eventname, self);
                     }
-                    callback.call(scope, request, status, self);
+                    if (typeof callback === 'function') {
+                        callback.call(scope, request, status, self);
+                    }
                 }
             }, config));
         }
