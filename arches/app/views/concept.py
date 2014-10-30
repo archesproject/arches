@@ -112,46 +112,52 @@ def concept(request, conceptid):
             ret = se.search('', index='concept', type=ids, search_field='value', use_wildcard=True)
 
     if request.method == 'POST':
-        json = request.body
+        if len(request.FILES) > 0:
+            value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+            value.save()
 
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
-            
-            try:
-                with transaction.atomic():
-                    concept = Concept(data)
-                    concept.save()
+            ret['success'] = True
+        else:
+            json = request.body
 
-                    if conceptid == '00000000-0000-0000-0000-000000000003':
-                        # we're adding a top level scheme so we don't index
-                        pass
-                    else:
-                        concept.index()
+            if json != None:
+                data = JSONDeserializer().deserialize(json)
+                
+                try:
+                    with transaction.atomic():
+                        concept = Concept(data)
+                        concept.save()
 
-                    # if 'relatedconcepts' in data:
-                    #     for relatedconcept in data['relatedconcepts']:
-                    #         relation = models.ConceptRelations()
-                    #         relation.pk = str(uuid.uuid4())
-                    #         relation.conceptidfrom_id = conceptid
-                    #         relation.conceptidto_id = relatedconcept['id']
-                    #         relation.relationtype_id = 'has related concept'
-                    #         relation.save()
-                    # else:
-                    #     conceptid = data['conceptid']
-                    #     target_parent_conceptid = data['target_parent_conceptid']
-                    #     current_parent_conceptid = data['current_parent_conceptid']
+                        if conceptid == '00000000-0000-0000-0000-000000000003':
+                            # we're adding a top level scheme so we don't index
+                            pass
+                        else:
+                            concept.index()
 
-                    #     relation = models.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                    #     relation.conceptidfrom_id = target_parent_conceptid
-                    #     relation.save()
+                        # if 'relatedconcepts' in data:
+                        #     for relatedconcept in data['relatedconcepts']:
+                        #         relation = models.ConceptRelations()
+                        #         relation.pk = str(uuid.uuid4())
+                        #         relation.conceptidfrom_id = conceptid
+                        #         relation.conceptidto_id = relatedconcept['id']
+                        #         relation.relationtype_id = 'has related concept'
+                        #         relation.save()
+                        # else:
+                        #     conceptid = data['conceptid']
+                        #     target_parent_conceptid = data['target_parent_conceptid']
+                        #     current_parent_conceptid = data['current_parent_conceptid']
 
-                    #     return JSONResponse(relation)
+                        #     relation = models.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                        #     relation.conceptidfrom_id = target_parent_conceptid
+                        #     relation.save()
+
+                        #     return JSONResponse(relation)
 
 
-                    ret['success'] = True
-            
-            except IntegrityError as e:
-                return JSONResponse(SaveFailed(message=str(e)))
+                        ret['success'] = True
+                
+                except IntegrityError as e:
+                    return JSONResponse(SaveFailed(message=str(e)))
 
 
 
@@ -217,14 +223,6 @@ def manage_parents(request, conceptid):
                 return JSONResponse(SaveFailed(message=str(e)))
 
     return JSONResponse(ret)
-
-
-@csrf_exempt
-def concept_image(request, conceptid):
-    value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
-    value.save()
-
-    return JSONResponse({'success': True})
 
 
 @csrf_exempt

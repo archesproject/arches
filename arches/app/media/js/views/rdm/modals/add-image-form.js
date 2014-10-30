@@ -9,7 +9,7 @@ define(['jquery', 'backbone', 'dropzone', 'arches', 'bootstrap'], function ($, B
             // detect if dropzone is attached, and if not init
             if (!dropzoneEl.hasClass('dz-clickable')) {
                 dropzoneInstance = new dropzone(dropzoneEl[0], {
-                    url: arches.urls.concept_image.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
+                    url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
                     dictResponseError: 'Error uploading file!'
                 });
 
