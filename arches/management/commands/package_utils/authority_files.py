@@ -144,6 +144,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
                             if row_valuetype not in value_types.values_list('valuetype', flat=True): 
                                 valuetype = models.ValueTypes()
                                 valuetype.valuetype = row_valuetype
+                                valuetype.category = 'undefined'
                                 valuetype.save()
                                 value_types = models.ValueTypes.objects.all()
 
