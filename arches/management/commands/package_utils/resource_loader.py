@@ -443,7 +443,7 @@ class ResourceLoader(object):
 
 
     # Now build a list of dictionaries, one per record
-    def collect_resource_info(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=False):
+    def collect_resource_info(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=True):
         dict_list=[] # list of dictionaries
         attr_names = reader_output[0]
         attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values

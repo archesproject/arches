@@ -139,24 +139,8 @@ class Entity(object):
 
         self._save()
 
-        # log the edit
         timestamp = datetime.now()
         if self.entityid != '' and diff != '':
-            for entity in diff['deleted_nodes']:
-                edit = archesmodels.EditLog()    
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceentitytypeid = self.entitytypeid
-                edit.resourceid = self.entityid
-                edit.attributeentitytypeid = entity.entitytypeid
-                edit.edittype = 'delete'
-                edit.userid = username
-                edit.timestamp = timestamp
-                edit.oldvalue = entity.value
-                edit.newvalue = None
-                edit.user_firstname = username
-                edit.user_lastname = username
-                edit.note = note
-                edit.save() 
 
             for entity in diff['updated_nodes']:
                 edit = archesmodels.EditLog()        
@@ -174,7 +158,6 @@ class Entity(object):
                 edit.note = note
                 edit.save()    
         else:
-
             for entity in self.flatten():
                 if entity.value != '':
                     edit = archesmodels.EditLog()        
@@ -246,10 +229,28 @@ class Entity(object):
         return domainentity
 
     @transaction.commit_on_success
-    def delete(self, delete_root=False):
+    def delete(self, username='', note='', delete_root=False):
         """
         Deltes an entity from the db wrapped in a transaction 
         """
+
+        timestamp = datetime.now()
+        for entity in self.flatten():
+            if entity.value != '':
+                edit = archesmodels.EditLog()        
+                edit.editlogid = str(uuid.uuid4())
+                edit.resourceentitytypeid = self.entitytypeid
+                edit.resourceid = self.entityid
+                edit.attributeentitytypeid = entity.entitytypeid
+                edit.edittype = 'delete'
+                edit.userid = username
+                edit.timestamp = timestamp
+                edit.oldvalue = None
+                edit.newvalue = entity.value
+                edit.user_firstname = username
+                edit.user_lastname = username
+                edit.note = note
+                edit.save()
 
         self._delete(delete_root)
 

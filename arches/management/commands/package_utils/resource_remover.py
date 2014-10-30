@@ -17,7 +17,8 @@ def delete_resources(load_id, truncate='False'):
 		try:
 			entity = Entity(r_id)
 			entity.delete_index()
-			entity.delete(delete_root=True)
+			note = '{0} Deleted'.format(load_id)
+			entity.delete(delete_root=True, note=note)
 		except ObjectDoesNotExist:
 			print 'Entity does not exist. Nothing to delete'
 
