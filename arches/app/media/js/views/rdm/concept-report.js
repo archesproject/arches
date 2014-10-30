@@ -116,9 +116,13 @@ define([
         },        
 
         addImageClicked: function (e) {
-            new AddImageForm({
-                el: this.$el.find('#add-image-form')[0],
-                model: this.model
+            var self = this,
+                form = new AddImageForm({
+                    el: this.$el.find('#add-image-form')[0],
+                    model: this.model
+                });
+            form.on('dataChanged', function () {
+                self.render();
             });
         },
 
