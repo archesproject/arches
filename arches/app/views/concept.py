@@ -221,7 +221,7 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def concept_image(request, conceptid):
-    value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+    value = archesmodels.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
     value.save()
 
     return JSONResponse({'success': True})
