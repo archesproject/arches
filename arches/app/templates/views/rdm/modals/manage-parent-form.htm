@@ -33,9 +33,9 @@
                                 <div data-id="{{parent.conceptid}}">
                                     <dd class="arches-RDM-label-highlighted">
                                         {% if direct_parents|length > 1 %}
-                                        <a href="#" title="{% trans "Remove the relationship to this parent concept" %}"><i class="arches-CRUD-delete fa fa-times-circle"  data-id="{{parent.conceptid}}"  data-message="{% trans "Remove the relationship to this parent concept." %}" ></i></a>
+                                        <a href="javascript:void(0);" title="{% trans "Remove the relationship to this parent concept" %}"><i class="arches-CRUD-delete fa fa-times-circle"  data-id="{{parent.conceptid}}"  data-message="{% trans "Remove the relationship to this parent concept." %}" ></i></a>
                                         {% endif %}
-                                        <span href="#" class="arches-CRUD-child">{{parent.value}}</span>
+                                        <span href="javascript:void(0);" class="arches-CRUD-child">{{parent.value}}</span>
                                     </dd>
                                 </div>
                                 {% endfor %}
@@ -50,7 +50,7 @@
                 {% for parent in direct_parents%}
                 <div data-id="{{parent.conceptid}}" style="display:none" class="pull-left">
                     <dd class="arches-RDM-label-highlighted">
-                        <span href="#" class="arches-CRUD-child">{% trans "Deleting reference to parent:" %} {{parent.value}}</span>
+                        <span href="javascript:void(0);" class="arches-CRUD-child">{% trans "Deleting reference to parent:" %} {{parent.value}}</span>
                     </dd>
                 </div>
                 {% endfor %}
