@@ -4,21 +4,26 @@ define([
     'arches',
     'models/concept',
     'models/value',
+    'models/concept-parents',
     'views/rdm/modals/value-form',
     'views/rdm/modals/related-concept-form',
+    'views/rdm/modals/manage-parent-form',
     'views/rdm/modals/add-child-form',
+    'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ValueEditor, RelatedConcept, AddChildForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
             'click .concept-report-content *[data-action="delete-relationship"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-value"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-concept"]': 'deleteClicked',
+            'click a.add-image-link': 'addImageClicked',
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
-            'click a[data-toggle="#add-concept-form"]': 'addChildConcept'
+            'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
+            'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
 
         initialize: function() {
@@ -33,6 +38,8 @@ define([
             if (conceptid) {
                 self.$el.find('.concept-report-loading').removeClass('hidden');
                 self.$el.find('.concept-report-content').addClass('hidden');
+
+
                 $.ajax({
                     url: '../Concepts/' + conceptid + '?f=html',
                     success: function(response) {
@@ -59,17 +66,13 @@ define([
         },
 
         deleteClicked: function(e) {
-            var data = $(e.target).data(),
-                idField = 'id';
-
-            if (data.action === 'delete-relationship') {
-                idField = 'relatedconceptid';
-            }
+            var data = $(e.target).data();
 
             this.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
             this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-            this.$el.find('.confirm-delete-yes').data(idField, data.id);
+            this.$el.find('.confirm-delete-yes').data('id', data.id);
             this.$el.find('.confirm-delete-yes').data('action', data.action);
+            this.$el.find('.confirm-delete-yes').data('category', data.category);
             this.$el.find('.confirm-delete-modal').modal('show');
         },
 
@@ -80,7 +83,6 @@ define([
         },
 
         addChildConcept: function(e){
-            var self = this;
             var form = new AddChildForm({
                 el: $('#add-child-form')[0],
                 model: this.model
@@ -90,11 +92,39 @@ define([
         },
 
         addRelatedConceptClicked: function(e){
-            var add_related_concept_modal = new RelatedConcept({
+            var modal = new RelatedConcept({
                 el: $('#related-concept-form')[0],
                 model: this.model
             });
-            add_related_concept_modal.modal.modal('show');
+            modal.modal.modal('show');
+        },
+
+        manageParentConcepts: function(e){
+            var self = this;
+            var parentmodel = new ConceptParentModel();
+            parentmodel.set('id', this.model.get('id'));
+            var modal = new ManageParentForm({
+                el: $('#manage-parent-form')[0],
+                model: parentmodel
+            });
+            modal.modal.modal('show');
+
+            parentmodel.on({
+                'save': function(){
+                    self.trigger('parentsChanged');
+                }
+            });
+        },        
+
+        addImageClicked: function (e) {
+            var self = this,
+                form = new AddImageForm({
+                    el: this.$el.find('#add-image-form')[0],
+                    model: this.model
+                });
+            form.on('dataChanged', function () {
+                self.render();
+            });
         },
 
         editValueClicked: function(e) {
@@ -121,25 +151,17 @@ define([
                 if (data.action === 'delete-value') {
                     model = new ValueModel(data);
                     self.model.set('values', [model]);
-                    //eventName = 'valueDeleted';
                 }
                 if (data.action === 'delete-relationship') {
                     model = new ConceptModel(data);
-                    model.set('id', self.model.get('id'));
                     self.model.set('relatedconcepts', [model]);
-
-                    //eventName = 'relationshipDeleted';
                 }
                 if (data.action === 'delete-concept') {
                     model = new ConceptModel(data)
                     self.model.set('subconcepts', [model]);
-                    //eventName = 'conceptDeleted';
                 }
 
-                self.model.delete(function() {
-                    // self.render();
-                    // self.trigger(eventName, model);
-                });
+                self.model.delete();
             });
             modal.modal('hide');
         }

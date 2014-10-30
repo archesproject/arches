@@ -253,6 +253,9 @@ class ConceptRelations(models.Model):
     class Meta:
         db_table = u'concepts"."relations'
 
+    def __unicode__(self):
+        return ('%s') % (self.relationid)
+
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
     category = models.TextField()
@@ -269,6 +272,26 @@ class Values(models.Model):
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
         db_table = u'values'
+
+class FileValues(models.Model):
+    valueid = models.TextField(primary_key=True) # This field type is a guess.
+    conceptid = models.ForeignKey('Concepts', db_column='conceptid')
+    valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
+    datatype = models.TextField()
+    value = models.FileField(upload_to='files')
+    languageid = models.ForeignKey('DLanguages', db_column='languageid')
+    class Meta:
+        db_table = u'values'
+
+    def geturl(self):
+        if self.value != None:
+            return self.value.url
+        return ''
+
+    def getname(self):
+        if self.value != None:
+            return self.value.name[6:]
+        return ''
 
 class AuthGroupPermissions(models.Model):
     id = models.IntegerField(primary_key=True)

@@ -19,11 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.conf import settings
 from django.db import transaction, IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-import arches.app.models.models as archesmodels
+from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
@@ -33,18 +33,22 @@ from arches.app.utils.skos import SKOSWriter
 
 
 def rdm(request, conceptid):
-    languages = archesmodels.DLanguages.objects.all()
+    lang = request.GET.get('lang', 'en-us')    
+    
+    languages = models.DLanguages.objects.all()
+    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
+    concept_schemes = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
-            'conceptid': conceptid
+            'conceptid': conceptid,
+            'concept_schemes': concept_schemes
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
 def concept(request, conceptid):
-    ret = {'success': False}
     f = request.GET.get('f', 'json')
     lang = request.GET.get('lang', 'en-us')
     pretty = request.GET.get('pretty', False)
@@ -64,17 +68,17 @@ def concept(request, conceptid):
         if f == 'skos':
             fromdb = True
 
-        ret = []
-
         if fromdb:
+            ret = []
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None)
 
             if f == 'html':
-                languages = archesmodels.DLanguages.objects.all()
-                valuetypes = archesmodels.ValueTypes.objects.all()
+                languages = models.DLanguages.objects.all()
+                valuetypes = models.ValueTypes.objects.all()
                 prefLabel = concept_graph.get_preflabel(lang=lang).value
+                direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -82,15 +86,15 @@ def concept(request, conceptid):
                     'languages': languages,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category=''),
+                    'valuetype_related_values': valuetypes.filter(category='').exclude(valuetype='image'),
                     'concept_paths': concept_graph.get_paths(lang=lang),
-                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang))
+                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                    'direct_parents': direct_parents
                 }, context_instance=RequestContext(request))
             
             if f == 'skos':
                 skos = SKOSWriter()
-                response = HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
-                return response
+                return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
 
             if emulate_elastic_search:
                 ret.append({'_type': id, '_source': concept_graph})
@@ -98,19 +102,27 @@ def concept(request, conceptid):
                 ret.append(concept_graph)       
 
             if emulate_elastic_search:
-                ret = {'hits':{'hits':ret}}    
+                ret = {'hits':{'hits':ret}} 
+
+            return JSONResponse(ret)   
 
         else:
             se = SearchEngineFactory().create()
-            ret = se.search('', index='concept', type=ids, search_field='value', use_wildcard=True)
+            return JSONResponse(se.search('', index='concept', type=ids, search_field='value', use_wildcard=True))
+
 
     if request.method == 'POST':
-        json = request.body
+        if len(request.FILES) > 0:
+            value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+            value.save()
 
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
-            
-            try:
+            return JSONResponse(value)
+        else:
+            json = request.body
+
+            if json != None:
+                data = JSONDeserializer().deserialize(json)
+                
                 with transaction.atomic():
                     concept = Concept(data)
                     concept.save()
@@ -121,89 +133,55 @@ def concept(request, conceptid):
                     else:
                         concept.index()
 
-                    # if 'relatedconcepts' in data:
-                    #     for relatedconcept in data['relatedconcepts']:
-                    #         relation = archesmodels.ConceptRelations()
-                    #         relation.pk = str(uuid.uuid4())
-                    #         relation.conceptidfrom_id = conceptid
-                    #         relation.conceptidto_id = relatedconcept['id']
-                    #         relation.relationtype_id = 'has related concept'
-                    #         relation.save()
-                    # else:
-                    #     conceptid = data['conceptid']
-                    #     target_parent_conceptid = data['target_parent_conceptid']
-                    #     current_parent_conceptid = data['current_parent_conceptid']
-
-                    #     relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                    #     relation.conceptidfrom_id = target_parent_conceptid
-                    #     relation.save()
-
-                    #     return JSONResponse(relation)
-
-
-                    ret['success'] = True
-            
-            except IntegrityError as e:
-                return JSONResponse(SaveFailed(message=str(e)))
-
+                    return JSONResponse(concept)
 
 
     if request.method == 'DELETE':
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            try:
-                with transaction.atomic():
-                    concept = Concept(data)
-                    concept.delete_index()                    
-                    concept.delete()
-                    print 'here'
-                    ret['success'] = True
-            except IntegrityError:
-                return JSONResponse(SaveFailed())
-            # if 'action' in data:
-            #     action = data['action']
+            
+            with transaction.atomic():
+                concept = Concept(data)
+                concept.delete_index()                    
+                concept.delete()
 
-            #     if data['action'] == 'delete-relationship':
-            #         relatedconceptid = data['relatedconceptid']
-            #         concept = Concept({'id':conceptid})
-            #         concept.addrelatedconcept({'id': relatedconceptid})
-            #         concept.delete_related_concept()
-                
-            #     elif data['action'] == 'delete-concept':
-            #         with transaction.atomic():
-            #             concept = Concept()
-            #             concept.get(id=conceptid)
-            #             concept.delete_index()
-            #             concept.delete()
-            #             ret['success'] = True
+                return JSONResponse(concept)
 
-    return JSONResponse(ret, indent=(4 if pretty else None))
+    return HttpResponseNotFound()
+
 
 @csrf_exempt
-def concept_value(request, valueid):
+def manage_parents(request, conceptid):
     #  need to check user credentials here
 
     if request.method == 'POST':
         json = request.body
-
         if json != None:
+            data = JSONDeserializer().deserialize(json)
+            
             with transaction.atomic():
-                value = ConceptValue(json)
-                value.save()
-                value.index()
+                if len(data['deleted']) > 0:
+                    concept = Concept({'id':conceptid})
+                    for deleted in data['deleted']:
+                        concept.addparent(deleted)  
+    
+                    concept.delete()
+                
+                if len(data['added']) > 0:
+                    concept = Concept({'id':conceptid})
+                    for added in data['added']:
+                        concept.addparent(added)   
+            
+                    concept.save()
 
-            return JSONResponse(value)
+                return JSONResponse(data)
 
-    if request.method == 'DELETE':
-        with transaction.atomic():
-            value = ConceptValue({'id': valueid})
-            value.delete()
-            value.delete_index()
-        
-        return JSONResponse(value)
+    else:
+        HttpResponseNotAllowed(['POST'])
 
-    return JSONResponse({'success': False})
+    return HttpResponseNotFound()
+
 
 @csrf_exempt
 def search(request):
@@ -235,6 +213,12 @@ def concept_tree(request):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)
+
+def schemes(request):
+    lang = request.GET.get('lang', 'en-us')
+    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
+    ret = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
+    return JSONResponse(ret, indent=4)
 
 class SaveFailed(object):
     def __init__(self, message='', additionaldata=None):

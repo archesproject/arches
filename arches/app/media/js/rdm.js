@@ -6,9 +6,11 @@ require([
     'views/rdm/concept-tree',
     'views/rdm/concept-report',
     'views/concept-search',
-        'views/rdm/modals/add-scheme-form',
+    'views/rdm/modals/add-scheme-form',
+    'views/rdm/modals/export-scheme-form',
+    'views/rdm/modals/delete-scheme-form',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm) {
     $(document).ready(function() {
         var appHeader = $("#appheader");
         var sidebar = $("#sidebar");
@@ -70,10 +72,11 @@ require([
                 concept.set('id', conceptid);
                 conceptTree.render();
                 conceptReport.render();
+            },
+            'parentsChanged': function() {
+                conceptTree.render();
+                conceptReport.render();
             }//,
-            // 'conceptDeleted': function() {
-            //     conceptTree.render();
-            // },
             // 'conceptAdded': function() {
             //     conceptTree.render();
             // }
@@ -89,7 +92,7 @@ require([
         $('a[data-toggle="#add-scheme-form"]').on( "click", function(){
             var self = this;
             var form = new AddSchemeForm({
-                el: $('#add-child-form')[0]
+                el: $('#add-scheme-form')
             });
             form.modal.modal('show');
             form.on({
@@ -98,6 +101,22 @@ require([
                     conceptReport.render();
                 }
             })
+        });
+
+        $('a[data-toggle="#export-scheme-form"]').on( "click", function(){
+            var self = this;
+            var form = new ExportSchemeForm({
+                el: $('#export-scheme-form')
+            });
+            form.modal.modal('show');
+        });
+
+        $('a[data-toggle="#delete-scheme-form"]').on( "click", function(){
+            var self = this;
+            var form = new DeleteSchemeForm({
+                el: $('#delete-scheme-form')
+            });
+            form.modal.modal('show');
         });
 
         $(window).scroll(function() {

@@ -30,15 +30,25 @@ INSERT INTO d_languages VALUES ('en-us', 'ENGLISH', true);
 -- Data for Name: d_valuetypes; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
+--SKOS Documentation Properties
 INSERT INTO d_valuetypes VALUES ('scopeNote', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('definition', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('example', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('historyNote', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('editorialNote', 'note',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('changeNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('note', 'note',null,TRUE);
+
+--SKOS Lexical Properties
 INSERT INTO d_valuetypes VALUES ('prefLabel', 'label',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('altLabel', 'label',null,TRUE);
 INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label',null,TRUE);
+
+--SKOS Notation (A notation is different from a lexical label in that a notation is not normally recognizable as a word or sequence of words in any natural language. (ie sortorder))
+INSERT INTO d_valuetypes VALUES ('Notation', 'Notation',null,TRUE);
+
+--NON-SKOS
+INSERT INTO d_valuetypes VALUES ('image', 'image',null,FALSE);
 
 
 --
@@ -47,11 +57,30 @@ INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label',null,TRUE);
 -- Data for Name: d_relationtypes; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_relationtypes VALUES ('has narrower concept');
-INSERT INTO d_relationtypes VALUES ('has related concept');
-INSERT INTO d_relationtypes VALUES ('has authority document');
-INSERT INTO d_relationtypes VALUES ('includes');
-INSERT INTO d_relationtypes VALUES ('has collection');
+--SKOS Mapping Properties (relationships between concepts across schemes)
+INSERT INTO d_relationtypes VALUES ('closeMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('mappingRelation', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrowMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('relatedMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('broadMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('exactMatch', 'Mapping Properties', TRUE);
+
+--SKOS Semantic Relations (relationship between concepts within a scheme)
+INSERT INTO d_relationtypes VALUES ('borader', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('broaderTransitive', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrower', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrowerTransitive', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('related', 'Semantic Relations', TRUE);
+
+
+-- legacy relationshiptypes (should be removed before v3)
+INSERT INTO d_relationtypes VALUES ('has narrower concept', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has related concept', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has authority document', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('includes', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has collection', 'Legacy', FALSE);
+
+
 
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');

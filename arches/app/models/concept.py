@@ -41,6 +41,8 @@ class Concept(object):
                     self.get(args[0])
                 except(ValueError):
                     self.load(JSONDeserializer().deserialize(args[0]))  
+            elif isinstance(args[0], dict):
+                self.load(args[0])  
             elif isinstance(args[0], object):
                 self.load(args[0])  
 
@@ -150,7 +152,6 @@ class Concept(object):
                 relation.conceptidto_id = relatedconcept.id
                 relation.relationtype_id = 'has related concept'
                 relation.save()
-                print relation
 
             for value in self.values:
                 if not isinstance(value, ConceptValue): 
@@ -162,6 +163,12 @@ class Concept(object):
 
     def delete(self, delete_self=False):
         with transaction.atomic():
+
+            for parentconcept in self.parentconcepts:
+                conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has narrower concept', conceptidfrom = parentconcept.id, conceptidto = self.id)
+                for relation in conceptrelations:
+                    relation.delete()
+
             for subconcept in self.subconcepts:
                 subconcept.delete(delete_self=True)
 
@@ -480,6 +487,9 @@ class ConceptValue(object):
             se.index_data('concept_labels', scheme, data, 'id')
     
     def delete_index(self):
+        if self.category == '':
+            raise Exception('Delete index failed.  Remember to specify a category for your value. %s' % JSONSerializer().serialize(self))
+        
         se = SearchEngineFactory().create()
         if self.category == 'label':
             scheme = self.get_scheme_id()
@@ -490,7 +500,6 @@ class ConceptValue(object):
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
         result = se.search(index='concept_labels', id=self.id)
-        #print result
         if not result['found']:
             return None
         else:
