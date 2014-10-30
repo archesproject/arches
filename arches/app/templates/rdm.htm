@@ -1,4 +1,4 @@
-﻿{% extends "base.htm" %}
+{% extends "base.htm" %}
 {% load i18n %}
 
 {% load staticfiles %}
@@ -67,10 +67,10 @@
                                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
                                     <li><a href="#ImportNewScheme" data-toggle="modal">{% trans "Import Scheme" %}</a></li>
-                                    <li><a href="javascript:void(0);" data-toggle="modal">{% trans "Export Scheme" %}</a></li>
-                                    <li><a href="#DeleteScheme" data-toggle="modal">{% trans "Delete Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
                                     <li class="divider"></li>
                                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                                 </ul>
@@ -134,6 +134,16 @@
         <input type="hidden" id="selected-conceptid" value="{{conceptid}}">
     </div>
 
-{% include "views/rdm/modals/add-scheme-form.htm" %}
+<div id="add-scheme-form">
+    {% include "views/rdm/modals/add-scheme-form.htm" %}
+</div>
+
+<div id="export-scheme-form">
+    {% include "views/rdm/modals/export-scheme-form.htm" %}
+</div>
+
+<div id="delete-scheme-form">
+    {% include "views/rdm/modals/delete-scheme-form.htm" %}
+</div>
 
 {% endblock content %}

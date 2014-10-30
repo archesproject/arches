@@ -23,7 +23,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-import arches.app.models.models as archesmodels
+from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
@@ -33,13 +33,18 @@ from arches.app.utils.skos import SKOSWriter
 
 
 def rdm(request, conceptid):
-    languages = archesmodels.DLanguages.objects.all()
+    lang = request.GET.get('lang', 'en-us')    
+    
+    languages = models.DLanguages.objects.all()
+    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
+    concept_schemes = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
-            'conceptid': conceptid
+            'conceptid': conceptid,
+            'concept_schemes': concept_schemes
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
@@ -72,8 +77,8 @@ def concept(request, conceptid):
                 depth_limit=depth_limit, up_depth_limit=None)
 
             if f == 'html':
-                languages = archesmodels.DLanguages.objects.all()
-                valuetypes = archesmodels.ValueTypes.objects.all()
+                languages = models.DLanguages.objects.all()
+                valuetypes = models.ValueTypes.objects.all()
                 prefLabel = concept_graph.get_preflabel(lang=lang).value
                 direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 return render_to_response('views/rdm/concept-report.htm', {
@@ -125,7 +130,7 @@ def concept(request, conceptid):
 
                     # if 'relatedconcepts' in data:
                     #     for relatedconcept in data['relatedconcepts']:
-                    #         relation = archesmodels.ConceptRelations()
+                    #         relation = models.ConceptRelations()
                     #         relation.pk = str(uuid.uuid4())
                     #         relation.conceptidfrom_id = conceptid
                     #         relation.conceptidto_id = relatedconcept['id']
@@ -136,7 +141,7 @@ def concept(request, conceptid):
                     #     target_parent_conceptid = data['target_parent_conceptid']
                     #     current_parent_conceptid = data['current_parent_conceptid']
 
-                    #     relation = archesmodels.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
+                    #     relation = models.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
                     #     relation.conceptidfrom_id = target_parent_conceptid
                     #     relation.save()
 
@@ -252,6 +257,12 @@ def concept_tree(request):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)
+
+def schemes(request):
+    lang = request.GET.get('lang', 'en-us')
+    concepts = Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=1, include=['label'])
+    ret = [concept.get_preflabel(lang=lang) for concept in concepts.subconcepts]
+    return JSONResponse(ret, indent=4)
 
 class SaveFailed(object):
     def __init__(self, message='', additionaldata=None):

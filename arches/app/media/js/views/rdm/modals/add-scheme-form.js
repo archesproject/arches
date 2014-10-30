@@ -1,9 +1,9 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptSearch, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(e){
             var self = this;
-            this.modal = $('#add-scheme-form');
+            this.modal = this.$el.find('.modal');
             this.modal.on('hidden.bs.modal', function () {
                 self.$el.find("input[type=text], textarea").val("");
             });
