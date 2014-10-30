@@ -72,6 +72,7 @@ define([
             this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
             this.$el.find('.confirm-delete-yes').data('id', data.id);
             this.$el.find('.confirm-delete-yes').data('action', data.action);
+            this.$el.find('.confirm-delete-yes').data('category', data.category);
             this.$el.find('.confirm-delete-modal').modal('show');
         },
 

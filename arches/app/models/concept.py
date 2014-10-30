@@ -487,6 +487,9 @@ class ConceptValue(object):
             se.index_data('concept_labels', scheme, data, 'id')
     
     def delete_index(self):
+        if self.category == '':
+            raise Exception('Delete index failed.  Remember to specify a category for your value. %s' % JSONSerializer().serialize(self))
+        
         se = SearchEngineFactory().create()
         if self.category == 'label':
             scheme = self.get_scheme_id()
@@ -497,7 +500,6 @@ class ConceptValue(object):
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
         result = se.search(index='concept_labels', id=self.id)
-        #print result
         if not result['found']:
             return None
         else:

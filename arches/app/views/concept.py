@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.conf import settings
 from django.db import transaction, IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -49,7 +49,6 @@ def rdm(request, conceptid):
 
 @csrf_exempt
 def concept(request, conceptid):
-    ret = {'success': False}
     f = request.GET.get('f', 'json')
     lang = request.GET.get('lang', 'en-us')
     pretty = request.GET.get('pretty', False)
@@ -69,9 +68,8 @@ def concept(request, conceptid):
         if f == 'skos':
             fromdb = True
 
-        ret = []
-
         if fromdb:
+            ret = []
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None)
@@ -96,8 +94,7 @@ def concept(request, conceptid):
             
             if f == 'skos':
                 skos = SKOSWriter()
-                response = HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
-                return response
+                return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
 
             if emulate_elastic_search:
                 ret.append({'_type': id, '_source': concept_graph})
@@ -105,124 +102,85 @@ def concept(request, conceptid):
                 ret.append(concept_graph)       
 
             if emulate_elastic_search:
-                ret = {'hits':{'hits':ret}}    
+                ret = {'hits':{'hits':ret}} 
+
+            return JSONResponse(ret)   
 
         else:
             se = SearchEngineFactory().create()
-            ret = se.search('', index='concept', type=ids, search_field='value', use_wildcard=True)
+            return JSONResponse(se.search('', index='concept', type=ids, search_field='value', use_wildcard=True))
+
 
     if request.method == 'POST':
         if len(request.FILES) > 0:
             value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
             value.save()
 
-            ret['success'] = True
+            return JSONResponse(value)
         else:
             json = request.body
 
             if json != None:
                 data = JSONDeserializer().deserialize(json)
                 
-                try:
-                    with transaction.atomic():
-                        concept = Concept(data)
-                        concept.save()
+                with transaction.atomic():
+                    concept = Concept(data)
+                    concept.save()
 
-                        if conceptid == '00000000-0000-0000-0000-000000000003':
-                            # we're adding a top level scheme so we don't index
-                            pass
-                        else:
-                            concept.index()
+                    if conceptid == '00000000-0000-0000-0000-000000000003':
+                        # we're adding a top level scheme so we don't index
+                        pass
+                    else:
+                        concept.index()
 
-                        # if 'relatedconcepts' in data:
-                        #     for relatedconcept in data['relatedconcepts']:
-                        #         relation = models.ConceptRelations()
-                        #         relation.pk = str(uuid.uuid4())
-                        #         relation.conceptidfrom_id = conceptid
-                        #         relation.conceptidto_id = relatedconcept['id']
-                        #         relation.relationtype_id = 'has related concept'
-                        #         relation.save()
-                        # else:
-                        #     conceptid = data['conceptid']
-                        #     target_parent_conceptid = data['target_parent_conceptid']
-                        #     current_parent_conceptid = data['current_parent_conceptid']
-
-                        #     relation = models.ConceptRelations.objects.get(conceptidfrom_id= current_parent_conceptid, conceptidto_id=conceptid)
-                        #     relation.conceptidfrom_id = target_parent_conceptid
-                        #     relation.save()
-
-                        #     return JSONResponse(relation)
-
-
-                        ret['success'] = True
-                
-                except IntegrityError as e:
-                    return JSONResponse(SaveFailed(message=str(e)))
-
+                    return JSONResponse(concept)
 
 
     if request.method == 'DELETE':
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            try:
-                with transaction.atomic():
-                    concept = Concept(data)
-                    concept.delete_index()                    
-                    concept.delete()
-                    ret['success'] = True
-            except IntegrityError as e:
-                return JSONResponse(SaveFailed(message=str(e)))
-            # if 'action' in data:
-            #     action = data['action']
+            
+            with transaction.atomic():
+                concept = Concept(data)
+                concept.delete_index()                    
+                concept.delete()
 
-            #     if data['action'] == 'delete-relationship':
-            #         relatedconceptid = data['relatedconceptid']
-            #         concept = Concept({'id':conceptid})
-            #         concept.addrelatedconcept({'id': relatedconceptid})
-            #         concept.delete_related_concept()
-                
-            #     elif data['action'] == 'delete-concept':
-            #         with transaction.atomic():
-            #             concept = Concept()
-            #             concept.get(id=conceptid)
-            #             concept.delete_index()
-            #             concept.delete()
-            #             ret['success'] = True
+                return JSONResponse(concept)
 
-    return JSONResponse(ret, indent=(4 if pretty else None))
+    return HttpResponseNotFound()
 
 
 @csrf_exempt
 def manage_parents(request, conceptid):
     #  need to check user credentials here
-    ret = {}
 
     if request.method == 'POST':
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            try:
-                with transaction.atomic():
-                    if len(data['deleted']) > 0:
-                        concept = Concept({'id':conceptid})
-                        for deleted in data['deleted']:
-                            concept.addparent(deleted)  
-        
-                        concept.delete()
-                    
-                    if len(data['added']) > 0:
-                        concept = Concept({'id':conceptid})
-                        for added in data['added']:
-                            concept.addparent(added)   
+            
+            with transaction.atomic():
+                if len(data['deleted']) > 0:
+                    concept = Concept({'id':conceptid})
+                    for deleted in data['deleted']:
+                        concept.addparent(deleted)  
+    
+                    concept.delete()
                 
-                        concept.save()
+                if len(data['added']) > 0:
+                    concept = Concept({'id':conceptid})
+                    for added in data['added']:
+                        concept.addparent(added)   
+            
+                    concept.save()
 
-                    ret['success'] = True
-            except IntegrityError as e:
-                return JSONResponse(SaveFailed(message=str(e)))
+                return JSONResponse(data)
 
-    return JSONResponse(ret)
+    else:
+        HttpResponseNotAllowed(['POST'])
+
+    return HttpResponseNotFound()
 
 
 @csrf_exempt
