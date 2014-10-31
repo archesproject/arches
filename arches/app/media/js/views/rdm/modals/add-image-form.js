@@ -11,7 +11,6 @@ define(['jquery', 'backbone', 'dropzone', 'arches', 'bootstrap'], function ($, B
             if (!dropzoneEl.hasClass('dz-clickable')) {
                 dropzoneInstance = new dropzone(dropzoneEl[0], {
                     url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-                    dictResponseError: 'Error uploading file!',
                     acceptedFiles: 'image/*'
                 });
 
