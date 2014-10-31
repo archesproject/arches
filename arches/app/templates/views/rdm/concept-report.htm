@@ -63,16 +63,14 @@
                     <span>
                 </h5>
             </dt>
-            {% for value in concept.values %}
-                {% if value.category == 'label' %}
+            {% for value in labels %}
                 <dd class="arches-RDM-label-highlighted">
-                    {% if concept.values|length > 1 %}
+                    {% if labels|length > 1 %}
                         <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                     {% endif %}
                     <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
                     <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                 </dd>
-                {% endif %}
             {% endfor %}
 
         </dl>

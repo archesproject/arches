@@ -70,6 +70,7 @@ def concept(request, conceptid):
 
         if fromdb:
             ret = []
+            labels = []
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                 depth_limit=depth_limit, up_depth_limit=None)
@@ -78,10 +79,14 @@ def concept(request, conceptid):
                 languages = models.DLanguages.objects.all()
                 valuetypes = models.ValueTypes.objects.all()
                 prefLabel = concept_graph.get_preflabel(lang=lang).value
+                for value in concept_graph.values:
+                    if value.category == 'label':
+                        labels.append(value)
                 direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
+                    'labels': labels,
                     'concept': concept_graph,
                     'languages': languages,
                     'valuetype_labels': valuetypes.filter(category='label'),
