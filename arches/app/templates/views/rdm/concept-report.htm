@@ -66,7 +66,9 @@
             {% for value in concept.values %}
                 {% if value.category == 'label' %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="javascript:void(0);" title="{% trans "Remove this label" %}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    {% if concept.values|length > 1 %}
+                        <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    {% endif %}
                     <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
                     <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                 </dd>
@@ -91,7 +93,7 @@
             {% for value in concept.values %}
                 {% if value.category == 'note' %}
                 <dd class="arches-RDM-label">
-                    <a href="javascript:void(0);" title="{% trans "Remove this note" %}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this note?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                     <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this note" data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a> 
                     <span class="text-muted"> ({{value.language}})</span>
                 </dd>
@@ -142,7 +144,7 @@
                             {% for subconcept in concept.subconcepts %}
                             <dd class="arches-concept-heirarchy">
                                 <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
-                                <a href="javascript:void(0);" title="{% trans "Delete this concept" %}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{subconcept.id}}" data-action="delete-concept" data-message="{% trans "Delete this concept and all of it''s sub concepts." %}" ></i></a>
+                                <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this concept?" %}" data-id="{{subconcept.id}}" data-action="delete-concept" data-message="{% trans "By deleting this concept, you will also be deleting the following concepts as well.  This operation cannot be undone." %}" ></i></a>
                                 <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>
                             </dd>
                             {% endfor %}
@@ -183,7 +185,7 @@
 
             {% for value in concept.relatedconcepts %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="javascript:void(0);" title="{% trans "Remove the relationship to this concept" %}"><i class="arches-CRUD-delete fa fa-times-circle" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"></i></a>
+                    <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Remove the relationship to this concept?" %}" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"></i></a>
                     <a href="javascript:void(0);" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{value.conceptid}}">{{value.value}} </a>
                     <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                 </dd>
@@ -209,7 +211,7 @@
             {% for value in concept.values %}
                 {% if value.category == '' and value.type != 'image' %}
                 <dd class="arches-RDM-label-highlighted">
-                    <a href="javascript:void(0);" title="{% trans "Remove this value" %}"><i class="color-red fa fa-times-circle" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    <a href="javascript:void(0);"><i class="color-red fa fa-times-circle" title="{% trans "Delete this value?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                     <a href="javascript:void(0);" title="{% trans "Edit this value" %}" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
                     <span class="arches-RDM-note">{{value.value}}</span>
                 </dd>
@@ -288,13 +290,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">{% trans "Are you ready to delete this?" %}</h4>
+                <h4 class="modal-title">{% trans "Are you ready to delete this item?" %}</h4>
             </div>
             <div class="modal-body">
+                <h5 name="warning-text">
+                </h5>
+                <div name="additional-info">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
-                <button class="btn-u btn-u-primary confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
+                <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
             </div>
         </div>
     </div>

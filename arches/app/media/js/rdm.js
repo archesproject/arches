@@ -41,16 +41,12 @@ require([
             'save': function(){
                 conceptTree.render();
                 conceptReport.render();
-                conceptid = concept.get('id');
-                concept.clear();
-                concept.set('id', conceptid);
+                concept.reset()
             },
             'delete': function(){
                 conceptTree.render();
                 conceptReport.render();
-                conceptid = concept.get('id');
-                concept.clear();
-                concept.set('id', conceptid);
+                concept.reset()
             }
         });
 

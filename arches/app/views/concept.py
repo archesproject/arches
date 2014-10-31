@@ -53,6 +53,7 @@ def concept(request, conceptid):
     pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
+
         include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
         include_parentconcepts = request.GET.get('include_parentconcepts', 'true') == 'true'
         include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
@@ -103,7 +104,7 @@ def concept(request, conceptid):
             if emulate_elastic_search:
                 ret = {'hits':{'hits':ret}} 
 
-            return JSONResponse(ret)   
+            return JSONResponse(ret, indent=4 if pretty else None)   
 
         else:
             se = SearchEngineFactory().create()
@@ -127,10 +128,7 @@ def concept(request, conceptid):
                     concept.save()
 
                     if conceptid not in CORE_CONCEPTS:
-                        if len(concept.subconcepts) > 0 and concept.subconcepts[0].is_scheme():
-                            concept.index(scheme=concept.subconcepts[0].id)
-                        else:
-                            concept.index()
+                        concept.index()
 
                     return JSONResponse(concept)
 
@@ -142,8 +140,9 @@ def concept(request, conceptid):
             
             with transaction.atomic():
                 concept = Concept(data)
+
                 if concept.id not in CORE_CONCEPTS:
-                    concept.delete_index()                    
+                    concept.delete_index()                
                 concept.delete()
 
                 return JSONResponse(concept)
@@ -182,6 +181,12 @@ def manage_parents(request, conceptid):
 
     return HttpResponseNotFound()
 
+@csrf_exempt
+def confirm_delete(request, conceptid):
+    concepts_to_delete = [concept.value for concept in Concept.gather_concepts_to_delete(conceptid)]
+
+    #return JSONResponse(concepts_to_delete)
+    return HttpResponse('<ul><li>' + '<li>'.join(concepts_to_delete) + '</ul>')
 
 @csrf_exempt
 def search(request):

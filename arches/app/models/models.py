@@ -263,6 +263,9 @@ class ValueTypes(models.Model):
     class Meta:
         db_table = u'concepts"."d_valuetypes'
 
+    def __unicode__(self):
+        return ('valuetype: %s, category: %s') % (self.valuetype, self.category)
+
 class Values(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')

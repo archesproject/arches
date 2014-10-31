@@ -10,6 +10,13 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
             'subconcepts': [],
             'parentconcepts': [],
             'relatedconcepts': []
+        },
+
+        reset: function(){
+            var conceptid = this.get('id');
+            this.clear();
+            this.set('id', conceptid);            
         }
+
     });
 });

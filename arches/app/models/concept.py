@@ -22,6 +22,7 @@ from django.db import transaction
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 CORE_CONCEPTS = (
@@ -170,14 +171,16 @@ class Concept(object):
 
     def delete(self, delete_self=False):
         with transaction.atomic():
+            for subconcept in self.subconcepts:
+                concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+                
+                for concept in concepts_to_delete:
+                    models.Concepts.objects.get(pk=concept.conceptid).delete()
 
             for parentconcept in self.parentconcepts:
                 conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has narrower concept', conceptidfrom = parentconcept.id, conceptidto = self.id)
                 for relation in conceptrelations:
                     relation.delete()
-
-            for subconcept in self.subconcepts:
-                subconcept.delete(delete_self=True)
 
             for relatedconcept in self.relatedconcepts:
                 deletedrelatedconcepts = []
@@ -202,9 +205,44 @@ class Concept(object):
                 value.delete()
 
             if delete_self:
-                concept = models.Concepts.objects.get(pk=self.id)
-                concept.delete()
+                models.Concepts.objects.get(pk=self.id).delete()
         return
+
+    @staticmethod
+    def gather_concepts_to_delete(conceptid):
+        concepts_to_delete = []
+        concept = Concept().get(id=conceptid, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
+        
+        def find_concepts(concept):
+            if len(concept.parentconcepts) <= 1:
+                concepts_to_delete.append(concept.get_preflabel())
+                for subconcept in concept.subconcepts:
+                    find_concepts(subconcept)
+
+        find_concepts(concept)
+        return concepts_to_delete
+
+    def traverse(self, func, scope=None):
+        """
+        Traverses a graph from leaf to root calling the given function on each node
+        passes an optional scope to each function
+
+        Return False from the function to prematurely end the traversal
+
+        """
+
+        if scope == None:
+            ret = func(self)
+        else:
+            ret = func(self, scope) 
+        
+        # break out of the traversal if the function returns False
+        if ret == False:
+            return False    
+
+        for subconcept in self.subconcepts:
+            if subconcept.traverse(func, scope) == False: 
+                break
 
     def get_sortkey(self, lang='en-us'):
         for value in self.values:
@@ -293,23 +331,39 @@ class Concept(object):
     def index(self, scheme=''):
         if scheme == '':
             scheme = self.get_auth_doc_concept().id
+        
         for value in self.values:
             value.index(scheme=scheme)        
+
         for subconcept in self.subconcepts:
-            subconcept.index(scheme=scheme)
+            if subconcept.is_scheme():
+                subconcept.index(scheme=subconcept.id)
+            else:
+                subconcept.index(scheme=scheme)
 
 
     def delete_index(self, delete_self=False):
+        se = SearchEngineFactory().create()
+        
+        for subconcept in self.subconcepts:
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+
+            for concept in concepts_to_delete:
+                query = Query(se, start=0, limit=10000)
+                phrase = Match(field='conceptid', query=concept.conceptid, type='phrase')
+                query.add_query(phrase)
+                query.delete(index='concept_labels')
+
         for value in self.values:
             value.delete_index()
 
-        for subconcept in self.subconcepts:
-            subconcept.delete_index(delete_self=True)
+        # for subconcept in self.subconcepts:
+        #     subconcept.delete_index(delete_self=True)
                     
-        if delete_self:
-            self.get(id=self.id)
-            for value in self.values:
-                value.delete_index()
+        # if delete_self:
+        #     self.get(id=self.id)
+        #     for value in self.values:
+        #         value.delete_index()
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
         class concept(object):
@@ -499,7 +553,7 @@ class ConceptValue(object):
             scheme = self.get_scheme_id()
             if scheme == None:
                 raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
-            se.delete(index='concept_labels', type=scheme, id=self.id)
+            se. ht9km (index='concept_labels', type=scheme, id=self.id)
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()

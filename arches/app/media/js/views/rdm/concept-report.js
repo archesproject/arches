@@ -66,14 +66,30 @@ define([
         },
 
         deleteClicked: function(e) {
+            var self = this;
             var data = $(e.target).data();
 
-            this.$el.find('.confirm-delete-modal .modal-title').text($(e.target).attr('title'));
-            this.$el.find('.confirm-delete-modal .modal-body').text(data.message);
-            this.$el.find('.confirm-delete-yes').data('id', data.id);
-            this.$el.find('.confirm-delete-yes').data('action', data.action);
-            this.$el.find('.confirm-delete-yes').data('category', data.category);
-            this.$el.find('.confirm-delete-modal').modal('show');
+            confirm_delete_modal = this.$el.find('.confirm-delete-modal');
+            confirm_delete_modal_yes = confirm_delete_modal.find('.confirm-delete-yes');
+
+            confirm_delete_modal_yes.data('id', data.id);
+            confirm_delete_modal_yes.data('action', data.action);
+            confirm_delete_modal_yes.data('category', data.category);
+
+            confirm_delete_modal.find('.modal-title').text($(e.target).attr('title'));
+            confirm_delete_modal.find('.modal-body [name="warning-text"]').text(data.message);
+            confirm_delete_modal.find('.modal-body [name="additional-info"]').text('');            
+            confirm_delete_modal.modal('show');
+
+            if (data.action === 'delete-concept'){
+                $.ajax({
+                    url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', data.id),
+                    success: function(response) {
+                        confirm_delete_modal.find('.modal-body [name="additional-info"]').html(response);
+                    }
+                });                
+            }
+
         },
 
         conceptSelected: function(e) {
@@ -83,6 +99,7 @@ define([
         },
 
         addChildConcept: function(e){
+            this.model.reset();
             var form = new AddChildForm({
                 el: $('#add-child-form')[0],
                 model: this.model
@@ -92,6 +109,7 @@ define([
         },
 
         addRelatedConceptClicked: function(e){
+            this.model.reset();
             var modal = new RelatedConcept({
                 el: $('#related-concept-form')[0],
                 model: this.model
@@ -103,6 +121,7 @@ define([
             var self = this;
             var parentmodel = new ConceptParentModel();
             parentmodel.set('id', this.model.get('id'));
+            
             var modal = new ManageParentForm({
                 el: $('#manage-parent-form')[0],
                 model: parentmodel
@@ -117,6 +136,7 @@ define([
         },        
 
         addImageClicked: function (e) {
+            this.model.reset();
             var self = this,
                 form = new AddImageForm({
                     el: this.$el.find('#add-image-form')[0],
@@ -128,6 +148,7 @@ define([
         },
 
         editValueClicked: function(e) {
+            this.model.reset();
             var data = $.extend({
                     conceptid: this.model.get('id')
                 }, 
@@ -144,6 +165,7 @@ define([
             var self = this;
             var data = $(e.target).data();
             var modal = self.$el.find('.confirm-delete-modal');
+            this.model.reset();
 
             modal.on('hidden.bs.modal', function () {
                 var model, eventName;
