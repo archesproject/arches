@@ -127,7 +127,7 @@ def concept(request, conceptid):
                     concept.save()
 
                     if conceptid not in CORE_CONCEPTS:
-                        if concept.subconcepts[0].is_scheme():
+                        if len(concept.subconcepts) > 0 and concept.subconcepts[0].is_scheme():
                             concept.index(scheme=concept.subconcepts[0].id)
                         else:
                             concept.index()
