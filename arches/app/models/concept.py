@@ -329,9 +329,6 @@ class Concept(object):
             raise Exception('Invalid value definition: %s' % (value))
 
     def index(self, scheme=''):
-        if scheme == '':
-            scheme = self.get_auth_doc_concept().id
-        
         for value in self.values:
             value.index(scheme=scheme)        
 
@@ -339,8 +336,9 @@ class Concept(object):
             if subconcept.is_scheme():
                 subconcept.index(scheme=subconcept.id)
             else:
+                if scheme == '':
+                    scheme = self.get_auth_doc_concept().id
                 subconcept.index(scheme=scheme)
-
 
     def delete_index(self, delete_self=False):
         se = SearchEngineFactory().create()
@@ -356,14 +354,6 @@ class Concept(object):
 
         for value in self.values:
             value.delete_index()
-
-        # for subconcept in self.subconcepts:
-        #     subconcept.delete_index(delete_self=True)
-                    
-        # if delete_self:
-        #     self.get(id=self.id)
-        #     for value in self.values:
-        #         value.delete_index()
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
         class concept(object):
