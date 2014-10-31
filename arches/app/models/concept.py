@@ -491,12 +491,11 @@ class ConceptValue(object):
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
             se.index_data('concept_labels', scheme, data, 'id')
     
-    def delete_index(self):
-        if self.category == '':
-            raise Exception('Delete index failed.  Remember to specify a category for your value. %s' % JSONSerializer().serialize(self))
-        
-        se = SearchEngineFactory().create()
+    def delete_index(self):      
         if self.category == 'label':
+            se = SearchEngineFactory().create()
+            if self.category == '':
+                raise Exception('Delete index failed.  Remember to specify a category for your value. %s' % JSONSerializer().serialize(self))
             scheme = self.get_scheme_id()
             if scheme == None:
                 raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
