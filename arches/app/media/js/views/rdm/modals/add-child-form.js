@@ -38,17 +38,13 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                         values: [label, note],
                         relationshiptype: $(form).find("[name=relationshiptype_dd]").val()
                     });
+                    self.model.set('values', []);
                     self.model.set('subconcepts', [subconcept]);
-                    self.model.save(function() {
-                        var modal = self.$el.find('#add-concept-form');
-                        // this.modal.on('hidden.bs.modal', function () {
-                        //     self.$el.find("input[type=text], textarea").val("");
-                        //     self.trigger('conceptAdded', subconcept);
-                        //     self.render();
-                        // });
-                        this.modal.modal('hide');
-                        $('.modal-backdrop.fade.in').remove();  // a hack for now
-                    }, self);
+
+                    self.modal.on('hidden.bs.modal', function () {
+                        self.model.save();
+                    });
+                    self.modal.modal('hide');
                 }
             });
         }
