@@ -3,6 +3,10 @@
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
 <!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->  
+{% if debug %}
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
+{% endif %}
+
 <head>
     <title>{% block title %}Arches v3.0{% endblock %}</title>
 
@@ -13,15 +17,17 @@
     <meta name="author" content="">
 
 	{% block css %}
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
-    {% if main_css %}
-    <link rel="stylesheet" href="{% static main_css %}">
-    {% else %}
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    {% endif %}
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
+        <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+        {% if main_css %}
+            <link rel="stylesheet" href="{% static main_css %}">
+        {% else %}
+            <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        {% endif %}
+        <link rel="stylesheet" href="{% static 'css/arches.css' %}">
     {% endblock css%}
 
 </head> 
@@ -53,7 +59,7 @@
                             <a>Languages</a>
                             <ul class="lenguages">
                                 <li class="active">
-                                    <a href="#">English <i class="fa fa-check"></i></a> 
+                                    <a href="javascript:void(0);">English <i class="fa fa-check"></i></a> 
                                 </li>
                             </ul>
                         </li>
@@ -142,14 +148,9 @@
                                         <!-- Project Dropdown -->
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="input-group">
+                                                <div class="input-group" id="simple-search">
                                                     <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
-                                                    <select style="width:100%" class="select2" id="SimpleSearch">
-                                                        <option value="00">Find a Heritage Resource</option>
-                                                        <option value="AK">Resource 1</option>
-                                                        <option value="HI">Resource 2</option>
-                                                        <option value="CA">Resource 3</option>    
-                                                    </select>
+                                                    {% include "views/simple-search.htm" %}
                                                 </div>
                                             </div>
                                         </div>  
@@ -227,21 +228,21 @@
                         <div class="posts">
                             <div class="headline"><h2>Recent Blog Entries</h2></div>
                             <dl class="dl-horizontal">
-                                <dt><a href="#"><img src="{{ STATIC_URL }}img/sliders/elastislide/6.jpg" alt="" /></a></dt>
+                                <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/6.jpg" alt="" /></a></dt>
                                 <dd>
-                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                    <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
                                 </dd>
                             </dl>
                             <dl class="dl-horizontal">
-                            <dt><a href="#"><img src="{{ STATIC_URL }}img/sliders/elastislide/10.jpg" alt="" /></a></dt>
+                            <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/10.jpg" alt="" /></a></dt>
                                 <dd>
-                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                    <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
                                 </dd>
                             </dl>
                             <dl class="dl-horizontal">
-                            <dt><a href="#"><img src="{{ STATIC_URL }}img/sliders/elastislide/11.jpg" alt="" /></a></dt>
+                            <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/11.jpg" alt="" /></a></dt>
                                 <dd>
-                                    <p><a href="#">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
+                                    <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
                                 </dd>
                             </dl>
                         </div>
@@ -263,13 +264,13 @@
                         <!-- Social Links -->
                         <div class="headline"><h2>Stay Connected</h2></div> 
                         <ul class="social-icons">
-                            <li><a href="#" data-original-title="Feed" class="social_rss"></a></li>
-                            <li><a href="#" data-original-title="Facebook" class="social_facebook"></a></li>
-                            <li><a href="#" data-original-title="Twitter" class="social_twitter"></a></li>
-                            <li><a href="#" data-original-title="Goole Plus" class="social_googleplus"></a></li>
-                            <li><a href="#" data-original-title="Pinterest" class="social_pintrest"></a></li>
-                            <li><a href="#" data-original-title="Linkedin" class="social_linkedin"></a></li>
-                            <li><a href="#" data-original-title="Vimeo" class="social_vimeo"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Feed" class="social_rss"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Facebook" class="social_facebook"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Twitter" class="social_twitter"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Goole Plus" class="social_googleplus"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Pinterest" class="social_pintrest"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Linkedin" class="social_linkedin"></a></li>
+                            <li><a href="javascript:void(0);" data-original-title="Vimeo" class="social_vimeo"></a></li>
                         </ul>
                         <!-- End Social Links -->
                     </div><!--/col-md-4-->
@@ -315,7 +316,7 @@
                 'plugins': '{{ STATIC_URL }}plugins',
                 'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
                 'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
-                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2',
+                'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2',
                 'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min',
                 'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
                 'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
@@ -323,7 +324,9 @@
                 'easing': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
                 'backbone': 'http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
                 'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
-                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min'
+                'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
+                'd3': 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min',
+                'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min'
             }
         });
 
@@ -337,15 +340,16 @@
                     urls: {
                         media: "{{ STATIC_URL }}",
                         concept_tree: "{% url 'concept_tree' %}",
-                        concept_value: "{% url 'concept_value' '' %}",
-                        concept: "{% url 'concept' '' %}",
-                        concept_relation: "{% url 'concept_relation' %}"
+                        concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        concept_search: "{% url 'concept_search' %}",
+                        concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
                     }
                 };
             });
 
-            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, simpleSearch) {
-                var search = new simpleSearch({ id: 'SimpleSearch' });
+            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
+                var search = new SimpleSearch({ el: $('#simple-search')[0] });
                 scrollToTop.init();
 
                 // include all base_page instances here that page scripts may need access to

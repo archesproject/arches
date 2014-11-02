@@ -43,17 +43,6 @@ from django.contrib.auth.models import User
 
 
 # User.get_mapping = types.MethodType(_func, None, User)
-class AppConfig(models.Model):
-    name = models.TextField(primary_key=True)
-    defaultvalue = models.TextField()
-    datatype = models.TextField()
-    notes = models.TextField()
-    isprivate = models.BooleanField()
-    class Meta:
-        db_table = u'app_config'
-    
-    def __unicode__(self):
-        return self.name
 
 class AuthGroup(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -86,12 +75,6 @@ class Classes(models.Model):
 
     def __unicode__(self):
         return self.classname
-
-class Conceptschemes(models.Model):
-    conceptschemeid = models.TextField(primary_key=True) # This field type is a guess.
-    name = models.TextField()
-    class Meta:
-        db_table = u'conceptschemes'
 
 class DLanguages(models.Model):
     languageid = models.TextField(primary_key=True)
@@ -139,13 +122,6 @@ class DjangoSite(models.Model):
     class Meta:
         db_table = u'django_site'
 
-class Forms(models.Model):
-    formid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    widgetname = models.TextField()
-    class Meta:
-        db_table = u'forms'
-
 class GeographyColumns(models.Model):
     f_table_catalog = models.TextField() # This field type is a guess.
     f_table_schema = models.TextField() # This field type is a guess.
@@ -167,36 +143,6 @@ class GeometryColumns(models.Model):
     type = models.CharField(max_length=30)
     class Meta:
         db_table = u'geometry_columns'
-
-class I18N(models.Model):
-    key = models.TextField()
-    value = models.TextField()
-    languageid = models.TextField()
-    widgetname = models.TextField(blank=True)
-    class Meta:
-        db_table = u'i18n'
-
-    def __unicode__(self):
-        return self.widgetname + '-' + self.key + ': ' + self.value
-
-class Maplayers(models.Model):
-    id = models.IntegerField(primary_key=True)
-    active = models.BooleanField()
-    on_map = models.BooleanField()
-    selectable = models.BooleanField()
-    basemap = models.BooleanField()
-    name_i18n_key = models.TextField()
-    icon = models.TextField(blank=True)
-    symbology = models.TextField(blank=True)
-    description_i18n_key = models.TextField(blank=True)
-    layergroup_i18n_key = models.TextField()
-    layer = models.TextField()
-    sortorder = models.IntegerField(blank=True)
-    class Meta:
-        db_table = u'maplayers'
-
-    def __unicode__(self):
-        return ('%s') % (self.name_i18n_key)
 
 class RasterColumns(models.Model):
     r_table_catalog = models.TextField() # This field type is a guess.
@@ -231,20 +177,6 @@ class RasterOverviews(models.Model):
     overview_factor = models.IntegerField()
     class Meta:
         db_table = u'raster_overviews'
-
-class Reports(models.Model):
-    reportid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    widgetname = models.TextField()
-    class Meta:
-        db_table = u'reports'
-
-class ResourceGroups(models.Model):
-    groupid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    displayclass = models.TextField()
-    class Meta:
-        db_table = u'resource_groups'
 
 class SpatialRefSys(models.Model):
     srid = models.IntegerField(primary_key=True)
@@ -311,150 +243,7 @@ class Concepts(models.Model):
         db_table = u'concepts'
 
     def __unicode__(self):
-        return ('%s - %s') % (self.get_preflabel(), self.conceptid)
-
-    def get_preflabel(self, lang='en-us'):
-        concept_graph = self.graph(include_subconcepts=False, include_parentconcepts=False, include=['label'])
-        return concept_graph.get_preflabel(lang=lang)
-
-    def get_auth_doc_concept(self, lang='en-us'):
-        concept_graph = self.graph(include_subconcepts=False, include_parentconcepts=True, include=['label'])
-
-        def find_auth_doc(concept):
-            for parentconcept in concept.parentconcepts:
-                if parentconcept.id == '00000000-0000-0000-0000-000000000003':
-                    return concept
-
-            for parentconcept in concept.parentconcepts:
-                return find_auth_doc(parentconcept)
-
-        auth_doc = find_auth_doc(concept_graph)
-        return auth_doc
-
-    class viewmodel(object):
-        def __init__(self):
-            self.id = ''
-            self.relationshiptype = ''
-            self.labels = []
-            self.notes = []
-            self.metadata = []
-            self.subconcepts = []
-            self.parentconcepts = []
-
-        def __unicode__(self):
-            return ('%s - %s') % (self.get_preflabel(), self.id)
-
-        def get_sortkey(self, lang='en-us'):
-            for metadata in self.metadata:
-                if metadata.type == 'sortorder':
-                    return metadata.value
-
-            return self.get_preflabel(lang=lang)
-
-        def get_preflabel(self, lang='en-us'):
-            ret = ''
-            for label in self.labels:
-                ret = label.value
-                if label.type == 'prefLabel':
-                    ret = label.value
-                    if label.language == lang:
-                        return label.value
-            return ret
-
-        def flatten(self, ret=None):
-            """
-            Flattens the graph into a unordered list of concepts
-
-            """
-
-            if ret == None:
-                ret = []
-
-            ret.append(self)
-            for subconcept in self.subconcepts:
-                subconcept.flatten(ret)
-                
-            return ret
-
-        def delete(self):
-            concept = Concepts.objects.get(pk=self.id)
-            concept.delete()
-
-
-    def toObject(self, full_graph=True, exclude_subconcepts=False, exclude_parentconcepts=False, 
-            exclude_notes=False, exclude_labels=False, exclude_metadata=False, depth_limit=None, **kwargs):
-        """
-        Depricated in Arches v3.x 
-        Only for backward compatiblity to Arches v2.x
-
-        """
-
-        exclude = []
-        if exclude_labels:
-            exclude.append('label')
-        if exclude_metadata:
-            exclude.append(None) 
-        if exclude_notes:
-            exclude.append('note') 
-
-        return self.graph(include_subconcepts=(not exclude_subconcepts), include_parentconcepts=(not exclude_parentconcepts), exclude=exclude, depth_limit=depth_limit, up_depth_limit=depth_limit)
-
-    def graph(self, include_subconcepts=True, include_parentconcepts=True, exclude=[], include=[], depth_limit=None, up_depth_limit=None, **kwargs):
-        ret = self.viewmodel()
-        ret.id = self.conceptid
-        uplevel = kwargs.pop('uplevel', 0)
-        downlevel = kwargs.pop('downlevel', 0)
-        depth_limit = depth_limit if depth_limit == None else int(depth_limit)
-        up_depth_limit = up_depth_limit if up_depth_limit == None else int(up_depth_limit)
-
-        if len(include) > 0 and len(exclude) > 0:
-            raise Exception('Only include values for include or exclude, but not both')
-        include = include if len(include) != 0 else ValueTypes.objects.distinct('category').values_list('category', flat=True)
-        include = set(include).difference(exclude)
-        exclude = []
-
-        values = Values.objects.filter(conceptid = self.conceptid)
-        for value in values:
-            if value.valuetype.category == 'label' and value.valuetype.category in include:
-                ret.labels.append(value.toViewModel())
-            if value.valuetype.category == 'note' and value.valuetype.category in include:
-                ret.notes.append(value.toViewModel())
-            if value.valuetype.category == None and value.valuetype.category in include:
-                ret.metadata.append(value.toViewModel())
-
-        if include_subconcepts:
-            conceptrealations = ConceptRelations.objects.filter(conceptidfrom = self.conceptid)
-            if depth_limit == None or downlevel < depth_limit:
-                if depth_limit != None:
-                    downlevel = downlevel + 1                
-                for relation in conceptrealations:
-                    ret.relationshiptype = relation.relationtype.pk
-                    ret.subconcepts.append(relation.conceptidto.graph(include_subconcepts=include_subconcepts, 
-                        include_parentconcepts=include_parentconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                        up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
-
-                # if True:
-                #     import locale
-                #     locale.setlocale(locale.LC_ALL, "en-us")
-
-
-                    # x =  sorted(ret.subconcepts, key=methodcaller('get_sortkey', lang='en-us'), reverse=False) 
-                    # print sorted(x, key=cmp_to_key(locale.strcoll))
-
-                ret.subconcepts = sorted(ret.subconcepts, key=methodcaller('get_sortkey', lang='en-us'), reverse=False) 
-
-
-        if include_parentconcepts:
-            conceptrealations = ConceptRelations.objects.filter(conceptidto = self.conceptid)
-            if up_depth_limit == None or uplevel < up_depth_limit:
-                if up_depth_limit != None:
-                    uplevel = uplevel + 1          
-                for relation in conceptrealations:
-                    #ret.parentconcepts.append(relation.conceptidfrom_id)
-                    ret.parentconcepts.append(relation.conceptidfrom.graph(include_subconcepts=False, 
-                        include_parentconcepts=include_parentconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                        up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
-        return ret
+        return ('%s') % (self.conceptid)
 
 class ConceptRelations(models.Model):
     relationid = models.TextField(primary_key=True)
@@ -464,12 +253,18 @@ class ConceptRelations(models.Model):
     class Meta:
         db_table = u'concepts"."relations'
 
+    def __unicode__(self):
+        return ('%s') % (self.relationid)
+
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
     category = models.TextField()
     description = models.TextField()
     class Meta:
         db_table = u'concepts"."d_valuetypes'
+
+    def __unicode__(self):
+        return ('valuetype: %s, category: %s') % (self.valuetype, self.category)
 
 class Values(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
@@ -481,17 +276,25 @@ class Values(models.Model):
     class Meta:
         db_table = u'values'
 
-    class viewmodel(object):
-        def __init__(self, id='', datatype='', type='', category='', value='', language=''):
-            self.id = id
-            self.datatype = datatype
-            self.type = type
-            self.category = category
-            self.value = value
-            self.language = language
+class FileValues(models.Model):
+    valueid = models.TextField(primary_key=True) # This field type is a guess.
+    conceptid = models.ForeignKey('Concepts', db_column='conceptid')
+    valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
+    datatype = models.TextField()
+    value = models.FileField(upload_to='files')
+    languageid = models.ForeignKey('DLanguages', db_column='languageid')
+    class Meta:
+        db_table = u'values'
 
-    def toViewModel(self):
-        return self.viewmodel(id=self.valueid, datatype=self.datatype, type=self.valuetype.pk, category=self.valuetype.category, value=self.value, language=self.languageid_id)
+    def geturl(self):
+        if self.value != None:
+            return self.value.url
+        return ''
+
+    def getname(self):
+        if self.value != None:
+            return self.value.name[6:]
+        return ''
 
 class AuthGroupPermissions(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -514,12 +317,6 @@ class AuthUserUserPermissions(models.Model):
     class Meta:
         db_table = u'auth_user_user_permissions'
 
-class ClassInheritance(models.Model):
-    classid = models.ForeignKey('Classes', db_column='classid', related_name='classinheritance_classid')
-    inheritsfrom = models.ForeignKey('Classes', db_column='inheritsfrom', related_name='classinheritance_inheritsfrom')
-    class Meta:
-        db_table = u'class_inheritance'
-
 class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
     classdomain = models.ForeignKey('Classes', db_column='classdomain', related_name='properties_classdomain')
@@ -537,18 +334,13 @@ class EntityTypes(models.Model):
     defaultvectorcolor = models.TextField()
     entitytypeid = models.TextField(primary_key=True)
     isresource = models.BooleanField()
-    groupid = models.ForeignKey('ResourceGroups', db_column='groupid')
     class Meta:
         db_table = u'data"."entity_types'
 
     def getcolumnname(self):
         ret = None
-        #businesstablename = self.classid.defaultbusinesstable
         if self.businesstablename is not None and self.businesstablename != 'entities':
-            if self.businesstablename == 'geometries':
-                ret = 'geometry'
-            else:
-                ret = 'val'
+            ret = 'val'
 
         return ret     
 
@@ -557,8 +349,6 @@ class EntityTypes(models.Model):
 
 class Entities(models.Model):
     entityid = models.TextField(primary_key=True) # This field type is a guess.
-    createtms = models.DateTimeField()
-    retiretms = models.DateTimeField()
     entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
     class Meta:
         db_table = u'data"."entities'
@@ -638,27 +428,26 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class Geometries(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
-    geometry = models.GeometryField()
+    val = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
         db_table = u'geometries'
 
-class InformationThemes(models.Model):
-    informationthemeid = models.IntegerField(primary_key=True)
-    name_i18n_key = models.TextField()
-    displayclass = models.TextField()
-    entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
+class EditLog(models.Model):
+    editlogid = models.TextField(primary_key=True)
+    resourceentitytypeid = models.TextField()
+    resourceid = models.TextField()
+    attributeentitytypeid = models.TextField()
+    edittype = models.TextField()
+    userid = models.TextField()
+    timestamp = models.DateTimeField()
+    oldvalue = models.TextField()
+    newvalue = models.TextField()
+    user_firstname = models.TextField()
+    user_lastname = models.TextField()
+    note = models.TextField()
     class Meta:
-        db_table = u'information_themes'
-
-# class Log(models.Model):
-#     logid = models.IntegerField(primary_key=True)
-#     entityid = models.ForeignKey('Entities', db_column='entityid')
-#     logtype = models.TextField()
-#     userid = models.TextField() # This field type is a guess.
-#     createtms = models.DateTimeField()
-#     class Meta:
-#         db_table = u'log'
+        db_table = u'data"."edit_log'
 
 class Domains(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
@@ -701,24 +490,10 @@ class Domains(models.Model):
 
         super(Domains, self).__setattr__(name, value)
 
-class EntityTypeXReports(models.Model):
-    reportid = models.ForeignKey('Reports', db_column='reportid')
-    entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
-    class Meta:
-        db_table = u'entity_type_x_reports'
-
-class InformationThemesXForms(models.Model):
-    formid = models.ForeignKey('Forms', db_column='formid')
-    sortorder = models.IntegerField()
-    informationthemeid = models.ForeignKey('InformationThemes', db_column='informationthemeid')
-    class Meta:
-        db_table = u'information_themes_x_forms'
-
 class Mappings(models.Model):
     mappingid = models.TextField(primary_key=True) # This field type is a guess.
     entitytypeidfrom = models.ForeignKey('EntityTypes', db_column='entitytypeidfrom', related_name='mappings_entitytypeidfrom')
     entitytypeidto = models.ForeignKey('EntityTypes', db_column='entitytypeidto', related_name='mappings_entitytypeidto')
-    default = models.BooleanField()
     mergenodeid = models.TextField()
     class Meta:
         db_table = u'ontology"."mappings'

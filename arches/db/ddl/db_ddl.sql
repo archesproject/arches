@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -12,16 +12,6 @@ SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
-
---
--- TOC entry 8 (class 2615 OID 15704192)
--- Name: app_metadata; Type: SCHEMA; Schema: -; Owner: postgres
---
-
-CREATE SCHEMA app_metadata;
-
-
-ALTER SCHEMA app_metadata OWNER TO postgres;
 
 --
 -- TOC entry 9 (class 2615 OID 15704193)
@@ -53,145 +43,6 @@ CREATE SCHEMA ontology;
 
 ALTER SCHEMA ontology OWNER TO postgres;
 
-SET search_path = app_metadata, pg_catalog;
-
---
--- TOC entry 1255 (class 1255 OID 15704196)
--- Dependencies: 8 1863
--- Name: add_form_relationship(text, text, text, integer, text); Type: FUNCTION; Schema: app_metadata; Owner: postgres
---
-
-CREATE FUNCTION add_form_relationship(entity_type_id text, information_theme_name text, form_widget text, sort_order integer, lang text) RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-
-Declare
-information_theme_name_i18n_key text := (replace(information_theme_name, ' ', '') || 'InformationTheme');
-information_theme_display_class text := lower(replace(information_theme_name, ' ', ''));
-form_id integer;
-informationtheme_id integer;
-
-BEGIN
-  IF (SELECT COUNT(*) FROM app_metadata.forms WHERE widgetname = form_widget) > 0
-  THEN
-    IF (SELECT COUNT(*) FROM app_metadata.information_themes WHERE name_i18n_key = information_theme_name_i18n_key AND entitytypeid = entity_type_id) = 0
-    THEN
-      INSERT INTO app_metadata.i18n(key, value, languageid, widgetname)
-      SELECT information_theme_name_i18n_key, information_theme_name, lang, ''
-      WHERE NOT EXISTS (SELECT * from app_metadata.i18n where key=information_theme_name_i18n_key);
-
-      INSERT INTO app_metadata.information_themes(name_i18n_key, displayclass, entitytypeid)
-          VALUES (information_theme_name_i18n_key, information_theme_display_class, entity_type_id);
-
-    END IF; 
-
-    form_id = (SELECT formid 
-            FROM app_metadata.forms
-            WHERE widgetname = form_widget);
-
-    informationtheme_id = (SELECT informationthemeid 
-            FROM app_metadata.information_themes
-            WHERE name_i18n_key = information_theme_name_i18n_key
-            AND entitytypeid = entity_type_id);
-
-    IF (SELECT COUNT(*) FROM app_metadata.information_themes_x_forms WHERE form_id = formid AND informationtheme_id = informationthemeid) = 0 THEN
-	INSERT INTO app_metadata.information_themes_x_forms(formid, sortorder, informationthemeid) VALUES 
-	    (form_id, sort_order, informationtheme_id);
-    END IF;
-  ELSE
-    Return 'WARNING: Form "' || form_widget || '" does not exist; No metadata records will be added for this entry. Resource: "' || entity_type_id || '", Theme: "' || information_theme_name || '"';
-  END IF; 
-
-Return 'SUCCESS: "' || form_widget || '" has been associated to "' || entity_type_id || '" under the "' || information_theme_name || '" theme.';
-
-End;
-
-$$;
-
-
-ALTER FUNCTION app_metadata.add_form_relationship(entity_type_id text, information_theme_name text, form_widget text, sort_order integer, lang text) OWNER TO postgres;
-
---
--- TOC entry 1256 (class 1255 OID 15704197)
--- Dependencies: 8 1863
--- Name: get_default_language(); Type: FUNCTION; Schema: app_metadata; Owner: postgres
---
-
-CREATE FUNCTION get_default_language() RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-
-BEGIN
-    Return (
-        SELECT defaultvalue 
-        FROM app_metadata.app_config
-        WHERE "name" = 'default_language'
-        LIMIT 1
-    );
-End;
-
-  $$;
-
-
-ALTER FUNCTION app_metadata.get_default_language() OWNER TO postgres;
-
---
--- TOC entry 1257 (class 1255 OID 15704198)
--- Dependencies: 8 1863
--- Name: get_i18n_value(text, text, text); Type: FUNCTION; Schema: app_metadata; Owner: postgres
---
-
-CREATE FUNCTION get_i18n_value(p_key text, p_language text, p_widgetname text) RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-
-BEGIN
-IF p_widgetname = '' THEN
-    IF EXISTS (SELECT value FROM app_metadata.i18n WHERE key = p_key AND languageid = p_language LIMIT 1) THEN
-        Return (
-            SELECT value
-            FROM app_metadata.i18n
-            WHERE key = p_key AND
-            languageid = p_language
-            LIMIT 1
-        );
-    ELSE
-        Return (
-            SELECT value
-            FROM app_metadata.i18n
-            WHERE key = p_key AND
-            languageid = app_metadata.get_default_language()
-            LIMIT 1
-        );
-    END IF;
-ELSE
-    IF EXISTS (SELECT value FROM app_metadata.i18n WHERE key = p_key AND languageid = p_language AND widgetname = p_widgetname LIMIT 1) THEN
-        Return (
-            SELECT value
-            FROM app_metadata.i18n
-            WHERE key = p_key AND
-            languageid = p_language AND
-            widgetname = p_widgetname
-            LIMIT 1
-        );
-    ELSE
-        Return (
-            SELECT value
-            FROM app_metadata.i18n
-            WHERE key = p_key AND
-            languageid = app_metadata.get_default_language() AND
-            widgetname = p_widgetname
-            LIMIT 1
-        );
-    END IF;
-END IF;
-
-End;
-
-  $$;
-
-
-ALTER FUNCTION app_metadata.get_i18n_value(p_key text, p_language text, p_widgetname text) OWNER TO postgres;
 
 SET search_path = concepts, pg_catalog;
 
@@ -599,7 +450,7 @@ CREATE FUNCTION get_geometry(p_entityid uuid) RETURNS text
   FOR relations IN SELECT r.entityidrange FROM data.relations r WHERE r.entityiddomain = p_entityid
   LOOP
     IF EXISTS(SELECT * FROM data.geometries g WHERE g.entityid = relations) THEN
-      ret = (select st_astext(st_multi(st_collect(g.geometry))) FROM data.geometries g WHERE g.entityid = relations);
+      ret = (select st_astext(st_multi(st_collect(g.val))) FROM data.geometries g WHERE g.entityid = relations);
       EXIT;
     ELSE
       ret = (SELECT data.get_geometry(relations));
@@ -809,6 +660,10 @@ BEGIN
             VALUES (v_parentconceptid, v_conceptid, 'has narrower concept', public.uuid_generate_v1mc());
         END IF;
         
+            IF p_businesstablename = '' THEN
+              p_businesstablename = null;
+            END IF;
+
             INSERT INTO data.entity_types(
                     classid, conceptid, businesstablename, publishbydefault, icon, 
                     defaultvectorcolor, entitytypeid, isresource)
@@ -983,40 +838,52 @@ ALTER FUNCTION ontology.check_entitytypeid(p_entitytypeidfrom text, p_entitytype
 --
 -- TOC entry 1289 (class 1255 OID 15704230)
 -- Dependencies: 1863 11
--- Name: insert_mapping(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mappings(text, text, text, boolean, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) RETURNS integer
+CREATE FUNCTION insert_mappings(p_mapping text, p_mergenodeid text) RETURNS integer
     LANGUAGE plpgsql
     AS $$
 DECLARE 
   v_domain text;
   v_property text;
+  v_entitytypefrom text;
+  v_entitytypeto text;
+  v_businesstablename_from text;
+  v_businesstablename_to text;
   v_range text;
   v_mappingid text;
-  v_index integer := 0;
+  v_index integer := 1;
+  -- p_mapping is a comma separated string in the form:
+  -- entitytypeid_from,businesstable,property_name,entitytypeid_to,businesstable,entitytypeid_from,...
+  -- 'HISTORICAL_RESOURCE.E1,,P1,NAME.E41,strings,P2,NAMETYPE.E55,domains'
   v_steps text[] := regexp_split_to_array(p_mapping, ',');
 BEGIN 
 
-    p_entitytypefrom = btrim(p_entitytypefrom);
-    p_entitytypeto = btrim(p_entitytypeto);
-    PERFORM data.insert_entitytype(p_entitytypefrom, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-    PERFORM data.insert_entitytype(p_entitytypeto, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-    v_mappingid = (SELECT ontology.populate_mappings(p_entitytypefrom, p_entitytypeto, p_default, p_mergenodeid));
+    v_entitytypefrom = btrim(v_steps[1]);
+    v_entitytypeto = btrim(v_steps[array_upper(v_steps, 1)-1]);
+    v_businesstablename_from = btrim(v_steps[2]);
+    v_businesstablename_to = btrim(v_steps[array_upper(v_steps, 1)]);
+    PERFORM data.insert_entitytype(v_entitytypefrom, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    PERFORM data.insert_entitytype(v_entitytypeto, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    v_mappingid = (SELECT ontology.insert_mapping(v_entitytypefrom, v_entitytypeto, p_mergenodeid));
 
-    WHILE v_index < ((array_length(v_steps,1)-1)/2)
+    --WHILE v_index < ((array_length(v_steps,1)-1)/2)
+    WHILE v_index < (array_length(v_steps,1)-1)
     LOOP
-        v_domain = btrim(v_steps[(v_index*2)+1]);
-        v_property = btrim(v_steps[(v_index*2+1)+1]);
-        v_range = btrim(v_steps[(v_index*2+2)+1]);
-        
-        PERFORM data.insert_entitytype(v_domain, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM data.insert_entitytype(v_range, '', 'True', '', '', p_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM ontology.populate_rules(v_domain, v_property, v_range);
-        PERFORM ontology.populate_mapping_steps(v_mappingid, v_domain, v_property, v_range, p_entitytypefrom, p_entitytypeto, v_index+1);  
+        v_domain = btrim(v_steps[v_index]);
+        v_businesstablename_from = btrim(v_steps[v_index+1]);
+        v_property = btrim(v_steps[v_index+2]);
+        v_range = btrim(v_steps[v_index+3]);
+        v_businesstablename_to = btrim(v_steps[v_index+4]);
+
+        PERFORM data.insert_entitytype(v_domain, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM data.insert_entitytype(v_range, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM ontology.insert_rule(v_domain, v_property, v_range);
+        PERFORM ontology.insert_mapping_step(v_mappingid, v_domain, v_property, v_range, v_entitytypefrom, v_entitytypeto, ((v_index+2)/3));  
 
         raise notice 'mapping step: % % %',v_domain, v_property, v_range;
-        v_index := v_index + 1;
+        v_index := v_index + 3;
 
     END LOOP;
   
@@ -1026,15 +893,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.insert_mapping(p_mapping text, p_entitytypefrom text, p_entitytypeto text, p_default boolean, p_mergenodeid text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mappings(p_mapping text, p_mergenodeid text) OWNER TO postgres;
 
 --
 -- TOC entry 1290 (class 1255 OID 15704231)
 -- Dependencies: 1863 11
--- Name: populate_mapping_steps(text, text, text, text, text, text, integer); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mapping_step(text, text, text, text, text, text, integer); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_mapping_steps(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) RETURNS text
+CREATE FUNCTION insert_mapping_step(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE 
@@ -1053,15 +920,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_mapping_steps(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mapping_step(p_mappingid text, p_domain text, p_property text, p_range text, p_entitytypefrom text, p_entitytypeto text, p_order integer) OWNER TO postgres;
 
 --
 -- TOC entry 1291 (class 1255 OID 15704232)
 -- Dependencies: 1863 11
--- Name: populate_mappings(text, text, boolean, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_mapping(text, text, boolean, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_mappings(p_entityfrom text, p_entityto text, p_default boolean, p_mergenodeid text) RETURNS text
+CREATE FUNCTION insert_mapping(p_entityfrom text, p_entityto text, p_mergenodeid text) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE v_newmappingid uuid = uuid_generate_v1mc();
@@ -1071,8 +938,8 @@ BEGIN
     THEN
         RETURN (SELECT mappingid FROM ontology.mappings WHERE entitytypeidfrom = p_entityfrom AND entitytypeidto = p_entityto);
     ELSE
-        INSERT INTO ontology.mappings (mappingid, entitytypeidfrom, entitytypeidto, "default", mergenodeid)
-        VALUES(v_newmappingid, p_entityfrom, p_entityto, p_default, p_mergenodeid);
+        INSERT INTO ontology.mappings (mappingid, entitytypeidfrom, entitytypeidto, mergenodeid)
+        VALUES(v_newmappingid, p_entityfrom, p_entityto, p_mergenodeid);
 
         RETURN v_newmappingid;
     END IF; 
@@ -1081,15 +948,15 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_mappings(p_entityfrom text, p_entityto text, p_default boolean, p_mergenodeid text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_mapping(p_entityfrom text, p_entityto text, p_mergenodeid text) OWNER TO postgres;
 
 --
 -- TOC entry 1292 (class 1255 OID 15704233)
 -- Dependencies: 1863 11
--- Name: populate_rules(text, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
+-- Name: insert_rule(text, text, text); Type: FUNCTION; Schema: ontology; Owner: postgres
 --
 
-CREATE FUNCTION populate_rules(p_domain text, p_property text, p_range text) RETURNS text
+CREATE FUNCTION insert_rule(p_domain text, p_property text, p_range text) RETURNS text
     LANGUAGE plpgsql
     AS $$
     DECLARE 
@@ -1108,7 +975,7 @@ END;
 $$;
 
 
-ALTER FUNCTION ontology.populate_rules(p_domain text, p_property text, p_range text) OWNER TO postgres;
+ALTER FUNCTION ontology.insert_rule(p_domain text, p_property text, p_range text) OWNER TO postgres;
 
 --
 -- TOC entry 1293 (class 1255 OID 15704234)
@@ -1145,8 +1012,6 @@ $$;
 
 ALTER FUNCTION ontology.tgr_mappings_validation() OWNER TO postgres;
 
-SET search_path = app_metadata, pg_catalog;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -1162,306 +1027,6 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE public.user_profile OWNER TO postgres;
-
-
---
--- TOC entry 207 (class 1259 OID 15704235)
--- Dependencies: 8
--- Name: app_config; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE app_config (
-    name text NOT NULL,
-    defaultvalue text NOT NULL,
-    datatype text NOT NULL,
-    notes text,
-    isprivate boolean NOT NULL
-);
-
-
-ALTER TABLE app_metadata.app_config OWNER TO postgres;
-
-
---
--- TOC entry 208 (class 1259 OID 15704241)
--- Dependencies: 8
--- Name: entity_type_x_reports; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE entity_type_x_reports (
-    reportid integer NOT NULL,
-    entitytypeid text
-);
-
-
-ALTER TABLE app_metadata.entity_type_x_reports OWNER TO postgres;
-
---
--- TOC entry 209 (class 1259 OID 15704247)
--- Dependencies: 8
--- Name: forms; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE forms (
-    formid integer NOT NULL,
-    name_i18n_key text NOT NULL,
-    widgetname text
-);
-
-
-ALTER TABLE app_metadata.forms OWNER TO postgres;
-
---
--- TOC entry 210 (class 1259 OID 15704253)
--- Dependencies: 8 209
--- Name: forms_formid_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE forms_formid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.forms_formid_seq OWNER TO postgres;
-
---
--- TOC entry 3465 (class 0 OID 0)
--- Dependencies: 210
--- Name: forms_formid_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE forms_formid_seq OWNED BY forms.formid;
-
-
---
--- TOC entry 211 (class 1259 OID 15704255)
--- Dependencies: 8
--- Name: i18n; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE i18n (
-    id integer NOT NULL,
-    key text NOT NULL,
-    value text NOT NULL,
-    languageid text NOT NULL,
-    widgetname text NOT NULL
-);
-
-
-ALTER TABLE app_metadata.i18n OWNER TO postgres;
-
---
--- TOC entry 212 (class 1259 OID 15704261)
--- Dependencies: 211 8
--- Name: i18n_id_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE i18n_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.i18n_id_seq OWNER TO postgres;
-
---
--- TOC entry 3466 (class 0 OID 0)
--- Dependencies: 212
--- Name: i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE i18n_id_seq OWNED BY i18n.id;
-
-
---
--- TOC entry 213 (class 1259 OID 15704263)
--- Dependencies: 8
--- Name: information_themes; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE information_themes (
-    informationthemeid integer NOT NULL,
-    name_i18n_key text NOT NULL,
-    displayclass text,
-    entitytypeid text
-);
-
-
-ALTER TABLE app_metadata.information_themes OWNER TO postgres;
-
---
--- TOC entry 214 (class 1259 OID 15704269)
--- Dependencies: 213 8
--- Name: information_themes_informationthemeid_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE information_themes_informationthemeid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.information_themes_informationthemeid_seq OWNER TO postgres;
-
---
--- TOC entry 3467 (class 0 OID 0)
--- Dependencies: 214
--- Name: information_themes_informationthemeid_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE information_themes_informationthemeid_seq OWNED BY information_themes.informationthemeid;
-
-
---
--- TOC entry 215 (class 1259 OID 15704271)
--- Dependencies: 8
--- Name: information_themes_x_forms; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE information_themes_x_forms (
-    formid integer NOT NULL,
-    sortorder integer NOT NULL,
-    informationthemeid integer NOT NULL
-);
-
-
-ALTER TABLE app_metadata.information_themes_x_forms OWNER TO postgres;
-
---
--- TOC entry 216 (class 1259 OID 15704274)
--- Dependencies: 3334 3335 3336 3337 8
--- Name: maplayers; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE maplayers (
-    id integer NOT NULL,
-    active boolean DEFAULT false NOT NULL,
-    on_map boolean DEFAULT false NOT NULL,
-    selectable boolean DEFAULT false NOT NULL,
-    basemap boolean DEFAULT false NOT NULL,
-    name_i18n_key text NOT NULL,
-    icon text,
-    symbology text,
-    thumbnail text,
-    description_i18n_key text,
-    layergroup_i18n_key text,
-    layer text NOT NULL,
-    sortorder integer
-);
-
-
-ALTER TABLE app_metadata.maplayers OWNER TO postgres;
-
---
--- TOC entry 217 (class 1259 OID 15704284)
--- Dependencies: 216 8
--- Name: maplayers_id_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE maplayers_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.maplayers_id_seq OWNER TO postgres;
-
---
--- TOC entry 3468 (class 0 OID 0)
--- Dependencies: 217
--- Name: maplayers_id_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE maplayers_id_seq OWNED BY maplayers.id;
-
-
---
--- TOC entry 218 (class 1259 OID 15704286)
--- Dependencies: 8
--- Name: reports; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE reports (
-    reportid integer NOT NULL,
-    name_i18n_key text NOT NULL,
-    widgetname text
-);
-
-
-ALTER TABLE app_metadata.reports OWNER TO postgres;
-
---
--- TOC entry 219 (class 1259 OID 15704292)
--- Dependencies: 218 8
--- Name: reports_reportid_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE reports_reportid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.reports_reportid_seq OWNER TO postgres;
-
---
--- TOC entry 3469 (class 0 OID 0)
--- Dependencies: 219
--- Name: reports_reportid_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE reports_reportid_seq OWNED BY reports.reportid;
-
-
---
--- TOC entry 220 (class 1259 OID 15704294)
--- Dependencies: 8
--- Name: resource_groups; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE resource_groups (
-    groupid integer NOT NULL,
-    name_i18n_key text NOT NULL,
-    displayclass text
-);
-
-
-ALTER TABLE app_metadata.resource_groups OWNER TO postgres;
-
---
--- TOC entry 221 (class 1259 OID 15704300)
--- Dependencies: 8 220
--- Name: resource_groups_groupid_seq; Type: SEQUENCE; Schema: app_metadata; Owner: postgres
---
-
-CREATE SEQUENCE resource_groups_groupid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE app_metadata.resource_groups_groupid_seq OWNER TO postgres;
-
---
--- TOC entry 3470 (class 0 OID 0)
--- Dependencies: 221
--- Name: resource_groups_groupid_seq; Type: SEQUENCE OWNED BY; Schema: app_metadata; Owner: postgres
---
-
-ALTER SEQUENCE resource_groups_groupid_seq OWNED BY resource_groups.groupid;
 
 
 SET search_path = concepts, pg_catalog;
@@ -1502,26 +1067,33 @@ ALTER TABLE concepts.d_languages OWNER TO postgres;
 --
 
 CREATE TABLE d_relationtypes (
-    relationtype text NOT NULL
+    relationtype text NOT NULL,
+	category text NOT NULL,
+	skoscompliant BOOLEAN NOT NULL
 );
 
 
 ALTER TABLE concepts.d_relationtypes OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 15704328)
--- Dependencies: 9
--- Name: d_valuetypes; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
---
+-- Table: concepts.d_valuetypes
 
-CREATE TABLE d_valuetypes (
-    valuetype text NOT NULL,
-    category text,
-    description text
+-- DROP TABLE concepts.d_valuetypes;
+
+CREATE TABLE concepts.d_valuetypes
+(
+  valuetype text NOT NULL,
+  category text,
+  description text,
+  skoscompliant boolean NOT NULL DEFAULT false,
+  CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype )
+)
+WITH (
+  OIDS=FALSE
 );
+ALTER TABLE concepts.d_valuetypes
+  OWNER TO postgres;
 
-
-ALTER TABLE concepts.d_valuetypes OWNER TO postgres;
 
 --
 -- TOC entry 227 (class 1259 OID 15704334)
@@ -1593,13 +1165,28 @@ ALTER TABLE data.resource_x_resource
   OWNER TO postgres;
 
 
+CREATE TABLE data.edit_log
+(
+  editlogid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+  resourceentitytypeid text,	
+  resourceid uuid,
+  attributeentitytypeid text,
+  edittype text,
+  oldvalue text,
+  newvalue text,
+  "timestamp" timestamp with time zone,  
+  userid text,
+  user_firstname text,
+  user_lastname text,  
+  user_email text,
+  note text,
 
-
-
--- TOC entry 213 (class 1259 OID 15704263)
--- Dependencies: 8
--- Name: information_themes; Type: TABLE; Schema: app_metadata; Owner: postgres; Tablespace: 
---
+  CONSTRAINT pk_edit_log PRIMARY KEY (editlogid )
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE data.edit_log OWNER TO postgres;
 
 --
 -- TOC entry 230 (class 1259 OID 15704349)
@@ -1675,8 +1262,6 @@ ALTER TABLE data.domains OWNER TO postgres;
 
 CREATE TABLE entities (
     entityid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    createtms timestamp without time zone NOT NULL,
-    retiretms timestamp without time zone,
     entitytypeid text
 );
 
@@ -1697,8 +1282,7 @@ CREATE TABLE entity_types (
     icon text,
     defaultvectorcolor text,
     entitytypeid text NOT NULL,
-    isresource boolean,
-    groupid integer
+    isresource boolean
 );
 
 
@@ -1726,7 +1310,7 @@ ALTER TABLE data.files OWNER TO postgres;
 
 CREATE TABLE geometries (
     entityid uuid NOT NULL,
-    geometry public.geometry(Geometry,4326)
+    val public.geometry(Geometry,4326)
 );
 
 
@@ -1809,7 +1393,7 @@ ALTER TABLE data.strings OWNER TO postgres;
 --
 
 CREATE VIEW vw_nodes AS
-    SELECT a.entitytypeid AS label, a.entityid AS id, b.val FROM (entities a LEFT JOIN ((((SELECT strings.entityid, strings.val FROM strings UNION SELECT dates.entityid, (dates.val)::text AS val FROM dates) UNION SELECT numbers.entityid, (numbers.val)::text AS val FROM numbers) UNION SELECT geometries.entityid, public.st_astext(geometries.geometry) AS val FROM geometries) UNION SELECT d.entityid, lbl.value AS val FROM domains d, concepts."values" lbl WHERE (((1 = 1) AND (d.val = lbl.valueid)) AND (lbl.valuetype = 'prefLabel'::text))) b ON ((a.entityid = b.entityid)));
+    SELECT a.entitytypeid AS label, a.entityid AS id, b.val FROM (entities a LEFT JOIN ((((SELECT strings.entityid, strings.val FROM strings UNION SELECT dates.entityid, (dates.val)::text AS val FROM dates) UNION SELECT numbers.entityid, (numbers.val)::text AS val FROM numbers) UNION SELECT geometries.entityid, public.st_astext(geometries.val) AS val FROM geometries) UNION SELECT d.entityid, lbl.value AS val FROM domains d, concepts."values" lbl WHERE (((1 = 1) AND (d.val = lbl.valueid)) AND (lbl.valuetype = 'prefLabel'::text))) b ON ((a.entityid = b.entityid)));
 
 
 ALTER TABLE data.vw_nodes OWNER TO postgres;
@@ -1853,7 +1437,7 @@ ALTER TABLE data.vw_edges OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid)));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid)));
 
 
 ALTER TABLE data.vw_resources OWNER TO postgres;
@@ -1865,7 +1449,7 @@ ALTER TABLE data.vw_resources OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_line AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiLineString'::text, 'ST_Linestring'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiLineString'::text, 'ST_Linestring'::text]));
 
 
 ALTER TABLE data.vw_resources_line OWNER TO postgres;
@@ -1877,7 +1461,7 @@ ALTER TABLE data.vw_resources_line OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_point AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiPoint'::text, 'ST_Point'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiPoint'::text, 'ST_Point'::text]));
 
 
 ALTER TABLE data.vw_resources_point OWNER TO postgres;
@@ -1889,26 +1473,13 @@ ALTER TABLE data.vw_resources_point OWNER TO postgres;
 --
 
 CREATE VIEW vw_resources_poly AS
-    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.geometry FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.geometry FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.geometry) = ANY (ARRAY['ST_MultiPolygon'::text, 'ST_Polygon'::text]));
+    SELECT row_number() OVER () AS geom_id, b.entityid AS resourceid, get_entitytypeid(b.entityid) AS rsrc_type, get_primaryname(b.entityid) AS p_name, get_attribute(b.entityid, 'SUMMARY.E62'::text) AS summary, a.val FROM ((SELECT recurse_up_relations(geometries.entityid) AS resourceid, geometries.val FROM geometries) a JOIN entities b ON ((a.resourceid = b.entityid))) WHERE (public.st_geometrytype(a.val) = ANY (ARRAY['ST_MultiPolygon'::text, 'ST_Polygon'::text]));
 
 
 ALTER TABLE data.vw_resources_poly OWNER TO postgres;
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 249 (class 1259 OID 15704442)
--- Dependencies: 11
--- Name: class_inheritance; Type: TABLE; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE class_inheritance (
-    classid text NOT NULL,
-    inheritsfrom text NOT NULL
-);
-
-
-ALTER TABLE ontology.class_inheritance OWNER TO postgres;
 
 --
 -- TOC entry 250 (class 1259 OID 15704448)
@@ -1919,8 +1490,7 @@ ALTER TABLE ontology.class_inheritance OWNER TO postgres;
 CREATE TABLE classes (
     classid text NOT NULL,
     classname text NOT NULL,
-    isactive boolean DEFAULT true NOT NULL,
-    defaultbusinesstable text
+    isactive boolean DEFAULT true NOT NULL
 );
 
 
@@ -1935,8 +1505,7 @@ ALTER TABLE ontology.classes OWNER TO postgres;
 CREATE TABLE mapping_steps (
     mappingid uuid NOT NULL,
     ruleid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
-    "order" integer NOT NULL,
-    defaultvalue text
+    "order" integer NOT NULL
 );
 
 
@@ -1952,7 +1521,6 @@ CREATE TABLE mappings (
     mappingid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     entitytypeidfrom text,
     entitytypeidto text,
-    "default" boolean DEFAULT false NOT NULL,
     mergenodeid text
 );
 
@@ -2010,61 +1578,6 @@ CREATE OR REPLACE VIEW ontology.vw_nodes AS
 
 ALTER TABLE ontology.vw_nodes OWNER TO postgres;
 
-SET search_path = app_metadata, pg_catalog;
-
---
--- TOC entry 3331 (class 2604 OID 15704485)
--- Dependencies: 210 209
--- Name: formid; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY forms ALTER COLUMN formid SET DEFAULT nextval('forms_formid_seq'::regclass);
-
-
---
--- TOC entry 3332 (class 2604 OID 15704486)
--- Dependencies: 212 211
--- Name: id; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY i18n ALTER COLUMN id SET DEFAULT nextval('i18n_id_seq'::regclass);
-
-
---
--- TOC entry 3333 (class 2604 OID 15704487)
--- Dependencies: 214 213
--- Name: informationthemeid; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY information_themes ALTER COLUMN informationthemeid SET DEFAULT nextval('information_themes_informationthemeid_seq'::regclass);
-
-
---
--- TOC entry 3338 (class 2604 OID 15704488)
--- Dependencies: 217 216
--- Name: id; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY maplayers ALTER COLUMN id SET DEFAULT nextval('maplayers_id_seq'::regclass);
-
-
---
--- TOC entry 3339 (class 2604 OID 15704489)
--- Dependencies: 219 218
--- Name: reportid; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY reports ALTER COLUMN reportid SET DEFAULT nextval('reports_reportid_seq'::regclass);
-
-
---
--- TOC entry 3340 (class 2604 OID 15704490)
--- Dependencies: 221 220
--- Name: groupid; Type: DEFAULT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY resource_groups ALTER COLUMN groupid SET DEFAULT nextval('resource_groups_groupid_seq'::regclass);
-
 
 SET search_path = data, pg_catalog;
 
@@ -2075,108 +1588,6 @@ SET search_path = data, pg_catalog;
 --
 
 ALTER TABLE ONLY relations ALTER COLUMN relationid SET DEFAULT nextval('relations_relationid_seq'::regclass);
-
-
-SET search_path = app_metadata, pg_catalog;
-
---
--- TOC entry 3353 (class 2606 OID 15704493)
--- Dependencies: 207 207
--- Name: pk_appconfig; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY app_config
-    ADD CONSTRAINT pk_appconfig PRIMARY KEY (name);
-
-
---
--- TOC entry 3355 (class 2606 OID 15704495)
--- Dependencies: 209 209
--- Name: pk_forms; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY forms
-    ADD CONSTRAINT pk_forms PRIMARY KEY (formid);
-
-
---
--- TOC entry 3357 (class 2606 OID 15704497)
--- Dependencies: 211 211
--- Name: pk_i18n; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY i18n
-    ADD CONSTRAINT pk_i18n PRIMARY KEY (id);
-
-
---
--- TOC entry 3361 (class 2606 OID 15704499)
--- Dependencies: 213 213
--- Name: pk_information_themes; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY information_themes
-    ADD CONSTRAINT pk_information_themes PRIMARY KEY (informationthemeid);
-
-
---
--- TOC entry 3367 (class 2606 OID 15704501)
--- Dependencies: 216 216
--- Name: pk_maplayers; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY maplayers
-    ADD CONSTRAINT pk_maplayers PRIMARY KEY (id);
-
-
---
--- TOC entry 3369 (class 2606 OID 15704503)
--- Dependencies: 218 218
--- Name: pk_reports; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY reports
-    ADD CONSTRAINT pk_reports PRIMARY KEY (reportid);
-
-
---
--- TOC entry 3371 (class 2606 OID 15704505)
--- Dependencies: 220 220
--- Name: pk_resource_groups; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY resource_groups
-    ADD CONSTRAINT pk_resource_groups PRIMARY KEY (groupid);
-
-
---
--- TOC entry 3359 (class 2606 OID 15704507)
--- Dependencies: 211 211 211 211 211
--- Name: unique_i18n; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY i18n
-    ADD CONSTRAINT unique_i18n UNIQUE (key, value, languageid, widgetname);
-
-
---
--- TOC entry 3363 (class 2606 OID 15704509)
--- Dependencies: 213 213 213 213
--- Name: unique_information_themes; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY information_themes
-    ADD CONSTRAINT unique_information_themes UNIQUE (name_i18n_key, displayclass, entitytypeid);
-
-
---
--- TOC entry 3365 (class 2606 OID 15704511)
--- Dependencies: 215 215 215
--- Name: unique_information_themes_x_forms; Type: CONSTRAINT; Schema: app_metadata; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY information_themes_x_forms
-    ADD CONSTRAINT unique_information_themes_x_forms UNIQUE (formid, informationthemeid);
 
 
 SET search_path = concepts, pg_catalog;
@@ -2210,15 +1621,6 @@ ALTER TABLE ONLY d_languages
 ALTER TABLE ONLY d_relationtypes
     ADD CONSTRAINT pk_d_relationtypes PRIMARY KEY (relationtype);
 
-
---
--- TOC entry 3383 (class 2606 OID 15704521)
--- Dependencies: 226 226
--- Name: pk_d_valuetypes; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY d_valuetypes
-    ADD CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype);
 
 
 --
@@ -2335,15 +1737,6 @@ ALTER TABLE ONLY strings
 
 SET search_path = ontology, pg_catalog;
 
---
--- TOC entry 3412 (class 2606 OID 15704545)
--- Dependencies: 249 249 249
--- Name: pk_class_inheritance; Type: CONSTRAINT; Schema: ontology; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT pk_class_inheritance PRIMARY KEY (classid, inheritsfrom);
-
 
 --
 -- TOC entry 3414 (class 2606 OID 15704547)
@@ -2453,58 +1846,6 @@ SET search_path = ontology, pg_catalog;
 --
 
 CREATE TRIGGER tgr_validate_entitytypes_in_mappings BEFORE INSERT ON mappings FOR EACH ROW EXECUTE PROCEDURE tgr_mappings_validation();
-
-
-SET search_path = app_metadata, pg_catalog;
-
---
--- TOC entry 3425 (class 2606 OID 15704564)
--- Dependencies: 3368 218 208
--- Name: fk_entity_reports_x_reports; Type: FK CONSTRAINT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY entity_type_x_reports
-    ADD CONSTRAINT fk_entity_reports_x_reports FOREIGN KEY (reportid) REFERENCES reports(reportid);
-
-
---
--- TOC entry 3426 (class 2606 OID 15704569)
--- Dependencies: 236 208 3394
--- Name: fk_entity_types_x_app_metadata_x_entity_type_x_reports; Type: FK CONSTRAINT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY entity_type_x_reports
-    ADD CONSTRAINT fk_entity_types_x_app_metadata_x_entity_type_x_reports FOREIGN KEY (entitytypeid) REFERENCES data.entity_types(entitytypeid);
-
-
---
--- TOC entry 3428 (class 2606 OID 15704574)
--- Dependencies: 215 209 3354
--- Name: fk_information_themes_x_forms; Type: FK CONSTRAINT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY information_themes_x_forms
-    ADD CONSTRAINT fk_information_themes_x_forms FOREIGN KEY (formid) REFERENCES forms(formid);
-
-
---
--- TOC entry 3429 (class 2606 OID 15704579)
--- Dependencies: 215 213 3360
--- Name: fk_information_themes_x_forms_x_information_themes; Type: FK CONSTRAINT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY information_themes_x_forms
-    ADD CONSTRAINT fk_information_themes_x_forms_x_information_themes FOREIGN KEY (informationthemeid) REFERENCES information_themes(informationthemeid);
-
-
---
--- TOC entry 3427 (class 2606 OID 15704584)
--- Dependencies: 213 236 3394
--- Name: fk_informationthemes_x_entity_type; Type: FK CONSTRAINT; Schema: app_metadata; Owner: postgres
---
-
-ALTER TABLE ONLY information_themes
-    ADD CONSTRAINT fk_informationthemes_x_entity_type FOREIGN KEY (entitytypeid) REFERENCES data.entity_types(entitytypeid);
 
 
 SET search_path = concepts, pg_catalog;
@@ -2682,16 +2023,6 @@ ALTER TABLE ONLY entities
 
 
 --
--- TOC entry 3443 (class 2606 OID 15704674)
--- Dependencies: 3370 236 220
--- Name: fk_entity_types_x_resource_groups; Type: FK CONSTRAINT; Schema: data; Owner: postgres
---
-
-ALTER TABLE ONLY entity_types
-    ADD CONSTRAINT fk_entity_types_x_resource_groups FOREIGN KEY (groupid) REFERENCES app_metadata.resource_groups(groupid);
-
-
---
 -- TOC entry 3448 (class 2606 OID 15704679)
 -- Dependencies: 239 243 3407
 -- Name: fk_relations_x_rules; Type: FK CONSTRAINT; Schema: data; Owner: postgres
@@ -2712,26 +2043,6 @@ ALTER TABLE ONLY domains
 
 
 SET search_path = ontology, pg_catalog;
-
---
--- TOC entry 3453 (class 2606 OID 15704689)
--- Dependencies: 250 249 3413
--- Name: fk_classes_class_inheritance_classid; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_classid FOREIGN KEY (classid) REFERENCES classes(classid);
-
-
---
--- TOC entry 3454 (class 2606 OID 15704694)
--- Dependencies: 3413 249 250
--- Name: fk_classes_class_inheritance_inheritsfrom; Type: FK CONSTRAINT; Schema: ontology; Owner: postgres
---
-
-ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT fk_classes_class_inheritance_inheritsfrom FOREIGN KEY (inheritsfrom) REFERENCES classes(classid);
-
 
 --
 -- TOC entry 3459 (class 2606 OID 15704699)
@@ -2842,3 +2153,137 @@ ALTER TABLE data.resource_x_resource ADD CONSTRAINT "fk_entities_entityid2.rsrc_
 ALTER TABLE data.resource_x_resource ADD CONSTRAINT "fk_entities_x_entities1.rsrc_x_rsrc" FOREIGN KEY ("entityid1") REFERENCES "data"."entities" ("entityid") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE data.resource_x_resource ADD CONSTRAINT "value_x_rsrc_x_rsrc" FOREIGN KEY ("relationshiptype") REFERENCES "concepts"."values" ("valueid") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.1.4
+-- Dumped by pg_dump version 9.1.4
+-- Started on 2014-09-10 15:56:10
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+--
+-- TOC entry 12 (class 2615 OID 16061322)
+-- Name: aux; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA aux;
+
+
+ALTER SCHEMA aux OWNER TO postgres;
+
+SET search_path = aux, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 256 (class 1259 OID 16061492)
+-- Dependencies: 1605 12
+-- Name: overlays; Type: TABLE; Schema: aux; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE overlays (
+    overlaytype text,
+    overlayvalue text,
+    geometry public.geometry(Geometry,4326),
+    overlayid uuid NOT NULL
+);
+
+
+ALTER TABLE aux.overlays OWNER TO postgres;
+
+--
+-- TOC entry 3288 (class 2606 OID 16064233)
+-- Dependencies: 256 256
+-- Name: overlays_pkey; Type: CONSTRAINT; Schema: aux; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY overlays
+    ADD CONSTRAINT overlays_pkey PRIMARY KEY (overlayid);
+
+
+--
+-- TOC entry 3289 (class 1259 OID 16064226)
+-- Dependencies: 256 2698
+-- Name: overlays_sidx; Type: INDEX; Schema: aux; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX overlays_sidx ON overlays USING gist (geometry);
+
+
+--
+-- TOC entry 3290 (class 1259 OID 16064234)
+-- Dependencies: 256
+-- Name: overlaytype_idx; Type: INDEX; Schema: aux; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX overlaytype_idx ON overlays USING btree (overlaytype);
+
+
+-- Completed on 2014-09-10 15:56:11
+
+--
+-- PostgreSQL database dump complete
+--
+CREATE TABLE aux.addresses
+(
+  addressnum text,
+  addressstreet text,
+  vintage text,
+  geometry public.geometry(MultiPoint,4326),
+  city text,
+  postalcode text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE aux.addresses
+  OWNER TO postgres;
+
+-- Index: aux.addresses_sidx
+
+-- DROP INDEX aux.addresses_sidx;
+
+CREATE INDEX addresses_sidx
+  ON aux.addresses
+  USING gist
+  (geometry );
+
+
+-- Index: aux.addresses_sidx
+
+  -- Table: aux.parcels
+
+-- DROP TABLE aux.parcels;
+
+CREATE TABLE aux.parcels
+(
+  parcelapn text,
+  vintage text,
+  geometry public.geometry(MultiPolygon,4326)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE aux.parcels
+  OWNER TO postgres;
+
+-- Index: aux.parcels_sidx
+
+-- DROP INDEX aux.parcels_sidx;
+
+CREATE INDEX parcels_sidx
+  ON aux.parcels
+  USING gist
+  (geometry );
+
+

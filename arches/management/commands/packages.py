@@ -25,6 +25,10 @@ from django.utils.importlib import import_module
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
+from package_utils.resource_loader import ResourceLoader
+import package_utils.resource_remover as resource_remover
+from arches.management.commands import utils
+from arches.app.search.search_engine_factory import SearchEngineFactory
 
 class Command(BaseCommand):
     """
@@ -34,16 +38,24 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions'],
+            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
-            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'),
+            '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
+            '\'livereload\'=Starts livereload for this package on port 35729'),
+        make_option('-s', '--source', action='store', dest='source', default='',
+            help='Directory containing a .arches or .shp file containing resource records'),
+        make_option('-t', '--truncate', action='store', dest='truncate', default='False',
+            help='Boolean to indicate if you want to clear all of the business data before loading. The default is False'),
+        make_option('-l', '--load_id', action='store', dest='load_id',
+            help='Text string identifying the resources in the data load you want to delete.'),
     )
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
+
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
@@ -56,9 +68,19 @@ class Command(BaseCommand):
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
 
+        if options['operation'] == 'livereload':
+            self.start_livereload()
+
         if options['operation'] == 'build_permissions':
             self.build_permissions()
-                
+
+        if options['operation'] == 'load_resources':     
+            self.load_resources(options['source'])
+            
+        if options['operation'] == 'remove_resources':     
+            self.remove_resources(options['load_id'])
+
+
     def setup(self, package_name):
         """
         Installs Elasticsearch into the package directory and 
@@ -120,6 +142,23 @@ class Command(BaseCommand):
             os.system("./plugin -install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
+        #self.setup_indexes(package_name)
+
+    def setup_indexes(self, package_name):
+        import time, signal
+        # p = self.start_elasticsearch(package_name)
+        # time.sleep(10)
+        se = SearchEngineFactory().create()
+        #create_mapping(self, index, type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
+        se.create_mapping('concept', 'Arches', 'label', 'string', 'analyzed')
+        #os.kill(p.pid, signal.CTRL_C_EVENT)
+        # print p.pid
+        # os.system('taskkill /F /PID %s' % p.pid)
+        #p = subprocess.Popen(['service.bat', 'remove'], cwd=es_start, shell=True) 
+        
+        # es_start = os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'service.bat')
+        # os.system('%s remove' % (es_start))
+
     def start_elasticsearch(self, package_name):
         """
         Starts the Elasticsearch process (blocking)
@@ -131,9 +170,14 @@ class Command(BaseCommand):
         
         # use this instead to start in a non-blocking way
         if sys.platform == 'win32':
-            p = subprocess.Popen('elasticsearch.bat', cwd=es_start, shell=True)  
+            import time
+            p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)  
+            time.sleep(10)
+            p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True) 
         else:
             p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)  
+        return p
+        #os.system('honcho start')
 
     def setup_db(self, package_name):
         """
@@ -162,9 +206,12 @@ class Command(BaseCommand):
 
         python_exe = os.path.abspath(sys.executable)
 
-        with open(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), 'w') as f:
-            f.write('elasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
-            f.write('\ndjango: %s manage.py runserver' % (python_exe))
+        contents = []
+        contents.append('\nelasticsearch: %s' % os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'elasticsearch'))
+        contents.append('django: %s manage.py runserver' % (python_exe))
+        contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
+
+        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
 
     def get_elasticsearch_install_location(self, package_name):
         """
@@ -193,3 +240,30 @@ class Command(BaseCommand):
             Permission.objects.create(codename='update_%s' % mapping.entitytypeidto, name='%s - update' % mapping.entitytypeidto , content_type=content_type[0])
             Permission.objects.create(codename='read_%s' % mapping.entitytypeidto, name='%s - read' % mapping.entitytypeidto , content_type=content_type[0])
             Permission.objects.create(codename='delete_%s' % mapping.entitytypeidto, name='%s - delete' % mapping.entitytypeidto , content_type=content_type[0])
+
+
+    def load_resources(self, data_source, truncate=False):
+        """
+        Runs the resource_loader command found in package_utils
+
+        """
+        resource_loader = ResourceLoader()
+        resource_loader.load(data_source, truncate)
+
+
+    def remove_resources(self, load_id):
+        """
+        Runs the resource_remover command found in package_utils
+
+        """
+        resource_remover.delete_resources(load_id)
+
+
+    def start_livereload(self):
+        from livereload import Server
+        server = Server()
+        for path in settings.STATICFILES_DIRS:
+            server.watch(path)
+        for path in settings.TEMPLATE_DIRS:
+            server.watch(path)
+        server.serve(port=settings.LIVERELOAD_PORT)

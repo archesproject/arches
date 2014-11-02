@@ -56,7 +56,7 @@ def install():
             pass
 
         download_elasticsearch()
-        get_version()
+        get_version(path_to_file=os.path.abspath(os.path.dirname(__file__)))
 
 def confirm_system_requirements():
     # CHECK PYTHON VERSION
@@ -96,29 +96,26 @@ def run_virtual_environment(env='ENV'):
         if os.path.exists(os.path.join(virtualenv_root, 'virtualenv.py')):
             virtualenv_working_dir = os.path.join(virtualenv_root, env)
             os.system("python %s %s" % (os.path.join(virtualenv_root, 'virtualenv.py'), virtualenv_working_dir))
-
-            # ACIVATE THE VIRTUAL ENV
-            if sys.platform == 'win32':
-                activate_this = os.path.join(virtualenv_working_dir, 'Scripts', 'activate_this.py')
-            else:
-                activate_this = os.path.join(virtualenv_working_dir, 'bin', 'activate_this.py')
-            execfile(activate_this, dict(__file__=activate_this))
+            activate_env(virtualenv_working_dir)
         else:
             os.system("pip install virtualenv")
             virtualenv_working_dir = os.path.join(here, 'virtualenv', env)
             os.system("virtualenv %s" % (virtualenv_working_dir))
             if os.path.exists(virtualenv_working_dir):
-                # ACIVATE THE VIRTUAL ENV
-                if sys.platform == 'win32':
-                    activate_this = os.path.join(virtualenv_working_dir, 'Scripts', 'activate_this.py')
-                else:
-                    activate_this = os.path.join(virtualenv_working_dir, 'bin', 'activate_this.py')
-                execfile(activate_this, dict(__file__=activate_this))
+                activate_env(virtualenv_working_dir)
             else:
                 raise Exception("""\n
             ----------------------------------------------------------------------------------------------------------------------
                 ERROR: Arches has to be run within a virtual environment http://virtualenv.readthedocs.org/
             -----------------------------------------------------------------------------------------------------------------------\n""")
+
+def activate_env(path_to_virtual_env):
+    # ACIVATE THE VIRTUAL ENV
+    if sys.platform == 'win32':
+        activate_this = os.path.join(path_to_virtual_env, 'Scripts', 'activate_this.py')
+    else:
+        activate_this = os.path.join(path_to_virtual_env, 'bin', 'activate_this.py')
+    execfile(activate_this, dict(__file__=activate_this))
 
 # INSTALL ELASTICSEARCH and HEAD plugin
 def download_file(url, file_name):
@@ -166,14 +163,15 @@ def get_elasticsearch_download_url():
         "# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-x.x.x.zip"
 ----------------------------------------------------------------------------------------------------\n""") 
 
-def get_version():
+def get_version(path_to_file=None):
     import os
     import subprocess
     from StringIO import StringIO
     from management.commands.utils import write_to_file
 
     sb = StringIO()
-    here = os.path.abspath(os.path.dirname(__file__))
+    if not path_to_file:
+        path_to_file =os.path.abspath(os.path.dirname(__file__))
     ver = ''
     try:
         hg_archival = open(os.path.abspath(os.path.join(here, '..', '.hg_archival.txt')),'r')
@@ -190,13 +188,13 @@ def get_version():
         sb.writelines(['__VERSION__="%s"' % latesttag])   
         sb.writelines(['\n__BUILD__="%s"' % node])  
         ver = '%s:%s' % (latesttag, node)
-        write_to_file(os.path.join(here,'version.py'), sb.getvalue(), 'w')
+        write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
     except:
         try:
             ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{latesttag}:{node|short}'])
             sb.writelines(['__VERSION__="%s"' % ver.split(':')[0]])
             sb.writelines(['\n__BUILD__="%s"' % ver.split(':')[1]]) 
-            write_to_file(os.path.join(here,'version.py'), sb.getvalue(), 'w')
+            write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
         except:
             pass
     return ver

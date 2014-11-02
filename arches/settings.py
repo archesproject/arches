@@ -17,13 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-import version
+#import version
 import inspect
 from django.utils.importlib import import_module
 # Django settings for Arches project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+INTERNAL_IPS = ('127.0.0.1',)
 
 #########################################
 ###  START PACKAGE SPECIFIC SETTINGS  ###
@@ -37,7 +38,7 @@ DATABASES = {
         'PASSWORD': 'postgis',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
-        'SCHEMAS': 'public,data,app_metadata,ontology,concepts', # syncdb will put the admin tables in the first listed schema,
+        'SCHEMAS': 'public,data,ontology,concepts', # syncdb will put the admin tables in the first listed schema,
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
 }
@@ -93,12 +94,14 @@ DATA_CONCEPT_SCHEME = ''
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
+LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
 
 
-ARCHES_VERSION = version.__VERSION__
+# ARCHES_VERSION = version.__VERSION__
 # BUILD = version.__BUILD__
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -172,6 +175,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(ROOT_DIR, 'app', 'media'),
+    MEDIA_ROOT
 )
 
 # List of finder classes that know how to find static files in
@@ -246,6 +250,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    'arches.app.utils.context_processors.livereload',
 )
 
 

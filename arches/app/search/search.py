@@ -33,32 +33,48 @@ class SearchEngine(object):
         index = kwargs.get('index', '').strip()
         type = kwargs.get('type', '').strip()
         id = kwargs.get('id', '').strip()
+        data = kwargs.pop('data', None)
         force = kwargs.get('force', False)
 
-        if (index == '' or type == '' or id == '') and force == False:
-            raise NotImplementedError("You must specify an 'index', 'type', and 'id' in your call to delete")
+        if data != None:
+            path = index
+            if type is not '':
+                path = '%s/%s' % (path, type)
 
-        path = index
-        if type is not '':
-            path = '%s/%s' % (path, type)
-            if id is not '':
-                path = '%s/%s' % (path, id) 
-        print 'deleting index by path: %s' % path
+            path = '%s/%s' % (path, '_query')
+                
+            return self.conn.delete(path, data=data)
+        else:
 
-        return self.conn.delete(path)
+            if (index == '' or type == '' or id == '') and force == False:
+                raise NotImplementedError("You must specify an 'index', 'type', and 'id' in your call to delete")
 
-    def search(self, q, **kwargs):
+            path = index
+            if type is not '':
+                path = '%s/%s' % (path, type)
+                if id is not '':
+                    path = '%s/%s' % (path, id) 
+            print 'deleting index by path: %s' % path
+
+            return self.conn.delete(path)
+
+    def search(self, q='', **kwargs):
         search_type = kwargs.pop('search_type', None)
         index = kwargs.pop('index', None)
-        type = kwargs.pop('type', '')
+        type = kwargs.pop('type', '_all')
+        id = kwargs.pop('id', None)
 
         if index is None:
             raise NotImplementedError("You must specify an 'index' in your call to search")
 
-        path = '%s/%s' % (index, type)
-        if search_type == None:
-            #path = path + '/_search?q="%s"' % q
-            path = '%s/%s' % (path, '_search')
+        if id:
+            path = '%s/%s/%s' % (index, type, id)
+            return self.conn.get(path)
+        else:
+            path = '%s/%s' % (index, type)
+            if search_type == None:
+                #path = path + '/_search?q="%s"' % q
+                path = '%s/%s' % (path, '_search')
 
         data = kwargs.pop('data', None)
         if data == None:

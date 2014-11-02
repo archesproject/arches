@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -8,7 +8,7 @@
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
+--SET standard_conformi= on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
@@ -30,15 +30,25 @@ INSERT INTO d_languages VALUES ('en-us', 'ENGLISH', true);
 -- Data for Name: d_valuetypes; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_valuetypes VALUES ('scopeNote', 'note');
-INSERT INTO d_valuetypes VALUES ('definition');
-INSERT INTO d_valuetypes VALUES ('example');
-INSERT INTO d_valuetypes VALUES ('historyNote', 'note');
-INSERT INTO d_valuetypes VALUES ('editorialNote', 'note');
-INSERT INTO d_valuetypes VALUES ('changeNote', 'note');
-INSERT INTO d_valuetypes VALUES ('prefLabel', 'label');
-INSERT INTO d_valuetypes VALUES ('altLabel', 'label');
-INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label');
+--SKOS Documentation Properties
+INSERT INTO d_valuetypes VALUES ('scopeNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('definition', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('example', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('historyNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('editorialNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('changeNote', 'note',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('note', 'note',null,TRUE);
+
+--SKOS Lexical Properties
+INSERT INTO d_valuetypes VALUES ('prefLabel', 'label',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('altLabel', 'label',null,TRUE);
+INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label',null,TRUE);
+
+--SKOS Notation (A notation is different from a lexical label in that a notation is not normally recognizable as a word or sequence of words in any natural language. (ie sortorder))
+INSERT INTO d_valuetypes VALUES ('Notation', 'Notation',null,TRUE);
+
+--NON-SKOS
+INSERT INTO d_valuetypes VALUES ('image', 'image',null,FALSE);
 
 
 --
@@ -47,22 +57,52 @@ INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label');
 -- Data for Name: d_relationtypes; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_relationtypes VALUES ('has narrower concept');
-INSERT INTO d_relationtypes VALUES ('has related concept');
-INSERT INTO d_relationtypes VALUES ('has authority document');
-INSERT INTO d_relationtypes VALUES ('includes');
-INSERT INTO d_relationtypes VALUES ('has collection');
+--SKOS Mapping Properties (relationships between concepts across schemes)
+INSERT INTO d_relationtypes VALUES ('closeMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('mappingRelation', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrowMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('relatedMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('broadMatch', 'Mapping Properties', TRUE);
+INSERT INTO d_relationtypes VALUES ('exactMatch', 'Mapping Properties', TRUE);
+
+--SKOS Semantic Relations (relationship between concepts within a scheme)
+INSERT INTO d_relationtypes VALUES ('borader', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('broaderTransitive', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrower', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('narrowerTransitive', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('related', 'Semantic Relations', TRUE);
+INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', TRUE);
+
+
+-- legacy relationshiptypes (should be removed before v3)
+INSERT INTO d_relationtypes VALUES ('has narrower concept', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has related concept', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has authority document', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('includes', 'Legacy', FALSE);
+INSERT INTO d_relationtypes VALUES ('has collection', 'Legacy', FALSE);
+
+
 
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'AUTHORITY FILES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'CONCEPT SCHEMES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ARCHES');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
+INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'CANDIDATES');
 
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'has narrower concept');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'has narrower concept');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'has narrower concept');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'has authority document');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'has narrower concept');
 
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Authority Files', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Concept Schemes', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'text', 'Arches', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'text', 'Resource To Resource Relationship Types', 'en-us');
+INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'text', 'Candidates', 'en-us');
+
 
 SET search_path = ontology, pg_catalog;
 
@@ -72,197 +112,92 @@ SET search_path = ontology, pg_catalog;
 -- Data for Name: classes; Type: TABLE DATA; Schema: ontology; Owner: postgres
 --
 
-INSERT INTO classes VALUES ('E10', 'Transfer of Custody', true, NULL);
-INSERT INTO classes VALUES ('E11', 'Modification', true, NULL);
-INSERT INTO classes VALUES ('E16', 'Measurement', true, NULL);
-INSERT INTO classes VALUES ('E19', 'Physical Object', true, NULL);
-INSERT INTO classes VALUES ('E2', 'Temporal Entity', true, NULL);
-INSERT INTO classes VALUES ('E20', 'Biological Object', true, NULL);
-INSERT INTO classes VALUES ('E22', 'Man-Made Object', true, NULL);
-INSERT INTO classes VALUES ('E24', 'Physical Man-Made Thing', true, NULL);
-INSERT INTO classes VALUES ('E25', 'Man-Made Feature', true, NULL);
-INSERT INTO classes VALUES ('E26', 'Physical Feature', true, NULL);
-INSERT INTO classes VALUES ('E28', 'Conceptual Object', true, NULL);
-INSERT INTO classes VALUES ('E33', 'Linguistic Object', true, NULL);
-INSERT INTO classes VALUES ('E35', 'Title', true, NULL);
-INSERT INTO classes VALUES ('E36', 'Visual Item', true, NULL);
-INSERT INTO classes VALUES ('E37', 'Mark', true, NULL);
-INSERT INTO classes VALUES ('E40', 'Legal Body', true, NULL);
-INSERT INTO classes VALUES ('E46', 'Section Definition', true, NULL);
-INSERT INTO classes VALUES ('E51', 'Contact Point', true, NULL);
-INSERT INTO classes VALUES ('E56', 'Language', true, NULL);
-INSERT INTO classes VALUES ('E59', 'Primitive Value', true, NULL);
-INSERT INTO classes VALUES ('E6', 'Destruction', true, NULL);
-INSERT INTO classes VALUES ('E61', 'Time Primitive', true, NULL);
-INSERT INTO classes VALUES ('E63', 'Beginning of Existence', true, NULL);
-INSERT INTO classes VALUES ('E64', 'End of Existence', true, NULL);
-INSERT INTO classes VALUES ('E66', 'Formation', true, NULL);
-INSERT INTO classes VALUES ('E68', 'Dissolution', true, NULL);
-INSERT INTO classes VALUES ('E70', 'Thing', true, NULL);
-INSERT INTO classes VALUES ('E71', 'Man-Made Thing', true, NULL);
-INSERT INTO classes VALUES ('E72', 'Legal Object', true, NULL);
-INSERT INTO classes VALUES ('E73', 'Information Object', true, NULL);
-INSERT INTO classes VALUES ('E75', 'Conceptual Object Appellation', true, NULL);
-INSERT INTO classes VALUES ('E77', 'Persistent Item', true, NULL);
-INSERT INTO classes VALUES ('E78', 'Collection', true, NULL);
-INSERT INTO classes VALUES ('E79', 'Part Addition', true, NULL);
-INSERT INTO classes VALUES ('E8', 'Acquisition Event', true, NULL);
-INSERT INTO classes VALUES ('E80', 'Part Removal', true, NULL);
-INSERT INTO classes VALUES ('E81', 'Transformation', true, NULL);
-INSERT INTO classes VALUES ('E83', 'Type Creation', true, NULL);
-INSERT INTO classes VALUES ('E84', 'Information Carrier', true, NULL);
-INSERT INTO classes VALUES ('E85', 'Joining', true, NULL);
-INSERT INTO classes VALUES ('E86', 'Leaving', true, NULL);
-INSERT INTO classes VALUES ('E87', 'Curation Activity', true, NULL);
-INSERT INTO classes VALUES ('E89', 'Propositional Object', true, NULL);
-INSERT INTO classes VALUES ('E9', 'Move', true, NULL);
-INSERT INTO classes VALUES ('E90', 'Symbolic Object', true, NULL);
-INSERT INTO classes VALUES ('E1', 'CRM Entity', true, 'strings');
-INSERT INTO classes VALUES ('E12', 'Production', true, 'entities');
-INSERT INTO classes VALUES ('E13', 'Attribute Assignment', true, 'entities');
-INSERT INTO classes VALUES ('E14', 'Condition Assessment', true, 'entities');
-INSERT INTO classes VALUES ('E15', 'Identifier Assignment', true, 'entities');
-INSERT INTO classes VALUES ('E17', 'Type Assignment', true, 'entities');
-INSERT INTO classes VALUES ('E18', 'Physical Thing', true, 'entities');
-INSERT INTO classes VALUES ('E21', 'Person', true, 'entities');
-INSERT INTO classes VALUES ('E27', 'Site', true, 'entities');
-INSERT INTO classes VALUES ('E29', 'Design or Procedure', true, 'entities');
-INSERT INTO classes VALUES ('E3', 'Condition State', true, 'entities');
-INSERT INTO classes VALUES ('E30', 'Right', true, 'entities');
-INSERT INTO classes VALUES ('E31', 'Document', true, 'entities');
-INSERT INTO classes VALUES ('E32', 'Authority Document', true, 'domains');
-INSERT INTO classes VALUES ('E34', 'Inscription', true, 'entities');
-INSERT INTO classes VALUES ('E38', 'Image', true, 'entities');
-INSERT INTO classes VALUES ('E39', 'Actor', true, 'entities');
-INSERT INTO classes VALUES ('E4', 'Period', true, 'entities');
-INSERT INTO classes VALUES ('E41', 'Appellation', true, 'strings');
-INSERT INTO classes VALUES ('E42', 'Identifier', true, 'strings');
-INSERT INTO classes VALUES ('E44', 'Place Appellation', true, 'strings');
-INSERT INTO classes VALUES ('E45', 'Address', true, 'strings');
-INSERT INTO classes VALUES ('E47', 'Spatial Coordinates', true, 'geometries');
-INSERT INTO classes VALUES ('E48', 'Place Name', true, 'domains');
-INSERT INTO classes VALUES ('E49', 'Time Appellation', true, 'strings');
-INSERT INTO classes VALUES ('E5', 'Event', true, 'entities');
-INSERT INTO classes VALUES ('E50', 'Date', true, 'strings');
-INSERT INTO classes VALUES ('E52', 'Time-Span', true, 'entities');
-INSERT INTO classes VALUES ('E53', 'Place', true, 'entities');
-INSERT INTO classes VALUES ('E54', 'Dimension', true, 'numbers');
-INSERT INTO classes VALUES ('E55', 'Type', true, 'domains');
-INSERT INTO classes VALUES ('E57', 'Material', true, 'domains');
-INSERT INTO classes VALUES ('E58', 'Measurement Unit', true, 'domains');
-INSERT INTO classes VALUES ('E60', 'Number', true, 'strings');
-INSERT INTO classes VALUES ('E62', 'String', true, 'strings');
-INSERT INTO classes VALUES ('E65', 'Creation', true, 'entities');
-INSERT INTO classes VALUES ('E67', 'Birth', true, 'entities');
-INSERT INTO classes VALUES ('E69', 'Death', true, 'entities');
-INSERT INTO classes VALUES ('E7', 'Activity', true, 'entities');
-INSERT INTO classes VALUES ('E74', 'Group', true, 'entities');
-INSERT INTO classes VALUES ('E82', 'Actor Appellation', true, 'strings');
-
-
---
--- TOC entry 3330 (class 0 OID 11001132)
--- Dependencies: 257 3331 3331
--- Data for Name: class_inheritance; Type: TABLE DATA; Schema: ontology; Owner: postgres
---
-
-INSERT INTO class_inheritance VALUES ('E2', 'E1');
-INSERT INTO class_inheritance VALUES ('E3', 'E2');
-INSERT INTO class_inheritance VALUES ('E4', 'E2');
-INSERT INTO class_inheritance VALUES ('E6', 'E64');
-INSERT INTO class_inheritance VALUES ('E7', 'E5');
-INSERT INTO class_inheritance VALUES ('E8', 'E7');
-INSERT INTO class_inheritance VALUES ('E9', 'E7');
-INSERT INTO class_inheritance VALUES ('E10', 'E7');
-INSERT INTO class_inheritance VALUES ('E11', 'E7');
-INSERT INTO class_inheritance VALUES ('E12', 'E11');
-INSERT INTO class_inheritance VALUES ('E12', 'E63');
-INSERT INTO class_inheritance VALUES ('E13', 'E7');
-INSERT INTO class_inheritance VALUES ('E14', 'E13');
-INSERT INTO class_inheritance VALUES ('E15', 'E13');
-INSERT INTO class_inheritance VALUES ('E16', 'E13');
-INSERT INTO class_inheritance VALUES ('E17', 'E13');
-INSERT INTO class_inheritance VALUES ('E18', 'E72');
-INSERT INTO class_inheritance VALUES ('E19', 'E18');
-INSERT INTO class_inheritance VALUES ('E20', 'E19');
-INSERT INTO class_inheritance VALUES ('E21', 'E20');
-INSERT INTO class_inheritance VALUES ('E21', 'E39');
-INSERT INTO class_inheritance VALUES ('E22', 'E19');
-INSERT INTO class_inheritance VALUES ('E22', 'E24');
-INSERT INTO class_inheritance VALUES ('E24', 'E18');
-INSERT INTO class_inheritance VALUES ('E24', 'E71');
-INSERT INTO class_inheritance VALUES ('E25', 'E24');
-INSERT INTO class_inheritance VALUES ('E25', 'E26');
-INSERT INTO class_inheritance VALUES ('E26', 'E18');
-INSERT INTO class_inheritance VALUES ('E27', 'E26');
-INSERT INTO class_inheritance VALUES ('E29', 'E73');
-INSERT INTO class_inheritance VALUES ('E30', 'E89');
-INSERT INTO class_inheritance VALUES ('E31', 'E73');
-INSERT INTO class_inheritance VALUES ('E32', 'E31');
-INSERT INTO class_inheritance VALUES ('E33', 'E73');
-INSERT INTO class_inheritance VALUES ('E34', 'E33');
-INSERT INTO class_inheritance VALUES ('E34', 'E37');
-INSERT INTO class_inheritance VALUES ('E35', 'E33');
-INSERT INTO class_inheritance VALUES ('E35', 'E41');
-INSERT INTO class_inheritance VALUES ('E36', 'E73');
-INSERT INTO class_inheritance VALUES ('E37', 'E36');
-INSERT INTO class_inheritance VALUES ('E37', 'E33');
-INSERT INTO class_inheritance VALUES ('E38', 'E36');
-INSERT INTO class_inheritance VALUES ('E39', 'E77');
-INSERT INTO class_inheritance VALUES ('E40', 'E74');
-INSERT INTO class_inheritance VALUES ('E41', 'E90');
-INSERT INTO class_inheritance VALUES ('E42', 'E41');
-INSERT INTO class_inheritance VALUES ('E44', 'E41');
-INSERT INTO class_inheritance VALUES ('E45', 'E44');
-INSERT INTO class_inheritance VALUES ('E45', 'E51');
-INSERT INTO class_inheritance VALUES ('E46', 'E44');
-INSERT INTO class_inheritance VALUES ('E47', 'E44');
-INSERT INTO class_inheritance VALUES ('E48', 'E44');
-INSERT INTO class_inheritance VALUES ('E49', 'E41');
-INSERT INTO class_inheritance VALUES ('E50', 'E49');
-INSERT INTO class_inheritance VALUES ('E51', 'E41');
-INSERT INTO class_inheritance VALUES ('E52', 'E1');
-INSERT INTO class_inheritance VALUES ('E53', 'E1');
-INSERT INTO class_inheritance VALUES ('E54', 'E1');
-INSERT INTO class_inheritance VALUES ('E55', 'E28');
-INSERT INTO class_inheritance VALUES ('E56', 'E55');
-INSERT INTO class_inheritance VALUES ('E57', 'E55');
-INSERT INTO class_inheritance VALUES ('E58', 'E55');
-INSERT INTO class_inheritance VALUES ('E60', 'E59');
-INSERT INTO class_inheritance VALUES ('E61', 'E59');
-INSERT INTO class_inheritance VALUES ('E62', 'E59');
-INSERT INTO class_inheritance VALUES ('E63', 'E5');
-INSERT INTO class_inheritance VALUES ('E64', 'E5');
-INSERT INTO class_inheritance VALUES ('E65', 'E7');
-INSERT INTO class_inheritance VALUES ('E65', 'E63');
-INSERT INTO class_inheritance VALUES ('E66', 'E7');
-INSERT INTO class_inheritance VALUES ('E66', 'E63');
-INSERT INTO class_inheritance VALUES ('E67', 'E63');
-INSERT INTO class_inheritance VALUES ('E68', 'E64');
-INSERT INTO class_inheritance VALUES ('E69', 'E64');
-INSERT INTO class_inheritance VALUES ('E70', 'E77');
-INSERT INTO class_inheritance VALUES ('E71', 'E70');
-INSERT INTO class_inheritance VALUES ('E71', 'E77');
-INSERT INTO class_inheritance VALUES ('E72', 'E70');
-INSERT INTO class_inheritance VALUES ('E73', 'E90');
-INSERT INTO class_inheritance VALUES ('E73', 'E89');
-INSERT INTO class_inheritance VALUES ('E74', 'E39');
-INSERT INTO class_inheritance VALUES ('E75', 'E41');
-INSERT INTO class_inheritance VALUES ('E77', 'E1');
-INSERT INTO class_inheritance VALUES ('E78', 'E24');
-INSERT INTO class_inheritance VALUES ('E79', 'E11');
-INSERT INTO class_inheritance VALUES ('E80', 'E11');
-INSERT INTO class_inheritance VALUES ('E81', 'E63');
-INSERT INTO class_inheritance VALUES ('E81', 'E64');
-INSERT INTO class_inheritance VALUES ('E82', 'E41');
-INSERT INTO class_inheritance VALUES ('E83', 'E65');
-INSERT INTO class_inheritance VALUES ('E84', 'E22');
-INSERT INTO class_inheritance VALUES ('E85', 'E7');
-INSERT INTO class_inheritance VALUES ('E86', 'E7');
-INSERT INTO class_inheritance VALUES ('E87', 'E7');
-INSERT INTO class_inheritance VALUES ('E89', 'E28');
-INSERT INTO class_inheritance VALUES ('E90', 'E72');
-INSERT INTO class_inheritance VALUES ('E90', 'E28');
+INSERT INTO classes VALUES ('E10', 'Transfer of Custody', true);
+INSERT INTO classes VALUES ('E11', 'Modification', true);
+INSERT INTO classes VALUES ('E16', 'Measurement', true);
+INSERT INTO classes VALUES ('E19', 'Physical Object', true);
+INSERT INTO classes VALUES ('E2', 'Temporal Entity', true);
+INSERT INTO classes VALUES ('E20', 'Biological Object', true);
+INSERT INTO classes VALUES ('E22', 'Man-Made Object', true);
+INSERT INTO classes VALUES ('E24', 'Physical Man-Made Thing', true);
+INSERT INTO classes VALUES ('E25', 'Man-Made Feature', true);
+INSERT INTO classes VALUES ('E26', 'Physical Feature', true);
+INSERT INTO classes VALUES ('E28', 'Conceptual Object', true);
+INSERT INTO classes VALUES ('E33', 'Linguistic Object', true);
+INSERT INTO classes VALUES ('E35', 'Title', true);
+INSERT INTO classes VALUES ('E36', 'Visual Item', true);
+INSERT INTO classes VALUES ('E37', 'Mark', true);
+INSERT INTO classes VALUES ('E40', 'Legal Body', true);
+INSERT INTO classes VALUES ('E46', 'Section Definition', true);
+INSERT INTO classes VALUES ('E51', 'Contact Point', true);
+INSERT INTO classes VALUES ('E56', 'Language', true);
+INSERT INTO classes VALUES ('E59', 'Primitive Value', true);
+INSERT INTO classes VALUES ('E6', 'Destruction', true);
+INSERT INTO classes VALUES ('E61', 'Time Primitive', true);
+INSERT INTO classes VALUES ('E63', 'Beginning of Existence', true);
+INSERT INTO classes VALUES ('E64', 'End of Existence', true);
+INSERT INTO classes VALUES ('E66', 'Formation', true);
+INSERT INTO classes VALUES ('E68', 'Dissolution', true);
+INSERT INTO classes VALUES ('E70', 'Thing', true);
+INSERT INTO classes VALUES ('E71', 'Man-Made Thing', true);
+INSERT INTO classes VALUES ('E72', 'Legal Object', true);
+INSERT INTO classes VALUES ('E73', 'Information Object', true);
+INSERT INTO classes VALUES ('E75', 'Conceptual Object Appellation', true);
+INSERT INTO classes VALUES ('E77', 'Persistent Item', true);
+INSERT INTO classes VALUES ('E78', 'Collection', true);
+INSERT INTO classes VALUES ('E79', 'Part Addition', true);
+INSERT INTO classes VALUES ('E8', 'Acquisition Event', true);
+INSERT INTO classes VALUES ('E80', 'Part Removal', true);
+INSERT INTO classes VALUES ('E81', 'Transformation', true);
+INSERT INTO classes VALUES ('E83', 'Type Creation', true);
+INSERT INTO classes VALUES ('E84', 'Information Carrier', true);
+INSERT INTO classes VALUES ('E85', 'Joining', true);
+INSERT INTO classes VALUES ('E86', 'Leaving', true);
+INSERT INTO classes VALUES ('E87', 'Curation Activity', true);
+INSERT INTO classes VALUES ('E89', 'Propositional Object', true);
+INSERT INTO classes VALUES ('E9', 'Move', true);
+INSERT INTO classes VALUES ('E90', 'Symbolic Object', true);
+INSERT INTO classes VALUES ('E1', 'CRM Entity', true);
+INSERT INTO classes VALUES ('E12', 'Production', true);
+INSERT INTO classes VALUES ('E13', 'Attribute Assignment', true);
+INSERT INTO classes VALUES ('E14', 'Condition Assessment', true);
+INSERT INTO classes VALUES ('E15', 'Identifier Assignment', true);
+INSERT INTO classes VALUES ('E17', 'Type Assignment', true);
+INSERT INTO classes VALUES ('E18', 'Physical Thing', true);
+INSERT INTO classes VALUES ('E21', 'Person', true);
+INSERT INTO classes VALUES ('E27', 'Site', true);
+INSERT INTO classes VALUES ('E29', 'Design or Procedure', true);
+INSERT INTO classes VALUES ('E3', 'Condition State', true);
+INSERT INTO classes VALUES ('E30', 'Right', true);
+INSERT INTO classes VALUES ('E31', 'Document', true);
+INSERT INTO classes VALUES ('E32', 'Authority Document', true);
+INSERT INTO classes VALUES ('E34', 'Inscription', true);
+INSERT INTO classes VALUES ('E38', 'Image', true);
+INSERT INTO classes VALUES ('E39', 'Actor', true);
+INSERT INTO classes VALUES ('E4', 'Period', true);
+INSERT INTO classes VALUES ('E41', 'Appellation', true);
+INSERT INTO classes VALUES ('E42', 'Identifier', true);
+INSERT INTO classes VALUES ('E44', 'Place Appellation', true);
+INSERT INTO classes VALUES ('E45', 'Address', true);
+INSERT INTO classes VALUES ('E47', 'Spatial Coordinates', true);
+INSERT INTO classes VALUES ('E48', 'Place Name', true);
+INSERT INTO classes VALUES ('E49', 'Time Appellation', true);
+INSERT INTO classes VALUES ('E5', 'Event', true);
+INSERT INTO classes VALUES ('E50', 'Date', true);
+INSERT INTO classes VALUES ('E52', 'Time-Span', true);
+INSERT INTO classes VALUES ('E53', 'Place', true);
+INSERT INTO classes VALUES ('E54', 'Dimension', true);
+INSERT INTO classes VALUES ('E55', 'Type', true);
+INSERT INTO classes VALUES ('E57', 'Material', true);
+INSERT INTO classes VALUES ('E58', 'Measurement Unit', true);
+INSERT INTO classes VALUES ('E60', 'Number', true);
+INSERT INTO classes VALUES ('E62', 'String', true);
+INSERT INTO classes VALUES ('E65', 'Creation', true);
+INSERT INTO classes VALUES ('E67', 'Birth', true);
+INSERT INTO classes VALUES ('E69', 'Death', true);
+INSERT INTO classes VALUES ('E7', 'Activity', true);
+INSERT INTO classes VALUES ('E74', 'Group', true);
+INSERT INTO classes VALUES ('E82', 'Actor Appellation', true);
 
 
 --

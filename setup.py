@@ -15,9 +15,6 @@ class post_install(install):
         install.run(self)
         arches_install()
 
-
-execfile(path.join('arches', 'version.py'))
-
 setup(
     name='arches',
 
@@ -56,11 +53,11 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    entry_points={
-        'console_scripts': [
-            'arches_install=arches.setup:install',
-        ],
-    },
+    # entry_points={
+    #     'console_scripts': [
+    #         'arches=arches.management.commands.cli:main',
+    #     ],
+    # },
 
     setup_requires=["hgtools"],
 

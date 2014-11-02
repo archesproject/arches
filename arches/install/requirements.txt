@@ -6,7 +6,9 @@ rdflib
 sphinx==1.2.2
 fabric
 honcho
+livereload
 unicodecsv
+pyyaml
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
