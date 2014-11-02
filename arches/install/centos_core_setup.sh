@@ -50,3 +50,5 @@ sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PU
 sudo -u postgres createdb training -T template_postgis
 
 sudo yum install -y python-setuptools python-devel.x86_64
+
+sudo -u postgres createdb -E UTF8 -T template_postgis --locale=en_US.utf8 arches
