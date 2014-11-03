@@ -281,7 +281,7 @@ class FileValues(models.Model):
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
     datatype = models.TextField()
-    value = models.FileField(upload_to='files')
+    value = models.FileField(upload_to='concepts')
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
         db_table = u'values'
