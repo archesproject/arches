@@ -80,11 +80,16 @@ def load_authority_file(cursor, path_to_authority_files, filename):
     #create nodes for each authority document file and relate them to the authority document node in the concept schema
     auth_doc_file_name = str(filename)
     display_file_name = string.capwords(auth_doc_file_name.replace('_',' ').replace('AUTHORITY DOCUMENT.csv', '').strip())
-    concept = Concept()
-    concept.id = str(uuid.uuid4())
-    concept.legacyoid = auth_doc_file_name
-    concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
-    scheme_id = concept.id
+    if auth_doc_file_name.upper() != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.CSV':
+        concept = Concept()
+        concept.id = str(uuid.uuid4())
+        concept.legacyoid = auth_doc_file_name
+        concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
+        scheme_id = concept.id
+    else:
+        concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
+        concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
+        scheme_id = concept.id
 
     lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='has narrower concept', target=concept.id)
     lookups.add_lookup(concept=concept, rownum=0)
@@ -203,11 +208,12 @@ def create_link_to_entity_types(cursor, path_to_authority_files):
         rows.next() # skip header row
         adoc_dict_list = []
         for row in rows:
-            sql = """
-                SELECT legacyoid FROM concepts.concepts 
-                WHERE conceptid IN (SELECT conceptid FROM data.entity_types WHERE entitytypeid = '%s')
-            """%(row[u'ENTITYTYPE'])
-            #print sql
+            if row[u'ENTITYTYPE'] != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv':
+                sql = """
+                    SELECT legacyoid FROM concepts.concepts 
+                    WHERE conceptid IN (SELECT conceptid FROM data.entity_types WHERE entitytypeid = '%s')
+                """%(row[u'ENTITYTYPE'])
+                #print sql
 
             try:
                 cursor.execute(sql)

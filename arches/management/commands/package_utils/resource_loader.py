@@ -32,7 +32,7 @@ class Row(object):
             self.resource_id = args[0][0].strip()
             self.resourcetype = args[0][1].strip()
             self.attributename = args[0][2].strip()
-            self.attributevalue = args[0][3].strip()
+            self.attributevalue = args[0][3].strip().replace('\\n', '\n')
             self.group_id = args[0][4].strip()
 
     def __repr__(self):
