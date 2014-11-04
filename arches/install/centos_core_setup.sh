@@ -29,24 +29,30 @@ sudo chmod 666 /var/lib/pgsql/9.3/data/pg_hba.conf
 echo 'CHANGED CONF FILE PERMISSIONS'
 sudo echo "standard_conforming_strings = off" | sudo tee --append  /var/lib/pgsql/9.3/data/postgresql.conf
 sudo echo "listen_addresses = '*'" | sudo tee --append  /var/lib/pgsql/9.3/data/postgresql.conf
+
+sudo cp /var/lib/pgsql/9.3/data/pg_hba.conf var/lib/pgsql/9.3/data/pg_hba.conf.backup
+sudo truncate /var/lib/pgsql/9.3/data/pg_hba.conf --size 0
+
 sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
 sudo echo "local   all       all                 trust" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
 sudo echo "host    all       all   127.0.0.1/32  trust" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
 sudo echo "host    all       all   ::1/128       trust" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
 sudo echo "host    all       all   0.0.0.0/0     md5" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
 
-sudo systemctl start postgresql-9.3.service 
+sudo systemctl start postgresql-9.3.service
 
 sudo -u postgres psql -d postgres -c "CREATE EXTENSION postgis;"
-sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
-sudo -u postgres createlang -d template_postgis plpgsql
-sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis'"
-sudo -u postgres psql -d template_postgis -f /usr/pgsql-9.3/share/contrib/postgis-2.1/postgis.sql
-sudo -u postgres psql -d template_postgis -f /usr/pgsql-9.3/share/contrib/postgis-2.1/spatial_ref_sys.sql
-sudo -u postgres psql -d template_postgis -f /usr/pgsql-9.3/share/contrib/postgis-2.1/rtpostgis.sql
-sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
-sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
-sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-sudo -u postgres createdb training -T template_postgis
+sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis_20
+sudo -u postgres createlang -d template_postgis_20 plpgsql
+
+sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_20'"
+sudo -u postgres psql -d template_postgis_20 -f /usr/pgsql-9.3/share/contrib/postgis-2.1/postgis.sql
+sudo -u postgres psql -d template_postgis_20 -f /usr/pgsql-9.3/share/contrib/postgis-2.1/spatial_ref_sys.sql
+sudo -u postgres psql -d template_postgis_20 -f /usr/pgsql-9.3/share/contrib/postgis-2.1/rtpostgis.sql
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns TO PUBLIC;"
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+sudo -u postgres createdb training -T template_postgis_20
 
 sudo yum install -y python-setuptools python-devel.x86_64
+sudo yum install -y python-pip.noarch
