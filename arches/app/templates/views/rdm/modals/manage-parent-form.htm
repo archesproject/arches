@@ -21,9 +21,10 @@
                                     {% include 'views/concept-search.htm' %}  
                                 </div>
                                 <div class="col-xs-4">
-                                    <select multiple style="width:100%;" class="select2" id="parent-relation-type" placeholder="{% trans "Relation to Parent" %}">
-                                        <option value="1">Broader</option>
-                                        <option value="2">Broader Transitive</option>
+                                    <select style="width:100%;" class="select2" id="parent-relation-type" placeholder="{% trans "Relation to Parent" %}">
+                                        {% for relation in parent_relations %}
+                                          <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>  

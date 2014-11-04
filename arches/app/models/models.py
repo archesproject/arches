@@ -85,6 +85,8 @@ class DLanguages(models.Model):
 
 class DRelationtypes(models.Model):
     relationtype = models.TextField(primary_key=True)
+    category = models.TextField()
+    skoscompliant = models.BooleanField()
     class Meta:
         db_table = u'd_relationtypes'
 

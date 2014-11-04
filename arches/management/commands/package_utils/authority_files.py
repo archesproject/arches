@@ -91,7 +91,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
         concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
         scheme_id = concept.id
 
-    lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='has narrower concept', target=concept.id)
+    lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='narrower', target=concept.id)
     lookups.add_lookup(concept=concept, rownum=0)
     
     try:
@@ -113,7 +113,8 @@ def load_authority_file(cursor, path_to_authority_files, filename):
                             for altlabel in altlabel_list:
                                 concept.addvalue({'value':altlabel, 'language': 'en-us', 'type': 'altLabel', 'datatype': 'text', 'category': 'label'})                          
                         
-                        relationshiptype = 'includes' if row[u'CONCEPTTYPE'].upper() == 'INDEX' else ('has collection' if row[u'CONCEPTTYPE'].upper() == 'COLLECTOR' else '')
+                        #relationshiptype = 'includes' if row[u'CONCEPTTYPE'].upper() == 'INDEX' else ('has collection' if row[u'CONCEPTTYPE'].upper() == 'COLLECTOR' else '')
+                        relationshiptype = 'narrower'
                         lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type=relationshiptype, target=concept.id, rownum=rows.line_num)
                         
                         if row[u'PARENTCONCEPTID'] == '' or (row[u'CONCEPTTYPE'].upper() != 'INDEX' and row[u'CONCEPTTYPE'].upper() != 'COLLECTOR'):

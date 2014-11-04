@@ -23,7 +23,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             if (this.searchbox.val() !== ''){
                 var parentConcept = new ConceptModel({
                     id: this.searchbox.val(),
-                    relationshiptype: 'has narrower concept' //this.relationshiptype.val()
+                    relationshiptype: this.relationshiptype.val()
                 });
                 this.model.set('added', [parentConcept.toJSON()]);
             }

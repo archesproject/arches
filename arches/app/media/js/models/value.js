@@ -1,12 +1,12 @@
 define(['arches', 'models/abstract'], function (arches, AbstractModel) {
     return AbstractModel.extend({
         defaults: {
-            'id': null,
+            'id': '',
             'value': '',            
-            'type': null,
+            'type': '',
             'category': '',
             'datatype': 'text',
-            'language': null,
+            'language': '',
             'conceptid': ''
         }  
     });

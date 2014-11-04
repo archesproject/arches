@@ -66,12 +66,15 @@ INSERT INTO d_relationtypes VALUES ('broadMatch', 'Mapping Properties', TRUE);
 INSERT INTO d_relationtypes VALUES ('exactMatch', 'Mapping Properties', TRUE);
 
 --SKOS Semantic Relations (relationship between concepts within a scheme)
-INSERT INTO d_relationtypes VALUES ('borader', 'Semantic Relations', TRUE);
-INSERT INTO d_relationtypes VALUES ('broaderTransitive', 'Semantic Relations', TRUE);
+--INSERT INTO d_relationtypes VALUES ('borader', 'Semantic Relations', TRUE);
+--INSERT INTO d_relationtypes VALUES ('broaderTransitive', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('narrower', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('narrowerTransitive', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('related', 'Semantic Relations', TRUE);
 INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', TRUE);
+
+--Arches entityttype relations to concepts
+INSERT INTO d_relationtypes VALUES ('referencesConcept', 'Entitytype Relations', FALSE);
 
 
 -- legacy relationshiptypes (should be removed before v3)
@@ -90,11 +93,11 @@ INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-0000
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
 INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'CANDIDATES');
 
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'has narrower concept');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'has narrower concept');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'has narrower concept');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'has authority document');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'has narrower concept');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');

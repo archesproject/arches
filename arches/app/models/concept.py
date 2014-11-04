@@ -97,7 +97,7 @@ class Concept(object):
                             self.values.append(ConceptValue(value))
 
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), ~Q(relationtype = 'has related concept'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'))
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -110,7 +110,7 @@ class Concept(object):
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang='en-us'), reverse=False) 
 
             if include_parentconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), ~Q(relationtype = 'has related concept'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -121,7 +121,7 @@ class Concept(object):
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
 
             if include_relatedconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'has related concept'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'referencesConcept') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptidto_id != self.id:
                         self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
@@ -178,19 +178,19 @@ class Concept(object):
                     models.Concepts.objects.get(pk=concept.conceptid).delete()
 
             for parentconcept in self.parentconcepts:
-                conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has narrower concept', conceptidfrom = parentconcept.id, conceptidto = self.id)
+                conceptrelations = models.ConceptRelations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
                 for relation in conceptrelations:
                     relation.delete()
 
             for relatedconcept in self.relatedconcepts:
                 deletedrelatedconcepts = []
                 for relatedconcept in self.relatedconcepts:
-                    conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidto = relatedconcept.id, conceptidfrom = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
 
-                    conceptrelations = models.ConceptRelations.objects.filter(relationtype = 'has related concept', conceptidfrom = relatedconcept.id, conceptidto = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
@@ -248,7 +248,7 @@ class Concept(object):
         for value in self.values:
             if value.type == 'sortorder':
                 return value.value
-
+                
         return self.get_preflabel(lang=lang).value
 
     def get_auth_doc_concept(self, lang='en-us'):

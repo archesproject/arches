@@ -35,12 +35,13 @@
 
                     <div class="col-xs-6">
                         <h4>{% trans "Relation from Parent" %}</h4>
-                        <p> 
+                        <div> 
                             <select style="width:100%;" class="select2" name="relationshiptype_dd" required>
-                                <option value="has narrower concept">has narrower concept</option>
-                                <!-- <option value="2">Narrower Transitive</option> -->
+                                {% for relation in parent_relations %}
+                                  <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
+                                {% endfor %}
                             </select>
-                         </p>
+                        </div>
                     </div>
 
                 </div>

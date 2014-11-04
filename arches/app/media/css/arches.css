@@ -400,6 +400,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 
+/*Select2 overrides*/
+
+.select2-arrow{
+    display: none !important; /*removes the down arrow from dropdowns*/
+}
+
 /*
 .sidebar-nav-v1 > li.active > a {
   color: #333;

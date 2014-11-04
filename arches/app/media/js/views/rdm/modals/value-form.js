@@ -45,9 +45,9 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                     self.valuemodel.set({
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
-                        type: self.valueTypeInput.select2("val")[0],
+                        type: self.valueTypeInput.select2("val"),
                         datatype: 'text',
-                        language: self.languageInput.select2("val")[0]
+                        language: self.languageInput.select2("val")
                     });
                     self.model.set('values', [self.valuemodel]);
                     modal.on('hidden.bs.modal', function () {
@@ -67,8 +67,12 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
         render: function () {
             this.valueInput.val(this.valuemodel.get('value'));
             this.idInput.val(this.valuemodel.get('id'));
-            this.valueTypeInput.select2("val", this.valuemodel.get('type'));
-            this.languageInput.select2("val", this.valuemodel.get('language'));
+            if(this.valuemodel.get('type') !== ''){
+                this.valueTypeInput.select2("val", this.valuemodel.get('type'));
+            }
+            if(this.valuemodel.get('language') !== ''){
+                this.languageInput.select2("val", this.valuemodel.get('language'));                
+            }
         }
     });
 });

@@ -31,7 +31,7 @@
 
                                     <!-- Label Type -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 value-type-input" id="label-type" name="label-type" placeholder="Label type" required>
+                                        <select style="width:100%;" class="select2 value-type-input" id="label-type" name="label-type" placeholder="Label type" required>
                                             {% for label in valuetype_labels %}
                                               <option value="{{label.valuetype}}">{{label.valuetype}}</option>
                                             {% endfor %}
@@ -41,7 +41,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder="Language" required>
+                                        <select style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder="Language" required>
                                             {% for language in languages %}
                                               <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                             {% endfor %}
@@ -103,7 +103,7 @@
 
                                     <!-- Note Type -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required placeholder="Note type">
+                                        <select style="width:100%;" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required placeholder="Note type">
                                         {% for note in valuetype_notes %}
                                           <option value="{{note.valuetype}}">{{note.valuetype}}</option>
                                         {% endfor %}
@@ -113,7 +113,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 language language-input" name="note_language_dd" id="note_language_dd" required placeholder="Language">
+                                        <select style="width:100%;" class="select2 language language-input" name="note_language_dd" id="note_language_dd" required placeholder="Language">
                                         {% for language in languages %}
                                           <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                         {% endfor %}
@@ -172,7 +172,7 @@
 
                                     <!-- Value Type -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 value value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required placeholder="Value type">
+                                        <select style="width:100%;" class="select2 value value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required placeholder="Value type">
                                         {% for related_value in valuetype_related_values %}
                                           <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
                                         {% endfor %}
@@ -182,7 +182,7 @@
 
                                     <!-- Language -->
                                     <div class="col-xs-6">
-                                        <select multiple style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder="Language">
+                                        <select style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder="Language">
                                         {% for language in languages %}
                                           <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
                                         {% endfor %}

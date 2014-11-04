@@ -84,7 +84,6 @@ class Query(Dsl):
     def delete(self, index='', type=''):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
-        print self
         return self.se.delete(index=index, data=self.dsl)
 
 class Bool(Dsl):

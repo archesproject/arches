@@ -653,11 +653,11 @@ BEGIN
     IF split_part(p_entitytypeid, '.', 1) != '' and split_part(p_entitytypeid, '.', 2) != '' THEN
         IF NOT EXISTS(SELECT entitytypeid FROM data.entity_types WHERE entitytypeid = p_entitytypeid) THEN
 
-        v_conceptid = (select concepts.insert_concept (split_part(p_entitytypeid, '.', 1), p_note, p_notelanguage, upper(p_entitytypeid)));
+        v_conceptid = (select concepts.insert_concept (p_entitytypeid, p_note, p_notelanguage, upper(p_entitytypeid)));
 
         IF v_parentconceptid in (select conceptid from concepts.concepts) then
             INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
-            VALUES (v_parentconceptid, v_conceptid, 'has narrower concept', public.uuid_generate_v1mc());
+            VALUES (v_parentconceptid, v_conceptid, 'narrower', public.uuid_generate_v1mc());
         END IF;
         
             IF p_businesstablename = '' THEN
