@@ -30,7 +30,7 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                     });
                     var subconcept = new ConceptModel({
                         values: [label],
-                        relationshiptype: 'has collection'
+                        relationshiptype: 'narrower'
                     });
                     model.set('subconcepts', [subconcept]);
                     model.save(function() {
