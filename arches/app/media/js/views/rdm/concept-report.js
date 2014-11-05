@@ -69,23 +69,23 @@ define([
             var self = this;
             var data = $(e.target).data();
 
-            confirm_delete_modal = this.$el.find('.confirm-delete-modal');
-            confirm_delete_modal_yes = confirm_delete_modal.find('.confirm-delete-yes');
+            this.confirm_delete_modal = this.$el.find('.confirm-delete-modal');
+            this.confirm_delete_modal_yes = this.confirm_delete_modal.find('.confirm-delete-yes');
 
-            confirm_delete_modal_yes.data('id', data.id);
-            confirm_delete_modal_yes.data('action', data.action);
-            confirm_delete_modal_yes.data('category', data.category);
+            this.confirm_delete_modal_yes.data('id', data.id);
+            this.confirm_delete_modal_yes.data('action', data.action);
+            this.confirm_delete_modal_yes.data('category', data.category);
 
-            confirm_delete_modal.find('.modal-title').text($(e.target).attr('title'));
-            confirm_delete_modal.find('.modal-body [name="warning-text"]').text(data.message);
-            confirm_delete_modal.find('.modal-body [name="additional-info"]').text('');            
-            confirm_delete_modal.modal('show');
+            this.confirm_delete_modal.find('.modal-title').text($(e.target).attr('title'));
+            this.confirm_delete_modal.find('.modal-body [name="warning-text"]').text(data.message);
+            this.confirm_delete_modal.find('.modal-body [name="additional-info"]').text('');            
+            this.confirm_delete_modal.modal('show');
 
             if (data.action === 'delete-concept'){
                 $.ajax({
                     url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', data.id),
                     success: function(response) {
-                        confirm_delete_modal.find('.modal-body [name="additional-info"]').html(response);
+                        self.confirm_delete_modal.find('.modal-body [name="additional-info"]').html(response);
                     }
                 });                
             }
