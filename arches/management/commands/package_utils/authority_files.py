@@ -86,12 +86,12 @@ def load_authority_file(cursor, path_to_authority_files, filename):
         concept.legacyoid = auth_doc_file_name
         concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
         scheme_id = concept.id
+        lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='narrower', target=concept.id)
     else:
         concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
         concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
         scheme_id = concept.id
 
-    lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='narrower', target=concept.id)
     lookups.add_lookup(concept=concept, rownum=0)
     
     try:
