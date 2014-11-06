@@ -60,6 +60,7 @@ class Concept(object):
     def load(self, value):
         if isinstance(value, dict):
             self.id = value['id'] if 'id' in value else ''
+            self.nodetype = value['nodetype'] if 'nodetype' in value else ''
             self.legacyoid = value['legacyoid'] if 'legacyoid' in value else ''
             self.relationshiptype = value['relationshiptype'] if 'relationshiptype' in value else ''            
             if 'values' in value:
@@ -75,10 +76,18 @@ class Concept(object):
                 for relatedconcept in value['relatedconcepts']:
                     self.addrelatedconcept(relatedconcept)
 
+        if isinstance(value, models.Concepts):
+            self.id = value.pk
+            self.nodetype = value.nodetype_id
+            self.legacyoid = value.legacyoid
+
     def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, **kwargs):
-        self.id = id if id != '' else self.id
-        if self.id != '' or legacyoid != '':
-            self.legacyoid = legacyoid
+        if id != '':
+            self.load(models.Concepts.objects.get(pk=id))
+        elif legacyoid != '':
+            self.load(models.Concepts.objects.get(legacyoid=legacyoid))
+
+        if self.id != '':
             uplevel = kwargs.pop('uplevel', 0)
             downlevel = kwargs.pop('downlevel', 0)
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
@@ -97,6 +106,15 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
+            # if self.nodetype == 'Collection':
+            #     if include_relatedconcepts:
+            #         conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+            #         for relation in conceptrealations:
+            #             if relation.conceptidto_id != self.id:
+            #                 self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
+            #             if relation.conceptidfrom_id != self.id:
+            #                 self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']).get_preflabel())
+            # else:
             if include_subconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
@@ -122,7 +140,7 @@ class Concept(object):
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
 
             if include_relatedconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptidto_id != self.id:
                         self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())

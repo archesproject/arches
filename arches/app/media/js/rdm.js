@@ -13,6 +13,15 @@ require([
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm) {
     $(document).ready(function() {
         var mode = 'scheme';
+        if (window.location.search.search('mode=dropdown') === 1){
+            mode = 'dropdown';
+        }
+
+        window.onpopstate = function(event) {
+          alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+          //window.location = document.location;
+        };
+
         var appHeader = $("#appheader");
         var sidebar = $("#sidebar");
         var topToHeaderPx = appHeader.offset().top;
@@ -28,7 +37,8 @@ require([
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
-            model: concept
+            model: concept,
+            mode: mode
         });
         var conceptsearch = new ConceptSearch({ 
             el: $('#rdm-concept-search-container')[0],
@@ -37,7 +47,7 @@ require([
 
         concept.on({
             'change': function(){
-                window.history.pushState({}, "conceptid", concept.get('id'));
+                window.history.pushState({}, "conceptid", concept.get('id') + '?mode=' + mode);
             },
             'save': function(){
                 conceptTree.render();
@@ -61,7 +71,7 @@ require([
                 if (mode !== 'dropdown'){
                     conceptTree.render();                    
                 }
-                conceptReport.render();
+                conceptReport.render(mode);
             }
         });
 

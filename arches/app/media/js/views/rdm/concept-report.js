@@ -26,11 +26,11 @@ define([
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
 
-        initialize: function() {
-            this.render();
+        initialize: function(options) {
+            this.render(options.mode);
         },
 
-        render: function() {
+        render: function(mode) {
             var self = this;
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
@@ -41,7 +41,7 @@ define([
 
 
                 $.ajax({
-                    url: '../Concepts/' + conceptid + '?f=html',
+                    url: '../Concepts/' + conceptid + '?f=html&mode=' + mode,
                     success: function(response) {
                         self.$el.find('.concept-report-loading').addClass('hidden');
                         self.$el.html(response);
@@ -143,7 +143,7 @@ define([
                     model: this.model
                 });
             form.on('dataChanged', function () {
-                self.render();
+                self.render(self.mode);
             });
         },
 

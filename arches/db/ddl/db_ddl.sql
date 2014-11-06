@@ -643,21 +643,27 @@ CREATE FUNCTION insert_entitytype(p_entitytypeid text, p_businesstablename text,
     v_conceptid uuid = null;
     v_parentconceptid uuid = (select concepts.get_conceptid(p_parentconceptlabel));
     v_isresource boolean = FALSE;
+    v_nodetype text = 'EntityType';
     
 BEGIN
 
-    IF p_entitytypeid = p_asset_entity
-    THEN v_isresource = TRUE;
+    IF p_entitytypeid = p_asset_entity THEN 
+      v_isresource = TRUE;
+    END IF;
+
+    IF p_businesstablename = 'domains' THEN 
+      v_nodetype = 'Collection';
     END IF;
     
     IF split_part(p_entitytypeid, '.', 1) != '' and split_part(p_entitytypeid, '.', 2) != '' THEN
         IF NOT EXISTS(SELECT entitytypeid FROM data.entity_types WHERE entitytypeid = p_entitytypeid) THEN
 
-        v_conceptid = (select concepts.insert_concept (p_entitytypeid, p_note, p_notelanguage, upper(p_entitytypeid), 'EntityType'));
+          v_conceptid = (select concepts.insert_concept (p_entitytypeid, p_note, p_notelanguage, upper(p_entitytypeid), v_nodetype));
 
-        IF v_parentconceptid in (select conceptid from concepts.concepts) then
-            INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
-            VALUES (v_parentconceptid, v_conceptid, 'narrower', public.uuid_generate_v1mc());
+          IF v_parentconceptid in (select conceptid from concepts.concepts) then
+              INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
+              VALUES (v_parentconceptid, v_conceptid, 'narrower', public.uuid_generate_v1mc());
+
         END IF;
         
             IF p_businesstablename = '' THEN
