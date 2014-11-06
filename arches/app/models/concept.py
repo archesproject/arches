@@ -34,6 +34,7 @@ CORE_CONCEPTS = (
 class Concept(object):
     def __init__(self, *args, **kwargs):
         self.id = ''
+        self.nodetype = ''
         self.legacyoid = ''
         self.relationshiptype = ''
         self.values = []
@@ -133,7 +134,7 @@ class Concept(object):
     def save(self):
         with transaction.atomic():
             self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-            concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid})
+            concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid, 'nodetype_id': self.nodetype})
 
             for parentconcept in self.parentconcepts:
                 parentconcept.save()

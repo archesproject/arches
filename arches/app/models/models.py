@@ -76,6 +76,12 @@ class Classes(models.Model):
     def __unicode__(self):
         return self.classname
 
+class DNodetypes(models.Model):
+    nodetype = models.TextField(primary_key=True)
+    skoscompliant = models.BooleanField()
+    class Meta:
+        db_table = u'd_nodetypes'
+
 class DLanguages(models.Model):
     languageid = models.TextField(primary_key=True)
     languagename = models.TextField()
@@ -240,6 +246,7 @@ class AuthPermission(models.Model):
 
 class Concepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
+    nodetype = models.ForeignKey('DNodetypes', db_column='nodetype')
     legacyoid = models.TextField()
     class Meta:
         db_table = u'concepts'

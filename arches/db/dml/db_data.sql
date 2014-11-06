@@ -85,13 +85,20 @@ INSERT INTO d_relationtypes VALUES ('includes', 'Legacy', FALSE);
 INSERT INTO d_relationtypes VALUES ('has collection', 'Legacy', FALSE);
 
 
+INSERT INTO d_nodetypes VALUES ('GroupingNode', FALSE);
+INSERT INTO d_nodetypes VALUES ('ConceptSchemeGroup', FALSE);
+INSERT INTO d_nodetypes VALUES ('ConceptScheme', TRUE);
+INSERT INTO d_nodetypes VALUES ('Concept', TRUE);
+INSERT INTO d_nodetypes VALUES ('Collection', TRUE);
+INSERT INTO d_nodetypes VALUES ('EntityType', FALSE);
 
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'CONCEPTS');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ENTITY TYPES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'CONCEPT SCHEMES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ARCHES');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
-INSERT INTO concepts(conceptid, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'CANDIDATES');
+
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'GroupingNode', 'CONCEPTS');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'GroupingNode', 'ENTITY TYPES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'CONCEPT SCHEMES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ConceptSchemeGroup', 'ARCHES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ConceptScheme', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptSchemeGroup', 'CANDIDATES');
 
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'narrower');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'narrower');

@@ -83,6 +83,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
     if auth_doc_file_name.upper() != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.CSV':
         concept = Concept()
         concept.id = str(uuid.uuid4())
+        concept.nodetype = 'ConceptScheme'                
         concept.legacyoid = auth_doc_file_name
         concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
         scheme_id = concept.id
@@ -106,6 +107,7 @@ def load_authority_file(cursor, path_to_authority_files, filename):
                     else:
                         concept = Concept()
                         concept.id = str(uuid.uuid4())
+                        concept.nodetype = 'Concept'
                         concept.legacyoid = row[u'CONCEPTID']
                         concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
                         if row[u'ALTLABELS'] != '':
