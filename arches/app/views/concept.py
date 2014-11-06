@@ -115,7 +115,7 @@ def concept(request, conceptid):
 
         else:
             se = SearchEngineFactory().create()
-            return JSONResponse(se.search('', index='concept', type=ids, search_field='value', use_wildcard=True))
+            return JSONResponse(se.search('', index='concept', search_field='value', use_wildcard=True))
 
 
     if request.method == 'POST':
