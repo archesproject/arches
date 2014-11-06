@@ -12,6 +12,7 @@ require([
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm) {
     $(document).ready(function() {
+        var mode = 'scheme';
         var appHeader = $("#appheader");
         var sidebar = $("#sidebar");
         var topToHeaderPx = appHeader.offset().top;
@@ -57,7 +58,9 @@ require([
             'conceptSelected': function(conceptid){
                 concept.clear();
                 concept.set('id', conceptid);
-                conceptTree.render();
+                if (mode !== 'dropdown'){
+                    conceptTree.render();                    
+                }
                 conceptReport.render();
             }
         });
@@ -66,6 +69,7 @@ require([
             'conceptSelected': function(conceptid) {
                 concept.clear();
                 concept.set('id', conceptid);
+
                 conceptTree.render();
                 conceptReport.render();
             },
@@ -113,6 +117,21 @@ require([
                 el: $('#delete-scheme-form')
             });
             form.modal.modal('show');
+        });
+
+        $('#option1').on( "click", function(){
+            mode = 'scheme';
+            concept.set('id', '00000000-0000-0000-0000-000000000003');
+            conceptTree.render();
+            conceptReport.render();
+        });
+
+        $('#option2').on( "click", function(){
+            mode = 'dropdown';
+            concept.set('id', '00000000-0000-0000-0000-000000000002');
+            conceptTree.render(mode);
+            conceptReport.render();
+
         });
 
         $(window).scroll(function() {

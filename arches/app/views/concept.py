@@ -223,5 +223,9 @@ def search(request):
 
 def concept_tree(request):
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
+    mode = request.GET.get('mode', None)
+    if mode == 'dropdown':
+        concepts = Concept({'id': conceptid}).concept_tree(top_concept = conceptid)
+    else:
+        concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
     return JSONResponse(concepts, indent=4)

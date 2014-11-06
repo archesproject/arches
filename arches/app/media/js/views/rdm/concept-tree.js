@@ -24,7 +24,7 @@ define([
             this.render();
         },
 
-        render: function() {
+        render: function(mode) {
             if (this._doNotRender) {
                 return;
             }
@@ -40,7 +40,7 @@ define([
 
             self.$el.tree(
                 'loadDataFromUrl',
-                arches.urls.concept_tree + "?node=" + this.model.get('id'),
+                arches.urls.concept_tree + "?node=" + this.model.get('id') + "&mode=" + mode,
                 null,
                 function() {
                     var node;
