@@ -97,7 +97,7 @@ class Concept(object):
                             self.values.append(ConceptValue(value))
 
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -121,7 +121,7 @@ class Concept(object):
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
 
             if include_relatedconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'referencesConcept') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptidto_id != self.id:
                         self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
@@ -158,7 +158,7 @@ class Concept(object):
                 relation.pk = str(uuid.uuid4())
                 relation.conceptidfrom_id = self.id
                 relation.conceptidto_id = relatedconcept.id
-                relation.relationtype_id = 'has related concept'
+                relation.relationtype_id = 'related'
                 relation.save()
 
             for value in self.values:

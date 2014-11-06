@@ -207,7 +207,7 @@
                 </h5>
             </dt>
             {% for value in concept.values %}
-                {% if value.category == '' and value.type != 'image' %}
+                {% if value.category == 'undefined' %}
                 <dd class="arches-RDM-label-highlighted">
                     <a href="javascript:void(0);"><i class="color-red fa fa-times-circle" title="{% trans "Delete this value?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                     <a href="javascript:void(0);" title="{% trans "Edit this value" %}" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
