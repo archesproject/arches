@@ -36,7 +36,8 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                     });
                     var subconcept = new ConceptModel({
                         values: [label, note],
-                        relationshiptype: $(form).find("[name=relationshiptype_dd]").val()
+                        relationshiptype: $(form).find("[name=relationshiptype_dd]").val(),
+                        nodetype: 'Concept'
                     });
                     self.model.set('values', []);
                     self.model.set('subconcepts', [subconcept]);

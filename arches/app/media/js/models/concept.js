@@ -5,6 +5,7 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         defaults: {
             'id': '',
             'legacyoid': '',
+            'nodetype': '',
             'relationshiptype': '',
             'values': [],
             'subconcepts': [],
