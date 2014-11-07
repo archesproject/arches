@@ -41,6 +41,7 @@ class Concept(object):
         self.subconcepts = []
         self.parentconcepts = []
         self.relatedconcepts = []
+        self.hassubconcepts = False
 
         if len(args) != 0:
             if isinstance(args[0], basestring):
@@ -106,15 +107,9 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            # if self.nodetype == 'Collection':
-            #     if include_relatedconcepts:
-            #         conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
-            #         for relation in conceptrealations:
-            #             if relation.conceptidto_id != self.id:
-            #                 self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
-            #             if relation.conceptidfrom_id != self.id:
-            #                 self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']).get_preflabel())
-            # else:
+            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))[0:1]
+            if len(hassubconcepts) > 0:
+                self.hassubconcepts = True
             if include_subconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
@@ -123,7 +118,7 @@ class Concept(object):
                     for relation in conceptrealations:
                         self.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
-                            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
+                            include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
 
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang='en-us'), reverse=False) 
@@ -418,14 +413,18 @@ class Concept(object):
                 return _findBroaderConcept(conceptrealations[0].conceptidfrom_id, ret, depth_limit=depth_limit, level=level)
             else:
                 return child_concept
-        
-        if self.id == None or self.id == '' or self.id == top_concept:
-            concepts = [_findNarrowerConcept(top_concept, depth_limit=1)]
-        else:
-            concepts = _findNarrowerConcept(self.id, depth_limit=1)
-            concepts = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
 
-        return concepts
+        graph = []
+        if self.id == None or self.id == '' or self.id == top_concept:
+            concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
+            for conceptmodel in concepts:
+                graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+        else:
+            graph = [_findNarrowerConcept(self.id, depth_limit=1)]
+            #concepts = _findNarrowerConcept(self.id, depth_limit=1)
+            #graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
+
+        return graph
 
     def get_paths(self, lang='en-us'):
         def graph_to_paths(current_concept, path=[], path_list=[[]]):
@@ -479,7 +478,13 @@ class Concept(object):
 
     @staticmethod
     def get_scheme_collections(include=None, depth=1):
-        return Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=depth, include=include).subconcepts
+        #return Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=depth, include=include).subconcepts
+        ret = []
+        concepts = models.Concepts.objects.filter(nodetype = 'ConceptSchemeGroup')
+        for concept in concepts:
+            ret.append(Concept().get(id=concept.pk, include=['label']))
+        return ret
+
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):

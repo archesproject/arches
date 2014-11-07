@@ -18,7 +18,7 @@ require([
         }
 
         window.onpopstate = function(event) {
-          alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+          //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
           //window.location = document.location;
         };
 
@@ -37,8 +37,7 @@ require([
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
-            model: concept,
-            mode: mode
+            model: concept
         });
         var conceptsearch = new ConceptSearch({ 
             el: $('#rdm-concept-search-container')[0],
@@ -47,15 +46,15 @@ require([
 
         concept.on({
             'change': function(){
-                window.history.pushState({}, "conceptid", concept.get('id') + '?mode=' + mode);
+                window.history.pushState({}, "conceptid", concept.get('id'));
             },
             'save': function(){
-                conceptTree.render();
+                //conceptTree.render();
                 conceptReport.render();
                 concept.reset()
             },
             'delete': function(){
-                conceptTree.render();
+                //conceptTree.render();
                 conceptReport.render();
                 concept.reset()
             }
@@ -67,11 +66,8 @@ require([
             },
             'conceptSelected': function(conceptid){
                 concept.clear();
-                concept.set('id', conceptid);
-                if (mode !== 'dropdown'){
-                    conceptTree.render();                    
-                }
-                conceptReport.render(mode);
+                concept.set('id', conceptid);                   
+                conceptReport.render();
             }
         });
 
@@ -80,11 +76,11 @@ require([
                 concept.clear();
                 concept.set('id', conceptid);
 
-                conceptTree.render();
+                //conceptTree.render();
                 conceptReport.render();
             },
             'parentsChanged': function() {
-                conceptTree.render();
+                //conceptTree.render();
                 conceptReport.render();
             }//,
             // 'conceptAdded': function() {
@@ -127,21 +123,6 @@ require([
                 el: $('#delete-scheme-form')
             });
             form.modal.modal('show');
-        });
-
-        $('#option1').on( "click", function(){
-            mode = 'scheme';
-            concept.set('id', '00000000-0000-0000-0000-000000000003');
-            conceptTree.render();
-            conceptReport.render();
-        });
-
-        $('#option2').on( "click", function(){
-            mode = 'dropdown';
-            concept.set('id', '00000000-0000-0000-0000-000000000002');
-            conceptTree.render(mode);
-            conceptReport.render();
-
         });
 
         $(window).scroll(function() {

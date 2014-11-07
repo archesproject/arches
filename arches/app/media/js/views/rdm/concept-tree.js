@@ -18,13 +18,13 @@ define([
                 dragAndDrop: true,
                 dataUrl: arches.urls.concept_tree,
                 data: [],
-                autoOpen: true
+                autoOpen: false
             });
 
             this.render();
         },
 
-        render: function(mode) {
+        render: function() {
             if (this._doNotRender) {
                 return;
             }
@@ -40,7 +40,7 @@ define([
 
             self.$el.tree(
                 'loadDataFromUrl',
-                arches.urls.concept_tree + "?node=" + this.model.get('id') + "&mode=" + mode,
+                arches.urls.concept_tree + "?node=" + this.model.get('id'),
                 null,
                 function() {
                     var node;
@@ -58,6 +58,9 @@ define([
             var node = event.node;
             if (this.model.get('id') !== node.id) {
                 this.trigger('conceptSelected', node.id);
+                if (! node.load_on_demand){
+                    this.$el.tree('toggle', node);                    
+                }
             } else {
                 event.preventDefault();
             }

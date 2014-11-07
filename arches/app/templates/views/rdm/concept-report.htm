@@ -129,20 +129,20 @@
                         {% for parent_concept in path %}
                             <dd class="arches-concept-heirarchy">
                                 {% with ''|center:forloop.counter0 as range %}
-                                <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                                <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
                                 <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
                                 {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                             </dd>
                         {% if forloop.last %}{% with ''|center:forloop.counter as range %}
                             <dd class="arches-concept-heirarchy selected-concept">
-                                <span class="text-muted">{% for i in range %}...{% endfor %}</span>
+                                <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a>
                             </dd>
                             {% if show_children%}
                                 {% for subconcept in concept.subconcepts %}
                                 <dd class="arches-concept-heirarchy">
-                                    <span class="text-muted">...{% for i in range %}...{% endfor %}</span>
+                                    <i class=" {% if subconcept.hassubconcepts %}fa fa-expand{% endif %}" style="color:#aaa"></i><span class="text-muted"{% if not subconcept.hassubconcepts %}style="padding-left:13px;"{% endif %}>...{% for i in range %}...{% endfor %}</span>
                                     <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this concept?" %}" data-id="{{subconcept.id}}" data-action="delete-concept" data-message="{% trans "By deleting this concept, you will also be deleting the following concepts as well.  This operation cannot be undone." %}" ></i></a>
                                     <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>
                                 </dd>

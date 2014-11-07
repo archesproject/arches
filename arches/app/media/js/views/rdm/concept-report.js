@@ -28,10 +28,10 @@ define([
         },
 
         initialize: function(options) {
-            this.render(options.mode);
+            this.render();
         },
 
-        render: function(mode) {
+        render: function() {
             var self = this;
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
@@ -40,7 +40,7 @@ define([
             self.$el.find('.concept-report-content').addClass('hidden');
 
             $.ajax({
-                url: '../Concepts/' + conceptid + '?f=html&mode=' + mode,
+                url: '../Concepts/' + conceptid + '?f=html',
                 success: function(response) {
                     self.$el.find('.concept-report-loading').addClass('hidden');
                     self.$el.html(response);
@@ -142,7 +142,7 @@ define([
                     model: this.model
                 });
             form.on('dataChanged', function () {
-                self.render(self.mode);
+                self.render();
             });
         },
 

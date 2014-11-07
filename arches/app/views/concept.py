@@ -86,7 +86,8 @@ def concept(request, conceptid):
                 depth_limit=depth_limit, up_depth_limit=None)
 
             if f == 'html':
-                if mode == 'scheme':
+                print concept_graph.nodetype
+                if concept_graph.nodetype != 'Collection':
                     languages = models.DLanguages.objects.all()
                     valuetypes = models.ValueTypes.objects.all()
                     relationtypes = models.DRelationtypes.objects.all()
@@ -110,7 +111,7 @@ def concept(request, conceptid):
                         'direct_parents': direct_parents
                     }, context_instance=RequestContext(request))
 
-                if mode == 'dropdown':
+                else:
                     languages = models.DLanguages.objects.all()
                     valuetypes = models.ValueTypes.objects.all()
                     relationtypes = models.DRelationtypes.objects.all()
@@ -258,9 +259,5 @@ def search(request):
 
 def concept_tree(request):
     conceptid = request.GET.get('node', None)
-    mode = request.GET.get('mode', None)
-    if mode == 'dropdown':
-        concepts = Concept({'id': conceptid}).concept_tree(top_concept = conceptid)
-    else:
-        concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
+    concepts = Concept({'id': conceptid}).concept_tree()
     return JSONResponse(concepts, indent=4)
