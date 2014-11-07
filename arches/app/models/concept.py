@@ -427,14 +427,20 @@ class Concept(object):
         return graph
 
     def get_paths(self, lang='en-us'):
-        def graph_to_paths(current_concept, path=[], path_list=[[]]):
-            parents = current_concept.parentconcepts
-            for parent in parents:
-                current_path = path[:]
-                if len(parent.parentconcepts) == 0:
-                    path_list.append(current_path)
-                current_path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
-                graph_to_paths(parent, current_path, path_list)
+        def graph_to_paths(current_concept, path=[], path_list=[]):
+            if len(path) == 0:
+                current_path = []
+            else:
+                current_path = path[:]    
+                
+            current_path.insert(0, {'label': current_concept.get_preflabel(lang=lang).value, 'relationshiptype': current_concept.relationshiptype, 'id': current_concept.id})
+
+            if len(current_concept.parentconcepts) == 0:
+                path_list.append(current_path[:])
+            else:    
+                for parent in current_concept.parentconcepts:   
+                    ret = graph_to_paths(parent, current_path, path_list)                    
+            
             return path_list
 
         return graph_to_paths(self)

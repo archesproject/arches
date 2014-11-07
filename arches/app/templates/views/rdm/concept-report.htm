@@ -127,7 +127,7 @@
                     <div>
                         <dl>
                         {% for parent_concept in path %}
-                            <dd class="arches-concept-heirarchy">
+                            <dd class="arches-concept-heirarchy {% if forloop.last %}selected-concept{% endif %}" >
                                 {% with ''|center:forloop.counter0 as range %}
                                 <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
@@ -135,10 +135,7 @@
                                 {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                             </dd>
                         {% if forloop.last %}{% with ''|center:forloop.counter as range %}
-                            <dd class="arches-concept-heirarchy selected-concept">
-                                <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
-                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a>
-                            </dd>
+                                <!-- <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a> -->
                             {% if show_children%}
                                 {% for subconcept in concept.subconcepts %}
                                 <dd class="arches-concept-heirarchy">
