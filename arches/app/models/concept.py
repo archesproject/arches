@@ -199,12 +199,12 @@ class Concept(object):
             for relatedconcept in self.relatedconcepts:
                 deletedrelatedconcepts = []
                 for relatedconcept in self.relatedconcepts:
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
 
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
