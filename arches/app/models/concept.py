@@ -415,12 +415,12 @@ class Concept(object):
                 return child_concept
 
         graph = []
-        if self.id == None or self.id == '' or self.id == top_concept:
-            concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
-            for conceptmodel in concepts:
-                graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
-        else:
-            graph = [_findNarrowerConcept(self.id, depth_limit=1)]
+        #if self.id == None or self.id == '' or self.id == top_concept:
+        concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
+        for conceptmodel in concepts:
+            graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+        #else:
+            #graph = [_findNarrowerConcept(self.id, depth_limit=1)]
             #concepts = _findNarrowerConcept(self.id, depth_limit=1)
             #graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
 
