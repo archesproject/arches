@@ -20,14 +20,27 @@
                         <form class="form-inline" role="form">
                             
                             <div class="form-group arches-modal-form-group">
+                    
+                                <div class="row">
+                                    <div class="col-xs-9">
+                                        <!-- Concept Search Widget -->
+                                        <h5 id="" class="arches-modal-section">{% trans "Select a concept" %}</h5>
+                                        <div class="">  
+                                            {% include 'views/concept-search.htm' %}  
+                                        </div>
+                                    </div>
 
-                                <h5 id="" class="arches-modal-section">{% trans "Select a concept" %}</h5>
-                                
-                                <!-- Concept Search Widget -->
-                                <div class="">  
-                                    {% include 'views/concept-search.htm' %}  
+                                    <div class="col-xs-3">
+                                        <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
+                                        <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}">
+                                            <option value=""></option>
+                                            {% for relation in related_relations %}
+                                              <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
-
+                                
                                 <!-- Spacer (for xs screens) -->
                                 <div class="margin-top-10"></div>
                                 
@@ -36,7 +49,7 @@
                                     <!-- Explanation -->
                                     <div class="col-xs-12">
                                         <p class="explanation">
-                                            {% trans "Use the search tool to select the concept that you want to relate.  Note that Arches will automatically create a skos:related association between the two concepts." %}
+                                            {% trans "Use the search tool to select the concept that you want to relate." %}
                                         </p>
                                     </div>
                                     <!-- End Explanation -->

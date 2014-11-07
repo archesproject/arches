@@ -56,11 +56,11 @@ define([
         treeClick: function(event) {
             // The clicked node is 'event.node'
             var node = event.node;
+            if (! node.load_on_demand){
+                this.$el.tree('toggle', node);                    
+            }            
             if (this.model.get('id') !== node.id) {
                 this.trigger('conceptSelected', node.id);
-                if (! node.load_on_demand){
-                    this.$el.tree('toggle', node);                    
-                }
             } else {
                 event.preventDefault();
             }

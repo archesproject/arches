@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.conf import settings
 from django.db import transaction, IntegrityError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
@@ -87,7 +88,7 @@ def concept(request, conceptid):
 
             if f == 'html':
                 print concept_graph.nodetype
-                if concept_graph.nodetype != 'Collection':
+                if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme':
                     languages = models.DLanguages.objects.all()
                     valuetypes = models.ValueTypes.objects.all()
                     relationtypes = models.DRelationtypes.objects.all()
@@ -105,7 +106,8 @@ def concept(request, conceptid):
                         'valuetype_labels': valuetypes.filter(category='label'),
                         'valuetype_notes': valuetypes.filter(category='note'),
                         'valuetype_related_values': valuetypes.filter(category='undefined'),
-                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype='related'),
+                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related'),
+                        'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
                         'concept_paths': concept_graph.get_paths(lang=lang),
                         'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                         'direct_parents': direct_parents
@@ -130,6 +132,7 @@ def concept(request, conceptid):
                         'valuetype_notes': valuetypes.filter(category='note'),
                         'valuetype_related_values': valuetypes.filter(category='undefined'),
                         'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype='related'),
+                        'related_relations': relationtypes.filter(relationtype = 'member'),
                         'concept_paths': concept_graph.get_paths(lang=lang),
                         'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                         'direct_parents': direct_parents

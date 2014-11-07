@@ -5,7 +5,7 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
         	var self = this;
 
             this.searchbox = this.$el.find('input.concept_search_widget').select2({
-				multiple: true,
+				multiple: false,
 				maximumselectionsize: 1,
 				minimumInputLength: 2,
 				ajax: {
