@@ -45,19 +45,21 @@ define([
                     self.$el.find('.concept-report-loading').addClass('hidden');
                     self.$el.html(response);
                     if (self.model.get('id')) {
-                        //Toggle Concept Heirarchy.  
-                        self.$el.find(".graph-toggle").click(function(){
-                            self.$el.find(".concept-tree").toggle(300);
-                            self.$el.find(".concept-graph").toggle(300);
-                            self.$el.find(".graph-toggle").toggle();
-                        });
-                        new ConceptGraph({
-                            el: self.$el.find(".concept-graph")
-                        });
-                        if (showGraph) {
-                            self.$el.find(".graph-toggle").toggle();
-                            self.$el.find(".concept-tree").toggle(0);
-                            self.$el.find(".concept-graph").toggle(0);
+                        if (self.$el.find(".concept-graph").length > 0) {
+                            //Toggle Concept Heirarchy.  
+                            self.$el.find(".graph-toggle").click(function(){
+                                self.$el.find(".concept-tree").toggle(300);
+                                self.$el.find(".concept-graph").toggle(300);
+                                self.$el.find(".graph-toggle").toggle();
+                            });
+                            new ConceptGraph({
+                                el: self.$el.find(".concept-graph")
+                            });
+                            if (showGraph) {
+                                self.$el.find(".graph-toggle").toggle();
+                                self.$el.find(".concept-tree").toggle(0);
+                                self.$el.find(".concept-graph").toggle(0);
+                            }
                         }
                     }
                 }
