@@ -387,7 +387,7 @@ class Concept(object):
                     ret.id = label.conceptid_id
                     ret.labelid = label.valueid
 
-            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'has related concept'))
+            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
             else:
@@ -399,7 +399,7 @@ class Concept(object):
             return ret 
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
-            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'has related concept'))
+            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if len(conceptrealations) > 0 and conceptid != top_concept:
                 labels = models.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
                 ret = concept()          
