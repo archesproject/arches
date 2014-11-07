@@ -61,6 +61,11 @@
                 <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
                 <button class="btn-u" type="submit">Save</button>
             </div>
+
+        {% for value in labels %}
+            <div style="display:none;" class="pref-label-data" data-id="{{value.id}}" data-language="{{value.language}}"> </div>
+        {% endfor %}
+            <div style="display:none;" class="pref-label-validation-message">Only one preferred label may exist for each language.</div>
           </div>
     </div>
 </form>
