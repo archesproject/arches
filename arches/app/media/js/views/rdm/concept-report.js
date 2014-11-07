@@ -11,7 +11,8 @@ define([
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph, waypoint) {
+    $.fn.waypoint = waypoint;
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -35,17 +36,15 @@ define([
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
 
-            if (conceptid) {
-                self.$el.find('.concept-report-loading').removeClass('hidden');
-                self.$el.find('.concept-report-content').addClass('hidden');
+            self.$el.find('.concept-report-loading').removeClass('hidden');
+            self.$el.find('.concept-report-content').addClass('hidden');
 
-
-                $.ajax({
-                    url: '../Concepts/' + conceptid + '?f=html&mode=' + mode,
-                    success: function(response) {
-                        self.$el.find('.concept-report-loading').addClass('hidden');
-                        self.$el.html(response);
-                        
+            $.ajax({
+                url: '../Concepts/' + conceptid + '?f=html&mode=' + mode,
+                success: function(response) {
+                    self.$el.find('.concept-report-loading').addClass('hidden');
+                    self.$el.html(response);
+                    if (self.model.get('id')) {
                         //Toggle Concept Heirarchy.  
                         self.$el.find(".graph-toggle").click(function(){
                             self.$el.find(".concept-tree").toggle(300);
@@ -61,8 +60,8 @@ define([
                             self.$el.find(".concept-graph").toggle(0);
                         }
                     }
-                });
-            }
+                }
+            });
         },
 
         deleteClicked: function(e) {

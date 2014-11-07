@@ -44,16 +44,11 @@ define([
                 null,
                 function() {
                     var node;
-                    if (self.model.get('id') === '') {
-                        // get the top level concept from the tree
-                        self._doNotRender = true;
-                        self.model.set({ 'id': self.$el.tree('getTree').children[0].id });
-                        self._doNotRender = undefined;
+                    if (self.model.get('id') !== '') {
+                        node = self.$el.tree('getNodeById', self.model.get('id'));
+                        self.$el.tree('selectNode', node);
+                        self.$el.tree('scrollToNode', node);
                     }
-
-                    node = self.$el.tree('getNodeById', self.model.get('id'));
-                    self.$el.tree('selectNode', node);
-                    self.$el.tree('scrollToNode', node);
                 }
             );
         },
