@@ -17,6 +17,7 @@
             <!-- Spacer for xs screens -->
             <div class="divider hidden-sm hidden-md hidden-lg"></div>
 
+            {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
             <!-- Concept Management Tools for larger screens -->
             <div class="btn-group pull-right hidden-xs">
                 <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
@@ -25,14 +26,18 @@
                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                 </button>
                 <ul class="dropdown-menu" role="menu">
+                    {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                     <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
+                    {% endif %}
+                    {% if concept.nodetype == 'Concept'%}
                     <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
-                    <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
+                    {% endif %}
                     <li class="divider"></li>
                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                 </ul>
             </div>
+            {% endif %}
 
             <!-- Concept Management Tools for xs screens -->
             <div class="btn-group hidden-sm hidden-md hidden-lg">
@@ -45,7 +50,6 @@
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                     <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
                     <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
-                    <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                 </ul>
