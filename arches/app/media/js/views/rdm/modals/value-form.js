@@ -9,20 +9,16 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
 
             this.$el.find('.pref-label-data').each(function (i, el) {
                 var data = $(el).data();
-
                 prefLabels[data.language] = data.id;
             });
 
             this.$el.find('.note-data').each(function (i, el) {
                 var data = $(el).data();
-                console.log(data);
                 if (!noteData[data.valuetype]) {
                     noteData[data.valuetype] = {};
                 }
                 noteData[data.valuetype][data.language] = data.id;
             });
-
-            console.log(noteData);
 
             this.valuemodel = this.model.get('values')[0];
 
