@@ -18,9 +18,6 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                     language_dd: "required"
                 },
                 submitHandler: function(form) {
-                    var model = new ConceptModel({
-                        id: '00000000-0000-0000-0000-000000000003'
-                    })
                     var label = new ValueModel({
                         value: $(form).find("[name=label]").val(),
                         language: $(form).find("[name=language_dd]").val(),
@@ -28,11 +25,11 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                         datatype: 'text',
                         type: 'prefLabel'
                     });
-                    var subconcept = new ConceptModel({
+                    var model = new ConceptModel({
                         values: [label],
-                        relationshiptype: 'narrower'
+                        relationshiptype: 'narrower',
+                        nodetype: 'ConceptSchemeGroup'
                     });
-                    model.set('subconcepts', [subconcept]);
                     model.save(function() {
                         var modal = self.$el.find('#add-scheme-form');
                         this.modal.modal('hide');

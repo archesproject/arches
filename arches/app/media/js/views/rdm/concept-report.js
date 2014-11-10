@@ -23,6 +23,7 @@ define([
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
+            'click a[data-toggle="#related-member-form"]': 'addRelatedMemberClicked',
             'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
@@ -113,6 +114,15 @@ define([
             this.model.reset();
             var modal = new RelatedConcept({
                 el: $('#related-concept-form')[0],
+                model: this.model
+            });
+            modal.modal.modal('show');
+        },
+
+        addRelatedMemberClicked: function(e){
+            this.model.reset();
+            var modal = new RelatedConcept({
+                el: $('#related-member-form')[0],
                 model: this.model
             });
             modal.modal.modal('show');

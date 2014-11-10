@@ -7,7 +7,7 @@
             <!-- Form Header -->
             <div class="modal-header arches-modal-header">
                 <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 id="" class="modal-title">{% trans "Manage Related Concepts" %}</h4>
+                <h4 id="" class="modal-title">{% trans "Select Concept Values for Dropdowns" %}</h4>
             </div>
             <!-- End Form Header -->
             
@@ -20,7 +20,7 @@
                         <form class="form-inline" role="form">
                             
                             <div class="form-group arches-modal-form-group">
-                    
+
                                 <div class="row">
                                     <div class="col-xs-9">
                                         <!-- Concept Search Widget -->
@@ -30,17 +30,16 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xs-3">
+                                    <div class="col-xs-3 hidden">
                                         <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
                                         <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}">
-                                            <option value=""></option>
                                             {% for relation in related_relations %}
                                               <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Spacer (for xs screens) -->
                                 <div class="margin-top-10"></div>
                                 
@@ -49,7 +48,7 @@
                                     <!-- Explanation -->
                                     <div class="col-xs-12">
                                         <p class="explanation">
-                                            {% trans "Use the search tool to select the concept that you want to relate." %}
+                                            {% trans "Selecting a concept will select that concept and all it's children." %}
                                         </p>
                                     </div>
                                     <!-- End Explanation -->

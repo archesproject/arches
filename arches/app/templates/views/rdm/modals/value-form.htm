@@ -61,6 +61,11 @@
                 <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
                 <button class="btn-u" type="submit">Save</button>
             </div>
+
+        {% for value in labels %}
+            <div style="display:none;" class="pref-label-data" data-id="{{value.id}}" data-language="{{value.language}}"> </div>
+        {% endfor %}
+            <div style="display:none;" class="pref-label-validation-message">{% trans "Only one preferred label may exist for each language." %}</div>
           </div>
     </div>
 </form>
@@ -133,6 +138,13 @@
                 <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
                 <button class="btn-u" type="submit">Save</button>
             </div>
+
+        {% for value in concept.values %}
+            {% if value.category == 'note' %}
+            <div style="display:none;" class="note-data" data-id="{{value.id}}" data-language="{{value.language}}" data-valuetype="{{value.type}}"> </div>
+            {% endif %}
+        {% endfor %}
+            <div style="display:none;" class="note-validation-message">{% trans "Only one note of each type may exist for each language." %}</div>
           </div>
     </div>
 </form>

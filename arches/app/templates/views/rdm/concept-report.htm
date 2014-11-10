@@ -17,6 +17,7 @@
             <!-- Spacer for xs screens -->
             <div class="divider hidden-sm hidden-md hidden-lg"></div>
 
+            {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
             <!-- Concept Management Tools for larger screens -->
             <div class="btn-group pull-right hidden-xs">
                 <button type="button" class="btn btn-primary dropdown-toggle arches-RDM-button" data-toggle="dropdown">
@@ -25,14 +26,18 @@
                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                 </button>
                 <ul class="dropdown-menu" role="menu">
+                    {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                     <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
+                    {% endif %}
+                    {% if concept.nodetype == 'Concept'%}
                     <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
-                    <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
+                    {% endif %}
                     <li class="divider"></li>
                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                 </ul>
             </div>
+            {% endif %}
 
             <!-- Concept Management Tools for xs screens -->
             <div class="btn-group hidden-sm hidden-md hidden-lg">
@@ -45,7 +50,6 @@
                     <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
                     <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
                     <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
-                    <li><a href="#ChangeConceptType" data-toggle="modal">{% trans "Change Concept Type" %}</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                 </ul>
@@ -58,7 +62,7 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Concept Labels" %}
+                    <h5 id="" class="section-headline">{% trans "Labels" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
                         <span>
@@ -83,7 +87,7 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Concept Notes" %}
+                    <h5 id="" class="section-headline">{% trans "Notes" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
                         <span>
@@ -127,7 +131,7 @@
                     <div>
                         <dl>
                         {% for parent_concept in path %}
-                            <dd class="arches-concept-heirarchy">
+                            <dd class="arches-concept-heirarchy {% if forloop.last %}selected-concept{% endif %}" >
                                 {% with ''|center:forloop.counter0 as range %}
                                 <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
@@ -135,10 +139,7 @@
                                 {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
                             </dd>
                         {% if forloop.last %}{% with ''|center:forloop.counter as range %}
-                            <dd class="arches-concept-heirarchy selected-concept">
-                                <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
-                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a>
-                            </dd>
+                                <!-- <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a> -->
                             {% if show_children%}
                                 {% for subconcept in concept.subconcepts %}
                                 <dd class="arches-concept-heirarchy">
@@ -201,7 +202,7 @@
         <div class="margin-bottom-10 padding-left-10">
             <dl>
                 <dt>
-                    <h5 id="" class="section-headline">{% trans "Related Values" %}
+                    <h5 id="" class="section-headline">{% trans "Values" %}
                         <span>
                             <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
                         <span>
@@ -242,7 +243,7 @@
                     <div class="row margin-top-10">
                         <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                             <div class="box-shadow shadow-effect-1">
-                                <img style="width: 100%;" src="{{STATIC_URL}}{{value.value}}" data-img="{{STATIC_URL}}{{value.value}}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                                <img style="width: 100%;" src="{{MEDIA_URL}}{{value.value}}" data-img="{{MEDIA_URL}}{{value.value}}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
                             </div>
 
                             <div class="margin-left-5 margin-top-10">

@@ -1228,7 +1228,7 @@ ALTER TABLE concepts.vw_concepts OWNER TO postgres;
 --
 
 CREATE VIEW vw_edges AS
-    SELECT relations.conceptidfrom AS source, relations.relationtype AS label, relations.conceptidto AS target, CASE WHEN (relations.relationtype = 'has related concept'::text) THEN 'undirected'::text ELSE 'directed'::text END AS type FROM relations UNION SELECT "values".conceptid AS source, "values".valuetype AS label, "values".valueid AS target, 'directed'::text AS type FROM "values";
+    SELECT relations.conceptidfrom AS source, relations.relationtype AS label, relations.conceptidto AS target, CASE WHEN (relations.relationtype = 'related'::text) THEN 'undirected'::text ELSE 'directed'::text END AS type FROM relations UNION SELECT "values".conceptid AS source, "values".valuetype AS label, "values".valueid AS target, 'directed'::text AS type FROM "values";
 
 
 ALTER TABLE concepts.vw_edges OWNER TO postgres;

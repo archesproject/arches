@@ -27,7 +27,7 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                 });              
             }
 
-            this.schemedropdown.on('changed')
+            //this.schemedropdown.on('changed')
 
             this.modal.validate({
                 ignore: null,

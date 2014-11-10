@@ -76,15 +76,7 @@ INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', TRUE);
 --Arches entityttype relations to concepts
 INSERT INTO d_relationtypes VALUES ('referencesConcept', 'Entitytype Relations', FALSE);
 
-
--- legacy relationshiptypes (should be removed before v3)
-INSERT INTO d_relationtypes VALUES ('has narrower concept', 'Legacy', FALSE);
-INSERT INTO d_relationtypes VALUES ('has related concept', 'Legacy', FALSE);
-INSERT INTO d_relationtypes VALUES ('has authority document', 'Legacy', FALSE);
-INSERT INTO d_relationtypes VALUES ('includes', 'Legacy', FALSE);
-INSERT INTO d_relationtypes VALUES ('has collection', 'Legacy', FALSE);
-
-
+--OWL Class types and Arches specific types
 INSERT INTO d_nodetypes VALUES ('GroupingNode', FALSE);
 INSERT INTO d_nodetypes VALUES ('ConceptSchemeGroup', FALSE);
 INSERT INTO d_nodetypes VALUES ('ConceptScheme', TRUE);

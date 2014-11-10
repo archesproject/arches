@@ -3,7 +3,22 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
         initialize: function(options) {
             var self = this,
                 rules = {},
+                prefLabels = {},
+                noteData = {},
                 modal, titles;
+
+            this.$el.find('.pref-label-data').each(function (i, el) {
+                var data = $(el).data();
+                prefLabels[data.language] = data.id;
+            });
+
+            this.$el.find('.note-data').each(function (i, el) {
+                var data = $(el).data();
+                if (!noteData[data.valuetype]) {
+                    noteData[data.valuetype] = {};
+                }
+                noteData[data.valuetype][data.language] = data.id;
+            });
 
             this.valuemodel = this.model.get('values')[0];
 
@@ -33,9 +48,37 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 minimumResultsForSearch: 10,
                 maximumSelectionSize: 1
             });
+
+            $.validator.addMethod("prefLabel", function(value, element) {
+                if (this.optional(element)) {
+                    return true;
+                }
+                
+                if (self.valuemodel.get('category') == 'label' && value == 'prefLabel' && prefLabels[self.languageInput.val()]) {
+                    return prefLabels[self.languageInput.val()] === self.valuemodel.get('id');
+                }
+
+                return true;
+            }, self.$el.find('.pref-label-validation-message').html());
+
+            $.validator.addMethod("prefLabel", function(value, element) {
+                if (this.optional(element)) {
+                    return true;
+                }
+                
+                if (self.valuemodel.get('category') == 'note' && noteData[value] && noteData[value][self.languageInput.val()]) {
+                    return noteData[value][self.languageInput.val()] === self.valuemodel.get('id');
+                }
+
+                return true;
+            }, self.$el.find('.note-validation-message').html());
+            
+            rules[this.valueTypeInput.attr('id')] = {
+                required: true,
+                prefLabel: true
+            };
             
             rules[this.valueInput.attr('id')] = "required";
-            rules[this.valueTypeInput.attr('id')] = "required";
             rules[this.languageInput.attr('id')] = "required";
 
             modal.validate({

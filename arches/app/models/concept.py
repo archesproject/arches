@@ -199,12 +199,12 @@ class Concept(object):
             for relatedconcept in self.relatedconcepts:
                 deletedrelatedconcepts = []
                 for relatedconcept in self.relatedconcepts:
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
 
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
+                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
                     for relation in conceptrelations:
                         relation.delete()
                         deletedrelatedconcepts.append(relatedconcept)
@@ -387,7 +387,7 @@ class Concept(object):
                     ret.id = label.conceptid_id
                     ret.labelid = label.valueid
 
-            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'has related concept'))
+            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
             else:
@@ -399,7 +399,7 @@ class Concept(object):
             return ret 
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
-            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'has related concept'))
+            conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if len(conceptrealations) > 0 and conceptid != top_concept:
                 labels = models.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
                 ret = concept()          
@@ -415,26 +415,32 @@ class Concept(object):
                 return child_concept
 
         graph = []
-        if self.id == None or self.id == '' or self.id == top_concept:
-            concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
-            for conceptmodel in concepts:
-                graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
-        else:
-            graph = [_findNarrowerConcept(self.id, depth_limit=1)]
+        #if self.id == None or self.id == '' or self.id == top_concept:
+        concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
+        for conceptmodel in concepts:
+            graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
+        #else:
+            #graph = [_findNarrowerConcept(self.id, depth_limit=1)]
             #concepts = _findNarrowerConcept(self.id, depth_limit=1)
             #graph = [_findBroaderConcept(self.id, concepts, depth_limit=1)]
 
         return graph
 
     def get_paths(self, lang='en-us'):
-        def graph_to_paths(current_concept, path=[], path_list=[[]]):
-            parents = current_concept.parentconcepts
-            for parent in parents:
-                current_path = path[:]
-                if len(parent.parentconcepts) == 0:
-                    path_list.append(current_path)
-                current_path.insert(0, {'label': parent.get_preflabel(lang=lang).value, 'relationshiptype': parent.relationshiptype, 'id': parent.id})
-                graph_to_paths(parent, current_path, path_list)
+        def graph_to_paths(current_concept, path=[], path_list=[]):
+            if len(path) == 0:
+                current_path = []
+            else:
+                current_path = path[:]    
+                
+            current_path.insert(0, {'label': current_concept.get_preflabel(lang=lang).value, 'relationshiptype': current_concept.relationshiptype, 'id': current_concept.id})
+
+            if len(current_concept.parentconcepts) == 0:
+                path_list.append(current_path[:])
+            else:    
+                for parent in current_concept.parentconcepts:   
+                    ret = graph_to_paths(parent, current_path, path_list)                    
+            
             return path_list
 
         return graph_to_paths(self)

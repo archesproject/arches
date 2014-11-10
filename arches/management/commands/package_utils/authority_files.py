@@ -115,10 +115,8 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                             altlabel_list = row[u'ALTLABELS'].split(';')
                             for altlabel in altlabel_list:
                                 concept.addvalue({'value':altlabel, 'language': 'en-us', 'type': 'altLabel', 'datatype': 'text', 'category': 'label'})                          
-                        
-                        #relationshiptype = 'includes' if row[u'CONCEPTTYPE'].upper() == 'INDEX' else ('has collection' if row[u'CONCEPTTYPE'].upper() == 'COLLECTOR' else '')
-                        relationshiptype = 'narrower'
-                        lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type=relationshiptype, target=concept.id, rownum=rows.line_num)
+
+                        lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='narrower', target=concept.id, rownum=rows.line_num)
                         if auth_doc_file_name in auth_file_to_entity_concept_mapping:
                             lookups.add_relationship(source=auth_file_to_entity_concept_mapping[auth_doc_file_name]['ENTITYTYPE_CONCEPTID'], type='member', target=concept.id, rownum=rows.line_num)
                         
@@ -204,34 +202,6 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
     #print 'Time to parse = %s' % ("{0:.2f}".format(time() - start))    
 
     return errors
-
-# def create_link_to_entity_types(cursor, path_to_authority_files):
-#     filepath = os.path.join(path_to_authority_files, 'ENTITY_TYPE_X_ADOC.csv')
-#     errors = []
-#     with open(filepath, 'rU') as f:
-#         rows = unicodecsv.DictReader(f, fieldnames=['ENTITYTYPE','AUTHORITYDOC'], 
-#                     encoding='utf-8-sig', delimiter=',', restkey='ADDITIONAL', restval='MISSING')
-#         rows.next() # skip header row
-#         adoc_dict_list = []
-#         for row in rows:
-#             if row[u'ENTITYTYPE'] != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv':
-#                 sql = """
-#                     SELECT legacyoid FROM concepts.concepts 
-#                     WHERE conceptid IN (SELECT conceptid FROM data.entity_types WHERE entitytypeid = '%s')
-#                 """%(row[u'ENTITYTYPE'])
-#                 #print sql
-
-#             try:
-#                 cursor.execute(sql)
-#                 entity_type = str(cursor.fetchone()[0])
-#                 concepts.insert_concept_relations(entity_type, 'has authority document', str(row['AUTHORITYDOC']))
-#             except Exception as e:
-#                 errors.append('ERROR in row %s (%s):\n%s\n%s' % (rows.line_num, str(e), sql, traceback.format_exc()))
-
-#     if len(errors) > 0:
-#         errors.insert(0, 'ERRORS IN FILE: %s\n' % (filepath))
-#         errors.append('\n\n\n\n')
-#     return errors
 
 def entitytype_to_auth_doc_mapping(cursor, path_to_authority_files):
     filepath = os.path.join(path_to_authority_files, 'ENTITY_TYPE_X_ADOC.csv')
