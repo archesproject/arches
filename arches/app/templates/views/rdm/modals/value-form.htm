@@ -215,6 +215,13 @@
                 <button class="btn-u" type="submit">Save</button>
             </div>
           </div>
+
+        {% for value in concept.values %}
+            {% if value.type == 'sortorder' %}
+            <div style="display:none;" class="sortorder-data" data-id="{{value.id}}" data-language="{{value.language}}"> </div>
+            {% endif %}
+        {% endfor %}
+            <div style="display:none;" class="sortorder-validation-message">{% trans "Only one sort order value can be assigned to a concept." %}</div>
     </div>
 </form>
 <!-- End Modal editing window for related_value -->

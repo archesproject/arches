@@ -5,7 +5,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 rules = {},
                 prefLabels = {},
                 noteData = {},
-                modal, titles;
+                sortorderId, modal, titles;
 
             this.$el.find('.pref-label-data').each(function (i, el) {
                 var data = $(el).data();
@@ -18,6 +18,10 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                     noteData[data.valuetype] = {};
                 }
                 noteData[data.valuetype][data.language] = data.id;
+            });
+
+            this.$el.find('.sortorder-data').each(function (i, el) {
+                sortorderId = $(el).data().id;
             });
 
             this.valuemodel = this.model.get('values')[0];
@@ -61,7 +65,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 return true;
             }, self.$el.find('.pref-label-validation-message').html());
 
-            $.validator.addMethod("prefLabel", function(value, element) {
+            $.validator.addMethod("notes", function(value, element) {
                 if (this.optional(element)) {
                     return true;
                 }
@@ -72,9 +76,23 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
 
                 return true;
             }, self.$el.find('.note-validation-message').html());
+
+            $.validator.addMethod("sortorder", function(value, element) {
+                if (this.optional(element)) {
+                    return true;
+                }
+                
+                if (!self.valuemodel.get('category') && value === 'sortorder' && sortorderId) {
+                    return sortorderId === self.valuemodel.get('id');
+                }
+
+                return true;
+            }, self.$el.find('.sortorder-validation-message').html());
             
             rules[this.valueTypeInput.attr('id')] = {
                 required: true,
+                sortorder: true,
+                notes: true,
                 prefLabel: true
             };
             
