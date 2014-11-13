@@ -13,6 +13,7 @@ from formats.archesfile import ArchesReader
 from formats.shapefile import ShapeReader
 from django.core.management.base import BaseCommand, CommandError
 import glob
+import csv
 
 
 class ResourceLoader(object): 
@@ -30,20 +31,27 @@ class ResourceLoader(object):
         )
 
 
-    def load(self, source, format):
-        if format == 'shp':
+    def load(self, source):
+        file_name, file_format = os.path.splitext(source)
+        if file_format == '.shp':
             reader = ShapeReader()
-        elif format == 'arches':
+        elif file_format == '.arches':
             reader = ArchesReader()
 
-        files = glob.glob(source + '//*.' + format)
-        print files
-        for f in files:
-            start = time()
-            resources = reader.load_file(f)
-            elapsed = (time() - start)
-            print 'time to parse input file = %s' % (elapsed)
-            self.resource_list_to_entities(resources)
+        start = time()
+        resources = reader.load_file(source)
+        relationships = None
+        relationships_file = file_name + '.relations'
+        elapsed = (time() - start)
+        print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
+        results = self.resource_list_to_entities(resources)
+        if os.path.exists(relationships_file):
+            relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
+            for relationship in relationships:
+                self.relate_resources(relationship, results['legacyid_to_entityid'])
+                print ('relationship {0} created').format(relationship)
+        else:
+            print 'No relationship file'
 
 
     def resource_list_to_entities(self, resource_list):
@@ -56,6 +64,7 @@ class ResourceLoader(object):
         ret = {'successfully_saved':0, 'successfully_indexed':0, 'failed_to_save':[], 'failed_to_index':[]}
         schema = None
         current_entitiy_type = None
+        legacyid_to_entityid = {}
 
         for resource in resource_list:
             masterGraph = None
@@ -65,26 +74,10 @@ class ResourceLoader(object):
 
             master_graph = self.build_master_graph(resource, schema)
 
-            related_resources = self.update_related_resources(master_graph, resource_list)
-
             self.pre_save(master_graph)
-
             master_graph.save(username=settings.ETL_USERNAME, note=load_id)
-
-            for related_resource in related_resources:
-                related_resource_record = RelatedResource(
-                    entityid1 = master_graph.entityid,
-                    entityid2 = related_resource['entityid'],
-                    reason = 'ETL',
-                    relationshiptype = related_resource['relationship_type_id'],
-                    datestarted = related_resource['date_started'],
-                    dateended = related_resource['date_ended'],
-                    )
-
-                related_resource_record.save()
-
             resource.entityid = master_graph.entityid
-            resource.legacyid = self.get_legacy_id(master_graph)
+            legacyid_to_entityid[resource.resource_id] = master_graph.entityid
 
             ret['successfully_saved'] += 1
             print 'saved', master_graph.entityid
@@ -92,6 +85,7 @@ class ResourceLoader(object):
             master_graph.index()
             ret['successfully_indexed'] += 1
 
+        ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)
         print 'total time to etl = %s' % (elapsed)
         print 'average time per entity = %s' % (elapsed/len(resource_list))
@@ -136,45 +130,20 @@ class ResourceLoader(object):
         pass
 
 
-    def get_legacy_id(self, entity):
-        for entity in entity.find_entities_by_type_id('EXTERNAL XREF.E42'):
-            return entity.value
-
-
-    def update_related_resources(self, master_graph, resource_list):
-        """
-        Assigns an entityid to related resources and collects information needed
-        to create a related resource record.
-        """
-        related_resources = []
-
-        for entity in master_graph.find_entities_by_type_id('ARCHES RESOURCE.E1'):
-            for resource in resource_list:
-                try:
-                    if entity.value == resource.legacyid:
-                        related = {}
-                        entity.value = resource.entityid
-                        related['entityid'] = resource.entityid
-                        relationship_type_legacyoid = entity.find_entities_by_type_id('ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPE.E55')[0].value
-                        rel_type_concept_id = Concepts.objects.get(legacyoid=relationship_type_legacyoid).conceptid
-                        related['relationship_type_id'] = Values.objects.get(conceptid=rel_type_concept_id, valuetype='prefLabel').valueid
-
-                        date_entity_types = [{
-                            'entitytypeid': 'DATE RESOURCE ASSOCIATION STARTED.E50',
-                            'key': 'date_started' 
-                        },{
-                            'entitytypeid': 'DATE RESOURCE ASSOCIATION ENDED.E50',
-                            'key': 'date_ended' 
-                        }]
-                        for date_entity_type in date_entity_types:
-                            started_entities = entity.find_entities_by_type_id(date_entity_type['entitytypeid'])
-                            related[date_entity_type['key']] = None if started_entities == [] else started_entities[0].value
-
-                        related_resources.append(related)
-                except:
-                    pass
-
-        return related_resources
+    def relate_resources(self, relationship, legacyid_to_entityid):
+        relationshiptype_concept = Concepts.objects.get(legacyoid = relationship['RELATION_TYPE'])
+        concept_value = Values.objects.filter(conceptid = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
+        start_date = None if relationship['START_DATE'] == '' else relationship['START_DATE']
+        end_date = None if relationship['END_DATE'] == '' else relationship['END_DATE']
+        related_resource_record = RelatedResource(
+            entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']],
+            entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']],
+            reason = 'ETL',
+            relationshiptype = concept_value[0].valueid,
+            datestarted = start_date,
+            dateended = end_date,
+            )
+        related_resource_record.save()
 
 
     def generate_uuid(self, cursor):
