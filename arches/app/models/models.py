@@ -549,7 +549,7 @@ class RelatedResource(models.Model):
     resourcexid = models.AutoField(primary_key=True)
     entityid1 = models.TextField()
     entityid2 = models.TextField()
-    reason = models.TextField()
+    notes = models.TextField()
     relationshiptype = models.TextField()
     datestarted = models.DateField()
     dateended = models.DateField()

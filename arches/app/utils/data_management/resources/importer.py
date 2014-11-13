@@ -138,7 +138,7 @@ class ResourceLoader(object):
         related_resource_record = RelatedResource(
             entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']],
             entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']],
-            reason = 'ETL',
+            notes = relationship['NOTES'],
             relationshiptype = concept_value[0].valueid,
             datestarted = start_date,
             dateended = end_date,

@@ -1173,7 +1173,7 @@ CREATE TABLE data.resource_x_resource
   resourcexid serial NOT NULL,
   entityid1 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
   entityid2 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
-  reason text,
+  notes text,
   relationshiptype uuid,
   datestarted date,
   dateended date,
