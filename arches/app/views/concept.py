@@ -43,7 +43,12 @@ def rdm(request, conceptid):
 
     concept_schemes = []
     for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
-        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+        scheme = Concept().get(id=concept.pk, include_parentconcepts=True, up_depth_limit=1, include=['label'])
+        group = []
+        for parent in scheme.parentconcepts:
+            if parent.nodetype == 'ConceptSchemeGroup':
+                group.append(parent.get_preflabel(lang=lang).value)
+        concept_schemes.append({'scheme': scheme.get_preflabel(lang=lang), 'group': ','.join(group)})
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
@@ -246,9 +251,8 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def confirm_delete(request, conceptid):
-    concepts_to_delete = [concept.value for concept in Concept.gather_concepts_to_delete(conceptid)]
-
-    #return JSONResponse(concepts_to_delete)
+    lang = request.GET.get('lang', 'en-us')  
+    concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(conceptid, lang=lang).iteritems()]
     return HttpResponse('<ul><li>' + '<li>'.join(concepts_to_delete) + '</ul>')
 
 @csrf_exempt

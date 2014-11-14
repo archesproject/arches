@@ -185,10 +185,8 @@ class Concept(object):
     def delete(self, delete_self=False):
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
-            
-            for concept in concepts_to_delete:
-                print concept.value
-                print concept.conceptid
+
+            for key, concept in concepts_to_delete.iteritems():
                 models.Concepts.objects.get(pk=concept.conceptid).delete()
 
         for parentconcept in self.parentconcepts:
@@ -223,13 +221,13 @@ class Concept(object):
         return
 
     @staticmethod
-    def gather_concepts_to_delete(conceptid):
-        concepts_to_delete = []
+    def gather_concepts_to_delete(conceptid, lang='en-us'):
+        concepts_to_delete = {}
         concept = Concept().get(id=conceptid, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
         
         def find_concepts(concept):
             if len(concept.parentconcepts) <= 1:
-                concepts_to_delete.append(concept.get_preflabel())
+                concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
                 for subconcept in concept.subconcepts:
                     find_concepts(subconcept)
 
@@ -353,7 +351,7 @@ class Concept(object):
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
 
-            for concept in concepts_to_delete:
+            for key, concept in concepts_to_delete.iteritems():
                 query = Query(se, start=0, limit=10000)
                 phrase = Match(field='conceptid', query=concept.conceptid, type='phrase')
                 query.add_query(phrase)
