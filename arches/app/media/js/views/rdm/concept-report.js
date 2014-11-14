@@ -40,8 +40,6 @@ define([
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
-            this.undelegateEvents();
-
             $.ajax({
                 url: '../Concepts/' + conceptid + '?f=html',
                 success: function(response) {
