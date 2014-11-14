@@ -30,21 +30,28 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.utils.skos import SKOSWriter
+from arches.app.utils.skos import SKOSWriter, SKOSReader
 
 def rdm(request, conceptid):
     lang = request.GET.get('lang', 'en-us')    
     
     languages = models.DLanguages.objects.all()
-    concept_schemes = Concept.get_scheme_collections(include=['label'])
-    concept_scheme_labels = [concept.get_preflabel(lang=lang) for concept in concept_schemes]
+
+    concept_scheme_groups = []
+    for concept in models.Concepts.objects.filter(nodetype = 'ConceptSchemeGroup'):
+        concept_scheme_groups.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
+    concept_schemes = []
+    for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
+        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
-            'concept_schemes': concept_scheme_labels
+            'concept_schemes': concept_schemes,
+            'concept_scheme_groups': concept_scheme_groups
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
@@ -84,10 +91,9 @@ def concept(request, conceptid):
             labels = []
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None)
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
             if f == 'html':
-                print concept_graph.nodetype
                 if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme':
                     languages = models.DLanguages.objects.all()
                     valuetypes = models.ValueTypes.objects.all()
@@ -110,7 +116,8 @@ def concept(request, conceptid):
                         'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
                         'concept_paths': concept_graph.get_paths(lang=lang),
                         'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
-                        'direct_parents': direct_parents
+                        'direct_parents': direct_parents,
+                        'in_scheme_id': concept_graph.get_context()
                     }, context_instance=RequestContext(request))
 
                 else:
@@ -157,18 +164,30 @@ def concept(request, conceptid):
             return JSONResponse(se.search('', index='concept', search_field='value', use_wildcard=True))
 
 
-    if request.method == 'POST':
+    if request.method == 'POST': 
+
         if len(request.FILES) > 0:
-            value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
-            value.save()
+            skosfile = request.FILES.get('skosfile', None)
+            imagefile = request.FILES.get('file', None)
 
-            return JSONResponse(value)
+            if imagefile:
+                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+                value.save()
+                return JSONResponse(value)
+
+            elif skosfile:
+                data = JSONDeserializer().deserialize(request.POST.get('data', None))
+                if data:
+                    concept = Concept(data)
+                    concept.save()
+                    skos = SKOSReader()
+                    rdf = skos.read_file(skosfile)
+                    ret = skos.get_concepts(rdf, concept_scheme_group=concept.id)
+                    return JSONResponse(ret)
+            
         else:
-            json = request.body
-
-            if json != None:
-                data = JSONDeserializer().deserialize(json)
-                
+            data = JSONDeserializer().deserialize(request.body) 
+            if data:
                 with transaction.atomic():
                     concept = Concept(data)
                     concept.save()
@@ -180,10 +199,9 @@ def concept(request, conceptid):
 
 
     if request.method == 'DELETE':
-        json = request.body
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
-            
+        data = JSONDeserializer().deserialize(request.body) 
+
+        if data:
             with transaction.atomic():
                 concept = Concept(data)
 
@@ -194,7 +212,6 @@ def concept(request, conceptid):
                 return JSONResponse(concept)
 
     return HttpResponseNotFound()
-
 
 @csrf_exempt
 def manage_parents(request, conceptid):
@@ -238,26 +255,44 @@ def confirm_delete(request, conceptid):
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
+    removechildren = request.GET.get('removechildren', None)
     query = Query(se, start=0, limit=100)
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
     results = query.search(index='concept_labels')
 
+    ids = []
+    if removechildren != None:
+        concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
+        print concepts
+        def get_children(concept):
+            ids.append(concept.id)
+
+        concepts.traverse(get_children)
+
+    newresults = []
     cached_scheme_names = {}
     for result in results['hits']['hits']:
-        # first look to see if we've already retrieved the scheme name
-        # else look up the scheme name with ES and cache the result
-        if result['_type'] in cached_scheme_names:
-            result['_type'] = cached_scheme_names[result['_type']]
+        if result['_source']['conceptid'] not in ids:
+            # first look to see if we've already retrieved the scheme name
+            # else look up the scheme name with ES and cache the result
+            if result['_type'] in cached_scheme_names:
+                result['in_scheme_name'] = cached_scheme_names[result['_type']]
+            else:
+                query = Query(se, start=0, limit=100)
+                phrase = Match(field='conceptid', query=result['_type'], type='phrase')
+                query.add_query(phrase)
+                scheme = query.search(index='concept_labels')
+                for label in scheme['hits']['hits']:
+                    if label['_source']['type'] == 'prefLabel':
+                        cached_scheme_names[result['_type']] = label['_source']['value']
+                        result['in_scheme_name'] = label['_source']['value']
+
+            newresults.append(result)
         else:
-            query = Query(se, start=0, limit=100)
-            phrase = Match(field='conceptid', query=result['_type'], type='phrase')
-            query.add_query(phrase)
-            scheme = query.search(index='concept_labels')
-            for label in scheme['hits']['hits']:
-                if label['_source']['type'] == 'prefLabel':
-                    cached_scheme_names[result['_type']] = label['_source']['value']
-                    result['_type'] = label['_source']['value']
+            print result['_source']['value']
+
+    results['hits']['hits'] = newresults
     return JSONResponse(results)
 
 def concept_tree(request):

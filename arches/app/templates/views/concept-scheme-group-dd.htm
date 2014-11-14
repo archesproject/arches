@@ -1,0 +1,6 @@
+<input style="width:100%" class="select2" name="scheme_group_dd" type="text"/>
+<div name="scheme_group_dd_data" style="display:hidden">
+    {% for scheme in concept_scheme_groups %}
+    <div data-id="{{scheme.conceptid}}" data-text="{{scheme.value}}"></div>
+    {% endfor %}
+</div>

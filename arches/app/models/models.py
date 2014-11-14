@@ -78,7 +78,7 @@ class Classes(models.Model):
 
 class DNodetypes(models.Model):
     nodetype = models.TextField(primary_key=True)
-    skoscompliant = models.BooleanField()
+    namespace = models.TextField()
     class Meta:
         db_table = u'd_nodetypes'
 
@@ -92,7 +92,7 @@ class DLanguages(models.Model):
 class DRelationtypes(models.Model):
     relationtype = models.TextField(primary_key=True)
     category = models.TextField()
-    skoscompliant = models.BooleanField()
+    namespace = models.TextField()
     class Meta:
         db_table = u'd_relationtypes'
 
@@ -265,10 +265,17 @@ class ConceptRelations(models.Model):
     def __unicode__(self):
         return ('%s') % (self.relationid)
 
+    def save(self, *args, **kwargs):
+        if ConceptRelations.objects.filter(conceptidfrom = self.conceptidfrom, conceptidto = self.conceptidto, relationtype = self.relationtype).exists():
+            return # can't insert duplicate values
+        else:
+            super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
+
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
     category = models.TextField()
     description = models.TextField()
+    namespace = models.TextField()
     class Meta:
         db_table = u'concepts"."d_valuetypes'
 
@@ -539,8 +546,7 @@ class Relations(models.Model):
         return ('%s is the parent of %s') % (self.entityiddomain, self.entityidrange)
 
     def save(self, *args, **kwargs):
-        relations = Relations.objects.filter(ruleid = self.ruleid, entityiddomain = self.entityiddomain, entityidrange = self.entityidrange)
-        if len(relations) > 0:
+        if Relations.objects.filter(ruleid = self.ruleid, entityiddomain = self.entityiddomain, entityidrange = self.entityidrange).exists():
             return # can't insert duplicate values
         else:
             super(Relations, self).save(*args, **kwargs) # Call the "real" save() method.

@@ -1060,7 +1060,7 @@ ALTER TABLE concepts.concepts OWNER TO postgres;
 
 CREATE TABLE d_nodetypes (
     nodetype text NOT NULL,
-    skoscompliant boolean NOT NULL DEFAULT false,
+    namespace text NOT NULL DEFAULT 'arches',
     CONSTRAINT pk_d_nodetypes PRIMARY KEY (nodetype)
 );
 
@@ -1090,7 +1090,7 @@ ALTER TABLE concepts.d_languages OWNER TO postgres;
 CREATE TABLE d_relationtypes (
     relationtype text NOT NULL,
 	category text NOT NULL,
-	skoscompliant BOOLEAN NOT NULL
+	namespace text NOT NULL DEFAULT 'arches'
 );
 
 
@@ -1106,7 +1106,7 @@ CREATE TABLE concepts.d_valuetypes
   valuetype text NOT NULL,
   category text,
   description text,
-  skoscompliant boolean NOT NULL DEFAULT false,
+  namespace text NOT NULL DEFAULT 'arches',
   CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype )
 )
 WITH (

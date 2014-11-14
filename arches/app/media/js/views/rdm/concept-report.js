@@ -40,11 +40,17 @@ define([
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
+            this.undelegateEvents();
+
             $.ajax({
                 url: '../Concepts/' + conceptid + '?f=html',
                 success: function(response) {
                     self.$el.find('.concept-report-loading').addClass('hidden');
                     self.$el.html(response);
+
+                    var data = self.$el.find('div[name="modeldata"]').data();
+                    self.model.set(data);
+
                     if (self.model.get('id')) {
                         if (self.$el.find(".concept-graph").length > 0) {
                             //Toggle Concept Heirarchy.  

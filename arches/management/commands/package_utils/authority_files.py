@@ -154,6 +154,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                                 valuetype = models.ValueTypes()
                                 valuetype.valuetype = row_valuetype
                                 valuetype.category = 'undefined'
+                                valuetype.namespace = 'arches'
                                 valuetype.save()
                                 value_types = models.ValueTypes.objects.all()
 

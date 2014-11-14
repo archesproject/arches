@@ -9,8 +9,9 @@ require([
     'views/rdm/modals/add-scheme-form',
     'views/rdm/modals/export-scheme-form',
     'views/rdm/modals/delete-scheme-form',
+    'views/rdm/modals/import-scheme-form',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm) {
     $(document).ready(function() {
         var mode = 'scheme';
         if (window.location.search.search('mode=dropdown') === 1){
@@ -103,8 +104,7 @@ require([
             form.modal.modal('show');
             form.on({
                 'conceptSchemeAdded': function(){
-                    conceptTree.render();
-                    conceptReport.render();
+                    window.location.reload();
                 }
             })
         });
@@ -123,6 +123,20 @@ require([
                 el: $('#delete-scheme-form')
             });
             form.modal.modal('show');
+        });
+
+        $('a[data-toggle="#import-scheme-form"]').on( "click", function(){
+            var self = this;
+            var form = new ImportSchemeForm({
+                el: $('#import-scheme-form'),
+                model: concept
+            });
+            form.modal.modal('show');
+            form.on({
+                'conceptSchemeAdded': function(){
+                    window.location.reload();
+                }
+            })
         });
 
         $(window).scroll(function() {

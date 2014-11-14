@@ -65,8 +65,8 @@ class Concept(object):
             self.legacyoid = value['legacyoid'] if 'legacyoid' in value else ''
             self.relationshiptype = value['relationshiptype'] if 'relationshiptype' in value else ''            
             if 'values' in value:
-                for value in value['values']:
-                    self.addvalue(value)
+                for val in value['values']:
+                    self.addvalue(val)
             if 'subconcepts' in value:
                 for subconcept in value['subconcepts']:
                     self.addsubconcept(subconcept)
@@ -82,7 +82,7 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang='en-us', **kwargs):
         if id != '':
             self.load(models.Concepts.objects.get(pk=id))
         elif legacyoid != '':
@@ -121,10 +121,10 @@ class Concept(object):
                             include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
 
-                    self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang='en-us'), reverse=False) 
+                    self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
             if include_parentconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -145,81 +145,81 @@ class Concept(object):
         return self
             
     def save(self):
-        with transaction.atomic():
-            self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-            concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid, 'nodetype_id': self.nodetype})
+        self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
+        concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid, 'nodetype_id': self.nodetype})
 
-            for parentconcept in self.parentconcepts:
-                parentconcept.save()
-                conceptrelation = models.ConceptRelations()
-                conceptrelation.pk = str(uuid.uuid4())
-                conceptrelation.conceptidfrom_id = parentconcept.id 
-                conceptrelation.conceptidto = concept
-                conceptrelation.relationtype_id = parentconcept.relationshiptype
-                conceptrelation.save()
+        for value in self.values:
+            if not isinstance(value, ConceptValue): 
+                value = ConceptValue(value)
+            value.conceptid = self.id
+            value.save()        
 
-            for subconcept in self.subconcepts:
-                subconcept.save()
-                conceptrelation = models.ConceptRelations()
-                conceptrelation.pk = str(uuid.uuid4())
-                conceptrelation.conceptidfrom = concept
-                conceptrelation.conceptidto_id = subconcept.id
-                conceptrelation.relationtype_id = subconcept.relationshiptype
-                conceptrelation.save()
+        for parentconcept in self.parentconcepts:
+            parentconcept.save()
+            conceptrelation = models.ConceptRelations()
+            conceptrelation.pk = str(uuid.uuid4())
+            conceptrelation.conceptidfrom_id = parentconcept.id 
+            conceptrelation.conceptidto = concept
+            conceptrelation.relationtype_id = parentconcept.relationshiptype
+            conceptrelation.save()
 
-            for relatedconcept in self.relatedconcepts:
-                relation = models.ConceptRelations()
-                relation.pk = str(uuid.uuid4())
-                relation.conceptidfrom_id = self.id
-                relation.conceptidto_id = relatedconcept.id
-                relation.relationtype_id = 'related'
-                relation.save()
+        for subconcept in self.subconcepts:
+            subconcept.save()
+            conceptrelation = models.ConceptRelations()
+            conceptrelation.pk = str(uuid.uuid4())
+            conceptrelation.conceptidfrom = concept
+            conceptrelation.conceptidto_id = subconcept.id
+            conceptrelation.relationtype_id = subconcept.relationshiptype
+            conceptrelation.save()
 
-            for value in self.values:
-                if not isinstance(value, ConceptValue): 
-                    value = ConceptValue(value)
-                value.conceptid = self.id
-                value.save()
+        for relatedconcept in self.relatedconcepts:
+            relation = models.ConceptRelations()
+            relation.pk = str(uuid.uuid4())
+            relation.conceptidfrom_id = self.id
+            relation.conceptidto_id = relatedconcept.id
+            relation.relationtype_id = 'related'
+            relation.save()
 
-            return concept
+        return concept
 
     def delete(self, delete_self=False):
-        with transaction.atomic():
-            for subconcept in self.subconcepts:
-                concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
-                
-                for concept in concepts_to_delete:
-                    models.Concepts.objects.get(pk=concept.conceptid).delete()
+        for subconcept in self.subconcepts:
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+            
+            for concept in concepts_to_delete:
+                print concept.value
+                print concept.conceptid
+                models.Concepts.objects.get(pk=concept.conceptid).delete()
 
-            for parentconcept in self.parentconcepts:
-                conceptrelations = models.ConceptRelations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
+        for parentconcept in self.parentconcepts:
+            conceptrelations = models.ConceptRelations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
+            for relation in conceptrelations:
+                relation.delete()
+
+        for relatedconcept in self.relatedconcepts:
+            deletedrelatedconcepts = []
+            for relatedconcept in self.relatedconcepts:
+                conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
                 for relation in conceptrelations:
                     relation.delete()
+                    deletedrelatedconcepts.append(relatedconcept)
 
-            for relatedconcept in self.relatedconcepts:
-                deletedrelatedconcepts = []
-                for relatedconcept in self.relatedconcepts:
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
-                    for relation in conceptrelations:
-                        relation.delete()
-                        deletedrelatedconcepts.append(relatedconcept)
+                conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
+                for relation in conceptrelations:
+                    relation.delete()
+                    deletedrelatedconcepts.append(relatedconcept)
 
-                    conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
-                    for relation in conceptrelations:
-                        relation.delete()
-                        deletedrelatedconcepts.append(relatedconcept)
+            for deletedrelatedconcept in deletedrelatedconcepts:
+                if deletedrelatedconcept in self.relatedconcepts:
+                    self.relatedconcepts.remove(deletedrelatedconcept)
 
-                for deletedrelatedconcept in deletedrelatedconcepts:
-                    if deletedrelatedconcept in self.relatedconcepts:
-                        self.relatedconcepts.remove(deletedrelatedconcept)
+        for value in self.values:
+            if not isinstance(value, ConceptValue): 
+                value = ConceptValue(value)
+            value.delete()
 
-            for value in self.values:
-                if not isinstance(value, ConceptValue): 
-                    value = ConceptValue(value)
-                value.delete()
-
-            if delete_self:
-                models.Concepts.objects.get(pk=self.id).delete()
+        if delete_self:
+            models.Concepts.objects.get(pk=self.id).delete()
         return
 
     @staticmethod
@@ -236,12 +236,12 @@ class Concept(object):
         find_concepts(concept)
         return concepts_to_delete
 
-    def traverse(self, func, scope=None):
+    def traverse(self, func, direction='down', scope=None):
         """
-        Traverses a graph from leaf to root calling the given function on each node
-        passes an optional scope to each function
+        Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling 
+        the given function on each node passes an optional scope to each function
 
-        Return False from the function to prematurely end the traversal
+        Return a value from the function to prematurely end the traversal
 
         """
 
@@ -250,13 +250,20 @@ class Concept(object):
         else:
             ret = func(self, scope) 
         
-        # break out of the traversal if the function returns False
-        if ret == False:
-            return False    
+        # break out of the traversal if the function returns a value
+        if ret != None:
+            return ret    
 
-        for subconcept in self.subconcepts:
-            if subconcept.traverse(func, scope) == False: 
-                break
+        if direction == 'down':
+            for subconcept in self.subconcepts:
+                ret = subconcept.traverse(func, direction, scope)
+                if ret != None: 
+                    return ret  
+        else:
+            for parentconcept in self.parentconcepts:
+                ret = parentconcept.traverse(func, direction, scope)
+                if ret != None: 
+                    return ret        
 
     def get_sortkey(self, lang='en-us'):
         for value in self.values:
@@ -265,34 +272,23 @@ class Concept(object):
                 
         return self.get_preflabel(lang=lang).value
 
-    def get_auth_doc_concept(self, lang='en-us'):
-        scheme_collections = [collection.id for collection in Concept.get_scheme_collections()]
-        concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=True)
-       
-        def find_auth_doc(concept):
-            for parentconcept in concept.parentconcepts:
-                if parentconcept.id in scheme_collections:
-                    return concept
-
-            for parentconcept in concept.parentconcepts:
-                return find_auth_doc(parentconcept)
-
-        auth_doc = find_auth_doc(concept)
-        return auth_doc
-
     def get_preflabel(self, lang='en-us'):
-        ret = ConceptValue()       
+        ret = []
         if self.values == []: 
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
         else:
             concept = self
         for value in concept.values:
-            ret = value.value
             if value.type == 'prefLabel':
-                ret = value.value
                 if value.language == lang:
                     return value
-        return ret
+                elif value.language == lang.split('-')[0]:
+                    ret.insert(0, value)
+            elif value.type == 'altLabel':
+                if value.language == lang:
+                    ret.insert(0, value)
+            ret.append(value)
+        return ret[0] if len(ret) > 0 else ConceptValue()
 
     def flatten(self, ret=None):
         """
@@ -344,15 +340,12 @@ class Concept(object):
 
     def index(self, scheme=''):
         for value in self.values:
+            if scheme == '':
+                scheme = self.get_context()
             value.index(scheme=scheme)        
 
         for subconcept in self.subconcepts:
-            if subconcept.is_scheme():
-                subconcept.index(scheme=subconcept.id)
-            else:
-                if scheme == '':
-                    scheme = self.get_auth_doc_concept().id
-                subconcept.index(scheme=scheme)
+            subconcept.index(scheme=subconcept.get_context())
 
     def delete_index(self, delete_self=False):
         se = SearchEngineFactory().create()
@@ -470,26 +463,21 @@ class Concept(object):
                 link['target'] = i if link['target'] == nodes[i]['concept_id'] else link['target']
         
         return {'nodes': nodes, 'links': links}
- 
-    def is_scheme(self):
-        scheme_collection_ids = []
-        for concept in Concept.get_scheme_collections(depth=2):
-            for subconcepts in concept.subconcepts:
-                scheme_collection_ids.append(subconcepts.id)
 
-        if self.id in scheme_collection_ids:
-            return True
-        else:
-            return False
+    def get_context(self):
+        if self.nodetype == 'Concept':
+            concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
+            
+            def get_scheme_id(concept):
+                #print concept.get_preflabel().value                
+                if concept.nodetype == 'ConceptScheme':
+                    return concept.id
 
-    @staticmethod
-    def get_scheme_collections(include=None, depth=1):
-        #return Concept().get(id='00000000-0000-0000-0000-000000000003', include_subconcepts=True, depth_limit=depth, include=include).subconcepts
-        ret = []
-        concepts = models.Concepts.objects.filter(nodetype = 'ConceptSchemeGroup')
-        for concept in concepts:
-            ret.append(Concept().get(id=concept.pk, include=['label']))
-        return ret
+            return concept.traverse(get_scheme_id, direction='up')
+        if self.nodetype == 'ConceptScheme':
+            return self.id
+        if self.nodetype == 'ConceptSchemeGroup':
+            return self.id
 
 
 class ConceptValue(object):

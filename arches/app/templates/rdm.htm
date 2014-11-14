@@ -78,7 +78,7 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
-                                    <li><a href="#ImportNewScheme" data-toggle="modal">{% trans "Import Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Scheme" %}</a></li>
                                     <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
                                     <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
                                     <li class="divider"></li>
@@ -153,6 +153,10 @@
 
 <div id="delete-scheme-form">
     {% include "views/rdm/modals/delete-scheme-form.htm" %}
+</div>
+
+<div id="import-scheme-form">
+    {% include "views/rdm/modals/import-scheme-form.htm" %}
 </div>
 
 {% endblock content %}
