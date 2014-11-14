@@ -3,6 +3,7 @@
 <div class="col-xs-12 concept-report-loading hidden">{% trans "Loading..." %}</div>
 {% if concept %}
     <div class="col-xs-12 concept-report-content">
+        <div style="display:none" name="modeldata" data-id="{{concept.id}}" data-legacyoid="{{concept.legacyoid}}" data-nodetype="{{concept.nodetype}}"></div>
         <!-- Concept Preferred Label -->
         <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{{prefLabel}} ({{lang}})</h3>
 
