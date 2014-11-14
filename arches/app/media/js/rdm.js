@@ -120,9 +120,15 @@ require([
         $('a[data-toggle="#delete-scheme-form"]').on( "click", function(){
             var self = this;
             var form = new DeleteSchemeForm({
-                el: $('#delete-scheme-form')
+                el: $('#delete-scheme-form'),
+                model: concept
             });
             form.modal.modal('show');
+            form.on({
+                'conceptSchemeDeleted': function(){
+                    window.location.reload();
+                }
+            })
         });
 
         $('a[data-toggle="#import-scheme-form"]').on( "click", function(){

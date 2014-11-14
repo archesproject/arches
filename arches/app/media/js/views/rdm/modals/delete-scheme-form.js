@@ -2,16 +2,7 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
     return Backbone.View.extend({
 
         initialize: function(e){
-
-            if (! this.rendered){
-                this.render();
-            }
-
-        },
-
-        render: function(){
             var self = this;
-            this.rendered = true;
             this.modal = this.$el.find('.modal');
 
             // test to see if select2 has already been applied to the dom
@@ -35,28 +26,15 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                     scheme_dd: "required"
                 },
                 submitHandler: function(form) {
-                    // var model = new ConceptModel({
-                    //     id: '00000000-0000-0000-0000-000000000003'
-                    // })
-                    // var label = new ValueModel({
-                    //     value: $(form).find("[name=label]").val(),
-                    //     language: $(form).find("[name=language_dd]").val(),
-                    //     category: 'label',
-                    //     datatype: 'text',
-                    //     type: 'prefLabel'
-                    // });
-                    // var subconcept = new ConceptModel({
-                    //     values: [label],
-                    //     relationshiptype: 'has collection'
-                    // });
-                    // model.set('subconcepts', [subconcept]);
-                    // model.save(function() {
-                    //     var modal = self.$el.find('#add-scheme-form');
-                    //     this.modal.modal('hide');
-                    //     $('.modal-backdrop.fade.in').remove();  // a hack for now
-                    //     self.trigger('conceptSchemeAdded');
-                    // }, self);
+                    model = new ConceptModel({'id':self.schemedropdown.val()})
+                    self.model.set('subconcepts', [model]);
+
+                    self.model.delete(function(){
+                        self.modal.modal('hide');
+                        self.trigger('conceptSchemeDeleted');
+                    }, self);
                 }
+                
             });            
         }
     });

@@ -49,8 +49,7 @@ define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-s
                     conceptschemegroup.set('subconcepts',[conceptscheme]);
 
                     conceptschemegroup.save(function() {
-                        var modal = self.$el.find('#add-scheme-form');
-                        this.modal.modal('hide');
+                        self.modal.modal('hide');
                         $('.modal-backdrop.fade.in').remove();  // a hack for now
                         self.trigger('conceptSchemeAdded');
                     }, self);
