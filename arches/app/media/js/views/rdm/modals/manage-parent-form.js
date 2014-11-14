@@ -1,5 +1,5 @@
 define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
-    return ConceptSearch.extend({
+    return Backbone.View.extend({
 
         events: {
             'click .modal-footer .savebtn': 'save',
@@ -8,7 +8,13 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
         },
 
         initialize: function(){
-            ConceptSearch.prototype.initialize.apply(this, arguments);
+            var self = this;
+            this.conceptsearch = new ConceptSearch({
+                el:this.$el,
+                getUrl: function(){
+                    return arches.urls.concept_search + '?removechildren=' + self.model.get('id');
+                }
+            });
             this.modal = this.$el.find('.modal');
             this.relationshiptype = this.modal.find('#parent-relation-type').select2({
                 minimumResultsForSearch: 10,
@@ -20,9 +26,9 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
         
 		save: function(){
             var self = this;
-            if (this.searchbox.val() !== ''){
+            if (this.conceptsearch.searchbox.val() !== ''){
                 var parentConcept = new ConceptModel({
-                    id: this.searchbox.val(),
+                    id: this.conceptsearch.searchbox.val(),
                     relationshiptype: this.relationshiptype.val()
                 });
                 this.model.set('added', [parentConcept.toJSON()]);
