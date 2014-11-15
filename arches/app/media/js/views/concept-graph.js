@@ -7,7 +7,12 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                 width = self.$el.parent().width(),
                 height = canvasd3.height(),
                 force = d3.layout.force()
-                    .charge(-1550)
+                    .charge(function(node, i) {
+                        if (node.type == 'Related'){
+                            return -3000;
+                        }
+                        return -1550;
+                    })
                     .linkDistance(90)
                     .gravity(0.05)
                     .friction(0.55)
@@ -34,12 +39,24 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                 link = svg.selectAll(".link")
                     .data(data.links)
                     .enter().append("line")
-                    .attr("class", "link")
+                    .attr("class", function(d) {
+                        if (d.relationship == "related") {
+                            return 'relatedlink';
+                        } else {
+                            return 'link';
+                        }
+                    })
                     .attr("marker-end", "url(#arrowGray)")
                     //add interactivity
                     .on("mouseover", function(d) {
                         d3.select(this)
-                            .attr("class", "linkMouseover");
+                            .attr("class", function(d) {
+                                if (d.relationship == "related") {
+                                    return 'linkMouseover relatedlink';
+                                } else {
+                                    return 'linkMouseover link';
+                                }
+                            });
 
                         //add tooltup to show edge property
                         link.append("title")
@@ -49,7 +66,13 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                     })
                     .on("mouseout", function(d) {
                         d3.select(this)
-                            .attr("class", "link");
+                            .attr("class", function(d) {
+                                if (d.relationship == "related") {
+                                    return 'relatedlink';
+                                } else {
+                                    return 'link';
+                                }
+                            });
                     }),
 
                 node = svg.selectAll(".node").data(data.nodes)
@@ -59,8 +82,10 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                             return 30;
                         } else if (d.type == "Ancestor" || d.type == "Root") {
                             return 22;
-                        } else {
+                        } else if (d.type == "Descendant") {
                             return 16;
+                        } else {
+                            return 8;
                         }
                     })
                     //.attr("class", "node")
@@ -211,6 +236,10 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                         "Descendant": {
                             x: width * 0.55,
                             y: height * 1.4
+                        },
+                        "Related": {
+                            x: width * 3.5,
+                            y: height * .5
                         }
                     };
 

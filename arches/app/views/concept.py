@@ -104,6 +104,10 @@ def concept(request, conceptid):
                     valuetypes = models.ValueTypes.objects.all()
                     relationtypes = models.DRelationtypes.objects.all()
                     prefLabel = concept_graph.get_preflabel(lang=lang).value
+                    for subconcept in concept_graph.subconcepts:
+                        subconcept.prefLabel = subconcept.get_preflabel(lang=lang) 
+                    for relatedconcept in concept_graph.relatedconcepts:
+                        relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang) 
                     for value in concept_graph.values:
                         if value.category == 'label':
                             labels.append(value)
@@ -300,6 +304,7 @@ def search(request):
     return JSONResponse(results)
 
 def concept_tree(request):
+    lang = request.GET.get('lang', 'en-us') 
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree()
+    concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)

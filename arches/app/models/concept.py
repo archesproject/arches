@@ -137,10 +137,11 @@ class Concept(object):
             if include_relatedconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
+                    self.relationshiptype = relation.relationtype.pk
                     if relation.conceptidto_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
+                        self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']))
                     if relation.conceptidfrom_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']).get_preflabel())
+                        self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']))
 
         return self
             
@@ -333,6 +334,8 @@ class Concept(object):
             self.values.append(ConceptValue(value))
         elif isinstance(value, ConceptValue):
             self.values.append(value)
+        elif isinstance(value, models.Values):
+            self.values.append(ConceptValue(value))
         else:
             raise Exception('Invalid value definition: %s' % (value))
 
@@ -360,7 +363,7 @@ class Concept(object):
         for value in self.values:
             value.delete_index()
 
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang='en-us'):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -371,12 +374,18 @@ class Concept(object):
 
         def _findNarrowerConcept(conceptid, depth_limit=None, level=0):
             labels = models.Values.objects.filter(conceptid = conceptid)
-            ret = concept()          
+            ret = concept()  
+            temp = Concept()        
             for label in labels:
-                if label.valuetype_id == 'prefLabel':
-                    ret.label = label.value
-                    ret.id = label.conceptid_id
-                    ret.labelid = label.valueid
+                temp.addvalue(label)
+                # if label.valuetype_id == 'prefLabel':
+                #     ret.label = label.value
+                #     ret.id = label.conceptid_id
+                #     ret.labelid = label.valueid
+            label = temp.get_preflabel(lang=lang)
+            ret.label = label.value
+            ret.id = label.conceptid
+            ret.labelid = label.id
 
             conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
@@ -394,11 +403,13 @@ class Concept(object):
             if len(conceptrealations) > 0 and conceptid != top_concept:
                 labels = models.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
                 ret = concept()          
+                temp = Concept()        
                 for label in labels:
-                    if label.valuetype_id == 'prefLabel':
-                        ret.label = label.value
-                        ret.id = label.conceptid_id
-                        ret.labelid = label.valueid
+                    temp.addvalue(label)
+                label = temp.get_preflabel(lang=lang)
+                ret.label = label.value
+                ret.id = label.conceptid
+                ret.labelid = label.id
 
                 ret.children.append(child_concept)
                 return _findBroaderConcept(conceptrealations[0].conceptidfrom_id, ret, depth_limit=depth_limit, level=level)
@@ -449,8 +460,12 @@ class Concept(object):
 
         get_parent_nodes_and_links(self)
         for child in self.subconcepts:
-            nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value,'type': 'Descendant' })
+            nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value, 'type': 'Descendant' })
             links.append({'source': self.id, 'target': child.id, 'relationship': 'narrower' })
+
+        for related in self.relatedconcepts:
+            nodes.append({'concept_id': related.id, 'name': related.get_preflabel(lang=lang).value, 'type': 'Related' })
+            links.append({'source': self.id, 'target': related.id, 'relationship': 'related' })
 
         # get unique node list and assign unique integer ids for each node (required by d3)
         nodes = {node['concept_id']:node for node in nodes}.values()
