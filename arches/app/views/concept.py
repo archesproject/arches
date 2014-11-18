@@ -90,6 +90,9 @@ def concept(request, conceptid):
 
         if f == 'skos':
             fromdb = True
+            include_parentconcepts = False
+            include_subconcepts = True
+            depth_limit = None
 
         if fromdb:
             ret = []
@@ -191,7 +194,7 @@ def concept(request, conceptid):
                     concept.save()
                     skos = SKOSReader()
                     rdf = skos.read_file(skosfile)
-                    ret = skos.get_concepts(rdf, concept_scheme_group=concept.id)
+                    ret = skos.save_concepts_from_skos(rdf, concept_scheme_group=concept.id)
                     return JSONResponse(ret)
             
         else:

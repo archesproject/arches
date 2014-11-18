@@ -266,10 +266,15 @@ class ConceptRelations(models.Model):
         return ('%s') % (self.relationid)
 
     def save(self, *args, **kwargs):
+        # prevent insert of duplicate records
         if ConceptRelations.objects.filter(conceptidfrom = self.conceptidfrom, conceptidto = self.conceptidto, relationtype = self.relationtype).exists():
             return # can't insert duplicate values
-        else:
-            super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
+        elif self.relationtype_id == 'related':
+            # check to see if the recipocal relationship exists as well (mostly for when we load a skos file)
+            if ConceptRelations.objects.filter(conceptidfrom = self.conceptidto, conceptidto = self.conceptidfrom, relationtype = self.relationtype).exists():
+                return
+
+        super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
 
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
