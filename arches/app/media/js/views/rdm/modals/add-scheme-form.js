@@ -1,44 +1,60 @@
-define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-scheme-group-dd'], function ($, Backbone, ConceptModel, ValueModel, ConceptSchemeGroupDD) {
     return Backbone.View.extend({
 
         initialize: function(e){
             var self = this;
             this.modal = this.$el.find('.modal');
             this.modal.on('hidden.bs.modal', function () {
-                self.$el.find("input[type=text], textarea").val("");
+                self.$el.find('input[type=text], textarea').val('');
             });
-            // test to see if select2 has already been applied to the dom
-            if (! this.modal.find('.select2').attr('id')){
-                this.select2 = this.modal.find('.select2').select2();                
-            }
+
+            this.select2 = this.$el.find('[name=language_dd]').select2({
+                minimumResultsForSearch: -1
+            });                
+
+            this.conceptschemegroupdd = new ConceptSchemeGroupDD({
+                el: this.$el
+            });
+
             this.modal.validate({
                 ignore: null,
                 rules: {
-                    label: "required",
-                    language_dd: "required"
+                    label: 'required',
+                    language_dd: 'required',
+                    scheme_group_dd: 'required'
                 },
                 submitHandler: function(form) {
-                    var model = new ConceptModel({
-                        id: '00000000-0000-0000-0000-000000000003'
-                    })
                     var label = new ValueModel({
-                        value: $(form).find("[name=label]").val(),
-                        language: $(form).find("[name=language_dd]").val(),
+                        value: $(form).find('[name=label]').val(),
+                        language: $(form).find('[name=language_dd]').val(),
                         category: 'label',
                         datatype: 'text',
                         type: 'prefLabel'
                     });
-                    var subconcept = new ConceptModel({
-                        values: [label],
-                        relationshiptype: 'narrower'
+                    var note = new ValueModel({
+                        value: $(form).find('[name=note]').val(),
+                        language: $(form).find('[name=language_dd]').val(),
+                        category: 'note',
+                        datatype: 'text',
+                        type: 'scopeNote'
                     });
-                    model.set('subconcepts', [subconcept]);
-                    model.save(function() {
-                        var modal = self.$el.find('#add-scheme-form');
-                        this.modal.modal('hide');
+                    var conceptscheme = new ConceptModel({
+                        legacyoid: $(form).find('[name=label]').val(),
+                        values: [label, note],
+                        relationshiptype: 'narrower',
+                        nodetype: 'ConceptScheme'
+                    });
+                    
+                    var conceptschemegroup = self.conceptschemegroupdd.getSchemeGroupModelFromSelection($(form).find('[name=language_dd]').val());
+                    conceptschemegroup.set('subconcepts',[conceptscheme]);
+
+                    conceptschemegroup.save(function() {
+                        self.modal.modal('hide');
                         $('.modal-backdrop.fade.in').remove();  // a hack for now
                         self.trigger('conceptSchemeAdded');
                     }, self);
+
+                    return false;
                 }
             });
         }

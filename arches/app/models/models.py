@@ -76,6 +76,12 @@ class Classes(models.Model):
     def __unicode__(self):
         return self.classname
 
+class DNodetypes(models.Model):
+    nodetype = models.TextField(primary_key=True)
+    namespace = models.TextField()
+    class Meta:
+        db_table = u'd_nodetypes'
+
 class DLanguages(models.Model):
     languageid = models.TextField(primary_key=True)
     languagename = models.TextField()
@@ -86,7 +92,7 @@ class DLanguages(models.Model):
 class DRelationtypes(models.Model):
     relationtype = models.TextField(primary_key=True)
     category = models.TextField()
-    skoscompliant = models.BooleanField()
+    namespace = models.TextField()
     class Meta:
         db_table = u'd_relationtypes'
 
@@ -240,6 +246,7 @@ class AuthPermission(models.Model):
 
 class Concepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
+    nodetype = models.ForeignKey('DNodetypes', db_column='nodetype')
     legacyoid = models.TextField()
     class Meta:
         db_table = u'concepts'
@@ -258,10 +265,22 @@ class ConceptRelations(models.Model):
     def __unicode__(self):
         return ('%s') % (self.relationid)
 
+    def save(self, *args, **kwargs):
+        # prevent insert of duplicate records
+        if ConceptRelations.objects.filter(conceptidfrom = self.conceptidfrom, conceptidto = self.conceptidto, relationtype = self.relationtype).exists():
+            return # can't insert duplicate values
+        elif self.relationtype_id == 'related':
+            # check to see if the recipocal relationship exists as well (mostly for when we load a skos file)
+            if ConceptRelations.objects.filter(conceptidfrom = self.conceptidto, conceptidto = self.conceptidfrom, relationtype = self.relationtype).exists():
+                return
+
+        super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
+
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
     category = models.TextField()
     description = models.TextField()
+    namespace = models.TextField()
     class Meta:
         db_table = u'concepts"."d_valuetypes'
 
@@ -532,8 +551,7 @@ class Relations(models.Model):
         return ('%s is the parent of %s') % (self.entityiddomain, self.entityidrange)
 
     def save(self, *args, **kwargs):
-        relations = Relations.objects.filter(ruleid = self.ruleid, entityiddomain = self.entityiddomain, entityidrange = self.entityidrange)
-        if len(relations) > 0:
+        if Relations.objects.filter(ruleid = self.ruleid, entityiddomain = self.entityiddomain, entityidrange = self.entityidrange).exists():
             return # can't insert duplicate values
         else:
             super(Relations, self).save(*args, **kwargs) # Call the "real" save() method.
@@ -542,7 +560,7 @@ class RelatedResource(models.Model):
     resourcexid = models.AutoField(primary_key=True)
     entityid1 = models.TextField()
     entityid2 = models.TextField()
-    reason = models.TextField()
+    notes = models.TextField()
     relationshiptype = models.TextField()
     datestarted = models.DateField()
     dateended = models.DateField()

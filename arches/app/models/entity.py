@@ -803,7 +803,6 @@ class Entity(object):
         # prune the remaining entities
         print 'entities to prune: %s' % entities_to_prune
         for entity in entities_to_prune:
-            print entity
             try:
                 parent = entity.get_parent()   
                 print '\nremoving: %s' % entity         

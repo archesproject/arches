@@ -219,7 +219,7 @@ ALTER FUNCTION concepts.get_preferred_label(p_conceptid uuid, p_languageid text)
 -- Name: insert_concept(text, text, text, text, text); Type: FUNCTION; Schema: concepts; Owner: postgres
 --
 
-CREATE FUNCTION insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text) RETURNS uuid
+CREATE FUNCTION insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text, p_nodetype text) RETURNS uuid
     LANGUAGE plpgsql
     AS $$
     Declare
@@ -230,7 +230,7 @@ CREATE FUNCTION insert_concept(p_label text, p_note text, p_languageid text, p_l
     
 BEGIN
 
-    INSERT INTO concepts.concepts(conceptid, legacyoid) VALUES (v_conceptid, p_legacyid);
+    INSERT INTO concepts.concepts(conceptid, nodetype, legacyoid) VALUES (v_conceptid, p_nodetype, p_legacyid);
 
     IF trim(p_label) is not null and p_label<>'' then
       INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
@@ -249,7 +249,7 @@ END;
 $$;
 
 
-ALTER FUNCTION concepts.insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text) OWNER TO postgres;
+ALTER FUNCTION concepts.insert_concept(p_label text, p_note text, p_languageid text, p_legacyid text, p_nodetype text) OWNER TO postgres;
 
 --
 -- TOC entry 1268 (class 1255 OID 15704209)
@@ -643,21 +643,27 @@ CREATE FUNCTION insert_entitytype(p_entitytypeid text, p_businesstablename text,
     v_conceptid uuid = null;
     v_parentconceptid uuid = (select concepts.get_conceptid(p_parentconceptlabel));
     v_isresource boolean = FALSE;
+    v_nodetype text = 'EntityType';
     
 BEGIN
 
-    IF p_entitytypeid = p_asset_entity
-    THEN v_isresource = TRUE;
+    IF p_entitytypeid = p_asset_entity THEN 
+      v_isresource = TRUE;
+    END IF;
+
+    IF p_businesstablename = 'domains' THEN 
+      v_nodetype = 'Collection';
     END IF;
     
     IF split_part(p_entitytypeid, '.', 1) != '' and split_part(p_entitytypeid, '.', 2) != '' THEN
         IF NOT EXISTS(SELECT entitytypeid FROM data.entity_types WHERE entitytypeid = p_entitytypeid) THEN
 
-        v_conceptid = (select concepts.insert_concept (p_entitytypeid, p_note, p_notelanguage, upper(p_entitytypeid)));
+          v_conceptid = (select concepts.insert_concept (p_entitytypeid, p_note, p_notelanguage, upper(p_entitytypeid), v_nodetype));
 
-        IF v_parentconceptid in (select conceptid from concepts.concepts) then
-            INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
-            VALUES (v_parentconceptid, v_conceptid, 'narrower', public.uuid_generate_v1mc());
+          IF v_parentconceptid in (select conceptid from concepts.concepts) then
+              INSERT INTO concepts.relations (conceptidfrom, conceptidto, relationtype, relationid)
+              VALUES (v_parentconceptid, v_conceptid, 'narrower', public.uuid_generate_v1mc());
+
         END IF;
         
             IF p_businesstablename = '' THEN
@@ -1039,12 +1045,27 @@ SET search_path = concepts, pg_catalog;
 
 CREATE TABLE concepts (
     conceptid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
+    nodetype text NOT NULL,
     legacyoid text
 );
 
 
 ALTER TABLE concepts.concepts OWNER TO postgres;
 
+--
+-- TOC entry 222 (class 1259 OID 15704302)
+-- Dependencies: 3341 9
+-- Name: concepts; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE d_nodetypes (
+    nodetype text NOT NULL,
+    namespace text NOT NULL DEFAULT 'arches',
+    CONSTRAINT pk_d_nodetypes PRIMARY KEY (nodetype)
+);
+
+
+ALTER TABLE concepts.concepts OWNER TO postgres;
 --
 -- TOC entry 224 (class 1259 OID 15704316)
 -- Dependencies: 9
@@ -1069,7 +1090,7 @@ ALTER TABLE concepts.d_languages OWNER TO postgres;
 CREATE TABLE d_relationtypes (
     relationtype text NOT NULL,
 	category text NOT NULL,
-	skoscompliant BOOLEAN NOT NULL
+	namespace text NOT NULL DEFAULT 'arches'
 );
 
 
@@ -1085,7 +1106,7 @@ CREATE TABLE concepts.d_valuetypes
   valuetype text NOT NULL,
   category text,
   description text,
-  skoscompliant boolean NOT NULL DEFAULT false,
+  namespace text NOT NULL DEFAULT 'arches',
   CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype )
 )
 WITH (
@@ -1152,7 +1173,7 @@ CREATE TABLE data.resource_x_resource
   resourcexid serial NOT NULL,
   entityid1 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
   entityid2 uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
-  reason text,
+  notes text,
   relationshiptype uuid,
   datestarted date,
   dateended date,
@@ -1207,7 +1228,7 @@ ALTER TABLE concepts.vw_concepts OWNER TO postgres;
 --
 
 CREATE VIEW vw_edges AS
-    SELECT relations.conceptidfrom AS source, relations.relationtype AS label, relations.conceptidto AS target, CASE WHEN (relations.relationtype = 'has related concept'::text) THEN 'undirected'::text ELSE 'directed'::text END AS type FROM relations UNION SELECT "values".conceptid AS source, "values".valuetype AS label, "values".valueid AS target, 'directed'::text AS type FROM "values";
+    SELECT relations.conceptidfrom AS source, relations.relationtype AS label, relations.conceptidto AS target, CASE WHEN (relations.relationtype = 'related'::text) THEN 'undirected'::text ELSE 'directed'::text END AS type FROM relations UNION SELECT "values".conceptid AS source, "values".valuetype AS label, "values".valueid AS target, 'directed'::text AS type FROM "values";
 
 
 ALTER TABLE concepts.vw_edges OWNER TO postgres;
@@ -1849,6 +1870,15 @@ CREATE TRIGGER tgr_validate_entitytypes_in_mappings BEFORE INSERT ON mappings FO
 
 
 SET search_path = concepts, pg_catalog;
+
+--
+-- TOC entry 3434 (class 2606 OID 15704589)
+-- Dependencies: 222 3372 229
+-- Name: fk_concepts_x_values; Type: FK CONSTRAINT; Schema: concepts; Owner: postgres
+--
+
+ALTER TABLE ONLY concepts
+    ADD CONSTRAINT fk_concepts_x_nodetypes FOREIGN KEY (nodetype) REFERENCES d_nodetypes(nodetype);
 
 --
 -- TOC entry 3434 (class 2606 OID 15704589)

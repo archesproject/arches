@@ -22,11 +22,12 @@ define([
             'click a.edit-value': 'editValueClicked',
             'click .confirm-delete-yes': 'deleteConfirmed',
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
+            'click a[data-toggle="#related-member-form"]': 'addRelatedMemberClicked',
             'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
 
-        initialize: function() {
+        initialize: function(options) {
             this.render();
         },
 
@@ -35,34 +36,38 @@ define([
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
 
-            if (conceptid) {
-                self.$el.find('.concept-report-loading').removeClass('hidden');
-                self.$el.find('.concept-report-content').addClass('hidden');
+            self.$el.find('.concept-report-loading').removeClass('hidden');
+            self.$el.find('.concept-report-content').addClass('hidden');
 
+            $.ajax({
+                url: '../Concepts/' + conceptid + '?f=html',
+                success: function(response) {
+                    self.$el.find('.concept-report-loading').addClass('hidden');
+                    self.$el.html(response);
 
-                $.ajax({
-                    url: '../Concepts/' + conceptid + '?f=html',
-                    success: function(response) {
-                        self.$el.find('.concept-report-loading').addClass('hidden');
-                        self.$el.html(response);
-                        
-                        //Toggle Concept Heirarchy.  
-                        self.$el.find(".graph-toggle").click(function(){
-                            self.$el.find(".concept-tree").toggle(300);
-                            self.$el.find(".concept-graph").toggle(300);
-                            self.$el.find(".graph-toggle").toggle();
-                        });
-                        new ConceptGraph({
-                            el: self.$el.find(".concept-graph")
-                        });
-                        if (showGraph) {
-                            self.$el.find(".graph-toggle").toggle();
-                            self.$el.find(".concept-tree").toggle(0);
-                            self.$el.find(".concept-graph").toggle(0);
+                    var data = self.$el.find('div[name="modeldata"]').data();
+                    self.model.set(data);
+
+                    if (self.model.get('id')) {
+                        if (self.$el.find(".concept-graph").length > 0) {
+                            //Toggle Concept Heirarchy.  
+                            self.$el.find(".graph-toggle").click(function(){
+                                self.$el.find(".concept-tree").toggle(300);
+                                self.$el.find(".concept-graph").toggle(300);
+                                self.$el.find(".graph-toggle").toggle();
+                            });
+                            new ConceptGraph({
+                                el: self.$el.find(".concept-graph")
+                            });
+                            if (showGraph) {
+                                self.$el.find(".graph-toggle").toggle();
+                                self.$el.find(".concept-tree").toggle(0);
+                                self.$el.find(".concept-graph").toggle(0);
+                            }
                         }
                     }
-                });
-            }
+                }
+            });
         },
 
         deleteClicked: function(e) {
@@ -112,6 +117,15 @@ define([
             this.model.reset();
             var modal = new RelatedConcept({
                 el: $('#related-concept-form')[0],
+                model: this.model
+            });
+            modal.modal.modal('show');
+        },
+
+        addRelatedMemberClicked: function(e){
+            this.model.reset();
+            var modal = new RelatedConcept({
+                el: $('#related-member-form')[0],
                 model: this.model
             });
             modal.modal.modal('show');

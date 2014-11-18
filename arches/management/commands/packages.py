@@ -25,8 +25,8 @@ from django.utils.importlib import import_module
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db, install_db
-from package_utils.resource_loader import ResourceLoader
-import package_utils.resource_remover as resource_remover
+from arches.app.utils.data_management.resources.importer import ResourceLoader
+import arches.app.utils.data_management.resources.remover as resource_remover
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
@@ -47,8 +47,8 @@ class Command(BaseCommand):
             '\'livereload\'=Starts livereload for this package on port 35729'),
         make_option('-s', '--source', action='store', dest='source', default='',
             help='Directory containing a .arches or .shp file containing resource records'),
-        make_option('-t', '--truncate', action='store', dest='truncate', default='False',
-            help='Boolean to indicate if you want to clear all of the business data before loading. The default is False'),
+        make_option('-f', '--format', action='store', dest='format', default='arches',
+            help='Format: shp or arches'),
         make_option('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.'),
     )
@@ -74,8 +74,8 @@ class Command(BaseCommand):
         if options['operation'] == 'build_permissions':
             self.build_permissions()
 
-        if options['operation'] == 'load_resources':     
-            self.load_resources(options['source'])
+        if options['operation'] == 'load_resources':  
+            self.load_resources(options['source'], options['format'])
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
@@ -242,13 +242,13 @@ class Command(BaseCommand):
             Permission.objects.create(codename='delete_%s' % mapping.entitytypeidto, name='%s - delete' % mapping.entitytypeidto , content_type=content_type[0])
 
 
-    def load_resources(self, data_source, truncate=False):
+    def load_resources(self, data_source, format='shp'):
         """
         Runs the resource_loader command found in package_utils
 
         """
         resource_loader = ResourceLoader()
-        resource_loader.load(data_source, truncate)
+        resource_loader.load(data_source, format)
 
 
     def remove_resources(self, load_id):

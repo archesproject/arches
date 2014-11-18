@@ -6,10 +6,6 @@
     padding: 13px;
 }
 
-.concept-tree {
-    margin-top: -20px;
-}
-
 ul.jqtree-tree div.jqtree_common { 
     display: block; 
     margin: 5px 0; 
@@ -244,13 +240,17 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
  
 .link {
     stroke: #ededed;
-    stroke-width: 6px;
+    stroke-width: 5px;
 }
 
+.relatedlink {
+    stroke: #E4E4E4;
+    stroke-width: 3px;
+    stroke-dasharray: 8,5;
+}
 
 .linkMouseover {
     stroke: #b0b0b0;
-    stroke-width: 6px;
     stroke-opacity: .6;
 }
 

@@ -1,34 +1,25 @@
 {% load i18n %}
-<!-- Modal window for adding a new concept -->
+<!-- Import New Scheme Modal Data Entry Form -->
 <form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
             <div class="modal-header arches-modal-header">
                 <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-                <h4 class="modal-title">{% trans "Add Concept Scheme" %}</h4>
+                <h4 id="" class="modal-title">{% trans "Import New Concept Scheme" %}</h4>
             </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <h5 class="arches-modal-section">{% trans "Select an existing group, or add your own" %}</h5>
                         <p> 
                             {% include 'views/concept-scheme-group-dd.htm' %}  
                         </p>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h5 class="arches-modal-section">{% trans "ConceptScheme Name" %}</h5>
-                        <p><input class="form-control" type="text" name="label" required/></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h5 class="arches-modal-section">{% trans "Scope Note" %}</h5>
-                        <p><textarea class="form-control textarea textarea-resizable" rows="3" type="text" name="note"></textarea></p>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <h5 class="arches-modal-section">{% trans "Language" %}</h5>
                         <p> 
@@ -40,11 +31,28 @@
                         </p>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        
+                        <form class="form-inline" role="form">
+                            
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 class="arches-modal-section">{% trans "SKOS File" %}</h5>
+                                <input type="file" class="form-control" style="width: 100%;" name="skosfile">
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
+            <!-- End Form (modal body) -->
+
             <div class="modal-footer">
-                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Cancel</button>
                 <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
             </div>
-        </div>
+          </div>
     </div>
 </form>
+<!-- End Import New Scheme Data Entry Form -->

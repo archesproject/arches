@@ -18,7 +18,7 @@ define([
                 dragAndDrop: true,
                 dataUrl: arches.urls.concept_tree,
                 data: [],
-                autoOpen: true
+                autoOpen: false
             });
 
             this.render();
@@ -44,16 +44,11 @@ define([
                 null,
                 function() {
                     var node;
-                    if (self.model.get('id') === '') {
-                        // get the top level concept from the tree
-                        self._doNotRender = true;
-                        self.model.set({ 'id': self.$el.tree('getTree').children[0].id });
-                        self._doNotRender = undefined;
+                    if (self.model.get('id') !== '') {
+                        node = self.$el.tree('getNodeById', self.model.get('id'));
+                        self.$el.tree('selectNode', node);
+                        self.$el.tree('scrollToNode', node);
                     }
-
-                    node = self.$el.tree('getNodeById', self.model.get('id'));
-                    self.$el.tree('selectNode', node);
-                    self.$el.tree('scrollToNode', node);
                 }
             );
         },
@@ -61,6 +56,9 @@ define([
         treeClick: function(event) {
             // The clicked node is 'event.node'
             var node = event.node;
+            if (! node.load_on_demand){
+                this.$el.tree('toggle', node);                    
+            }            
             if (this.model.get('id') !== node.id) {
                 this.trigger('conceptSelected', node.id);
             } else {

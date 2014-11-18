@@ -54,12 +54,22 @@
                 
                 <!-- Begin RDM Tree -->
                 <div class="col-md-5 col-lg-4">
+
+
                     
                     <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
                         
-                        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{% trans "RDM Schemes" %}</h3>
+                        <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{% trans "RDM" %}</h3>
                             
                             <!-- Scheme Tools for larger screens -->
+<!--                             <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-primary active" id="option1">
+                                    <input type="radio" name="options" autocomplete="off" checked>{% trans "Schemes" %}
+                                </label>
+                                <label class="btn btn-primary" id="option2" >
+                                    <input type="radio" name="options" autocomplete="off">{% trans "Dropdowns" %}
+                                </label>
+                            </div> -->
                             <div class="btn-group pull-right hidden-xs">
                                 <button type="button" class="btn btn-primary">{% trans "Tools" %}</button>
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -68,14 +78,13 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Scheme" %}</a></li>
-                                    <li><a href="#ImportNewScheme" data-toggle="modal">{% trans "Import Scheme" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Scheme" %}</a></li>
                                     <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Scheme" %}</a></li>
                                     <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Scheme" %}</a></li>
                                     <li class="divider"></li>
                                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                                 </ul>
                             </div>
-
 
                         </div>
 
@@ -144,6 +153,10 @@
 
 <div id="delete-scheme-form">
     {% include "views/rdm/modals/delete-scheme-form.htm" %}
+</div>
+
+<div id="import-scheme-form">
+    {% include "views/rdm/modals/import-scheme-form.htm" %}
 </div>
 
 {% endblock content %}

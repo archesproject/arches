@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.conf import settings
 from django.db import transaction, IntegrityError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
@@ -29,21 +30,33 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.utils.skos import SKOSWriter
+from arches.app.utils.skos import SKOSWriter, SKOSReader
 
 def rdm(request, conceptid):
     lang = request.GET.get('lang', 'en-us')    
     
     languages = models.DLanguages.objects.all()
-    concept_schemes = Concept.get_scheme_collections(include=['label'])
-    concept_scheme_labels = [concept.get_preflabel(lang=lang) for concept in concept_schemes]
+
+    concept_scheme_groups = []
+    for concept in models.Concepts.objects.filter(nodetype = 'ConceptSchemeGroup'):
+        concept_scheme_groups.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
+    concept_schemes = []
+    for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
+        scheme = Concept().get(id=concept.pk, include_parentconcepts=True, up_depth_limit=1, include=['label'])
+        group = []
+        for parent in scheme.parentconcepts:
+            if parent.nodetype == 'ConceptSchemeGroup':
+                group.append(parent.get_preflabel(lang=lang).value)
+        concept_schemes.append({'scheme': scheme.get_preflabel(lang=lang), 'group': ','.join(group)})
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
-            'concept_schemes': concept_scheme_labels
+            'concept_schemes': concept_schemes,
+            'concept_scheme_groups': concept_scheme_groups
         }, context_instance=RequestContext(request))
 
 @csrf_exempt
@@ -60,45 +73,90 @@ def concept(request, conceptid):
         emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
         fromdb = request.GET.get('fromdb', 'false') == 'true'
         depth_limit = request.GET.get('depth_limit', None)
+        mode = request.GET.get('mode', 'scheme')
 
         if f == 'html':
             fromdb = True
             depth_limit = 1
+            if conceptid == None:
+                return render_to_response('views/rdm/concept-report.htm', {
+                    'lang': lang,
+                    'concept_count': models.Concepts.objects.filter(nodetype='Concept').count(),
+                    'collection_count': models.Concepts.objects.filter(nodetype='Collection').count(),
+                    'scheme_count': models.Concepts.objects.filter(nodetype='ConceptScheme').count(),
+                    'entitytype_count': models.Concepts.objects.filter(nodetype='EntityType').count(),
+                    'default_report': True
+                }, context_instance=RequestContext(request))
 
         if f == 'skos':
             fromdb = True
+            include_parentconcepts = False
+            include_subconcepts = True
+            depth_limit = None
 
         if fromdb:
             ret = []
             labels = []
             concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
                 include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                depth_limit=depth_limit, up_depth_limit=None)
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
             if f == 'html':
-                languages = models.DLanguages.objects.all()
-                valuetypes = models.ValueTypes.objects.all()
-                relationtypes = models.DRelationtypes.objects.all()
-                prefLabel = concept_graph.get_preflabel(lang=lang).value
-                for value in concept_graph.values:
-                    if value.category == 'label':
-                        labels.append(value)
-                direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
-                return render_to_response('views/rdm/concept-report.htm', {
-                    'lang': lang,
-                    'prefLabel': prefLabel,
-                    'labels': labels,
-                    'concept': concept_graph,
-                    'languages': languages,
-                    'valuetype_labels': valuetypes.filter(category='label'),
-                    'valuetype_notes': valuetypes.filter(category='note'),
-                    'valuetype_related_values': valuetypes.filter(category='undefined'),
-                    'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype='related'),
-                    'concept_paths': concept_graph.get_paths(lang=lang),
-                    'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
-                    'direct_parents': direct_parents
-                }, context_instance=RequestContext(request))
-            
+                if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme':
+                    languages = models.DLanguages.objects.all()
+                    valuetypes = models.ValueTypes.objects.all()
+                    relationtypes = models.DRelationtypes.objects.all()
+                    prefLabel = concept_graph.get_preflabel(lang=lang).value
+                    for subconcept in concept_graph.subconcepts:
+                        subconcept.prefLabel = subconcept.get_preflabel(lang=lang) 
+                    for relatedconcept in concept_graph.relatedconcepts:
+                        relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang) 
+                    for value in concept_graph.values:
+                        if value.category == 'label':
+                            labels.append(value)
+                    direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
+                    return render_to_response('views/rdm/concept-report.htm', {
+                        'lang': lang,
+                        'prefLabel': prefLabel,
+                        'labels': labels,
+                        'concept': concept_graph,
+                        'languages': languages,
+                        'valuetype_labels': valuetypes.filter(category='label'),
+                        'valuetype_notes': valuetypes.filter(category='note'),
+                        'valuetype_related_values': valuetypes.filter(category='undefined'),
+                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related'),
+                        'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
+                        'concept_paths': concept_graph.get_paths(lang=lang),
+                        'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                        'direct_parents': direct_parents,
+                        'in_scheme_id': concept_graph.get_context()
+                    }, context_instance=RequestContext(request))
+
+                else:
+                    languages = models.DLanguages.objects.all()
+                    valuetypes = models.ValueTypes.objects.all()
+                    relationtypes = models.DRelationtypes.objects.all()
+                    prefLabel = concept_graph.get_preflabel(lang=lang).value
+                    for value in concept_graph.values:
+                        if value.category == 'label':
+                            labels.append(value)
+                    direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
+                    return render_to_response('views/rdm/entitytype-report.htm', {
+                        'lang': lang,
+                        'prefLabel': prefLabel,
+                        'labels': labels,
+                        'concept': concept_graph,
+                        'languages': languages,
+                        'valuetype_labels': valuetypes.filter(category='label'),
+                        'valuetype_notes': valuetypes.filter(category='note'),
+                        'valuetype_related_values': valuetypes.filter(category='undefined'),
+                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype='related'),
+                        'related_relations': relationtypes.filter(relationtype = 'member'),
+                        'concept_paths': concept_graph.get_paths(lang=lang),
+                        'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
+                        'direct_parents': direct_parents
+                    }, context_instance=RequestContext(request))
+
             if f == 'skos':
                 skos = SKOSWriter()
                 return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
@@ -118,18 +176,30 @@ def concept(request, conceptid):
             return JSONResponse(se.search('', index='concept', search_field='value', use_wildcard=True))
 
 
-    if request.method == 'POST':
+    if request.method == 'POST': 
+
         if len(request.FILES) > 0:
-            value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
-            value.save()
+            skosfile = request.FILES.get('skosfile', None)
+            imagefile = request.FILES.get('file', None)
 
-            return JSONResponse(value)
+            if imagefile:
+                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+                value.save()
+                return JSONResponse(value)
+
+            elif skosfile:
+                data = JSONDeserializer().deserialize(request.POST.get('data', None))
+                if data:
+                    concept = Concept(data)
+                    concept.save()
+                    skos = SKOSReader()
+                    rdf = skos.read_file(skosfile)
+                    ret = skos.save_concepts_from_skos(rdf, concept_scheme_group=concept.id)
+                    return JSONResponse(ret)
+            
         else:
-            json = request.body
-
-            if json != None:
-                data = JSONDeserializer().deserialize(json)
-                
+            data = JSONDeserializer().deserialize(request.body) 
+            if data:
                 with transaction.atomic():
                     concept = Concept(data)
                     concept.save()
@@ -141,10 +211,9 @@ def concept(request, conceptid):
 
 
     if request.method == 'DELETE':
-        json = request.body
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
-            
+        data = JSONDeserializer().deserialize(request.body) 
+
+        if data:
             with transaction.atomic():
                 concept = Concept(data)
 
@@ -155,7 +224,6 @@ def concept(request, conceptid):
                 return JSONResponse(concept)
 
     return HttpResponseNotFound()
-
 
 @csrf_exempt
 def manage_parents(request, conceptid):
@@ -190,38 +258,56 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def confirm_delete(request, conceptid):
-    concepts_to_delete = [concept.value for concept in Concept.gather_concepts_to_delete(conceptid)]
-
-    #return JSONResponse(concepts_to_delete)
+    lang = request.GET.get('lang', 'en-us')  
+    concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(conceptid, lang=lang).iteritems()]
     return HttpResponse('<ul><li>' + '<li>'.join(concepts_to_delete) + '</ul>')
 
 @csrf_exempt
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
+    removechildren = request.GET.get('removechildren', None)
     query = Query(se, start=0, limit=100)
     phrase = Match(field='value', query=searchString.lower(), type='phrase_prefix')
     query.add_query(phrase)
     results = query.search(index='concept_labels')
 
+    ids = []
+    if removechildren != None:
+        concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
+        print concepts
+        def get_children(concept):
+            ids.append(concept.id)
+
+        concepts.traverse(get_children)
+
+    newresults = []
     cached_scheme_names = {}
     for result in results['hits']['hits']:
-        # first look to see if we've already retrieved the scheme name
-        # else look up the scheme name with ES and cache the result
-        if result['_type'] in cached_scheme_names:
-            result['_type'] = cached_scheme_names[result['_type']]
+        if result['_source']['conceptid'] not in ids:
+            # first look to see if we've already retrieved the scheme name
+            # else look up the scheme name with ES and cache the result
+            if result['_type'] in cached_scheme_names:
+                result['in_scheme_name'] = cached_scheme_names[result['_type']]
+            else:
+                query = Query(se, start=0, limit=100)
+                phrase = Match(field='conceptid', query=result['_type'], type='phrase')
+                query.add_query(phrase)
+                scheme = query.search(index='concept_labels')
+                for label in scheme['hits']['hits']:
+                    if label['_source']['type'] == 'prefLabel':
+                        cached_scheme_names[result['_type']] = label['_source']['value']
+                        result['in_scheme_name'] = label['_source']['value']
+
+            newresults.append(result)
         else:
-            query = Query(se, start=0, limit=100)
-            phrase = Match(field='conceptid', query=result['_type'], type='phrase')
-            query.add_query(phrase)
-            scheme = query.search(index='concept_labels')
-            for label in scheme['hits']['hits']:
-                if label['_source']['type'] == 'prefLabel':
-                    cached_scheme_names[result['_type']] = label['_source']['value']
-                    result['_type'] = label['_source']['value']
+            print result['_source']['value']
+
+    results['hits']['hits'] = newresults
     return JSONResponse(results)
 
 def concept_tree(request):
+    lang = request.GET.get('lang', 'en-us') 
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree(top_concept = '00000000-0000-0000-0000-000000000003')
+    concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)

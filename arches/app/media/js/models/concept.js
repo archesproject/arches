@@ -5,6 +5,7 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         defaults: {
             'id': '',
             'legacyoid': '',
+            'nodetype': '',
             'relationshiptype': '',
             'values': [],
             'subconcepts': [],
@@ -13,9 +14,13 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         },
 
         reset: function(){
-            var conceptid = this.get('id');
+            var id = this.get('id');
+            var legacyoid = this.get('legacyoid');
+            var nodetype = this.get('nodetype');
             this.clear();
-            this.set('id', conceptid);            
+            this.set('id', id);  
+            this.set('legacyoid', legacyoid);  
+            this.set('nodetype', nodetype);            
         }
 
     });
