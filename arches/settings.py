@@ -251,6 +251,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'arches.app.utils.context_processors.livereload',
+    'arches.app.utils.context_processors.resource_types',
 )
 
 

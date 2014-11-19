@@ -112,10 +112,10 @@ class SearchEngine(object):
 
             # strip out any non-printable characters then hash the string into a uuid
             try:
-                _id = term.decode("utf-8").encode('ascii',errors='ignore')
+                _id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
             except Exception as detail:
                 print "\n\nException detail: %s " % (detail)
-                print 'WARNING: failed to index term: %s' %s (term)
+                print 'WARNING: failed to index term: %s' % (_id)
                 pass
 
             if _id:

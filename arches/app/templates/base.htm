@@ -119,17 +119,14 @@
                             <!-- End Inventory-->
 
                             <!-- Resource Editor-->
-                            <li class="dropdown active">
-                                <a href="hip_resource_editor.html" class="dropdown-toggle" data-toggle="dropdown">
+                            <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                                     Resource Manager
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href=""><i class="fa fa-trophy"></i>New Historic Resource</a></li>
-                                    <li><a href=""><i class="fa fa-bookmark-o"></i>New Historic District</a></li>
-                                    <li><a href=""><i class="fa fa-tasks"></i>New Activity</a></li>
-                                    <li><a href=""><i class="fa fa-calendar-o"></i>New Historic Event</a></li>
-                                    <li><a href=""><i class="fa fa-group"></i>New Actor</a></li>
-                                    <li><a href=""><i class="fa fa-file-text-o"></i>New Information Resource</a></li>
+                                    {% for type in resource_types %}
+                                        <li><a href="{% url 'new_resource_manager' type.resourcetypeid type.default_page%}"><i class="{{type.icon_class}}"></i>{{type.name}}</a></li>
+                                    {% endfor %}
                                 </ul>
                             </li>
                             <!-- End Resource Editor -->
@@ -137,7 +134,7 @@
                              <!-- RDM-->
                             <li class="{% if user.is_anonymous %}disabled{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
                                 <a href="{% if user.is_anonymous %}javascript:void(0);{% else %}{% url 'rdm' '' %}{% endif %}">
-                                    Reference Data Manager
+                                    RDM {{what}}
                                 </a>
                             </li>
                             <!-- End RDM-->
