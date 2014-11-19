@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^MapLayers/(?P<entitytypeid>.*)$', 'arches.app.views.maplayers.MapLayers', name="map_layers"),
     url(r'^Search', 'arches.app.views.main.search'),
     url(r'^TermSearch', 'arches.app.views.search.search_terms'),
+    url(r'^resources/new/(?P<entitytypeid>.*)$', 'arches.app.views.resources.new'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

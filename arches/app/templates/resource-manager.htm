@@ -1,0 +1,240 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
+{{ block.super }}
+{% endblock css %}
+
+{% block content %}
+<!--=== App Header ===-->
+<div class="breadcrumbs arches-app-header sticky" id="appheader" style="padding-top: 0px; padding-bottom: 0px;">
+    <div class="container">
+
+        <div class="row">
+            
+            <!-- App Name for larger screens -->
+            <div class="col-sm-4 col-lg-3 hidden-xs">
+                <h1 class="pull-left arches-breadcrumb-title">Resource Data Manager</h1>
+            </div>
+
+            <!-- App Name for xs screens -->
+            <div class="col-xs-12 hidden-sm hidden-md hidden-lg text-center">
+                <h1 class="arches-breadcrumb-title">Resource Data Manager</h1>
+            </div>
+
+            <!-- Resource Name/ID -->
+            <div class="col-sm-8 col-lg-9">
+                <div class="row">
+                    
+                    <!-- Header for larger screens -->
+                    <div class="col-md-12 hidden-xs hidden-sm">
+                        <h2 class="margin-top-10 margin-bottom-0 text-primary">
+                            <i class="fa fa-trophy text-primary"></i>
+                            Castle Wolfenstein <small class="text-primary">Historic Resource</small>
+                        </h2>
+                    </div>
+
+                    <!-- Header for small screens -->
+                    <div class="col-sm-12 hidden-xs hidden-md hidden-lg">
+                        <h2 class="margin-bottom-0 text-primary" style="margin-top: 15px;">
+                            <i class="fa fa-trophy text-primary"></i>
+                            Castle Wolfenstein <small class="text-primary">Historic Resource</small>
+                        </h2>
+                    </div>
+
+                    <!-- Header for xtra small screens -->
+                    <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+                        <h2 class="margin-bottom-10 margin-top-minus-10 text-center text-primary">
+                            <i class="fa fa-trophy text-primary"></i>
+                            Castle Wolfenstein <small class="text-primary">Historic Resource</small>
+                        </h2>
+                    </div> 
+
+                    <div class="col-xs-12 hidden-md hidden-lg margin-bottom-10">
+
+                        <!-- CRUD Form Selector for sm and xs screens -->
+                        <select style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form" id="crud_menu" placeholder="type">
+                            <optgroup label="Describe Resource">   
+                                <option value="1">Names</option>
+                                <option value="2">Dates</option>
+                                <option value="3">Classification/Components</option>
+                                <option value="4">Condition Assessment</option>
+                                <option value="5">Descriptions</option>
+                                <option value="6">Inages and Files</option>
+                                <option value="7" selected>Locations</option>
+                                <option value="8">Measurements</option>
+                                <option value="9">Subjects</option>
+                                <option value="10">Related Resources</option>
+                                <option value="11">External References</option>
+                            </optgroup>
+
+                            <optgroup label="Evaluate Resource">   
+                                <option value="21">Evaluation Criteria</option>
+                                <option value="22">Designation and Protection</option>
+                                
+                            </optgroup>
+
+                            <optgroup label="Manage Resource">   
+                                <option value="31">Review Edit History</option>
+                                <option value="32">Publication Settings</option>
+                                <option value="33">Delete Resource</option>
+                            </optgroup>
+
+                        </select>
+                        <!-- Address Type -->
+                    </div>  
+                </div> 
+
+                <div class="row">
+                    <div class="hidden-xs hidden-sm col-md-12 margin-left-30 text-left pull-left margin-top-0 margin-bottom-20">
+                        <span class="text-muted">Arches ID: 550e8400-e29b-41d4-a716-446655440000</span> 
+                       
+                    </div>
+                </div> 
+            </div>
+            <!-- End Resource Name/ID -->
+
+        </div>
+    </div>
+</div>
+<!--=== End App Header ===-->
+
+
+<!--=== Content Part ===-->
+<div class="block-description arches-secondary-header">
+    <div class="container content padding-top-0">		
+        
+        <!-- Resource Information Themes and CRUD Forms -->
+        <div class="row">
+            
+            <!-- Begin Sidebar Menu 
+            Note that this gets loaded by jQuery on Document Ready -->
+            <div id="" class="col-md-4 col-lg-3 hidden-sm hidden-xs">
+                
+                <ul class="list-group sidebar-nav-v1 arches-sidebar-nav" id="sidebar">
+                                            
+                    <!-- Manage Resource -->
+                    <li class="list-group-item list-toggle arches-list-group-item active">                   
+                        
+                        <a data-toggle="collapse" data-parent="#sidebar-nav" href="#collapse-typography"><i class="fa fa-folder"></i> Resource Description</a>
+                        
+                        <ul id="collapse-typography" class="collapse in">
+                            <li>
+                                <a href="./hip_resource_editor_names.html" class="arches-list-item arches-selected" style="background-color: #f7f7f7;"><i class="fa fa-tag"></i> Resource Summary</a>
+                            </li>
+                            
+                            <li>                            
+                                <a href="./hip_resource_editor_classification.html" class="arches-list-item"><i class="fa fa-bar-chart-o"></i> Classification/Components</a>
+                            </li>
+                            
+                            <li>                           
+                                <a href="./hip_resource_editor_condition.html" class="arches-list-item"><i class="fa fa-asterisk"></i> Condition Assessment</a>
+                            </li>
+
+                            <li>                           
+                                <a href="./hip_resource_editor_descriptions.html" class="arches-list-item"><i class="fa fa-picture-o"></i> Descriptions</a>
+                            </li>
+                            
+                            <li>
+                                <a href="./hip_resource_editor_files.html" class="arches-list-item"><i class="fa fa-file-text-o"></i> Images and Files</a>
+                            </li> 
+
+                            <li>
+                                <a href="./hip_resource_editor_locations.html" class="arches-list-item"><i class="fa fa-map-marker"></i> Locations</a>
+                            </li>
+                            
+                            <li>
+                                <a href="./hip_resource_editor_measurements.html" class="arches-list-item"><i class="fa fa-th-large"></i> Measurements</a>
+                            </li>
+
+                            <li>
+                                <a href="./hip_resource_editor_related_resources.html" class="arches-list-item"><i class="fa fa-exchange"></i> Related Resources</a>
+                            </li>
+                            
+                            <li>
+                                <a href="./hip_resource_editor_external_references.html" class="arches-list-item"><i class="fa fa-random"></i> External References</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- End Manage Resource -->
+
+                    <!-- Evaluate Resource -->
+                    <li class="list-group-item list-toggle arches-list-group-item">
+                        
+                        <a data-toggle="collapse" data-parent="#sidebar-nav" href="#collapse-buttons"><i class="fa fa-dashboard"></i> Evaluate Resource</a>
+                        
+                        <ul id="collapse-buttons" class="collapse">
+                            <li>
+                                <a href="./hip_resource_editor_evaluations.html" class="arches-list-item"><i class="fa fa-star-half-full"></i> Evaluation Criteria</a>
+                            </li>
+                            
+                            <li>
+                                <a href="./hip_resource_editor_designation.html" class="arches-list-item"><i class="fa fa-shield"></i> Designation and Protection</a>
+                            </li>
+                            
+                        </ul>
+                    </li>
+                    <!-- End Evaluate Resource -->
+
+                    <!-- Manage Resource -->
+                    <li class="list-group-item list-toggle arches-list-group-item">                   
+                        
+                        <a data-toggle="collapse" data-parent="#sidebar-nav" href="#collapse-icons"><i class="fa fa-wrench"></i> Manage Resource</a>
+                        
+                        <ul id="collapse-icons" class="collapse">
+                            <li>
+                                <a href="./hip_resource_editor_edit_history.html" class="arches-list-item"><i class="fa fa-step-backward"></i> Review Edit History</a>
+                            </li>
+                            
+                            <li>
+                                <a href="./hip_resource_editor_settings.html" class="arches-list-item"><i class="fa fa-quote-right"></i> Publication Settings</a>
+                            </li>
+                            
+                            <li>                            
+                                <a href="./hip_resource_editor_delete.html" class="arches-list-item"><i class="fa fa-times-circle"></i> Delete Resource</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Manage Resource -->
+
+                </ul>
+            </div>
+            <!-- End Sidebar Menu -->
+
+
+            <!-- Spacer for small screens -->
+            <div class="margin-top-10 hidden-md hidden-lg"></div>
+
+            
+            <!-- CRUD Form -->
+            <div class="col-md-8 col-lg-9">            
+                FORM HERE....
+                
+                <div class="clearfix margin-bottom-10"></div>
+
+            </div>
+            <!-- End Content -->
+        </div>          
+    </div><!--/container-->		
+
+</div>
+<!--=== End Content Part ===-->
+{% endblock %}
