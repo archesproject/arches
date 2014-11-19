@@ -34,9 +34,13 @@ class ResourceForm(object):
 		# here is where we can create the basic format for the form data
 		self.data = {}
 
-	def update(resource=None, post_data=None):
+	def read(self, resource=None, post_data=None):
 		# update form data here w/ resource or post data
 		return
+
+	def write(self, resource):
+		# update resource graph with form data
+		return resource
 
 
 class TestForm(ResourceForm):
@@ -72,11 +76,6 @@ class FakeResource():
 			return selected_form
 		else:
 			return self.form_groups
-
-	def update(self, form_id, post_data):
-		form = self.get_forms(form_id)
-		form.update(post_data)
-		# now apply form data to resource...
 
 	def get_type_name(self):
 		return _('Test Resource')
