@@ -23,11 +23,77 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils.translation import ugettext as _
+
+class ResourceForm(object):
+	id = ''
+	icon = ''
+	name = ''
+
+	def __init__(self):
+		# here is where we can create the basic format for the form data
+		self.data = {}
+
+	def update(resource=None, post_data=None):
+		# update form data here w/ resource or post data
+		return
+
+
+class TestForm(ResourceForm):
+	id = 'test-form'
+	icon = 'fa-folder'
+	name = _('Test Form')
+
+
+# mocked up for form collection
+class FakeResource():
+	id = None
+	form_groups = [{
+		'id': 'resource-description',
+		'icon':'fa-folder',
+		'name': _('Resource Description'),
+		'forms': [
+			TestForm()
+		]
+	},{
+		'id': 'resource-evaluation',
+		'icon': 'fa-dashboard',
+		'name': _('Evaluate Resource'),
+		'forms': []
+	}]
+
+	def get_forms(self, form_id=None):
+		if form_id:
+			selected_form = None
+			forms = [form for group in self.form_groups for form in group.forms]
+			for form in forms:
+				if form.id == form_id:
+					selected_form = form
+			return selected_form
+		else:
+			return self.form_groups
+
+	def update(self, form_id, post_data):
+		form = self.get_forms(form_id)
+		form.update(post_data)
+		# now apply form data to resource...
+
+	def get_type_name(self):
+		return _('Test Resource')
+
+	def get_name(self):
+		return _('Unnamed Resource')
+
 
 def new(request, entitytypeid):
-    return render_to_response('resource-manager.htm', {
+	resource = FakeResource()
+	return render_to_response('resource-manager.htm', {
             'main_script': 'resource-manager',
             'active_page': 'Home',
+            'resource': resource,
+            'resource_name': resource.get_name(),
+            'resource_type_name': resource.get_type_name(),
+            'form_groups': resource.get_forms()
         },
         context_instance=RequestContext(request))
 
