@@ -30,11 +30,11 @@ def resource_manager(request, resourcetypeid=None, formname=None, resourceid=Non
 
     resource = Resource({'entityid':'laskdj'})
     entityid = resource.entityid    
-    what = resource.shit()
+    #what = resource.shit()
 
 
     return render_to_response('resource-manager.htm', {
-            'what': what,
+            #'what': what,
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,
