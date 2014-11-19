@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from operator import methodcaller
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -185,10 +185,10 @@ class Concept(object):
 
     def delete(self, delete_self=False):
         for subconcept in self.subconcepts:
-            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
 
             for key, concept in concepts_to_delete.iteritems():
-                models.Concepts.objects.get(pk=concept.conceptid).delete()
+                models.Concepts.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
             conceptrelations = models.ConceptRelations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
@@ -221,17 +221,62 @@ class Concept(object):
         return
 
     @staticmethod
-    def gather_concepts_to_delete(conceptid, lang='en-us'):
-        concepts_to_delete = {}
-        concept = Concept().get(id=conceptid, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
-        
-        def find_concepts(concept):
-            if len(concept.parentconcepts) <= 1:
-                concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
-                for subconcept in concept.subconcepts:
-                    find_concepts(subconcept)
+    def gather_concepts_to_delete(concept, lang='en-us'):
+        """
+        Gets a dictionary of all the concepts ids to delete
+        The values of the dictionary keys differ somewhat depending on the node type being deletedrelatedconcept
+        If the nodetype == 'Concept' then return ConceptValue objects keyed to the concept id
+        If the nodetype == 'ConceptScheme' or 'ConceptSchemeGroup' then return a text string representing the 'prefLabel' keyed to the concept id
+        We do this because it takes so long to gather the ids of the concepts when deleting a Scheme or Group
 
-        find_concepts(concept)
+        """
+
+        concepts_to_delete = {}
+
+        # Here we have to worry about making sure we don't delete nodes that have more than 1 parent
+        if concept.nodetype == 'Concept':
+            concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
+            
+            def find_concepts(concept):
+                if len(concept.parentconcepts) <= 1:
+                    concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
+                    for subconcept in concept.subconcepts:
+                        find_concepts(subconcept)
+
+            find_concepts(concept)
+            return concepts_to_delete
+
+        # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
+        if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
+
+            sql = """WITH RECURSIVE children AS (
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, 1 AS depth       ---|NonRecursive Part
+                    FROM concepts.relations d
+                    JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
+                    JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
+                    WHERE d.conceptidfrom = '%s'
+                    and c.valuetype = 'prefLabel'
+                    and c2.valuetype = 'prefLabel'
+                    and d.relationtype = 'narrower'
+                UNION
+                    SELECT a.conceptidfrom, a.conceptidto, v2.value, v.value as valueto, depth+1      ---|RecursivePart
+                    FROM concepts.relations  a
+                    JOIN children b ON(b.conceptidto = a.conceptidfrom) 
+                    JOIN concepts.values v ON(v.conceptid = a.conceptidto) 
+                    JOIN concepts.values v2 ON(v2.conceptid = a.conceptidfrom) 
+                    WHERE  v.valuetype = 'prefLabel'
+                    and v2.valuetype = 'prefLabel'
+                    and a.relationtype = 'narrower'
+            ) 
+            SELECT conceptidfrom, conceptidto, value, valueto FROM children ;""" % (concept.id)
+
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            for row in rows:
+                concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
+                concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
+
         return concepts_to_delete
 
     def traverse(self, func, direction='down', scope=None):
@@ -351,11 +396,11 @@ class Concept(object):
         se = SearchEngineFactory().create()
         
         for subconcept in self.subconcepts:
-            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
 
             for key, concept in concepts_to_delete.iteritems():
                 query = Query(se, start=0, limit=10000)
-                phrase = Match(field='conceptid', query=concept.conceptid, type='phrase')
+                phrase = Match(field='conceptid', query=key, type='phrase')
                 query.add_query(phrase)
                 query.delete(index='concept_labels')
 
