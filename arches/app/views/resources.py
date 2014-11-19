@@ -29,12 +29,10 @@ from django.utils.translation import ugettext as _
 def resource_manager(request, resourcetypeid=None, formname=None, resourceid=None):
 
     resource = Resource({'entityid':'laskdj'})
-    entityid = resource.entityid    
-    #what = resource.shit()
+    entityid = resource.entityid
 
 
     return render_to_response('resource-manager.htm', {
-            #'what': what,
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,
@@ -50,23 +48,20 @@ class ResourceForm(object):
 	icon = ''
 	name = ''
 
-	def __init__(self):
+	def __init__(self, resource=None):
 		# here is where we can create the basic format for the form data
+		self.resource = resource
 		self.data = {}
 
-	def read(self, resource=None, post_data=None):
-		# update form data here w/ resource or post data
-		return
-
-	def write(self, resource):
-		# update resource graph with form data
-		return resource
+	def update(self, post_data):
+		# update resource w/ post data
+		return self.resource
 
 
-class TestForm(ResourceForm):
-	id = 'test-form'
-	icon = 'fa-folder'
-	name = _('Test Form')
+# class TestForm(ResourceForm):
+# 	id = 'test-form'
+# 	icon = 'fa-folder'
+# 	name = _('Test Form')
 
 
 # # mocked up for form collection
