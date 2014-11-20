@@ -23,7 +23,9 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from arches.app.models import models
 from arches.app.models.resource import Resource
+from arches.app.models.concept import Concept
 from django.utils.translation import ugettext as _
 
 def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
@@ -61,11 +63,19 @@ class ResourceForm(object):
     icon = ''
     name = ''
 
-    def __init__(self, resource=None):
+    def __init__(self, resource):
         # here is where we can create the basic format for the form data
         self.resource = resource
         self.data = {}
+        self.domains = {}
 
 	def update(self, post_data):
 		# update resource w/ post data
 		return self.resource
+
+    def get_e55_domain(self, entitytypeid, lang='en-us'):
+        conceptid = models.EntityTypes.objects.get(pk=entitytypeid).conceptid
+        concept_graph = Concept().get(id=conceptid, include_subconcepts=False, 
+                include_parentconcepts=False, include_relatedconcepts=True,
+                depth_limit=0, up_depth_limit=0, lang=lang)
+        return concept_graph.relatedconcepts

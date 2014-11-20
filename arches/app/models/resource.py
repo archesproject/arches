@@ -60,7 +60,7 @@ class Resource(Entity):
         for form in forms:
             if form.id == form_id:
                 selected_form = form
-        return selected_form()
+        return selected_form(self)
 
     def get_type_name(self):
         resource_name = ''
