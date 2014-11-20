@@ -28,7 +28,10 @@ from django.utils.translation import ugettext as _
 
 def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
     resource = Resource()
-    resource.entitytypeid = resourcetypeid
+    if resourceid:
+        resource.get(resourceid)
+    else:
+        resource.entitytypeid = resourcetypeid
     form = resource.get_form(form_id)
 
     if request.method == 'POST':
