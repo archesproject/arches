@@ -28,8 +28,15 @@ from django.utils.translation import ugettext as _
 
 def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
     resource = Resource()
+    resource.entitytypeid = resourcetypeid
+    form = resource.get_form(form_id)
+
+    if request.method == 'POST':
+        form.update(request.POST)
+        resource.save()
 
     return render_to_response('resource-manager.htm', {
+            'form': form,
             'form_template': 'forms/' + form_id + '.htm',
             'form_id': form_id,
             'resourcetypeid': resourcetypeid,
@@ -38,9 +45,10 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
             'resource': resource,
             'resource_name': resource.get_name(),
             'resource_type_name': resource.get_type_name(),
-            'form_groups': resource.get_forms()        
+            'form_groups': resource.get_forms()
         },
         context_instance=RequestContext(request))
+
 
 
 class ResourceForm(object):
@@ -56,57 +64,3 @@ class ResourceForm(object):
 	def update(self, post_data):
 		# update resource w/ post data
 		return self.resource
-
-
-# class TestForm(ResourceForm):
-# 	id = 'test-form'
-# 	icon = 'fa-folder'
-# 	name = _('Test Form')
-
-
-# # mocked up for form collection
-# class FakeResource():
-# 	id = None
-# 	form_groups = [{
-# 		'id': 'resource-description',
-# 		'icon':'fa-folder',
-# 		'name': _('Resource Description'),
-# 		'forms': [
-# 			TestForm()
-# 		]
-# 	},{
-# 		'id': 'resource-evaluation',
-# 		'icon': 'fa-dashboard',
-# 		'name': _('Evaluate Resource'),
-# 		'forms': []
-# 	}]
-
-# 	def get_forms(self, form_id=None):
-# 		if form_id:
-# 			selected_form = None
-# 			forms = [form for group in self.form_groups for form in group.forms]
-# 			for form in forms:
-# 				if form.id == form_id:
-# 					selected_form = form
-# 			return selected_form
-# 		else:
-# 			return self.form_groups
-
-# 	def get_type_name(self):
-# 		return _('Test Resource')
-
-# 	def get_name(self):
-# 		return _('Unnamed Resource')
-
-
-# def new(request, entitytypeid):
-# 	resource = FakeResource()
-# 	return render_to_response('resource-manager.htm', {
-#             'main_script': 'resource-manager',
-#             'active_page': 'Home',
-#             'resource': resource,
-#             'resource_name': resource.get_name(),
-#             'resource_type_name': resource.get_type_name(),
-#             'form_groups': resource.get_forms()
-#         },
-#         context_instance=RequestContext(request))

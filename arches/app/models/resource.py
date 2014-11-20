@@ -59,15 +59,17 @@ class Resource(Entity):
     def get_resource_types():
         raise NotImplementedError
      
-    def get_forms(self, form_id=None):
-        if form_id:
-            selected_form = None
-            forms = [form for group in self.form_groups for form in group.forms]
-            for form in forms:
-                if form.id == form_id:
-                    selected_form = form
-            return selected_form
-        else:
+
+    def get_form(self, form_id):
+        selected_form = None
+        forms = [form for group in self.form_groups for form in group['forms']]
+        for form in forms:
+            if form.id == form_id:
+                selected_form = form(self)
+        return selected_form
+
+
+    def get_forms(self):
             return self.form_groups
 
     def get_type_name(self):
