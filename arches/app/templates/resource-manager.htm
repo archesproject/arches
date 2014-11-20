@@ -137,8 +137,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             
             <!-- CRUD Form -->
-            <div class="col-md-8 col-lg-9" id="resource-manager-form">
-                {% include form_template %}
+            <div class="col-md-8 col-lg-9">
+                <div id="resource-manager-form">{% include form_template %}</div>
                 <div class="clearfix margin-bottom-10"></div>
 
             </div>
@@ -148,4 +148,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </div>
 <!--=== End Content Part ===-->
+
+<div style="display:none;" id="form-data">
+    <input type="hidden" id="form-id" value="{{form_id}}">
+</div>
 {% endblock %}

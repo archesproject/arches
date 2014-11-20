@@ -81,6 +81,14 @@ require([
             }
 
         });
+        
+        require(['forms/' + $('#form-id').val()], function (FormView) {
+            if (FormView) {
+                new FormView({
+                    el: $('#resource-manager-form')[0]
+                });
+            }
+        });
 
     });
 });
