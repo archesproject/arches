@@ -48,7 +48,6 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,
-            'data': form.data,
             'resource_name': resource.get_name(),
             'resource_type_name': resource.get_type_name(),
             'form_groups': resource.form_groups

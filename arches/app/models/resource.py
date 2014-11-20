@@ -52,19 +52,15 @@ class Resource(Entity):
         super(Resource, self).__init__(*args, **kwargs)
 
         self.form_groups = []
-     
-    def get_forms(self):
-        return self.form_groups
     
+
     def get_form(self, form_id=None):
-        if form_id:
-            selected_form = None
-            forms = [form for group in self.form_groups for form in group['forms']]
-            for form in forms:
-                if form.id == form_id:
-                    selected_form = form
-            return selected_form()
-        return None
+        selected_form = None
+        forms = [form for group in self.form_groups for form in group['forms']]
+        for form in forms:
+            if form.id == form_id:
+                selected_form = form
+        return selected_form()
 
     def get_type_name(self):
         resource_name = ''
