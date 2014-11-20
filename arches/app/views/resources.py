@@ -32,6 +32,7 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
     return render_to_response('resource-manager.htm', {
             'form_template': 'forms/' + form_id + '.htm',
             'form_id': form_id,
+            'resourcetypeid': resourcetypeid,
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,

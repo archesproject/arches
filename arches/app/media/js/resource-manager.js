@@ -81,12 +81,26 @@ require([
             }
 
         });
+
+        var dirty = false;
         
         require(['forms/' + $('#form-id').val()], function (FormView) {
             if (FormView) {
-                new FormView({
+                var formView = new FormView({
                     el: $('#resource-manager-form')[0]
                 });
+                formView.on('change', function () {
+                    dirty = true;
+                });
+            }
+        });
+
+        $('.form-link').click(function (e) {
+            var formurl = $(e.target).data().formurl;
+            if (dirty) {
+                // make sure they are cool with losing edits before switching...
+            } else {
+                document.location.href = formurl;
             }
         });
 
