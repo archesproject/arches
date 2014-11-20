@@ -45,7 +45,7 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
             'resource': resource,
             'resource_name': resource.get_name(),
             'resource_type_name': resource.get_type_name(),
-            'form_groups': resource.get_forms()
+            'form_groups': resource.form_groups
         },
         context_instance=RequestContext(request))
 

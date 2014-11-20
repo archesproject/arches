@@ -69,11 +69,9 @@ class Resource(Entity):
         return selected_form
 
 
-    def get_forms(self):
-        return self.form_groups
-
     def get_type_name(self):
         return _('Test Resource')
+
 
     def get_name(self):
         return _('Unnamed Resource')
