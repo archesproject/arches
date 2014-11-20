@@ -27,10 +27,7 @@ from arches.app.models.resource import Resource
 from django.utils.translation import ugettext as _
 
 def resource_manager(request, resourcetypeid=None, formname=None, resourceid=None):
-
-    resource = Resource({'entityid':'laskdj'})
-    entityid = resource.entityid
-
+    resource = Resource()
 
     return render_to_response('resource-manager.htm', {
             'main_script': 'resource-manager',
