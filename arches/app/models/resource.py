@@ -53,11 +53,6 @@ class Resource(Entity):
 
         self.id = None
         self.form_groups = []
-    
-
-    @staticmethod
-    def get_resource_types():
-        raise NotImplementedError
      
 
     def get_form(self, form_id):
@@ -70,11 +65,20 @@ class Resource(Entity):
 
 
     def get_type_name(self):
-        return _('Test Resource')
+        resource_name = ''
+        for resource_type in self.get_resource_types():
+            if resource_type['resourcetypeid'] == self.entitytypeid:
+                return resource_type['name']
+        return resource_name
 
 
     def get_name(self):
         return _('Unnamed Resource')
+
+
+    @staticmethod
+    def get_resource_types():
+        raise NotImplementedError
 
 
 
