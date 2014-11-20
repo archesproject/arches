@@ -70,7 +70,7 @@ class Resource(Entity):
 
 
     def get_forms(self):
-            return self.form_groups
+        return self.form_groups
 
     def get_type_name(self):
         return _('Test Resource')
