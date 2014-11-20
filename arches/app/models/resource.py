@@ -54,7 +54,7 @@ class Resource(Entity):
         self.form_groups = []
     
 
-    def get_form(self, form_id=None):
+    def get_form(self, form_id):
         selected_form = None
         forms = [form for group in self.form_groups for form in group['forms']]
         for form in forms:
