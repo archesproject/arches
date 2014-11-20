@@ -72,7 +72,7 @@ class Entity(object):
                     self.load(JSONDeserializer().deserialize(args[0]))  
             elif isinstance(args[0], Entity):
                 self = args[0]
-            elif isinstance(args[0], object):
+            elif args[0] != None and isinstance(args[0], object):
                 self.load(args[0])  
 
     def __repr__(self):

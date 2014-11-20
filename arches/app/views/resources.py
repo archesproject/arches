@@ -27,14 +27,16 @@ from arches.app.models.resource import Resource
 from django.utils.translation import ugettext as _
 
 def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
-    resource = Resource()
-    if resourceid:
-        resource.get(resourceid)
-    else:
-        resource.entitytypeid = resourcetypeid
+
+    if resourceid != None:
+        resource = Resource(resourceid)
+    elif resourcetypeid != None:
+        resource = Resource({'entitytypeid': resourcetypeid})
+
     form = resource.get_form(form_id)
 
     if request.method == 'POST':
+        # get the values from the form and pass to the resource
         form.update(request.POST)
         resource.save()
 
@@ -46,23 +48,24 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,
+            'data': form.data,
             'resource_name': resource.get_name(),
             'resource_type_name': resource.get_type_name(),
             'form_groups': resource.form_groups
         },
-        context_instance=RequestContext(request))
+        context_instance=RequestContext(request))        
 
 
 
 class ResourceForm(object):
-	id = ''
-	icon = ''
-	name = ''
+    id = ''
+    icon = ''
+    name = ''
 
-	def __init__(self, resource=None):
-		# here is where we can create the basic format for the form data
-		self.resource = resource
-		self.data = {}
+    def __init__(self, resource=None):
+        # here is where we can create the basic format for the form data
+        self.resource = resource
+        self.data = {}
 
 	def update(self, post_data):
 		# update resource w/ post data
