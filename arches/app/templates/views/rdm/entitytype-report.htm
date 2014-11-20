@@ -93,12 +93,15 @@
                     </h5>
                 </dt>
 
-                {% for value in concept.relatedconcepts %}
+                {% for concept in concept.relatedconcepts %}
+                    {% for value in concept.values %}
+                    {% if value.type == 'prefLabel' %}
                     <dd class="arches-RDM-label-highlighted">
                         <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Remove the relationship to this concept?" %}" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"></i></a>
                         <a href="javascript:void(0);" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{value.conceptid}}">{{value.value}} </a>
-                        <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
                     </dd>
+                    {% endif %}
+                    {% endfor %}
                 {% endfor %}
                 
             </dl>
