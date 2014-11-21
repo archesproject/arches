@@ -229,6 +229,17 @@ class VwNodes(models.Model):
     class Meta:
         db_table = u'vw_nodes'
 
+class VwEntitytypeDomains(models.Model):
+    entitytypeid = models.TextField(blank=True)
+    conceptid = models.TextField(blank=True) # This field type is a guess.
+    valueid = models.TextField(primary_key=True) # This field type is a guess.
+    value = models.TextField(blank=True)
+    valuetype = models.TextField(blank=True)
+    languageid = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'vw_entitytype_domains'
+
 class AuthMessage(models.Model):
     id = models.IntegerField(primary_key=True)
     user = models.ForeignKey('AuthUser')

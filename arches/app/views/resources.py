@@ -76,9 +76,5 @@ class ResourceForm(object):
 		# update resource w/ post data
 		return self.resource
 
-    def get_e55_domain(self, entitytypeid, lang='en-us'):
-        conceptid = models.EntityTypes.objects.get(pk=entitytypeid).conceptid
-        concept_graph = Concept().get(id=conceptid, include_subconcepts=False, 
-                include_parentconcepts=False, include_relatedconcepts=True,
-                depth_limit=0, up_depth_limit=0, lang=lang)
-        return concept_graph.relatedconcepts
+    def get_e55_domain(self, entitytypeid):
+        return models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid)
