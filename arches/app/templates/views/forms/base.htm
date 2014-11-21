@@ -1,39 +1,42 @@
-<div class="right-inner arches-box-grey-border padding-10" id="crud" style="">
+<form method="POST" id="resource_data_management_form" class="form-inline arches-form" role="form">
+    <div class="right-inner arches-box-grey-border padding-10" id="crud" style="">
                 
-    <!-- Theme Title -->
-    <div class="row">
-        <div class="col-xs-12">
-            
-            <div class="headline margin-bottom-10 padding-left-10">
-                <h3 class="headline text-primary"><i class="fa fa-tag text-primary"></i>{{form.name}}</h3>
+        <!-- Theme Title -->
+        <div class="row">
+            <div class="col-xs-12">
+                
+                <div class="headline margin-bottom-10 padding-left-10">
+                    <h3 class="headline text-primary"><i class="fa fa-tag text-primary"></i>{{form.name}}</h3>
 
-                <!-- Save/Discard Buttons for small, medium and large screens -->
-                <span class="pull-right margin-top-minus-10 hidden-xs">
-                    <button class="btn btn-danger"> 
-                        <i class="fa fa-times"></i>&nbsp; Discard edits
-                    </button>
-                    <button class="btn btn-success"> 
-                        <i class="fa fa-check"></i>&nbsp; Save edits
-                    </button>
-                </span>
+                    <!-- Save/Discard Buttons for small, medium and large screens -->
+                    <span class="pull-right margin-top-minus-10 hidden-xs">
+                        <button class="btn btn-danger"> 
+                            <i class="fa fa-times"></i>&nbsp; Discard edits
+                        </button>
+                        <button type="submit" id="submitform" class="btn btn-success"> 
+                            <i class="fa fa-check"></i>&nbsp; Save edits
+                        </button>
+                    </span>
 
-                <!-- Save/Discard Buttons for xs screens -->
-                <span class="hidden-sm hidden-md hidden-lg">
-                    </br>
-                    <button class="btn btn-danger"> 
-                        <i class="fa fa-times"></i>&nbsp; Discard edits
-                    </button>
-                    <button class="btn btn-success"> 
-                        <i class="fa fa-check"></i>&nbsp; Save edits
-                    </button>
-                </span>
+                    <!-- Save/Discard Buttons for xs screens -->
+                    <span class="hidden-sm hidden-md hidden-lg">
+                        </br>
+                        <button class="btn btn-danger"> 
+                            <i class="fa fa-times"></i>&nbsp; Discard edits
+                        </button>
+                        <button type="submit" id="submitform" class="btn btn-success"> 
+                            <i class="fa fa-check"></i>&nbsp; Save edits
+                        </button>
+                    </span>
 
+                </div>
             </div>
         </div>
+        <!-- End Theme Title -->
+
+        {% block form_content %}
+        {% endblock form_content %}
+
+        <input id="formdata" name="formdata" type="hidden" value="{{formdata}}"/>
     </div>
-    <!-- End Theme Title -->
-
-    {% block form_content %}
-    {% endblock form_content %}
-
-</div>
+</form>

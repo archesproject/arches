@@ -27,7 +27,9 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
 from django.utils.translation import ugettext as _
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+@csrf_exempt
 def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
 
     if resourceid != None:
@@ -40,10 +42,11 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
     if request.method == 'POST':
         # get the values from the form and pass to the resource
         form.update(request.POST)
-        resource.save()
+        #resource.save()
 
     return render_to_response('resource-manager.htm', {
             'form': form,
+            'formdata': JSONSerializer().serialize(form.data),
             'form_template': 'forms/' + form_id + '.htm',
             'form_id': form_id,
             'resourcetypeid': resourcetypeid,

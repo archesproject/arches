@@ -87,7 +87,7 @@ require([
         require(['forms/' + $('#form-id').val()], function (FormView) {
             if (FormView) {
                 var formView = new FormView({
-                    el: $('#resource-manager-form')[0]
+                    el: $('#resource_data_management_form')[0]
                 });
                 formView.on('change', function () {
                     dirty = true;
