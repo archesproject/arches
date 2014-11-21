@@ -1,7 +1,10 @@
 define(['jquery', 'backbone'], function ($, Backbone) {
     return Backbone.View.extend({
-        events: {
-            'click #submitform': 'submit'
+        
+        events: function(){
+            return {
+                'click #submitform': 'submit'  
+            }
         },
 
         initialize: function() {
@@ -12,5 +15,6 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         submit: function(){
             this.form.submit();
         }
+        
     });
 });
