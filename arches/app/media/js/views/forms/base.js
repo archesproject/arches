@@ -1,4 +1,4 @@
-define(['jquery', 'backbone'], function ($, Backbone) {
+define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
     return Backbone.View.extend({
         
         events: function(){
@@ -7,14 +7,22 @@ define(['jquery', 'backbone'], function ($, Backbone) {
             }
         },
 
+        constructor: function (options) {
+            Backbone.View.apply(this, arguments);
+
+            ko.applyBindings(this.viewModel, this.el);
+            return this;
+        },
+
         initialize: function() {
             this.form = this.$el;
             this.formdata = JSON.parse(this.form.find('#formdata').val());
             this._rawdata = JSON.parse(this.form.find('#formdata').val());
+            this.viewModel = {};
         },
 
         getData: function(){
-            return this.formdata;
+            return ko.toJSON(this.viewModel);
         },
 
         validate: function(){
