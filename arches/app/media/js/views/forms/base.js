@@ -16,9 +16,8 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
 
         initialize: function() {
             this.form = this.$el;
-            this.formdata = JSON.parse(this.form.find('#formdata').val());
+            this.viewModel = JSON.parse(this.form.find('#formdata').val());
             this._rawdata = JSON.parse(this.form.find('#formdata').val());
-            this.viewModel = {};
         },
 
         getData: function(){
@@ -31,11 +30,9 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
 
         submit: function(){
             if (this.validate()){
-                //this.formdata = this.getData();
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }
         }
-
     });
 });
