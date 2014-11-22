@@ -15,9 +15,16 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
         },
 
         initialize: function() {
+            var self = this;
             this.form = this.$el;
-            this.viewModel = JSON.parse(this.form.find('#formdata').val());
+            this.formdata = JSON.parse(this.form.find('#formdata').val());
             this._rawdata = JSON.parse(this.form.find('#formdata').val());
+
+            this.viewModel = {};
+
+            $.each(this.formdata, function( key, value ) {
+                self.viewModel[key] = ko.observableArray(value);
+            });
         },
 
         getData: function(){

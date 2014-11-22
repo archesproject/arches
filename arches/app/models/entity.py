@@ -118,7 +118,6 @@ class Entity(object):
 
         return self
 
-    @transaction.commit_on_success
     def save(self, username='', note=''):
         """
         Saves an entity back to the db wrapped in a transaction
@@ -228,7 +227,6 @@ class Entity(object):
 
         return domainentity
 
-    @transaction.commit_on_success
     def delete(self, username='', note='', delete_root=False):
         """
         Deltes an entity from the db wrapped in a transaction 
@@ -310,6 +308,25 @@ class Entity(object):
             self.append_child(relatedentity.load(entity))
         return self
 
+    def copy(self, shallow=False):
+        """
+        Returns a copy of this entity
+        if shallow is True then don't retrun any relatedentities
+
+        """
+        ret = {}
+        for key, value in self.__dict__.items():
+            if not key.startswith("__"):
+                if key == 'relatedentities':
+                    if shallow:
+                        ret[key] = []
+                    else:
+                        ret[key] = [relatedentity.copy(shallow=shallow) for relatedentity in self.relatedentities]
+                else:
+                    ret[key] = value
+
+        return Entity(ret)
+
     def add_related_entity(self, entitytypeid, property, value, entityid):
         """
         Add a related entity to this entity instance
@@ -361,12 +378,16 @@ class Entity(object):
         """        
 
         # if the nodes are equal attempt a merge otherwise don't bother
-        if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property and entitytomerge.entityid == ''):
+        if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property):
             # if the value of each node is not blank then the nodes can't be merged
             # and we simply append entitytomerge node to self's parent node
             if self.value != '' and entitytomerge.value != '':
                 self.get_parent().append_child(entitytomerge)
                 return self
+
+            # update self.entityid if it makes sense to do so  
+            if self.entityid == '' and entitytomerge.entityid != '':
+                self.entityid = entitytomerge.entityid
 
             # update self.value if it makes sense to do so  
             if self.value == '' and entitytomerge.value != '':
@@ -376,7 +397,7 @@ class Entity(object):
             # try to merge any relatedentities of self and entitytomerge 
             for relatedentitytomerge in entitytomerge.relatedentities:
                 for relatedentity in self.relatedentities:
-                    if (relatedentity.entitytypeid == relatedentitytomerge.entitytypeid and relatedentity.property == relatedentitytomerge.property and relatedentitytomerge.entityid == ''):   
+                    if (relatedentity.entitytypeid == relatedentitytomerge.entitytypeid and relatedentity.property == relatedentitytomerge.property):   
                         relatedentity.merge(relatedentitytomerge)
                         relatedentitiesmerged.append(relatedentitytomerge)
 
@@ -396,6 +417,8 @@ class Entity(object):
 
         selfEntities = self.find_entities_by_type_id(entitytypeid)
         foundEntities = entitytomerge.find_entities_by_type_id(entitytypeid)
+        print entitytypeid
+        print len(foundEntities)
         if len(selfEntities) == 1 and len(foundEntities) == 1:
             for foundEntity in foundEntities[0].relatedentities:
                 selfEntities[0].append_child(foundEntity)
@@ -448,9 +471,10 @@ class Entity(object):
                 entity.parentid = entity.get_parent().entityid
             else:
                 entity.parentid = None
-            flat_entity = Entity(entity.entityid)
-            flat_entity.relatedentities = []
-            ret.append(flat_entity)
+            # flat_entity = Entity(entity.entityid)
+            # flat_entity.relatedentities = []
+            # ret.append(flat_entity)
+            ret.append(entity.copy(shallow=True))
 
         # def gather_entities_inplace(entity):
         #     entity.relatedentities = []
@@ -536,7 +560,7 @@ class Entity(object):
         entities = self.find_entities_by_type_id(entitytypeid)
 
         if append or len(entities) == 0:
-            schema = Entity.get_mapping_schem2a(self.entitytypeid)
+            schema = Entity.get_mapping_schema(self.entitytypeid)
             entity = Entity()
             entity.create_from_mapping(self.entitytypeid, schema[entitytypeid]['steps'], entitytypeid, value)
             self.merge_at(entity, schema[entitytypeid]['mergenodeid'])
@@ -546,7 +570,7 @@ class Entity(object):
             entities[0].value = value 
             return entities[0]
 
-    def create_from_mapping(self, entitytypeid, mappingsteps, leafentitytypeid, leafvalue):
+    def create_from_mapping(self, entitytypeid, mappingsteps, leafentitytypeid, leafvalue, leafentityid=''):
         currentEntity = self
         currentEntity.entitytypeid = entitytypeid
         for step in mappingsteps:
@@ -554,7 +578,8 @@ class Entity(object):
             value = ''
             if step['entitytyperange'] == leafentitytypeid:
                 value = leafvalue
-            currentEntity = currentEntity.add_related_entity(step['entitytyperange'], step['propertyid'], value, '')
+            currentEntity = currentEntity.add_related_entity(step['entitytyperange'], step['propertyid'], value, leafentityid)
+        return self
 
     @classmethod
     def get_mapping_schema(cls, entitytypeid):

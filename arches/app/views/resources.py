@@ -23,6 +23,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.db import transaction
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
@@ -41,8 +42,15 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
 
     if request.method == 'POST':
         # get the values from the form and pass to the resource
-        form.update(request.POST)
-        #resource.save()
+        data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
+        form.update(data)
+
+        with transaction.atomic():
+            resource.save()
+            resource.index()
+            resourceid = resource.entityid
+
+            return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
     return render_to_response('resource-manager.htm', {
             'form': form,
@@ -72,9 +80,51 @@ class ResourceForm(object):
         self.data = {}
         self.domains = {}
 
-	def update(self, post_data):
+	def update(self, data):
 		# update resource w/ post data
-		return self.resource
+		return 
 
     def get_e55_domain(self, entitytypeid):
         return models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value')
+
+    def get_nodes(self, entitytypeid):
+        ret = []
+        entities = self.resource.find_entities_by_type_id(entitytypeid)
+        for entity in entities:
+            data = {}
+
+            for entity in entity.flatten():
+                #data[entity.entitytypeid] = self.encode_entity(entity)
+                data = dict(data.items() + self.encode_entity(entity).items())
+            ret.append(data)
+        return ret
+
+    def encode_entity(self, entity):
+        def enc(entity, attr):
+            return '%s_%s' % (entity.entitytypeid.replace('.', '_'), attr)
+
+        ret = {}
+        for key, value in entity.__dict__.items():
+            if not key.startswith("__"):
+                ret[enc(entity, key)] = value
+        return ret
+
+    def decode_data_item(self, entity):
+        def dec(item):
+            v = item.split('_')
+            entitytypeid = '%s.%s' % ('_'.join(v[:-2]), v[-2:-1][0])
+            propertyname = v[-1]
+            return (entitytypeid, propertyname)
+
+        ret = {}
+        for key, value in entity.iteritems():
+            r = dec(key)
+            if r[0] not in ret:
+                ret[r[0]] = {}
+            ret[r[0]][r[1]] = value
+
+        ret2 = []
+        for key, value in ret.iteritems():
+            value['entitytypeid'] = key
+            ret2.append(value)
+        return ret2
