@@ -236,6 +236,7 @@ class VwEntitytypeDomains(models.Model):
     value = models.TextField(blank=True)
     valuetype = models.TextField(blank=True)
     languageid = models.TextField(blank=True)
+    sortorder = models.TextField(blank=True)
     class Meta:
         managed = False
         db_table = 'vw_entitytype_domains'

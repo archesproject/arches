@@ -1245,23 +1245,26 @@ CREATE VIEW vw_nodes AS
 
 ALTER TABLE concepts.vw_nodes OWNER TO postgres;
 
-CREATE VIEW vw_entitytype_domains AS
-    select 
-      c.legacyoid as entitytypeid
-      ,r.conceptidto as conceptid
-      ,v.valueid
-      ,v.value
-      ,v.valuetype
-      ,v.languageid
-    from 
-      concepts.concepts c
-      join concepts.relations r on (c.conceptid = r.conceptidfrom)
-      join concepts.values v on (r.conceptidto = v.conceptid)
-    where 
-      c.nodetype='Collection'
-      and r.relationtype = 'member'
-      and v.valuetype in ('prefLabel', 'altLabel');
-
+CREATE VIEW vw_entitytype_domains AS 
+ SELECT c.legacyoid AS entitytypeid, 
+    r.conceptidto AS conceptid, 
+    v.valueid, 
+    v.value, 
+    v.valuetype, 
+    v.languageid, 
+    v1.value AS sortorder
+   FROM concepts.concepts c
+   JOIN concepts.relations r ON c.conceptid = r.conceptidfrom
+   JOIN concepts."values" v ON r.conceptidto = v.conceptid
+   LEFT JOIN ( SELECT "values".valueid, 
+    "values".conceptid, 
+    "values".valuetype, 
+    "values".datatype, 
+    "values".value, 
+    "values".languageid
+   FROM concepts."values"
+  WHERE "values".valuetype = 'sortorder'::text) v1 ON r.conceptidto = v1.conceptid
+  WHERE c.nodetype = 'Collection'::text AND r.relationtype = 'member'::text AND (v.valuetype = ANY (ARRAY['prefLabel'::text, 'altLabel'::text]));
 
 ALTER TABLE concepts.vw_entitytype_domains OWNER TO postgres;
 SET search_path = data, pg_catalog;

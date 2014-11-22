@@ -77,4 +77,4 @@ class ResourceForm(object):
 		return self.resource
 
     def get_e55_domain(self, entitytypeid):
-        return models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid)
+        return models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value')
