@@ -24,14 +24,11 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.utils.translation import ugettext as _
 
 class Resource(Entity):
-    # def __new__(cls, *args, **kwargs):
-    #     kwargs['mod'] = ''
-    #     return super(Resource, cls).__new__(cls, *args, **kwargs)
     """ 
-    Used for managing Resrouce type entities
+    Used for managing Resource type entities
 
     This class will return an instance of the class defined in settings.RESOURCE_MODEL
-    The class defined in settings.ENTITY_MODEL must be a subclass of this class (arches.app.models.entity.Entity)
+    The class defined in settings.ENTITY_MODEL must be a subclass of this class (arches.app.models.resource.Resource)
 
     """
     def __new__(cls, *args, **kwargs):
@@ -40,6 +37,8 @@ class Resource(Entity):
             return super(Entity, cls).__new__(cls)
         else:
             fully_qualified_modulename = settings.RESOURCE_MODEL.get(modulename)
+            if fully_qualified_modulename == 'arches.app.models.resource.Resource' or fully_qualified_modulename == '':
+                return super(Entity, cls).__new__(cls)
             components = fully_qualified_modulename.split('.')
             classname = components[len(components)-1]
             modulename = ('.').join(components[0:len(components)-1])

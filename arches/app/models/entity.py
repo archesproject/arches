@@ -35,26 +35,8 @@ class Entity(object):
     """ 
     Used for mapping complete entity graph objects to and from the database
 
-    This class will return an instance of the class defined in settings.ENTITY_MODEL
-    The class defined in settings.ENTITY_MODEL must be a subclass of this class (arches.app.models.entity.Entity)
-
     """
-    def __new__(cls, *args, **kwargs):
-        modulename = kwargs.get('mod', 'default')
-        if modulename == '':
-            return super(Entity, cls).__new__(cls)
-        else:
-            fully_qualified_modulename = settings.ENTITY_MODEL.get(modulename)
-            components = fully_qualified_modulename.split('.')
-            classname = components[len(components)-1]
-            modulename = ('.').join(components[0:len(components)-1])
-            kwargs['mod'] = ''
-            mod = __import__(modulename, globals(), locals(), [classname], -1)
-            if issubclass(getattr(mod, classname), Entity):
-                return getattr(mod, classname)(*args, **kwargs)
-            else:
-                raise Exception('The class "%s" defined in settings.ENTITY_MODEL must be a subclass of arches.app.models.entity.Entity' % fully_qualified_modulename)
-
+    
     def __init__(self, *args, **kwargs):
         self.property = ''
         self.entitytypeid = ''
@@ -499,9 +481,8 @@ class Entity(object):
         def appendValue(entity):
             if entity.entitytypeid == entitytypeid:
                 ret.append(entity)
-                
-        if self.valid_entity_type_id(entitytypeid):
-            self.traverse(appendValue)
+
+        self.traverse(appendValue)
         return ret
 
     def traverse(self, func, scope=None):
@@ -525,17 +506,6 @@ class Entity(object):
         # break out of the traversal if the function returns False
         if ret == False:
             return False     
-
-
-    def valid_entity_type_id(self, entitytypeid):
-        """
-        Test to determine if this entity has a properly formed type id
-
-        """
-        if isinstance(entitytypeid, basestring):
-            if '.' in entitytypeid:
-                return True
-        raise Exception('Invalid entitytypeid: %s' % (entitytypeid))
 
     def get_rank(self, rank=0):
         """
