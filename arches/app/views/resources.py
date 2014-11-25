@@ -113,11 +113,11 @@ class ResourceForm(object):
         def dec(item):
             # item = "NAME_E41__entitytypeid"
             val = item.split('__')
-            entitytypeid = val[:-1]
-            propertyname = val[-1]
+            entitytypeid = val[0]
+            propertyname = val[1]
             
             v = entitytypeid.split('_')
-            entitytypeid = '%s.%s' % ('_'.join(v[:-2]), v[-2:-1][0])
+            entitytypeid = '%s.%s' % ('_'.join(v[:-1]), v[-1])
             return (entitytypeid, propertyname)
 
         ret = {}
