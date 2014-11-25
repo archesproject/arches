@@ -84,7 +84,7 @@ require([
 
         var dirty = false;
         
-        require(['forms/' + $('#form-id').val()], function (FormView) {
+        require(['views/forms/' + $('#form-id').val()], function (FormView) {
             if (FormView) {
                 var formView = new FormView({
                     el: $('#resource_data_management_form')[0]
