@@ -90,7 +90,7 @@ require([
                     el: $('#resource_data_management_form')[0]
                 });
                 formView.on('change', function () {
-                    dirty = true;
+                    dirty = formView.isDirty();
                 });
             }
         });
