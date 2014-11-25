@@ -17,7 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import settings
+import arches.app.models.models as archesmodels
 from arches.app.models.entity import Entity
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
 
 class Resource(Entity):
@@ -62,6 +65,7 @@ class Resource(Entity):
                 selected_form = form
         return selected_form(self)
 
+
     def get_type_name(self):
         resource_name = ''
         for resource_type in self.get_resource_types():
@@ -70,8 +74,189 @@ class Resource(Entity):
         return resource_name
 
 
-    def get_name(self):
+    def get_primary_name(self):
         return _('Unnamed Resource')
+
+
+    def create_resource_relationship(self, related_resource_id, notes=None, date_started=None, date_ended=None, relationship_type_id=None):
+        """
+        Creates a relationship between resources 
+        
+        """
+        relationship = RelatedResource(
+                entityid1 = self.entityid,
+                entityid2 = related_resource_id,
+                notes = notes,
+                relationshiptype = relationship_type_id,
+                datestarted = date_started,
+                dateended = date_ended,
+                )
+
+        relationship.save()
+
+
+    def delete_all_resource_relationships(self):
+        """
+        Deletes all relationships to other resources. 
+        
+        """        
+        relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid) )
+
+        for relationship in relationships:
+            relationship.delete()
+
+
+    def delete_resource_relationship(self, related_resource_id, relationship_type_id=None):
+        """
+        Deletes the relationships from this entity to another entity. 
+        
+        """        
+
+        if relationship_type:
+            relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id), Q(relationshiptype=relationship_type_id))
+        else:
+            relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id) )
+
+        for relationship in relationships:
+            relationship.delete()
+
+
+    def get_related_resources(self, entitytypeid=None, relationship_type_id=None, return_entities=True, showlabels=False):
+        """
+        Gets a list of entities related to this entity, optionaly filters on entitytypeid and/or relationship type. 
+        Setting return_entities to False will return the relationship records 
+        rather than the related entities. 
+        """
+        ret = []
+
+        if self.entityid:
+            if relationship_type_id:
+                relationships = RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(relationshiptype=relationship_type_id))
+            else:
+                relationships = RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid))
+      
+            for relationship in relationships: 
+                related_resource_id = relationship.entityid1 if relationship.entityid1 != self.entityid else relationship.entityid2
+                entity_obj = archesmodels.Entities.objects.get(pk = related_resource_id)
+                if (entitytypeid == None or entity_obj.entitytypeid_id == entitytypeid) and (relationship_type_id == None or relationship_type_id == relationship.relationshiptype):
+                    if return_entities == True:
+                        related_entity = Entity().get(related_resource_id, showlabels=showlabels)
+                        ret.append(related_entity)
+                    else:
+                        ret.append(relationship)
+        return ret   
+
+
+    def get_alternate_names(self):
+        """
+        Gets the human readable name to display for entity instances
+
+        """
+        pass
+
+    def index(self):
+        """
+        Gets a SearchResult object for a given resource
+        Used for populating the search index with searchable entity information
+
+        """
+
+
+        if self.get_rank() == 0:
+            se = SearchEngineFactory().create()
+            search_result = {}
+            search_result['entityid'] = self.entityid
+            search_result['entitytypeid'] = self.entitytypeid  
+            search_result['strings'] = []
+            search_result['geometries'] = []
+            search_result['concepts'] = []
+
+            term_entities = []
+
+            names = []
+            for name in self.get_primary_name():
+                names.append(name.value)
+
+            primary_display_name = ' '.join(names)
+            search_result['primaryname'] = primary_display_name
+
+            for enititytype in settings.SEARCHABLE_ENTITY_TYPES:
+                for entity in self.find_entities_by_type_id(enititytype):
+                    search_result['strings'].append(entity.value)
+                    term_entities.append(entity)
+
+            for geom_entity in self.find_entities_by_type_id(settings.ENTITY_TYPE_FOR_MAP_DISPLAY):
+                search_result['geometries'].append(fromstr(geom_entity.value).json)
+                mapfeature = MapFeature()
+                mapfeature.geomentityid = geom_entity.entityid
+                mapfeature.entityid = self.entityid
+                mapfeature.entitytypeid = self.entitytypeid
+                mapfeature.primaryname = primary_display_name
+                mapfeature.geometry = geom_entity.value
+                data = JSONSerializer().serializeToPython(mapfeature, ensure_ascii=True, indent=4)
+                se.index_data('maplayers', self.entitytypeid, data, idfield='geomentityid')
+
+            def to_int(s):
+                try:
+                    return int(s)
+                except ValueError:
+                    return ''
+
+            def inspect_node(entity):
+                if entity.entitytypeid in settings.ADV_SEARCHABLE_ENTITY_TYPES or entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
+                    if entity.entitytypeid not in search_result:
+                        search_result[entity.entitytypeid] = []
+
+                    if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
+                        search_result[entity.entitytypeid].append(JSONDeserializer().deserialize(fromstr(entity.value).json))
+                    else:
+                        search_result[entity.entitytypeid].append(entity.value)
+
+            self.traverse(inspect_node)
+
+            for entitytype, value in search_result.iteritems():
+                if entitytype in settings.ADV_SEARCHABLE_ENTITY_TYPES or entitytype in settings.SEARCHABLE_ENTITY_TYPES:
+                    if entitytype in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
+                        se.create_mapping('entity', self.entitytypeid, entitytype, 'geo_shape') 
+                    else:                   
+                        try:
+                            uuid.UUID(value[0])
+                            # SET FIELDS WITH UUIDS TO BE "NOT ANALYZED" IN ELASTIC SEARCH
+                            se.create_mapping('entity', self.entitytypeid, entitytype, 'string', 'not_analyzed')
+                        except(ValueError):
+                            pass
+
+                        search_result[entitytype] = list(set(search_result[entitytype]))
+
+            data = JSONSerializer().serializeToPython(search_result, ensure_ascii=True, indent=4)
+            se.index_data('entity', self.entitytypeid, data, idfield=None, id=self.entityid)
+            se.create_mapping('term', 'value', 'entityids', 'string', 'not_analyzed')
+            se.index_terms(term_entities)
+
+            return search_result   
+
+    def delete_index(self):
+        """
+        removes an entity from the search index
+        assumes that self is a resource
+
+        """
+        if self.get_rank() == 0:
+            se = SearchEngineFactory().create()
+            def delete_indexes(entity):
+                if entity.get_rank() == 0:
+                    se.delete(index='entity', type=entity.entitytypeid, id=entity.entityid)
+
+                if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
+                    se.delete(index='maplayers', type=self.entitytypeid, id=entity.entityid)
+
+                if entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
+                    se.delete_terms(entity)
+
+            entity = Entity().get(self.entityid)
+            entity.traverse(delete_indexes)
+
+
 
 
     @staticmethod

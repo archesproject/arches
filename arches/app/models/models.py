@@ -196,10 +196,9 @@ class SpatialRefSys(models.Model):
         db_table = u'spatial_ref_sys'
 
 class VwConcepts(models.Model):
-    conceptid = models.TextField() # This field type is a guess.
+    conceptid = models.TextField(primary_key=True) # This field type is a guess.
     conceptlabel = models.TextField()
     legacyoid = models.TextField()
-    conceptschemename = models.TextField()
     class Meta:
         db_table = u'vw_concepts'
 

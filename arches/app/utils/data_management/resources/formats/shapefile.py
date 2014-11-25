@@ -5,9 +5,11 @@ from django.contrib.gis.gdal import DataSource
 from django.conf import settings
 import os
 from arches.app.models.models import Concepts
+from arches.app.models.models import VwConcepts
 from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from django.db import connection
+
 
 class Row(object):
     def __init__(self, *args):
@@ -252,18 +254,17 @@ class ShapeReader():
         return conceptid_map  
 
 
-    def get_e55_concept_legacyoids(self, e55_type):
+    def get_e55_concept_legacyoids(self, e55_type, lang=u'en-us'):
         concept = EntityTypes.objects.get(pk=e55_type).conceptid
         concept_graph = Concept().get(id=concept.pk, include_relatedconcepts=True, include=['label'])
         values_to_legacy = []
         cursor = connection.cursor()
         if len(concept_graph.relatedconcepts) > 0:
-            for value in concept_graph.relatedconcepts:
-                if value.type == "prefLabel":
-                    sql = "SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '{0}'".format(value.conceptid)
-                    cursor.execute(sql)
-                    legacyoid = str(cursor.fetchone()[0])
-                    values_to_legacy.append({value.value:legacyoid})
+            for concept_graph in concept_graph.relatedconcepts:
+                for value in concept_graph.values:
+                    if value.type == "prefLabel" and value.language == lang:
+                        concept_view = VwConcepts.objects.filter(conceptid = value.conceptid)[0] 
+                        values_to_legacy.append({value.value:concept_view.legacyoid})
         return e55_type, values_to_legacy
 
 

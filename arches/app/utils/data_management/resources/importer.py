@@ -4,6 +4,7 @@ import datetime
 from django.conf import settings
 from django.db import connection, transaction
 from arches.app.models.entity import Entity
+from arches.app.models.resource import Resource
 from arches.app.models.models import Concepts
 from arches.app.models.models import Values
 from arches.app.models.models import RelatedResource
@@ -70,7 +71,7 @@ class ResourceLoader(object):
             masterGraph = None
             entityData = []
             if current_entitiy_type != resource.entitytypeid:
-                schema = Entity.get_mapping_schema(resource.entitytypeid)
+                schema = Resource.get_mapping_schema(resource.entitytypeid)
 
             master_graph = self.build_master_graph(resource, schema)
 
@@ -97,7 +98,7 @@ class ResourceLoader(object):
         master_graph = None
         entity_data = []
         for row in resource.nongroups:
-            entity = Entity()
+            entity = Resource()
             entity.create_from_mapping(row.resourcetype, schema[row.attributename]['steps'], row.attributename, row.attributevalue)
             entity_data.append(entity)
 
@@ -109,7 +110,7 @@ class ResourceLoader(object):
         for group in resource.groups:
             entity_data2 = []
             for row in group.rows:
-                entity = Entity()
+                entity = Resource()
                 entity.create_from_mapping(row.resourcetype, schema[row.attributename]['steps'], row.attributename, row.attributevalue)
                 entity_data2.append(entity)  
 

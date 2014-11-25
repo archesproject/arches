@@ -59,7 +59,7 @@ class Entity(object):
         self.entitytypeid = ''
         self.entityid = ''
         self.value = ''
-        self.relatedentities = [
+        self.child_entities = [
             # contains an array of other entities
         ]      
 
@@ -83,7 +83,7 @@ class Entity(object):
         Gets a complete entity graph for a single entity instance given an entity id
         If a parent is given, will attempt to lookup the rule used to relate parent to child
 
-        if showlabels = True, then concept uuids and related asset uuids will be replaced with their
+        if showlabels = True, then concept uuids and child uuids will be replaced with their
         labels or primary display names respectively
 
         """
@@ -106,15 +106,15 @@ class Entity(object):
             else:
                 self.value = getattr(themodelinstance, columnname, 'Entity %s could not be found in the table %s' % (pk, entity.entitytypeid.businesstablename))                   
                 
-        # get the property that related parent to child
+        # get the property that associated parent to child
         if parent is not None:
             relation = archesmodels.Relations.objects.get(entityiddomain =  parent.entityid, entityidrange = entity.entityid)
             self.property = relation.ruleid.propertyid_id                
         
-        # get the related entities if any
-        relatedentities = archesmodels.Relations.objects.filter(entityiddomain = pk)
-        for relatedentity in relatedentities:       
-            self.append_child(Entity().get(relatedentity.entityidrange_id, entity, showlabels))
+        # get the child entities if any
+        child_entities = archesmodels.Relations.objects.filter(entityiddomain = pk)
+        for child_entity in child_entities:       
+            self.append_child(Entity().get(child_entity.entityidrange_id, entity, showlabels))
 
         return self
 
@@ -213,7 +213,7 @@ class Entity(object):
             if(domainentity.entitytypeid.businesstablename == 'domains'):
                 self.value = themodelinstance.getlabelid()
 
-        for entity in self.relatedentities:
+        for entity in self.child_entities:
             rangeentity = entity._save()
             try:
                 rule = archesmodels.Rules.objects.get(entitytypedomain = domainentity.entitytypeid, entitytyperange = rangeentity.entitytypeid, propertyid = entity.property)
@@ -284,12 +284,12 @@ class Entity(object):
                 dbentity = archesmodels.Entities.objects.filter(pk = entity.entityid)
                 if len(dbentity) == 1:
                     dbentity[0].delete()
-                    parent.relatedentities.remove(entity)
+                    parent.child_entities.remove(entity)
                     # print 'deleted: %s' % dbentity[0]
                     # print 'parent: %s' % JSONSerializer().serializeToPython(parent, ensure_ascii=True, indent=4)
             
                 # now try and remove this entity's parent 
-                if len(parent.relatedentities) == 0 and parent.value == '' and not parent_is_root:
+                if len(parent.child_entities) == 0 and parent.value == '' and not parent_is_root:
                     #print 'trying to delete parent node'
                     parent._delete()  
 
@@ -303,33 +303,33 @@ class Entity(object):
         self.entitytypeid = E.get('entitytypeid', '')
         self.entityid = E.get('entityid', '')
         self.value = E.get('value', '')
-        for entity in E.get('relatedentities', []):
-            relatedentity = Entity()
-            self.append_child(relatedentity.load(entity))
+        for entity in E.get('child_entities', []):
+            child_entity = Entity()
+            self.append_child(child_entity.load(entity))
         return self
 
     def copy(self, shallow=False):
         """
         Returns a copy of this entity
-        if shallow is True then don't retrun any relatedentities
+        if shallow is True then don't retrun any child_entities
 
         """
         ret = {}
         for key, value in self.__dict__.items():
             if not key.startswith("__"):
-                if key == 'relatedentities':
+                if key == 'child_entities':
                     if shallow:
                         ret[key] = []
                     else:
-                        ret[key] = [relatedentity.copy(shallow=shallow) for relatedentity in self.relatedentities]
+                        ret[key] = [child_entity.copy(shallow=shallow) for child_entity in self.child_entities]
                 else:
                     ret[key] = value
 
         return Entity(ret)
 
-    def add_related_entity(self, entitytypeid, property, value, entityid):
+    def add_child_entity(self, entitytypeid, property, value, entityid):
         """
-        Add a related entity to this entity instance
+        Add a child entity to this entity instance
 
         """     
 
@@ -344,7 +344,7 @@ class Entity(object):
 
     def append_child(self, entity):
         """
-        Append a related entity to this entity instance
+        Append a child entity to this entity instance
 
         """
         parent = self        
@@ -355,8 +355,8 @@ class Entity(object):
             return parent
 
         entity.get_parent = types.MethodType(func, entity, Entity)
-        if entity not in self.relatedentities:
-            self.relatedentities.append(entity)
+        if entity not in self.child_entities:
+            self.child_entities.append(entity)
 
     def equals(self, entitytocompare, strict=False):
         """
@@ -393,17 +393,17 @@ class Entity(object):
             if self.value == '' and entitytomerge.value != '':
                 self.value = entitytomerge.value
 
-            relatedentitiesmerged = []
-            # try to merge any relatedentities of self and entitytomerge 
-            for relatedentitytomerge in entitytomerge.relatedentities:
-                for relatedentity in self.relatedentities:
-                    if (relatedentity.entitytypeid == relatedentitytomerge.entitytypeid and relatedentity.property == relatedentitytomerge.property):   
-                        relatedentity.merge(relatedentitytomerge)
-                        relatedentitiesmerged.append(relatedentitytomerge)
+            child_entitiesmerged = []
+            # try to merge any child_entities of self and entitytomerge 
+            for child_entitytomerge in entitytomerge.child_entities:
+                for child_entity in self.child_entities:
+                    if (child_entity.entitytypeid == child_entitytomerge.entitytypeid and child_entity.property == child_entitytomerge.property):   
+                        child_entity.merge(child_entitytomerge)
+                        child_entitiesmerged.append(child_entitytomerge)
 
-            # append all entitytomerge.relatedentities that weren't merged above
-            for relatedentity in list(set(entitytomerge.relatedentities)-set(relatedentitiesmerged)):
-                self.append_child(relatedentity)
+            # append all entitytomerge.child_entities that weren't merged above
+            for child_entity in list(set(entitytomerge.child_entities)-set(child_entitiesmerged)):
+                self.append_child(child_entity)
         else:
             self.get_parent().append_child(entitytomerge)
         return self
@@ -420,7 +420,7 @@ class Entity(object):
         print entitytypeid
         print len(foundEntities)
         if len(selfEntities) == 1 and len(foundEntities) == 1:
-            for foundEntity in foundEntities[0].relatedentities:
+            for foundEntity in foundEntities[0].child_entities:
                 selfEntities[0].append_child(foundEntity)
         
         # if you can't find the merge node in self then just merge at Root
@@ -472,12 +472,12 @@ class Entity(object):
             else:
                 entity.parentid = None
             # flat_entity = Entity(entity.entityid)
-            # flat_entity.relatedentities = []
+            # flat_entity.child_entities = []
             # ret.append(flat_entity)
             ret.append(entity.copy(shallow=True))
 
         # def gather_entities_inplace(entity):
-        #     entity.relatedentities = []
+        #     entity.child_entities = []
         #     if entity.get_rank() != 0:
         #         entity.parentid = entity.get_parent().entityid
         #     else:
@@ -511,8 +511,8 @@ class Entity(object):
 
         """
 
-        for relatedentity in self.relatedentities:
-            if relatedentity.traverse(func, scope) == False: 
+        for child_entity in self.child_entities:
+            if child_entity.traverse(func, scope) == False: 
                 break
 
         if scope == None:
@@ -522,7 +522,8 @@ class Entity(object):
         
         # break out of the traversal if the function returns False
         if ret == False:
-            return False        
+            return False     
+
 
     def valid_entity_type_id(self, entitytypeid):
         """
@@ -578,7 +579,7 @@ class Entity(object):
             value = ''
             if step['entitytyperange'] == leafentitytypeid:
                 value = leafvalue
-            currentEntity = currentEntity.add_related_entity(step['entitytyperange'], step['propertyid'], value, leafentityid)
+            currentEntity = currentEntity.add_child_entity(step['entitytyperange'], step['propertyid'], value, leafentityid)
         return self
 
     @classmethod
@@ -643,122 +644,6 @@ class Entity(object):
 
         return ret
 
-    def get_primary_display_name(self):
-        """
-        Gets the human readable name to display for entity instances
-
-        """
-        pass
-
-    def get_alternate_display_names(self):
-        """
-        Gets the human readable name to display for entity instances
-
-        """
-
-        pass
-
-    def index(self):
-        """
-        Gets a SearchResult object for a given asset entity
-        Used for populating the search index with searchable entity information
-
-        """
-
-
-        if self.get_rank() == 0:
-            se = SearchEngineFactory().create()
-            search_result = {}
-            search_result['entityid'] = self.entityid
-            search_result['entitytypeid'] = self.entitytypeid  
-            search_result['strings'] = []
-            search_result['geometries'] = []
-            search_result['concepts'] = []
-
-            term_entities = []
-
-            names = []
-            for name in self.get_primary_display_name():
-                names.append(name.value)
-
-            primary_display_name = ' '.join(names)
-            search_result['primaryname'] = primary_display_name
-
-            for enititytype in settings.SEARCHABLE_ENTITY_TYPES:
-                for entity in self.find_entities_by_type_id(enititytype):
-                    search_result['strings'].append(entity.value)
-                    term_entities.append(entity)
-
-            for geom_entity in self.find_entities_by_type_id(settings.ENTITY_TYPE_FOR_MAP_DISPLAY):
-                search_result['geometries'].append(fromstr(geom_entity.value).json)
-                mapfeature = MapFeature()
-                mapfeature.geomentityid = geom_entity.entityid
-                mapfeature.entityid = self.entityid
-                mapfeature.entitytypeid = self.entitytypeid
-                mapfeature.primaryname = primary_display_name
-                mapfeature.geometry = geom_entity.value
-                data = JSONSerializer().serializeToPython(mapfeature, ensure_ascii=True, indent=4)
-                se.index_data('maplayers', self.entitytypeid, data, idfield='geomentityid')
-
-            def to_int(s):
-                try:
-                    return int(s)
-                except ValueError:
-                    return ''
-
-            def inspect_node(entity):
-                if entity.entitytypeid in settings.ADV_SEARCHABLE_ENTITY_TYPES or entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
-                    if entity.entitytypeid not in search_result:
-                        search_result[entity.entitytypeid] = []
-
-                    if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                        search_result[entity.entitytypeid].append(JSONDeserializer().deserialize(fromstr(entity.value).json))
-                    else:
-                        search_result[entity.entitytypeid].append(entity.value)
-
-            self.traverse(inspect_node)
-
-            for entitytype, value in search_result.iteritems():
-                if entitytype in settings.ADV_SEARCHABLE_ENTITY_TYPES or entitytype in settings.SEARCHABLE_ENTITY_TYPES:
-                    if entitytype in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                        se.create_mapping('entity', self.entitytypeid, entitytype, 'geo_shape') 
-                    else:                   
-                        try:
-                            uuid.UUID(value[0])
-                            # SET FIELDS WITH UUIDS TO BE "NOT ANALYZED" IN ELASTIC SEARCH
-                            se.create_mapping('entity', self.entitytypeid, entitytype, 'string', 'not_analyzed')
-                        except(ValueError):
-                            pass
-
-                        search_result[entitytype] = list(set(search_result[entitytype]))
-
-            data = JSONSerializer().serializeToPython(search_result, ensure_ascii=True, indent=4)
-            se.index_data('entity', self.entitytypeid, data, idfield=None, id=self.entityid)
-            se.create_mapping('term', 'value', 'entityids', 'string', 'not_analyzed')
-            se.index_terms(term_entities)
-
-            return search_result   
-
-    def delete_index(self):
-        """
-        removes an entity from the search index
-        assumes that self is an asset entity
-
-        """
-        if self.get_rank() == 0:
-            se = SearchEngineFactory().create()
-            def delete_indexes(entity):
-                if entity.get_rank() == 0:
-                    se.delete(index='entity', type=entity.entitytypeid, id=entity.entityid)
-
-                if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                    se.delete(index='maplayers', type=self.entitytypeid, id=entity.entityid)
-
-                if entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
-                    se.delete_terms(entity)
-
-            entity = Entity().get(self.entityid)
-            entity.traverse(delete_indexes)
 
     def prune(self, entitytypes, action='disallow'):
         """
@@ -831,7 +716,7 @@ class Entity(object):
             try:
                 parent = entity.get_parent()   
                 print '\nremoving: %s' % entity         
-                parent.relatedentities.remove(entity) 
+                parent.child_entities.remove(entity) 
             except:
                 if entity.get_rank() == 0:
                     self.clear()
@@ -841,7 +726,7 @@ class Entity(object):
 
     def trim(self):
         """
-        recusrsively removes all nodes starting from the leaf that have no relatedentities and no value
+        recusrsively removes all nodes starting from the leaf that have no child_entities and no value
         these nodes are assumed to be of no material value to the graph
 
         """
@@ -849,8 +734,8 @@ class Entity(object):
         def func(entity):
             try:
                 parent = entity.get_parent()
-                if len(entity.relatedentities) == 0 and entity.value == '':
-                    parent.relatedentities.remove(entity)
+                if len(entity.child_entities) == 0 and entity.value == '':
+                    parent.child_entities.remove(entity)
             except:
                 pass
         self.traverse(func)
@@ -861,7 +746,7 @@ class Entity(object):
 
         """
 
-        self.relatedentities = []
+        self.child_entities = []
         self.entitytypeid = ''
         self.entityid = ''
         self.value = ''
