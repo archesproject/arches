@@ -30,6 +30,7 @@ from arches.app.models.search import SearchResult, MapFeature
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+
 class Entity(object):
     """ 
     Used for mapping complete entity graph objects to and from the database
@@ -59,6 +60,8 @@ class Entity(object):
         self.entitytypeid = ''
         self.entityid = ''
         self.value = ''
+        self.label = None
+        self.businesstablename = None
         self.child_entities = [
             # contains an array of other entities
         ]      
@@ -78,20 +81,16 @@ class Entity(object):
     def __repr__(self):
         return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, self.value)
 
-    def get(self, pk, parent=None, showlabels=False):
+    def get(self, pk, parent=None):
         """
         Gets a complete entity graph for a single entity instance given an entity id
         If a parent is given, will attempt to lookup the rule used to relate parent to child
 
-        if showlabels = True, then concept uuids and child uuids will be replaced with their
-        labels or primary display names respectively
-
         """
-
         entity = archesmodels.Entities.objects.get(pk = pk)
         self.entitytypeid = entity.entitytypeid_id
         self.entityid = entity.pk
-        
+        self.businesstablename = entity.entitytypeid.businesstablename
         # get the entity value if any
         if entity.entitytypeid.businesstablename != None:
             themodel = self._get_model(entity.entitytypeid.businesstablename)
@@ -99,12 +98,14 @@ class Entity(object):
             columnname = entity.entitytypeid.getcolumnname()
 
             if (isinstance(themodelinstance, archesmodels.Domains)): 
-                if showlabels:             
-                    self.value = themodelinstance.getlabelvalue()  
-                else:
-                    self.value = themodelinstance.getlabelid() 
+                self.value = themodelinstance.getlabelid()
+                self.label = themodelinstance.getlabelvalue()
+            elif (isinstance(themodelinstance, archesmodels.Files)): 
+                self.label = themodelinstance.getname()
+                self.value = themodelinstance.geturl() 
             else:
                 self.value = getattr(themodelinstance, columnname, 'Entity %s could not be found in the table %s' % (pk, entity.entitytypeid.businesstablename))                   
+                self.label = self.value
                 
         # get the property that associated parent to child
         if parent is not None:
@@ -114,7 +115,7 @@ class Entity(object):
         # get the child entities if any
         child_entities = archesmodels.Relations.objects.filter(entityiddomain = pk)
         for child_entity in child_entities:       
-            self.append_child(Entity().get(child_entity.entityidrange_id, entity, showlabels))
+            self.append_child(Entity().get(child_entity.entityidrange_id, entity))
 
         return self
 
@@ -175,7 +176,6 @@ class Entity(object):
                     edit.save()
 
         return self
-
 
     def _save(self):
         """
@@ -303,6 +303,8 @@ class Entity(object):
         self.entitytypeid = E.get('entitytypeid', '')
         self.entityid = E.get('entityid', '')
         self.value = E.get('value', '')
+        self.label = E.get('label', '')
+        self.businesstablename = E.get('businesstablename', '')
         for entity in E.get('child_entities', []):
             child_entity = Entity()
             self.append_child(child_entity.load(entity))

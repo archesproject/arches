@@ -79,7 +79,7 @@ class ResourceLoader(object):
             master_graph.save(username=settings.ETL_USERNAME, note=load_id)
             resource.entityid = master_graph.entityid
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid
-
+            
             ret['successfully_saved'] += 1
             print 'saved', master_graph.entityid
             print 'indexing', master_graph.entityid
