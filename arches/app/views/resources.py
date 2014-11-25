@@ -101,7 +101,7 @@ class ResourceForm(object):
 
     def encode_entity(self, entity):
         def enc(entity, attr):
-            return '%s_%s' % (entity.entitytypeid.replace('.', '_'), attr)
+            return '%s__%s' % (entity.entitytypeid.replace('.', '_'), attr)
 
         ret = {}
         for key, value in entity.__dict__.items():
@@ -111,9 +111,13 @@ class ResourceForm(object):
 
     def decode_data_item(self, entity):
         def dec(item):
-            v = item.split('_')
+            # item = "NAME_E41__entitytypeid"
+            val = item.split('__')
+            entitytypeid = val[:-1]
+            propertyname = val[-1]
+            
+            v = entitytypeid.split('_')
             entitytypeid = '%s.%s' % ('_'.join(v[:-2]), v[-2:-1][0])
-            propertyname = v[-1]
             return (entitytypeid, propertyname)
 
         ret = {}
