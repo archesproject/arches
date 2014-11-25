@@ -17,14 +17,18 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
         initialize: function() {
             var self = this;
             this.form = this.$el;
-            this.formdata = JSON.parse(this.form.find('#formdata').val());
-            this._rawdata = JSON.parse(this.form.find('#formdata').val());
+            // parse then restringify JSON data to ensure whitespace is identical
+            this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
+            this.viewModel = JSON.parse(this._rawdata);
 
-            this.viewModel = {};
-
-            $.each(this.formdata, function( key, value ) {
-                self.viewModel[key] = ko.observableArray(value);
+            $('input,select').change(function() {
+                var isDirty = self.isDirty();
+                self.trigger('change', isDirty);
             });
+        },
+
+        isDirty: function () {
+            return this.getData() !== this._rawdata;
         },
 
         getData: function(){
