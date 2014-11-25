@@ -61,8 +61,7 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
             this.viewModel = JSON.parse(this._rawdata);
-            this.viewModel._editing = {};
-            this.viewModel._defaults = {};
+            this.viewModel.editing = {};
 
             $('input,select').change(function() {
                 var isDirty = self.isDirty();

@@ -77,8 +77,11 @@ class ResourceForm(object):
     def __init__(self, resource):
         # here is where we can create the basic format for the form data
         self.resource = resource
-        self.data = {}
-        self.domains = {}
+        self.data = {
+            "domains": {},
+            "defaults": {}
+        }
+        self.load()
 
 	def update(self, data):
 		# update resource w/ post data
