@@ -43,7 +43,7 @@ require([
                                 $("#sidebar").css("margin-top", "20px");
 
                                 //Now scroll the sidebar if the footer threatens to bump into it.  
-                                var footer_top = $("#footer").offset().top - $(window).scrollTop();
+                                var footer_top = $(".footer").offset().top - $(window).scrollTop();
 
                                 if(footer_top < sidebar_bottom) { 
                                         
