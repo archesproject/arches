@@ -3,7 +3,7 @@ define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function 
         
         events: function(){
             return {
-                'click #submitform': 'submit'  
+                'click #saveedits': 'submit'  
             }
         },
 
@@ -36,9 +36,31 @@ define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function 
                 var isDirty = self.isDirty();
                 self.trigger('change', isDirty);
             });
+
+            this.on('change', function(eventtype, item){
+                console.log(eventtype);
+                console.log(item);
+                $('#saveedits').removeClass('disabled');
+                $('#canceledits').removeClass('disabled');                    
+            })
         },
 
         isDirty: function () {
+            // var viewModel = JSON.parse(ko.toJSON(this.viewModel));
+            // for(branch in ko.toJS(this.viewModel)){
+            //     if(branch !== 'domains' && branch !== 'defaults' && branch !== 'editing'){
+            //         for(index in viewModel[branch]){
+            //             for(item in viewModel[branch][index]){
+            //                 if(item.indexOf('entityid') > 0){
+            //                     if(viewModel[branch][index][item] === ''){
+            //                         return true;
+            //                         break;
+            //                     }
+            //                 }                            
+            //             }
+            //         }                    
+            //     }
+            // }
             return this.getData(true) !== this._rawdata;
         },
 

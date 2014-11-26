@@ -47,7 +47,7 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
 
         with transaction.atomic():
             resource.save()
-            resource.index()
+            #resource.index()
             resourceid = resource.entityid
 
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
