@@ -229,9 +229,9 @@ class VwNodes(models.Model):
         db_table = u'vw_nodes'
 
 class VwEntitytypeDomains(models.Model):
+    id = models.TextField(primary_key=True) # This field type is a guess.
     entitytypeid = models.TextField(blank=True)
     conceptid = models.TextField(blank=True) # This field type is a guess.
-    valueid = models.TextField(primary_key=True) # This field type is a guess.
     value = models.TextField(blank=True)
     valuetype = models.TextField(blank=True)
     languageid = models.TextField(blank=True)

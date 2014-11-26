@@ -1248,7 +1248,7 @@ ALTER TABLE concepts.vw_nodes OWNER TO postgres;
 CREATE VIEW vw_entitytype_domains AS 
  SELECT c.legacyoid AS entitytypeid, 
     r.conceptidto AS conceptid, 
-    v.valueid, 
+    v.valueid AS id, 
     v.value, 
     v.valuetype, 
     v.languageid, 

@@ -88,7 +88,7 @@ class ResourceForm(object):
 		return 
 
     def get_e55_domain(self, entitytypeid):
-        return models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value')
+        return list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value').values())
 
     def get_nodes(self, entitytypeid):
         ret = []
