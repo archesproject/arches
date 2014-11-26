@@ -116,6 +116,8 @@ class ResourceForm(object):
         def dec(item):
             # item = "NAME_E41__entitytypeid"
             val = item.split('__')
+            if len(val) != 2:
+                return False
             entitytypeid = val[0]
             propertyname = val[1]
             
@@ -126,9 +128,10 @@ class ResourceForm(object):
         ret = {}
         for key, value in entity.iteritems():
             r = dec(key)
-            if r[0] not in ret:
-                ret[r[0]] = {}
-            ret[r[0]][r[1]] = value
+            if r:
+                if r[0] not in ret:
+                    ret[r[0]] = {}
+                ret[r[0]][r[1]] = value
 
         ret2 = []
         for key, value in ret.iteritems():

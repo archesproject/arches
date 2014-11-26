@@ -13,26 +13,29 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         initialize: function(options) {
             _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField'));
 
+            _.each(this.viewModel[this.key], function (item) {
+                item.tempId = '';
+            });
+            this.viewModel.defaults[this.key].tempId = '';
+
             this.viewModel[this.key] = ko.observableArray(this.viewModel[this.key]);
             this.viewModel.editing[this.key] = koMapping.fromJS(this.viewModel.defaults[this.key]);
         },
 
         addItem: function() {
-            var data = ko.toJS(this.viewModel.editing[this.key]),
-                defaults = this.viewModel.defaults[this.key];
-            if (!data[this.pkField] && !data.__tempId__) {
-                data.__tempId__ = _.uniqueId('tempId_');
+            var data = ko.toJS(this.viewModel.editing[this.key]);
+            if (!data[this.pkField] && !data.tempId) {
+                data.tempId = _.uniqueId('tempId_');
             }
             delete data.__ko_mapping__;
             this.viewModel[this.key].push(data);
-            defaults.__tempId__ = '';
-            koMapping.fromJS(defaults, this.viewModel.editing[this.key]);
+            koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
         },
 
         matchItem: function(item, data) {
             matchField = this.pkField;
             if (!data[matchField.toLowerCase()]) {
-                matchField = '__tempId__';
+                matchField = 'tempId';
             }
             return item[matchField] === data[matchField.toLowerCase()];
         },
