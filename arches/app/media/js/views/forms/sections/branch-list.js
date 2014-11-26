@@ -18,9 +18,23 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         addItem: function() {
-            delete this.viewModel.editing[this.key].__ko_mapping__;
-            this.viewModel[this.key].push(ko.toJS(this.viewModel.editing[this.key]));
-            koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
+            var data = ko.toJS(this.viewModel.editing[this.key]),
+                defaults = this.viewModel.defaults[this.key];
+            if (!data[this.pkField] && !data.__tempId__) {
+                data.__tempId__ = _.uniqueId('tempId_');
+            }
+            delete data.__ko_mapping__;
+            this.viewModel[this.key].push(data);
+            defaults.__tempId__ = '';
+            koMapping.fromJS(defaults, this.viewModel.editing[this.key]);
+        },
+
+        matchItem: function(item, data) {
+            matchField = this.pkField;
+            if (!data[matchField.toLowerCase()]) {
+                matchField = '__tempId__';
+            }
+            return item[matchField] === data[matchField.toLowerCase()];
         },
 
         deleteItem: function(e) {
@@ -28,7 +42,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 data = $(e.target).data();
 
             this.viewModel[this.key].remove(function(item) {
-                return item[self.pkField] === data[self.pkField.toLowerCase()];
+                return self.matchItem(item, data);
             });
         },
 
@@ -37,7 +51,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 data = $(e.target).closest('.arches-CRUD-edit').data();
 
             this.viewModel[this.key].remove(function(item) {
-                var match = item[self.pkField] === data[self.pkField.toLowerCase()];
+                var match = self.matchItem(item, data);
                 if (match) {
                     koMapping.fromJS(ko.toJS(item), self.viewModel.editing[self.key]);
                 }
