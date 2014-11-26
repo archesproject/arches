@@ -6,7 +6,8 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         events: {
             'click .add-button': 'addItem',
-            'click .arches-CRUD-delete ': 'deleteItem'
+            'click .arches-CRUD-delete ': 'deleteItem',
+            'click .arches-CRUD-edit ': 'editItem'
         },
 
         initialize: function(options) {
@@ -21,12 +22,25 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
         },
 
-        deleteItem: function(el) {
+        deleteItem: function(e) {
             var self = this,
-                data = $(el.target).data();
+                data = $(e.target).data();
 
             this.viewModel[this.key].remove(function(item) {
                 return item[self.pkField] === data[self.pkField.toLowerCase()];
+            });
+        },
+
+        editItem: function(e) {
+            var self = this,
+                data = $(e.target).closest('.arches-CRUD-edit').data();
+
+            this.viewModel[this.key].remove(function(item) {
+                var match = item[self.pkField] === data[self.pkField.toLowerCase()];
+                if (match) {
+                    koMapping.fromJS(ko.toJS(item), self.viewModel.editing[self.key]);
+                }
+                return match;
             });
         }
     });

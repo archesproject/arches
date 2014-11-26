@@ -45,7 +45,7 @@ define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function 
         getData: function(includeDomains){
             var data = ko.toJS(this.viewModel)
             if (!includeDomains) {
-                delete data.domains;   
+                delete data.domains;
             }
             delete data.editing;
             return ko.toJSON(data);
