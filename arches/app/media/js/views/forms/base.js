@@ -80,11 +80,16 @@ define(['jquery', 'backbone', 'knockout'], function ($, Backbone, ko) {
         },
 
         isDirty: function () {
-            return this.getData() !== this._rawdata;
+            return this.getData(true) !== this._rawdata;
         },
 
-        getData: function(){
-            return ko.toJSON(this.viewModel);
+        getData: function(includeDomains){
+            var data = ko.toJS(this.viewModel)
+            if (!includeDomains) {
+                delete data.domains;   
+            }
+            delete data.editing;
+            return ko.toJSON(data);
         },
 
         validate: function(){
