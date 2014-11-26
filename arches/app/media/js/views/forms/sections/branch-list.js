@@ -18,6 +18,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         addItem: function() {
+            delete this.viewModel.editing[this.key].__ko_mapping__;
             this.viewModel[this.key].push(ko.toJS(this.viewModel.editing[this.key]));
             koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
         },
