@@ -11,7 +11,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField'));
+            _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField', 'validateBranch'));
 
             _.each(this.viewModel[this.key], function (item) {
                 item.tempId = '';
@@ -22,14 +22,26 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             this.viewModel.editing[this.key] = koMapping.fromJS(this.viewModel.defaults[this.key]);
         },
 
+        validateBranch: function (data) {
+            return true;
+        },
+
         addItem: function() {
-            var data = ko.toJS(this.viewModel.editing[this.key]);
-            if (!data[this.pkField] && !data.tempId) {
-                data.tempId = _.uniqueId('tempId_');
+            var data = ko.toJS(this.viewModel.editing[this.key]),
+                validationAlert = this.$el.find('.branch-invalid-alert');
+            if (this.validateBranch(data)) {
+                if (!data[this.pkField] && !data.tempId) {
+                    data.tempId = _.uniqueId('tempId_');
+                }
+                delete data.__ko_mapping__;
+                this.viewModel[this.key].push(data);
+                koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
+            } else {
+                validationAlert.show();
+                setTimeout(function() {
+                    validationAlert.fadeOut();
+                }, 1000);
             }
-            delete data.__ko_mapping__;
-            this.viewModel[this.key].push(data);
-            koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
         },
 
         matchItem: function(item, data) {

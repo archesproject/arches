@@ -430,3 +430,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background: #ededed;
 }
 */
+
+.branch-invalid-alert {
+    margin-top: 10px !important;
+}
