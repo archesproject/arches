@@ -1,6 +1,5 @@
 define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
-        baseForm: null,
         viewModel: null,
         key: '',
         pkField: '',
@@ -12,7 +11,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'baseForm', 'viewModel', 'key', 'pkField', 'validateBranch'));
+            _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField', 'validateBranch'));
 
             _.each(this.viewModel[this.key], function (item) {
                 item.tempId = '';
@@ -35,7 +34,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                     data.tempId = _.uniqueId('tempId_');
                 }
                 delete data.__ko_mapping__;
-				this.baseForm.trigger('change', 'add', data);
+				this.trigger('change', 'add', data);
                 this.viewModel[this.key].push(data);
                 koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
             } else {
@@ -60,7 +59,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
             this.viewModel[this.key].remove(function(item) {
                 if(self.matchItem(item, data)){
-                    self.baseForm.trigger('change', 'delete', item);   
+                    self.trigger('change', 'delete', item);   
                     return true;                 
                 }
                 return false;
@@ -74,7 +73,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             this.viewModel[this.key].remove(function(item) {
                 var match = self.matchItem(item, data);
                 if (match) {
-                    self.baseForm.trigger('change', 'edit', item);
+                    self.trigger('change', 'edit', item);
                     koMapping.fromJS(ko.toJS(item), self.viewModel.editing[self.key]);
                 }
                 return match;
