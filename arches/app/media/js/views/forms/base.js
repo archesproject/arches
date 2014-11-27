@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function ($, Backbone, ko) {
+define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2'], function ($, Backbone, ko, _) {
     return Backbone.View.extend({
         
         events: function(){
@@ -8,7 +8,15 @@ define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function 
         },
 
         constructor: function (options) {
+            var self = this;
+
             Backbone.View.apply(this, arguments);
+            
+            _.each(this.branchLists, function(branchList) {
+                self.listenTo(branchList, 'change', function(eventtype, item){
+                    self.trigger('change', eventtype, item);                 
+                }));
+            });
 
             ko.applyBindings(this.viewModel, this.el);
             return this;
@@ -42,7 +50,9 @@ define(['jquery', 'backbone', 'knockout', 'plugins/knockout-select2'], function 
                 console.log(item);
                 $('#saveedits').removeClass('disabled');
                 $('#canceledits').removeClass('disabled');                    
-            })
+            });
+
+            this.branchLists = [];
         },
 
         isDirty: function () {
