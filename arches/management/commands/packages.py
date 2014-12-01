@@ -242,14 +242,14 @@ class Command(BaseCommand):
             Permission.objects.create(codename='delete_%s' % mapping.entitytypeidto, name='%s - delete' % mapping.entitytypeidto , content_type=content_type[0])
 
 
-    def load_resources(self, data_source, format='shp'):
+    def load_resources(self, package_name, data_source=None):
         """
-        Runs the resource_loader command found in package_utils
+        Runs the setup.py file found in the package root
 
         """
-        resource_loader = ResourceLoader()
-        resource_loader.load(data_source, format)
-
+        module = import_module('%s.setup' % package_name)
+        load = getattr(module, 'load_resources')
+        load(data_source) 
 
     def remove_resources(self, load_id):
         """
