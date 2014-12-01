@@ -34,7 +34,7 @@ class Resource(Entity):
     def __new__(cls, *args, **kwargs):
         modulename = kwargs.get('mod', 'default')
         if modulename == '':
-            return super(Entity, cls).__new__(cls)
+            return super(Resource, cls).__new__(cls)
         else:
             fully_qualified_modulename = settings.RESOURCE_MODEL.get(modulename)
             if fully_qualified_modulename == 'arches.app.models.resource.Resource' or fully_qualified_modulename == '':
@@ -44,7 +44,7 @@ class Resource(Entity):
             modulename = ('.').join(components[0:len(components)-1])
             kwargs['mod'] = ''
             mod = __import__(modulename, globals(), locals(), [classname], -1)
-            if issubclass(getattr(mod, classname), Entity):
+            if issubclass(getattr(mod, classname), Resource):
                 return getattr(mod, classname)(*args, **kwargs)
             else:
                 raise Exception('The class "%s" defined in settings.RESOURCE_MODEL must be a subclass of arches.app.models.resource.Resource' % fully_qualified_modulename)

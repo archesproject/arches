@@ -34,13 +34,14 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                     data.tempId = _.uniqueId('tempId_');
                 }
                 delete data.__ko_mapping__;
+				this.trigger('change', 'add', data);
                 this.viewModel[this.key].push(data);
                 koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
             } else {
-                validationAlert.show();
+                validationAlert.show(300);
                 setTimeout(function() {
                     validationAlert.fadeOut();
-                }, 1000);
+                }, 5000);
             }
         },
 
@@ -57,7 +58,11 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 data = $(e.target).data();
 
             this.viewModel[this.key].remove(function(item) {
-                return self.matchItem(item, data);
+                if(self.matchItem(item, data)){
+                    self.trigger('change', 'delete', item);   
+                    return true;                 
+                }
+                return false;
             });
         },
 
@@ -68,6 +73,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             this.viewModel[this.key].remove(function(item) {
                 var match = self.matchItem(item, data);
                 if (match) {
+                    self.trigger('change', 'edit', item);
                     koMapping.fromJS(ko.toJS(item), self.viewModel.editing[self.key]);
                 }
                 return match;
