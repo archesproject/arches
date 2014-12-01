@@ -15,7 +15,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             _.each(this.branchLists, function(branchList) {
                 self.listenTo(branchList, 'change', function(eventtype, item){
                     self.trigger('change', eventtype, item);                 
-                }));
+                });
             });
 
             ko.applyBindings(this.viewModel, this.el);
