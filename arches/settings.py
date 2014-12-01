@@ -255,6 +255,26 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(ROOT_DIR, 'arches.log'),
+        },
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+
 try:
     from settings_local import *
 except ImportError:

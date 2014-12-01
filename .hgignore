@@ -10,3 +10,4 @@ virtualenv/ENV
 install_db.sql
 truncate_db.sql
 arches.egg-info
+arches.log
