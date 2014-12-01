@@ -75,7 +75,7 @@ class Command(BaseCommand):
             self.build_permissions()
 
         if options['operation'] == 'load_resources':  
-            self.load_resources(options['source'], options['format'])
+            self.load_resources(package_name, options['source'])
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
