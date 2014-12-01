@@ -38,10 +38,10 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 this.viewModel[this.key].push(data);
                 koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
             } else {
-                validationAlert.show();
+                validationAlert.show(300);
                 setTimeout(function() {
                     validationAlert.fadeOut();
-                }, 1000);
+                }, 5000);
             }
         },
 
