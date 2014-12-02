@@ -50,7 +50,6 @@ class ResourceLoader(object):
             relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
             for relationship in relationships:
                 self.relate_resources(relationship, results['legacyid_to_entityid'])
-                print ('relationship {0} created').format(relationship)
         else:
             print 'No relationship file'
 

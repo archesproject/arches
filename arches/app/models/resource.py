@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
 import arches.app.models.models as archesmodels
+from django.db.models import Q
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -82,7 +83,7 @@ class Resource(Entity):
         Creates a relationship between resources 
         
         """
-        relationship = RelatedResource(
+        relationship = archesmodels.RelatedResource(
                 entityid1 = self.entityid,
                 entityid2 = related_resource_id,
                 notes = notes,
@@ -99,7 +100,7 @@ class Resource(Entity):
         Deletes all relationships to other resources. 
         
         """        
-        relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid) )
+        relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid) )
 
         for relationship in relationships:
             relationship.delete()
@@ -112,15 +113,15 @@ class Resource(Entity):
         """        
 
         if relationship_type:
-            relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id), Q(relationshiptype=relationship_type_id))
+            relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id), Q(relationshiptype=relationship_type_id))
         else:
-            relationships = RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id) )
+            relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id) )
 
         for relationship in relationships:
             relationship.delete()
 
 
-    def get_related_resources(self, entitytypeid=None, relationship_type_id=None, return_entities=True, showlabels=False):
+    def get_related_resources(self, entitytypeid=None, relationship_type_id=None, return_entities=True):
         """
         Gets a list of entities related to this entity, optionaly filters on entitytypeid and/or relationship type. 
         Setting return_entities to False will return the relationship records 
@@ -130,16 +131,16 @@ class Resource(Entity):
 
         if self.entityid:
             if relationship_type_id:
-                relationships = RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(relationshiptype=relationship_type_id))
+                relationships = archesmodels.RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(relationshiptype=relationship_type_id))
             else:
-                relationships = RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid))
+                relationships = archesmodels.RelatedResource.objects.filter(Q(entityid2=self.entityid)|Q(entityid1=self.entityid))
       
             for relationship in relationships: 
                 related_resource_id = relationship.entityid1 if relationship.entityid1 != self.entityid else relationship.entityid2
                 entity_obj = archesmodels.Entities.objects.get(pk = related_resource_id)
                 if (entitytypeid == None or entity_obj.entitytypeid_id == entitytypeid) and (relationship_type_id == None or relationship_type_id == relationship.relationshiptype):
                     if return_entities == True:
-                        related_entity = Entity().get(related_resource_id, showlabels=showlabels)
+                        related_entity = Entity().get(related_resource_id)
                         ret.append(related_entity)
                     else:
                         ret.append(relationship)
@@ -159,7 +160,6 @@ class Resource(Entity):
         Used for populating the search index with searchable entity information
 
         """
-
 
         if self.get_rank() == 0:
             se = SearchEngineFactory().create()

@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import connection, transaction
+from arches.app.models.resource import Resource
 from arches.app.models.entity import Entity
+
 import arches.app.models.models as archesmodels
 from django.db.models import Q
 from django.db.models import Count
@@ -15,12 +17,17 @@ def delete_resources(load_id):
     resourceids = set([editlog.resourceid for editlog in resources_for_removal])
     for r_id in resourceids:
         try:
-            entity = Entity(r_id)
-            entity.delete_index()
+            resource = Resource(r_id)
             note = '{0} Deleted'.format(load_id)
-            entity.delete(delete_root=True, note=note)
+            resource.delete_all_resource_relationships()
+            resource.delete(delete_root=True, note=note)
+            resource.delete_index()
         except ObjectDoesNotExist:
-            print 'Entity does not exist. Nothing to delete'
+            try:
+                entity = Entity(r_id)
+                entity.entitytypeid, 'test'
+            except ObjectDoesNotExist:
+                print 'Entity does not exist. Nothing to delete'
 
 
 def truncate_resources():
