@@ -120,7 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul id="collapse-{{ form_group.id }}" class="collapse in">
                             {% for form in form_group.forms %}
                             <li>
-                                <a href="javascript:void(0);" class="arches-list-item{% if form.id == form_id %} arches-selected{% endif %} form-link" style="background-color: #f7f7f7;" data-formid="{{form.id}}" data-formurl="{% url 'new_resource_manager' resourcetypeid form.id %}"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'new_resource_manager' resourcetypeid form.id %}"></i> {{ form.name }}</a>
+                                <a href="javascript:void(0);" class="arches-list-item{% if form.id == form_id %} arches-selected{% endif %} form-link" style="background-color: #f7f7f7;" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"><i class="fa {{ form.icon }}" data-formid="{{form.id}}" data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}"></i> {{ form.name }}</a>
                             </li>
                             {% endfor %}
                         </ul>
