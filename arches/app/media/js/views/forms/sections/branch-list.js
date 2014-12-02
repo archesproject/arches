@@ -46,7 +46,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         matchItem: function(item, data) {
-            matchField = this.pkField;
+            var matchField = this.pkField;
             if (!data[matchField.toLowerCase()]) {
                 matchField = 'tempId';
             }
