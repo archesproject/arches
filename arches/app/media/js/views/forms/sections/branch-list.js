@@ -12,11 +12,9 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         initialize: function(options) {
             _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField', 'validateBranch'));
-
-            _.each(this.viewModel[this.key], function (item) {
-                item.tempId = '';
-            });
-            this.viewModel.defaults[this.key].tempId = '';
+            if (this.pkField === ''){
+                this.pkField = this.key + '__entityid';                
+            }
 
             this.viewModel[this.key] = ko.observableArray(this.viewModel[this.key]);
             this.viewModel.editing[this.key] = koMapping.fromJS(this.viewModel.defaults[this.key]);
@@ -27,12 +25,10 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         addItem: function() {
-            var data = ko.toJS(this.viewModel.editing[this.key]),
-                validationAlert = this.$el.find('.branch-invalid-alert');
+            var data = ko.toJS(this.viewModel.editing[this.key]);
+            var validationAlert = this.$el.find('.branch-invalid-alert');
+            
             if (this.validateBranch(data)) {
-                if (!data[this.pkField] && !data.tempId) {
-                    data.tempId = _.uniqueId('tempId_');
-                }
                 delete data.__ko_mapping__;
 				this.trigger('change', 'add', data);
                 this.viewModel[this.key].push(data);
@@ -45,39 +41,21 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             }
         },
 
-        matchItem: function(item, data) {
-            var matchField = this.pkField;
-            if (!data[matchField.toLowerCase()]) {
-                matchField = 'tempId';
-            }
-            return item[matchField] === data[matchField.toLowerCase()];
-        },
-
         deleteItem: function(e) {
-            var self = this,
-                data = $(e.target).data();
+            var data = $(e.target).data();
+            var item = this.viewModel[this.key]()[data.index];
 
-            this.viewModel[this.key].remove(function(item) {
-                if(self.matchItem(item, data)){
-                    self.trigger('change', 'delete', item);   
-                    return true;                 
-                }
-                return false;
-            });
+            this.trigger('change', 'delete', item);   
+            this.viewModel[this.key].remove(this.viewModel[this.key]()[data.index]);
         },
 
         editItem: function(e) {
-            var self = this,
-                data = $(e.target).closest('.arches-CRUD-edit').data();
+            var data = $(e.target).closest('.arches-CRUD-edit').data();
+            var item = this.viewModel[this.key]()[data.index];
 
-            this.viewModel[this.key].remove(function(item) {
-                var match = self.matchItem(item, data);
-                if (match) {
-                    self.trigger('change', 'edit', item);
-                    koMapping.fromJS(ko.toJS(item), self.viewModel.editing[self.key]);
-                }
-                return match;
-            });
+            this.trigger('change', 'edit', item);
+            koMapping.fromJS(ko.toJS(item), this.viewModel.editing[this.key]);
+            this.viewModel[this.key].remove(item);
         }
     });
 });
