@@ -63,7 +63,7 @@
                         <li><a href="page_faq.html">Help</a></li>  
                         <li class="topbar-devider"></li>   
                         <li>
-                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
+                            <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
                         </li>
                         
                     </ul>
