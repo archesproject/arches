@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from operator import methodcaller
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -137,10 +137,11 @@ class Concept(object):
             if include_relatedconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
+                    self.relationshiptype = relation.relationtype.pk
                     if relation.conceptidto_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']).get_preflabel())
+                        self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']))
                     if relation.conceptidfrom_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']).get_preflabel())
+                        self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']))
 
         return self
             
@@ -184,32 +185,31 @@ class Concept(object):
 
     def delete(self, delete_self=False):
         for subconcept in self.subconcepts:
-            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
 
             for key, concept in concepts_to_delete.iteritems():
-                models.Concepts.objects.get(pk=concept.conceptid).delete()
+                models.Concepts.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
             conceptrelations = models.ConceptRelations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
             for relation in conceptrelations:
                 relation.delete()
 
+        deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:
-            deletedrelatedconcepts = []
-            for relatedconcept in self.relatedconcepts:
-                conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
-                for relation in conceptrelations:
-                    relation.delete()
-                    deletedrelatedconcepts.append(relatedconcept)
+            conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
+            for relation in conceptrelations:
+                relation.delete()
+                deletedrelatedconcepts.append(relatedconcept)
 
-                conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
-                for relation in conceptrelations:
-                    relation.delete()
-                    deletedrelatedconcepts.append(relatedconcept)
+            conceptrelations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
+            for relation in conceptrelations:
+                relation.delete()
+                deletedrelatedconcepts.append(relatedconcept)
 
-            for deletedrelatedconcept in deletedrelatedconcepts:
-                if deletedrelatedconcept in self.relatedconcepts:
-                    self.relatedconcepts.remove(deletedrelatedconcept)
+        for deletedrelatedconcept in deletedrelatedconcepts:
+            if deletedrelatedconcept in self.relatedconcepts:
+                self.relatedconcepts.remove(deletedrelatedconcept)
 
         for value in self.values:
             if not isinstance(value, ConceptValue): 
@@ -221,17 +221,62 @@ class Concept(object):
         return
 
     @staticmethod
-    def gather_concepts_to_delete(conceptid, lang='en-us'):
-        concepts_to_delete = {}
-        concept = Concept().get(id=conceptid, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
-        
-        def find_concepts(concept):
-            if len(concept.parentconcepts) <= 1:
-                concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
-                for subconcept in concept.subconcepts:
-                    find_concepts(subconcept)
+    def gather_concepts_to_delete(concept, lang='en-us'):
+        """
+        Gets a dictionary of all the concepts ids to delete
+        The values of the dictionary keys differ somewhat depending on the node type being deletedrelatedconcept
+        If the nodetype == 'Concept' then return ConceptValue objects keyed to the concept id
+        If the nodetype == 'ConceptScheme' or 'ConceptSchemeGroup' then return a text string representing the 'prefLabel' keyed to the concept id
+        We do this because it takes so long to gather the ids of the concepts when deleting a Scheme or Group
 
-        find_concepts(concept)
+        """
+
+        concepts_to_delete = {}
+
+        # Here we have to worry about making sure we don't delete nodes that have more than 1 parent
+        if concept.nodetype == 'Concept':
+            concept = Concept().get(id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=['label'], up_depth_limit=1)
+            
+            def find_concepts(concept):
+                if len(concept.parentconcepts) <= 1:
+                    concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
+                    for subconcept in concept.subconcepts:
+                        find_concepts(subconcept)
+
+            find_concepts(concept)
+            return concepts_to_delete
+
+        # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
+        if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
+
+            sql = """WITH RECURSIVE children AS (
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, 1 AS depth       ---|NonRecursive Part
+                    FROM concepts.relations d
+                    JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
+                    JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
+                    WHERE d.conceptidfrom = '%s'
+                    and c.valuetype = 'prefLabel'
+                    and c2.valuetype = 'prefLabel'
+                    and d.relationtype = 'narrower'
+                UNION
+                    SELECT a.conceptidfrom, a.conceptidto, v2.value, v.value as valueto, depth+1      ---|RecursivePart
+                    FROM concepts.relations  a
+                    JOIN children b ON(b.conceptidto = a.conceptidfrom) 
+                    JOIN concepts.values v ON(v.conceptid = a.conceptidto) 
+                    JOIN concepts.values v2 ON(v2.conceptid = a.conceptidfrom) 
+                    WHERE  v.valuetype = 'prefLabel'
+                    and v2.valuetype = 'prefLabel'
+                    and a.relationtype = 'narrower'
+            ) 
+            SELECT conceptidfrom, conceptidto, value, valueto FROM children ;""" % (concept.id)
+
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            for row in rows:
+                concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
+                concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
+
         return concepts_to_delete
 
     def traverse(self, func, direction='down', scope=None):
@@ -333,6 +378,8 @@ class Concept(object):
             self.values.append(ConceptValue(value))
         elif isinstance(value, ConceptValue):
             self.values.append(value)
+        elif isinstance(value, models.Values):
+            self.values.append(ConceptValue(value))
         else:
             raise Exception('Invalid value definition: %s' % (value))
 
@@ -349,18 +396,18 @@ class Concept(object):
         se = SearchEngineFactory().create()
         
         for subconcept in self.subconcepts:
-            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept.id)
+            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
 
             for key, concept in concepts_to_delete.iteritems():
                 query = Query(se, start=0, limit=10000)
-                phrase = Match(field='conceptid', query=concept.conceptid, type='phrase')
+                phrase = Match(field='conceptid', query=key, type='phrase')
                 query.add_query(phrase)
                 query.delete(index='concept_labels')
 
         for value in self.values:
             value.delete_index()
 
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001'):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang='en-us'):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -371,12 +418,18 @@ class Concept(object):
 
         def _findNarrowerConcept(conceptid, depth_limit=None, level=0):
             labels = models.Values.objects.filter(conceptid = conceptid)
-            ret = concept()          
+            ret = concept()  
+            temp = Concept()        
             for label in labels:
-                if label.valuetype_id == 'prefLabel':
-                    ret.label = label.value
-                    ret.id = label.conceptid_id
-                    ret.labelid = label.valueid
+                temp.addvalue(label)
+                # if label.valuetype_id == 'prefLabel':
+                #     ret.label = label.value
+                #     ret.id = label.conceptid_id
+                #     ret.labelid = label.valueid
+            label = temp.get_preflabel(lang=lang)
+            ret.label = label.value
+            ret.id = label.conceptid
+            ret.labelid = label.id
 
             conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
@@ -394,11 +447,13 @@ class Concept(object):
             if len(conceptrealations) > 0 and conceptid != top_concept:
                 labels = models.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
                 ret = concept()          
+                temp = Concept()        
                 for label in labels:
-                    if label.valuetype_id == 'prefLabel':
-                        ret.label = label.value
-                        ret.id = label.conceptid_id
-                        ret.labelid = label.valueid
+                    temp.addvalue(label)
+                label = temp.get_preflabel(lang=lang)
+                ret.label = label.value
+                ret.id = label.conceptid
+                ret.labelid = label.id
 
                 ret.children.append(child_concept)
                 return _findBroaderConcept(conceptrealations[0].conceptidfrom_id, ret, depth_limit=depth_limit, level=level)
@@ -449,8 +504,12 @@ class Concept(object):
 
         get_parent_nodes_and_links(self)
         for child in self.subconcepts:
-            nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value,'type': 'Descendant' })
+            nodes.append({'concept_id': child.id, 'name': child.get_preflabel(lang=lang).value, 'type': 'Descendant' })
             links.append({'source': self.id, 'target': child.id, 'relationship': 'narrower' })
+
+        for related in self.relatedconcepts:
+            nodes.append({'concept_id': related.id, 'name': related.get_preflabel(lang=lang).value, 'type': 'Related' })
+            links.append({'source': self.id, 'target': related.id, 'relationship': 'related' })
 
         # get unique node list and assign unique integer ids for each node (required by d3)
         nodes = {node['concept_id']:node for node in nodes}.values()

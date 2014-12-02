@@ -17,17 +17,13 @@
     <meta name="author" content="">
 
 	{% block css %}
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="{% static 'plugins/line-icons/line-icons.css' %}">
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
-        {% if main_css %}
-            <link rel="stylesheet" href="{% static main_css %}">
-        {% else %}
-            <link rel="stylesheet" href="{% static 'css/main.css' %}">
-        {% endif %}
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/arches.css' %}">
+        <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
     {% endblock css%}
 
 </head> 
@@ -122,21 +118,27 @@
                             </li>
                             <!-- End Inventory-->
 
+                            <!-- Resource Editor-->
+                            <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                    Resource Manager
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {% for type in resource_types %}
+                                        <li><a href="{% url 'resource_manager' type.resourcetypeid type.default_page '' %}"><i class="{{type.icon_class}}"></i>{{type.name}}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- End Resource Editor -->
+
                              <!-- RDM-->
                             <li class="{% if user.is_anonymous %}disabled{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
                                 <a href="{% if user.is_anonymous %}javascript:void(0);{% else %}{% url 'rdm' '' %}{% endif %}">
-                                    Reference Data Manager
+                                    RDM {{what}}
                                 </a>
                             </li>
                             <!-- End RDM-->
 
-                            <!-- Reports-->
-                            <li class="{% if active_page = 'Reports' %}active{% endif %}">
-                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                                    Reports
-                                </a>
-                            </li>
-                            <!-- End Reports -->
                             {% endblock navitems %}
                             {% block navsearch %}
                             <!-- Search Block -->
@@ -317,7 +319,7 @@
                 'async': 'http://cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
                 'jquery': 'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min',
                 'select2': 'http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2',
-                'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min',
+                'bootstrap': 'http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
                 'jquery-ui': 'http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
                 'flexslider': 'http://cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
                 'openlayers': 'http://openlayers.org/en/v3.0.0/build/ol',
@@ -326,7 +328,10 @@
                 'underscore': 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
                 'jquery-validate': 'http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
                 'd3': 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.8/d3.min',
-                'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min'
+                'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
+                'summernote': 'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
+                'knockout': 'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.2.0/knockout-min',
+                'knockout-mapping': 'http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min'
             }
         });
 

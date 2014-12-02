@@ -196,10 +196,9 @@ class SpatialRefSys(models.Model):
         db_table = u'spatial_ref_sys'
 
 class VwConcepts(models.Model):
-    conceptid = models.TextField() # This field type is a guess.
+    conceptid = models.TextField(primary_key=True) # This field type is a guess.
     conceptlabel = models.TextField()
     legacyoid = models.TextField()
-    conceptschemename = models.TextField()
     class Meta:
         db_table = u'vw_concepts'
 
@@ -228,6 +227,18 @@ class VwNodes(models.Model):
     val = models.TextField()
     class Meta:
         db_table = u'vw_nodes'
+
+class VwEntitytypeDomains(models.Model):
+    id = models.TextField(primary_key=True) # This field type is a guess.
+    entitytypeid = models.TextField(blank=True)
+    conceptid = models.TextField(blank=True) # This field type is a guess.
+    value = models.TextField(blank=True)
+    valuetype = models.TextField(blank=True)
+    languageid = models.TextField(blank=True)
+    sortorder = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'vw_entitytype_domains'
 
 class AuthMessage(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -266,10 +277,15 @@ class ConceptRelations(models.Model):
         return ('%s') % (self.relationid)
 
     def save(self, *args, **kwargs):
+        # prevent insert of duplicate records
         if ConceptRelations.objects.filter(conceptidfrom = self.conceptidfrom, conceptidto = self.conceptidto, relationtype = self.relationtype).exists():
             return # can't insert duplicate values
-        else:
-            super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
+        elif self.relationtype_id == 'related':
+            # check to see if the recipocal relationship exists as well (mostly for when we load a skos file)
+            if ConceptRelations.objects.filter(conceptidfrom = self.conceptidto, conceptidto = self.conceptidfrom, relationtype = self.relationtype).exists():
+                return
+
+        super(ConceptRelations, self).save(*args, **kwargs) # Call the "real" save() method.
 
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)

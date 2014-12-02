@@ -146,7 +146,7 @@
                                 <dd class="arches-concept-heirarchy">
                                     <i class=" {% if subconcept.hassubconcepts %}fa fa-expand{% endif %}" style="color:#aaa"></i><span class="text-muted"{% if not subconcept.hassubconcepts %}style="padding-left:13px;"{% endif %}>...{% for i in range %}...{% endfor %}</span>
                                     <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this concept?" %}" data-id="{{subconcept.id}}" data-action="delete-concept" data-message="{% trans "By deleting this concept, you will also be deleting the following concepts as well.  This operation cannot be undone." %}" ></i></a>
-                                    <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{% for value in subconcept.values %}{% if value.type == 'prefLabel' %}{{value.value}}{% endif %}{% endfor %}</a>
+                                    <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{subconcept.id}}">{{subconcept.prefLabel.value}}</a>
                                 </dd>
                                 {% endfor %}
                             {% endif %}
@@ -184,11 +184,11 @@
                     </h5>
                 </dt>
 
-                {% for value in concept.relatedconcepts %}
+                {% for concept in concept.relatedconcepts %}
                     <dd class="arches-RDM-label-highlighted">
-                        <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Remove the relationship to this concept?" %}" data-id="{{value.conceptid}}" data-action="delete-relationship" data-message="{{value.value}}"></i></a>
-                        <a href="javascript:void(0);" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{value.conceptid}}">{{value.value}} </a>
-                        <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
+                        <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Remove the relationship to this concept?" %}" data-id="{{concept.id}}" data-action="delete-relationship" data-message="{{concept.prefLabel.value}}"></i></a>
+                        <a href="javascript:void(0);" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{concept.id}}">{{concept.prefLabel.value}}</a>
+                        <span class="text-muted"> (preferred, {{concept.prefLabel.language}})</span>
                     </dd>
                 {% endfor %}
                 

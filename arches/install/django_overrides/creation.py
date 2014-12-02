@@ -1,9 +1,8 @@
-import sys
-
+import sys, os
 from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
-
+from arches.db.install import install_db
 
 class DatabaseCreation(BaseDatabaseCreation):
     # This dictionary maps Field objects to their associated PostgreSQL column
@@ -139,17 +138,26 @@ class DatabaseCreation(BaseDatabaseCreation):
         """
         Internal implementation - creates the test db tables.
         """
-        suffix = self.sql_table_creation_suffix()
+        suffix = 'test' #self.sql_table_creation_suffix()
 
         test_database_name = self._get_test_db_name()
 
         qn = self.connection.ops.quote_name
 
-        # Create the test database and connect to it.
-        cursor = self.connection.cursor()
         try:
-            cursor.execute(
-                "CREATE DATABASE %s WITH TEMPLATE arches OWNER postgres" % (qn(test_database_name)))
+
+            # Create the base arches database and connect to it.
+            db_settings = settings.DATABASES['default']
+            db_settings['NAME'] = test_database_name
+            install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
+            db_settings['install_path'] = install_path   
+            install_db.create_sqlfile(db_settings, install_path)
+            
+            os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -c "DROP DATABASE IF EXISTS %(NAME)s;"' % db_settings)
+            os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -c "CREATE DATABASE %(NAME)s WITH ENCODING=\'UTF8\' OWNER=%(USER)s CONNECTION LIMIT=-1;"' % db_settings)
+            
+            os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
+
         except Exception as e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
@@ -176,3 +184,12 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.exit(1)
 
         return test_database_name
+
+    def _destroy_test_db(self, test_database_name, verbosity):
+        """
+        Internal implementation - remove the test db tables.
+        """
+
+        db_settings = settings.DATABASES['default']
+        db_settings['NAME'] = test_database_name
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -c "DROP DATABASE IF EXISTS %(NAME)s;"' % db_settings)

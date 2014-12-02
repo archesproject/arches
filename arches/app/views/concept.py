@@ -90,6 +90,9 @@ def concept(request, conceptid):
 
         if f == 'skos':
             fromdb = True
+            include_parentconcepts = False
+            include_subconcepts = True
+            depth_limit = None
 
         if fromdb:
             ret = []
@@ -104,6 +107,10 @@ def concept(request, conceptid):
                     valuetypes = models.ValueTypes.objects.all()
                     relationtypes = models.DRelationtypes.objects.all()
                     prefLabel = concept_graph.get_preflabel(lang=lang).value
+                    for subconcept in concept_graph.subconcepts:
+                        subconcept.prefLabel = subconcept.get_preflabel(lang=lang) 
+                    for relatedconcept in concept_graph.relatedconcepts:
+                        relatedconcept.prefLabel = relatedconcept.get_preflabel(lang=lang) 
                     for value in concept_graph.values:
                         if value.category == 'label':
                             labels.append(value)
@@ -187,7 +194,7 @@ def concept(request, conceptid):
                     concept.save()
                     skos = SKOSReader()
                     rdf = skos.read_file(skosfile)
-                    ret = skos.get_concepts(rdf, concept_scheme_group=concept.id)
+                    ret = skos.save_concepts_from_skos(rdf, concept_scheme_group=concept.id)
                     return JSONResponse(ret)
             
         else:
@@ -251,9 +258,11 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def confirm_delete(request, conceptid):
-    lang = request.GET.get('lang', 'en-us')  
-    concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(conceptid, lang=lang).iteritems()]
-    return HttpResponse('<ul><li>' + '<li>'.join(concepts_to_delete) + '</ul>')
+    lang = request.GET.get('lang', 'en-us') 
+    concept = Concept().get(id=conceptid)
+    concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
+    #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
+    return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
 @csrf_exempt
 def search(request):
@@ -300,6 +309,7 @@ def search(request):
     return JSONResponse(results)
 
 def concept_tree(request):
+    lang = request.GET.get('lang', 'en-us') 
     conceptid = request.GET.get('node', None)
-    concepts = Concept({'id': conceptid}).concept_tree()
+    concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)

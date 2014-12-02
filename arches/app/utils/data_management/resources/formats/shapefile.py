@@ -1,13 +1,16 @@
 import sys
-import yaml
+import json
 # from .. import utils
 from django.contrib.gis.gdal import DataSource
 from django.conf import settings
 import os
 from arches.app.models.models import Concepts
+from arches.app.models.models import VwConcepts
 from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from django.db import connection
+import arches.management.commands.utils as utils
+
 
 class Row(object):
     def __init__(self, *args):
@@ -75,7 +78,7 @@ class ShapeReader():
 
         self.configs = self.parse_configs(shapefile)
         if self.configs:
-            self.attr_map = self.configs['FIELD_MAP']
+            self.attr_map = dict(self.configs['FIELD_MAP'])
 
             self.concept_value_mappings = {}
             for field, entitytypeid in self.attr_map.iteritems():
@@ -190,7 +193,7 @@ class ShapeReader():
         try:
             config_file = os.path.join(os.path.dirname(shapefile), os.path.basename(shapefile).split('.')[0] + '.config')
             if os.path.exists(config_file):
-                result = yaml.load(open(config_file, 'r'))
+                result = json.load(open(config_file, 'r'))
                 result['AUXILIARY_MAP'] = {}
             #AUXILIARY_MAP = {"NAME TYPE.E55" : "Primary","EXTERNAL XREF TYPE.E55" : "Legacy System"}
             #The auxiliary_map was Tharindus strategy to map concepts to their labels. This is not being implemented yet
@@ -252,23 +255,23 @@ class ShapeReader():
         return conceptid_map  
 
 
-    def get_e55_concept_legacyoids(self, e55_type):
+    def get_e55_concept_legacyoids(self, e55_type, lang=u'en-us'):
         concept = EntityTypes.objects.get(pk=e55_type).conceptid
         concept_graph = Concept().get(id=concept.pk, include_relatedconcepts=True, include=['label'])
         values_to_legacy = []
         cursor = connection.cursor()
         if len(concept_graph.relatedconcepts) > 0:
-            for value in concept_graph.relatedconcepts:
-                if value.type == "prefLabel":
-                    sql = "SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '{0}'".format(value.conceptid)
-                    cursor.execute(sql)
-                    legacyoid = str(cursor.fetchone()[0])
-                    values_to_legacy.append({value.value:legacyoid})
+            for concept_graph in concept_graph.relatedconcepts:
+                for value in concept_graph.values:
+                    if value.type == "prefLabel" and value.language == lang:
+                        concept_view = VwConcepts.objects.filter(conceptid = value.conceptid)[0] 
+                        values_to_legacy.append({value.value:concept_view.legacyoid})
         return e55_type, values_to_legacy
 
 
     # Now build a list of dictionaries, one per record
     def collect_resource_info(self, attr_mapping, auth_mapping, reader_output, geom_type, value_to_concept_label_mappings, break_on_error=True):
+
         dict_list=[] # list of dictionaries
         attr_names = reader_output[0]
         attr_vals = reader_output[1][0:-1] # get all attribute values except the geom_wkt values
@@ -277,7 +280,7 @@ class ShapeReader():
         '''
         first, add the attribute values to the dictionary
         and then add authority details. Because shapefile data does not 
-        contain authority details but the authority mapping
+        contain authority details, the authority mapping
         is defined by the user and passed in a separate dictionary
         '''      
         errors = []
@@ -290,8 +293,8 @@ class ShapeReader():
                 entitytypeid = attr_mapping.get(attr)
                 label = attr_vals[attr_index][record_index]
                 found_match = False
-
-                if type(entitytypeid) == str:
+                if type(entitytypeid) in [str, unicode]:
+                    print entitytypeid
                     if entitytypeid.endswith('.E55'):
                         count = 0
                         for mapping in value_to_concept_label_mappings[entitytypeid]:
@@ -302,6 +305,8 @@ class ShapeReader():
                                 break
                         if count == len(value_to_concept_label_mappings[entitytypeid]):
                             errors.append('shapefile record {0}: "{1}", Does not match any available {2} concept value\n'.format(str(record_index), label, entitytypeid))
+                        else:
+                            print str(record_index), label, entitytypeid
                         
                 record_dictionary[entitytypeid] = label
             
@@ -310,11 +315,12 @@ class ShapeReader():
             record_dictionary[geom_type] = geom_values[record_index] 
             dict_list.append(record_dictionary)
 
-        # if len(errors) > 0:
-        #     utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'), '\n'.join(errors))
-        #     print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'))
-        #     if break_on_error:
-        #         sys.exit(101)
+        if len(errors) > 0:
+            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'), '\n'.join(errors))
+            print 'There were errors matching some values to concepts, please see {0} for details'.format(os.path.join(settings.PACKAGE_ROOT, 'logs', 'shapefile_loading_errors.txt'))
+            if break_on_error:
+                sys.exit(101)
+
         return dict_list
 
 
