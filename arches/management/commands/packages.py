@@ -55,7 +55,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
-
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
@@ -74,7 +73,7 @@ class Command(BaseCommand):
         if options['operation'] == 'build_permissions':
             self.build_permissions()
 
-        if options['operation'] == 'load_resources':  
+        if options['operation'] == 'load_resources':
             self.load_resources(package_name, options['source'])
             
         if options['operation'] == 'remove_resources':     
@@ -132,6 +131,7 @@ class Command(BaseCommand):
             f.write('\nindex.number_of_shards: 1')
             f.write('\nindex.number_of_replicas: 0')
             f.write('\nhttp.port: %s' % port)
+            f.write('\ndiscovery.zen.ping.multicast.ping.enabled: false')
 
         # install plugin
         if sys.platform == 'win32':
@@ -247,6 +247,7 @@ class Command(BaseCommand):
         Runs the setup.py file found in the package root
 
         """
+        data_source = None if data_source == '' else data_source
         module = import_module('%s.setup' % package_name)
         load = getattr(module, 'load_resources')
         load(data_source) 
