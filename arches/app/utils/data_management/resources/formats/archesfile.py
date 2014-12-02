@@ -146,10 +146,14 @@ class Validator(object):
             self.append_error('additional values present in row', 'syntax_errors')
 
     def validate_entitytype(self, row, rownum):
-        if row['ATTRIBUTENAME'] in self.resource_attributes[row['RESOURCETYPE']]:
-            pass
+        if row['RESOURCETYPE'] in self.resource_attributes:
+            if row['ATTRIBUTENAME'] in self.resource_attributes[row['RESOURCETYPE']]:
+                pass
+            else:
+                self.append_error('{0} not a valid entity type for {1} resource.'.format(row['ATTRIBUTENAME'], row['RESOURCETYPE']), 'entitytype_errors')
         else:
-            self.append_error('{0} not a valid entity type for {1} resource.'.format(row['ATTRIBUTENAME'], row['RESOURCETYPE']), 'entitytype_errors')
+            self.append_error('{0} is not a valid resource type.'.format(row['RESOURCETYPE']), 'entitytype_errors')
+
 
     def valdiate_attribute_value(self, row, rownum):
         entity_type = row['ATTRIBUTENAME']
