@@ -208,6 +208,10 @@ class Entity(object):
                     setattr(themodelinstance, columnname, self.value)
                     themodelinstance.save()
                     self.value = themodelinstance.geturl()
+                elif isinstance(self.value, str):
+                    setattr(themodelinstance, columnname, self.value)
+                    themodelinstance.save()
+                    self.value = themodelinstance.geturl()
             else:
                 setattr(themodelinstance, columnname, self.value)
                 themodelinstance.save()
