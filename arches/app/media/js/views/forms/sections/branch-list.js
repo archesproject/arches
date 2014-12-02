@@ -3,11 +3,13 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         viewModel: null,
         key: '',
         pkField: '',
+        editeditem: '',
 
         events: {
             'click .add-button': 'addItem',
             'click .arches-CRUD-delete ': 'deleteItem',
-            'click .arches-CRUD-edit ': 'editItem'
+            'click .arches-CRUD-edit ': 'editItem',
+            'click [name="discard-edit-link"]': 'discardEdit'
         },
 
         initialize: function(options) {
@@ -25,6 +27,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         addItem: function() {
+            this.editeditem = ''
             var data = ko.toJS(this.viewModel.editing[this.key]);
             var validationAlert = this.$el.find('.branch-invalid-alert');
             
@@ -51,11 +54,19 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         editItem: function(e) {
             var data = $(e.target).closest('.arches-CRUD-edit').data();
-            var item = this.viewModel[this.key]()[data.index];
+            this.editeditem = this.viewModel[this.key]()[data.index];
 
-            this.trigger('change', 'edit', item);
-            koMapping.fromJS(ko.toJS(item), this.viewModel.editing[this.key]);
-            this.viewModel[this.key].remove(item);
+            this.trigger('change', 'edit', this.editeditem);
+            koMapping.fromJS(ko.toJS(this.editeditem), this.viewModel.editing[this.key]);
+            this.viewModel[this.key].remove(this.editeditem);
+        },
+
+        discardEdit: function(e) {
+            if(this.editeditem !== ''){
+                this.viewModel[this.key].push(this.editeditem);
+                koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
+                this.editeditem = '';           
+            }
         }
     });
 });
