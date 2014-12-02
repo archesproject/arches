@@ -15,6 +15,8 @@ from formats.shapefile import ShapeReader
 from django.core.management.base import BaseCommand, CommandError
 import glob
 import csv
+import sys
+from arches.management.commands import utils
 
 
 class ResourceLoader(object): 
@@ -39,6 +41,7 @@ class ResourceLoader(object):
         elif file_format == '.arches':
             reader = ArchesReader()
 
+        reader.validate_file(source)
         start = time()
         resources = reader.load_file(source)
         relationships = None
@@ -66,6 +69,9 @@ class ResourceLoader(object):
         schema = None
         current_entitiy_type = None
         legacyid_to_entityid = {}
+        errors = []
+
+        # print resource_list
 
         for resource in resource_list:
             masterGraph = None
