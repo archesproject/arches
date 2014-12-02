@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2'], function ($, Backbone, ko, _) {
+define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2', 'plugins/knockout-summernote'], function ($, Backbone, ko, _) {
     return Backbone.View.extend({
         
         events: function(){

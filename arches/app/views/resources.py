@@ -31,11 +31,11 @@ from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @csrf_exempt
-def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None):
+def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
-    if resourceid != None:
+    if resourceid != '':
         resource = Resource(resourceid)
-    elif resourcetypeid != None:
+    elif resourcetypeid != '':
         resource = Resource({'entitytypeid': resourcetypeid})
 
     form = resource.get_form(form_id)
@@ -58,6 +58,7 @@ def resource_manager(request, resourcetypeid=None, form_id=None, resourceid=None
             'form_template': 'forms/' + form_id + '.htm',
             'form_id': form_id,
             'resourcetypeid': resourcetypeid,
+            'resourceid': resourceid,
             'main_script': 'resource-manager',
             'active_page': 'ResourceManger',
             'resource': resource,

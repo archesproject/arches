@@ -47,7 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <div class="row">
-                        <form action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                        <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
                             <div class="col-sm-4 col-sm-offset-4">
 
                                 <div class="input-group margin-bottom-20">
@@ -62,7 +62,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   
                                 <div class="row">
                                     <div class="col-md-10 col-md-offset-1">
-                                        <button type="submit" class="btn-u btn-block margin-bottom-10">Log In</button>
+                                        <button type="submit" class="btn-u btn-block margin-bottom-10" id="login-btn">Log In</button>
                                         <!-- Uncomment the below when automated sign up is made available -->
                                         <!-- <span>Don't Have Account? <a class="color-green margin-top-10 text-center" href="page_registration1.html">Sign Up!</a></span>  -->
                                     </div>

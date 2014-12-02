@@ -63,7 +63,7 @@
                         <li><a href="page_faq.html">Help</a></li>  
                         <li class="topbar-devider"></li>   
                         <li>
-                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
+                            <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
                         </li>
                         
                     </ul>
@@ -125,7 +125,7 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     {% for type in resource_types %}
-                                        <li><a href="{% url 'new_resource_manager' type.resourcetypeid type.default_page%}"><i class="{{type.icon_class}}"></i>{{type.name}}</a></li>
+                                        <li><a href="{% url 'resource_manager' type.resourcetypeid type.default_page '' %}"><i class="{{type.icon_class}}"></i>{{type.name}}</a></li>
                                     {% endfor %}
                                 </ul>
                             </li>
