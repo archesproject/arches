@@ -40,6 +40,10 @@ class ResourceLoader(object):
             reader.validate_file(source)
 
         start = time()
+
+        print '\nLOADING RESOURCES ({0})'.format(source)
+        print '-----------------------'
+
         resources = reader.load_file(source)
         relationships = None
         relationships_file = file_name + '.relations'
@@ -65,10 +69,10 @@ class ResourceLoader(object):
         current_entitiy_type = None
         legacyid_to_entityid = {}
         errors = []
-        progress_interval = 500
+        progress_interval = 250
         for count, resource in enumerate(resource_list):
 
-            if count > progress_interval and count % progress_interval == 0:
+            if count >= progress_interval and count % progress_interval == 0:
                 print count, 'of', len(resource_list), 'loaded'
 
             masterGraph = None
@@ -89,9 +93,10 @@ class ResourceLoader(object):
 
         ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)
+        print len(resource_list), 'resources loaded'
         print 'total time to etl = %s' % (elapsed)
         print 'average time per entity = %s' % (elapsed/len(resource_list))
-        print 'Load Identifier = ', load_id
+        print 'Load Identifier =', load_id
         return ret
 
     def build_master_graph(self, resource, schema):
