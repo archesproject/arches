@@ -6,15 +6,32 @@ define(['jquery', 'knockout', 'select2'], function ($, ko) {
           });
 
           var allBindings = allBindingsAccessor(),
-              select2 = ko.utils.unwrapObservable(allBindings.select2);
+              select2Config = ko.utils.unwrapObservable(allBindings.select2);
 
-          $(el).select2(select2);
+          if (select2Config.viewModel && select2Config.conceptKey) {
+            select2Config.formatResult = function (item) {
+                return item.value;
+            };
+
+            select2Config.formatSelection = function (item) {
+                select2Config.viewModel[select2Config.conceptKey + '__label'](item.value)
+                select2Config.viewModel[select2Config.conceptKey + '__value'](item.id)
+                return item.value;
+            };
+          }
+
+          $(el).select2(select2Config);
         },
         update: function (el, valueAccessor, allBindingsAccessor, viewModel) {
-            var allBindings = allBindingsAccessor();
+            var allBindings = allBindingsAccessor(),
+                select2Config = ko.utils.unwrapObservable(allBindings.select2);
 
             if ("value" in allBindings) {
                 $(el).select2("val", allBindings.value());
+            } else if (select2Config.viewModel && select2Config.conceptKey) {
+                if ($(el).select2("val") != select2Config.viewModel[select2Config.conceptKey + '__value']()) {
+                    $(el).select2("val", select2Config.viewModel[select2Config.conceptKey + '__value']());
+                }
             } else if ("selectedOptions" in allBindings) {
                 var converted = [];
                 var textAccessor = function(value) { return value; };
