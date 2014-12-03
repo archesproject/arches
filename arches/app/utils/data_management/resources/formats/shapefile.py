@@ -294,7 +294,6 @@ class ShapeReader():
                 label = attr_vals[attr_index][record_index]
                 found_match = False
                 if type(entitytypeid) in [str, unicode]:
-                    print entitytypeid
                     if entitytypeid.endswith('.E55'):
                         count = 0
                         for mapping in value_to_concept_label_mappings[entitytypeid]:

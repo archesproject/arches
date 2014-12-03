@@ -65,10 +65,10 @@ class ResourceLoader(object):
         current_entitiy_type = None
         legacyid_to_entityid = {}
         errors = []
-
+        progress_interval = 500
         for count, resource in enumerate(resource_list):
 
-            if count % 100 == 0:
+            if count > progress_interval and count % progress_interval == 0:
                 print count, 'of', len(resource_list), 'loaded'
 
             masterGraph = None
