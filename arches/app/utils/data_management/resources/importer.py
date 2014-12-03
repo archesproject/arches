@@ -13,9 +13,7 @@ from optparse import make_option
 from formats.archesfile import ArchesReader
 from formats.shapefile import ShapeReader
 from django.core.management.base import BaseCommand, CommandError
-import glob
 import csv
-import sys
 from arches.management.commands import utils
 
 
@@ -33,15 +31,14 @@ class ResourceLoader(object):
             help='format extension that you would like to load: arches or shp'),
         )
 
-
     def load(self, source):
         file_name, file_format = os.path.splitext(source)
         if file_format == '.shp':
             reader = ShapeReader()
         elif file_format == '.arches':
             reader = ArchesReader()
+            reader.validate_file(source)
 
-        reader.validate_file(source)
         start = time()
         resources = reader.load_file(source)
         relationships = None
@@ -56,7 +53,6 @@ class ResourceLoader(object):
         else:
             print 'No relationship file'
 
-
     def resource_list_to_entities(self, resource_list):
         '''Takes a collection of imported resource records and saves them as arches entities'''
 
@@ -70,9 +66,11 @@ class ResourceLoader(object):
         legacyid_to_entityid = {}
         errors = []
 
-        # print resource_list
+        for count, resource in enumerate(resource_list):
 
-        for resource in resource_list:
+            if count % 100 == 0:
+                print count, 'of', len(resource_list), 'loaded'
+
             masterGraph = None
             entityData = []
             if current_entitiy_type != resource.entitytypeid:
@@ -86,8 +84,6 @@ class ResourceLoader(object):
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             
             ret['successfully_saved'] += 1
-            print 'saved', master_graph.entityid
-            print 'indexing', master_graph.entityid
             master_graph.index()
             ret['successfully_indexed'] += 1
 
@@ -97,7 +93,6 @@ class ResourceLoader(object):
         print 'average time per entity = %s' % (elapsed/len(resource_list))
         print 'Load Identifier = ', load_id
         return ret
-
 
     def build_master_graph(self, resource, schema):
         master_graph = None
@@ -131,10 +126,8 @@ class ResourceLoader(object):
 
         return master_graph
 
-
     def pre_save(self, master_graph):
         pass
-
 
     def relate_resources(self, relationship, legacyid_to_entityid):
         relationshiptype_concept = Concepts.objects.get(legacyoid = relationship['RELATION_TYPE'])
@@ -150,19 +143,3 @@ class ResourceLoader(object):
             dateended = end_date,
             )
         related_resource_record.save()
-
-
-    def generate_uuid(self, cursor):
-        sql = """
-            SELECT uuid_generate_v1mc()
-        """
-        cursor.execute(sql)
-        return cursor.fetchone()[0]
-
-
-    def get_mapping_steps(self, resource_entity, leaf_entity_type_id, cursor):
-        sql = """
-            SELECT mappingid FROM ontology.mappings WHERE entitytypeidfrom = '%s' AND entitytypeidto = '%s'
-        """%(resource_entity.entitytypeid, leaf_entity_type_id)
-        cursor.execute(sql)
-        return resource_entity._get_mappings(cursor.fetchone()[0])

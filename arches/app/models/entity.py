@@ -405,8 +405,6 @@ class Entity(object):
 
         selfEntities = self.find_entities_by_type_id(entitytypeid)
         foundEntities = entitytomerge.find_entities_by_type_id(entitytypeid)
-        print entitytypeid
-        print len(foundEntities)
         if len(selfEntities) == 1 and len(foundEntities) == 1:
             for foundEntity in foundEntities[0].child_entities:
                 selfEntities[0].append_child(foundEntity)
