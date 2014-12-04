@@ -24,6 +24,7 @@
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/arches.css' %}">
         <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css" type="text/css" media="screen">
     {% endblock css%}
 
 </head> 
@@ -331,7 +332,9 @@
                 'dropzone': 'http://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
                 'summernote': 'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
                 'knockout': 'http://cdnjs.cloudflare.com/ajax/libs/knockout/3.2.0/knockout-min',
-                'knockout-mapping': 'http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min'
+                'knockout-mapping': 'http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min',
+                'moment': 'http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min',
+                'bootstrap-datetimepicker': 'http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min'
             }
         });
 
@@ -353,9 +356,12 @@
                 };
             });
 
-            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
+            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui", "moment", "bootstrap-datetimepicker"], function (scrollToTop, SimpleSearch) {
                 var search = new SimpleSearch({ el: $('#simple-search')[0] });
                 scrollToTop.init();
+                $(function () {
+                    $('.datetimepicker').datetimepicker({pickTime: false});
+                });
 
                 // include all base_page instances here that page scripts may need access to
                 // NOTE: this module should only ever be required from within main page scripts
@@ -373,6 +379,7 @@
             });
         });
     </script>
+
 	{% endblock javascript %}
 
 </body>
