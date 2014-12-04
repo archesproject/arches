@@ -79,6 +79,11 @@ class ResourceForm(object):
     def __init__(self, resource):
         # here is where we can create the basic format for the form data
         self.resource = resource
+        if self.resource == None:
+            self.schema = None
+        else:
+            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+        
         self.data = {
             "domains": {},
             "defaults": {}
@@ -108,12 +113,13 @@ class ResourceForm(object):
         for entity in self.resource.find_entities_by_type_id(entitytypeid):
             self.resource.child_entities.remove(entity)
 
-        schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+        if self.schema == None:
+            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
         for value in data[entitytypeid.replace('.', '_')]:
             baseentity = None
             for newentity in self.decode_data_item(value):
                 entity = Entity()
-                entity.create_from_mapping(self.resource.entitytypeid, schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+                entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
 
                 if baseentity == None:
                     baseentity = entity
@@ -121,6 +127,19 @@ class ResourceForm(object):
                     baseentity.merge(entity)
             
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
+
+    def update_node(self, entitytypeid, data):
+        if self.schema == None:
+            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+        nodes = self.resource.find_entities_by_type_id(entitytypeid)
+        node_data = self.decode_data_item(data[entitytypeid.replace('.', '_')])[0]
+
+        if len(nodes) == 0:
+            entity = Entity()
+            entity.create_from_mapping(self.resource.entitytypeid, self.schema[entitytypeid]['steps'], entitytypeid, node_data['value'], node_data['entityid'])
+            self.resource.merge_at(entity, self.resource.entitytypeid)
+        else:
+            nodes[0].value = node_data['value']
 
     def encode_entity(self, entity):
         def enc(entity, attr):
