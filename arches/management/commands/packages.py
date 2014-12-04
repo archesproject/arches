@@ -131,7 +131,8 @@ class Command(BaseCommand):
             f.write('\nindex.number_of_shards: 1')
             f.write('\nindex.number_of_replicas: 0')
             f.write('\nhttp.port: %s' % port)
-            f.write('\ndiscovery.zen.ping.multicast.ping.enabled: false')
+            f.write('\ndiscovery.zen.ping.multicast.enabled: false')
+            f.write('\ndiscovery.zen.ping.unicast.hosts: ["localhost"]')
 
         # install plugin
         if sys.platform == 'win32':
