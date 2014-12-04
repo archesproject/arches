@@ -75,6 +75,8 @@ class Resource(Entity):
 
 
     def get_primary_name(self):
+        if self.entityid == '':
+            return _('New Resource')
         return _('Unnamed Resource')
 
 
