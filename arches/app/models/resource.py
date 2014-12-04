@@ -80,6 +80,10 @@ class Resource(Entity):
         return _('Unnamed Resource')
 
 
+    def get_names(self):
+        return []
+
+
     def create_resource_relationship(self, related_resource_id, notes=None, date_started=None, date_ended=None, relationship_type_id=None):
         """
         Creates a relationship between resources 
@@ -174,12 +178,8 @@ class Resource(Entity):
 
             term_entities = []
 
-            names = []
-            for name in self.get_primary_name():
-                names.append(name.value)
-
-            primary_display_name = ' '.join(names)
-            search_result['primaryname'] = primary_display_name
+            names = self.get_names()
+            primary_display_name = self.get_primary_name()
 
             for enititytype in settings.SEARCHABLE_ENTITY_TYPES:
                 for entity in self.find_entities_by_type_id(enititytype):
