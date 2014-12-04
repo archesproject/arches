@@ -29,6 +29,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.entity import Entity
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -102,6 +103,24 @@ class ResourceForm(object):
                 data = dict(data.items() + self.encode_entity(entity).items())
             ret.append(data)
         return ret
+
+    def update_nodes(self, entitytypeid, data):
+        for entity in self.resource.find_entities_by_type_id(entitytypeid):
+            self.resource.child_entities.remove(entity)
+
+        schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+        for value in data[entitytypeid.replace('.', '_')]:
+            baseentity = None
+            for newentity in self.decode_data_item(value):
+                entity = Entity()
+                entity.create_from_mapping(self.resource.entitytypeid, schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+
+                if baseentity == None:
+                    baseentity = entity
+                else:
+                    baseentity.merge(entity)
+            
+            self.resource.merge_at(baseentity, self.resource.entitytypeid)
 
     def encode_entity(self, entity):
         def enc(entity, attr):
