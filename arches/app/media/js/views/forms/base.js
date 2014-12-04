@@ -29,16 +29,6 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
             this.viewModel = JSON.parse(this._rawdata);
             this.viewModel.editing = {};
-            this.viewModel.formatDomainValue = function (item) {
-                return item.value;
-            };
-
-            this.viewModel.selectDomainValue = function (item) {
-                if (this.labelValue) {
-                    this.labelValue(item.value);
-                }
-                return self.viewModel.formatDomainValue(item);
-            };
 
             $('input,select').change(function() {
                 var isDirty = self.isDirty();
@@ -46,8 +36,6 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             });
 
             this.on('change', function(eventtype, item){
-                console.log(eventtype);
-                console.log(item);
                 $('#saveedits').removeClass('disabled');
                 $('#canceledits').removeClass('disabled');                    
             });
