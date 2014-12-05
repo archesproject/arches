@@ -1,23 +1,27 @@
 require([
     'jquery',
-    'arches'
+    'arches',
+    "bootstrap", 
+    "moment", 
+    "bootstrap-datetimepicker"
 ], function($, arches) {
     $(document).ready(function() {
         //Scrolling, Get initial offsets for the app header
         var header_offset = $("#appheader").offset();
         
-
         //Determine the trigger to start scrolling the sidebar.  Sidebar should scroll when the position of the bottom of the CRUD form 
         //coincides with the bottom of the sidebar.  Determine which div is lower, then set the trigger to that div
         var sidebar = $("#sidebar");
         var crud = $("#crud");
         var sidebar_bottom = sidebar.offset().top + sidebar.height();
         
- 
         //There seems to be a bug in jQuery.  When setting the position class during scrolling the menu width gets reset.
         //Fix this by getting initial width of menu.  Use to reset the menu width on scroll
         var menu_width = $("#sidebar").width();
         
+        $(function () {
+            $('.datetimepicker').datetimepicker({pickTime: false});
+        });
         
         //Manage position/scrolling of App header, menu, and CRUD forms based on user scrolling
         $( window ).scroll(function() {

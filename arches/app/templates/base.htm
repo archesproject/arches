@@ -356,13 +356,9 @@
                 };
             });
 
-            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui", "moment", "bootstrap-datetimepicker"], function (scrollToTop, SimpleSearch) {
+            require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
                 var search = new SimpleSearch({ el: $('#simple-search')[0] });
                 scrollToTop.init();
-                $(function () {
-                    $('.datetimepicker').datetimepicker({pickTime: false});
-                });
-
                 // include all base_page instances here that page scripts may need access to
                 // NOTE: this module should only ever be required from within main page scripts
                 define('base_page', [], function () {
