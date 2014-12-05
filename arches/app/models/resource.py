@@ -61,9 +61,9 @@ class Resource(Entity):
         selected_form = None
         forms = [form for group in self.form_groups for form in group['forms']]
         for form in forms:
-            if form.id == form_id:
+            if form['id'] == form_id:
                 selected_form = form
-        return selected_form(self)
+        return selected_form['class'](self)
 
 
     def get_type_name(self):

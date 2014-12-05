@@ -72,12 +72,12 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
 
 class ResourceForm(object):
-    id = ''
-    icon = ''
-    name = ''
-
     def __init__(self, resource):
         # here is where we can create the basic format for the form data
+        info = self.get_info()
+        self.id = info['id']
+        self.name = info['name']
+        self.icon = info['icon']
         self.resource = resource
         if self.resource == None:
             self.schema = None
@@ -89,6 +89,15 @@ class ResourceForm(object):
             "defaults": {}
         }
         self.load()
+    
+    @staticmethod
+    def get_info():
+        return {
+            'id': '',
+            'icon': '',
+            'name': '',
+            'class': ResourceForm
+        }
 
 	def update(self, data):
 		# update resource w/ post data
