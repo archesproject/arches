@@ -467,3 +467,125 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     position: absolute;
     width: 1px;
 }
+
+
+/* Timeline Overrides */
+
+.arches-timeline {
+    position:relative;
+}
+
+.arches-timeline-list {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.arches-timeline-list:after {
+    content:" ";
+    background-color:#eee;
+    position:absolute;
+    display:block;
+    width:2px;
+    top:0;
+    left:150px;
+    bottom:0;
+    z-index:1;
+}
+
+.arches-timeline-list li {
+    position:relative;
+    margin:0;
+    padding:15px 0;
+}
+
+.arches-timeline-list>li:hover {
+    background-color:#f4f4f4;
+}
+
+.arches-timeline-hover li:hover {
+    background-color:#f9f9f9;
+}
+
+.arches-timeline-icon {
+    background:#3276b1;
+    color:#fff;
+    border-radius:50%;
+    position:relative;
+    width: 28px;
+    height: 28px;
+    line-height: 26px;
+    font-size: 12px;
+    text-align:center;
+    left: -41px;
+    top: 26px;
+    z-index:100;
+    padding: 2px;
+}
+
+.added {
+    background:#c39400;
+}
+
+.edited {
+    background:#ffd03a;
+}
+
+.deleted {
+    background:#AE1212;
+}
+
+.arches-timeline-icon>img {
+    height:32px;
+    width:32px;
+    border-radius:50%;
+    margin-top:-2px;
+    margin-left:-2px;
+    border:2px solid #3276b1;
+}
+
+.arches-timeline-time {
+    float:left;
+    width:125px;
+    font-size: 13px;
+    font-weight: 300;
+    color: #a0a0a0;
+    font-style: italic;
+} 
+
+.arches-timeline-time>small {
+    font-style:italic;
+}
+
+.arches-timeline-date {
+    float:left;
+    width:125px;
+    font-size: 15px;
+    font-weight: 400;
+    text-align:right;
+    color: #777;
+} 
+
+.arches-timeline-content {
+    margin-left:178px;
+    margin-top: -40px;
+}
+
+.arches-timeline-content-title {
+    font-size: 17px;
+    font-weight: 400;
+    color: #666;
+}
+
+.arches-timeline-description {
+    font-size: 15px;
+    line-height: 1.25;
+    font-weight: 300;
+    color: #666;
+}
+
+.arches-timeline-editor {
+    color: #666;
+    position: relative;
+    left: 178px;
+}

@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import uuid
+from datetime import datetime
 from django.conf import settings
 import arches.app.models.models as archesmodels
 from django.db.models import Q
@@ -55,7 +57,129 @@ class Resource(Entity):
         super(Resource, self).__init__(*args, **kwargs)
 
         self.form_groups = []
-    
+
+    def save(self, user={}, note=''):
+        """
+        Saves a resource back to the db 
+
+        """
+
+        newentity = False
+        diff = ''
+        timestamp = datetime.now()
+
+        if self.entityid != '':
+            entity_pre_save = Entity().get(self.entityid)
+            diff = self.diff(entity_pre_save)
+        else:
+            newentity = True
+
+
+        self._save() 
+
+        if not newentity:
+            for entity in diff['deleted_nodes']:
+                if entity.label != '' or entity.value != '':
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
+                    edit.resourceentitytypeid = self.entitytypeid
+                    edit.resourceid = self.entityid
+                    edit.userid = getattr(user, 'id', '')
+                    edit.user_email = getattr(user, 'email', '')
+                    edit.user_firstname = getattr(user, 'first_name', '')
+                    edit.user_lastname = getattr(user, 'last_name', '')
+                    edit.note = note
+                    edit.timestamp = timestamp
+                    edit.attributeentitytypeid = entity.entitytypeid
+                    edit.edittype = 'delete'
+                    edit.oldvalue = entity.label if entity.label != '' else entity.value
+                    edit.save()             
+                entity._delete(delete_root=True)
+
+            for entity in diff['updated_nodes']:
+                if entity.label != '' or entity.value != '':
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
+                    edit.resourceentitytypeid = self.entitytypeid
+                    edit.resourceid = self.entityid
+                    edit.userid = getattr(user, 'id', '')
+                    edit.user_email = getattr(user, 'email', '')
+                    edit.user_firstname = getattr(user, 'first_name', '')
+                    edit.user_lastname = getattr(user, 'last_name', '')
+                    edit.note = note
+                    edit.timestamp = timestamp
+                    edit.attributeentitytypeid = entity['from'].entitytypeid
+                    edit.edittype = 'update'
+                    edit.oldvalue = entity['from'].label if entity['from'].label != '' else entity['from'].value 
+                    edit.newvalue = entity['to'].label if entity['to'].label != '' else entity['to'].value 
+                    edit.save()    
+
+            for entity in diff['inserted_nodes']:
+                if entity.label != '' or entity.value != '':
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
+                    edit.resourceentitytypeid = self.entitytypeid
+                    edit.resourceid = self.entityid
+                    edit.userid = getattr(user, 'id', '')
+                    edit.user_email = getattr(user, 'email', '')
+                    edit.user_firstname = getattr(user, 'first_name', '')
+                    edit.user_lastname = getattr(user, 'last_name', '')
+                    edit.note = note
+                    edit.timestamp = timestamp
+                    edit.attributeentitytypeid = entity.entitytypeid
+                    edit.edittype = 'insert'
+                    edit.oldvalue = None
+                    edit.newvalue = entity.label if entity.label != '' else entity.value
+                    edit.save()      
+
+        else:
+            for entity in self.flatten():
+                if entity.label != '' or entity.value != '':
+                    edit = archesmodels.EditLog()        
+                    edit.editlogid = str(uuid.uuid4())
+                    edit.resourceentitytypeid = self.entitytypeid
+                    edit.resourceid = self.entityid
+                    edit.userid = getattr(user, 'id', '')
+                    edit.user_email = getattr(user, 'email', '')
+                    edit.user_firstname = getattr(user, 'first_name', '')
+                    edit.user_lastname = getattr(user, 'last_name', '')
+                    edit.note = note
+                    edit.timestamp = timestamp
+                    edit.attributeentitytypeid = entity.entitytypeid
+                    edit.edittype = 'create'
+                    edit.oldvalue = None
+                    edit.newvalue = entity.label if entity.label != '' else entity.value
+                    edit.save()
+
+        return self
+
+    def delete(self, user={}, note=''):
+        """
+        Deltes a resource from the db wrapped in a transaction 
+        
+        """
+
+        timestamp = datetime.now()
+        for entity in self.flatten():
+            if not delete_root and entity.entitytypeid != self.entitytypeid:
+                edit = archesmodels.EditLog()        
+                edit.editlogid = str(uuid.uuid4())
+                edit.resourceentitytypeid = self.entitytypeid
+                edit.resourceid = self.entityid
+                edit.userid = getattr(user, 'id', '')
+                edit.user_email = getattr(user, 'email', '')
+                edit.user_firstname = getattr(user, 'first_name', '')
+                edit.user_lastname = getattr(user, 'last_name', '') 
+                edit.note = note                               
+                edit.timestamp = timestamp
+                edit.attributeentitytypeid = entity.entitytypeid
+                edit.edittype = 'delete'
+                edit.oldvalue = entity.label if entity.label != '' else entity.value
+                edit.newvalue = None
+                edit.save()
+
+        #super(Resource, self).delete(delete_root=delete_root)
+        self._delete(delete_root=delete_root)
 
     def get_form(self, form_id):
         selected_form = None

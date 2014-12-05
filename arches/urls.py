@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     url(r'^Search', 'arches.app.views.main.search'),
     url(r'^TermSearch', 'arches.app.views.search.search_terms'),
     url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.resource_manager', name="resource_manager"),
+    url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.edit_history', name="edit_history"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

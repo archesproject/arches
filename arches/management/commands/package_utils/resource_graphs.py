@@ -4,17 +4,18 @@ import traceback
 import unicodecsv
 from os import listdir
 from os.path import isfile, join
-from django.conf import settings
 from django.db import connection, transaction
 import concepts
 from .. import utils
 
-def load_graphs(break_on_error=True):
+def load_graphs(break_on_error=True, settings=None):
     """
     Iterates through the resource node and edge files to load entitytypes and mappings into the database.
 
     """
 
+    if not settings:
+        from django.conf import settings        
   
     suffix = '_nodes.csv'
     errors = []

@@ -3,6 +3,7 @@ from time import time
 import datetime
 from django.conf import settings
 from django.db import connection, transaction
+from django.contrib.auth.models import User
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.models import Concepts
@@ -17,7 +18,11 @@ import csv
 from arches.management.commands import utils
 
 
-class ResourceLoader(object): 
+class ResourceLoader(object):
+
+    def __init__(self):
+        self.user = User()
+        self.user.first_name = settings.ETL_USERNAME
 
     option_list = BaseCommand.option_list + (
         make_option('--source',
@@ -83,7 +88,7 @@ class ResourceLoader(object):
             master_graph = self.build_master_graph(resource, schema)
 
             self.pre_save(master_graph)
-            master_graph.save(username=settings.ETL_USERNAME, note=load_id)
+            master_graph.save(user=self.user, note=load_id)
             resource.entityid = master_graph.entityid
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             

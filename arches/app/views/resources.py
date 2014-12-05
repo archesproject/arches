@@ -29,6 +29,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 
 @csrf_exempt
@@ -47,7 +48,7 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         form.update(data)
 
         with transaction.atomic():
-            resource.save()
+            resource.save(user=request.user)
             #resource.index()
             resourceid = resource.entityid
 
@@ -56,7 +57,7 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
     return render_to_response('resource-manager.htm', {
             'form': form,
             'formdata': JSONSerializer().serialize(form.data),
-            'form_template': 'forms/' + form_id + '.htm',
+            'form_template': 'views/forms/' + form_id + '.htm',
             'form_id': form_id,
             'resourcetypeid': resourcetypeid,
             'resourceid': resourceid,
@@ -69,6 +70,28 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         },
         context_instance=RequestContext(request))        
 
+def edit_history(request, resourceid=''):
+    ret = []
+    current = None
+    index = -1
+    start = request.GET.get('start', 0)
+    limit = request.GET.get('limit', 10)
+    if resourceid != '':
+        dates = models.EditLog.objects.filter(resourceid = resourceid).values_list('timestamp', flat=True).order_by('-timestamp').distinct('timestamp')[start:limit]
+        # dates = models.EditLog.objects.datetimes('timestamp', 'second', order='DESC')
+        for date in dates:
+            #ret[str(date)] = models.EditLog.objects.filter(resourceid = self.resource.entityid, timestamp = date)
+            print str(date)
+
+        for log in models.EditLog.objects.filter(resourceid = resourceid, timestamp__in = dates).values().order_by('-timestamp', 'attributeentitytypeid'):
+            if str(log['timestamp']) != current:
+                current = str(log['timestamp']) 
+                ret.append({'date':str(log['timestamp'].date()), 'time': str(log['timestamp'].time().replace(microsecond=0).isoformat()), 'log': []})
+                index = index + 1
+
+            ret[index]['log'].append(log)
+            
+    return JSONResponse(ret, indent=4)
 
 
 class ResourceForm(object):
@@ -102,6 +125,10 @@ class ResourceForm(object):
 	def update(self, data):
 		# update resource w/ post data
 		return 
+
+    def load(self):
+        # retrieves the data from the server
+        return 
 
     def get_e55_domain(self, entitytypeid):
         return list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value').values())

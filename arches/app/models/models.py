@@ -475,6 +475,7 @@ class EditLog(models.Model):
     timestamp = models.DateTimeField()
     oldvalue = models.TextField()
     newvalue = models.TextField()
+    user_email = models.TextField()
     user_firstname = models.TextField()
     user_lastname = models.TextField()
     note = models.TextField()

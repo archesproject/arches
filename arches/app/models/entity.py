@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from datetime import datetime
 import uuid
 import types
 import arches.app.models.models as archesmodels
@@ -42,8 +41,8 @@ class Entity(object):
         self.entitytypeid = ''
         self.entityid = ''
         self.value = ''
-        self.label = None
-        self.businesstablename = None
+        self.label = ''
+        self.businesstablename = ''
         self.child_entities = [
             # contains an array of other entities
         ]      
@@ -63,16 +62,22 @@ class Entity(object):
     def __repr__(self):
         return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, self.value)
 
+    def __hash__(self): return hash('%s%s%s' % (self.entityid, self.entitytypeid, self.value))
+    def __eq__(self, x): return hash(self) == hash(x)
+    def __ne__(self, x): return hash(self) != hash(x)
+
     def get(self, pk, parent=None):
         """
         Gets a complete entity graph for a single entity instance given an entity id
         If a parent is given, will attempt to lookup the rule used to relate parent to child
 
         """
+
         entity = archesmodels.Entities.objects.get(pk = pk)
         self.entitytypeid = entity.entitytypeid_id
         self.entityid = entity.pk
         self.businesstablename = entity.entitytypeid.businesstablename
+
         # get the entity value if any
         if entity.entitytypeid.businesstablename != None:
             themodel = self._get_model(entity.entitytypeid.businesstablename)
@@ -101,64 +106,6 @@ class Entity(object):
 
         return self
 
-    def save(self, username='', note=''):
-        """
-        Saves an entity back to the db wrapped in a transaction
-        We can't simply apply the decorator to the _save method 
-        because of the recursive nature of the save process
-
-        """
-
-        # first we remove any entities from the current entity graph that have been deleted
-        diff = ''
-
-        if self.entityid != '':
-            entity_pre_save = Entity().get(self.entityid)
-            diff = entity_pre_save.diff(self)
-
-            for entity in diff['deleted_nodes']:             
-                entity.delete()
-
-        self._save()
-
-        timestamp = datetime.now()
-        if self.entityid != '' and diff != '':
-
-            for entity in diff['updated_nodes']:
-                edit = archesmodels.EditLog()        
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceentitytypeid = self.entitytypeid
-                edit.resourceid = self.entityid
-                edit.attributeentitytypeid = entity['from'].entitytypeid
-                edit.edittype = 'update'
-                edit.userid = username
-                edit.timestamp = timestamp
-                edit.oldvalue = entity['from'].value
-                edit.newvalue = entity['to'].value
-                edit.user_firstname = username
-                edit.user_lastname = username
-                edit.note = note
-                edit.save()    
-        else:
-            for entity in self.flatten():
-                if entity.value != '':
-                    edit = archesmodels.EditLog()        
-                    edit.editlogid = str(uuid.uuid4())
-                    edit.resourceentitytypeid = self.entitytypeid
-                    edit.resourceid = self.entityid
-                    edit.attributeentitytypeid = entity.entitytypeid
-                    edit.edittype = 'insert'
-                    edit.userid = username
-                    edit.timestamp = timestamp
-                    edit.oldvalue = None
-                    edit.newvalue = entity.value
-                    edit.user_firstname = username
-                    edit.user_lastname = username
-                    edit.note = note
-                    edit.save()
-
-        return self
-
     def _save(self):
         """
         Saves an entity back to the db, returns a DB model instance, not an instance of self
@@ -171,72 +118,54 @@ class Entity(object):
             self.entityid = str(uuid.uuid4())
 
 
-        domainentity = archesmodels.Entities()
-        domainentity.entitytypeid = entitytype
-        domainentity.entityid = self.entityid
-        domainentity.save()
+        entity = archesmodels.Entities()
+        entity.entitytypeid = entitytype
+        entity.entityid = self.entityid
+        entity.save()
 
-        columnname = domainentity.entitytypeid.getcolumnname()
+
+        columnname = entity.entitytypeid.getcolumnname()
         if columnname != None:
-            themodel = self._get_model(domainentity.entitytypeid.businesstablename)
+            themodel = self._get_model(entity.entitytypeid.businesstablename)
             themodelinstance = themodel()
-            themodelinstance.entityid = domainentity
-            if(domainentity.entitytypeid.businesstablename == 'files'):
+            themodelinstance.entityid = entity
+
+            if (isinstance(themodelinstance, archesmodels.Files)): 
                 # Saving of files must be handled specially
                 # Because on subsequent saves of a file resource, we post back the file path url (instead of posting the file like we originally did),
                 # we want to prevent the path from being saved back to the database thus screwing up the file save process 
                 if isinstance(self.value, (InMemoryUploadedFile, TemporaryUploadedFile)):
                     setattr(themodelinstance, columnname, self.value)
                     themodelinstance.save()
-                    self.value = themodelinstance.geturl()
                 elif isinstance(self.value, str):
                     setattr(themodelinstance, columnname, self.value)
                     themodelinstance.save()
-                    self.value = themodelinstance.geturl()
             else:
                 setattr(themodelinstance, columnname, self.value)
                 themodelinstance.save()
-            if(domainentity.entitytypeid.businesstablename == 'domains'):
-                self.value = themodelinstance.getlabelid()
 
-        for entity in self.child_entities:
-            rangeentity = entity._save()
+            self.businesstablename = entity.entitytypeid.businesstablename
+            self.label = self.value
+            if (isinstance(themodelinstance, archesmodels.Domains)): 
+                self.value = themodelinstance.getlabelid()
+                self.label = themodelinstance.getlabelvalue()
+            elif (isinstance(themodelinstance, archesmodels.Files)): 
+                self.value = themodelinstance.geturl()
+                self.label = themodelinstance.getname()
+
+        for child_entity in self.child_entities:
+            child = child_entity._save()
             try:
-                rule = archesmodels.Rules.objects.get(entitytypedomain = domainentity.entitytypeid, entitytyperange = rangeentity.entitytypeid, propertyid = entity.property)
+                rule = archesmodels.Rules.objects.get(entitytypedomain = entity.entitytypeid, entitytyperange = child.entitytypeid, propertyid = child_entity.property)
                 newrelationship = archesmodels.Relations()
-                newrelationship.entityiddomain = domainentity
-                newrelationship.entityidrange = rangeentity
+                newrelationship.entityiddomain = entity
+                newrelationship.entityidrange = child
                 newrelationship.ruleid = rule
                 newrelationship.save()
             except:
-                print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(domainentity.entitytypeid, rangeentity.entitytypeid, entity.property)
+                print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(entity.entitytypeid, child.entitytypeid, entity.property)
 
-        return domainentity
-
-    def delete(self, username='', note='', delete_root=False):
-        """
-        Deltes an entity from the db wrapped in a transaction 
-        """
-
-        timestamp = datetime.now()
-        for entity in self.flatten():
-            if entity.value != '':
-                edit = archesmodels.EditLog()        
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceentitytypeid = self.entitytypeid
-                edit.resourceid = self.entityid
-                edit.attributeentitytypeid = entity.entitytypeid
-                edit.edittype = 'delete'
-                edit.userid = username
-                edit.timestamp = timestamp
-                edit.oldvalue = None
-                edit.newvalue = entity.value
-                edit.user_firstname = username
-                edit.user_lastname = username
-                edit.note = note
-                edit.save()
-
-        self._delete(delete_root)
+        return entity
 
     def _delete(self, delete_root=False):
         """
@@ -423,26 +352,40 @@ class Entity(object):
 
         """
         
-        ret = {'deleted_nodes':[], 'updated_nodes':[]}
+        ret = {'deleted_nodes':[], 'updated_nodes':[], 'inserted_nodes': []}
 
-        def find_diffs(self_entity):
-            found_nodes = []
-            updated_nodes = []
+        # def find_diffs(self_entity):
+        #     found_nodes = []
+        #     updated_nodes = []
             
-            def find_matching_entity(entitytotest_entity):
-                if self_entity.entityid == entitytotest_entity.entityid: 
-                    found_nodes.append(self_entity.entityid)
-                    if self_entity.value != entitytotest_entity.value: 
-                        updated_nodes.append({'from': self_entity, 'to': entitytotest_entity})
-                    return False
+        #     def find_matching_entity(entitytotest_entity):
+        #         if self_entity.entityid == entitytotest_entity.entityid: 
+        #             found_nodes.append(self_entity.entityid)
+        #             if self_entity.value != entitytotest_entity.value: 
+        #                 updated_nodes.append({'from': self_entity, 'to': entitytotest_entity})
+        #             return False
 
-            entitytotest.traverse(find_matching_entity)
-            if len(found_nodes) == 0: # meaning it wasn't found
-                ret['deleted_nodes'].append(self_entity)
-            if len(updated_nodes) == 1: # meaning it was updated
-                ret['updated_nodes'].append(updated_nodes[0])
+        #     entitytotest.traverse(find_matching_entity)
+        #     if len(found_nodes) == 0: # meaning it wasn't found
+        #         ret['deleted_nodes'].append(self_entity)
+        #     if len(updated_nodes) == 1: # meaning it was updated
+        #         ret['updated_nodes'].append(updated_nodes[0])
 
-        self.traverse(find_diffs)
+        # self.traverse(find_diffs)
+
+        self_flattened = set(self.flatten())
+        entitytotest_flattened = set(entitytotest.flatten())
+
+        ret['deleted_nodes'] = list(entitytotest_flattened.difference(self_flattened))
+        ret['inserted_nodes'] = list(self_flattened.difference(entitytotest_flattened))
+
+        for inserted_entity in list(self_flattened.difference(entitytotest_flattened)):
+            for deleted_entity in list(entitytotest_flattened.difference(self_flattened)):
+                if inserted_entity.entityid == deleted_entity.entityid:
+                    ret['inserted_nodes'].remove(inserted_entity)
+                    ret['deleted_nodes'].remove(deleted_entity)
+                    ret['updated_nodes'].append({'from': deleted_entity, 'to': inserted_entity})
+
         return ret
 
     def flatten(self):
