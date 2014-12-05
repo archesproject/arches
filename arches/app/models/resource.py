@@ -65,19 +65,17 @@ class Resource(Entity):
         """
 
         newentity = False
-        diff = ''
         timestamp = datetime.now()
 
         if self.entityid != '':
             entity_pre_save = Entity().get(self.entityid)
-            diff = self.diff(entity_pre_save)
         else:
             newentity = True
-
 
         self._save() 
 
         if not newentity:
+            diff = self.diff(entity_pre_save)
             for entity in diff['deleted_nodes']:
                 if entity.label != '' or entity.value != '':
                     edit = archesmodels.EditLog()        
@@ -97,7 +95,7 @@ class Resource(Entity):
                 entity._delete(delete_root=True)
 
             for entity in diff['updated_nodes']:
-                if entity.label != '' or entity.value != '':
+                if entity['from'].label != '' or entity['to'].label != '' or entity['from'].value != '' or entity['to'].value != '':
                     edit = archesmodels.EditLog()        
                     edit.editlogid = str(uuid.uuid4())
                     edit.resourceentitytypeid = self.entitytypeid
