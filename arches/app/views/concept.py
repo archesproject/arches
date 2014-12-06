@@ -124,7 +124,7 @@ def concept(request, conceptid):
                         'valuetype_labels': valuetypes.filter(category='label'),
                         'valuetype_notes': valuetypes.filter(category='note'),
                         'valuetype_related_values': valuetypes.filter(category='undefined'),
-                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related'),
+                        'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive'),
                         'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
                         'concept_paths': concept_graph.get_paths(lang=lang),
                         'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
@@ -135,7 +135,7 @@ def concept(request, conceptid):
                 else:
                     languages = models.DLanguages.objects.all()
                     valuetypes = models.ValueTypes.objects.all()
-                    relationtypes = models.DRelationtypes.objects.all()
+                    relationtypes = models.DRelationtypes.objects.filter(relationtype = 'member')
                     prefLabel = concept_graph.get_preflabel(lang=lang).value
                     for value in concept_graph.values:
                         if value.category == 'label':

@@ -160,7 +160,7 @@ class Concept(object):
             conceptrelation = models.ConceptRelations()
             conceptrelation.pk = str(uuid.uuid4())
             conceptrelation.conceptidfrom_id = parentconcept.id 
-            conceptrelation.conceptidto = concept
+            conceptrelation.conceptidto_id = self.id
             conceptrelation.relationtype_id = parentconcept.relationshiptype
             conceptrelation.save()
 
@@ -168,7 +168,7 @@ class Concept(object):
             subconcept.save()
             conceptrelation = models.ConceptRelations()
             conceptrelation.pk = str(uuid.uuid4())
-            conceptrelation.conceptidfrom = concept
+            conceptrelation.conceptidfrom_id = self.id
             conceptrelation.conceptidto_id = subconcept.id
             conceptrelation.relationtype_id = subconcept.relationshiptype
             conceptrelation.save()
@@ -178,7 +178,7 @@ class Concept(object):
             relation.pk = str(uuid.uuid4())
             relation.conceptidfrom_id = self.id
             relation.conceptidto_id = relatedconcept.id
-            relation.relationtype_id = 'related'
+            relation.relationtype_id = relatedconcept.relationshiptype
             relation.save()
 
         return concept

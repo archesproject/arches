@@ -7,11 +7,12 @@ define([
     'models/concept-parents',
     'views/rdm/modals/value-form',
     'views/rdm/modals/related-concept-form',
+    'views/rdm/modals/related-member-form',
     'views/rdm/modals/manage-parent-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -124,7 +125,7 @@ define([
 
         addRelatedMemberClicked: function(e){
             this.model.reset();
-            var modal = new RelatedConcept({
+            var modal = new RelatedMember({
                 el: $('#related-member-form')[0],
                 model: this.model
             });
