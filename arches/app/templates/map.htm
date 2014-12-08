@@ -1,0 +1,637 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% block content %}
+<div class="map-space">
+
+    <!-- Map Side -->
+    <div class="map-space-panel" id="map-panel">
+        
+        <!-- Map -->
+        <div id="map" class="map map-space-panel"></div>
+        <div id="olmap" class="fill"></div>
+        
+        
+
+        <!-- Map Header -->
+        <div class="row arches-map-inventory-header">
+
+            <div class="container padding-left-0">
+
+                <!-- Map Search Box (Address/APN) Screens greater than XS-->
+                <div class="hidden-xs col-sm-9 col-md-7">
+
+                    <!-- Geocoding Widget -->
+                    <div class="">
+                        <div class="form-group">       
+                            <input class="geocodewidget margin-top-10" id="geocodewidget" name="" style="width:100%"  value="">
+                        </div>
+                    </div>
+                    <!-- End Geocoding Widget -->
+
+                </div>
+                <!-- End Map Search Box (Address/APN) Screens greater than XS -->
+
+                <!-- Map Search Box (Address/APN) for XS Screens -->
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg">
+
+                    <!-- Filter Input -->
+                    <div class="">
+                        <div class="input-group margin-top-10 margin-left-10 pull-left">
+                            <input type="text" class="form-control" placeholder="Find an address or Parcel Number">
+                            <span class="input-group-btn">
+                                <button class="btn btn-u disabled" type="button" title="Add Filter"><i class="fa fa-plus"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- End FIlter Input -->
+
+                </div>
+                <!-- End Map Search Box (Address/APN) for XS Screens  -->
+
+            </div>
+
+        </div>
+        <!-- End Map Header -->
+
+
+        <!--=== Map Footer ===-->
+        <div class="full-w-block padding-15 arches-map-inventory-footer">
+            <div class="container">
+                <div class="row">
+
+                    <!-- Map Metadata -->
+                    <div class="col-xs-12 col-sm-8">
+                        <div class="info-blocks">
+                            <div class="info-blocks-in margin-bottom-0">
+                                <p class="margin-top-5">
+                                    <span class="txt-color-white arches-map-inventory-footer-text">
+                                        Map Zoom: XX &nbsp; &nbsp;
+                                        Cursor: 32.7742 -127.9932 <span class="hidden-xs">(lat/long)</span>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Map Metadata -->
+
+                </div>
+            </div>   
+        </div>    
+        <!--=== End Map Footer ===--> 
+
+
+        <!-- Map: Project Info Panel -->
+        <div class="container">
+            
+            <!-- Map Tools Panel -->
+            <div class="row">
+                <div class="col-xs-4" style="">
+
+                    <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                        <div class="modal-header arches-modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+                            <h4 class="modal-title">
+                                Basemaps
+                            </h4>
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-10 padding-bottom-0" style="">
+                            
+                            <!-- 2 Images per row -->
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="thumbnails thumbnail-style arches-thumbnail" style="">
+                                        <a id="Road" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Streets" href="#">
+                                            <span class="">  
+                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_streets.jpg' %}" alt="" />
+                                                <span class="zoom-icon"></span>                   
+                                            </span>                                              
+                                        </a>                    
+                                        <div class="caption">
+                                            <a id="Road" class="hover-effect txt-color-blue font-120 basemap info-click" href="#">Streets</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xs-6">
+                                    <div class="thumbnails thumbnail-style arches-thumbnail">
+                                        <a id="AerialWithLabels" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Satellite" href="#">
+                                            <span class="">  
+                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_satellite.jpg' %}" alt="" />
+                                                <span class="zoom-icon"></span>                   
+                                            </span>                                              
+                                        </a>                    
+                                        <div class="caption">
+                                            <a id="AerialWithLabels" class="hover-effect txt-color-blue font-120 basemap info-click" href="#">Satellite</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="thumbnails thumbnail-style arches-thumbnail">
+                                        <a id="ordnanceSurvey" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Terrain" href="#">
+                                            <span class="">  
+                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_terrain.jpg' %}" alt="" />
+                                                <span class="zoom-icon"></span>                   
+                                            </span>                                              
+                                        </a>                    
+                                        <div class="caption">
+                                            <a id="ordnanceSurvey" class="hover-effect txt-color-blue font-120 basemap info-link" href="#">Terrain</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>   
+                        </div>
+                        <!-- End Body Content -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Map Tools Panel -->
+
+            <!-- Overlays Panel -->
+            <div class="row">
+                <div class="col-xs-4" style="">
+
+                    <div id="overlay-panel" class="tools-panel hidden" style="border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                        <div class="modal-header arches-modal-header">
+
+                            <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <div class="btn-group pull-right" style="margin-top:-10px; margin-right: 10px;">
+                                <button type="button" id="add-layer" class="btn btn-primary arches-RDM-button-xs">
+                                    <i class="fa fa-plus"></i> Add Layer                         
+                                </button>
+                                
+                            </div>
+
+                            <h4 class="modal-title">
+                                Overlays
+                            </h4>
+                        </div>
+            
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" style="overflow-y: scroll; height: 395px;">
+                            
+                            <!-- List overlays -->
+                            <div class="row">
+                                <div class="col-xs-12">
+
+                                    <!-- Layer Entry -->
+                                    <div class="row arches-overlay-item arches-ll-selected" id="map-layer-10" style="padding-top: 10px; padding-bottom: 10px;">
+
+                                        <!-- Layer Thumbnail -->
+                                        <div class="col-xs-2" style="padding-right: 0px;">
+                                            <img id="map-layer-10-img" style="width: 52px; height: 52px; border: 1px solid #cdcdcd;" src="{% static 'img/map/heritage_grey.png' %}" alt="" title="" class="">
+                                        </div>
+
+                                        <!-- Layer Title and Controls -->
+                                        <div class="col-xs-10">
+                                            
+                                            <!-- Layer Title -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-10-button"><i id="map-layer-10-icon" class="fa fa-dot-circle-o"></i> Heritage Resources</a>
+                                                </div>
+                                            </div>
+
+                                            <!-- Layer Controls -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="knobs-demo" id="map-layer-10-knobs" style="margin-left: 5px; display: block;">
+                                                        
+                                                        <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3>
+
+                                                        <div style="margin-top: -63px; margin-left: 47px;">
+                                                            <a href="" class="zoom" title="zoom to overlay"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Layer Entry -->
+
+
+                                    <!-- Spacer -->
+                                     <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
+
+                                    
+                                    <!-- Layer Entry -->
+                                    <div class="row arches-overlay-item" id="map-layer-11" style="padding-top: 10px; padding-bottom: 10px;">
+
+                                        <!-- Layer Thumbnail -->
+                                        <div class="col-xs-2" style="padding-right: 0px;">
+                                            <img id="map-layer-11-img" style="width: 52px; height: 52px; border: 1px solid #cdcdcd; opacity: 0.5" src="{% static 'img/map/marker_blue.png' %}" alt="" title="" class="">
+                                        </div>
+
+                                        <!-- Layer Title and Controls -->
+                                        <div class="col-xs-10">
+                                            
+                                            <!-- Layer Title -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-11-button"><i id="map-layer-11-icon" class="fa fa-ban"></i> Heritage Districts</a>
+                                                </div>
+                                            </div>
+
+                                            <!-- Layer Controls -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="knobs-demo" id="map-layer-11-knobs" style="margin-left: 5px; display: none;">
+                                                        
+                                                        <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3>
+
+                                                        <div style="margin-top: -63px; margin-left: 47px;">
+                                                            <a href="" class="zoom" title="zoom to overlay"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Layer Entry -->
+
+
+                                    <!-- Spacer -->
+                                    <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
+
+
+                                    <!-- Layer Entry -->
+                                    <div class="row arches-overlay-item" id="map-layer-13" style="padding-top: 10px; padding-bottom: 10px;">
+
+                                        <!-- Layer Thumbnail -->
+                                        <div class="col-xs-2" style="padding-right: 0px;">
+                                            <img id="map-layer-13-img" style="width: 52px; height: 52px; border: 1px solid #cdcdcd; opacity: 0.5" src="{% static 'img/map/marker_grey.png' %}" alt="" title="" class="">
+                                        </div>
+
+                                        <!-- Layer Title and Controls -->
+                                        <div class="col-xs-10">
+                                            
+                                            <!-- Layer Title -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-13-button"><i id="map-layer-13-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
+                                                </div>
+                                            </div>
+
+                                            <!-- Layer Controls -->
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="knobs-demo" id="map-layer-13-knobs" style="margin-left: 5px; display: none;">
+                                                        
+                                                        <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3>
+
+                                                        <div style="margin-top: -63px; margin-left: 47px;">
+                                                            <a href="" class="zoom" title="zoom to overlay"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Layer Entry -->
+
+
+                                    <!-- Spacer -->
+                                    <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Body Content -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Overlays Panel -->
+
+            <!-- Map Tools -->
+            <div class="row">
+                <div class="col-xs-12" style="margin-top: -121px;">
+
+                    <div class="btn-group">
+
+                        <button id="inventory-home" type="button" class="btn btn-primary arches-map-tools-pressed hidden" style="width: 50px; border: 1px solid rgba(206,217,233,.95);"><i class="fa fa-caret-down"></i>
+                        </button>
+
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-globe"></i> Basemaps
+                        </button>
+
+                        <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-align-justify"></i> Overlays
+                        </button>
+
+                </div>
+
+                </div>
+            </div>
+            <!-- End Map Tools -->
+
+
+            <!-- Info Panel -->
+            <div class="row hidden">
+
+                <!-- Setup display, hide for xs screens -->
+                <div class="col-sm-7 col-sm-offset-6 col-md-5 col-md-offset-7 pull-right">
+
+                    <!-- Using Bootstrap Model CSS classes to get the overall look of the info panel,
+                    but the actual info panel is NOT implemented as a model form -->
+                    <div class="modal-content no-corners arches-map-inventory-panel">
+                        <div class="modal-header">
+                            <button type="button" class="close" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <h4 class="modal-title">
+                                <a href="#" class="text-primary">
+                                    <i class="fa fa-trophy text-primary"></i> 
+                                    Castle Wolfenstein 
+
+                                    <!-- Resource Type for larger screens -->
+                                    <span class="hidden-xs">
+                                        <small class="text-primary">Historic Resource</small>
+                                    </span>
+
+                                    <!-- Resource Type for small screens -->
+                                    <span class="hidden-sm hidden-md hidden-lg">
+                                        </br><small class="text-primary margin-left-30 margin-top-minus-10">Historic Resource</small>
+                                    </span>
+
+                                </a>
+                            </h4>
+
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0">
+                            <p>    
+                                <dl class="">
+                                    <dt class="txt-color-blue">Resource Type</dt>
+                                    <dd class="txt-color-blue arches-map-panel-list">Building</dd>
+                                    
+                                    <dt class="txt-color-blue">Designation</dt>
+                                    <dd class="txt-color-blue arches-map-panel-list">Resource of Local Importance</dd>
+                                    
+                                    <dt class="txt-color-blue">Designation Date</dt>
+                                    <dd class="txt-color-blue arches-map-panel-list">August 24, 2014</dd>
+                                    
+                                    
+                                </dl>
+                            </p>
+                        </div>
+                        <!-- End Body Content -->
+
+                        <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" class="btn btn-primary">
+                                View Report
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+
+                </div>
+            </div>
+        </div>
+        <!-- End Map Project Info Panel -->
+    
+    </div>
+    <!-- End of Map Side -->
+
+
+    <!-- Layer Library  -->
+    <div class="" id="layer-library" style="display: none; margin-bottom: 35px;">
+
+        <!-- Layer Library Header -->
+        <div class="row" style="background: #f6f6f6; height: 60px;">
+            <div class="container">
+
+                <div class="col-xs-12" style="padding-left: 0px; padding-right: 0px; margin-top: 5px;">
+                    <button type="button" id="back-to-map" class="btn btn-primary arches-RDM-button-xs">
+                        <i class="fa fa-arrow-circle-down"></i> Back to map                         
+                    </button>&nbsp;
+
+                    <span style="color: #585f69; font-size: 18px; font-weight: 200; vertical-align: middle;">
+                        Manage Map Layers
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        
+        <!-- Form -->
+        <div class="container" style="margin-top: 30px;">
+
+            <!-- Layer Filter Widget -->
+            <div class="row">
+                <div class="col-xs-12 col-sm-9 col-md-8">
+                    <div class="form-group">       
+                        <input class="layerfilter" id="" name="" style="width:100%"  value="">
+                    </div>
+                </div>
+            </div>
+            <!-- End Layer Filter Widget -->
+
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <!-- Form for screens > XS -->
+                    <dl class="hidden-xs">   
+
+                        <dd class="heritage">
+                            <div class="row arches-layer-library" id="map-layer-1">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <img id="map-layer-1-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="{% static 'img/map/heritage_grey.png' %}" alt="" title="" class="pull-right">
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11">
+                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-1-button"><i id="map-layer-1-icon" class="fa fa-ban"></i> Heritage Resources</a>
+
+                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
+                                    </span>  
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11">
+                                    <span class="arches-subtitle">
+                                        Heritage Resources include houses, signs, storefronts, and many other architectural features or other objects of significance that we observed during the SurveyLA effort
+                                    </span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider">
+
+                        </dd>
+
+                        <dd class="heritage">
+                            <div class="row arches-layer-library arches-ll-selected" id="map-layer-2">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <img id="map-layer-2-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd;" src="{% static 'img/map/marker_blue.png' %}" alt="" title="" class="pull-right">
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11">
+                                    <a href="#" class="arches-ll-title layer-selector layer-selected-title" id="map-layer-2-button"><i id="map-layer-2-icon" class="fa fa-dot-circle-o"></i> Heritage District</a>
+                                    
+                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
+                                    </span>
+                                    
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11">
+                                    <span class="arches-subtitle">
+                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
+                                    </span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider">
+
+                        </dd>
+
+                        <dd class="planning historical">
+                            <div class="row arches-layer-library" id="map-layer-3">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <img id="map-layer-3-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11">
+                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-3-button"><i id="map-layer-3-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
+                                    
+                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Planning, Historical
+                                    </span>  
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11">
+                                    <span class="arches-subtitle">
+                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
+                                    </span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider">
+
+                        </dd>
+
+                        <dd class="environmental historical">
+                            <div class="row arches-layer-library" id="map-layer-4">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <img id="map-layer-4-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11">
+                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-4-button"><i id="map-layer-4-icon" class="fa fa-ban"></i> Seismic Hazard Zones</a>
+                                    
+                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Environmental, Historical
+                                    </span>  
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11">
+                                    <span class="arches-subtitle">
+                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
+                                    </span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider">
+
+                        </dd>
+
+                        <dd class="administrative">
+                            <div class="row arches-layer-library" id="map-layer-5">
+
+                                <!-- Layer Thumbnail -->
+                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
+                                    <img id="map-layer-5-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
+                                </div>
+
+                                <!-- Layer Name/Categories -->
+                                <div class="col-sm-9 col-md-11">
+                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-5-button"><i id="map-layer-5-icon" class="fa fa-ban"></i> Census Tracts</a>
+
+                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Administrative
+                                    </span>  
+                                </div>
+
+                                <!-- Layer description -->
+                                <div class="col-sm-9 col-md-11">
+                                    <span class="arches-subtitle">
+                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
+                                    </span>  
+                                </div>    
+
+                            </div>
+
+                            <!-- Spacer -->
+                            <hr class="arches-layer-divider">
+
+                        </dd>
+
+                    </dl>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End Layer Library (Back side) -->
+
+</div>
+{% endblock %}
