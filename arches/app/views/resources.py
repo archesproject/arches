@@ -77,8 +77,8 @@ def report(request, resourceid):
     return render_to_response('resource-report.htm', {
             'report_template': 'views/reports/' + report_info['id'] + '.htm',
             'report_info': report_info,
-            'main_script': 'resource-manager',
-            'active_page': 'ResourceManger'
+            'main_script': 'resource-report',
+            'active_page': 'ResourceReport'
         },
         context_instance=RequestContext(request))        
 
