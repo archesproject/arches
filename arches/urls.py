@@ -34,6 +34,8 @@ urlpatterns = patterns('',
     url(r'^index.htm', 'arches.app.views.main.index', name='home'),
     url(r'^auth/', 'arches.app.views.main.auth', name='auth'),
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.rdm', name='rdm'),
+    url(r'^map', 'arches.app.views.map.get_page', name="map"),
+    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , 'arches.app.views.resources.report'),
     
     url(r'^Entities/(?P<entityid>%s)$' % uuid_regex , 'arches.app.views.entity.Entities'),
     url(r'^Entities/(?P<entityid>%s)/(?P<labeled>.*)/$' % uuid_regex , 'arches.app.views.entity.Entities'),

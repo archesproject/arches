@@ -70,6 +70,19 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         },
         context_instance=RequestContext(request))        
 
+
+def report(request, resourceid):
+    report_info = Resource().get_report(resourceid)
+
+    return render_to_response('resource-report.htm', {
+            'report_template': 'views/reports/' + report_info['id'] + '.htm',
+            'report_info': report_info,
+            'main_script': 'resource-manager',
+            'active_page': 'ResourceManger'
+        },
+        context_instance=RequestContext(request))        
+
+
 def edit_history(request, resourceid=''):
     ret = []
     current = None

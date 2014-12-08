@@ -380,6 +380,12 @@ class Resource(Entity):
             entity.traverse(delete_indexes)
 
 
+    @staticmethod
+    def get_report(resourceid):
+        return {
+            'id': None,
+            'data': None
+        }
 
 
     @staticmethod
