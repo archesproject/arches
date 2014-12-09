@@ -154,11 +154,6 @@ require([
   });
   featureOverlay.setMap(map);
 
-
-  //Move zoom control so that it isn't under the map search bar
-  $(".ol-control").css("margin-top", "70px");
-
-
   //End OPenlayer 3 Map
 
 

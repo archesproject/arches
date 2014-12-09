@@ -590,6 +590,299 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     left: 178px;
 }
 
+.arches-layer {
+    padding-bottom: 25px;
+    padding-top: 15px;
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.arches-layer:hover {
+    background: #f7f7f7;
+}
+
+.arches-layer-divider {
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-top: 1px solid #dedede;
+}
+
+
+/* Layer Library */
+.arches-layer-library {
+    padding-bottom: 25px;
+    padding-top: 15px;
+    margin-left: 0px;
+    margin-right: 5px;
+    background: #f9f9f9;
+}
+
+/*.arches-layer-library:hover {
+    background: #f7f7f7;
+}*/
+
+.arches-ll-category {
+    color: #777;
+}
+
+.arches-ll-title {
+    font-size: 18px;
+    font-weight: 400;
+    padding-left: 2px;
+    margin-bottom: 3px;
+    color: #555;
+}
+
+.arches-ll-selected {
+    background: #ffffff;
+}
+
+.layer-selector {
+    color: #888;
+}
+
+.layer-selected-title {
+    color: #285e8e;
+}
+
+
+.arches-related-resource {
+    padding-left: 10px; 
+    margin-top: -5px;
+}
+
+
+.arches-related-resource-title {
+    color: #4765a0;
+}
+
+.arches-related-resource-button {
+    margin-top: 10px; 
+    margin-right: 15px;
+}
+
+
+
+/* Flippable Panel */
+.panel {
+    margin: 0 auto;
+    /*width: 130px;
+    height: 130px;  
+    position: relative;
+    font-size: .8em;
+    -webkit-perspective: 600px;
+    -moz-perspective: 600px;*/
+}
+/* -- make sure to declare a default for every property that you want animated -- */
+/* -- general styles, including Y axis rotation -- */
+
+.panel .front {
+    /*position: absolute;
+    top: 0;
+    z-index: 900;
+    width: inherit;
+    height: inherit;
+    text-align: center;*/
+    -webkit-transform: rotateX(0deg) rotateY(0deg);
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-transform: rotateX(0deg) rotateY(0deg);
+    -moz-transform-style: preserve-3d;
+    -moz-backface-visibility: hidden;
+    /* -- transition is the magic sauce for animation -- */
+    -o-transition: all 1.8s ease-in-out;
+    -ms-transition: all 1.8s ease-in-out;
+    -moz-transition: all 1.8s ease-in-out;
+    -webkit-transition: all 1.8s ease-in-out;
+    transition: all 1.8s ease-in-out;
+}
+
+.panel.flip .front {
+    z-index: 900;
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+}
+
+.panel .back {
+    position: absolute;
+    top: 0;
+    z-index: 800;
+    width: inherit;
+    height: inherit;
+    -webkit-transform: rotateY(-180deg);
+    -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+ 
+    -moz-transform: rotateY(-180deg);
+    -moz-transform-style: preserve-3d;
+    -moz-backface-visibility: hidden;
+    /* -- transition is the magic sauce for animation -- */
+    -o-transition: all 1.8s ease-in-out;
+    -ms-transition: all 1.8s ease-in-out;
+    -moz-transition: all 1.8s ease-in-out;
+    -webkit-transition: all 1.8s ease-in-out;
+    transition: all 1.8s ease-in-out;
+}
+
+.panel.flip .back {
+    z-index: 1000;
+    -webkit-transform: rotateX(0deg) rotateY(0deg);
+    -moz-transform: rotateX(0deg) rotateY(0deg);
+}
+
+.map-space-panel {
+    width: 100%; 
+    height: 650px;
+    margin-left: 0%;
+}
+
+#layer-library {
+    /*margin-top: -650px;
+    margin-left: 100%;*/
+    height: 650px;
+    width: 100%;
+}
+
+
+/* Inventory Map Tools Buttons and panels*/
+.arches-map-tools {
+    width: 175px;
+    height: 46px;
+    background: #F5F7FB;
+    color: #3A67A6;
+    font-size: 15px;
+    font-weight: 400;
+    z-index: 150;
+    border: 1px solid rgba(206,217,233,.95);
+}
+
+.arches-map-tools:active {
+    top: 0px;
+    left: 0px;
+    color: #3A67A6;
+    background: #F5F7FB;
+    border: 1px solid rgba(206,217,233,.95);
+    z-index: 0;
+    box-shadow: none;
+}
+
+.arches-map-tools:focus {
+    top: 0px;
+    left: 0px;
+    background: #F5F7FB;
+    color: #3A67A6;
+    border: 1px solid rgba(206,217,233,.95);
+    z-index: 0;
+    box-shadow: none;
+}
+
+.arches-map-tools:hover {
+    background: #fdfdfd;
+    color: #645699;
+    border: 1px solid rgba(206,217,233,.95);
+}
+
+.arches-map-tools-pressed {
+    width: 175px;
+    height: 46px;
+    font-size: 15px;
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    color: #3A67A6;
+    font-weight: 400;
+}
+
+.arches-map-tools-pressed:hover {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+}
+
+.arches-map-tools-pressed:active {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+    top: 0px;
+    left: 0px;
+    /*box-shadow: inset 0 0px 0px rgba(0,0,0,.125);*/
+    box-shadow: none;
+}
+
+.arches-map-tools-pressed:focus {
+    background: #ffffff;
+    border: 1px solid rgba(206,217,233,.95);
+    border-top-color: #ffffff;
+    cursor: pointer;
+    color: #3A67A6;
+}
+
+.btn:active {
+    top: 0px;
+}
+
+.tools-panel {
+    margin-top: -580px;
+    height: 500px; 
+    width: 349px; 
+    margin-left: -1px;
+    background: #ffffff; 
+    border: 1px solid rgba(0,0,0,.2); 
+    opacity: 1.0; 
+    border-top-left-radius: 1px; 
+    border-top-right-radius: 1px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.overlay-entry {
+    color: #555;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.15;
+}
+
+.overlay-entry-icon {
+    color: #428BCA;
+    font-size: 19px;
+}
+
+.arches-overlay-item {
+    background: #fafafa;
+}
+
+
+.font-120 {
+    font-size: 120%;
+}
+
+.arches-tool-item {
+    font-size: 17px;
+    font-weight: 200;
+    color: #555;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: block;
+    padding-left: 8px;
+    padding-right: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+
+.arches-tool-item:hover {
+    background: #f7f7f7;
+}
+
+.arches-tool-text {
+    color: #555;
+}
+
 
 
 
