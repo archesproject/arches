@@ -31,6 +31,7 @@ from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
+from arches.app.search.search_engine_factory import SearchEngineFactory
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -49,7 +50,7 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
         with transaction.atomic():
             resource.save(user=request.user)
-            #resource.index()
+            resource.index()
             resourceid = resource.entityid
 
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
@@ -82,6 +83,15 @@ def report(request, resourceid):
         },
         context_instance=RequestContext(request))        
 
+def map_layers(request, entitytypeid):
+    data = []
+    bbox = request.GET.get('bbox', '')
+    limit = request.GET.get('limit', 10000)
+    
+    se = SearchEngineFactory().create()
+    data = se.search('', index="maplayers", type=entitytypeid, end_offset=limit)
+
+    return JSONResponse(data)
 
 def edit_history(request, resourceid=''):
     ret = []
