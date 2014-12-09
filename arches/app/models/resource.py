@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from datetime import datetime
 from django.conf import settings
+from django.contrib.gis.geos import fromstr
 import arches.app.models.models as archesmodels
 from django.db.models import Q
 from arches.app.models.entity import Entity
@@ -282,7 +283,7 @@ class Resource(Entity):
         """
         pass
 
-    def index(self):
+    def index_old(self):
         """
         Gets a SearchResult object for a given resource
         Used for populating the search index with searchable entity information
@@ -357,6 +358,133 @@ class Resource(Entity):
             se.index_terms(term_entities)
 
             return search_result   
+
+    def index(self):
+        se = SearchEngineFactory().create()
+
+        se.create_mapping('term', 'value', 'ids', 'string', 'not_analyzed')
+        
+        mapping =  { 
+            self.entitytypeid : {
+                'properties' : {
+                    'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'value' : {'type' : 'string', 'index' : 'analyzed'},
+                    'relatedentities' : { 
+                        'type' : 'nested', 
+                        'index' : 'analyzed',
+                        'properties' : {
+                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'value' : {
+                                'type' : 'string',
+                                'index' : 'analyzed',
+                                'fields' : {
+                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                }
+                            }
+                        }
+                    },
+                    'geometries' : { 
+                        'type' : 'nested', 
+                        'index' : 'analyzed',
+                        'properties' : {
+                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'value' : {
+                                "type": "geo_shape"
+                            }
+                        }
+                    },
+                    'dates' : { 
+                        'type' : 'nested', 
+                        'index' : 'analyzed',
+                        'properties' : {
+                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'value' : {
+                                "type" : "date"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        se.create_mapping('entity', self.entitytypeid, mapping=mapping)
+
+        def gather_entities(entity):
+            dbentity = archesmodels.Entities.objects.get(pk=entity.entityid)
+            # businesstablename = dbentity.entitytypeid.businesstablename
+            # entity.businesstablename = businesstablename
+            if entity.businesstablename == 'strings':
+                if len(entity.value.split(' ')) < 10:
+                    se.index_term(entity.value, entity.entityid, options={'context': entity.entitytypeid})
+            elif entity.businesstablename == 'domains':
+                # domain = archesmodels.Domains.objects.get(pk=dbentity.entityid)
+                # if domain.val:
+                #     concept = Concept({'id': domain.val.conceptid.pk}).get(inlude=['label'])
+                #     if concept:
+                #         auth_pref_label = ''
+                #         auth_doc_concept = concept.get_auth_doc_concept()
+                #         if auth_doc_concept:
+                #             auth_pref_label = auth_doc_concept.get_preflabel().value
+                #         se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': auth_pref_label, 'conceptid': domain.val.conceptid_id})
+                pass
+            elif entity.businesstablename == 'geometries':
+                geojson = {
+                    'type': 'Feature',
+                    'id': entity.entityid,
+                    'geometry': JSONDeserializer().deserialize(fromstr(entity.value).json),
+                    'properties': {
+                        'resourceid': self.entityid,
+                        'entitytypeid': self.entitytypeid,
+                        'primaryname': self.get_primary_name(),
+                    }
+                }
+                se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
+            elif entity.businesstablename == 'dates':
+                pass
+            elif entity.businesstablename == 'numbers':
+                pass
+            elif entity.businesstablename == 'files':
+                pass
+            return entity.businesstablename
+
+
+
+
+        flattend_entity = self.flatten()
+        # root_entity = self
+        # root_entity.district = district
+        # root_entity.relatedentities = []
+        # root_entity.dates = []
+        # root_entity.geometries = []
+        for entity in flattend_entity:
+            businesstablename = gather_entities(entity)
+        #     if entity.entityid != self.entityid:
+        #         try:
+        #             del entity.relatedentities
+        #         except: pass
+        #         if businesstablename == 'dates':
+        #             root_entity.dates.append(entity)
+        #         elif businesstablename == 'geometries':
+        #             root_entity.geometries.append(entity)
+        #         else:
+        #             root_entity.relatedentities.append(entity)
+
+        # se.index_data('entity', root_entity.entitytypeid, JSONSerializer().serializeToPython(root_entity, ensure_ascii=True), idfield=None, id=root_entity.entityid)
 
     def delete_index(self):
         """
