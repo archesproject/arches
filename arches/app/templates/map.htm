@@ -17,6 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css">
+    {{ block.super }}
+{% endblock css%}
 {% block content %}
 <div class="map-space">
 
