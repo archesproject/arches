@@ -219,4 +219,4 @@ def link_entitytypes_to_concepts(nodes):
 
     for node in nodes:
         if node['BUSINESSTABLE'] == 'domains':
-            concepts.insert_concept_relations(str(sourcelegacyid), 'referencesConcept', node["LABEL"])
+            concepts.insert_concept_relations(str(sourcelegacyid), 'hasCollection', node["LABEL"])

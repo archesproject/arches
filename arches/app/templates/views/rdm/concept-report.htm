@@ -75,7 +75,7 @@
                             <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
                         {% endif %}
                         <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title="Edit this label" data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a> 
-                        <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
+                        <span class="text-muted"> ({% if value.type == 'prefLabel' %}{% trans "preferred" %}, {% endif %}{% if value.type == 'altLabel' %}{% trans "alternate" %}, {% endif %}{% if value.type == 'hiddenLabel' %}{% trans "hidden" %}, {% endif %}{{value.language}})</span>
                     </dd>
                 {% endfor %}
 
@@ -136,8 +136,8 @@
                                 {% with ''|center:forloop.counter0 as range %}
                                 <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
                                 {% endwith %}
-                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>&nbsp; 
-                                {% if parent_concept.relationshiptype %}<span class="text-muted">({{parent_concept.relationshiptype}})</span>{% endif %}
+                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>
+                               
                             </dd>
                         {% if forloop.last %}{% with ''|center:forloop.counter as range %}
                                 <!-- <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Jump to this concept" %}">{{prefLabel}}</a> -->

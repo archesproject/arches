@@ -79,7 +79,7 @@ INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', 'skos');
 INSERT INTO d_relationtypes VALUES ('hasTopConcept', 'Properties', 'skos');
 
 --Arches entityttype relations to concepts
-INSERT INTO d_relationtypes VALUES ('referencesConcept', 'Entitytype Relations', 'arches');
+INSERT INTO d_relationtypes VALUES ('hasCollection', 'Entitytype Relations', 'arches');
 
 --OWL Class types and Arches specific types
 INSERT INTO d_nodetypes VALUES ('GroupingNode', 'arches');
