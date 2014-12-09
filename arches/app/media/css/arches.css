@@ -589,3 +589,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     position: relative;
     left: 178px;
 }
+
+
+
+
+/* Search */
+.search-block {
+    margin-bottom: 50px;
+    padding: 50px 0 58px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+}

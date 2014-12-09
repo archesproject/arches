@@ -105,7 +105,7 @@
 
                             <!-- New Search-->
                             <li class="{% if active_page = 'Search' %}active{% endif %}">
-                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="{% url 'search_home' %}">
                                     Search
                                 </a>
                             </li>
@@ -357,7 +357,8 @@
                         concept_search: "{% url 'concept_search' %}",
                         concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                        edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+                        edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        search_terms: "{% url 'search_terms' %}"
                     }
                 };
             });

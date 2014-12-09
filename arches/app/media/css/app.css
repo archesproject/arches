@@ -1616,6 +1616,7 @@ i.icon-bg-light-grey {
   padding: 20px 30px;
   text-align: center;
   margin-bottom: 20px;
+  min-height: 200px;
 }
 
 .servive-block p,

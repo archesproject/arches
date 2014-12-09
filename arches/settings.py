@@ -69,6 +69,8 @@ SEARCH_CONNECTION = {
     }
 }
 
+SEARCH_ITEMS_PER_PAGE = 10
+
 SEARCHABLE_ENTITY_TYPES = (
     # override this setting in your packages settings.py file
     # entity types that are used to index terms for simple search
