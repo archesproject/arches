@@ -18,6 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/page_job_inner.css' %}">
+{% endblock css%}
 
 {% block content %}
     <div id="resource-report">{% include report_template %}</div>
