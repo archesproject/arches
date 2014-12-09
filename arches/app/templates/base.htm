@@ -359,7 +359,13 @@
                         confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         search_terms: "{% url 'search_terms' %}"
-                    }
+                    },
+                    mapDefaults: {
+                        x: {{ map_info.x }},
+                        y: {{ map_info.y }},
+                        zoom: {{ map_info.zoom }}
+                    },
+                    bingKey: "{{ map_info.bing_key }}"
                 };
             });
 
