@@ -7,8 +7,28 @@ require([
     'select2',
     'plugins/jquery.knob.min'
 ], function($, ol, arches, MapView) {
-    new MapView({
+    var map = new MapView({
         el: $('#map')
+    });
+
+    //set up basemap display selection
+    $(".basemap").click(function (){ 
+
+        var basemap = $(this).attr('id');
+
+        //iterate through the set of layers.  Set the layer visibilty to "true" for the 
+        //layer that matches the user's selection
+        var i, ii;
+        for (i = 0, ii = map.baseLayers.length; i < ii; ++i) {
+            map.baseLayers[i].layer.setVisible(map.baseLayers[i].id == basemap);
+        }
+
+        //close panel
+        $("#inventory-home").click();
+
+        //keep page from re-loading
+        return false;
+
     });
 
     //Map Tools Buttons... Inventory-home button hides all panels

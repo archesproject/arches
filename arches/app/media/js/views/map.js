@@ -1,54 +1,22 @@
 define([
     'jquery',
     'backbone',
+    'underscore',
     'openlayers',
     'arches',
+    'map/base-layers',
     'bootstrap'
-], function($, Backbone, ol, arches) {
+], function($, Backbone, _, ol, arches, baseLayers) {
     return Backbone.View.extend({
         initialize: function() {
             var projection = ol.proj.get('EPSG:3857');
 
-            var styles = [
-                'Road',
-                'AerialWithLabels',
-                'ordnanceSurvey'
-            ];
+            this.baseLayers = baseLayers;
 
             var layers = [];
-            var i, ii;
-            for (i = 0, ii = styles.length; i < ii; ++i) {
-                layers.push(new ol.layer.Tile({
-                    visible: false,
-                    preload: Infinity,
-                    source: new ol.source.BingMaps({
-                        key: arches.bingKey,
-                        imagerySet: styles[i]
-                    })
-                }));
-            }
 
-            //set default map style to Roads
-            layers[0].setVisible(true);
-
-            //set up basemap display selection
-            $(".basemap").click(function (){ 
-
-                var basemap = $(this).attr('id');
-
-                //iterate through the set of layers.  Set the layer visibilty to "true" for the 
-                //layer that matches the user's selection
-                var i, ii;
-                for (i = 0, ii = layers.length; i < ii; ++i) {
-                    layers[i].setVisible(styles[i] == basemap);
-                }
-
-                //close panel
-                $("#inventory-home").click();
-
-                //keep page from re-loading
-                return false;
-
+            _.each(this.baseLayers, function(baseLayer) {
+                layers.push(baseLayer.layer);
             });
 
             var dragAndDropInteraction = new ol.interaction.DragAndDrop({
