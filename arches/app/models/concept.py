@@ -383,14 +383,14 @@ class Concept(object):
         else:
             raise Exception('Invalid value definition: %s' % (value))
 
-    def index(self, scheme=''):
+    def index(self, scheme=None):
         for value in self.values:
-            if scheme == '':
+            if scheme == None:
                 scheme = self.get_context()
-            value.index(scheme=scheme)        
+            value.index(scheme=scheme.id)        
 
         for subconcept in self.subconcepts:
-            subconcept.index(scheme=subconcept.get_context())
+            subconcept.index(scheme=subconcept.get_context().id)
 
     def delete_index(self, delete_self=False):
         se = SearchEngineFactory().create()
@@ -526,15 +526,13 @@ class Concept(object):
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             
             def get_scheme_id(concept):
-                #print concept.get_preflabel().value                
                 if concept.nodetype == 'ConceptScheme':
-                    return concept.id
+                    return concept
 
             return concept.traverse(get_scheme_id, direction='up')
-        if self.nodetype == 'ConceptScheme':
-            return self.id
-        if self.nodetype == 'ConceptSchemeGroup':
-            return self.id
+
+        if self.nodetype == 'ConceptScheme' or self.nodetype == 'ConceptSchemeGroup':
+            return self
 
 
 class ConceptValue(object):
