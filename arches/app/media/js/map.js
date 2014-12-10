@@ -1,15 +1,21 @@
 require([
     'jquery',
     'openlayers',
+    'knockout',
     'arches',
     'views/map',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, ol, arches, MapView) {
+], function($, ol, ko, arches, MapView) {
     var map = new MapView({
         el: $('#map')
     });
+    var viewModel = {
+        baseLayers: map.baseLayers
+    };
+
+    ko.applyBindings(viewModel, $('body')[0]);
 
     //set up basemap display selection
     $(".basemap").click(function (){ 
