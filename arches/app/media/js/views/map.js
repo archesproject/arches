@@ -82,7 +82,7 @@ define([
                 view.fitExtent(vectorSource.getExtent(), (map.getSize()));
             });
 
-            var map = new ol.Map({
+            this.map = new ol.Map({
                 layers: layers,
                 interactions: ol.interaction.defaults({
                     altShiftDragRotate: false,

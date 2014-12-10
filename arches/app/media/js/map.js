@@ -6,8 +6,8 @@ require([
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, ol, arches, mapView) {
-    new mapView({
+], function($, ol, arches, MapView) {
+    new MapView({
         el: $('#map')
     });
 

@@ -21,8 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block css %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/page_job_inner.css' %}">
-    <link rel="stylesheet" href="http://openlayers.org/en/master/css/ol.css">
-    <link rel="stylesheet" href="http://openlayers.org/en/master/resources/layout.css">
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css">
 {% endblock css%}
 {% block content %}
     <div id="resource-report">{% include report_template %}</div>
