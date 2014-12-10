@@ -69,6 +69,8 @@ SEARCH_CONNECTION = {
     }
 }
 
+SEARCH_ITEMS_PER_PAGE = 10
+
 SEARCHABLE_ENTITY_TYPES = (
     # override this setting in your packages settings.py file
     # entity types that are used to index terms for simple search
@@ -95,6 +97,12 @@ DATA_CONCEPT_SCHEME = ''
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
 LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+
+DEFAULT_MAP_X = 0
+DEFAULT_MAP_Y = 0
+DEFAULT_MAP_ZOOM = 0
+
+BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
@@ -252,6 +260,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'arches.app.utils.context_processors.livereload',
     'arches.app.utils.context_processors.resource_types',
+    'arches.app.utils.context_processors.map_info',
 )
 
 

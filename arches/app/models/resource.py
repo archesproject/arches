@@ -23,6 +23,7 @@ from django.contrib.gis.geos import fromstr
 import arches.app.models.models as archesmodels
 from django.db.models import Q
 from arches.app.models.entity import Entity
+from arches.app.models.concept import Concept
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
@@ -425,23 +426,16 @@ class Resource(Entity):
         se.create_mapping('entity', self.entitytypeid, mapping=mapping)
 
         def gather_entities(entity):
-            dbentity = archesmodels.Entities.objects.get(pk=entity.entityid)
-            # businesstablename = dbentity.entitytypeid.businesstablename
-            # entity.businesstablename = businesstablename
             if entity.businesstablename == 'strings':
                 if len(entity.value.split(' ')) < 10:
                     se.index_term(entity.value, entity.entityid, options={'context': entity.entitytypeid})
             elif entity.businesstablename == 'domains':
-                # domain = archesmodels.Domains.objects.get(pk=dbentity.entityid)
-                # if domain.val:
-                #     concept = Concept({'id': domain.val.conceptid.pk}).get(inlude=['label'])
-                #     if concept:
-                #         auth_pref_label = ''
-                #         auth_doc_concept = concept.get_auth_doc_concept()
-                #         if auth_doc_concept:
-                #             auth_pref_label = auth_doc_concept.get_preflabel().value
-                #         se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': auth_pref_label, 'conceptid': domain.val.conceptid_id})
-                pass
+                domain = archesmodels.Domains.objects.get(pk=entity.entityid)
+                if domain.val:
+                    concept = Concept(domain.val.conceptid).get(include=['label'])
+                    if concept:
+                        scheme_pref_label = concept.get_context().get_preflabel().value
+                        se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': scheme_pref_label, 'conceptid': domain.val.conceptid_id})
             elif entity.businesstablename == 'geometries':
                 geojson = {
                     'type': 'Feature',
@@ -489,9 +483,9 @@ class Resource(Entity):
     def delete_index(self):
         """
         removes an entity from the search index
-        assumes that self is a resource
 
         """
+
         if self.get_rank() == 0:
             se = SearchEngineFactory().create()
             def delete_indexes(entity):
@@ -519,84 +513,3 @@ class Resource(Entity):
     @staticmethod
     def get_resource_types():
         raise NotImplementedError
-
-
-
-# # Here's what I'd like to be able to do
-
-# resource = Resource('0538a60a-2816-3b0b-9415-124e2aad65cd') # a heritage resource guid, populates the Resource with data from the db
-# resource = Resource(Entity({entitytypeid: 'HeritageResource.E32'})) # a heritage resource type id, returns a blank resource
-# # now we have a resource that "knows" it's a heritage resource
-# # forms aren't populated until we access them
-
-# # resource has specific methods to perform CRUD on specific portions of itself as view models (for forms etc..)
-# summary_form = resource.forms.get('summary')
-# resource.forms.set('summary', formdata)
-# resource.save() # this method calls save on the forms themselves
-
-
-# class Form(object):
-#     self.icon = ''
-#     self.displayname = ''
-#     ....
-#     pass
-
-
-# class SummaryForm(Form):  # this form is specific to a certain resource graph shape (could be used across multiple entitytypes)
-#     def __init__(self, *args, **kwargs):
-#         self.names = []
-#         self.importantdates = []
-#         self.subjects = []
-#         self.resource = None
-    
-#     def get():
-#         # populates itself based on its Entity
-#         # here's where we parse a enitty into it's constitutant parts
-#         return self
-
-#     def set(data):
-#         pass
-
-# class DescriptionForm(Form):  # this form is specific to a certain resource graph shape (could be used across multiple entitytypes)
-#     def __init__(self, *args, **kwargs):
-#         self.description = []
-    
-#     def get():
-#         # populates itself based on its Entity
-#         # here's where we parse a enitty into it's constitutant parts
-#         for item in self.find_entities_by_type_id('DESCRIPTION.E83')
-#             self.description['type'] = item.get_entity_value # here's where we populate the actual value
-#             self.description['description'] = item.get_entity_value
-#         return self
-
-#     def set(data):
-#         pass
-
-# class InformationResourceSummaryForm(Form):
-#     pass
-
-# class FormManager():
-#     def get(formname):
-#         form = self.forms[formname]
-#         return form.get()
-
-#     def set(formname, data):
-#         form = self.forms[formname]
-#         form.set(data)
-#         return form
-
-
-# class HeritageDistrictForms(FormManager):
-#     forms = {
-#         'summary': SummaryForm(),
-#         'description': DescriptionForm(),
-#         ....
-#     }
-
-# class ActorForms(FormManager):
-#     forms = {
-#         'summary': ActorSummaryForm(),
-#         'description': DescriptionForm(),
-#         ....
-#     }
-

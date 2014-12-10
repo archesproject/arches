@@ -24,6 +24,16 @@ def livereload(request):
 		'livereload_port': settings.LIVERELOAD_PORT
 	}
 
+def map_info(request):
+    return {
+        'map_info': {
+            'x': settings.DEFAULT_MAP_X,
+            'y': settings.DEFAULT_MAP_Y,
+            'zoom': settings.DEFAULT_MAP_ZOOM,
+            'bing_key': settings.BING_KEY
+        }
+    }
+
 def resource_types(request):
     return {
         'resource_types': Resource().get_resource_types()

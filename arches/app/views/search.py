@@ -17,12 +17,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.http import HttpResponse
+from django.template import RequestContext
+from django.shortcuts import render_to_response
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 
-def Search(request):
+def home(request):
+    lang = request.GET.get('lang', 'en-us')
+
+    return render_to_response('search.htm', {
+            'main_script': 'search',
+            'active_page': 'Search'
+        }, context_instance=RequestContext(request))
+
+def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
     search_results = _normalize_spatial_results_to_wkt(se.search(searchString.lower(), index='entity', type='', search_field='strings', use_phrase=True))
@@ -30,8 +42,14 @@ def Search(request):
 
 def search_terms(request):
     se = SearchEngineFactory().create()
-    searchString = request.GET['q']
-    return HttpResponse(JSONSerializer().serialize(se.search(searchString.lower(), index='term', type='value', search_field='term', use_fuzzy=True), ensure_ascii=False))
+    searchString = request.GET.get('q', '')
+    
+    query = Query(se, start=0, limit=settings.SEARCH_ITEMS_PER_PAGE)
+    phrase = Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO')
+    #boolfilter = Bool(should=phrase)
+    query.add_query(phrase)
+
+    return JSONResponse(query.search(index='term', type='value'))
 
 def _normalize_spatial_results_to_wkt(search_results):
 	for search_result in search_results['hits']['hits']:

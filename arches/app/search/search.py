@@ -109,17 +109,10 @@ class SearchEngine(object):
             already_indexed = False
             count = 1
             ids = [id]
-
-            # strip out any non-printable characters then hash the string into a uuid
+            
             try:
-                _id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
-            except Exception as detail:
-                print "\n\nException detail: %s " % (detail)
-                print 'WARNING: failed to index term: %s' % (_id)
-                pass
-
-            if _id:
-                _id = uuid.uuid3(uuid.NAMESPACE_DNS, _id)
+                #_id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
+                _id = uuid.uuid3(uuid.NAMESPACE_DNS, str(hash(term)))
                 result = self.conn.get('term/value/%s' % (_id)) #{"_index":"term","_type":"value","_id":"CASTLE MILL","_version":2,"exists":true, "_source" : {"term": "CASTLE MILL"}}
 
                 #print 'result: %s' % result
@@ -131,6 +124,11 @@ class SearchEngine(object):
                     ids = [id]
 
                 self.index_data('term', 'value', {'term': term, 'options': options, 'count': len(ids), 'ids': ids}, idfield=None, id=_id)
+
+            except Exception as detail:
+                print "\n\nException detail: %s " % (detail)
+                print 'WARNING: failed to index term: %s' % (term)
+                pass            
 
     def delete_terms(self, entities):
         """
@@ -257,230 +255,6 @@ class SearchEngine(object):
                             within=None, dwithin=None, distance_point=None, models=None, 
                             result_class=None, use_phrase=False, use_fuzzy=False, use_wildcard=False, 
                             use_fuzzy_like_this=False, use_range=False):
-        
-        #index = haystack.connections[self.connection_alias].get_unified_index()
-        #search_field = "_all"#index.document_field
-
-        # if query_string == '*:*':
-        #     kwargs = {
-        #         'query': {
-        #             'filtered': {
-        #                 'query': {
-        #                     "match_all": {}
-        #                 },
-        #             },
-        #         },
-        #     }
-        # else:
-        #     kwargs = {
-        #         'query': {
-        #             'filtered': {
-        #                 'query': {
-        #                     'query_string': {
-        #                         'default_field': search_field,
-        #                         'default_operator': self.default_operator,
-        #                         'query': query_string,
-        #                         'analyze_wildcard': True,
-        #                         'auto_generate_phrase_queries': True,
-        #                     },
-        #                 },
-        #             },
-        #         },
-        #     }
-
-        # if return_fields:
-        #     if isinstance(return_fields, (list, set)):
-        #         return_fields = " ".join(return_fields)
-
-        #     kwargs['fields'] = return_fields
-
-        # if sort_by is not None:
-        #     order_list = []
-        #     for field, direction in sort_by:
-        #         if field == 'distance' and distance_point:
-        #             # Do the geo-enabled sort.
-        #             lng, lat = distance_point['point'].get_coords()
-        #             sort_kwargs = {
-        #                 "_geo_distance": {
-        #                     distance_point['field']: [lng, lat],
-        #                     "order": direction,
-        #                     "unit": "km"
-        #                 }
-        #             }
-        #         else:
-        #             if field == 'distance':
-        #                 warnings.warn("In order to sort by distance, you must call the '.distance(...)' method.")
-
-        #             # Regular sorting.
-        #             sort_kwargs = {field: {'order': direction}}
-
-        #         order_list.append(sort_kwargs)
-
-        #     kwargs['sort'] = order_list
-
-        # # From/size offsets don't seem to work right in Elasticsearch's DSL. :/
-        # # if start_offset is not None:
-        # #     kwargs['from'] = start_offset
-
-        # # if end_offset is not None:
-        # #     kwargs['size'] = end_offset - start_offset
-
-        # if highlight is True:
-        #     kwargs['highlight'] = {
-        #         "pre_tags" : ["<span class='searchHighlight'>"],
-        #         "post_tags" : ["</span>"],     
-        #         'fields': {
-        #             search_field: {'store': 'yes'},
-        #         }
-        #     }
-
-        # # if self.include_spelling is True:
-        # #     warnings.warn("Elasticsearch does not handle spelling suggestions.", Warning, stacklevel=2)
-
-        # if narrow_queries is None:
-        #     narrow_queries = set()
-
-        # if facets is not None:
-        #     kwargs.setdefault('facets', {})
-
-        #     for facet_fieldname in facets:
-        #         kwargs['facets'][facet_fieldname] = {
-        #             'terms': {
-        #                 'field': facet_fieldname,
-        #             },
-        #         }
-
-        # if date_facets is not None:
-        #     kwargs.setdefault('facets', {})
-
-        #     for facet_fieldname, value in date_facets.items():
-        #         # Need to detect on gap_by & only add amount if it's more than one.
-        #         interval = value.get('gap_by').lower()
-
-        #         # Need to detect on amount (can't be applied on months or years).
-        #         if value.get('gap_amount', 1) != 1 and not interval in ('month', 'year'):
-        #             # Just the first character is valid for use.
-        #             interval = "%s%s" % (value['gap_amount'], interval[:1])
-
-        #         kwargs['facets'][facet_fieldname] = {
-        #             'date_histogram': {
-        #                 'field': facet_fieldname,
-        #                 'interval': interval,
-        #             },
-        #             'facet_filter': {
-        #                 "range": {
-        #                     facet_fieldname: {
-        #                         'from': self.conn.from_python(value.get('start_date')),
-        #                         'to': self.conn.from_python(value.get('end_date')),
-        #                     }
-        #                 }
-        #             }
-        #         }
-
-        # if query_facets is not None:
-        #     kwargs.setdefault('facets', {})
-
-        #     for facet_fieldname, value in query_facets:
-        #         kwargs['facets'][facet_fieldname] = {
-        #             'query': {
-        #                 'query_string': {
-        #                     'query': value,
-        #                 }
-        #             },
-        #         }
-
-        # if limit_to_registered_models is None:
-        #     limit_to_registered_models = getattr(settings, 'HAYSTACK_LIMIT_TO_REGISTERED_MODELS', True)
-
-        # if models and len(models):
-        #     model_choices = sorted(['%s.%s' % (model._meta.app_label, model._meta.module_name) for model in models])
-        # elif limit_to_registered_models:
-        #     # Using narrow queries, limit the results to only models handled
-        #     # with the current routers.
-        #     model_choices = self.build_models_list()
-        # else:
-        #     model_choices = []
-
-        # if len(model_choices) > 0:
-        #     if narrow_queries is None:
-        #         narrow_queries = set()
-
-        #     narrow_queries.add('%s:(%s)' % (DJANGO_CT, ' OR '.join(model_choices)))
-
-        # if narrow_queries:
-        #     kwargs['query'].setdefault('filtered', {})
-        #     kwargs['query']['filtered'].setdefault('filter', {})
-        #     kwargs['query']['filtered']['filter'] = {
-        #         'fquery': {
-        #             'query': {
-        #                 'query_string': {
-        #                     'query': u' AND '.join(list(narrow_queries)),
-        #                 },
-        #             },
-        #             '_cache': True,
-        #         }
-        #     }
-
-        # if within is not None:
-        #     from haystack.utils.geo import generate_bounding_box
-
-        #     ((min_lat, min_lng), (max_lat, max_lng)) = generate_bounding_box(within['point_1'], within['point_2'])
-        #     within_filter = {
-        #         "geo_bounding_box": {
-        #             within['field']: {
-        #                 "top_left": {
-        #                     "lat": max_lat,
-        #                     "lon": max_lng
-        #                 },
-        #                 "bottom_right": {
-        #                     "lat": min_lat,
-        #                     "lon": min_lng
-        #                 }
-        #             }
-        #         },
-        #     }
-        #     kwargs['query'].setdefault('filtered', {})
-        #     kwargs['query']['filtered'].setdefault('filter', {})
-        #     if kwargs['query']['filtered']['filter']:
-        #         compound_filter = {
-        #             "and": [
-        #                 kwargs['query']['filtered']['filter'],
-        #                 within_filter,
-        #             ]
-        #         }
-        #         kwargs['query']['filtered']['filter'] = compound_filter
-        #     else:
-        #         kwargs['query']['filtered']['filter'] = within_filter
-
-        # if dwithin is not None:
-        #     lng, lat = dwithin['point'].get_coords()
-        #     dwithin_filter = {
-        #         "geo_distance": {
-        #             "distance": dwithin['distance'].km,
-        #             dwithin['field']: {
-        #                 "lat": lat,
-        #                 "lon": lng
-        #             }
-        #         }
-        #     }
-        #     kwargs['query'].setdefault('filtered', {})
-        #     kwargs['query']['filtered'].setdefault('filter', {})
-        #     if kwargs['query']['filtered']['filter']:
-        #         compound_filter = {
-        #             "and": [
-        #                 kwargs['query']['filtered']['filter'],
-        #                 dwithin_filter
-        #             ]
-        #         }
-        #         kwargs['query']['filtered']['filter'] = compound_filter
-        #     else:
-        #         kwargs['query']['filtered']['filter'] = dwithin_filter
-
-
-        # # Remove the "filtered" key if we're not filtering. Otherwise,
-        # # Elasticsearch will blow up.
-        # if not kwargs['query']['filtered'].get('filter'):
-        #     kwargs['query'] = kwargs['query']['filtered']['query']
 
         kwargs = {
             'query': {

@@ -2,6 +2,7 @@
 import decimal
 import types
 import json
+import inspect
 from io import StringIO
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import Model
@@ -57,8 +58,17 @@ class JSONSerializer(object):
 
     def handle_object(self, object):
         """ Called to handle everything, looks for the correct handling """
-        if (type(object) is types.FunctionType or 
-            type(object) is types.MethodType):
+        # print type(object)
+        # print inspect.isclass(object)
+        # print inspect.ismethod(object)
+        # print inspect.isfunction(object)
+        # print inspect.isbuiltin(object)
+        # print inspect.isroutine(object)
+        # print inspect.isabstract(object)
+        # print type(object) == 'staticmethod'
+        if (inspect.isroutine(object) or
+            inspect.isbuiltin(object) or
+            inspect.isclass(object)):
             raise UnableToSerializeMethodTypesError(type(object))
         elif isinstance(object, dict):
             return self.handle_dictionary(object)

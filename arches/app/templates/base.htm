@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load i18n %}
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
@@ -105,7 +106,7 @@
 
                             <!-- New Search-->
                             <li class="{% if active_page = 'Search' %}active{% endif %}">
-                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="{% url 'search_home' %}">
                                     Search
                                 </a>
                             </li>
@@ -357,8 +358,30 @@
                         concept_search: "{% url 'concept_search' %}",
                         concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                         confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                        edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
-                    }
+                        edit_history: "{% url 'edit_history' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                        search_terms: "{% url 'search_terms' %}"
+                    },
+                    mapDefaults: {
+                        x: {{ map_info.x }},
+                        y: {{ map_info.y }},
+                        zoom: {{ map_info.zoom }}
+                    },
+                    bingKey: "{{ map_info.bing_key }}",
+                    bingLayers: [{
+                        id: 'Road',
+                        name: "{% trans 'Streets' %}",
+                        icon: "{% static 'img/map/google_streets.jpg' %}"
+                    },
+                    {
+                        id: 'Aerial',
+                        name: "{% trans 'Satellite' %}",
+                        icon: "{% static 'img/map/google_satellite.jpg' %}"
+                    },
+                    {
+                        id: 'AerialWithLabels',
+                        name: "{% trans 'Hybrid' %}",
+                        icon: "{% static 'img/map/google_satellite.jpg' %}"
+                    }]
                 };
             });
 

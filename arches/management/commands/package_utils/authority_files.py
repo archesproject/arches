@@ -87,12 +87,12 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         concept.nodetype = 'ConceptScheme'                
         concept.legacyoid = auth_doc_file_name
         concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
-        scheme_id = concept.id
+        scheme_id = concept
         lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='narrower', target=concept.id)
     else:
         concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
         concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
-        scheme_id = concept.id
+        scheme_id = concept
 
     lookups.add_lookup(concept=concept, rownum=0)
     
@@ -108,7 +108,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                     else:
                         concept = Concept()
                         concept.id = str(uuid.uuid4())
-                        concept.nodetype = 'Concept'
+                        concept.nodetype = 'Concept' if row[u'CONCEPTTYPE'].upper() == 'INDEX' else 'Collection'
                         concept.legacyoid = row[u'CONCEPTID']
                         concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'prefLabel', 'datatype': 'text', 'category': 'label'})
                         if row[u'ALTLABELS'] != '':

@@ -17,6 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css">
+    {{ block.super }}
+{% endblock css%}
 {% block content %}
 <div class="map-space">
 
@@ -116,54 +120,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Body Content -->
                         <div class="modal-body padding-top-10 padding-bottom-0" style="">
-                            
-                            <!-- 2 Images per row -->
-                            <div class="row">
+                            <div class="row" data-bind='foreach: baseLayers'>
                                 <div class="col-xs-6">
                                     <div class="thumbnails thumbnail-style arches-thumbnail" style="">
-                                        <a id="Road" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Streets" href="#">
+                                        <a data-bind="attr: { id: id }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Streets" href="#">
                                             <span class="">  
-                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_streets.jpg' %}" alt="" />
+                                                <img data-bind="attr: { src: icon }" class="img-responsive arches-basemap-thumbnail" alt="" />
                                                 <span class="zoom-icon"></span>                   
                                             </span>                                              
                                         </a>                    
                                         <div class="caption">
-                                            <a id="Road" class="hover-effect txt-color-blue font-120 basemap info-click" href="#">Streets</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-xs-6">
-                                    <div class="thumbnails thumbnail-style arches-thumbnail">
-                                        <a id="AerialWithLabels" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Satellite" href="#">
-                                            <span class="">  
-                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_satellite.jpg' %}" alt="" />
-                                                <span class="zoom-icon"></span>                   
-                                            </span>                                              
-                                        </a>                    
-                                        <div class="caption">
-                                            <a id="AerialWithLabels" class="hover-effect txt-color-blue font-120 basemap info-click" href="#">Satellite</a>
+                                            <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue font-120 basemap info-click" href="#"> </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    <div class="thumbnails thumbnail-style arches-thumbnail">
-                                        <a id="ordnanceSurvey" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Terrain" href="#">
-                                            <span class="">  
-                                                <img class="img-responsive arches-basemap-thumbnail" src="{% static 'img/map/google_terrain.jpg' %}" alt="" />
-                                                <span class="zoom-icon"></span>                   
-                                            </span>                                              
-                                        </a>                    
-                                        <div class="caption">
-                                            <a id="ordnanceSurvey" class="hover-effect txt-color-blue font-120 basemap info-link" href="#">Terrain</a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>   
                         </div>
                         <!-- End Body Content -->
 

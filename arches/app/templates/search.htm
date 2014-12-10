@@ -1,0 +1,141 @@
+{% extends "base.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block content %}
+
+<!--=== Search Block ===-->
+<div class="search-block" style="padding-bottom: 10px; padding-top: 30px;">
+    
+    <!-- Search Terms -->
+    <div class="container">
+        <div class="row">
+            
+            <!-- Search Widget -->
+            <div class="col-xs-12 col-md-8">
+                <div class="form-group">       
+                    <input class="select2 resource_search_widget" name="" style="width:100%" placeholder="{% trans "Search for a resource..." %}" value="">
+                </div>
+            </div>
+            <!-- End Search Widget -->
+
+            <!-- Advanced Search Option -->
+            <div class="col-sm-3 col-sm-offset-1">
+
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Search Tools &nbsp;
+                        <i class="fa fa-chevron-down"></i>
+                        <span class="sr-only">Toggle Dropdown</span>                            
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#" data-toggle="modal" data-target="#myModal">Filter by time</a></li>
+                        <li><a href="#">Filter by location</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Export results to .SHP</a></li>
+                        <li><a href="#">Export results to .CSV</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- End Advanced Search Option -->
+
+            <!-- Date Filter Modal Data Entry Form -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        
+                        <!-- Form Header -->
+                        <div class="modal-header">
+                            <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                            <h2 id="myModalLabel" class="modal-title" style="margin-bottom: 0px; text-align: left;">Filter by Time</h2>
+                        </div>
+                        <!-- End Form Header -->
+                        
+                        <!-- Modal Body -->
+                        <div class="modal-body padding-top-0">
+
+                            <!-- Date Filter Tools -->
+                            <div class="row">
+                                                                                      
+                                <div class=" col-xs-12 related-search" style="">
+                                            
+                                    <!-- Year-Before-Present Slider -->
+                                    <div class="row">
+
+                                        <h4 class="margin-top-20 margin-bottom-5 margin-left-15" style="font-style: normal">
+                                            Years <small>(show results that fall between these years)</small>
+                                        </h4>
+                                        
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <input id="range-slider-4" type="text" name="years_slider" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Year-Before-Present Slider -->
+
+
+                                    <!-- Start/End Date Pickers -->
+                                    <div class="row">
+
+                                        <h4 class="margin-top-20 margin-bottom-5 margin-left-15" style="font-style: normal">
+                                            Start/End Dates <small>(show results that fall between these dated)</small>
+                                        </h4>
+
+                                        <!-- Calendars -->
+                                        <form action="" id="" class="sky-form label-rounded arches-date-filter" style="border-width: 0px;">
+                                            <fieldset class="margin-bottom-10" style="padding: 0px;">   
+                                                <div class="col-sm-4">
+                                                    <label class="input">
+                                                        <i class="icon-append fa fa-calendar"></i>
+                                                        <input type="text" name="start" id="start" placeholder="Start date">
+                                                    </label>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label class="input">
+                                                        <i class="icon-append fa fa-calendar"></i>
+                                                        <input type="text" name="finish" id="finish" placeholder="End date">
+                                                    </label>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                        <!-- End Calendars -->
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <!-- End Date Filters -->
+
+                        </div>
+                        <!-- End Modal Body -->
+
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" class="btn-u btn-u-default" type="button">Close</button>
+                            <button class="btn-u btn-u-yellow" type="button">Reset Filters</button>
+                            <button class="btn-u" type="button">Apply Filter</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- End Date Filter Modal Data Entry Form -->
+
+        </div>
+    </div>
+    <!-- End Search Terms -->  
+
+</div>    
+<!--=== End Search Block ===-->
+
+
+<!--=== Default Resource Summary ===-->
+<div class="container margin-bottom-50">
+
+    {% include "views/saved-searches.htm" %}
+
+</div>
+
+{% endblock content %}
