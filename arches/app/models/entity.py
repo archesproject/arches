@@ -354,25 +354,6 @@ class Entity(object):
         
         ret = {'deleted_nodes':[], 'updated_nodes':[], 'inserted_nodes': []}
 
-        # def find_diffs(self_entity):
-        #     found_nodes = []
-        #     updated_nodes = []
-            
-        #     def find_matching_entity(entitytotest_entity):
-        #         if self_entity.entityid == entitytotest_entity.entityid: 
-        #             found_nodes.append(self_entity.entityid)
-        #             if self_entity.value != entitytotest_entity.value: 
-        #                 updated_nodes.append({'from': self_entity, 'to': entitytotest_entity})
-        #             return False
-
-        #     entitytotest.traverse(find_matching_entity)
-        #     if len(found_nodes) == 0: # meaning it wasn't found
-        #         ret['deleted_nodes'].append(self_entity)
-        #     if len(updated_nodes) == 1: # meaning it was updated
-        #         ret['updated_nodes'].append(updated_nodes[0])
-
-        # self.traverse(find_diffs)
-
         self_flattened = set(self.flatten())
         entitytotest_flattened = set(entitytotest.flatten())
 
@@ -400,18 +381,7 @@ class Entity(object):
                 entity.parentid = entity.get_parent().entityid
             else:
                 entity.parentid = None
-            # flat_entity = Entity(entity.entityid)
-            # flat_entity.child_entities = []
-            # ret.append(flat_entity)
             ret.append(entity.copy(shallow=True))
-
-        # def gather_entities_inplace(entity):
-        #     entity.child_entities = []
-        #     if entity.get_rank() != 0:
-        #         entity.parentid = entity.get_parent().entityid
-        #     else:
-        #         entity.parentid = None
-        #     ret.append(entity)
 
         self.traverse(gather_entities)
 
@@ -435,22 +405,23 @@ class Entity(object):
         Traverses a graph from leaf to root calling the given function on each node
         passes an optional scope to each function
 
-        Return False from the function to prematurely end the traversal
+        Return a value from the function to prematurely end the traversal
 
         """
-
-        for child_entity in self.child_entities:
-            if child_entity.traverse(func, scope) == False: 
-                break
 
         if scope == None:
             ret = func(self)
         else:
             ret = func(self, scope) 
-        
-        # break out of the traversal if the function returns False
-        if ret == False:
-            return False     
+
+        # break out of the traversal if the function returns a value
+        if ret != None:
+            return ret   
+
+        for child_entity in self.child_entities:
+            ret = child_entity.traverse(func, scope) 
+            if ret != None: 
+                return ret   
 
     def get_rank(self, rank=0):
         """
