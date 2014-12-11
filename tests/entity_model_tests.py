@@ -23,7 +23,15 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
+import os
+from tests import test_settings
+from django.core import management
 from django.test import SimpleTestCase, TestCase
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.data_management.resources.importer import ResourceLoader
+import arches.app.utils.data_management.resources.remover as resource_remover
+from arches.management.commands.package_utils import resource_graphs
+from arches.management.commands.package_utils import authority_files
 from arches.app.models.entity import Entity
 
 class BasicEntityTests(SimpleTestCase):
@@ -71,8 +79,6 @@ class BasicEntityTests(SimpleTestCase):
         self.assertEqual(entity.value, '123')
         self.assertEqual(entity.child_entities, [])
 
-        raise Exception()
-
 
 class TestEntityFactory(object):
     @staticmethod
@@ -85,20 +91,7 @@ class TestEntityFactory(object):
         entity.child_entities = []
         return entity
 
-import os
-import sys
-from tests import test_settings
-from django.core import management
-from arches.setup import get_version
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.data_management.resources.importer import ResourceLoader
-import arches.app.utils.data_management.resources.remover as resource_remover
-from arches.management.commands.package_utils import resource_graphs
-from arches.management.commands.package_utils import authority_files
 
-
-def setup():
-    get_version(path_to_file=os.path.abspath(os.path.dirname(__file__)))
 
 def install(path_to_source_data_dir=None):
     #truncate_db()
