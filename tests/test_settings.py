@@ -24,7 +24,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, '..', 'arches'))
 PACKAGE_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 
-RESOURCE_GRAPH_LOCATIONS = os.path.join(PACKAGE_ROOT, 'resource_graphs'),
+RESOURCE_GRAPH_LOCATIONS = os.path.join(PACKAGE_ROOT, 'fixtures'),
 
 #########################################
 ###  START PACKAGE SPECIFIC SETTINGS  ###
