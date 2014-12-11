@@ -1,0 +1,14 @@
+Source,Target,Type,Id,Label,Weight
+10,18,Directed,10,P3,1.0
+10,57,Directed,15,P10,1.0
+10,71,Directed,71,P2,1.0
+18,66,Directed,65,P2,1.0
+57,58,Directed,57,-P41,1.0
+58,59,Directed,58,-P41,1.0
+58,61,Directed,59,P4,1.0
+58,64,Directed,60,P42,1.0
+61,62,Directed,62,P78,1.0
+61,63,Directed,63,P78,1.0
+64,65,Directed,64,-P71,1.0
+66,67,Directed,66,-P71,1.0
+71,72,Directed,72,-P71,1.0
