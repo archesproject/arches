@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% load i18n %}
 {% block css %}
     <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css">
     {{ block.super }}
@@ -119,20 +120,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <!-- Body Content -->
-                        <div class="modal-body padding-top-10 padding-bottom-0" style="">
-                            <div class="row" data-bind='foreach: baseLayers'>
-                                <div class="col-xs-6">
-                                    <div class="thumbnails thumbnail-style arches-thumbnail" style="">
-                                        <a data-bind="attr: { id: id }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" title="Google Streets" href="#">
-                                            <span class="">  
-                                                <img data-bind="attr: { src: icon }" class="img-responsive arches-basemap-thumbnail" alt="" />
-                                                <span class="zoom-icon"></span>                   
-                                            </span>                                              
-                                        </a>                    
-                                        <div class="caption">
-                                            <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue font-120 basemap info-click" href="#"> </a>
-                                        </div>
-                                    </div>
+                        <div class="modal-body padding-top-10 padding-bottom-0" data-bind='foreach: baseLayers'>
+                            <div class="thumbnails thumbnail-style arches-thumbnail" style="">
+                                <a data-bind="attr: { id: id, title: name }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" href="javascript:void(0);">
+                                    <span class="">  
+                                        <img data-bind="attr: { src: icon }" class="img-responsive arches-basemap-thumbnail" alt="" />
+                                        <span class="zoom-icon"></span>                   
+                                    </span>                                              
+                                </a>                    
+                                <div class="caption">
+                                    <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue font-120 basemap info-click" href="javascript:void(0);"> </a>
                                 </div>
                             </div>
                         </div>
@@ -187,7 +184,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <!-- Layer Title -->
                                             <div class="row">
                                                 <div class="col-xs-12">
-                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-10-button"><i id="map-layer-10-icon" class="fa fa-dot-circle-o"></i> Heritage Resources</a>
+                                                    <a href="javascript:void(0);" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-10-button"><i id="map-layer-10-icon" class="fa fa-dot-circle-o"></i> Heritage Resources</a>
                                                 </div>
                                             </div>
 
@@ -228,7 +225,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <!-- Layer Title -->
                                             <div class="row">
                                                 <div class="col-xs-12">
-                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-11-button"><i id="map-layer-11-icon" class="fa fa-ban"></i> Heritage Districts</a>
+                                                    <a href="javascript:void(0);" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-11-button"><i id="map-layer-11-icon" class="fa fa-ban"></i> Heritage Districts</a>
                                                 </div>
                                             </div>
 
@@ -269,7 +266,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <!-- Layer Title -->
                                             <div class="row">
                                                 <div class="col-xs-12">
-                                                    <a href="#" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-13-button"><i id="map-layer-13-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
+                                                    <a href="javascript:void(0);" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-13-button"><i id="map-layer-13-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
                                                 </div>
                                             </div>
 
@@ -307,12 +304,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Map Tools -->
             <div class="row">
-                <div class="col-xs-12" style="margin-top: -121px;">
+                <div class="col-xs-12" style="margin-top: -121px;margin-left: -1px;">
 
                     <div class="btn-group">
-
-                        <button id="inventory-home" type="button" class="btn btn-primary arches-map-tools-pressed hidden" style="width: 50px; border: 1px solid rgba(206,217,233,.95);"><i class="fa fa-caret-down"></i>
-                        </button>
 
                         <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-globe"></i> Basemaps
                         </button>
@@ -320,7 +314,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-align-justify"></i> Overlays
                         </button>
 
-                </div>
+                    </div>
 
                 </div>
             </div>
@@ -342,7 +336,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </button>
 
                             <h4 class="modal-title">
-                                <a href="#" class="text-primary">
+                                <a href="javascript:void(0);" class="text-primary">
                                     <i class="fa fa-trophy text-primary"></i> 
                                     Castle Wolfenstein 
 
@@ -449,7 +443,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-1-button"><i id="map-layer-1-icon" class="fa fa-ban"></i> Heritage Resources</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-1-button"><i id="map-layer-1-icon" class="fa fa-ban"></i> Heritage Resources</a>
 
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
@@ -480,7 +474,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="#" class="arches-ll-title layer-selector layer-selected-title" id="map-layer-2-button"><i id="map-layer-2-icon" class="fa fa-dot-circle-o"></i> Heritage District</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector layer-selected-title" id="map-layer-2-button"><i id="map-layer-2-icon" class="fa fa-dot-circle-o"></i> Heritage District</a>
                                     
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
@@ -512,7 +506,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-3-button"><i id="map-layer-3-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-3-button"><i id="map-layer-3-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
                                     
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: Planning, Historical
@@ -543,7 +537,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-4-button"><i id="map-layer-4-icon" class="fa fa-ban"></i> Seismic Hazard Zones</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-4-button"><i id="map-layer-4-icon" class="fa fa-ban"></i> Seismic Hazard Zones</a>
                                     
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: Environmental, Historical
@@ -574,7 +568,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="#" class="arches-ll-title layer-selector" id="map-layer-5-button"><i id="map-layer-5-icon" class="fa fa-ban"></i> Census Tracts</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-5-button"><i id="map-layer-5-icon" class="fa fa-ban"></i> Census Tracts</a>
 
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: Administrative
@@ -606,3 +600,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </div>
 {% endblock %}
+{% block pre_require_js %}
+    {% include 'map/layer-names.htm' %}
+{% endblock pre_require_js %}

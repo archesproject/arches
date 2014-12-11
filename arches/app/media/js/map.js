@@ -1,45 +1,30 @@
 require([
     'jquery',
+    'underscore',
     'openlayers',
     'knockout',
     'arches',
     'views/map',
+    'map/layers',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, ol, ko, arches, MapView) {
+], function($, _, ol, ko, arches, MapView, layers) {
+    var mapLayers = [];
+    _.each(layers, function(layer) {
+        if (layer.onMap) {
+            mapLayers.push(layer.layer);
+        }
+    });
     var map = new MapView({
-        el: $('#map')
+        el: $('#map'),
+        overlays: mapLayers
     });
     var viewModel = {
-        baseLayers: map.baseLayers
+        baseLayers: map.baseLayers,
+        layers: layers
     };
-
-    ko.applyBindings(viewModel, $('body')[0]);
-
-    //set up basemap display selection
-    $(".basemap").click(function (){ 
-
-        var basemap = $(this).attr('id');
-
-        //iterate through the set of layers.  Set the layer visibilty to "true" for the 
-        //layer that matches the user's selection
-        var i, ii;
-        for (i = 0, ii = map.baseLayers.length; i < ii; ++i) {
-            map.baseLayers[i].layer.setVisible(map.baseLayers[i].id == basemap);
-        }
-
-        //close panel
-        $("#inventory-home").click();
-
-        //keep page from re-loading
-        return false;
-
-    });
-
-    //Map Tools Buttons... Inventory-home button hides all panels
-    $("#inventory-home").click(function (){ 
-        //Collapse panels
+    var hideAllPanels = function () {
         $("#overlay-panel").addClass("hidden");
         $("#basemaps-panel").addClass("hidden");
 
@@ -51,27 +36,24 @@ require([
         $("#inventory-overlays").removeClass("arches-map-tools-pressed");
         $("#inventory-overlays").addClass("arches-map-tools");
         $("#inventory-overlays").css("border-bottom-right-radius", "1px");
+    };
 
+    ko.applyBindings(viewModel, $('body')[0]);
 
-        //Update state of current button and adjust position
-        $("#inventory-home").addClass("arches-map-tools-pressed");
-        //$("#inventory-home").addClass("button-shim");
-        $("#inventory-home").removeClass("arches-map-tools");
-
-        //Don't let the page reload
-        return false;
+    $(".basemap").click(function (){ 
+        var basemap = $(this).attr('id');
+        _.each(map.baseLayers, function(baseLayer){ 
+            baseLayer.layer.setVisible(baseLayer.id == basemap);
+        });
+        hideAllPanels();
     });
 
     //Inventory-basemaps button opens basemap panel
-    $("#inventory-basemaps").click(function (){ 
-        //Collapse panels
+    $("#inventory-basemaps").click(function (){
         $("#overlay-panel").addClass("hidden");
         $("#basemaps-panel").removeClass("hidden");
 
         //Update state of remaining buttons
-        $("#inventory-home").removeClass("arches-map-tools-pressed");
-        $("#inventory-home").addClass("arches-map-tools");
-
         $("#inventory-overlays").removeClass("arches-map-tools-pressed");
         $("#inventory-overlays").addClass("arches-map-tools");
         $("#inventory-overlays").css("border-bottom-right-radius", "5px");
@@ -80,65 +62,37 @@ require([
         $("#inventory-basemaps").addClass("arches-map-tools-pressed");
         $("#inventory-basemaps").removeClass("arches-map-tools");
         $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
-
-        //Don't let the page reload
-        return false;
     });
 
 
     //Inventory-overlayss button opens overlay panel
-    $("#inventory-overlays").click(function (){ 
-        //Collapse panels
+    $("#inventory-overlays").click(function (){
         $("#overlay-panel").removeClass("hidden");
         $("#basemaps-panel").addClass("hidden");
 
         //Update state of remaining buttons
-        $("#inventory-home").removeClass("arches-map-tools-pressed");
-        $("#inventory-home").addClass("arches-map-tools");
-
         $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
         $("#inventory-basemaps").addClass("arches-map-tools");
 
         //Update state of current button and adjust position
         $("#inventory-overlays").addClass("arches-map-tools-pressed");
         $("#inventory-overlays").removeClass("arches-map-tools");
-
-        //Don't let the page reload
-        return false;
     });
-
 
     //Close Button
     $(".close").click(function (){ 
-        $("#inventory-home").click()
-    });
-
-    //Toggle Overlay display
-    $(".toggle-overlay").click(function(){
-        //Don't let the page reload
-        return false;
-    });
-
-    //Zoom Overlay 
-    $(".zoom").click(function(){
-        //Don't let the page reload
-        return false;
-
+        hideAllPanels();
     });
 
     //Show and hide Layer Library.  
     $("#add-layer").click(function(){
-        //function to toggle display of map div
         $( "#map-panel" ).slideToggle(600);
         $( "#layer-library" ).slideToggle(600);
-        return false; 
     });
 
     $("#back-to-map").click(function(){
-        //function to toggle display of map div
         $( "#map-panel" ).slideToggle(600);
         $( "#layer-library" ).slideToggle(600);
-        return false;
     });
 
     //Select2 Simple Search initialize
@@ -211,8 +165,6 @@ require([
             $(layer_url).addClass("layer-selected-title");
             $(knobs).css("display", "block");
         }
-
-        return false; 
     });
 
     //Select2 Simple Search initialize

@@ -8,17 +8,10 @@ define([
     'bootstrap'
 ], function($, Backbone, _, ol, arches, baseLayers) {
     return Backbone.View.extend({
-        initialize: function() {
+        overlays: [],
+        initialize: function(options) {
             var projection = ol.proj.get('EPSG:3857');
-
-            this.baseLayers = baseLayers;
-
             var layers = [];
-
-            _.each(this.baseLayers, function(baseLayer) {
-                layers.push(baseLayer.layer);
-            });
-
             var dragAndDropInteraction = new ol.interaction.DragAndDrop({
                 formatConstructors: [
                     ol.format.GPX,
@@ -27,6 +20,17 @@ define([
                     ol.format.KML,
                     ol.format.TopoJSON
                 ]
+            });
+
+            _.extend(this, _.pick(options, 'overlays'));
+
+            this.baseLayers = baseLayers;
+
+            _.each(this.baseLayers, function(baseLayer) {
+                layers.push(baseLayer.layer);
+            });
+            _.each(this.overlays, function(overlay) {
+                layers.push(overlay);
             });
 
             dragAndDropInteraction.on('addfeatures', function(event) {

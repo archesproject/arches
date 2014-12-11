@@ -313,6 +313,8 @@
 
 	{% block javascript %}
     <script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+    {% block pre_require_js %}
+    {% endblock pre_require_js %}
     <script>
         require.config({
             baseUrl: '{{ STATIC_URL }}js',

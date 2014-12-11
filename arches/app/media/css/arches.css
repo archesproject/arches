@@ -893,3 +893,8 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     border-bottom: 1px solid #eee;
     background: #fafafa;
 }
+
+.arches-thumbnail {
+    float: left;
+    width: 50%;
+}
