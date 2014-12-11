@@ -115,7 +115,7 @@ def report(request, resourceid):
         'EXTERNAL_XREF_E42':'xxxxxxxxxxxxxxxxxxx',
         'FROM_DATE_E49':'11/8/13',
         'GEOMETRY_QUALIFIER_E55':'GEOMETRY_QUALIFIER:1',
-        'HERITAGE_RESOURCE_TYPE_E55':['Residential Single Family'],
+        'HERITAGE_RESOURCE_TYPE_E55':['First example resource type', 'Second example resource type', 'Third example resource type'],
         'HERITAGE_RESOURCE_USE_TYPE_E55':'USE_TYPE:1',
         'INTEGRITY_TYPE_E55':'INTEGRITY:1',
         'KEYWORD_E55':'SUBJECT:1',
