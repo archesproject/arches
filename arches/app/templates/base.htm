@@ -134,8 +134,8 @@
                             <!-- End Resource Editor -->
 
                              <!-- RDM-->
-                            <li class="{% if user.is_anonymous %}disabled{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
-                                <a href="{% if user.is_anonymous %}javascript:void(0);{% else %}{% url 'rdm' '' %}{% endif %}">
+                            <li class="{% if user.is_anonymous %}{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
+                                <a href="{% url 'rdm' '' %}">
                                     RDM {{what}}
                                 </a>
                             </li>
