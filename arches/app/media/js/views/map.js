@@ -10,6 +10,7 @@ define([
     return Backbone.View.extend({
         overlays: [],
         initialize: function(options) {
+            var self = this;
             var projection = ol.proj.get('EPSG:3857');
             var layers = [];
             var dragAndDropInteraction = new ol.interaction.DragAndDrop({
@@ -38,20 +39,22 @@ define([
                     features: event.features,
                     projection: event.projection
                 });
-                map.getLayers().push(new ol.layer.Vector({
-                source: vectorSource,
-                style: new ol.style.Style({
-                        fill: new ol.style.Fill({
-                            color: 'rgba(92, 184, 92, 0.5)'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: '#0ff',
-                            width: 1
-                        })
+                var vectorLayer = new ol.layer.Vector({
+                    source: vectorSource,
+                    style: new ol.style.Style({
+                            fill: new ol.style.Fill({
+                                color: 'rgba(92, 184, 92, 0.5)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#0ff',
+                                width: 1
+                            })
                     })
-                }));
-                var view = map.getView();
-                view.fitExtent(vectorSource.getExtent(), (map.getSize()));
+                });
+                self.map.addLayer(vectorLayer);
+                var view = self.map.getView();
+                view.fitExtent(vectorSource.getExtent(), (self.map.getSize()));
+                self.trigger('layerDropped', vectorLayer, event.file.name);
             });
 
             this.map = new ol.Map({
