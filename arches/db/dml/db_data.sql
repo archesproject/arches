@@ -49,6 +49,7 @@ INSERT INTO d_valuetypes VALUES ('notation', 'notation', null, 'skos');
 
 --NON-SKOS
 INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
+INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
 
 --DUBLIN CORE
 INSERT INTO d_valuetypes VALUES ('title', 'label', null, 'dcterms');
@@ -101,7 +102,7 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'narrower');
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'narrower');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
+--INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
 --INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
 INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
