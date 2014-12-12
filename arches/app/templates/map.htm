@@ -349,9 +349,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="col-xs-12">
 
                     <!-- Form for screens > XS -->
-                    <dl class="hidden-xs" data-bind="foreach: filteredLayers">   
+                    <dl class="hidden-xs" data-bind="foreach: layers">   
 
-                        <dd class="heritage">
+                        <dd class="heritage" data-bind="css: {hidden: filtered}">
                             <div class="row arches-layer-library" data-bind="css: {'arches-ll-selected': onMap()}">
 
                                 <!-- Layer Thumbnail -->

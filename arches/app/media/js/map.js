@@ -27,6 +27,7 @@ require([
         layers[index].active.subscribe(function(show) {
             layer.layer.setVisible(show);
         });
+        layer.filtered = ko.observable(false);
     });
     var map = new MapView({
         el: $('#map'),
@@ -38,22 +39,23 @@ require([
         filterTerms: ko.observableArray()
     };
 
-    viewModel.filteredLayers = ko.computed(function() {
-        if(viewModel.filterTerms().length == 0) {
-            return viewModel.layers();
-        } else {
-            return ko.utils.arrayFilter(viewModel.layers(), function(layer) {
-                var include = false;
-                _.each(viewModel.filterTerms(), function(term) {
+    viewModel.filterTerms.subscribe(function () {
+        var terms = viewModel.filterTerms()
+        _.each(viewModel.layers(), function(layer) {
+            var filtered = true;
+            if (terms.length == 0) {
+                filtered = false;
+            } else {
+                _.each(terms, function(term) {
                     if (term.text === layer.name) {
-                        include = true;
+                        filtered = false;
                     } else if (_.contains(layer.categories, term.text)) {
-                        include = true;
+                        filtered = false;
                     }
                 });
-                return include
-            });
-        }
+            }
+            layer.filtered(filtered)
+        });
     });
 
     var hideAllPanels = function () {
