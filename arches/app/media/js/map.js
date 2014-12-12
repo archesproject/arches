@@ -34,8 +34,28 @@ require([
     });
     var viewModel = {
         baseLayers: map.baseLayers,
-        layers: ko.observableArray(layers)
+        layers: ko.observableArray(layers),
+        filterTerms: ko.observableArray()
     };
+
+    viewModel.filteredLayers = ko.computed(function() {
+        if(viewModel.filterTerms().length == 0) {
+            return viewModel.layers();
+        } else {
+            return ko.utils.arrayFilter(viewModel.layers(), function(layer) {
+                var include = false;
+                _.each(viewModel.filterTerms(), function(term) {
+                    if (term.text === layer.name) {
+                        include = true;
+                    } else if (_.contains(layer.categories, term.text)) {
+                        include = true;
+                    }
+                });
+                return include
+            });
+        }
+    });
+
     var hideAllPanels = function () {
         $("#overlay-panel").addClass("hidden");
         $("#basemaps-panel").addClass("hidden");
@@ -153,17 +173,19 @@ require([
     //Select2 Simple Search initialize
     $('.layerfilter').select2({
         data: function() {
-            var data;
+            var terms = [];
+            _.each(layers, function (layer) {
+                terms = _.union(terms, layer.categories, [layer.name]);
+            });
 
-            data = [
-                {id: "administrative", text: "Administrative Layers"},
-                {id: "environmental", text: "Environmental Layers"},
-                {id: "planning", text: "Planning Layers"},
-                {id: "historical", text: "Historical Maps"},
-                {id: "heritage", text: "Cultural Heritage Maps"}
-            ];
-
-            return {results: data};
+            return {
+                results: _.map(terms, function(term) { 
+                    return {
+                        id: _.uniqueId('term'),
+                        text: term
+                    }
+                })
+            };
         },
         placeholder: "Filter Layer List",
         multiple: true,
@@ -172,25 +194,15 @@ require([
 
     //filter layer library
     $(".layerfilter").on("select2-selecting", function(e) {
-        //toggle off layers that don't match the users' selection
-        var selected = e.val;
-
-        if (selected == 'historical') {
-            //toggle off layers that arent historical
-            $(".administrative").toggle(600);
-            $(".heritage").toggle(600);
-        }
+        viewModel.filterTerms.push(e.object);
     });
 
     $(".layerfilter").on("select2-removed", function(e) {
-        //toggle off layers that don't match the users' selection
-        var unselected = e.val;
+        var term = ko.utils.arrayFirst(viewModel.filterTerms(), function(term) {
+            return term.id === e.val;
+        });
 
-        if (unselected == 'historical') {
-            //toggle off layers that arent historical
-            $(".administrative").toggle(600);
-            $(".heritage").toggle(600);
-        }
+        viewModel.filterTerms.remove(term);
     });
 
     //Select2 Simple Search initialize
