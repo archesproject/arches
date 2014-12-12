@@ -22,7 +22,7 @@ require([
     });
     var viewModel = {
         baseLayers: map.baseLayers,
-        layers: layers
+        layers: ko.observableArray(layers)
     };
     var hideAllPanels = function () {
         $("#overlay-panel").addClass("hidden");
@@ -138,33 +138,44 @@ require([
         }
     });
 
-    //Layer Selector
     $(".layer-selector").click (function(event){
-        //determine which layer user wants to enable/disable.  Determine layer by trimming "-button" from url, its icon
-        //by adding -icon to layer name, and its thumbnail by adding -img to layer name
-        var layer_url = "#" + event.target.id;
-        var layer = layer_url.slice(0, -7);
-        var icon = layer + "-icon";
-        var thumb = layer + "-img";
-        var knobs = layer + "-knobs";
+        var layerId = $(this).data().layerid;
+        var root = $(this).closest('.arches-overlay-item');
+        var icon = root.find('.layer-icon');
+        var thumb = root.find('.layer-thumb');
+        var knob = root.find('.knobs-demo');
+        var hide = root.hasClass("arches-ll-selected");
+        var layer;
 
-        if ($(layer).hasClass("arches-ll-selected")) {
-            //user wants to remove layer from map
-            $(layer).removeClass("arches-ll-selected");
-            $(icon).removeClass("fa-dot-circle-o");
-            $(icon).addClass("fa-ban");
-            $(thumb).css("opacity", "0.5");
-            $(layer_url).removeClass("layer-selected-title");
-            $(knobs).css("display", "none");
+        if (hide) {
+            root.removeClass("arches-ll-selected");
+            icon.removeClass("fa-dot-circle-o");
+            icon.addClass("fa-ban");
+            thumb.css("opacity", "0.5");
+            $(this).removeClass("layer-selected-title");
+            knob.css("display", "none");
         } else {
-            //User wants to add layer to map
-            $(layer).addClass("arches-ll-selected");
-            $(icon).addClass("fa-dot-circle-o");
-            $(icon).removeClass("fa-ban");
-            $(thumb).css("opacity", "1");
-            $(layer_url).addClass("layer-selected-title");
-            $(knobs).css("display", "block");
+            root.addClass("arches-ll-selected");
+            icon.addClass("fa-dot-circle-o");
+            icon.removeClass("fa-ban");
+            thumb.css("opacity", "1");
+            $(this).addClass("layer-selected-title");
+            knob.css("display", "block");
         }
+        
+        layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+            return layerId === item.id;
+        });
+
+        layer.layer.setVisible(!hide);
+    });
+
+    $('.layer-zoom').click(function () {
+        var layerId = $(this).data().layerid;
+        var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+            return layerId === item.id;
+        });
+        map.map.getView().fitExtent(layer.layer.getSource().getExtent(), map.map.getSize());
     });
 
     //Select2 Simple Search initialize
@@ -191,13 +202,11 @@ require([
 
     $('.knob').knob({
         change: function (value) {
-
-        },
-        release: function (value) {
-
-        },
-        cancel: function () {
-
+            var layerId = this.$.data().layerid;
+            var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+                return layerId === item.id;
+            });
+            layer.layer.setOpacity(value/100)
         }
     });
 
