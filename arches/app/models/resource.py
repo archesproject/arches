@@ -189,7 +189,6 @@ class Resource(Entity):
                 selected_form = form
         return selected_form['class'](self)
 
-
     def get_type_name(self):
         resource_name = ''
         for resource_type in self.get_resource_types():
@@ -197,44 +196,41 @@ class Resource(Entity):
                 return resource_type['name']
         return resource_name
 
-
     def get_primary_name(self):
         if self.entityid == '':
             return _('New Resource')
         return _('Unnamed Resource')
 
-
     def get_names(self):
         return []
-
 
     def create_resource_relationship(self, related_resource_id, notes=None, date_started=None, date_ended=None, relationship_type_id=None):
         """
         Creates a relationship between resources 
         
         """
+
         relationship = archesmodels.RelatedResource(
-                entityid1 = self.entityid,
-                entityid2 = related_resource_id,
-                notes = notes,
-                relationshiptype = relationship_type_id,
-                datestarted = date_started,
-                dateended = date_ended,
-                )
+            entityid1 = self.entityid,
+            entityid2 = related_resource_id,
+            notes = notes,
+            relationshiptype = relationship_type_id,
+            datestarted = date_started,
+            dateended = date_ended,
+        )
 
         relationship.save()
-
 
     def delete_all_resource_relationships(self):
         """
         Deletes all relationships to other resources. 
         
-        """        
+        """     
+
         relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid) )
 
         for relationship in relationships:
             relationship.delete()
-
 
     def delete_resource_relationship(self, related_resource_id, relationship_type_id=None):
         """
@@ -250,13 +246,13 @@ class Resource(Entity):
         for relationship in relationships:
             relationship.delete()
 
-
     def get_related_resources(self, entitytypeid=None, relationship_type_id=None, return_entities=True):
         """
         Gets a list of entities related to this entity, optionaly filters on entitytypeid and/or relationship type. 
         Setting return_entities to False will return the relationship records 
         rather than the related entities. 
         """
+
         ret = []
 
         if self.entityid:
@@ -282,85 +278,15 @@ class Resource(Entity):
         Gets the human readable name to display for entity instances
 
         """
+
         pass
 
-    def index_old(self):
-        """
-        Gets a SearchResult object for a given resource
-        Used for populating the search index with searchable entity information
-
-        """
-
-        if self.get_rank() == 0:
-            se = SearchEngineFactory().create()
-            search_result = {}
-            search_result['entityid'] = self.entityid
-            search_result['entitytypeid'] = self.entitytypeid  
-            search_result['strings'] = []
-            search_result['geometries'] = []
-            search_result['concepts'] = []
-
-            term_entities = []
-
-            names = self.get_names()
-            primary_display_name = self.get_primary_name()
-
-            for enititytype in settings.SEARCHABLE_ENTITY_TYPES:
-                for entity in self.find_entities_by_type_id(enititytype):
-                    search_result['strings'].append(entity.value)
-                    term_entities.append(entity)
-
-            for geom_entity in self.find_entities_by_type_id(settings.ENTITY_TYPE_FOR_MAP_DISPLAY):
-                search_result['geometries'].append(fromstr(geom_entity.value).json)
-                mapfeature = MapFeature()
-                mapfeature.geomentityid = geom_entity.entityid
-                mapfeature.entityid = self.entityid
-                mapfeature.entitytypeid = self.entitytypeid
-                mapfeature.primaryname = primary_display_name
-                mapfeature.geometry = geom_entity.value
-                data = JSONSerializer().serializeToPython(mapfeature, ensure_ascii=True, indent=4)
-                se.index_data('maplayers', self.entitytypeid, data, idfield='geomentityid')
-
-            def to_int(s):
-                try:
-                    return int(s)
-                except ValueError:
-                    return ''
-
-            def inspect_node(entity):
-                if entity.entitytypeid in settings.ADV_SEARCHABLE_ENTITY_TYPES or entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
-                    if entity.entitytypeid not in search_result:
-                        search_result[entity.entitytypeid] = []
-
-                    if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                        search_result[entity.entitytypeid].append(JSONDeserializer().deserialize(fromstr(entity.value).json))
-                    else:
-                        search_result[entity.entitytypeid].append(entity.value)
-
-            self.traverse(inspect_node)
-
-            for entitytype, value in search_result.iteritems():
-                if entitytype in settings.ADV_SEARCHABLE_ENTITY_TYPES or entitytype in settings.SEARCHABLE_ENTITY_TYPES:
-                    if entitytype in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                        se.create_mapping('entity', self.entitytypeid, entitytype, 'geo_shape') 
-                    else:                   
-                        try:
-                            uuid.UUID(value[0])
-                            # SET FIELDS WITH UUIDS TO BE "NOT ANALYZED" IN ELASTIC SEARCH
-                            se.create_mapping('entity', self.entitytypeid, entitytype, 'string', 'not_analyzed')
-                        except(ValueError):
-                            pass
-
-                        search_result[entitytype] = list(set(search_result[entitytype]))
-
-            data = JSONSerializer().serializeToPython(search_result, ensure_ascii=True, indent=4)
-            se.index_data('entity', self.entitytypeid, data, idfield=None, id=self.entityid)
-            se.create_mapping('term', 'value', 'entityids', 'string', 'not_analyzed')
-            se.index_terms(term_entities)
-
-            return search_result   
-
     def index(self):
+        """
+        Indexes all the nessesary documents related to resources to support the map, search, and reports
+
+        """
+
         se = SearchEngineFactory().create()
 
         se.create_mapping('term', 'value', 'ids', 'string', 'not_analyzed')
@@ -373,8 +299,9 @@ class Resource(Entity):
                     'property' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'value' : {'type' : 'string', 'index' : 'analyzed'},
-                    'relatedentities' : { 
+                    'value' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                    'child_entities' : { 
                         'type' : 'nested', 
                         'index' : 'analyzed',
                         'properties' : {
@@ -423,6 +350,7 @@ class Resource(Entity):
                 }
             }
         }
+
         se.create_mapping('entity', self.entitytypeid, mapping=mapping)
 
         def gather_entities(entity):
@@ -437,10 +365,11 @@ class Resource(Entity):
                         scheme_pref_label = concept.get_context().get_preflabel().value
                         se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': scheme_pref_label, 'conceptid': domain.val.conceptid_id})
             elif entity.businesstablename == 'geometries':
+                entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
                 geojson = {
                     'type': 'Feature',
                     'id': entity.entityid,
-                    'geometry': JSONDeserializer().deserialize(fromstr(entity.value).json),
+                    'geometry': entity.value,
                     'properties': {
                         'resourceid': self.entityid,
                         'entitytypeid': self.entitytypeid,
@@ -455,30 +384,26 @@ class Resource(Entity):
             elif entity.businesstablename == 'files':
                 pass
             return entity.businesstablename
+        
+        root_entity = self.copy()
+        root_entity.primaryname = self.get_primary_name()
+        root_entity.child_entities = []
+        root_entity.dates = []
+        root_entity.geometries = []
+        del root_entity.form_groups
 
-
-
-
-        flattend_entity = self.flatten()
-        # root_entity = self
-        # root_entity.district = district
-        # root_entity.relatedentities = []
-        # root_entity.dates = []
-        # root_entity.geometries = []
-        for entity in flattend_entity:
+        for entity in self.flatten():
             businesstablename = gather_entities(entity)
-        #     if entity.entityid != self.entityid:
-        #         try:
-        #             del entity.relatedentities
-        #         except: pass
-        #         if businesstablename == 'dates':
-        #             root_entity.dates.append(entity)
-        #         elif businesstablename == 'geometries':
-        #             root_entity.geometries.append(entity)
-        #         else:
-        #             root_entity.relatedentities.append(entity)
+            if entity.entityid != self.entityid:
+                if businesstablename == 'dates':
+                    root_entity.dates.append(entity)
+                elif businesstablename == 'geometries':
+                    root_entity.geometries.append(entity)
+                else:
+                    root_entity.child_entities.append(entity)
 
-        # se.index_data('entity', root_entity.entitytypeid, JSONSerializer().serializeToPython(root_entity, ensure_ascii=True), idfield=None, id=root_entity.entityid)
+        se.index_data('resource', self.entitytypeid, self.dictify(), id=self.entityid)
+        se.index_data('entity', root_entity.entitytypeid, JSONSerializer().serializeToPython(root_entity), id=root_entity.entityid)
 
     def delete_index(self):
         """
@@ -501,14 +426,12 @@ class Resource(Entity):
             entity = Entity().get(self.entityid)
             entity.traverse(delete_indexes)
 
-
     @staticmethod
     def get_report(resourceid):
         return {
             'id': None,
             'data': None
         }
-
 
     @staticmethod
     def get_resource_types():
