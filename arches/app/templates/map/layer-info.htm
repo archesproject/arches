@@ -1,0 +1,12 @@
+{% load i18n %}
+<script>
+    define('layer-info', [], function () {
+        return {
+            exampleLayer: {
+                name: "{% trans 'Example Layer' %}",
+                description: "{% trans 'Lorem ipsum dolor si amet...' %}",
+                categories: ["{% trans 'test' %}", "{% trans 'example' %}"]
+            }
+        };
+    });
+</script>

@@ -3,7 +3,7 @@ define([
     'openlayers',
     'underscore',
     'arches',
-    'layer-names'
+    'layer-info'
 ], function($, ol, _, arches, layerNames) {
     var createDemoLayer = function () {
       var fillColor = '#'+Math.floor(Math.random()*16777215).toString(16);
@@ -60,36 +60,36 @@ define([
     return [
       {
           id: 'exampleLayer',
-          name: layerNames.exampleLayer,
-          description: 'Lorem ipsum dolor si amet...',
-          categories: ['test', 'example'],
+          name: layerNames.exampleLayer.name,
+          description: layerNames.exampleLayer.description,
+          categories: layerNames.exampleLayer.categories,
           icon: arches.urls.media + '',
           layer: createDemoLayer(),
           onMap: true
       },
       {
           id: 'exampleLayer2',
-          name: layerNames.exampleLayer + " 2",
-          description: 'Lorem ipsum dolor si amet...',
-          categories: ['test', 'example'],
+          name: layerNames.exampleLayer.name + " 2",
+          description: layerNames.exampleLayer.description,
+          categories: layerNames.exampleLayer.categories,
           icon: arches.urls.media + '',
           layer: createDemoLayer(),
           onMap: true
       },
       {
           id: 'exampleLayer3',
-          name: layerNames.exampleLayer + " 3",
-          description: 'Lorem ipsum dolor si amet...',
-          categories: ['test', 'example'],
+          name: layerNames.exampleLayer.name + " 3",
+          description: layerNames.exampleLayer.description,
+          categories: layerNames.exampleLayer.categories,
           icon: arches.urls.media + '',
           layer: createDemoLayer(),
           onMap: false
       },
       {
           id: 'exampleLayer4',
-          name: layerNames.exampleLayer + " 4",
-          description: 'Lorem ipsum dolor si amet...',
-          categories: ['test', 'example'],
+          name: layerNames.exampleLayer.name + " 4",
+          description: layerNames.exampleLayer.description,
+          categories: layerNames.exampleLayer.categories,
           icon: arches.urls.media + '',
           layer: createDemoLayer(),
           onMap: false
