@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 {% block css %}
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css">
+    <link rel="stylesheet" href="{% static 'plugins/openlayers/ol.css' %}">
     {{ block.super }}
 {% endblock css%}
 {% block content %}
@@ -169,47 +169,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- List overlays -->
                             <div class="row">
                                 <div class="col-xs-12" data-bind="foreach: layers">
-                                    <!-- ko if: onMap -->
                                     <!-- Layer Entry -->
-                                    <div class="row arches-overlay-item arches-ll-selected" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <div data-bind="css: {hidden: !onMap()}">
+                                        <div data-bind="css: { 'arches-ll-selected': active() }" class="row arches-overlay-item" style="padding-top: 10px; padding-bottom: 10px;">
 
-                                        <!-- Layer Thumbnail -->
-                                        <div class="col-xs-2" style="padding-right: 0px;">
-                                            <img style="width: 52px; height: 52px; border: 1px solid #cdcdcd;" data-bind="attr: {src: icon}" alt="" title="" class="layer-thumb">
-                                        </div>
-
-                                        <!-- Layer Title and Controls -->
-                                        <div class="col-xs-10">
-                                            
-                                            <!-- Layer Title -->
-                                            <div class="row">
-                                                <div class="col-xs-12">
-                                                    <a href="javascript:void(0);" class="overlay-entry layer-selector" style="margin-left: 5px;" id="map-layer-10-button" data-bind="text: name, attr: {'data-layerid': id}"><i class="fa fa-dot-circle-o layer-icon"></i></a>
-                                                </div>
+                                            <!-- Layer Thumbnail -->
+                                            <div class="col-xs-2" style="padding-right: 0px;">
+                                                <img style="width: 52px; height: 52px; border: 1px solid #cdcdcd;" data-bind="attr: {src: icon}, style: { opacity: active() ? 1 : 0.5 }" alt="" title="" class="layer-thumb">
                                             </div>
 
-                                            <!-- Layer Controls -->
-                                            <div class="row">
-                                                <div class="col-xs-12">
-                                                    <div class="knobs-demo" style="margin-left: 5px; display: block;">
-                                                        
-                                                        <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
+                                            <!-- Layer Title and Controls -->
+                                            <div class="col-xs-10">
+                                                
+                                                <!-- Layer Title -->
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 5px;" id="map-layer-10-button" data-bind="text: name, attr: {'data-layerid': id}, css: { 'arches-ll-selected': active() }"><i class="fa fa-dot-circle-o layer-icon"></i></a>
+                                                    </div>
+                                                </div>
 
-                                                        <div style="margin-top: -63px; margin-left: 47px;">
-                                                            <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                <!-- Layer Controls -->
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="knobs-demo" data-bind="css: { 'hidden': !active() }" style="margin-left: 5px; display: block;">
+                                                            
+                                                            <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
+
+                                                            <div style="margin-top: -63px; margin-left: 47px;">
+                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                            </div>
+
                                                         </div>
-
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- End Layer Entry -->
+
+
+                                        <!-- Spacer -->
+                                         <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
                                     </div>
-                                    <!-- End Layer Entry -->
-
-
-                                    <!-- Spacer -->
-                                     <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
-                                    <!-- /ko -->
                                 </div>
                             </div>
                         </div>
@@ -349,155 +349,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="col-xs-12">
 
                     <!-- Form for screens > XS -->
-                    <dl class="hidden-xs">   
+                    <dl class="hidden-xs" data-bind="foreach: layers">   
 
                         <dd class="heritage">
-                            <div class="row arches-layer-library" id="map-layer-1">
+                            <div class="row arches-layer-library" data-bind="css: {'arches-ll-selected': onMap()}">
 
                                 <!-- Layer Thumbnail -->
                                 <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img id="map-layer-1-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="{% static 'img/map/heritage_grey.png' %}" alt="" title="" class="pull-right">
+                                    <img style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" alt="" title="" class="pull-right" data-bind="attr: {src: icon}, style: {opactiy: onMap() ? 1 : 0.5}">
                                 </div>
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-1-button"><i id="map-layer-1-icon" class="fa fa-ban"></i> Heritage Resources</a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, text: name, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap(), 'fa-dot-circle-o': onMap()}"></i></a>
 
                                     <span class="arches-ll-category pull-right" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
+                                        <i class="fa-fw fa fa-info-circle"></i>Categories: <span data-bind="text:categories.join(', ')"
                                     </span>  
                                 </div>
 
                                 <!-- Layer description -->
                                 <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle">
-                                        Heritage Resources include houses, signs, storefronts, and many other architectural features or other objects of significance that we observed during the SurveyLA effort
-                                    </span>  
-                                </div>    
-
-                            </div>
-
-                            <!-- Spacer -->
-                            <hr class="arches-layer-divider">
-
-                        </dd>
-
-                        <dd class="heritage">
-                            <div class="row arches-layer-library arches-ll-selected" id="map-layer-2">
-
-                                <!-- Layer Thumbnail -->
-                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img id="map-layer-2-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd;" src="{% static 'img/map/marker_blue.png' %}" alt="" title="" class="pull-right">
-                                </div>
-
-                                <!-- Layer Name/Categories -->
-                                <div class="col-sm-9 col-md-11">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector layer-selected-title" id="map-layer-2-button"><i id="map-layer-2-icon" class="fa fa-dot-circle-o"></i> Heritage District</a>
-                                    
-                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Heritage
-                                    </span>
-                                    
-                                </div>
-
-                                <!-- Layer description -->
-                                <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle">
-                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
-                                    </span>  
-                                </div>    
-
-                            </div>
-
-                            <!-- Spacer -->
-                            <hr class="arches-layer-divider">
-
-                        </dd>
-
-                        <dd class="planning historical">
-                            <div class="row arches-layer-library" id="map-layer-3">
-
-                                <!-- Layer Thumbnail -->
-                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img id="map-layer-3-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
-                                </div>
-
-                                <!-- Layer Name/Categories -->
-                                <div class="col-sm-9 col-md-11">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-3-button"><i id="map-layer-3-icon" class="fa fa-ban"></i> Land Use Planning Areas</a>
-                                    
-                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Planning, Historical
-                                    </span>  
-                                </div>
-
-                                <!-- Layer description -->
-                                <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle">
-                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
-                                    </span>  
-                                </div>    
-
-                            </div>
-
-                            <!-- Spacer -->
-                            <hr class="arches-layer-divider">
-
-                        </dd>
-
-                        <dd class="environmental historical">
-                            <div class="row arches-layer-library" id="map-layer-4">
-
-                                <!-- Layer Thumbnail -->
-                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img id="map-layer-4-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
-                                </div>
-
-                                <!-- Layer Name/Categories -->
-                                <div class="col-sm-9 col-md-11">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-4-button"><i id="map-layer-4-icon" class="fa fa-ban"></i> Seismic Hazard Zones</a>
-                                    
-                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Environmental, Historical
-                                    </span>  
-                                </div>
-
-                                <!-- Layer description -->
-                                <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle">
-                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
-                                    </span>  
-                                </div>    
-
-                            </div>
-
-                            <!-- Spacer -->
-                            <hr class="arches-layer-divider">
-
-                        </dd>
-
-                        <dd class="administrative">
-                            <div class="row arches-layer-library" id="map-layer-5">
-
-                                <!-- Layer Thumbnail -->
-                                <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img id="map-layer-5-img" style="width: 64px; height: 64px; border: 1px solid #cdcdcd; opacity: 0.5" src="img/superbox/superbox-thumb-3.jpg" alt="" title="" class="pull-right">
-                                </div>
-
-                                <!-- Layer Name/Categories -->
-                                <div class="col-sm-9 col-md-11">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector" id="map-layer-5-button"><i id="map-layer-5-icon" class="fa fa-ban"></i> Census Tracts</a>
-
-                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: Administrative
-                                    </span>  
-                                </div>
-
-                                <!-- Layer description -->
-                                <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle">
-                                        Vestibulum ut orci urna. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi. Morbi blandit enim eget risus posuere dapibus. Vestibulum velit nisi.
-                                    </span>  
+                                    <span class="arches-subtitle" data-bind="text:description"></span>  
                                 </div>    
 
                             </div>

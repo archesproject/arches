@@ -11,10 +11,22 @@ require([
     'plugins/jquery.knob.min'
 ], function($, _, ol, ko, arches, MapView, layers) {
     var mapLayers = [];
-    _.each(layers, function(layer) {
+    _.each(layers, function(layer, index) {
         if (layer.onMap) {
             mapLayers.push(layer.layer);
         }
+        layer.onMap = ko.observable(layer.onMap);
+        layers[index].onMap.subscribe(function(add) {
+            if (add) {
+                map.map.addLayer(layer.layer);
+            } else {
+                map.map.removeLayer(layer.layer);
+            }
+        });
+        layer.active = ko.observable(true);
+        layers[index].active.subscribe(function(show) {
+            layer.layer.setVisible(show);
+        });
     });
     var map = new MapView({
         el: $('#map'),
@@ -95,6 +107,49 @@ require([
         $( "#layer-library" ).slideToggle(600);
     });
 
+    $(".visibility-toggle").click (function(event){
+        var layerId = $(this).data().layerid;
+        
+        layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+            return layerId === item.id;
+        });
+
+        layer.active(!layer.active());
+    });
+
+    $('.layer-zoom').click(function () {
+        var layerId = $(this).data().layerid;
+        var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+            return layerId === item.id;
+        });
+        map.map.getView().fitExtent(layer.layer.getSource().getExtent(), map.map.getSize());
+    });
+
+
+    $('.knob').knob({
+        change: function (value) {
+            var layerId = this.$.data().layerid;
+            var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+                return layerId === item.id;
+            });
+            layer.layer.setOpacity(value/100)
+        }
+    });
+    $(".knob").css("font-size", 11);
+    $(".knob").css("font-weight", 200);
+
+    $(".ol-zoom").css("top", "70px");
+
+    $('.on-map-toggle').click(function () {
+        var layerId = $(this).data().layerid;
+        
+        layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
+            return layerId === item.id;
+        });
+
+        layer.onMap(!layer.onMap());
+    });
+
     //Select2 Simple Search initialize
     $('.layerfilter').select2({
         data: function() {
@@ -138,46 +193,6 @@ require([
         }
     });
 
-    $(".layer-selector").click (function(event){
-        var layerId = $(this).data().layerid;
-        var root = $(this).closest('.arches-overlay-item');
-        var icon = root.find('.layer-icon');
-        var thumb = root.find('.layer-thumb');
-        var knob = root.find('.knobs-demo');
-        var hide = root.hasClass("arches-ll-selected");
-        var layer;
-
-        if (hide) {
-            root.removeClass("arches-ll-selected");
-            icon.removeClass("fa-dot-circle-o");
-            icon.addClass("fa-ban");
-            thumb.css("opacity", "0.5");
-            $(this).removeClass("layer-selected-title");
-            knob.css("display", "none");
-        } else {
-            root.addClass("arches-ll-selected");
-            icon.addClass("fa-dot-circle-o");
-            icon.removeClass("fa-ban");
-            thumb.css("opacity", "1");
-            $(this).addClass("layer-selected-title");
-            knob.css("display", "block");
-        }
-        
-        layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
-            return layerId === item.id;
-        });
-
-        layer.layer.setVisible(!hide);
-    });
-
-    $('.layer-zoom').click(function () {
-        var layerId = $(this).data().layerid;
-        var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
-            return layerId === item.id;
-        });
-        map.map.getView().fitExtent(layer.layer.getSource().getExtent(), map.map.getSize());
-    });
-
     //Select2 Simple Search initialize
     $('.geocodewidget').select2({
         data: function() {
@@ -200,20 +215,4 @@ require([
         maximumSelectionSize: 1
     });
 
-    $('.knob').knob({
-        change: function (value) {
-            var layerId = this.$.data().layerid;
-            var layer = ko.utils.arrayFirst(viewModel.layers(), function(item) {
-                return layerId === item.id;
-            });
-            layer.layer.setOpacity(value/100)
-        }
-    });
-
-    //Knob overrides
-    $(".knob").css("font-size", 11);
-    $(".knob").css("font-weight", 200);
-
-    //Position OpenLayers COntrol
-    $(".ol-zoom").css("top", "70px");
 });
