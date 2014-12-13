@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import types
+import copy
 import arches.app.models.models as archesmodels
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -76,7 +77,7 @@ class Entity(object):
         entity = archesmodels.Entities.objects.get(pk = pk)
         self.entitytypeid = entity.entitytypeid_id
         self.entityid = entity.pk
-        self.businesstablename = entity.entitytypeid.businesstablename
+        self.businesstablename = entity.entitytypeid.businesstablename if entity.entitytypeid.businesstablename else ''
 
         # get the entity value if any
         if entity.entitytypeid.businesstablename != None:
@@ -225,25 +226,6 @@ class Entity(object):
             self.append_child(child_entity.load(entity))
         return self
 
-    def copy(self, shallow=False):
-        """
-        Returns a copy of this entity
-        if shallow is True then don't retrun any child_entities
-
-        """
-        ret = {}
-        for key, value in self.__dict__.items():
-            if not key.startswith("__"):
-                if key == 'child_entities':
-                    if shallow:
-                        ret[key] = []
-                    else:
-                        ret[key] = [child_entity.copy(shallow=shallow) for child_entity in self.child_entities]
-                else:
-                    ret[key] = value
-
-        return Entity(ret)
-
     def add_child_entity(self, entitytypeid, property, value, entityid):
         """
         Add a child entity to this entity instance
@@ -369,6 +351,9 @@ class Entity(object):
 
         return ret
 
+    def copy(self):
+        return copy.deepcopy(self)
+
     def flatten(self):
         """
         flattens the graph into a list of unordered entities
@@ -381,9 +366,12 @@ class Entity(object):
                 entity.parentid = entity.get_parent().entityid
             else:
                 entity.parentid = None
-            ret.append(entity.copy(shallow=True))
+            ret.append(entity)
 
-        self.traverse(gather_entities)
+        copiedself = self.copy()
+        copiedself.traverse(gather_entities)
+        for item in ret:
+            del item.child_entities
 
         return ret
 
@@ -654,3 +642,139 @@ class Entity(object):
         if Model is None:
             raise TypeError(u"Invalid model identifier: '%s'" % model_identifier)
         return Model
+
+
+    def dictify(self):
+        """
+        Takes an entity and turns it into recursive lists nested objects
+        Uses an in-built algorithm to derive which sub-branches appear to be grouped, and then flattens them out
+
+        A partial example output follows...
+
+        .. code-block:: python
+            [
+                {
+                    "EVALUATION_CRITERIA_ASSIGNMENT_E13": [{
+                        "STATUS_E55": [
+                            {"STATUS_E55__label": "3D"}, 
+                            {"STATUS_E55__label": "3CD"}, 
+                            {"STATUS_E55__label": "5D3"}
+                        ]
+                    }], 
+                    "BEGINNING_OF_EXISTENCE_E63": [{
+                        "BEGINNING_OF_EXISTENCE_TIME-SPAN_E52": [{
+                            "BEGINNING_OF_EXISTENCE_TIME-SPAN_E52__label": "", 
+                            "START_DATE_OF_EXISTENCE_E49__label": "1962-01-01T00:00:00"
+                        }], 
+                        "BEGINNING_OF_EXISTENCE_TYPE_E55": [{
+                            "BEGINNING_OF_EXISTENCE_TYPE_E55__label": "Built Date"
+                        }]
+                    }], 
+                    "NAME_E41": [{
+                        "NAME_TYPE_E55__label": "Primary", 
+                        "NAME_E41__label": "3264 N WRIGHTWOOD DR"
+                    }], 
+                    "PRODUCTION_E12": [{
+                        "PHASE_TYPE_ASSIGNMENT_E17": [
+                            {
+                                "STYLE_E55": [{
+                                        "STYLE_E55__label": "Modern, Mid-Century"
+                                }], 
+                                "HERITAGE_RESOURCE_TYPE_E55": [{
+                                    "HERITAGE_RESOURCE_TYPE_E55__label": "HP02. Single family property"
+                                    },{
+                                    "HERITAGE_RESOURCE_TYPE_E55__label": "House"
+                                }], 
+                                "HERITAGE_RESOURCE_USE_TYPE_E55": [{
+                                    "HERITAGE_RESOURCE_USE_TYPE_E55__label": "Historic"
+                                }]
+                            }
+                        ]
+                    }]
+                }
+            ]
+
+        """
+
+        data = {}
+        for child_entity in self.child_entities:
+            if child_entity.businesstablename != '':
+                data[child_entity.undotify()] = self.get_nodes(child_entity.entitytypeid)
+            else:
+                collectsdata = False
+                for grand_child in child_entity.child_entities:
+                    if grand_child.businesstablename != '':
+                        collectsdata = True
+                        break
+                if collectsdata:
+                    data[child_entity.undotify()] = self.get_group_nodes(child_entity.entitytypeid)
+                else:
+                    data[child_entity.undotify()] = child_entity.dictify()
+        return [data]
+
+    def get_group_nodes(self, entitytypeid):
+        """
+        Used by dictify to gather and flatten groups of nodes
+
+        """
+
+        ret = []
+        entities = self.find_entities_by_type_id(entitytypeid)
+        for entity in entities:
+            data = {}
+
+            for child_entity in entity.child_entities:
+                data[child_entity.undotify_entitytypeid()] = self.get_nodes(child_entity.entitytypeid)
+            ret.append(data)
+        return ret
+
+    def get_nodes(self, entitytypeid):
+        """
+        Used by dictify to gather and flatten a single node (by entitytypeid) and all it's children
+
+        for example, a NAME.E41 node with a single child of NAME_TYPE.E55 would be transformed as below
+        
+        .. code-block:: python
+
+                "NAME_E41": [{
+                    "NAME_TYPE_E55__label": "Primary", 
+                    "NAME_E41__label": "3264 N WRIGHTWOOD DR"
+                }],
+
+        """
+
+        ret = []
+        entities = self.find_entities_by_type_id(entitytypeid)
+        for entity in entities:
+            data = {}
+
+            for entity in entity.flatten():
+                data = dict(data.items() + entity.encode().items())
+            ret.append(data)
+        return ret
+
+    def encode(self):
+        """
+        Encodes an Entity into a dictionary of keys derived by the entitytypeid of the Entity concatonated wtih property name 
+
+        .. code-block:: python
+
+                {
+                    "NAME_TYPE_E55__label": "Primary"
+                }
+
+        """
+
+        ret = {}
+        for key, value in self.__dict__.items():
+            #if (not key.startswith("__")) and key != 'property' and key != 'child_entities' :
+            #if key == 'entityid' or key == 'value' or key == 'label' or key == 'businesstablename':
+            if key == 'label':
+                ret['%s__%s' % (self.undotify(), key)] = value
+        return ret
+
+    def undotify(self):
+        return self.undotify_entitytypeid()
+
+    def undotify_entitytypeid(self):
+        return self.entitytypeid.replace('.', '_');
