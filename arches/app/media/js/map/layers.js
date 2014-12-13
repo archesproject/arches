@@ -63,7 +63,7 @@ define([
           name: layerNames.exampleLayer.name,
           description: layerNames.exampleLayer.description,
           categories: layerNames.exampleLayer.categories,
-          icon: arches.urls.media + '',
+          icon: arches.urls.media + 'img/map/marker_blue.png',
           layer: createDemoLayer(),
           onMap: true
       },
@@ -72,7 +72,7 @@ define([
           name: layerNames.exampleLayer.name + " 2",
           description: layerNames.exampleLayer.description,
           categories: layerNames.exampleLayer.categories,
-          icon: arches.urls.media + '',
+          icon: arches.urls.media + 'img/map/marker_blue.png',
           layer: createDemoLayer(),
           onMap: true
       },
@@ -81,7 +81,7 @@ define([
           name: layerNames.exampleLayer.name + " 3",
           description: layerNames.exampleLayer.description,
           categories: layerNames.exampleLayer.categories,
-          icon: arches.urls.media + '',
+          icon: arches.urls.media + 'img/map/marker_blue.png',
           layer: createDemoLayer(),
           onMap: false
       },
@@ -90,7 +90,7 @@ define([
           name: layerNames.exampleLayer.name + " 4",
           description: layerNames.exampleLayer.description,
           categories: layerNames.exampleLayer.categories,
-          icon: arches.urls.media + '',
+          icon: arches.urls.media + 'img/map/marker_blue.png',
           layer: createDemoLayer(),
           onMap: false
       }
