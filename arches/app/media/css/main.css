@@ -2887,6 +2887,8 @@ ul.labels-demo li {
 
 .arches-basemap-thumbnail {
     border: 1px solid rgba(0,10,0,.3);
+    width: 120px;
+    height: 100px;
 }
 
 .arches-form-inline {
