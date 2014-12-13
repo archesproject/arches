@@ -20,5 +20,15 @@ define([
     //set default map style to Roads
     baseLayers[0].layer.setVisible(true);
 
+    baseLayers.push({
+        id: 'osm',
+        name: 'OpenStreetMap',
+        icon: arches.urls.media + 'img/map/google_streets.jpg',
+        layer: new ol.layer.Tile({
+          source: new ol.source.OSM(),
+          visible: false
+        })
+    });   
+
     return baseLayers;
 });
