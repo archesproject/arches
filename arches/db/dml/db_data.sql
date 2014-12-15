@@ -49,7 +49,6 @@ INSERT INTO d_valuetypes VALUES ('notation', 'notation', null, 'skos');
 
 --NON-SKOS
 INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
-INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
 
 --DUBLIN CORE
 INSERT INTO d_valuetypes VALUES ('title', 'label', null, 'dcterms');
