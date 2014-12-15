@@ -78,7 +78,7 @@ require([
                       name: name,
                       description: '',
                       categories: [''],
-                      icon: arches.urls.media + 'img/map/marker_blue.png',
+                      icon: 'fa fa-map-marker',
                       layer: layer,
                       onMap:  ko.observable(true),
                       active: ko.observable(true),

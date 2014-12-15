@@ -88,7 +88,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="margin-top-5">
                                     <span class="txt-color-white arches-map-inventory-footer-text">
                                         Map Zoom: <span data-bind="text:zoom"></span> &nbsp; &nbsp;
-                                        Cursor: <span data-bind="text:mousePosition"></span> <span class="hidden-xs">(long, lat)</span>
+                                        Cursor: <span data-bind="text:mousePosition"></span> <span class="hidden-xs">(long,lat)</span>
                                     </span>
                                 </p>
                             </div>
@@ -175,7 +175,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <!-- Layer Thumbnail -->
                                             <div class="col-xs-2" style="padding-right: 0px;">
-                                                <img style="width: 52px; height: 52px; border: 1px solid #cdcdcd;" data-bind="attr: {src: icon}, style: { opacity: active() ? 1 : 0.5 }" alt="" title="" class="layer-thumb">
+                                                <div data-bind="style: { opacity: active() ? 1 : 0.5 }" style="border: 1px solid #cdcdcd;vertical-align: middle;text-align: center;width: 52px; height: 52px;">
+                                                    <div style="display: table-cell;vertical-align: middle;text-align: center;width: 52px; height: 52px; ">
+                                                        <div data-bind="attr: { class: icon + ' fa-3x layer-thumb' }" style="display: inline-block;text-align: left;"></div>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <!-- Layer Title and Controls -->
@@ -356,7 +360,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Thumbnail -->
                                 <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <img style="width: 64px; height: 64px; border: 1px solid #cdcdcd;" alt="" title="" class="pull-right" data-bind="attr: {src: icon}, style: {opacity: onMap() ? 1 : 0.5}">
+                                    <div data-bind="style: { opacity: onMap() ? 1 : 0.5 }" style="border: 1px solid #cdcdcd;vertical-align: middle;text-align: center;width: 64px; height: 64px;">
+                                        <div style="display: table-cell;vertical-align: middle;text-align: center;width: 64px; height: 64px; ">
+                                            <div data-bind="attr: { class: icon + ' fa-4x layer-thumb' }" style="display: inline-block;text-align: left;"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Layer Name/Categories -->
