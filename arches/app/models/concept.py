@@ -390,11 +390,11 @@ class Concept(object):
             value.index(scheme=scheme.id)        
 
         for subconcept in self.subconcepts:
-            subconcept.index(scheme=subconcept.get_context().id)
+            subconcept.index(scheme=subconcept.get_context())
 
     def delete_index(self, delete_self=False):
         se = SearchEngineFactory().create()
-        
+
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
 

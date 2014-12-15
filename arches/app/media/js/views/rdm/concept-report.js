@@ -79,6 +79,7 @@ define([
             this.confirm_delete_modal_yes = this.confirm_delete_modal.find('.confirm-delete-yes');
 
             this.confirm_delete_modal_yes.data('id', data.id);
+            this.confirm_delete_modal_yes.data('nodetype', data.nodetype);
             this.confirm_delete_modal_yes.data('action', data.action);
             this.confirm_delete_modal_yes.data('category', data.category);
 
