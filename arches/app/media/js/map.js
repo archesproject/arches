@@ -46,7 +46,9 @@ require([
             self.viewModel = {
                 baseLayers: map.baseLayers,
                 layers: ko.observableArray(layers),
-                filterTerms: ko.observableArray()
+                filterTerms: ko.observableArray(),
+                zoom: ko.observable(arches.mapDefaults.zoom),
+                mousePosition: ko.observable('')
             };
             self.map = map;
 
@@ -104,6 +106,14 @@ require([
                 });
                 $(".knob").css("font-size", 11);
                 $(".knob").css("font-weight", 200);
+            });
+
+            map.on('viewChanged', function (zoom, extent) {
+                self.viewModel.zoom(zoom);
+            });
+
+            map.on('mousePositionChanged', function (mousePosition) {
+                self.viewModel.mousePosition(mousePosition);
             });
 
             var hideAllPanels = function () {
@@ -190,6 +200,7 @@ require([
             $(".knob").css("font-weight", 200);
 
             $(".ol-zoom").css("top", "70px");
+            $(".ol-attribution").css("margin-bottom", "70px")
 
             //Select2 Simple Search initialize
             $('.layerfilter').select2({
