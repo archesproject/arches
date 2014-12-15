@@ -160,7 +160,15 @@ def map_layers(request, entitytypeid):
     se = SearchEngineFactory().create()
     data = se.search('', index="maplayers", type=entitytypeid, end_offset=limit)
 
-    return JSONResponse(data)
+    geojson_collection = {
+      "type": "FeatureCollection",
+      "features": []
+    }
+
+    for item in data['hits']['hits']:
+        geojson_collection['features'].append(item['_source'])
+
+    return JSONResponse(geojson_collection)
 
 def edit_history(request, resourceid=''):
     ret = []
