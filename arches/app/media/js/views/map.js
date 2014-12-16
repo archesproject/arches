@@ -8,6 +8,11 @@ define([
     'bootstrap'
 ], function($, Backbone, _, ol, arches, baseLayers) {
     return Backbone.View.extend({
+        events: {
+            'mousemove': 'handleMouseMove',
+            'mouseout': 'handleMouseOut'
+        },
+
         overlays: [],
         initialize: function(options) {
             var self = this;
@@ -70,6 +75,26 @@ define([
                     zoom: arches.mapDefaults.zoom
                 })
             });
+
+            this.map.on('moveend', function () {
+                var view = self.map.getView();
+                var extent = view.calculateExtent(self.map.getSize());
+                self.trigger('viewChanged', view.getZoom(), extent);
+            });
+        },
+
+        handleMouseMove: function(e) {
+            var coords = this.map.getCoordinateFromPixel([e.offsetX, e.offsetY]);
+            var point = new ol.geom.Point(coords);
+            var format = ol.coordinate.createStringXY(4);
+            coords = point.transform("EPSG:3857", "EPSG:4326").getCoordinates();
+            if (coords.length > 0) {
+                this.trigger('mousePositionChanged', format(coords));
+            }
+        },
+
+        handleMouseOut: function () {
+            this.trigger('mousePositionChanged', '');
         }
     });
 });

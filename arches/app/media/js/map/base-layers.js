@@ -28,7 +28,7 @@ define([
           source: new ol.source.OSM(),
           visible: false
         })
-    });   
+    });
 
     return baseLayers;
 });
