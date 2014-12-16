@@ -5,7 +5,6 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
             'value': '',            
             'type': '',
             'category': '',
-            'datatype': 'text',
             'language': '',
             'conceptid': ''
         }  

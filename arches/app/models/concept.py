@@ -247,29 +247,9 @@ class Concept(object):
             return concepts_to_delete
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
+
         if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
-
-            sql = """WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, 1 AS depth       ---|NonRecursive Part
-                    FROM concepts.relations d
-                    JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
-                    JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
-                    WHERE d.conceptidfrom = '%s'
-                    and c.valuetype = 'prefLabel'
-                    and c2.valuetype = 'prefLabel'
-                    and d.relationtype = 'narrower'
-                UNION
-                    SELECT a.conceptidfrom, a.conceptidto, v2.value, v.value as valueto, depth+1      ---|RecursivePart
-                    FROM concepts.relations  a
-                    JOIN children b ON(b.conceptidto = a.conceptidfrom) 
-                    JOIN concepts.values v ON(v.conceptid = a.conceptidto) 
-                    JOIN concepts.values v2 ON(v2.conceptid = a.conceptidfrom) 
-                    WHERE  v.valuetype = 'prefLabel'
-                    and v2.valuetype = 'prefLabel'
-                    and a.relationtype = 'narrower'
-            ) 
-            SELECT conceptidfrom, conceptidto, value, valueto FROM children ;""" % (concept.id)
-
+            rows = self.get_child_concepts(conceptid, 'narrower', ['prefLabel'], 'prefLabel')
             cursor = connection.cursor()
             cursor.execute(sql)
             rows = cursor.fetchall()
@@ -278,6 +258,36 @@ class Concept(object):
                 concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
 
         return concepts_to_delete
+
+    def get_child_concepts(self, conceptid, relationtype, child_valuetypes, parent_valuetype):
+        """
+        Recursively builds a list of child concepts for a given concept based on its relationship type and valuetypes. 
+        """
+        cursor = connection.cursor()
+        sql = """WITH RECURSIVE children AS (
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c.valuetype, 1 AS depth       ---|NonRecursive Part
+                    FROM concepts.relations d
+                    JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
+                    JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
+                    WHERE d.conceptidfrom = '{0}'
+                    and c2.valuetype = '{3}'
+                    and c.valuetype in ('{2}')
+                    and d.relationtype = '{1}'
+                UNION
+                    SELECT a.conceptidfrom, a.conceptidto, v2.value, v.value as valueto, v.valuetype, depth+1      ---|RecursivePart
+                    FROM concepts.relations  a
+                    JOIN children b ON(b.conceptidto = a.conceptidfrom) 
+                    JOIN concepts.values v ON(v.conceptid = a.conceptidto) 
+                    JOIN concepts.values v2 ON(v2.conceptid = a.conceptidfrom) 
+                    WHERE  v2.valuetype = '{3}'
+                    and v.valuetype in ('{2}')
+                    and a.relationtype = '{1}'
+            ) 
+            SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtype, ("','").join(child_valuetypes), parent_valuetype)
+        print 'new:', sql
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        return rows
 
     def traverse(self, func, direction='down', scope=None):
         """
@@ -539,7 +549,6 @@ class ConceptValue(object):
     def __init__(self, *args, **kwargs):
         self.id = ''
         self.conceptid = ''
-        self.datatype = ''
         self.type = ''
         self.category = ''
         self.value = ''
@@ -567,7 +576,6 @@ class ConceptValue(object):
         value.value = self.value
         value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
         value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
-        value.datatype = self.datatype
         if self.language != '':
             value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
         value.save()
@@ -583,7 +591,6 @@ class ConceptValue(object):
         if isinstance(value, models.Values):
             self.id = value.pk
             self.conceptid = value.conceptid.pk
-            self.datatype = value.datatype
             self.type = value.valuetype.pk
             self.category = value.valuetype.category
             self.value = value.value
@@ -592,7 +599,6 @@ class ConceptValue(object):
         if isinstance(value, dict):
             self.id = value['id'] if 'id' in value else ''
             self.conceptid = value['conceptid'] if 'conceptid' in value else ''
-            self.datatype = value['datatype'] if 'datatype' in value else ''
             self.type = value['type'] if 'type' in value else ''
             self.category = value['category'] if 'category' in value else ''
             self.value = value['value'] if 'value' in value else ''

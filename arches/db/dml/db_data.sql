@@ -31,29 +31,29 @@ INSERT INTO d_languages VALUES ('en-us', 'ENGLISH', true);
 --
 
 --SKOS Documentation Properties
-INSERT INTO d_valuetypes VALUES ('scopeNote', 'note', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('definition', 'note', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('example', 'note', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('historyNote', 'note', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('editorialNote', 'note', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('changeNote', 'note', null, 'skos');
+INSERT INTO d_valuetypes VALUES ('scopeNote', 'note', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('definition', 'note', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('example', 'note', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('historyNote', 'note', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('editorialNote', 'note', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('changeNote', 'note', null, 'skos', 'text');
 INSERT INTO d_valuetypes VALUES ('note', 'note', null, 'skos');
 
 --SKOS Lexical Properties
-INSERT INTO d_valuetypes VALUES ('prefLabel', 'label', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('altLabel', 'label', null, 'skos');
-INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label', null, 'skos');
+INSERT INTO d_valuetypes VALUES ('prefLabel', 'label', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('altLabel', 'label', null, 'skos', 'text');
+INSERT INTO d_valuetypes VALUES ('hiddenLabel', 'label', null, 'skos', 'text');
 
 --SKOS Notation (A notation is different from a lexical label in that a notation is not normally recognizable as a word or sequence of words in any natural language. (ie sortorder))
-INSERT INTO d_valuetypes VALUES ('notation', 'notation', null, 'skos');
+INSERT INTO d_valuetypes VALUES ('notation', 'notation', null, 'skos', 'text');
 
 --NON-SKOS
-INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
-INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches');
+INSERT INTO d_valuetypes VALUES ('image', 'image', null, 'arches', 'text');
 
 --DUBLIN CORE
-INSERT INTO d_valuetypes VALUES ('title', 'label', null, 'dcterms');
-INSERT INTO d_valuetypes VALUES ('description', 'note', null, 'dcterms');
+INSERT INTO d_valuetypes VALUES ('title', 'label', null, 'dcterms', 'text');
+INSERT INTO d_valuetypes VALUES ('description', 'note', null, 'dcterms', 'text');
+INSERT INTO d_valuetypes VALUES ('collector', 'undefined', null, 'arches', 'text');
 
 --
 -- TOC entry 3329 (class 0 OID 11000965)
@@ -104,12 +104,12 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
---INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'text', 'Concepts', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'text', 'Entity Types', 'en-us');
---INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'text', 'Concept Schemes', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'text', 'Arches', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'text', 'Resource To Resource Relationship Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, datatype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'text', 'Candidates', 'en-us');
+--INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Concepts', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'Entity Types', 'en-us');
+--INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'Concept Schemes', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'Arches', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-us');
 
 
 SET search_path = ontology, pg_catalog;

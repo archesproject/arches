@@ -107,7 +107,6 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                         value: self.valueInput.val(),
                         id: self.idInput.val(),
                         type: self.valueTypeInput.select2("val"),
-                        datatype: 'text',
                         language: self.languageInput.select2("val")
                     });
                     self.model.set('values', [self.valuemodel]);

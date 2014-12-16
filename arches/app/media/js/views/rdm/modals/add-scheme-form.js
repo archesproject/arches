@@ -28,14 +28,12 @@ define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-s
                         value: $(form).find('[name=label]').val(),
                         language: $(form).find('[name=language_dd]').val(),
                         category: 'label',
-                        datatype: 'text',
                         type: 'prefLabel'
                     });
                     var note = new ValueModel({
                         value: $(form).find('[name=note]').val(),
                         language: $(form).find('[name=language_dd]').val(),
                         category: 'note',
-                        datatype: 'text',
                         type: 'scopeNote'
                     });
                     var conceptscheme = new ConceptModel({

@@ -92,10 +92,10 @@ class SKOSReader(object):
                             # first try and get any values associated with the concept
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, '')) # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             if predicate == DCTERMS.title:
-                                concept.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'datatype': 'text', 'category': value_type.category}) 
+                                concept.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'category': value_type.category}) 
                                 print 'Casting dcterms:title to skos:prefLabel'
                             if predicate == DCTERMS.description:
-                                concept.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'datatype': 'text', 'category': value_type.category}) 
+                                concept.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'category': value_type.category}) 
                                 print 'Casting dcterms:description to skos:scopeNote'
                         except:
                             pass
@@ -132,7 +132,7 @@ class SKOSReader(object):
 
                         if relation_or_value_type in skos_value_types_list:
                             value_type = skos_value_types.get(valuetype=relation_or_value_type)
-                            concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'datatype': 'text', 'category': value_type.category}) 
+                            concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category}) 
                         elif predicate == SKOS.broader:
                             self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
                         elif predicate == SKOS.narrower:

@@ -233,13 +233,13 @@ BEGIN
     INSERT INTO concepts.concepts(conceptid, nodetype, legacyoid) VALUES (v_conceptid, p_nodetype, p_legacyid);
 
     IF trim(p_label) is not null and p_label<>'' then
-      INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-      VALUES (v_valueid, v_conceptid, 'prefLabel', 'text', trim(initcap(p_label)), v_languageid);
+      INSERT INTO concepts.values (valueid, conceptid, valuetype, value, languageid)
+      VALUES (v_valueid, v_conceptid, 'prefLabel', trim(initcap(p_label)), v_languageid);
     END IF;
 
     IF trim(p_note) is not null and p_note <> '' then 
-      INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-      VALUES (v_valueid, v_conceptid, 'scopeNote', 'text', p_note, v_languageid);
+      INSERT INTO concepts.values (valueid, conceptid, valuetype, value, languageid)
+      VALUES (v_valueid, v_conceptid, 'scopeNote', p_note, v_languageid);
     END IF;  
 
     return v_conceptid;
@@ -305,17 +305,17 @@ CREATE FUNCTION insert_value(p_legacyid text, p_value text, p_valuetype text, p_
     
 BEGIN
 
-IF p_valuetype in ('altLabel','changeNote','definition','editorialNote','example','hiddenLabel','historyNote','prefLabel','scopeNote') THEN
+IF p_valuetype in ('altLabel','changeNote','definition','editorialNote','example','hiddenLabel','historyNote','prefLabel','scopeNote', 'collector') THEN
 
-    INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value, languageid)
-    VALUES (v_valueid, v_conceptid, p_valuetype, p_datatype, p_value, v_languageid);
+    INSERT INTO concepts.values (valueid, conceptid, valuetype, value, languageid)
+    VALUES (v_valueid, v_conceptid, p_valuetype, p_value, v_languageid);
 
     return v_valueid;
 
 ELSE
 
-    INSERT INTO concepts.values (valueid, conceptid, valuetype, datatype, value)
-    VALUES (v_valueid, v_conceptid, p_valuetype, p_datatype, p_value);
+    INSERT INTO concepts.values (valueid, conceptid, valuetype, value)
+    VALUES (v_valueid, v_conceptid, p_valuetype, p_value);
 
     return v_valueid;
     
@@ -1107,6 +1107,7 @@ CREATE TABLE concepts.d_valuetypes
   category text,
   description text,
   namespace text NOT NULL DEFAULT 'arches',
+  datatype text,
   CONSTRAINT pk_d_valuetypes PRIMARY KEY (valuetype )
 )
 WITH (
@@ -1158,7 +1159,6 @@ CREATE TABLE "values" (
     valueid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     conceptid uuid NOT NULL,
     valuetype text NOT NULL,
-    datatype text NOT NULL,
     value text NOT NULL,
     languageid text
 );
@@ -1246,25 +1246,24 @@ CREATE VIEW vw_nodes AS
 ALTER TABLE concepts.vw_nodes OWNER TO postgres;
 
 CREATE VIEW vw_entitytype_domains AS 
- SELECT c.legacyoid AS entitytypeid, 
-    r.conceptidto AS conceptid, 
-    v.valueid AS id, 
-    v.value, 
-    v.valuetype, 
-    v.languageid, 
+ SELECT c.legacyoid AS entitytypeid,
+    r.conceptidto AS conceptid,
+    v.valueid AS id,
+    v.value,
+    v.valuetype,
+    v.languageid,
     v1.value AS sortorder
    FROM concepts.concepts c
-   JOIN concepts.relations r ON c.conceptid = r.conceptidfrom
-   JOIN concepts."values" v ON r.conceptidto = v.conceptid
-   LEFT JOIN ( SELECT "values".valueid, 
-    "values".conceptid, 
-    "values".valuetype, 
-    "values".datatype, 
-    "values".value, 
-    "values".languageid
-   FROM concepts."values"
-  WHERE "values".valuetype = 'sortorder'::text) v1 ON r.conceptidto = v1.conceptid
-  WHERE c.nodetype = 'Collection'::text AND r.relationtype = 'member'::text AND (v.valuetype = ANY (ARRAY['prefLabel'::text, 'altLabel'::text]));
+     JOIN concepts.relations r ON c.conceptid = r.conceptidfrom
+     JOIN concepts."values" v ON r.conceptidto = v.conceptid
+     LEFT JOIN ( SELECT "values".valueid,
+            "values".conceptid,
+            "values".valuetype,
+            "values".value,
+            "values".languageid
+           FROM concepts."values"
+          WHERE "values".valuetype = 'sortorder'::text) v1 ON r.conceptidto = v1.conceptid
+  WHERE r.relationtype = 'member'::text AND (v.valuetype = ANY (ARRAY['prefLabel'::text, 'altLabel'::text, 'collector'::text]));
 
 ALTER TABLE concepts.vw_entitytype_domains OWNER TO postgres;
 SET search_path = data, pg_catalog;

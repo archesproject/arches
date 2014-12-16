@@ -31,7 +31,6 @@ define(['jquery', 'backbone', 'models/concept', 'models/value', 'select2'], func
                     value: selection.text,
                     language: language,
                     category: 'label',
-                    datatype: 'text',
                     type: 'prefLabel'
                 });
                 conceptschemegroup.set('values', [label]);

@@ -302,7 +302,6 @@ class Values(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
-    datatype = models.TextField()
     value = models.TextField()
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
@@ -312,7 +311,6 @@ class FileValues(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
-    datatype = models.TextField()
     value = models.FileField(upload_to='concepts')
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
