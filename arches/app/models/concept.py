@@ -249,10 +249,8 @@ class Concept(object):
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
 
         if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
-            rows = self.get_child_concepts(conceptid, 'narrower', ['prefLabel'], 'prefLabel')
-            cursor = connection.cursor()
-            cursor.execute(sql)
-            rows = cursor.fetchall()
+
+            rows = Concept().get_child_concepts(concept.id, 'narrower', ['prefLabel'], 'prefLabel')
             for row in rows:
                 concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
                 concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
@@ -284,7 +282,7 @@ class Concept(object):
                     and a.relationtype = '{1}'
             ) 
             SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtype, ("','").join(child_valuetypes), parent_valuetype)
-        print 'new:', sql
+
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
