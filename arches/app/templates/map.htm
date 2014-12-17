@@ -18,10 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'plugins/openlayers/ol.css' %}">
-    {{ block.super }}
-{% endblock css%}
 {% block content %}
 <div class="map-space">
 
