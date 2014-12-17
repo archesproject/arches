@@ -15,4 +15,4 @@ sst
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.1.1.zip
+# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.zip
