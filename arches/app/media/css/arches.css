@@ -887,13 +887,18 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 /* Search */
 .search-block {
-    margin-bottom: 50px;
-    padding: 50px 0 58px;
     border-bottom: 1px solid #eee;
     background: #fafafa;
+    padding-bottom: 9px;
+    padding-top: 30px;
 }
 
 .arches-thumbnail {
     float: left;
     width: 50%;
+}
+
+
+.search-spinner {
+    content: url(../img/spinner.gif);
 }

@@ -23,19 +23,19 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.contrib.gis.geos import GEOSGeometry
+from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 
-def home(request):
+def home_page(request):
     lang = request.GET.get('lang', 'en-us')
 
     return render_to_response('search.htm', {
             'main_script': 'search',
-            'active_page': 'Search',
-            'content': 'views/saved-searches.htm'
-        }, context_instance=RequestContext(request))
+            'active_page': 'Search'
+        }, context_instance=RequestContext(request))  
 
 def search_terms(request):
     se = SearchEngineFactory().create()
@@ -47,12 +47,30 @@ def search_terms(request):
 
     return JSONResponse(query.search(index='term', type='value'))
 
-def search_resources(request, as_text=False):
+def search_results_home(request):
+
+    return render_to_response('search.htm', {
+            'main_script': 'search',
+            'active_page': 'Search',
+            'user_can_edit': False
+        }, 
+        context_instance=RequestContext(request))
+
+def search_results(request, as_text=False):
+    results = _search_resources(request)
+    total = results['hits']['total']
+    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+
+    #pagination = _get_pagination('', total, page, settings.SEARCH_ITEMS_PER_PAGE)
+
+    return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
+
+def _search_resources(request):
     searchString = request.GET.get('q', '')
     extent = request.GET.get('extent', None)    
     f = request.GET.get('f', None)
     export = request.GET.get('export', None)
-    page = int(request.GET.get('page', 1))
+    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
 
@@ -64,36 +82,32 @@ def search_resources(request, as_text=False):
     else:
         query = Query(se, start=settings.SEARCH_ITEMS_PER_PAGE*int(page-1), limit=settings.SEARCH_ITEMS_PER_PAGE)
     boolquery = Bool()
+    boolfilter = Bool()
     
     if searchString != '':
-        q = JSONDeserializer().deserialize(searchString)
-        strings = q['strings']
-        strings_inverted = q['strings_inverted']
-        concepts = q['concepts']
-        concepts_inverted = q['concepts_inverted']      
-
-        if len(strings) != 0 or len(strings_inverted) != 0 or len(concepts) != 0 or len(concepts_inverted) != 0:
-            
-            for string in strings:
-                phrase = Match(field='relatedentities.value', query=string['value'], type='phrase')
-                nested = Nested(path='relatedentities', query=phrase)
+        qparam = JSONDeserializer().deserialize(searchString)
+        for q in qparam:
+            if q['type'] == 'term':
+                phrase = Match(field='child_entities.value', query=q['value'], type='phrase')
+                nested = Nested(path='child_entities', query=phrase)
                 boolquery.must(nested)
-
-            for string in strings_inverted:
-                phrase = Match(field='relatedentities.value', query=string['value'], type='phrase')
-                nested = Nested(path='relatedentities', query=phrase)
-                boolquery.must_not(nested)
-
-            for concept in concepts:
-                concept_lables = search_view._get_child_concepts(concept['value'])
-                terms = Terms(field='relatedentities.value.raw', terms=concept_lables)
-                nested = Nested(path='relatedentities', query=terms)
+            elif q['type'] == 'concept':
+                concept_ids = _get_child_concepts(q['value'])
+                terms = Terms(field='domains.conceptid', terms=concept_ids)
+                nested = Nested(path='domains', query=terms)
                 boolfilter.must(nested)
-
-            for concept in concepts_inverted:
-                concept_lables = search_view._get_child_concepts(concept['value'])
-                terms = Terms(field='relatedentities.value.raw', terms=concept_lables)
-                nested = Nested(path='relatedentities', query=terms)
+            elif q['type'] == 'string':
+                phrase = Match(field='child_entities.value', query=q['value'], type='phrase_prefix')
+                nested = Nested(path='child_entities', query=phrase)
+                boolquery.must(nested)
+            elif q['type'] == 'string_inverted':
+                phrase = Match(field='child_entities.value', query=q['value'], type='phrase')
+                nested = Nested(path='child_entities', query=phrase)
+                boolquery.must_not(nested)
+            elif q['type'] == 'concept_inverted':
+                concept_lables = _get_child_concepts(q['value'])
+                terms = Terms(field='domains.conceptid', terms=concept_lables)
+                nested = Nested(path='domains', query=terms)
                 boolfilter.must_not(nested)
 
     if extent:
@@ -117,42 +131,23 @@ def search_resources(request, as_text=False):
     if not boolquery.empty:
         query.add_query(boolquery)
 
+    if not boolfilter.empty:
+        query.add_query(boolfilter)
+
+    print query
+
     search_results = query.search(index='entity', type='') 
 
-    if export in ['kml','shp','csv','geojson']:
-        return search_results 
-
-    if f == 'json' or f == 'pretty-json':
-        indent = 4 if f == 'pretty-json' else None
-        return JSONResponse(search_results, indent=indent)  
-
-    total = search_results['hits']['total']
-
-    # remove leading underscores from results dictionary becuase django templates don't like them
-    for result in search_results['hits']['hits']:
-        result['source'] = result.pop('_source')
-
-    pagination = _get_pagination(total, page, settings.SEARCH_ITEMS_PER_PAGE)
-    renderer = render_to_string if as_text==True else render_to_response
-
-    return renderer('search.htm', {'content': 'views/search-results.htm', 'pagination': pagination, 'count': total, 'results': search_results['hits']['hits'], 'user_groups': groups}, context_instance=RequestContext(request))
+    return search_results
 
 def _get_child_concepts(conceptid):
-	se = SearchEngineFactory().create()
-	ret = se.search(conceptid, index='concept', type='all', search_field='conceptid', use_phrase=True)
-	left = ret['hits']['hits'][0]['_source']['left']
-	right = ret['hits']['hits'][0]['_source']['right']
+    ret = set([conceptid])
+    for row in Concept().get_child_concepts(conceptid, 'narrower', ['prefLabel'], 'prefLabel'):
+        ret.add(row[0])
+        ret.add(row[1])
+    return list(ret)
 
-	concepts = se.search({'from':left, 'to':right}, index='concept', type='all', search_field='left', use_range=True)
-
-	ret = []
-	for concept in concepts['hits']['hits']:
-		for label in concept['_source']['labels']:
-			ret.append(label['labelid'])
-
-	return ret
-
-def _get_pagination(total_count, page, count_per_page):
+def _get_pagination(results, total_count, page, count_per_page):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
@@ -166,4 +161,4 @@ def _get_pagination(total_count, page, count_per_page):
         if len(after) > ct_after:
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
-    return render_to_string('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page)})
+    return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results)})

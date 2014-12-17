@@ -224,9 +224,9 @@ class Concept(object):
     def gather_concepts_to_delete(concept, lang='en-us'):
         """
         Gets a dictionary of all the concepts ids to delete
-        The values of the dictionary keys differ somewhat depending on the node type being deletedrelatedconcept
+        The values of the dictionary keys differ somewhat depending on the node type being deleted
         If the nodetype == 'Concept' then return ConceptValue objects keyed to the concept id
-        If the nodetype == 'ConceptScheme' or 'ConceptSchemeGroup' then return a text string representing the 'prefLabel' keyed to the concept id
+        If the nodetype == 'ConceptScheme' or 'ConceptSchemeGroup' then return a ConceptValue object with the value set to any ONE prefLabel keyed to the concept id
         We do this because it takes so long to gather the ids of the concepts when deleting a Scheme or Group
 
         """
@@ -247,9 +247,7 @@ class Concept(object):
             return concepts_to_delete
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
-
         if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
-
             rows = Concept().get_child_concepts(concept.id, 'narrower', ['prefLabel'], 'prefLabel')
             for row in rows:
                 concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
@@ -260,7 +258,9 @@ class Concept(object):
     def get_child_concepts(self, conceptid, relationtype, child_valuetypes, parent_valuetype):
         """
         Recursively builds a list of child concepts for a given concept based on its relationship type and valuetypes. 
+
         """
+        
         cursor = connection.cursor()
         sql = """WITH RECURSIVE children AS (
                 SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c.valuetype, 1 AS depth       ---|NonRecursive Part

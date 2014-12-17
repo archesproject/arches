@@ -300,6 +300,7 @@ class Resource(Entity):
                     'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'value' : {'type' : 'string', 'index' : 'not_analyzed'},
+                    'label' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
                     'child_entities' : { 
                         'type' : 'nested', 
@@ -310,6 +311,7 @@ class Resource(Entity):
                             'property' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'value' : {
                                 'type' : 'string',
                                 'index' : 'analyzed',
@@ -317,6 +319,26 @@ class Resource(Entity):
                                     'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
                                 }
                             }
+                        }
+                    },
+                    'domains' : { 
+                        'type' : 'nested', 
+                        'index' : 'analyzed',
+                        'properties' : {
+                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'value' : {
+                                'type' : 'string',
+                                'index' : 'analyzed',
+                                'fields' : {
+                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                }
+                            },
+                            'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
                         }
                     },
                     'geometries' : { 
@@ -328,6 +350,7 @@ class Resource(Entity):
                             'property' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'value' : {
                                 "type": "geo_shape"
                             }
@@ -342,6 +365,7 @@ class Resource(Entity):
                             'property' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
                             'value' : {
                                 "type" : "date"
                             }
@@ -361,6 +385,7 @@ class Resource(Entity):
                 domain = archesmodels.Domains.objects.get(pk=entity.entityid)
                 if domain.val:
                     concept = Concept(domain.val.conceptid).get(include=['label'])
+                    entity.conceptid = domain.val.conceptid_id
                     if concept:
                         scheme_pref_label = concept.get_context().get_preflabel().value
                         se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': scheme_pref_label, 'conceptid': domain.val.conceptid_id})
@@ -389,13 +414,16 @@ class Resource(Entity):
         root_entity.primaryname = self.get_primary_name()
         root_entity.child_entities = []
         root_entity.dates = []
+        root_entity.domains = []
         root_entity.geometries = []
         del root_entity.form_groups
 
         for entity in self.flatten():
             businesstablename = gather_entities(entity)
             if entity.entityid != self.entityid:
-                if businesstablename == 'dates':
+                if businesstablename == 'domains':
+                    root_entity.domains.append(entity)
+                elif businesstablename == 'dates':
                     root_entity.dates.append(entity)
                 elif businesstablename == 'geometries':
                     root_entity.geometries.append(entity)

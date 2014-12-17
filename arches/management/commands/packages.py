@@ -133,6 +133,7 @@ class Command(BaseCommand):
             f.write('\nhttp.port: %s' % port)
             f.write('\ndiscovery.zen.ping.multicast.enabled: false')
             f.write('\ndiscovery.zen.ping.unicast.hosts: ["localhost"]')
+            f.write('\ncluster.routing.allocation.disk.threshold_enabled: false')
 
         # install plugin
         if sys.platform == 'win32':
