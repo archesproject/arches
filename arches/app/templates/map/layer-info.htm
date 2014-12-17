@@ -1,12 +1,30 @@
 {% load i18n %}
 <script>
     define('layer-info', [], function () {
-        return {
-            exampleLayer: {
-                name: "{% trans 'Example Layer' %}",
-                description: "{% trans 'Lorem ipsum dolor si amet...' %}",
-                categories: ["{% trans 'test' %}", "{% trans 'example' %}"]
-            }
+        var layerInfo = {
+            {% for type in resource_types %}
+            {% if type.has_layer %}
+            "{{type.resourcetypeid}}": {
+                id: "{{type.resourcetypeid}}",
+                icon: "{{type.icon_class}}",
+                name: "{{type.name}}",
+                description: "{{type.description}}",
+                categories: [
+                    {% for category in type.categories %}
+                    "{{category}}"
+                    {% endfor %}
+                ],
+                {% if type.on_map %}
+                onMap: true,
+                {% else %}
+                onMap: false,
+                {% endif %}
+                vectorColor: "{{type.vector_color}}" 
+            {% endif %}
+            },
+            {% endfor %}
         };
+
+        return layerInfo;
     });
 </script>

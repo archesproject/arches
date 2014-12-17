@@ -30,7 +30,8 @@ def map_info(request):
             'x': settings.DEFAULT_MAP_X,
             'y': settings.DEFAULT_MAP_Y,
             'zoom': settings.DEFAULT_MAP_ZOOM,
-            'bing_key': settings.BING_KEY
+            'bing_key': settings.BING_KEY,
+            'resource_cluster_min_resolution': settings.RESOURCE_CLUSTERING_MIN_RESOLUTION
         }
     }
 
