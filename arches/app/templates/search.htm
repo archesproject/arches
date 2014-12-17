@@ -48,15 +48,25 @@
 <!--=== Default Resource Summary ===-->
 <div class="container margin-bottom-50">
 
-    <div id="saved-searches">
+   <!-- Results Header -->
+    <div class="row" id="search-results-count">        
+
+        <div class="col-xs-12">
+
+            <!-- Results Counter/Filters -->
+            <h2 class="text-muted margin-left-5" style="margin-bottom: 5px;">Search Results: <span style="font-size:18px;" data-bind="text: total() + ' {% trans "Results" %}'"></span> 
+            </h2>                                     
+            <!-- End Results Counter/Filters -->
+        </div>
+
+    </div>
+    <!-- Results Header -->
+
+    <div class="row" id="saved-searches">
         {% include 'views/saved-searches.htm' %}
     </div>
 
-    <div id="search-results-loading" class="row" style="display:none">
-        <div class="col-xs-4 col-xs-offset-4 search-spinner"></div>
-    </div>
-
-    <div id="search-results" style="display:none">
+    <div class="row" id="search-results" style="display:none">
         {% include 'views/search-results.htm' %}
     </div>
 

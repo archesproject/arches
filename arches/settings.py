@@ -69,7 +69,7 @@ SEARCH_CONNECTION = {
     }
 }
 
-SEARCH_ITEMS_PER_PAGE = 10
+SEARCH_ITEMS_PER_PAGE = 5
 
 SEARCHABLE_ENTITY_TYPES = (
     # override this setting in your packages settings.py file
