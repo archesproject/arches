@@ -26,7 +26,6 @@ from django.contrib.gis.geos import fromstr
 from django.db import connection
 from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from arches.app.models.search import SearchResult, MapFeature
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
