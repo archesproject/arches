@@ -902,3 +902,78 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .search-spinner {
     content: url(../img/spinner.gif);
 }
+
+.btn-search-filter{
+    background-color: rgb(195, 195, 195);
+    border-color: grey;
+    color: white;
+}
+
+.btn-search-filter:hover,
+.btn-search-filter:focus,
+.btn-search-filter:active,
+.btn-search-filter.active,
+.open .dropdown-toggle.btn-search-filter{
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    color: white;
+}
+
+/* Map Filter*/
+/*element.style {
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0px);
+    background-color: rgb(229, 227, 223);
+}*/
+
+.arches-search-map {
+    height: 400px;
+    margin-top: 0px;
+    border-width: 1px 1px 1px 1px;
+    border-color: #cfcfcf;
+    border-style: solid;
+}
+
+.arches-map-filter {
+    padding-left: 0px;
+    margin-left: 20px;
+    margin-top: -10px;
+    margin-right: 25px;
+    margin-bottom: 20px;
+}
+
+/* Time Filter*/
+
+.arches-time-filter {
+    padding-left: 20px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 20px;
+    background: #fbfbfb;
+    border: 1px solid rgba(0,0,0,.1);
+}
+
+.slider.slider-horizontal .slider-selection {
+    background: #739e73;
+}
+
+.slider.slider-horizontal .slider-track {
+    height: 10px;
+    width: 100%;
+    margin-top: -5px;
+    top: 50%;
+    left: 0;
+}
+
+.slider.slider-horizontal .slider-handle{
+    background: #858585;
+    opacity: 1;
+}
+
+.slider-track {
+    position: absolute;
+    cursor: pointer;
+    background: #E5E5E5;
+}
+

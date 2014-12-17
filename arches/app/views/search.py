@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from datetime import date
 from django.conf import settings
 from django.http import HttpResponse
 from django.template import RequestContext
@@ -23,6 +24,8 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import Max, Min
+from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -31,11 +34,16 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 
 def home_page(request):
     lang = request.GET.get('lang', 'en-us')
-
+    min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
+    
     return render_to_response('search.htm', {
             'main_script': 'search',
-            'active_page': 'Search'
-        }, context_instance=RequestContext(request))  
+            'active_page': 'Search',
+            'user_can_edit': False,
+            'min_date': min_max_dates['val__min'].year,
+            'max_date': min_max_dates['val__max'].year
+        }, 
+        context_instance=RequestContext(request))
 
 def search_terms(request):
     se = SearchEngineFactory().create()
@@ -47,21 +55,24 @@ def search_terms(request):
 
     return JSONResponse(query.search(index='term', type='value'))
 
-def search_results_home(request):
-
-    return render_to_response('search.htm', {
-            'main_script': 'search',
-            'active_page': 'Search',
-            'user_can_edit': False
-        }, 
-        context_instance=RequestContext(request))
+# def search_results_home(request):
+#     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
+#     print min_max_dates
+#     print min_max_dates['max_date'] 
+#     print 'here'
+#     return render_to_response('search.htm', {
+#             'main_script': 'search',
+#             'active_page': 'Search',
+#             'user_can_edit': False,
+#             'min_date': min_max_dates['min_date'],
+#             'max_date': min_max_dates['max_date']
+#         }, 
+#         context_instance=RequestContext(request))
 
 def search_results(request, as_text=False):
     results = _search_resources(request)
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-
-    #pagination = _get_pagination('', total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
@@ -71,8 +82,7 @@ def _search_resources(request):
     f = request.GET.get('f', None)
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    start_date = request.GET.get('start_date', None)
-    end_date = request.GET.get('end_date', None)
+    year_min_max = JSONDeserializer().deserialize(request.GET.get('year_min_max', []))
 
     groups = [group.name for group in request.user.groups.all()] 
     
@@ -117,13 +127,13 @@ def _search_resources(request):
         nested = Nested(path='geometries', query=geoshape)
         boolquery.must(nested)
 
-    if start_date or end_date:
+    if len(year_min_max) == 2:
+        start_date = date(year_min_max[0], 1, 1)
+        end_date = date(year_min_max[1], 12, 31)
         if start_date:
-            start_date = time.strptime(start_date, "%m/%d/%Y")
-            start_date = time.strftime('%Y-%m-%d', start_date)
+            start_date = start_date.strftime('%Y-%m-%d')
         if end_date:
-            end_date = time.strptime(end_date, "%m/%d/%Y")
-            end_date = time.strftime('%Y-%m-%d', end_date)
+            end_date = end_date.strftime('%Y-%m-%d')
         range = Range(field='dates.value', gte=start_date, lte=end_date)
         nested = Nested(path='dates', query=range)
         boolquery.must(nested)
