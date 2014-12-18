@@ -377,6 +377,8 @@ class Resource(Entity):
 
         se.create_mapping('entity', self.entitytypeid, mapping=mapping)
 
+        geometries = []
+
         def gather_entities(entity):
             if entity.businesstablename == 'strings':
                 if len(entity.value.split(' ')) < 10:
@@ -391,17 +393,7 @@ class Resource(Entity):
                         se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': scheme_pref_label, 'conceptid': domain.val.conceptid_id})
             elif entity.businesstablename == 'geometries':
                 entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
-                geojson = {
-                    'type': 'Feature',
-                    'id': entity.entityid,
-                    'geometry': entity.value,
-                    'properties': {
-                        'resourceid': self.entityid,
-                        'entitytypeid': self.entitytypeid,
-                        'primaryname': self.get_primary_name(),
-                    }
-                }
-                se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
+                geometries.append(entity.value)
             elif entity.businesstablename == 'dates':
                 pass
             elif entity.businesstablename == 'numbers':
@@ -430,6 +422,21 @@ class Resource(Entity):
                 else:
                     root_entity.child_entities.append(entity)
 
+
+        if len(geometries) > 0:
+            geojson = {
+                'type': 'Feature',
+                'id': self.entityid,
+                'geometry':  { 
+                    'type': 'GeometryCollection',
+                    'geometries': geometries
+                },
+                'properties': {
+                    'entitytypeid': self.entitytypeid,
+                    'primaryname': self.get_primary_name(),
+                }
+            }
+            se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
         se.index_data('resource', self.entitytypeid, self.dictify(), id=self.entityid)
         se.index_data('entity', root_entity.entitytypeid, JSONSerializer().serializeToPython(root_entity), id=root_entity.entityid)
 
