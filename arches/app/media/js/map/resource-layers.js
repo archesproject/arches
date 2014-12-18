@@ -20,19 +20,20 @@ define([
 
       var style = new ol.style.Style({
         fill: new ol.style.Fill({
-          color: item.vectorColor
+          color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.3)',
         }),
         stroke: new ol.style.Stroke({
-          color: item.vectorColor,
-          width: 1
+          color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
+          width: 2
         }),
         image: new ol.style.Circle({
-          radius: 5,
+          radius: 8,
           stroke: new ol.style.Stroke({
-            color: '#fff'
+            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
+            width: 2
           }),
           fill: new ol.style.Fill({
-            color: item.vectorColor
+            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.3)',
           })
         })
       });
@@ -47,11 +48,9 @@ define([
       });
 
       source.on('addfeature', function (e) {
-        var feature = e.feature;
-        if (e.feature.getGeometry().getType() === 'Polygon') {
-          feature = feature.clone();
-          feature.setGeometry(feature.getGeometry().getInteriorPoint());
-        }
+        var feature = e.feature.clone();
+        var center = ol.extent.getCenter(feature.getGeometry().getExtent());
+        feature.setGeometry(new ol.geom.Point(center));
         pointSource.addFeature(feature);
       });
 
