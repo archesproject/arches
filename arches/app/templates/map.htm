@@ -26,6 +26,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         
         <!-- Map -->
         <div id="map" class="map map-space-panel"></div>
+        <div id="popup" class="ol-popup">
+            <a href="javascript:void(0);" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content" style="height:75px; width: 250px;">
+                <h3 data-bind="text:selectedResource.name()" style="margin:2px;"></h3>
+                <div><a href="javascript:void(0);" data-bind="" style="margin-left: 16px;">View Report</a></div>
+                <div><a href="javascript:void(0);" data-bind="" style="margin-left: 16px;">Edit Resource</a></div>
+            </div>
+        </div>
         <div id="olmap" class="fill"></div>
         
         

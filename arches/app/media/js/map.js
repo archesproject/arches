@@ -48,7 +48,12 @@ require([
                 layers: ko.observableArray(layers),
                 filterTerms: ko.observableArray(),
                 zoom: ko.observable(arches.mapDefaults.zoom),
-                mousePosition: ko.observable('')
+                mousePosition: ko.observable(''),
+                selectedResource: {
+                    id: ko.observable(''),
+                    type: ko.observable(''),
+                    name: ko.observable('')
+                }
             };
             self.map = map;
 
@@ -114,6 +119,42 @@ require([
 
             map.on('mousePositionChanged', function (mousePosition) {
                 self.viewModel.mousePosition(mousePosition);
+            });
+
+            $('#popup-closer').click(function() {
+                $('#popup').hide();
+                $('#popup-closer')[0].blur();
+            });
+
+            var overlay = new ol.Overlay({
+              element: $('#popup')[0]
+            });
+
+            map.map.addOverlay(overlay);
+
+            map.map.on('click', function(e) {
+                var pixels = [e.originalEvent.offsetX, e.originalEvent.offsetY];
+                var clickFeature;
+                map.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
+                    if (!_.contains(feature.getKeys(), "features")) {
+                        clickFeature = feature;
+                    }
+                });
+                if (clickFeature) {
+                    overlay.setPosition(e.coordinate);
+                    self.viewModel.selectedResource.id(clickFeature.getId());
+                    self.viewModel.selectedResource.type(clickFeature.get('entitytypeid'));
+                    self.viewModel.selectedResource.name(clickFeature.get('primaryname'));
+                    $('#popup').show();
+                }
+            });
+
+            map.select.getFeatures().on('change:length', function(e) {
+                if (e.target.getArray().length === 0) {
+                    $('#popup').hide();
+                } else {
+                    $('#popup').show();
+                }
             });
 
             var hideAllPanels = function () {

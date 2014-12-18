@@ -14,6 +14,7 @@ define([
         },
 
         overlays: [],
+        enableSelection: true,
         initialize: function(options) {
             var self = this;
             var projection = ol.proj.get('EPSG:3857');
@@ -28,7 +29,7 @@ define([
                 ]
             });
 
-            _.extend(this, _.pick(options, 'overlays'));
+            _.extend(this, _.pick(options, 'overlays', 'enableSelection'));
 
             this.baseLayers = baseLayers;
 
@@ -75,18 +76,68 @@ define([
                     zoom: arches.mapDefaults.zoom
                 })
             });
+            
+            if (this.enableSelection) {
+                this.select = new ol.interaction.Select({
+                    condition: ol.events.condition.click,
+                    style: new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(0, 255, 255, 0.3)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(0, 255, 255, 0.9)',
+                            width: 3
+                        }),
+                        image: new ol.style.Circle({
+                            radius: 10,
+                            fill: new ol.style.Fill({
+                                color: 'rgba(0, 255, 255, 0.3)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: 'rgba(0, 255, 255, 0.9)',
+                                width: 3
+                            })
+                        })
+                    })
+                });
+
+                this.map.addInteraction(this.select);
+            }
 
             this.map.on('moveend', function () {
                 var view = self.map.getView();
                 var extent = view.calculateExtent(self.map.getSize());
                 self.trigger('viewChanged', view.getZoom(), extent);
             });
+
+            this.select.getFeatures().on('change:length', function(e) {
+                if (e.target.getArray().length !== 0) {
+                    var feature = e.target.item(0);
+                    var isClustered = _.contains(feature.getKeys(), "features");
+                    if (isClustered) {
+                        var extent = feature.getGeometry().getExtent();
+                        _.each(feature.get("features"), function (feature) {
+                            extent = ol.extent.extend(extent, feature.getGeometry().getExtent());
+                        });
+                        self.map.getView().fitExtent(extent, (self.map.getSize()));
+                        self.select.getFeatures().clear();
+                    }
+                }
+            });
         },
 
         handleMouseMove: function(e) {
-            var coords = this.map.getCoordinateFromPixel([e.offsetX, e.offsetY]);
+            var pixels = [e.offsetX, e.offsetY];
+            var coords = this.map.getCoordinateFromPixel(pixels);
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
+            var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
+                return true;
+            });
+            var cursorStyle = overFeature ? "pointer" : "";
+            if (this.enableSelection) {
+                this.$el.css("cursor", cursorStyle);
+            }
             coords = point.transform("EPSG:3857", "EPSG:4326").getCoordinates();
             if (coords.length > 0) {
                 this.trigger('mousePositionChanged', format(coords));
