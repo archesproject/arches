@@ -79,7 +79,7 @@ class Query(Dsl):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
         #print self
-        return self.se.search('', index=index, type=type, data=self.dsl)
+        return self.se.search(index=index, type=type, data=self.dsl)
 
     def delete(self, index='', type=''):
         return self.se.delete(index=index, data=self.dsl)

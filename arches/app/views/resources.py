@@ -33,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Query
 import copy
 from operator import itemgetter
 
@@ -161,7 +162,8 @@ def map_layers(request, entitytypeid):
     limit = request.GET.get('limit', 10000)
     
     se = SearchEngineFactory().create()
-    data = se.search('', index="maplayers", type=entitytypeid, end_offset=limit)
+    query = Query(se, limit=limit)
+    data = query.search(index='maplayers', type=entitytypeid) 
 
     geojson_collection = {
       "type": "FeatureCollection",

@@ -58,10 +58,11 @@ class SearchEngine(object):
 
             return self.conn.delete(path)
 
-    def search(self, q='', **kwargs):
-        search_type = kwargs.pop('search_type', None)
+    def search(self, **kwargs):
+        data = kwargs.pop('data', None)
+        search_type = kwargs.pop('search_type', '_search')
         index = kwargs.pop('index', None)
-        type = kwargs.pop('type', '_all')
+        type = kwargs.pop('type', None)
         id = kwargs.pop('id', None)
 
         if index is None:
@@ -70,20 +71,18 @@ class SearchEngine(object):
         if id:
             path = '%s/%s/%s' % (index, type, id)
             return self.conn.get(path)
-        else:
+        
+        if type:
             path = '%s/%s' % (index, type)
-            if search_type == None:
-                #path = path + '/_search?q="%s"' % q
-                path = '%s/%s' % (path, '_search')
+        else:
+            path = index
 
-        data = kwargs.pop('data', None)
-        if data == None:
-            data = self.build_search_kwargs(q, **kwargs)
+        path = '%s/%s' % (path, search_type)
+
         # print path
         # print JSONSerializer().serialize(data, indent=4)
-        return self.conn.post(path, 
-            data = data
-        )
+
+        return self.conn.post(path, data=data)
 
     def index_terms(self, entities):
         """
@@ -247,159 +246,3 @@ class SearchEngine(object):
             ]
         else:
             return false
-
-    def build_search_kwargs(self, query_string, sort_by=None, start_offset=0, end_offset=50,
-                            search_field='', return_fields='', highlight=False, facets=None,
-                            date_facets=None, query_facets=None,
-                            narrow_queries=None, spelling_query=None,
-                            within=None, dwithin=None, distance_point=None, models=None, 
-                            result_class=None, use_phrase=False, use_fuzzy=False, use_wildcard=False, 
-                            use_fuzzy_like_this=False, use_range=False):
-
-        kwargs = {
-            'query': {
-                "bool":{
-                    "should":[],
-                    "must":[],
-                    "must_not":[]
-                }
-            },
-            "sort":[],
-            "facets":{}
-        }
-
-        #From/size offsets don't seem to work right in Elasticsearch's DSL. :/
-        self.add_limit(kwargs, start_offset, end_offset)
-
-        if query_string == '':
-            kwargs['query']['bool']['should'].append({
-                "match_all": {}
-            })
-            return kwargs
-
-        if use_phrase is True:
-            if not isinstance(query_string, list):
-                query_string = [query_string] 
-            for query_string_item in query_string:
-                kwargs['query']['bool']['must'].append(self.build_dsl('phrase', search_field, query_string_item))
-
-
-        if use_fuzzy is True:
-            kwargs['query']['bool']['should'].append(self.build_dsl('fuzzy', search_field, query_string, operator='and'))
-
-
-        if use_range is True:
-            kwargs['query']['bool']['must'].append(self.build_dsl('range', search_field, query_string))   
-
-
-        if use_wildcard is True:
-            kwargs['query']['bool']['should'].append(self.build_dsl('wildcard', search_field, query_string))
-
-
-        if highlight is True:
-            kwargs['highlight'] = {
-                "pre_tags" : ["<span class='searchHighlight'>"],
-                "post_tags" : ["</span>"],     
-                'fields': {
-                    search_field: {'store': 'yes'},
-                }
-            }
-
-        return kwargs
-
-    def build_dsl(self, querytype, search_field, query_string, operator='or'):
-        if querytype is 'phrase':
-            return {
-                "match_phrase": {
-                    search_field: {
-                        "query": query_string
-                    }
-                }
-            }
-
-        if querytype is 'fuzzy':
-            return {
-                "match": {
-                    search_field: {
-                        "query": query_string,
-                        "operator": operator,
-                        "fuzziness": 0.4
-                    }
-                }
-            }
-
-        if querytype is 'wildcard':
-            return {
-                "wildcard": {
-                    search_field: '%s%s' % (query_string, "*")
-                }
-            }
-
-        if querytype is 'terms':
-            return {
-                "terms": {
-                    search_field: query_string,
-                    "execution": operator
-                }
-            }   
-
-        if querytype is 'range':
-            rangefilter = {}
-            if 'from' in query_string:
-                rangefilter['gte'] = query_string['from']
-            if 'to' in query_string:
-                rangefilter['lte'] = query_string['to']
-            return {
-                "range": {
-                    search_field: rangefilter
-                }
-            }
-
-        if querytype is 'geo_shape':
-            return {
-                "geo_shape": {
-                    search_field: {
-                        "shape": query_string
-                    }
-                }
-            }
-
-    def range(self, search_field, gte=None, lte=None, gt=None, lt=None):
-        if gte is None and gt is None and lte is None and lt is None:
-            raise Exception("You need at least one of the following: gte, gt, lte, or lt")
-        if gte is not None and gt is not None:
-            raise Exception("You can only use one of either: gte or gt") 
-        if lte is not None and lt is not None:
-            raise Exception("You can only use one of either: lte or lt") 
-        
-        ret = {search_field: {}}
-        if gte is not None:
-            ret[search_field]['gte'] = gte
-        if gt is not None:
-            ret[search_field]['gt'] = gt
-        if lte is not None:
-            ret[search_field]['lte'] = lte
-        if lt is not None:
-            ret[search_field]['lt'] = lt
-        
-        return {'range': ret }
-
-    def bool(self, must=None, should=None, must_not=None):
-        if must is None and should is None and must_not is None:
-            raise Exception("You need at least one of the following: must, should, or must_not") 
-        
-        ret = {}
-        if must is not None:
-            ret['must'] = must
-        if should is not None:
-            ret['should'] = should
-        if must_not is not None:
-            ret['must_not'] = must_not
-        
-        return {'bool': ret }
-
-    def add_limit(self, dsl={}, start_offset=0, end_offset=50):
-        dsl['from'] = start_offset
-        dsl['size'] = end_offset - start_offset
-        return dsl
-
