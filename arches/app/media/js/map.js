@@ -123,15 +123,11 @@ require([
                 $('.resource-info-closer')[0].blur();
             });
 
-            map.map.on('click', function(e) {
-                var pixels = [e.originalEvent.offsetX, e.originalEvent.offsetY];
-                var clickFeature;
-                map.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
-                    if (!_.contains(feature.getKeys(), "features")) {
-                        clickFeature = feature;
-                    }
-                });
-                if (clickFeature) {
+            map.select.getFeatures().on('change:length', function(e) {
+                if (e.target.getArray().length === 0) {
+                    $('#resource-info').hide();
+                } else {
+                    var clickFeature = e.target.getArray()[0];
                     var resourceData = {
                         id: clickFeature.getId()
                     }
@@ -145,14 +141,6 @@ require([
                     });
 
                     self.viewModel.selectedResource(resourceData)
-                    $('#resource-info').show();
-                }
-            });
-
-            map.select.getFeatures().on('change:length', function(e) {
-                if (e.target.getArray().length === 0) {
-                    $('#resource-info').hide();
-                } else {
                     $('#resource-info').show();
                 }
             });
