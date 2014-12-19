@@ -235,32 +235,6 @@ class ResourceForm(object):
         # retrieves the data from the server
         return 
 
-    def get_e55_domain(self, entitytypeid):
-        """For a given entitytypeid creates a dictionary for each collector node. Each collector dictionary includes
-        an array of its child nodes. Returns a list of these collector dictionaries added to a list of nodes that are
-        neither collectors nor children of collectors"""
-        domains = list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).order_by('sortorder', 'value').values())
-        domains_copy = copy.deepcopy(domains) #Prevents 'recursive dictionary' type from getting created in nested for loop 
-        nested_domains = []
-        conceptids_in_nested = []
-        for domain in domains:
-            if domain['valuetype'] == 'collector':
-                conceptids_in_nested.append(domain['conceptid'])
-                children = [] #(conceptid, relationtype, child_valuetype, parent_valuetype)
-                collector_children = Concept().get_child_concepts(domain['conceptid'], 'member', ['prefLabel','collector'], 'collector')
-                for child in collector_children:
-                    for d in domains_copy:
-                        if child[1] == d['conceptid']:
-                            children.append(d)
-                            conceptids_in_nested.append(d['conceptid'])
-                nested_domain = domain
-                nested_domain['children'] = sorted(children, key=itemgetter('sortorder'))
-                nested_domain['disabled'] = True
-                nested_domains.append(nested_domain)
-        collectorless_domains = [a for a in domains_copy if a['conceptid'] not in conceptids_in_nested]
-        result = sorted(nested_domains + collectorless_domains, key=itemgetter('sortorder')) 
-        return result
-
     def get_nodes(self, entitytypeid):
         ret = []
         entities = self.resource.find_entities_by_type_id(entitytypeid)
