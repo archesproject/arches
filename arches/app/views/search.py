@@ -82,7 +82,7 @@ def search_results(request, as_text=False):
 
 def _search_resources(request):
     searchString = request.GET.get('q', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': None})) 
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': ''})) 
     f = request.GET.get('f', None)
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -124,7 +124,7 @@ def _search_resources(request):
                 nested = Nested(path='domains', query=terms)
                 boolfilter.must_not(nested)
 
-    if spatial_filter['type']:
+    if spatial_filter['type'] != '':
         if spatial_filter['type'] == 'bbox':
             coordinates = [[spatial_filter['coordinates'][0],spatial_filter['coordinates'][3]], [spatial_filter['coordinates'][2],spatial_filter['coordinates'][1]]]
             geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
