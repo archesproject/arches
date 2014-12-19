@@ -38,13 +38,17 @@ def home_page(request):
     lang = request.GET.get('lang', 'en-us')
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
     resource_count = se.search(index='resource', search_type='_count')['count']
-    print resource_count
+    date_types = [
+
+    ]
+
     return render_to_response('search.htm', {
             'main_script': 'search',
             'active_page': 'Search',
             'user_can_edit': False,
             'min_date': min_max_dates['val__min'].year,
             'max_date': min_max_dates['val__max'].year,
+            'date_types': 
             'resource_count': resource_count
         }, 
         context_instance=RequestContext(request))
@@ -59,28 +63,14 @@ def search_terms(request):
 
     return JSONResponse(query.search(index='term', type='value'))
 
-# def search_results_home(request):
-#     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-#     print min_max_dates
-#     print min_max_dates['max_date'] 
-#     print 'here'
-#     return render_to_response('search.htm', {
-#             'main_script': 'search',
-#             'active_page': 'Search',
-#             'user_can_edit': False,
-#             'min_date': min_max_dates['min_date'],
-#             'max_date': min_max_dates['max_date']
-#         }, 
-#         context_instance=RequestContext(request))
-
 def search_results(request, as_text=False):
-    results = _search_resources(request)
+    results = search_resources(request)
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
-def _search_resources(request):
+def search_resources(request):
     searchString = request.GET.get('q', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': ''})) 
     f = request.GET.get('f', None)
