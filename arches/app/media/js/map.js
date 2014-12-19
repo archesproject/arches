@@ -183,33 +183,41 @@ require([
 
             //Inventory-basemaps button opens basemap panel
             $("#inventory-basemaps").click(function (){
-                $("#overlay-panel").addClass("hidden");
-                $("#basemaps-panel").removeClass("hidden");
+                if ($(this).hasClass('arches-map-tools-pressed')) {
+                    hideAllPanels();
+                } else {
+                    $("#overlay-panel").addClass("hidden");
+                    $("#basemaps-panel").removeClass("hidden");
 
-                //Update state of remaining buttons
-                $("#inventory-overlays").removeClass("arches-map-tools-pressed");
-                $("#inventory-overlays").addClass("arches-map-tools");
-                $("#inventory-overlays").css("border-bottom-right-radius", "5px");
+                    //Update state of remaining buttons
+                    $("#inventory-overlays").removeClass("arches-map-tools-pressed");
+                    $("#inventory-overlays").addClass("arches-map-tools");
+                    $("#inventory-overlays").css("border-bottom-right-radius", "5px");
 
-                //Update state of current button and adjust position
-                $("#inventory-basemaps").addClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").removeClass("arches-map-tools");
-                $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
+                    //Update state of current button and adjust position
+                    $("#inventory-basemaps").addClass("arches-map-tools-pressed");
+                    $("#inventory-basemaps").removeClass("arches-map-tools");
+                    $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
+                }
             });
 
 
             //Inventory-overlayss button opens overlay panel
             $("#inventory-overlays").click(function (){
-                $("#overlay-panel").removeClass("hidden");
-                $("#basemaps-panel").addClass("hidden");
+                if ($(this).hasClass('arches-map-tools-pressed')) {
+                    hideAllPanels();
+                } else {
+                    $("#overlay-panel").removeClass("hidden");
+                    $("#basemaps-panel").addClass("hidden");
 
-                //Update state of remaining buttons
-                $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").addClass("arches-map-tools");
+                    //Update state of remaining buttons
+                    $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
+                    $("#inventory-basemaps").addClass("arches-map-tools");
 
-                //Update state of current button and adjust position
-                $("#inventory-overlays").addClass("arches-map-tools-pressed");
-                $("#inventory-overlays").removeClass("arches-map-tools");
+                    //Update state of current button and adjust position
+                    $("#inventory-overlays").addClass("arches-map-tools-pressed");
+                    $("#inventory-overlays").removeClass("arches-map-tools");
+                }
             });
 
             //Close Button
