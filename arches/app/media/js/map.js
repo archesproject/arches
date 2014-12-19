@@ -42,7 +42,7 @@ require([
             });
             var map = new MapView({
                 el: $('#map'),
-                overlays: mapLayers
+                overlays: mapLayers.reverse()
             });
             self.viewModel = {
                 baseLayers: map.baseLayers,
