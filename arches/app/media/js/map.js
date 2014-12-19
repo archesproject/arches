@@ -307,8 +307,13 @@ require([
             layer.onMap(!layer.onMap());
         },
         layerZoom: function (e) {
-            var layer = this.getLayerById($(e.target).closest('.layer-zoom').data().layerid);
-            this.map.map.getView().fitExtent(layer.layer.getSource().getExtent(), this.map.map.getSize());
+            var layer = this.getLayerById($(e.target).closest('.layer-zoom').data().layerid).layer;
+            if (layer.getLayers) {
+                layer = layer.getLayers().getArray()[0];
+            }
+            if (layer.getSource) {
+                this.map.map.getView().fitExtent(layer.getSource().getExtent(), this.map.map.getSize());
+            }
         }
     });
     new PageView();
