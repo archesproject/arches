@@ -5,12 +5,13 @@ require([
     'openlayers',
     'knockout',
     'arches',
+    'layer-info',
     'views/map',
     'map/layers',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, _, Backbone, ol, ko, arches, MapView, layers) {
+], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers) {
     var PageView = Backbone.View.extend({
         el: $('body'),
         events: {
@@ -133,6 +134,11 @@ require([
                 if (clickFeature) {
                     var resourceData = {
                         id: clickFeature.getId()
+                    }
+                    var typeInfo = layerInfo[clickFeature.get('entitytypeid')]
+                    if (typeInfo) {
+                        resourceData.typeName = typeInfo.name;
+                        resourceData.typeIcon = typeInfo.icon;
                     }
                     _.each(clickFeature.getKeys(), function (key) {
                         resourceData[key] = clickFeature.get(key);

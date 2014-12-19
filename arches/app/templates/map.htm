@@ -252,17 +252,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <h4 class="modal-title">
                                 <a href="javascript:void(0);" class="text-primary">
-                                    <i class="fa fa-trophy text-primary"></i> 
+                                    <i class="fa fa-trophy text-primary" data-bind="attr: { class: selectedResource() ? selectedResource().typeIcon + ' text-primary': '' }"></i> 
                                     <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
 
                                     <!-- Resource Type for larger screens -->
                                     <span class="hidden-xs">
-                                        <small class="text-primary">Historic Resource</small>
+                                        <small class="text-primary" data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
                                     </span>
 
                                     <!-- Resource Type for small screens -->
                                     <span class="hidden-sm hidden-md hidden-lg">
-                                        </br><small class="text-primary margin-left-30 margin-top-minus-10">Historic Resource</small>
+                                        </br><small class="text-primary margin-left-30 margin-top-minus-10"  data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
                                     </span>
 
                                 </a>
