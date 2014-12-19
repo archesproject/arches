@@ -120,6 +120,7 @@ require([
 
             $('.resource-info-closer').click(function() {
                 $('#resource-info').hide();
+                map.select.getFeatures().clear();
                 $('.resource-info-closer')[0].blur();
             });
 
