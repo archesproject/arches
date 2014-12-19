@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
+import copy
+from operator import itemgetter
 from operator import methodcaller
 from django.db import transaction, connection
 from django.db.models import Q
@@ -571,7 +573,7 @@ class Concept(object):
         collectorless_domains = [a for a in domains_copy if a['conceptid'] not in conceptids_in_nested]
         result = sorted(nested_domains + collectorless_domains, key=itemgetter('sortorder')) 
         return result
-        
+
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):
