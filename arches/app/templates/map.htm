@@ -236,8 +236,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
             <!-- End Map Tools -->
-
-
             <!-- Info Panel -->
             <div id="resource-info" class="row" style="display:none;">
 
@@ -255,7 +253,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <h4 class="modal-title">
                                 <a href="javascript:void(0);" class="text-primary">
                                     <i class="fa fa-trophy text-primary"></i> 
-                                    <span data-bind="text:selectedResource.name()"></span>
+                                    <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
 
                                     <!-- Resource Type for larger screens -->
                                     <span class="hidden-xs">
@@ -274,19 +272,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Body Content -->
                         <div class="modal-body padding-top-0 padding-bottom-0">
-                            <p>    
-                                <dl class="">
-                                    <dt class="txt-color-blue">Resource Type</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">Building</dd>
-                                    
-                                    <dt class="txt-color-blue">Designation</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">Resource of Local Importance</dd>
-                                    
-                                    <dt class="txt-color-blue">Designation Date</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">August 24, 2014</dd>
-                                    
-                                    
-                                </dl>
+                            <p> 
+                                {% include 'map/resource-popup.htm' %}
                             </p>
                         </div>
                         <!-- End Body Content -->

@@ -49,11 +49,7 @@ require([
                 filterTerms: ko.observableArray(),
                 zoom: ko.observable(arches.mapDefaults.zoom),
                 mousePosition: ko.observable(''),
-                selectedResource: {
-                    id: ko.observable(''),
-                    type: ko.observable(''),
-                    name: ko.observable('')
-                }
+                selectedResource: ko.observable(null)
             };
             self.map = map;
 
@@ -135,9 +131,14 @@ require([
                     }
                 });
                 if (clickFeature) {
-                    self.viewModel.selectedResource.id(clickFeature.getId());
-                    self.viewModel.selectedResource.type(clickFeature.get('entitytypeid'));
-                    self.viewModel.selectedResource.name(clickFeature.get('primaryname'));
+                    var resourceData = {
+                        id: clickFeature.getId()
+                    }
+                    _.each(clickFeature.getKeys(), function (key) {
+                        resourceData[key] = clickFeature.get(key);
+                    });
+
+                    self.viewModel.selectedResource(resourceData)
                     $('#resource-info').show();
                 }
             });

@@ -277,6 +277,13 @@ class Resource(Entity):
 
         pass
 
+    def get_feature_data(self):
+        """
+        Gets a dictionary of data available when displaying resource as a map feature
+
+        """
+        return {}
+
     def index(self):
         """
         Indexes all the nessesary documents related to resources to support the map, search, and reports
@@ -420,6 +427,11 @@ class Resource(Entity):
 
 
         if len(geometries) > 0:
+            properties = {
+                'entitytypeid': self.entitytypeid,
+                'primaryname': self.get_primary_name(),
+            }
+            properties = dict(properties.items() + self.get_feature_data().items())
             geojson = {
                 'type': 'Feature',
                 'id': self.entityid,
@@ -427,10 +439,7 @@ class Resource(Entity):
                     'type': 'GeometryCollection',
                     'geometries': geometries
                 },
-                'properties': {
-                    'entitytypeid': self.entitytypeid,
-                    'primaryname': self.get_primary_name(),
-                }
+                'properties': properties
             }
             se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
         se.index_data('resource', self.entitytypeid, self.dictify(), id=self.entityid)
