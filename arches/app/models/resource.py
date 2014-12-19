@@ -190,11 +190,7 @@ class Resource(Entity):
         return selected_form['class'](self)
 
     def get_type_name(self):
-        resource_name = ''
-        for resource_type in self.get_resource_types():
-            if resource_type['resourcetypeid'] == self.entitytypeid:
-                return resource_type['name']
-        return resource_name
+        return settings.RESOURCE_TYPE_CONFIGS[self.entitytypeid]['name']
 
     def get_primary_name(self):
         if self.entityid == '':
@@ -467,7 +463,3 @@ class Resource(Entity):
             'id': None,
             'data': None
         }
-
-    @staticmethod
-    def get_resource_types():
-        raise NotImplementedError

@@ -105,6 +105,27 @@ RESOURCE_CLUSTERING_MIN_RESOLUTION = 78271.51696402048
 
 BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 
+RESOURCE_TYPE_CONFIGS = {
+    # override this setting in your packages settings.py file
+    #
+    # 'HERITAGE_RESOURCE.E18': {
+    #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
+    #     'name': _('Heritage Resource'),
+    #     'icon_class': 'fa fa-trophy',
+    #     'default_page': 'summary',
+    #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
+    #     'categories': [_('Resource')],
+    #     'has_layer': True,
+    #     'on_map': True,
+    #     'vector_color': '#3366FF',
+    #     'primary_name_lookups': {
+    #         'entity_type': 'NAME.E41',
+    #         'lookup_value': 'Primary'
+    #     },
+    #     'sort_order': 1
+    # },
+}
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################

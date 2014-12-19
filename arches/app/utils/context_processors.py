@@ -37,5 +37,5 @@ def map_info(request):
 
 def resource_types(request):
     return {
-        'resource_types': Resource().get_resource_types()
+        'resource_types': settings.RESOURCE_TYPE_CONFIGS
     }
