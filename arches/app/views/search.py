@@ -48,7 +48,6 @@ def home_page(request):
             'user_can_edit': False,
             'min_date': min_max_dates['val__min'].year,
             'max_date': min_max_dates['val__max'].year,
-            'date_types': 
             'resource_count': resource_count
         }, 
         context_instance=RequestContext(request))

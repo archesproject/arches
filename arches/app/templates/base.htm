@@ -127,7 +127,7 @@
                                     Resource Manager
                                 </a>
                                 <ul class="dropdown-menu">
-                                    {% for type, type_data in resource_types.items %}
+                                    {% for type, type_data in resource_types %}
                                         <li><a href="{% url 'resource_manager' type type_data.default_page '' %}"><i class="{{type_data.icon_class}}"></i>{{type_data.name}}</a></li>
                                     {% endfor %}
                                 </ul>

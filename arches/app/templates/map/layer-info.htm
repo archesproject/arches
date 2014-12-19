@@ -2,7 +2,7 @@
 <script>
     define('layer-info', [], function () {
         var layerInfo = {
-            {% for type, type_data in resource_types.items %}
+            {% for type, type_data in resource_types %}
             {% if type_data.has_layer %}
             "{{type}}": {
                 id: "{{type_data.resourcetypeid}}",
