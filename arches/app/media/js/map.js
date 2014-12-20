@@ -317,6 +317,7 @@ require([
             $('#popup-closer').click(function() {
                 $('#popup').hide();
                 $('#popup-closer')[0].blur();
+                $('.geocodewidget').select2('val', '');
             });
         },
         getLayerById: function(layerId) {

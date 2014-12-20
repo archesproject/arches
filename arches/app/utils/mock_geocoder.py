@@ -23,7 +23,8 @@ def findCandidates(searchString):
     # return data as follows:
     return [
         {
-            'label': '100 Main St., San Francisco CA 94109',
+            'id': 1,
+            'text': '100 Main St., San Francisco CA 94109',
             'geometry': {
                 "type": "Point",
                 "coordinates": [
@@ -34,7 +35,8 @@ def findCandidates(searchString):
             'score': 99
         },
         {
-            'label': '101 Main St., San Francisco CA 94109',
+            'id': 2,
+            'text': '101 Main St., San Francisco CA 94109',
             'geometry': {
                 "type": "Point",
                 "coordinates": [
@@ -45,7 +47,8 @@ def findCandidates(searchString):
             'score': 99
         },
         {
-            'label': '102 Main St., San Francisco CA 94109',
+            'id': 3,
+            'text': '102 Main St., San Francisco CA 94109',
             'geometry': {
                 "type": "Point",
                 "coordinates": [
@@ -56,7 +59,8 @@ def findCandidates(searchString):
             'score': 99
         },
         {
-            'label': '103 Main St., San Francisco CA 94109',
+            'id': 4,
+            'text': '103 Main St., San Francisco CA 94109',
             'geometry': {
                 "type": "Point",
                 "coordinates": [
@@ -67,5 +71,3 @@ def findCandidates(searchString):
             'score': 99
         }
     ]
-
-        
