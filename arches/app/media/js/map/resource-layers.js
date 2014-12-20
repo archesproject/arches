@@ -49,7 +49,9 @@ define([
 
       source.on('addfeature', function (e) {
         var feature = e.feature.clone();
-        var center = ol.extent.getCenter(feature.getGeometry().getExtent());
+        var extent = feature.getGeometry().getExtent();
+        var center = ol.extent.getCenter(extent);
+        feature.set('originalExtent', extent);
         feature.setGeometry(new ol.geom.Point(center));
         pointSource.addFeature(feature);
       });

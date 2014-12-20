@@ -190,11 +190,7 @@ class Resource(Entity):
         return selected_form['class'](self)
 
     def get_type_name(self):
-        resource_name = ''
-        for resource_type in self.get_resource_types():
-            if resource_type['resourcetypeid'] == self.entitytypeid:
-                return resource_type['name']
-        return resource_name
+        return settings.RESOURCE_TYPE_CONFIGS[self.entitytypeid]['name']
 
     def get_primary_name(self):
         if self.entityid == '':
@@ -280,6 +276,13 @@ class Resource(Entity):
         """
 
         pass
+
+    def get_feature_data(self):
+        """
+        Gets a dictionary of data available when displaying resource as a map feature
+
+        """
+        return {}
 
     def index(self):
         """
@@ -424,6 +427,11 @@ class Resource(Entity):
 
 
         if len(geometries) > 0:
+            properties = {
+                'entitytypeid': self.entitytypeid,
+                'primaryname': self.get_primary_name(),
+            }
+            properties = dict(properties.items() + self.get_feature_data().items())
             geojson = {
                 'type': 'Feature',
                 'id': self.entityid,
@@ -431,10 +439,7 @@ class Resource(Entity):
                     'type': 'GeometryCollection',
                     'geometries': geometries
                 },
-                'properties': {
-                    'entitytypeid': self.entitytypeid,
-                    'primaryname': self.get_primary_name(),
-                }
+                'properties': properties
             }
             se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
         se.index_data('resource', self.entitytypeid, self.dictify(), id=self.entityid)
@@ -467,7 +472,3 @@ class Resource(Entity):
             'id': None,
             'data': None
         }
-
-    @staticmethod
-    def get_resource_types():
-        raise NotImplementedError

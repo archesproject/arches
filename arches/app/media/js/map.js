@@ -5,12 +5,13 @@ require([
     'openlayers',
     'knockout',
     'arches',
+    'layer-info',
     'views/map',
     'map/layers',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, _, Backbone, ol, ko, arches, MapView, layers) {
+], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers) {
     var PageView = Backbone.View.extend({
         el: $('body'),
         events: {
@@ -41,7 +42,7 @@ require([
             });
             var map = new MapView({
                 el: $('#map'),
-                overlays: mapLayers
+                overlays: mapLayers.reverse()
             });
             self.viewModel = {
                 baseLayers: map.baseLayers,
@@ -49,11 +50,7 @@ require([
                 filterTerms: ko.observableArray(),
                 zoom: ko.observable(arches.mapDefaults.zoom),
                 mousePosition: ko.observable(''),
-                selectedResource: {
-                    id: ko.observable(''),
-                    type: ko.observable(''),
-                    name: ko.observable('')
-                }
+                selectedResource: ko.observable(null)
             };
             self.map = map;
 
@@ -121,39 +118,31 @@ require([
                 self.viewModel.mousePosition(mousePosition);
             });
 
-            $('#popup-closer').click(function() {
-                $('#popup').hide();
-                $('#popup-closer')[0].blur();
-            });
-
-            var overlay = new ol.Overlay({
-              element: $('#popup')[0]
-            });
-
-            map.map.addOverlay(overlay);
-
-            map.map.on('click', function(e) {
-                var pixels = [e.originalEvent.offsetX, e.originalEvent.offsetY];
-                var clickFeature;
-                map.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
-                    if (!_.contains(feature.getKeys(), "features")) {
-                        clickFeature = feature;
-                    }
-                });
-                if (clickFeature) {
-                    overlay.setPosition(e.coordinate);
-                    self.viewModel.selectedResource.id(clickFeature.getId());
-                    self.viewModel.selectedResource.type(clickFeature.get('entitytypeid'));
-                    self.viewModel.selectedResource.name(clickFeature.get('primaryname'));
-                    $('#popup').show();
-                }
+            $('.resource-info-closer').click(function() {
+                $('#resource-info').hide();
+                map.select.getFeatures().clear();
+                $('.resource-info-closer')[0].blur();
             });
 
             map.select.getFeatures().on('change:length', function(e) {
                 if (e.target.getArray().length === 0) {
-                    $('#popup').hide();
+                    $('#resource-info').hide();
                 } else {
-                    $('#popup').show();
+                    var clickFeature = e.target.getArray()[0];
+                    var resourceData = {
+                        id: clickFeature.getId()
+                    }
+                    var typeInfo = layerInfo[clickFeature.get('entitytypeid')]
+                    if (typeInfo) {
+                        resourceData.typeName = typeInfo.name;
+                        resourceData.typeIcon = typeInfo.icon;
+                    }
+                    _.each(clickFeature.getKeys(), function (key) {
+                        resourceData[key] = clickFeature.get(key);
+                    });
+
+                    self.viewModel.selectedResource(resourceData)
+                    $('#resource-info').show();
                 }
             });
 
@@ -183,33 +172,41 @@ require([
 
             //Inventory-basemaps button opens basemap panel
             $("#inventory-basemaps").click(function (){
-                $("#overlay-panel").addClass("hidden");
-                $("#basemaps-panel").removeClass("hidden");
+                if ($(this).hasClass('arches-map-tools-pressed')) {
+                    hideAllPanels();
+                } else {
+                    $("#overlay-panel").addClass("hidden");
+                    $("#basemaps-panel").removeClass("hidden");
 
-                //Update state of remaining buttons
-                $("#inventory-overlays").removeClass("arches-map-tools-pressed");
-                $("#inventory-overlays").addClass("arches-map-tools");
-                $("#inventory-overlays").css("border-bottom-right-radius", "5px");
+                    //Update state of remaining buttons
+                    $("#inventory-overlays").removeClass("arches-map-tools-pressed");
+                    $("#inventory-overlays").addClass("arches-map-tools");
+                    $("#inventory-overlays").css("border-bottom-right-radius", "5px");
 
-                //Update state of current button and adjust position
-                $("#inventory-basemaps").addClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").removeClass("arches-map-tools");
-                $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
+                    //Update state of current button and adjust position
+                    $("#inventory-basemaps").addClass("arches-map-tools-pressed");
+                    $("#inventory-basemaps").removeClass("arches-map-tools");
+                    $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
+                }
             });
 
 
             //Inventory-overlayss button opens overlay panel
             $("#inventory-overlays").click(function (){
-                $("#overlay-panel").removeClass("hidden");
-                $("#basemaps-panel").addClass("hidden");
+                if ($(this).hasClass('arches-map-tools-pressed')) {
+                    hideAllPanels();
+                } else {
+                    $("#overlay-panel").removeClass("hidden");
+                    $("#basemaps-panel").addClass("hidden");
 
-                //Update state of remaining buttons
-                $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").addClass("arches-map-tools");
+                    //Update state of remaining buttons
+                    $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
+                    $("#inventory-basemaps").addClass("arches-map-tools");
 
-                //Update state of current button and adjust position
-                $("#inventory-overlays").addClass("arches-map-tools-pressed");
-                $("#inventory-overlays").removeClass("arches-map-tools");
+                    //Update state of current button and adjust position
+                    $("#inventory-overlays").addClass("arches-map-tools-pressed");
+                    $("#inventory-overlays").removeClass("arches-map-tools");
+                }
             });
 
             //Close Button
@@ -280,24 +277,23 @@ require([
 
             //Select2 Simple Search initialize
             $('.geocodewidget').select2({
-                data: function() {
-                    var data;
-
-                    data = [
-                        {id: "1", text: "109 Newhaven Street, Los Angeles, CA"},
-                        {id: "2", text: "11243 Western Drive Los Angeles, CA"},
-                        {id: "3", text: "2566 Alison Drive, Santa Monica, CA"},
-                        {id: "4", text: "34789 Myers Circle, Burbank, CA"},
-                        {id: "5", text: "Parcel: 110-445-009"},
-                        {id: "6", text: "Parcel: 333-012-987"},
-                        {id: "7", text: "Parcel: 13-012-987"}
-                    ];
-
-                    return {results: data};
+                ajax: {
+                    url: "geocoder",
+                    dataType: 'json',
+                    quietMillis: 250,
+                    data: function (term, page) {
+                        return {
+                            q: term
+                        };
+                    },
+                    results: function (data, page) {
+                        return { results: data.results };
+                    },
+                    cache: true
                 },
+
                 placeholder: "Find an Address or Parcel Number",
-                multiple: true,
-                maximumSelectionSize: 1
+                minimumInputLength: 4
             });
         },
         getLayerById: function(layerId) {
@@ -314,8 +310,13 @@ require([
             layer.onMap(!layer.onMap());
         },
         layerZoom: function (e) {
-            var layer = this.getLayerById($(e.target).closest('.layer-zoom').data().layerid);
-            this.map.map.getView().fitExtent(layer.layer.getSource().getExtent(), this.map.map.getSize());
+            var layer = this.getLayerById($(e.target).closest('.layer-zoom').data().layerid).layer;
+            if (layer.getLayers) {
+                layer = layer.getLayers().getArray()[0];
+            }
+            if (layer.getSource) {
+                this.map.map.getView().fitExtent(layer.getSource().getExtent(), this.map.map.getSize());
+            }
         }
     });
     new PageView();

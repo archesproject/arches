@@ -24,24 +24,33 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.contrib.gis.geos import GEOSGeometry
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Count
+from django.utils.importlib import import_module
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
+geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
+    se = SearchEngineFactory().create()
+
     lang = request.GET.get('lang', 'en-us')
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-    
+    resource_count = se.search(index='resource', search_type='_count')['count']
+    date_types = [
+
+    ]
+
     return render_to_response('search.htm', {
             'main_script': 'search',
             'active_page': 'Search',
             'user_can_edit': False,
             'min_date': min_max_dates['val__min'].year,
-            'max_date': min_max_dates['val__max'].year
+            'max_date': min_max_dates['val__max'].year,
+            'resource_count': resource_count
         }, 
         context_instance=RequestContext(request))
 
@@ -55,30 +64,16 @@ def search_terms(request):
 
     return JSONResponse(query.search(index='term', type='value'))
 
-# def search_results_home(request):
-#     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-#     print min_max_dates
-#     print min_max_dates['max_date'] 
-#     print 'here'
-#     return render_to_response('search.htm', {
-#             'main_script': 'search',
-#             'active_page': 'Search',
-#             'user_can_edit': False,
-#             'min_date': min_max_dates['min_date'],
-#             'max_date': min_max_dates['max_date']
-#         }, 
-#         context_instance=RequestContext(request))
-
 def search_results(request, as_text=False):
-    results = _search_resources(request)
+    results = search_resources(request)
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
-def _search_resources(request):
+def search_resources(request):
     searchString = request.GET.get('q', '')
-    extent = request.GET.get('extent', None)    
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': ''})) 
     f = request.GET.get('f', None)
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -120,12 +115,16 @@ def _search_resources(request):
                 nested = Nested(path='domains', query=terms)
                 boolfilter.must_not(nested)
 
-    if extent:
-        extent = extent.split(',')
-        coordinates = [[extent[0],extent[3]], [extent[2],extent[1]]]
-        geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates)
-        nested = Nested(path='geometries', query=geoshape)
-        boolquery.must(nested)
+    if spatial_filter['type'] != '':
+        if spatial_filter['type'] == 'bbox':
+            coordinates = [[spatial_filter['coordinates'][0],spatial_filter['coordinates'][3]], [spatial_filter['coordinates'][2],spatial_filter['coordinates'][1]]]
+            geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
+            nested = Nested(path='geometries', query=geoshape)
+            boolquery.must(nested)
+        else:
+            geoshape = GeoShape(field='geometries.value', type=spatial_filter['type'], coordinates=spatial_filter['coordinates'] )
+            nested = Nested(path='geometries', query=geoshape)
+            boolquery.must(nested)
 
     if len(year_min_max) == 2:
         start_date = date(year_min_max[0], 1, 1)
@@ -172,3 +171,7 @@ def _get_pagination(results, total_count, page, count_per_page):
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
     return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results)})
+
+def geocode(request):
+    searchString = request.GET.get('q', '')    
+    return JSONResponse({ 'results': geocoder.findCandidates(searchString) })

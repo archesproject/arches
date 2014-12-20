@@ -1,4 +1,4 @@
-'''
+<!--
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,29 +14,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
-
-from django.conf import settings
-from arches.app.models.resource import Resource
-
-def livereload(request):
-	return {
-		'livereload_port': settings.LIVERELOAD_PORT
-	}
-
-def map_info(request):
-    return {
-        'map_info': {
-            'x': settings.DEFAULT_MAP_X,
-            'y': settings.DEFAULT_MAP_Y,
-            'zoom': settings.DEFAULT_MAP_ZOOM,
-            'bing_key': settings.BING_KEY,
-            'resource_cluster_min_resolution': settings.RESOURCE_CLUSTERING_MIN_RESOLUTION
-        }
-    }
-
-def resource_types(request):
-    sorted_x = sorted(settings.RESOURCE_TYPE_CONFIGS.items(), key=lambda v: v[1]['sort_order'])
-    return {
-        'resource_types': sorted_x
-    }
+-->
+{% load staticfiles %}
+{% load i18n %}   
+<span>popup content goes here...</span>

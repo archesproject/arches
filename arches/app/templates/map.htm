@@ -26,15 +26,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         
         <!-- Map -->
         <div id="map" class="map map-space-panel"></div>
-        <div id="popup" class="ol-popup">
-            <a href="javascript:void(0);" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content" style="width: 250px;">
-                <h3 data-bind="text:selectedResource.name()" style="margin:2px;"></h3>
-                <div><a href="javascript:void(0);" data-bind="" style="margin-left: 16px;">View Report</a></div>
-                <div><a href="javascript:void(0);" data-bind="" style="margin-left: 16px;">Edit Resource</a></div>
-            </div>
-        </div>
-        <div id="olmap" class="fill"></div>
         
         
 
@@ -245,10 +236,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
             <!-- End Map Tools -->
-
-
             <!-- Info Panel -->
-            <div class="row hidden">
+            <div id="resource-info" class="row" style="display:none;">
 
                 <!-- Setup display, hide for xs screens -->
                 <div class="col-sm-7 col-sm-offset-6 col-md-5 col-md-offset-7 pull-right">
@@ -257,23 +246,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     but the actual info panel is NOT implemented as a model form -->
                     <div class="modal-content no-corners arches-map-inventory-panel">
                         <div class="modal-header">
-                            <button type="button" class="close" aria-hidden="true">
+                            <button type="button" class="close resource-info-closer" aria-hidden="true">
                                 ×
                             </button>
 
                             <h4 class="modal-title">
                                 <a href="javascript:void(0);" class="text-primary">
-                                    <i class="fa fa-trophy text-primary"></i> 
-                                    Castle Wolfenstein 
+                                    <i class="fa fa-trophy text-primary" data-bind="attr: { class: selectedResource() ? selectedResource().typeIcon + ' text-primary': '' }"></i> 
+                                    <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
 
                                     <!-- Resource Type for larger screens -->
                                     <span class="hidden-xs">
-                                        <small class="text-primary">Historic Resource</small>
+                                        <small class="text-primary" data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
                                     </span>
 
                                     <!-- Resource Type for small screens -->
                                     <span class="hidden-sm hidden-md hidden-lg">
-                                        </br><small class="text-primary margin-left-30 margin-top-minus-10">Historic Resource</small>
+                                        </br><small class="text-primary margin-left-30 margin-top-minus-10"  data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
                                     </span>
 
                                 </a>
@@ -283,25 +272,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Body Content -->
                         <div class="modal-body padding-top-0 padding-bottom-0">
-                            <p>    
-                                <dl class="">
-                                    <dt class="txt-color-blue">Resource Type</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">Building</dd>
-                                    
-                                    <dt class="txt-color-blue">Designation</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">Resource of Local Importance</dd>
-                                    
-                                    <dt class="txt-color-blue">Designation Date</dt>
-                                    <dd class="txt-color-blue arches-map-panel-list">August 24, 2014</dd>
-                                    
-                                    
-                                </dl>
+                            <p> 
+                                {% include 'map/resource-popup.htm' %}
                             </p>
                         </div>
                         <!-- End Body Content -->
 
                         <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <button type="button" class="btn btn-default resource-info-closer">
                                 Close
                             </button>
                             <button type="button" class="btn btn-primary">

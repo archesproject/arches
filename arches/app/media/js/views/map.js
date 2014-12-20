@@ -117,7 +117,7 @@ define([
                     if (isClustered) {
                         var extent = feature.getGeometry().getExtent();
                         _.each(feature.get("features"), function (feature) {
-                            extent = ol.extent.extend(extent, feature.getGeometry().getExtent());
+                            extent = ol.extent.extend(extent, feature.get('originalExtent'));
                         });
                         self.map.getView().fitExtent(extent, (self.map.getSize()));
                         self.select.getFeatures().clear();

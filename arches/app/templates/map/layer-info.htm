@@ -2,26 +2,26 @@
 <script>
     define('layer-info', [], function () {
         var layerInfo = {
-            {% for type in resource_types %}
-            {% if type.has_layer %}
-            "{{type.resourcetypeid}}": {
-                id: "{{type.resourcetypeid}}",
-                icon: "{{type.icon_class}}",
-                name: "{{type.name}}",
-                description: "{{type.description}}",
+            {% for type, type_data in resource_types %}
+            {% if type_data.has_layer %}
+            "{{type}}": {
+                id: "{{type_data.resourcetypeid}}",
+                icon: "{{type_data.icon_class}}",
+                name: "{{type_data.name}}",
+                description: "{{type_data.description}}",
                 categories: [
-                    {% for category in type.categories %}
+                    {% for category in type_data.categories %}
                     "{{category}}"
                     {% endfor %}
                 ],
-                {% if type.on_map %}
+                {% if type_data.on_map %}
                 onMap: true,
                 {% else %}
                 onMap: false,
                 {% endif %}
-                vectorColor: "{{type.vector_color}}" 
-            {% endif %}
+                vectorColor: "{{type_data.vector_color}}"   
             },
+            {% endif %}
             {% endfor %}
         };
 
