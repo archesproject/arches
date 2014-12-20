@@ -277,24 +277,23 @@ require([
 
             //Select2 Simple Search initialize
             $('.geocodewidget').select2({
-                data: function() {
-                    var data;
-
-                    data = [
-                        {id: "1", text: "109 Newhaven Street, Los Angeles, CA"},
-                        {id: "2", text: "11243 Western Drive Los Angeles, CA"},
-                        {id: "3", text: "2566 Alison Drive, Santa Monica, CA"},
-                        {id: "4", text: "34789 Myers Circle, Burbank, CA"},
-                        {id: "5", text: "Parcel: 110-445-009"},
-                        {id: "6", text: "Parcel: 333-012-987"},
-                        {id: "7", text: "Parcel: 13-012-987"}
-                    ];
-
-                    return {results: data};
+                ajax: {
+                    url: "geocoder",
+                    dataType: 'json',
+                    quietMillis: 250,
+                    data: function (term, page) {
+                        return {
+                            q: term
+                        };
+                    },
+                    results: function (data, page) {
+                        return { results: data.results };
+                    },
+                    cache: true
                 },
+
                 placeholder: "Find an Address or Parcel Number",
-                multiple: true,
-                maximumSelectionSize: 1
+                minimumInputLength: 4
             });
         },
         getLayerById: function(layerId) {

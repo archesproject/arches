@@ -173,4 +173,5 @@ def _get_pagination(results, total_count, page, count_per_page):
     return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results)})
 
 def geocode(request):
-    return JSONResponse({ 'results': geocoder.findCandidates('') })
+    searchString = request.GET.get('q', '')    
+    return JSONResponse({ 'results': geocoder.findCandidates(searchString) })
