@@ -25,12 +25,14 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min, Count
+from django.utils.importlib import import_module
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
+geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
     se = SearchEngineFactory().create()
@@ -169,3 +171,6 @@ def _get_pagination(results, total_count, page, count_per_page):
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
     return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results)})
+
+def geocode(request):
+    return JSONResponse({ 'results': geocoder.findCandidates('') })

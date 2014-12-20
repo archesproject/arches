@@ -126,6 +126,8 @@ RESOURCE_TYPE_CONFIGS = {
     # },
 }
 
+GEOCODING_PROVIDER = 'arches.app.utils.mock_geocoder'
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
