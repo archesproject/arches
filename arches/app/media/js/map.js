@@ -12,6 +12,7 @@ require([
     'select2',
     'plugins/jquery.knob.min'
 ], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers) {
+    var geoJSON = new ol.format.GeoJSON();
     var PageView = Backbone.View.extend({
         el: $('body'),
         events: {
@@ -50,7 +51,8 @@ require([
                 filterTerms: ko.observableArray(),
                 zoom: ko.observable(arches.mapDefaults.zoom),
                 mousePosition: ko.observable(''),
-                selectedResource: ko.observable(null)
+                selectedResource: ko.observable(null),
+                selectedAddress: ko.observable('')
             };
             self.map = map;
 
@@ -130,7 +132,8 @@ require([
                 } else {
                     var clickFeature = e.target.getArray()[0];
                     var resourceData = {
-                        id: clickFeature.getId()
+                        id: clickFeature.getId(),
+                        reportLink: arches.urls.reports + clickFeature.getId()
                     }
                     var typeInfo = layerInfo[clickFeature.get('entitytypeid')]
                     if (typeInfo) {
@@ -294,6 +297,26 @@ require([
 
                 placeholder: "Find an Address or Parcel Number",
                 minimumInputLength: 4
+            });
+
+            $('.geocodewidget').on("select2-selecting", function(e) {
+                var geom = geoJSON.readGeometry(e.object.geometry)
+                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
+                self.viewModel.selectedAddress(e.object.text)
+                overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
+                $('#popup').show();
+            });
+
+            var overlay = new ol.Overlay({
+              element: $('#popup')[0]
+            });
+
+            map.map.addOverlay(overlay);
+
+            $('#popup-closer').click(function() {
+                $('#popup').hide();
+                $('#popup-closer')[0].blur();
             });
         },
         getLayerById: function(layerId) {

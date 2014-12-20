@@ -44,7 +44,7 @@ define([
 
       var source = new ol.source.GeoJSON({
         projection: 'EPSG:3857',
-        url: 'resources/layers/' + entitytypeid + '/'
+        url: arches.urls.map_layers + entitytypeid + '/'
       });
 
       source.on('addfeature', function (e) {
