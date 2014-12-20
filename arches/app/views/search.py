@@ -40,9 +40,31 @@ def home_page(request):
     lang = request.GET.get('lang', 'en-us')
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
     resource_count = se.search(index='resource', search_type='_count')['count']
-    date_types = [
 
-    ]
+    date_types = Concept().get_e55_domain('BEGINNING_OF_EXISTENCE_TYPE.E55')+ Concept().get_e55_domain('END_OF_EXISTENCE_TYPE.E55')
+    data = {'domains' :{'date_types': date_types}}
+    data['domains']['date_operators'] = [{
+        "conceptid": "0",
+        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+        "id": "0",
+        "language,id": "en-us",
+        "value": "Before",
+        "valuetype": "prefLabel"
+    },{
+        "conceptid": "1",
+        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+        "id": "1",
+        "language,id": "en-us",
+        "value": "On",
+        "valuetype": "prefLabel"
+    },{
+        "conceptid": "2",
+        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+        "id": "2",
+        "language,id": "en-us",
+        "value": "After",
+        "valuetype": "prefLabel"
+    }]
 
     return render_to_response('search.htm', {
             'main_script': 'search',
@@ -50,6 +72,8 @@ def home_page(request):
             'user_can_edit': False,
             'min_date': min_max_dates['val__min'].year,
             'max_date': min_max_dates['val__max'].year,
+            #'date_types': date_types,
+            'formdata': JSONSerializer().serialize(data),
             'resource_count': resource_count
         }, 
         context_instance=RequestContext(request))

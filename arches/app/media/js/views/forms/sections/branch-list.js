@@ -18,7 +18,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 this.pkField = this.key + '__entityid';                
             }
 
-            this.viewModel[this.key] = ko.observableArray(this.viewModel[this.key]);
+            this.viewModel[this.key] = ko.observableArray(ko.utils.unwrapObservable(this.viewModel[this.key]));
             this.viewModel.editing[this.key] = koMapping.fromJS(this.viewModel.defaults[this.key]);
         },
 
