@@ -99,9 +99,10 @@ class ResourceLoader(object):
         ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)
         print len(resource_list), 'resources loaded'
-        print 'total time to etl = %s' % (elapsed)
-        print 'average time per entity = %s' % (elapsed/len(resource_list))
-        print 'Load Identifier =', load_id
+        if len(resource_list) > 0:
+            print 'total time to etl = %s' % (elapsed)
+            print 'average time per entity = %s' % (elapsed/len(resource_list))
+            print 'Load Identifier =', load_id
         return ret
 
     def build_master_graph(self, resource, schema):

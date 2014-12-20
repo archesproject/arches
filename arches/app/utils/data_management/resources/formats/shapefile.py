@@ -75,7 +75,7 @@ class Resource(object):
 class ShapeReader():
 
     def load_file(self, shapefile):
-
+        resources = []
         self.configs = self.parse_configs(shapefile)
         if self.configs:
             self.attr_map = dict(self.configs['FIELD_MAP'])
@@ -101,16 +101,13 @@ class ShapeReader():
                     geom_type=self.geom_type,
                     value_to_concept_label_mappings=self.concept_value_mappings)
 
-            resources = []
             resource_id = ''
             group_id = ''
                 
             for shp_dictionary in shp_resource_info:
                 
                 if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
-                    #take 1 dictionary at a time, and build a ShpResource from it
                     resource = Resource()
-                    # populate the row with attributename and attributevalue
                     for key in shp_dictionary.keys():
                         if key is not None:
                             row = Row()
@@ -122,7 +119,7 @@ class ShapeReader():
                     resource.entitytypeid = self.entitytypeid
                     resources.append(resource)
 
-            return resources
+        return resources
 
 
     def read(self, path):
