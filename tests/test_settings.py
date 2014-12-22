@@ -50,13 +50,6 @@ ENTITY_MODEL = {
     'default': 'arches.app.models.entity.Entity'
 }
 
-PRIMARY_DISPLAY_NAME_LOOKUPS = {
-    'default': {
-        # override this setting in your packages settings.py file
-        'entity_type': '',
-        'lookup_value': ''
-    }
-}
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_CONNECTION = {

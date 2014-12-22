@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 #import version
 import inspect
-from django.utils.importlib import import_module
 # Django settings for Arches project.
 
 DEBUG = True
@@ -48,14 +47,6 @@ ENTITY_MODEL = {
     # to set the default model for the system to use
     # Your model needs to inherit from 'arches.app.models.entity.Entity' to work
     'default': 'arches.app.models.entity.Entity'
-}
-
-PRIMARY_DISPLAY_NAME_LOOKUPS = {
-    'default': {
-        # override this setting in your packages settings.py file
-        'entity_type': '',
-        'lookup_value': ''
-    }
 }
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
@@ -312,49 +303,3 @@ try:
     from settings_local import *
 except ImportError:
     pass
-
-# def apply_package_settings(package_name):
-#     print 'Loading package : %s' % package_name
-#     if package_name == '':
-#         if len(INSTALLED_PACKAGES) == 1:
-#             package_name = INSTALLED_PACKAGES[0]
-#         if len(INSTALLED_PACKAGES) > 1:
-#             clear_package_setting()
-#             raise Exception("""\n
-#     ------------------------------------------------------------------------------------------------------
-#         ERROR: You have more then 1 package enabled and you didn't specify which package to load
-#         Either disable one of the packages by commenting out it's name in the INSTALLED_PACKAGES setting
-#                                                 OR
-#         Specify the package by adding the --package or -p flag and then the package name like so...
-#         python manage.py packages -p <package_name>
-#                                                 OR
-#         Run the server from runserver.py specifying the package name and port to run on like so...
-#         python runserver.py <my package name> <port>
-#     ----------------------------------------------------------------------------------------------------\n""")
-
-
-#     if package_name in INSTALLED_PACKAGES:
-#         print 'Running package : %s' % package_name
-#         settingsfile = os.path.join(ROOT_DIR, 'packages', package_name, 'settings.py')
-#         if os.path.exists(settingsfile):
-#             mod = import_module("arches.app.packages.%s.settings" % package_name)
-#             package_settings = mod.get_settings(globals())
-#             for member_name in package_settings: 
-#                 globals()[member_name] = package_settings[member_name]
-#     else:
-#         clear_package_setting()
-#         raise Exception("""\n
-#         ------------------------------------------------------------------------------------------------------
-#             ERROR: You specified a package "%s" that doesn't exist in your INSTALLED_PACKAGES setting
-#         ----------------------------------------------------------------------------------------------------\n""" % package_name)
-
-# def clear_package_setting():
-#     from arches.app.build.management.commands import utils
-#     utils.write_to_file(os.path.join(ROOT_DIR, 'package_setting.py'), 'PACKAGE=""')
-#     #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.app.settings")
-
-
-# apply_package_settings(PACKAGE)
-# clear_package_setting()
-
-
