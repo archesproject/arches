@@ -192,6 +192,8 @@ class ShapeReader():
             if os.path.exists(config_file):
                 result = json.load(open(config_file, 'r'))
                 result['AUXILIARY_MAP'] = {}
+            else:
+                print 'Unable to find config file:', config_file
             #AUXILIARY_MAP = {"NAME TYPE.E55" : "Primary","EXTERNAL XREF TYPE.E55" : "Legacy System"}
             #The auxiliary_map was Tharindus strategy to map concepts to their labels. This is not being implemented yet
         except:
