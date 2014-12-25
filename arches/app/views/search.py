@@ -18,15 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import date
 from django.conf import settings
-from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.template.loader import render_to_string
 from django.core.paginator import Paginator
-from django.contrib.gis.geos import GEOSGeometry
-from django.db.models import Max, Min, Count
 from django.utils.importlib import import_module
-from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -38,45 +33,16 @@ def home_page(request):
     se = SearchEngineFactory().create()
 
     lang = request.GET.get('lang', 'en-us')
-    min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
     resource_count = se.search(index='resource', search_type='_count')['count']
-
-    date_types = Concept().get_e55_domain('BEGINNING_OF_EXISTENCE_TYPE.E55')+ Concept().get_e55_domain('END_OF_EXISTENCE_TYPE.E55')
-    data = {'domains' :{'date_types': date_types}}
-    data['domains']['date_operators'] = [{
-        "conceptid": "0",
-        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-        "id": "0",
-        "language,id": "en-us",
-        "value": "Before",
-        "valuetype": "prefLabel"
-    },{
-        "conceptid": "1",
-        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-        "id": "1",
-        "language,id": "en-us",
-        "value": "On",
-        "valuetype": "prefLabel"
-    },{
-        "conceptid": "2",
-        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-        "id": "2",
-        "language,id": "en-us",
-        "value": "After",
-        "valuetype": "prefLabel"
-    }]
 
     return render_to_response('search.htm', {
             'main_script': 'search',
             'active_page': 'Search',
-            'user_can_edit': False,
-            'min_date': min_max_dates['val__min'].year,
-            'max_date': min_max_dates['val__max'].year,
-            #'date_types': date_types,
-            'formdata': JSONSerializer().serialize(data),
-            'resource_count': resource_count
+            'resource_count': resource_count,
+            'user_can_edit': False
         }, 
         context_instance=RequestContext(request))
+
 
 def search_terms(request):
     se = SearchEngineFactory().create()
@@ -89,22 +55,20 @@ def search_terms(request):
     return JSONResponse(query.search(index='term', type='value'))
 
 def search_results(request, as_text=False):
-    results = search_resources(request)
+    dsl = build_query_dsl(request)
+    results = dsl.search(index='entity', type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
-def search_resources(request):
+def build_query_dsl(request):
     searchString = request.GET.get('q', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': ''})) 
-    f = request.GET.get('f', None)
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     year_min_max = JSONDeserializer().deserialize(request.GET.get('year_min_max', []))
 
-    groups = [group.name for group in request.user.groups.all()] 
-    
     se = SearchEngineFactory().create()
     if export != None:
         query = Query(se, start=settings.SEARCH_EXPORT_ITEMS_PER_PAGE*int(page-1), limit=settings.SEARCH_EXPORT_ITEMS_PER_PAGE)
@@ -169,9 +133,7 @@ def search_resources(request):
 
     print query
 
-    search_results = query.search(index='entity', type='') 
-
-    return search_results
+    return query
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
