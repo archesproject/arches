@@ -36,7 +36,7 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
                             results.push({
                                 inverted: false,
                                 type: this._source.options.conceptid ? 'concept' : 'term',
-                                context: this._source.options.context,
+                                context: this._source.context,
                                 id: this._source.term,
                                 text: this._source.term,
                                 value: this._source.options.conceptid ? this._source.options.conceptid : this._source.term

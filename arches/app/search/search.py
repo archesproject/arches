@@ -84,20 +84,7 @@ class SearchEngine(object):
 
         return self.conn.post(path, data=data)
 
-    def index_terms(self, entities):
-        """
-        If the term is already indexed, then simply increment the count and add the entity id of the term to the existing index.
-        If the term isn't indexed then add the index.
-
-        """
-
-        if not isinstance(entities, list):
-            entities = [entities]
-
-        for entity in entities:
-            self.index_term(entity.value, entity.entityid, entity.entitytypeid)
-
-    def index_term(self, term, id, options={}):
+    def index_term(self, term, id, context='', options={}):
         """
         If the term is already indexed, then simply increment the count and add the entity id of the term to the existing index.
         If the term isn't indexed then add the index.
@@ -111,7 +98,7 @@ class SearchEngine(object):
             
             try:
                 #_id = unicode(term, errors='ignore').decode('utf-8').encode('ascii')
-                _id = uuid.uuid3(uuid.NAMESPACE_DNS, str(hash(term)))
+                _id = uuid.uuid3(uuid.NAMESPACE_DNS, '%s%s' % (hash(term), hash(context)))
                 result = self.conn.get('term/value/%s' % (_id)) #{"_index":"term","_type":"value","_id":"CASTLE MILL","_version":2,"exists":true, "_source" : {"term": "CASTLE MILL"}}
 
                 #print 'result: %s' % result
@@ -122,7 +109,7 @@ class SearchEngine(object):
                 else:
                     ids = [id]
 
-                self.index_data('term', 'value', {'term': term, 'options': options, 'count': len(ids), 'ids': ids}, idfield=None, id=_id)
+                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options, 'count': len(ids), 'ids': ids}, idfield=None, id=_id)
 
             except Exception as detail:
                 print "\n\nException detail: %s " % (detail)

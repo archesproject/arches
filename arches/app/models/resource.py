@@ -385,7 +385,7 @@ class Resource(Entity):
         def gather_entities(entity):
             if entity.businesstablename == 'strings':
                 if len(entity.value.split(' ')) < 10:
-                    se.index_term(entity.value, entity.entityid, options={'context': entity.entitytypeid})
+                    se.index_term(entity.value, entity.entityid, context=entity.entitytypeid)
             elif entity.businesstablename == 'domains':
                 domain = archesmodels.Domains.objects.get(pk=entity.entityid)
                 if domain.val:
@@ -393,7 +393,7 @@ class Resource(Entity):
                     entity.conceptid = domain.val.conceptid_id
                     if concept:
                         scheme_pref_label = concept.get_context().get_preflabel().value
-                        se.index_term(concept.get_preflabel().value, entity.entityid, options={'context': scheme_pref_label, 'conceptid': domain.val.conceptid_id})
+                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': domain.val.conceptid_id})
             elif entity.businesstablename == 'geometries':
                 entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
                 geometries.append(entity.value)
