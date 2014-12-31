@@ -62,7 +62,7 @@ class Entity(object):
     def __repr__(self):
         return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, self.value)
 
-    def __hash__(self): return hash('%s%s%s' % (self.entityid, self.entitytypeid, self.value))
+    def __hash__(self): return hash('%s%s%s' % (self.entityid, self.entitytypeid, hash(self.value)))
     def __eq__(self, x): return hash(self) == hash(x)
     def __ne__(self, x): return hash(self) != hash(x)
 
