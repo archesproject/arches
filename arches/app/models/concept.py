@@ -532,7 +532,7 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
-        if self.nodetype == 'Concept':
+        if self.nodetype == 'Concept' or self.nodetype == 'Collection':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             
             def get_scheme_id(concept):

@@ -35,6 +35,7 @@ import os
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 # from django.contrib.auth.models import User
 
@@ -514,7 +515,7 @@ class Domains(models.Model):
                     # print value, 'attr value'
                     concepts = Concepts.objects.filter(legacyoid = value)
                     if len(concepts) == 1:
-                        value = Values.objects.get(conceptid = concepts[0], valuetype = 'prefLabel')
+                        value = Values.objects.get(Q(conceptid = concepts[0], valuetype = 'prefLabel') | Q(conceptid = concepts[0], valuetype = 'collector'))
                     else:
                         # print 'unable to find, or found more then 1 Concept with legacyoid: %s' % (value)
                         value = None
