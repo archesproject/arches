@@ -20,9 +20,9 @@ from django.conf import settings
 from arches.app.models.resource import Resource
 
 def livereload(request):
-	return {
-		'livereload_port': settings.LIVERELOAD_PORT
-	}
+    return {
+        'livereload_port': settings.LIVERELOAD_PORT
+    }
 
 def map_info(request):
     return {
@@ -36,7 +36,7 @@ def map_info(request):
     }
 
 def resource_types(request):
-    sorted_x = sorted(settings.RESOURCE_TYPE_CONFIGS.items(), key=lambda v: v[1]['sort_order'])
+    sorted_resource_types = sorted(settings.RESOURCE_TYPE_CONFIGS.items(), key=lambda v: v[1]['sort_order'])
     return {
-        'resource_types': sorted_x
+        'resource_types': sorted_resource_types
     }
