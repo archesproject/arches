@@ -3,8 +3,9 @@ define([
     'openlayers',
     'underscore',
     'arches',
-    'layer-info'
-], function($, ol, _, arches, layerInfo) {
+    'layer-info',
+    'map/layer-model'
+], function($, ol, _, arches, layerInfo, LayerModel) {
     var layers = [];
     var hexToRgb = function (hex) {
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -116,10 +117,11 @@ define([
         ]
       });
 
-      var layerModel = _.extend({
-        layer: layerGroup,
-        onMap: true
-      }, layerInfo[entitytypeid]);
+      var layerModel = new LayerModel(_.extend({
+          layer: layerGroup,
+          onMap: true
+        }, layerInfo[entitytypeid])
+      );
 
       layers.push(layerModel);
     });
