@@ -117,7 +117,7 @@ RESOURCE_TYPE_CONFIGS = {
     # },
 }
 
-GEOCODING_PROVIDER = 'arches.app.utils.mock_geocoder'
+GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
