@@ -21,9 +21,11 @@ from django.shortcuts import render_to_response
 from django.conf import settings
 
 def get_page(request):
+    resource_id = request.GET.get('resourceid', '')
     return render_to_response('map.htm', {
             'main_script': 'map',
             'active_page': 'Map',
+            'resource_id': resource_id
         },
         context_instance=RequestContext(request))
 

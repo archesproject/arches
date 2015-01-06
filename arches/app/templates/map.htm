@@ -391,4 +391,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock %}
 {% block pre_require_js %}
     {% include 'map/layer-info.htm' %}
+    <script>
+        define('selected-resource-id', [], function () {
+            return '{{resource_id}}';
+        });
+    </script>
 {% endblock pre_require_js %}

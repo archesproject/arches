@@ -2,10 +2,12 @@ define([
     'jquery',
     'openlayers',
     'underscore',
+    'knockout',
     'arches',
     'layer-info',
     'map/layer-model'
-], function($, ol, _, arches, layerInfo, LayerModel) {
+], function($, ol, _, ko, arches, layerInfo, LayerModel) {
+    var resourceFeatures = ko.observableArray();
     var layers = [];
     var hexToRgb = function (hex) {
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -52,6 +54,7 @@ define([
         var feature = e.feature.clone();
         var extent = feature.getGeometry().getExtent();
         var center = ol.extent.getCenter(extent);
+        resourceFeatures.push(e.feature);
         feature.set('originalExtent', extent);
         feature.setGeometry(new ol.geom.Point(center));
         pointSource.addFeature(feature);
@@ -126,5 +129,8 @@ define([
       layers.push(layerModel);
     });
 
-    return layers;
+    return {
+      layers: layers,
+      features: resourceFeatures
+    };
 });

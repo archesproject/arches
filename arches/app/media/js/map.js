@@ -8,10 +8,12 @@ require([
     'layer-info',
     'views/map',
     'map/layers',
+    'map/resource-layers',
+    'selected-resource-id',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers) {
+], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers, resourceLayers, selectedResourceId) {
     var geoJSON = new ol.format.GeoJSON();
     var PageView = Backbone.View.extend({
         el: $('body'),
@@ -55,7 +57,19 @@ require([
                 selectedAddress: ko.observable('')
             };
             self.map = map;
+            selectFeatureIfDefault = function (feature) {
+                if (feature.getId() === selectedResourceId) {
+                    map.map.getView().fitExtent(feature.getGeometry().getExtent(), map.map.getSize());
+                    map.select.getFeatures().clear();
+                    map.select.getFeatures().push(feature);
+                }
+            };
+            _.each(resourceLayers.features(), selectFeatureIfDefault);
 
+            resourceLayers.features.subscribe(function (features) {
+                var feature = features[features.length-1];
+                selectFeatureIfDefault(features[features.length-1]);
+            });
 
             self.viewModel.filterTerms.subscribe(function () {
                 var terms = self.viewModel.filterTerms()
