@@ -365,7 +365,8 @@
                         search_terms: "{% url 'search_terms' %}",
                         search_results: "{% url 'search_results' %}",
                         map_layers: "{% url 'map_layers' '' %}",
-                        reports: "{% url 'report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '')
+                        reports: "{% url 'report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                        buffer: "{% url 'buffer'%}",
                     },
                     mapDefaults: {
                         x: {{ map_info.x }},

@@ -22,6 +22,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.paginator import Paginator
 from django.utils.importlib import import_module
+from django.contrib.gis.geos import GEOSGeometry
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -64,7 +65,7 @@ def search_results(request, as_text=False):
 
 def build_query_dsl(request):
     searchString = request.GET.get('q', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'type': ''})) 
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     year_min_max = JSONDeserializer().deserialize(request.GET.get('year_min_max', []))
@@ -103,14 +104,17 @@ def build_query_dsl(request):
                 nested = Nested(path='domains', query=terms)
                 boolfilter.must_not(nested)
 
-    if spatial_filter['type'] != '':
-        if spatial_filter['type'] == 'bbox':
-            coordinates = [[spatial_filter['coordinates'][0],spatial_filter['coordinates'][3]], [spatial_filter['coordinates'][2],spatial_filter['coordinates'][1]]]
+    if spatial_filter['geometry']['type'] != '':
+        geojson = spatial_filter['geometry']
+        if geojson['type'] == 'bbox':
+            coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
             geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
             nested = Nested(path='geometries', query=geoshape)
             boolquery.must(nested)
         else:
-            geoshape = GeoShape(field='geometries.value', type=spatial_filter['type'], coordinates=spatial_filter['coordinates'] )
+            buffer = spatial_filter['buffer']
+            geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
+            geoshape = GeoShape(field='geometries.value', type=geojson['type'], coordinates=geojson['coordinates'] )
             nested = Nested(path='geometries', query=geoshape)
             boolquery.must(nested)
 
@@ -134,6 +138,31 @@ def build_query_dsl(request):
     print query
 
     return query
+
+def buffer(request):
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
+    return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
+
+def _buffer(geojson, width=0, unit='ft'):
+    geojson = JSONSerializer().serialize(geojson)
+    
+    try:
+        width = float(width)
+    except:
+        width = 0
+
+    if width > 0:
+        geom = GEOSGeometry(geojson, srid=4326)
+        geom.transform(3857)
+
+        if unit == 'ft':
+            width = width/3.28084
+
+        buffered_geom = geom.buffer(width)
+        buffered_geom.transform(4326)
+        return buffered_geom
+    else:
+        return GEOSGeometry(geojson)
 
 def _get_child_concepts(conceptid):
     ret = set([conceptid])
