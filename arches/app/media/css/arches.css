@@ -1021,3 +1021,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .ol-popup-closer:after {
     content: "✖";
 }
+
+
+.arches-related-resource-panel {
+    margin-right: 10px; 
+    background: #fefefe; 
+    border: 1px solid rgba(0,0,0,.1); 
+    height: 400px; 
+    padding-top: 0px; 
+    padding-bottom: 0px;
+}
