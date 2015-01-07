@@ -62,15 +62,7 @@ SEARCH_CONNECTION = {
 
 SEARCH_ITEMS_PER_PAGE = 5
 
-SEARCHABLE_ENTITY_TYPES = (
-    # override this setting in your packages settings.py file
-    # entity types that are used to index terms for simple search
-)
-
-ADV_SEARCHABLE_ENTITY_TYPES = (
-    # override this setting in your packages settings.py file
-    # entity types to index for advanced search
-)
+WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
 DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
 
