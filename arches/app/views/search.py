@@ -141,7 +141,11 @@ def build_query_dsl(request):
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
-    return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
+
+    if spatial_filter['geometry']['coordinates'] != '' and spatial_filter['geometry']['type'] != '':
+        return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
+
+    return JSONResponse()
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
