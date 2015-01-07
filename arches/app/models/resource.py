@@ -268,7 +268,6 @@ class Resource(Entity):
                         ret.append(relationship)
         return ret   
 
-
     def get_alternate_names(self):
         """
         Gets the human readable name to display for entity instances
@@ -276,13 +275,6 @@ class Resource(Entity):
         """
 
         pass
-
-    def get_feature_data(self):
-        """
-        Gets a dictionary of data available when displaying resource as a map feature
-
-        """
-        return {}
 
     def index(self):
         """
@@ -292,10 +284,153 @@ class Resource(Entity):
 
         se = SearchEngineFactory().create()
 
+        report_documents = self.prepare_documents_for_report_index()
+        for document in report_documents:
+            se.index_data('resource', self.entitytypeid, document, id=self.entityid)
+
+        search_documents = self.prepare_documents_for_search_index()
+        for document in search_documents:
+            se.index_data('entity', self.entitytypeid, document, id=self.entityid)
+
+            geojson_documents = self.prepare_documents_for_map_index(geom_entities=document['geometries'])
+            for geojson in geojson_documents:
+                se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
+
+        self.index_terms()
+
+    def prepare_documents_for_search_index(self):
+        """
+        Generates a list of specialized resource based documents to support resource search
+
+        """
+
+        document = Entity()
+        document.property = self.property
+        document.entitytypeid = self.entitytypeid
+        document.entityid = self.entityid
+        document.value = self.value
+        document.label = self.label
+        document.businesstablename = self.businesstablename
+        document.primaryname = self.get_primary_name()
+        document.child_entities = []
+        document.dates = []
+        document.domains = []
+        document.geometries = []
+
+        for entity in self.flatten():
+            if entity.entityid != self.entityid:
+                if entity.businesstablename == 'domains':
+                    document.domains.append(entity)
+                elif entity.businesstablename == 'dates':
+                    document.dates.append(entity)
+                elif entity.businesstablename == 'geometries':
+                    entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
+                    document.geometries.append(entity)
+                else:
+                    document.child_entities.append(entity)
+
+        return [JSONSerializer().serializeToPython(document)]
+
+    def prepare_documents_for_map_index(self, geom_entities=[]):
+        """
+        Generates a list of geojson documents to support the display of resources on a map
+
+        """
+
+        document = []
+        if len(geom_entities) > 0:
+            geo_json_features = [geom_entity['value'] for geom_entity in geom_entities]
+             
+            document = [{
+                'type': 'Feature',
+                'id': self.entityid,
+                'geometry':  { 
+                    'type': 'GeometryCollection',
+                    'geometries': geo_json_features
+                },
+                'properties': {
+                    'entitytypeid': self.entitytypeid,
+                    'primaryname': self.get_primary_name(),
+                }
+            }]
+
+        return document
+
+    def index_terms(self):
+        """
+        Indexes any string less then 10 words long and any concept associated with a resource to support term search  
+
+        """
+
+        se = SearchEngineFactory().create()
+
+        def gather_entities(entity):
+            if entity.businesstablename == '':
+                pass
+            elif entity.businesstablename == 'strings':
+                if settings.WORDS_PER_SEARCH_TERM == None or (len(entity.value.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
+                    se.index_term(entity.value, entity.entityid, context=entity.entitytypeid)
+            elif entity.businesstablename == 'domains':
+                domain = archesmodels.Domains.objects.get(pk=entity.entityid)
+                if domain.val:
+                    concept = Concept(domain.val.conceptid).get(include=['label'])
+                    entity.conceptid = domain.val.conceptid_id
+                    if concept:
+                        scheme_pref_label = concept.get_context().get_preflabel().value
+                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': domain.val.conceptid_id})
+            elif entity.businesstablename == 'geometries':
+                pass
+            elif entity.businesstablename == 'dates':
+                pass
+            elif entity.businesstablename == 'numbers':
+                pass
+            elif entity.businesstablename == 'files':
+                pass
+
+        self.traverse(gather_entities)
+
+    def prepare_documents_for_report_index(self):
+        """
+        Generates a list of specialized resource based documents to support resource reports
+
+        """
+
+        return [self.dictify()]
+
+    def delete_index(self):
+        """
+        removes an entity from the search index
+
+        """
+
+        if self.get_rank() == 0:
+            se = SearchEngineFactory().create()
+            def delete_indexes(entity):
+                if entity.get_rank() == 0:
+                    se.delete(index='entity', type=entity.entitytypeid, id=entity.entityid)
+
+                if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
+                    se.delete(index='maplayers', type=self.entitytypeid, id=entity.entityid)
+
+                if entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
+                    se.delete_terms(entity)
+
+            entity = Entity().get(self.entityid)
+            entity.traverse(delete_indexes)
+
+    @staticmethod
+    def prepare_search_mappings(resource_type_id):
+        """
+        Creates Elasticsearch document mappings
+
+        """
+
+        se = SearchEngineFactory().create()
+
         se.create_mapping('term', 'value', 'ids', 'string', 'not_analyzed')
         
         mapping =  { 
-            self.entitytypeid : {
+            resource_type_id : {
                 'properties' : {
                     'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
                     'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -378,93 +513,7 @@ class Resource(Entity):
             }
         }
 
-        se.create_mapping('entity', self.entitytypeid, mapping=mapping)
-
-        geometries = []
-
-        def gather_entities(entity):
-            if entity.businesstablename == 'strings':
-                if len(entity.value.split(' ')) < 10:
-                    se.index_term(entity.value, entity.entityid, context=entity.entitytypeid)
-            elif entity.businesstablename == 'domains':
-                domain = archesmodels.Domains.objects.get(pk=entity.entityid)
-                if domain.val:
-                    concept = Concept(domain.val.conceptid).get(include=['label'])
-                    entity.conceptid = domain.val.conceptid_id
-                    if concept:
-                        scheme_pref_label = concept.get_context().get_preflabel().value
-                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': domain.val.conceptid_id})
-            elif entity.businesstablename == 'geometries':
-                entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
-                geometries.append(entity.value)
-            elif entity.businesstablename == 'dates':
-                pass
-            elif entity.businesstablename == 'numbers':
-                pass
-            elif entity.businesstablename == 'files':
-                pass
-            return entity.businesstablename
-        
-        root_entity = self.copy()
-        root_entity.primaryname = self.get_primary_name()
-        root_entity.child_entities = []
-        root_entity.dates = []
-        root_entity.domains = []
-        root_entity.geometries = []
-        del root_entity.form_groups
-
-        for entity in self.flatten():
-            businesstablename = gather_entities(entity)
-            if entity.entityid != self.entityid:
-                if businesstablename == 'domains':
-                    root_entity.domains.append(entity)
-                elif businesstablename == 'dates':
-                    root_entity.dates.append(entity)
-                elif businesstablename == 'geometries':
-                    root_entity.geometries.append(entity)
-                else:
-                    root_entity.child_entities.append(entity)
-
-
-        if len(geometries) > 0:
-            properties = {
-                'entitytypeid': self.entitytypeid,
-                'primaryname': self.get_primary_name(),
-            }
-            properties = dict(properties.items() + self.get_feature_data().items())
-            geojson = {
-                'type': 'Feature',
-                'id': self.entityid,
-                'geometry':  { 
-                    'type': 'GeometryCollection',
-                    'geometries': geometries
-                },
-                'properties': properties
-            }
-            se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
-        se.index_data('resource', self.entitytypeid, self.dictify(), id=self.entityid)
-        se.index_data('entity', root_entity.entitytypeid, JSONSerializer().serializeToPython(root_entity), id=root_entity.entityid)
-
-    def delete_index(self):
-        """
-        removes an entity from the search index
-
-        """
-
-        if self.get_rank() == 0:
-            se = SearchEngineFactory().create()
-            def delete_indexes(entity):
-                if entity.get_rank() == 0:
-                    se.delete(index='entity', type=entity.entitytypeid, id=entity.entityid)
-
-                if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                    se.delete(index='maplayers', type=self.entitytypeid, id=entity.entityid)
-
-                if entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
-                    se.delete_terms(entity)
-
-            entity = Entity().get(self.entityid)
-            entity.traverse(delete_indexes)
+        se.create_mapping('entity', resource_type_id, mapping=mapping)
 
     @staticmethod
     def get_report(resourceid):
