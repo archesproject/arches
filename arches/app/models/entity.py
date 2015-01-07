@@ -643,7 +643,7 @@ class Entity(object):
         return Model
 
 
-    def dictify(self):
+    def dictify(self, keys=['label']):
         """
         Takes an entity and turns it into recursive lists nested objects
         Uses an in-built algorithm to derive which sub-branches appear to be grouped, and then flattens them out
@@ -698,7 +698,7 @@ class Entity(object):
         data = {}
         for child_entity in self.child_entities:
             if child_entity.businesstablename != '':
-                data[child_entity.undotify()] = self.get_nodes(child_entity.entitytypeid)
+                data[child_entity.undotify()] = self.get_nodes(child_entity.entitytypeid, keys=keys)
             else:
                 collectsdata = False
                 for grand_child in child_entity.child_entities:
@@ -706,12 +706,12 @@ class Entity(object):
                         collectsdata = True
                         break
                 if collectsdata:
-                    data[child_entity.undotify()] = self.get_group_nodes(child_entity.entitytypeid)
+                    data[child_entity.undotify()] = self.get_group_nodes(child_entity.entitytypeid, keys=keys)
                 else:
                     data[child_entity.undotify()] = child_entity.dictify()
         return [data]
 
-    def get_group_nodes(self, entitytypeid):
+    def get_group_nodes(self, entitytypeid, keys=[]):
         """
         Used by dictify to gather and flatten groups of nodes
 
@@ -723,11 +723,11 @@ class Entity(object):
             data = {}
 
             for child_entity in entity.child_entities:
-                data[child_entity.undotify_entitytypeid()] = self.get_nodes(child_entity.entitytypeid)
+                data[child_entity.undotify_entitytypeid()] = self.get_nodes(child_entity.entitytypeid, keys=keys)
             ret.append(data)
         return ret
 
-    def get_nodes(self, entitytypeid):
+    def get_nodes(self, entitytypeid, keys=[]):
         """
         Used by dictify to gather and flatten a single node (by entitytypeid) and all it's children
 
@@ -748,11 +748,11 @@ class Entity(object):
             data = {}
 
             for entity in entity.flatten():
-                data = dict(data.items() + entity.encode().items())
+                data = dict(data.items() + entity.encode(keys=keys).items())
             ret.append(data)
         return ret
 
-    def encode(self):
+    def encode(self, keys=[]):
         """
         Encodes an Entity into a dictionary of keys derived by the entitytypeid of the Entity concatonated wtih property name 
 
@@ -766,9 +766,7 @@ class Entity(object):
 
         ret = {}
         for key, value in self.__dict__.items():
-            #if (not key.startswith("__")) and key != 'property' and key != 'child_entities' :
-            #if key == 'entityid' or key == 'value' or key == 'label' or key == 'businesstablename':
-            if key == 'label':
+            if key in keys:
                 ret['%s__%s' % (self.undotify(), key)] = value
         return ret
 
