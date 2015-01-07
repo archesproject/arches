@@ -889,13 +889,21 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .search-block {
     border-bottom: 1px solid #eee;
     background: #fafafa;
-    padding-bottom: 9px;
+    padding-bottom: 15px;
     padding-top: 30px;
 }
 
 .arches-thumbnail {
     float: left;
     width: 50%;
+}
+
+.arches-search-link {
+    color: #999;
+}
+
+.arches-search-subtitle {
+    color: #888;
 }
 
 
