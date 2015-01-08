@@ -1,11 +1,26 @@
-define(['jquery', 'backbone', 'd3'], function($, Backbone) {
+define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
     return Backbone.View.extend({
+        resourceId: null,
 
-        initialize: function() {
+        initialize: function(options) {
+            var self = this,
+                data;
+
+            _.extend(this, _.pick(options, 'resourceId'));
+
+            if (self.resourceId) {
+                self.$el.addClass('loading');
+                self.getResourceData(self.resourceId, function (data) {
+                    self.$el.removeClass('loading');
+                    self.render(data);
+                });
+            }
+        },
+        render: function (data) {
             var self = this;
 
             //Define basic SVG Container variables
-            var panelWidth = $(".arches-search-item-description").width() - 50;
+            var panelWidth = this.$el.parent().width();
 
             var width = panelWidth,  //800,
                 height = 400,
@@ -59,30 +74,9 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
                 links = force.links();
             
             //Load initial nodes/links
-            nodes = [ 
-                { id: "0", conceptName: "Castle Wolfenstein", conceptType: "Current" },
-                { id: "1", conceptName: "Castle Anthrax", conceptType: "Ancestor" },
-                { id: "2", conceptName: "Nunnery of Carol", conceptType: "Ancestor" },
-                { id: "3", conceptName: "King Arthur", conceptType: "Ancestor" },
-                { id: "4", conceptName: "Wolfenstein Aerial Image", conceptType: "Ancestor" },
-                { id: "5", conceptName: "Earl of Crankcase", conceptType: "Ancestor" },
-                { id: "6", conceptName: "Wolfenstein Investigation", conceptType: "Ancestor" },
-                { id: "7", conceptName: "Bank of Kent", conceptType: "Ancestor" },
-                { id: "8", conceptName: "Fencing Grounds", conceptType: "Ancestor" },
-                { id: "9", conceptName: "Stables", conceptType: "Ancestor" },
-            ];
+            nodes = data.nodes;
 
-            links = [   
-                {"source":0, "target":1, "relationship": "Was at the location of"},
-                {"source":0, "target":2, "relationship": "Is contained by"},
-                {"source":0, "target":3, "relationship": "Was owned by"},
-                {"source":0, "target":4, "relationship": "Describes"},
-                {"source":0, "target":5, "relationship": "Architected"},
-                {"source":0, "target":6, "relationship": "Describes"},
-                {"source":5, "target":7, "relationship": "Founded"},
-                {"source":1, "target":8, "relationship": "Contained"},
-                {"source":1, "target":9, "relationship": "Contained"},
-            ];
+            links = data.links;
 
 
             //pin first node to center of svg
@@ -276,6 +270,109 @@ define(['jquery', 'backbone', 'd3'], function($, Backbone) {
 
 
             self.$el.addClass('view-created');
+        },
+        getResourceData: function (resourceId, callback) {
+            $.ajax({
+                url: '../resources/get/' + resourceId,
+                success: function(response) {
+
+                    var links = [],
+                        nodes = [{
+                            id: 0,
+                            entityid: response['_source'].entityid,
+                            conceptName: response['_source'].primaryname,
+                            conceptType: 'Current'
+                        }],
+                        nodeIdMap = {},
+                        nodeId = 1;
+
+                    nodeIdMap[response['_source'].entityid] = 0
+                    _.each(response['_source'].related_resources, function (related_resources) {
+                        nodes.push({
+                            id: nodeId,
+                            entityid: related_resources.entityid,
+                            conceptName: related_resources.primaryname,
+                            conceptType: 'Ancestor'
+                        });
+                        nodeIdMap[related_resources.entityid] = nodeId
+                        nodeId += 1;
+                    });
+
+                    _.each(response['_source'].resource_relationships, function (resource_relationships) {
+                        links.push({
+                            source: nodeIdMap[resource_relationships.entityid1],
+                            target: nodeIdMap[resource_relationships.entityid2],
+                            relationship: resource_relationships.relationshiptype
+                        })
+                    });
+
+                    callback({
+                        nodes: nodes,
+                        links: links
+                    });
+                }
+            });
         }
     });
 });
+
+
+    // "resource_relationships": [
+    //   {
+    //     "notes": "",
+    //     "entityid2": "dea3ed16-13a2-438f-bf9c-9cd465ea3046",
+    //     "entityid1": "6ea3e924-ecd4-432d-9c05-c93dab578899",
+    //     "datestarted": null,
+    //     "resourcexid": 2,
+    //     "dateended": null,
+    //     "relationshiptype": "ea1d6f73-24a5-4a7a-9491-347ed8a10d2f"
+    //   },
+    //   {
+    //     "notes": "",
+    //     "entityid2": "18688c0e-4950-4e67-a7b2-375d45b5822e",
+    //     "entityid1": "6ea3e924-ecd4-432d-9c05-c93dab578899",
+    //     "datestarted": null,
+    //     "resourcexid": 3,
+    //     "dateended": null,
+    //     "relationshiptype": "17298183-5c74-4000-904c-bee6a95faaf8"
+    //   },
+    //   {
+    //     "notes": "",
+    //     "entityid2": "6ea3e924-ecd4-432d-9c05-c93dab578899",
+    //     "entityid1": "a5de75a9-04c0-47a3-b929-3f74b387ff58",
+    //     "datestarted": null,
+    //     "resourcexid": 8,
+    //     "dateended": null,
+    //     "relationshiptype": "a100f1b1-59e7-4495-bc09-9aab31f81ae4"
+    //   }
+    // ],
+
+    // "related_resources": [
+    //   {
+    //     "label": "",
+    //     "primaryname": "Historic Resources Group",
+    //     "value": "",
+    //     "entitytypeid": "ACTOR.E39",
+    //     "entityid": "dea3ed16-13a2-438f-bf9c-9cd465ea3046",
+    //     "property": "",
+    //     "businesstablename": ""
+    //   },
+    //   {
+    //     "label": "",
+    //     "primaryname": "SurveyLA: Sherman Oaks-Studio City-Toluca Lake-Cahuenga Pass Historic Resources Survey Report",
+    //     "value": "",
+    //     "entitytypeid": "INFORMATION_RESOURCE.E73",
+    //     "entityid": "18688c0e-4950-4e67-a7b2-375d45b5822e",
+    //     "property": "",
+    //     "businesstablename": ""
+    //   },
+    //   {
+    //     "label": "",
+    //     "primaryname": "3264 N WRIGHTWOOD DR",
+    //     "value": "",
+    //     "entitytypeid": "HERITAGE_RESOURCE.E18",
+    //     "entityid": "a5de75a9-04c0-47a3-b929-3f74b387ff58",
+    //     "property": "",
+    //     "businesstablename": ""
+    //   }
+    // ],

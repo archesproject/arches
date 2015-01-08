@@ -23,6 +23,7 @@ class ResourceLoader(object):
     def __init__(self):
         self.user = User()
         self.user.first_name = settings.ETL_USERNAME
+        self.resources = []
 
     option_list = BaseCommand.option_list + (
         make_option('--source',
@@ -62,6 +63,9 @@ class ResourceLoader(object):
         else:
             print 'No relationship file'
 
+        for resource in self.resources:
+            resource.index()
+
     def resource_list_to_entities(self, resource_list):
         '''Takes a collection of imported resource records and saves them as arches entities'''
 
@@ -69,7 +73,7 @@ class ResourceLoader(object):
         d = datetime.datetime.now()
         load_id = 'LOADID:{0}-{1}-{2}-{3}-{4}-{5}'.format(d.year, d.month, d.day, d.hour, d.minute, d.microsecond) #Should we append the timestamp to the exported filename?
 
-        ret = {'successfully_saved':0, 'successfully_indexed':0, 'failed_to_save':[], 'failed_to_index':[]}
+        ret = {'successfully_saved':0, 'failed_to_save':[]}
         schema = None
         current_entitiy_type = None
         legacyid_to_entityid = {}
@@ -93,8 +97,7 @@ class ResourceLoader(object):
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             
             ret['successfully_saved'] += 1
-            master_graph.index()
-            ret['successfully_indexed'] += 1
+            self.resources.append(master_graph)
 
         ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)

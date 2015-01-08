@@ -1039,3 +1039,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     padding-top: 0px; 
     padding-bottom: 0px;
 }
+
+.arches-related-resource-panel.loading {
+    background-image: url("../img/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}

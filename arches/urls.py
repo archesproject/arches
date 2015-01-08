@@ -49,8 +49,10 @@ urlpatterns = patterns('',
     url(r'^search/resources$', 'arches.app.views.search.search_results', name="search_results"),
     url(r'^buffer/$', 'arches.app.views.search.buffer', name="buffer"),
     url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.resource_manager', name="resource_manager"),
+    url(r'^resources/get/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.get', name="get_resource"),
     url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.edit_history', name="edit_history"),
     url(r'^resources/layers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', name="map_layers"),
+    url(r'^resources/markers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', {'get_centroids':True}, name="map_markers"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

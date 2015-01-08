@@ -74,6 +74,12 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         context_instance=RequestContext(request))        
 
 
+def get(request, resourceid):
+    se = SearchEngineFactory().create()
+    result = se.search(index='resource', id=resourceid, type="_all")
+    return JSONResponse(result)
+
+
 def report(request, resourceid):
     report_info = Resource().get_report(resourceid)
 
@@ -154,7 +160,7 @@ def report(request, resourceid):
         },
         context_instance=RequestContext(request))        
 
-def map_layers(request, entitytypeid):
+def map_layers(request, entitytypeid, get_centroids=False):
     data = []
     bbox = request.GET.get('bbox', '')
     limit = request.GET.get('limit', 10000)
@@ -169,6 +175,11 @@ def map_layers(request, entitytypeid):
     }
 
     for item in data['hits']['hits']:
+        if get_centroids:
+            item['_source']['geometry'] = item['_source']['properties']['centroid']
+        else:
+            item['_source']['properties'].pop('extent', None)
+        item['_source']['properties'].pop('centroid', None)
         geojson_collection['features'].append(item['_source'])
 
     return JSONResponse(geojson_collection)

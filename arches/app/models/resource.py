@@ -27,6 +27,8 @@ from arches.app.models.concept import Concept
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.forms.models import model_to_dict
+from django.contrib.gis.geos import GEOSGeometry
 
 class Resource(Entity):
     """ 
@@ -262,7 +264,7 @@ class Resource(Entity):
                 entity_obj = archesmodels.Entities.objects.get(pk = related_resource_id)
                 if (entitytypeid == None or entity_obj.entitytypeid_id == entitytypeid) and (relationship_type_id == None or relationship_type_id == relationship.relationshiptype):
                     if return_entities == True:
-                        related_entity = Entity().get(related_resource_id)
+                        related_entity = Resource().get(related_resource_id)
                         ret.append(related_entity)
                     else:
                         ret.append(relationship)
@@ -339,18 +341,21 @@ class Resource(Entity):
 
         document = []
         if len(geom_entities) > 0:
-            geo_json_features = [geom_entity['value'] for geom_entity in geom_entities]
+            geojson_geom = {
+                'type': 'GeometryCollection',
+                'geometries': [geom_entity['value'] for geom_entity in geom_entities]
+            }
+            geom = GEOSGeometry(JSONSerializer().serialize(geojson_geom), srid=4326)
              
             document = [{
                 'type': 'Feature',
                 'id': self.entityid,
-                'geometry':  { 
-                    'type': 'GeometryCollection',
-                    'geometries': geo_json_features
-                },
+                'geometry':  geojson_geom,
                 'properties': {
                     'entitytypeid': self.entitytypeid,
                     'primaryname': self.get_primary_name(),
+                    'centroid': JSONDeserializer().deserialize(geom.centroid.json),
+                    'extent': geom.extent
                 }
             }]
 
@@ -394,8 +399,24 @@ class Resource(Entity):
         Generates a list of specialized resource based documents to support resource reports
 
         """
+        entity = Entity()
+        entity.property = self.property
+        entity.entitytypeid = self.entitytypeid
+        entity.entityid = self.entityid
+        entity.primaryname = self.get_primary_name()
+        
+        entity_dict = JSONSerializer().serializeToPython(entity)
+        entity_dict['related_resources'] = []
+        for resource in self.get_related_resources():
+            resource.primaryname = resource.get_primary_name()
+            entity_dict['related_resources'].append(JSONSerializer().serializeToPython(resource))
+        entity_dict['resource_relationships'] = []
+        for relationship in self.get_related_resources(return_entities=False):
+            relationship_dict = model_to_dict(relationship)
+            entity_dict['resource_relationships'].append(relationship_dict)
+        entity_dict['graph'] = self.dictify()
 
-        return [self.dictify()]
+        return [entity_dict]
 
     def delete_index(self):
         """

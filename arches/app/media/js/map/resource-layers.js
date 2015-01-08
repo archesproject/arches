@@ -41,25 +41,15 @@ define([
         })
       });
 
-      var pointSource = new ol.source.Vector({
-        features: []
+      var pointSource = new ol.source.GeoJSON({
+        projection: 'EPSG:3857',
+        url: arches.urls.map_markers + entitytypeid + '/'
       });
 
       var source = new ol.source.GeoJSON({
         projection: 'EPSG:3857',
         url: arches.urls.map_layers + entitytypeid + '/'
       });
-
-      source.on('addfeature', function (e) {
-        var feature = e.feature.clone();
-        var extent = feature.getGeometry().getExtent();
-        var center = ol.extent.getCenter(extent);
-        resourceFeatures.push(e.feature);
-        feature.set('originalExtent', extent);
-        feature.setGeometry(new ol.geom.Point(center));
-        pointSource.addFeature(feature);
-      });
-
 
       var vectorLayer = new ol.layer.Vector({
         maxResolution: arches.mapDefaults.cluster_min,

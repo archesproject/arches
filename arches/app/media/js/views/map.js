@@ -117,7 +117,11 @@ define([
                     if (isClustered) {
                         var extent = feature.getGeometry().getExtent();
                         _.each(feature.get("features"), function (feature) {
-                            extent = ol.extent.extend(extent, feature.get('originalExtent'));
+                            featureExtent = feature.getGeometry().getExtent()
+                            if (_.contains(feature.getKeys(), 'extent')) {
+                                featureExtent = ol.extent.applyTransform(feature.get('extent'), ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
+                            }
+                            extent = ol.extent.extend(extent, featureExtent);
                         });
                         self.map.getView().fitExtent(extent, (self.map.getSize()));
                         self.select.getFeatures().clear();
