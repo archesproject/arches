@@ -200,7 +200,7 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                         nodes.push({ id: "10", conceptName: "St Albans Church", conceptType: "Ancestor" });
                     
                         //Re-render graph with new nodes/links
-                        update();
+                        // update();
 
                     })
 
