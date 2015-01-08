@@ -19,8 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Dsl(object):
-    def __init__(self, dsl={}):
-        self.dsl = dsl
+    def __init__(self, dsl=None):
+        if dsl is None: 
+            self.dsl = {}
+        else:
+            self.dsl = dsl
 
     def __str__(self):
         return JSONSerializer().serialize(self.dsl, indent=4) 
@@ -34,7 +37,7 @@ class Dsl(object):
         try:
             self._dsl = value.dsl
         except AttributeError:
-            self._dsl = value      
+            self._dsl = value  
 
 class Query(Dsl):
     """
@@ -54,26 +57,31 @@ class Query(Dsl):
             }
         }
 
-    def add_filter(self, dsl={}):
-        self._filtered = True
-        dsl = Dsl(dsl).dsl
+    def add_filter(self, dsl=None):
+        if dsl is not None:
+            self._filtered = True
+            dsl = Dsl(dsl).dsl
 
-        self.dsl = {
-            'query':{
-                'filtered':{
-                    'query': self.dsl['query'],
-                    'filter': dsl
+            self.dsl = {
+                'query':{
+                    'filtered':{
+                        'query': self.dsl['query'],
+                        'filter': dsl
+                    }
                 }
             }
-        }
 
-    def add_query(self, dsl={}):
-        dsl = Dsl(dsl).dsl
+    def add_query(self, dsl=None):
+        if dsl is not None:
+            dsl = Dsl(dsl).dsl
 
-        if self._filtered:
-            self.dsl['query']['filtered']['query'] = dsl
-        else:
-            self.dsl['query'] = dsl
+            if self._filtered:
+                self.dsl['query']['filtered']['query'] = dsl
+            else:
+                if 'bool' in dsl and 'bool' in self.dsl['query']:
+                    self.dsl['query']['bool']['must'] = self.dsl['query']['bool']['must'] + dsl['bool']['must']
+                else:
+                    self.dsl['query'] = dsl
 
     def search(self, index='', type=''):
         self.dsl['from'] = self.start
@@ -90,14 +98,18 @@ class Bool(Dsl):
     
     """
     
-    def __init__(self, **kwargs):  
-        self.dsl = {
-            'bool':{
-                'should':[],
-                'must':[],
-                'must_not':[]
+    def __init__(self, dsl=None, **kwargs):  
+        if dsl is None: 
+            self.dsl = {
+                'bool':{
+                    'should':[],
+                    'must':[],
+                    'must_not':[]
+                }
             }
-        }
+        else:
+            self.dsl = dsl
+
         self.should(kwargs.pop('should', None))
         self.must(kwargs.pop('must', None))
         self.must_not(kwargs.pop('must_not', None))
