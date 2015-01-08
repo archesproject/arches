@@ -32,8 +32,7 @@ def Entities(request, entityid):
         if entityid == '':
             pass
         else:
-            showlabels = request.GET.get('labeled', False) == 'true'
-            entity = Entity().get(entityid, showlabels=showlabels)
+            entity = Entity().get(entityid)
     else:
         if not request.user.is_authenticated():
             raise Exception('User must be logged in to insert, update, or delete entities')
