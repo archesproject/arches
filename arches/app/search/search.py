@@ -82,7 +82,11 @@ class SearchEngine(object):
         # print path
         # print JSONSerializer().serialize(data, indent=4)
 
-        return self.conn.post(path, data=data)
+        ret = self.conn.post(path, data=data)
+        if 'error' in ret:
+            raise Exception(ret)
+
+        return ret
 
     def index_term(self, term, id, context='', options={}):
         """
