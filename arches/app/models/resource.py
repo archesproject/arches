@@ -322,7 +322,10 @@ class Resource(Entity):
         for entity in self.flatten():
             if entity.entityid != self.entityid:
                 if entity.businesstablename == 'domains':
-                    document.domains.append(entity)
+                    value = archesmodels.Values.objects.get(pk=entity.value)
+                    entity_copy = entity.copy()
+                    entity_copy.conceptid = value.conceptid_id
+                    document.domains.append(entity_copy)
                 elif entity.businesstablename == 'dates':
                     document.dates.append(entity)
                 elif entity.businesstablename == 'geometries':
@@ -376,13 +379,12 @@ class Resource(Entity):
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(entity.value.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     se.index_term(entity.value, entity.entityid, context=entity.entitytypeid)
             elif entity.businesstablename == 'domains':
-                domain = archesmodels.Domains.objects.get(pk=entity.entityid)
-                if domain.val:
-                    concept = Concept(domain.val.conceptid).get(include=['label'])
-                    entity.conceptid = domain.val.conceptid_id
+                value = archesmodels.Values.objects.get(pk=entity.value)
+                if value:
+                    concept = Concept(value.conceptid).get(include=['label'])
                     if concept:
                         scheme_pref_label = concept.get_context().get_preflabel().value
-                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': domain.val.conceptid_id})
+                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': value.conceptid_id})
             elif entity.businesstablename == 'geometries':
                 pass
             elif entity.businesstablename == 'dates':
