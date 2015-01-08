@@ -439,8 +439,7 @@ class Resource(Entity):
             entity = Entity().get(self.entityid)
             entity.traverse(delete_indexes)
 
-    @staticmethod
-    def prepare_search_mappings(resource_type_id):
+    def prepare_search_mappings(self, resource_type_id):
         """
         Creates Elasticsearch document mappings
 

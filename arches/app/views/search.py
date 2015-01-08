@@ -135,8 +135,6 @@ def build_query_dsl(request):
     if not boolfilter.empty:
         query.add_query(boolfilter)
 
-    print query
-
     return query
 
 def buffer(request):
