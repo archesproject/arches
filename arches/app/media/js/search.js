@@ -4,7 +4,7 @@ require(['jquery',
     'bootstrap',
     'arches', 
     'select2',
-    'views/resource-search', 
+    'views/search/term-filter', 
     'views/search/map-filter',
     'views/search/time-filter',
     'views/search/search-results',
@@ -14,7 +14,7 @@ require(['jquery',
     'resource-types',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, ResourceSearch, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, TermFilter, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes) {
     $(document).ready(function() {
 
         var SearchView = Backbone.View.extend({
@@ -31,6 +31,10 @@ require(['jquery',
                 var self = this;
                 var initialcount = $('#search-results-count').data().count;
 
+                this.termFilter = new TermFilter({
+                    el: $.find('input.resource_search_widget')[0]
+                });
+
                 this.mapFilter = new MapFilter({
                     el: $('#map-filter-container')[0]
                 });
@@ -44,68 +48,44 @@ require(['jquery',
                 });
 
                 this.searchQuery = {
-                    page: this.searchResults.page,
-                    q: ko.observableArray(),
-                    temporalFilter:  this.timeFilter.query.filter,
-                    spatialFilter: this.mapFilter.query.filter,
                     queryString: function(){
                         var params = {
-                            page: this.page(),
-                            q: ko.toJSON(this.q()),
-                            year_min_max: ko.toJSON(this.temporalFilter.year_min_max()),
-                            temporalFilter: ko.toJSON(this.temporalFilter.filters()),
-                            spatialFilter: ko.toJSON(this.spatialFilter),
+                            page: self.searchResults.page(),
+                            termFilter: ko.toJSON(self.termFilter.query.filter.terms()),
+                            year_min_max: ko.toJSON(self.timeFilter.query.filter.year_min_max()),
+                            temporalFilter: ko.toJSON(self.timeFilter.query.filter.filters()),
+                            spatialFilter: ko.toJSON(self.mapFilter.query.filter),
                             mapExpanded: self.mapFilter.expanded(),
-                            timeExpaned: ''
+                            timeExpaned: self.timeFilter.expanded()
                         }; 
                         return $.param(params);
                     }, 
                     isEmpty: function(){
                         if (self.mapFilter.query.isEmpty() && 
-                            self.searchQuery.q().length === 0 && 
+                            self.termFilter.query.isEmpty() && 
                             self.timeFilter.query.isEmpty()){
                             return true;
                         }
                         return false;
                     },
                     changed: ko.pureComputed(function(){
-                        var ret = ko.toJSON(this.searchQuery.q()) +
-                            ko.toJSON(this.searchQuery.temporalFilter.year_min_max()) +
-                            ko.toJSON(this.searchQuery.temporalFilter.filters()) +
-                            ko.toJSON(this.searchQuery.spatialFilter.geometry.coordinates());
+                        var ret = ko.toJSON(this.termFilter.query.changed()) +
+                            ko.toJSON(this.timeFilter.query.changed()) +
+                            ko.toJSON(this.mapFilter.query.changed());
                         return ret;
                     }, this).extend({ rateLimit: 200 })
                 }
 
-                this.searchQuery.page.subscribe(function(){
+                this.getSearchQuery();
+
+                this.searchResults.page.subscribe(function(){
                     self.doQuery();
                 })
 
                 this.searchQuery.changed.subscribe(function(){
-                    self.searchQuery.page(1);
+                    self.searchResults.page(1);
                     self.doQuery();
                 });
-
-                this.searchbox = new ResourceSearch({
-                    el: $.find('input.resource_search_widget')[0]
-                });
-
-                this.searchbox.on('change', function(e, el){
-                    if(e.added){
-                        self.termFilterViewModel.filters.push(e.added);
-                    }
-                    if(e.removed){
-                        self.termFilterViewModel.filters.remove(e.removed);
-                    }
-                    self.updateTermFilter();
-                });
-
-                this.termFilterViewModel = {
-                    filters: ko.observableArray()
-                };
-
-                this.getSearchQuery();
-
             },
 
             doQuery: function () {
@@ -114,9 +94,6 @@ require(['jquery',
                 if (this.updateRequest) {
                     this.updateRequest.abort();
                 }
-
-                //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-                //window.location = document.location;
 
                 window.history.pushState({}, '', '?'+queryString);
 
@@ -168,22 +145,6 @@ require(['jquery',
                 this.timeFilter.expanded(!this.timeFilter.expanded());
             },
 
-            toggleFilterSection: function(ele, currentlyExpanded){
-                if(!currentlyExpanded){
-                    if(this.searchQuery.isEmpty()){
-                        this.searchQuery.page(1);
-                        this.slideToggle(ele, 'show');
-                    }else{
-                        
-                        this.slideToggle(ele, 'show');
-                        this.hideSavedSearches();
-                    }
-                }else{
-                    this.slideToggle(ele, 'hide');               
-                }
-                return !currentlyExpanded;
-            },
-
             slideToggle: function(ele, showOrHide){
                 var self = this;
                 if ($(ele).is(":visible") && showOrHide === 'hide'){
@@ -201,11 +162,8 @@ require(['jquery',
                 }
             },
 
-            updateTermFilter: function(){
-                this.searchQuery.q(this.termFilterViewModel.filters());
-            },
-
             getSearchQuery: function(){
+                var doQuery = false;
                 var query = _.chain(decodeURIComponent(location.search).slice(1).split('&') )
                     // Split each array item into [key, value]
                     // ignore empty string if search is empty
@@ -217,34 +175,55 @@ require(['jquery',
                     // Return the value of the chain operation
                     .value();
 
-                if(query.page){
-                    query.page = JSON.parse(query.page);
-                    this.searchQuery.page(query.page);
+                if('page' in query){
+                    this.searchResults.page(JSON.parse(query.page));
+                    doQuery = true;
                 }
-                if(query.q){
-                    query.q = JSON.parse(query.q);
-                    this.searchQuery.q(query.q);
+                if('termFilter' in query){
+                    this.termFilter.query.filter.terms(JSON.parse(query.termFilter));
+                    doQuery = true;
                 }
-                if(query.temporalFilter){
+                if('temporalFilter' in query){
                     query.temporalFilter = JSON.parse(query.temporalFilter);
                     if(query.temporalFilter.length > 0){
-                        this.searchQuery.temporalFilter.filters(query.temporalFilter);
+                        this.timeFilter.query.filter.filters(query.temporalFilter);
+                        doQuery = true;
                     }
                 }
-                if(query.year_min_max){
+                if('year_min_max' in query){
                     query.year_min_max = JSON.parse(query.year_min_max);
                     if(query.year_min_max.length === 2){
-                        this.searchQuery.temporalFilter.year_min_max(query.year_min_max);
+                        this.timeFilter.query.filter.year_min_max(query.year_min_max);
+                        doQuery = true;
                     }
                 }
-                if(query.spatialFilter){
+                if('spatialFilter' in query){
                     query.spatialFilter = JSON.parse(query.spatialFilter);
                     if(query.spatialFilter.geometry.coordinates.length > 0){
-                        this.searchQuery.spatialFilter.geometry.type(ko.utils.unwrapObservable(query.spatialFilter.geometry.type));
-                        this.searchQuery.spatialFilter.geometry.coordinates(ko.utils.unwrapObservable(query.spatialFilter.geometry.coordinates));
-                        this.searchQuery.spatialFilter.buffer.width(ko.utils.unwrapObservable(query.spatialFilter.buffer.width));
-                        this.searchQuery.spatialFilter.buffer.unit(ko.utils.unwrapObservable(query.spatialFilter.buffer.unit));
+                        this.mapFilter.query.filter.geometry.type(ko.utils.unwrapObservable(query.spatialFilter.geometry.type));
+                        this.mapFilter.query.filter.geometry.coordinates(ko.utils.unwrapObservable(query.spatialFilter.geometry.coordinates));
+                        this.mapFilter.query.filter.buffer.width(ko.utils.unwrapObservable(query.spatialFilter.buffer.width));
+                        this.mapFilter.query.filter.buffer.unit(ko.utils.unwrapObservable(query.spatialFilter.buffer.unit));
+                        doQuery = true;
+
+                        var coordinates = this.mapFilter.query.filter.geometry.coordinates();
+                        var type = this.mapFilter.query.filter.geometry.type();
+                        if(type === 'bbox'){
+                            this.mapFilter.zoomToExtent(coordinates);
+                        }else{
+                            this.mapFilter.zoomToExtent(new ol.geom[type](coordinates).getExtent());
+                        }
                     }
+                }
+                if('mapExpanded' in query){
+                    this.mapFilter.expanded(JSON.parse(query.mapExpanded))
+                }
+                if('timeExpanded' in query){
+                    this.timeFilter.expanded(JSON.parse(query.timeExpanded))
+                }
+
+                if(doQuery){
+                    this.doQuery();
                 }
                 
 

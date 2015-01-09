@@ -1,8 +1,26 @@
-define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arches, Select2) {
+define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Backbone, arches, Select2, ko) {
     return Backbone.View.extend({
 
         initialize: function(options) {
-            $.extend(this, options);
+            $.extend(this, options);            
+            var self = this;
+
+            this.query = {
+                filter:  {
+                    terms: ko.observableArray()
+                },
+                isEmpty: function(){
+                    if (this.filter.terms.length === 0){
+                        return true;
+                    }
+                    return false;
+                },
+                changed: ko.pureComputed(function(){
+                    var ret = ko.toJSON(this.query.filter.terms());
+                    return ret;
+                }, this).extend({ rateLimit: 200 })
+            };
+
         	this.render();
         },
 
@@ -57,15 +75,18 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
                 self.trigger("select2-selecting", e, el);
             }).on("change", function(e, el){
                 self.trigger("change", e, el);
-            });            
+
+                if(e.added){
+                    self.query.filter.terms.push(e.added);
+                }
+                if(e.removed){
+                    self.query.filter.terms.remove(e.removed);
+                }
+            });     
         },
 
         getUrl: function(){
             return arches.urls.search_terms;
-        },
-
-        getSelected: function(){
-            return this.searchbox.select2('data');
         }
 
     });

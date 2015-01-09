@@ -64,7 +64,7 @@ def search_results(request, as_text=False):
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
 def build_query_dsl(request):
-    searchString = request.GET.get('q', '')
+    term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
@@ -78,28 +78,27 @@ def build_query_dsl(request):
     boolquery = Bool()
     boolfilter = Bool()
     
-    if searchString != '':
-        qparam = JSONDeserializer().deserialize(searchString)
-        for q in qparam:
-            if q['type'] == 'term':
-                phrase = Match(field='child_entities.value', query=q['value'], type='phrase')
+    if term_filter != '':
+        for term in JSONDeserializer().deserialize(term_filter):
+            if term['type'] == 'term':
+                phrase = Match(field='child_entities.value', query=term['value'], type='phrase')
                 nested = Nested(path='child_entities', query=phrase)
                 boolquery.must(nested)
-            elif q['type'] == 'concept':
-                concept_ids = _get_child_concepts(q['value'])
+            elif term['type'] == 'concept':
+                concept_ids = _get_child_concepts(term['value'])
                 terms = Terms(field='domains.conceptid', terms=concept_ids)
                 nested = Nested(path='domains', query=terms)
                 boolfilter.must(nested)
-            elif q['type'] == 'string':
-                phrase = Match(field='child_entities.value', query=q['value'], type='phrase_prefix')
+            elif term['type'] == 'string':
+                phrase = Match(field='child_entities.value', query=term['value'], type='phrase_prefix')
                 nested = Nested(path='child_entities', query=phrase)
                 boolquery.must(nested)
-            elif q['type'] == 'string_inverted':
-                phrase = Match(field='child_entities.value', query=q['value'], type='phrase')
+            elif term['type'] == 'string_inverted':
+                phrase = Match(field='child_entities.value', query=term['value'], type='phrase')
                 nested = Nested(path='child_entities', query=phrase)
                 boolquery.must_not(nested)
-            elif q['type'] == 'concept_inverted':
-                concept_lables = _get_child_concepts(q['value'])
+            elif term['type'] == 'concept_inverted':
+                concept_lables = _get_child_concepts(term['value'])
                 terms = Terms(field='domains.conceptid', terms=concept_lables)
                 nested = Nested(path='domains', query=terms)
                 boolfilter.must_not(nested)

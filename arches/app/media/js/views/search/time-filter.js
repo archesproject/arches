@@ -14,10 +14,6 @@ define(['jquery',
 
         return Backbone.View.extend({
 
-            events: {
-                'click #add-temporal-filter-btn': 'addTemporalFilter'
-            },
-
             initialize: function(options) { 
                 var self = this;
                 var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});
@@ -62,15 +58,8 @@ define(['jquery',
                             }
                         } 
                     },
-                    queryString: function(){
-                        var params = {
-                            filter: ko.toJSON(this.filter.filters()),
-                            expanded: this.expanded
-                        }; 
-                        return $.param(params);
-                    }, 
                     isEmpty: function(){
-                        if (self.query.filter.year_min_max.length === 0){
+                        if (this.filter.year_min_max.length === 0){
                             return true;
                         }
                         return false;
@@ -101,11 +90,6 @@ define(['jquery',
                 })
 
                 ko.applyBindings(this.query.filter, $('#time-filter')[0]);
-            },
-
-            addTemporalFilter: function(evt){
-                var form = $(evt.target).closest('form');
-
             },
 
             toggleFilterSection: function(ele, expand){

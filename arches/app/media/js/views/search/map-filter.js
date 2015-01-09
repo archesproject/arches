@@ -38,13 +38,6 @@ define(['jquery',
                             unit: ko.observable('ft')
                         }
                     },
-                    queryString: function(){
-                        var params = {
-                            filter: ko.toJSON(this.filter),
-                            expanded: this.expanded
-                        }; 
-                        return $.param(params);
-                    }, 
                     isEmpty: function(){
                         if (self.query.filter.geometry.type() === ''){
                             return true;
@@ -144,18 +137,17 @@ define(['jquery',
                     }
                 });
 
-                function zoomToLayer(vectorLayer, map){
-                    var extent = (vectorLayer.getSource().getExtent());
-                    var size = (map.map.getSize());
-                    var view = map.map.getView()
-                    view.fitExtent(
-                        extent,
-                        size
-                    );
-                }
+                //this.zoomToExtent(this.vectorLayer.getSource().getExtent())
+            },
 
-                zoomToLayer(this.vectorLayer, this.map)
-
+            zoomToExtent: function(extent){
+                var extent = ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
+                var size = this.map.map.getSize();
+                var view = this.map.map.getView()
+                view.fitExtent(
+                    extent,
+                    size
+                );
             },
 
             highlightFeatures: function(resultsarray){
@@ -351,6 +343,24 @@ define(['jquery',
 
             handleMapToolsBtn: function(evt){
                 evt.stopPropagation();
+            },
+
+            restoreState: function(filter, expanded){
+                if(query.spatialFilter.geometry.coordinates.length > 0){
+                    this.searchQuery.spatialFilter.geometry.type(ko.utils.unwrapObservable(query.spatialFilter.geometry.type));
+                    this.searchQuery.spatialFilter.geometry.coordinates(ko.utils.unwrapObservable(query.spatialFilter.geometry.coordinates));
+                    this.searchQuery.spatialFilter.buffer.width(ko.utils.unwrapObservable(query.spatialFilter.buffer.width));
+                    this.searchQuery.spatialFilter.buffer.unit(ko.utils.unwrapObservable(query.spatialFilter.buffer.unit));
+                    doQuery = true;
+
+                    var coordinates = this.searchQuery.spatialFilter.geometry.coordinates();
+                    var type = this.searchQuery.spatialFilter.geometry.type();
+                    if(type === 'bbox'){
+                        this.mapFilter.zoomToExtent(coordinates);
+                    }else{
+                        this.mapFilter.zoomToExtent(new ol.geom[type](coordinates).getExtent());
+                    }
+                }
             }
 
 
