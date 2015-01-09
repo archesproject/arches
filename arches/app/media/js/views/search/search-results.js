@@ -4,13 +4,12 @@ define(['jquery',
     'bootstrap',
     'arches', 
     'select2',
-    'views/resource-search', 
     'knockout',
     'views/related-resources-graph',
     'resource-types',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, ResourceSearch, ko, RelatedResourcesGraph, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, ko, RelatedResourcesGraph, resourceTypes) {
 
         return Backbone.View.extend({
 
