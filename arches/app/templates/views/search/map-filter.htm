@@ -1,0 +1,94 @@
+{% load i18n %}
+
+<!-- Map -->
+<div id="map-filter" class="" style="display: none;">
+
+    <div class="row" style="margin-left: -19px;">
+        <div class="col-xs-2 col-xs-offset-10" style="z-index: 900;">
+
+            <div class="row" style="margin-right: 0px; margin-top: 0px;">
+                <!-- Filter Tools -->
+                <div class="col-sm-5 col-md-4 pull-right hidden-xs" style="padding-right: 0px;">
+                    <div class="btn-group pull-right margin-10 margin-right-10" style="margin-top: 15px;">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Map Tools
+                            <i class="fa fa-chevron-down"></i>
+                            <span class="sr-only">Toggle Dropdown</span>                            
+                        </button>
+                        <ul id="map-tools-dropdown" class="dropdown-menu" role="menu">
+                            <li name="map-tools"><a id="map-extent-filter" data-tooltype="map-extent" href="#" class="info-link"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'bbox'}"></i>Limit search results to map extent</a></li>
+                            <li class="divider"></li>
+                            <li name="map-tools"><a id="polygon-filter" data-tooltype="Polygon" href="#" class="info-link polygon-filter"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Polygon'}"></i>Draw Polygon to Filter Map</a></li>
+                            <li name="map-tools"><a id="line-filter" data-tooltype="LineString" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'LineString'}"></i>Draw Line to Filter Map</a></li>
+                            <li name="map-tools"><a id="point-filter" data-tooltype="Point" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Point'}"></i>Draw Point to Filter Map</a></li>
+                            <li class="divider"></li>
+                            <li>
+                                <a id="spatial-buffer" href="#" style="padding-left: 13px;"><i class="fa fa-xxx"></i>Buffer (ft)<input id="map-buffer" type="text" class="" style="width: 30%; margin-left: 5px;" data-bind="textInput: buffer.width" /></a>
+                            </li>
+                        </ul>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <!-- Map -->
+        <div class="col-xs-12" style="margin-top: -50px;">
+            <!-- <div id="searchmap" class="map arches-map-filter arches-search-map"></div>
+            <div id="map" class="fill"></div> -->
+            <div id="map" class="map arches-map-filter arches-search-map"></div>
+            <div id="olmap" class="fill"></div>
+            <div class="col-xs-12" style="margin-top: -640px; float:right; width:105px">
+                <div class="btn-group-vertical" role="group" data-bind='foreach: baseLayers' style="padding:3px; border-radius:4px; background: rgba(255, 255, 255, 0.4); z-index:100; color:#fff'">
+                <button data-bind="attr: { id: id }, text: name" type="button" class="btn btn-primary basemap info-click" style="background:rgba(0,60,136,.5);"></button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+<!-- End Basic Map -->
+
+
+<!-- Geometry Tools -->
+<div>
+    <div class="row">
+
+        <div class="col-sm-6 col-sm-offset-6 col-md-5 col-md-offset-7 col-lg-4 col-lg-offset-8">
+            <div id="filter-tools" class="arches-map-filter-toolpanel" style="display: none;">
+                
+                <h3 class="margin-top-0 margin-bottom-0">Manage Filter</h3>
+
+                <dl>
+                    
+                    <dd class="">
+                        <div class="arches-crud-record">
+                            <a href="#" class="arches-CRUD-child" title="Remove this geometry"><i class="arches-CRUD-delete fa fa-trash-o"></i></a>
+                            <a href="#" class="arches-CRUD-child" style="font-size: 16px;" title="Edit this geometry">Polygon</a>
+                            
+                                <div class='row'>
+                                    <div class='col-xs-12'>
+                                        <p style="font-size: 14px; font-weight: 300; color: #999">
+                                            You can limit results to an area around this polygon.  Enter a distance (in feet):
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class='row'>
+                                    <div class='col-xs-12'>
+                                        <label class='input' style='width: 100%'>
+                                            <input type='text' class='' style='width: 50%;' placeholder='100'>
+                                            <button class='btn btn-primary btn-u-xs' style="height: 27px; margin-top: -4px;" type='submit'>Filter</button>
+                                        </label>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                    </dd>
+
+                </dl>
+         
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Geometry Tools -->

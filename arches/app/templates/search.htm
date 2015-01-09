@@ -1,30 +1,43 @@
 {% extends "base.htm" %}
 {% load i18n %}
 {% load staticfiles %}
-
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/plugins/bootstrap-slider.min.css' %}">    
+{% endblock css%}
 {% block content %}
 
 <!--=== Search Block ===-->
-<div class="search-block" style="padding-bottom: 10px; padding-top: 30px;">
+<div class="search-block">
     
     <!-- Search Terms -->
     <div class="container">
         <div class="row">
             
             <!-- Search Widget -->
-            <div class="col-xs-12 col-md-8">
+            <div class="col-xs-12 col-md-7 col-lg-8">
                 <div class="form-group">       
                     <input class="select2 resource_search_widget" name="" style="width:100%" placeholder="{% trans "Search for a resource..." %}" value="">
                 </div>
             </div>
             <!-- End Search Widget -->
 
+
             <!-- Advanced Search Option -->
-            <div class="col-sm-3 col-sm-offset-1">
+            <div class="col-md-5 col-lg-4">
+
+                <button class="btn btn-success btn" id="map-filter-button" style=""> 
+                    <i class="fa fa-map-marker"></i> Map search
+                </button>
+
+                <button class="btn btn-success btn" id="time-filter-button" style=""> 
+                    <i class="fa fa-clock-o"></i> Time search
+                </button>
+                
 
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        Search Tools
+                        Tools
                         <i class="fa fa-chevron-down"></i>
                         <span class="sr-only">Toggle Dropdown</span>                            
                     </button>
@@ -49,27 +62,59 @@
 <div class="container margin-bottom-50">
 
    <!-- Results Header -->
-    <div class="row" id="search-results-count">        
+    <h2 style="margin-bottom:8px;">
+        <div class="row" id="search-results-count" data-count="{{resource_count}}">        
+            
+            <div class="col-xs-12">
+                <span class="text-muted margin-left-5" style="margin-bottom: 5px;">Or try a popular search: <span style="font-size:18px;" data-bind="text: total() + ' {% trans "Results" %}'"></span></span>                                 
+            </div>
 
-        <div class="col-xs-12">
-
-            <!-- Results Counter/Filters -->
-            <h2 class="text-muted margin-left-5" style="margin-bottom: 5px;">Search Results: <span style="font-size:18px;" data-bind="text: total() + ' {% trans "Results" %}'"></span> 
-            </h2>                                     
-            <!-- End Results Counter/Filters -->
         </div>
-
-    </div>
+    </h2>   
     <!-- Results Header -->
 
-    <div class="row" id="saved-searches">
+    <div class="row" id="saved-searches" style="margin-top:8px; margin-left:0px; margin-right:0px;">
         {% include 'views/saved-searches.htm' %}
     </div>
 
-    <div class="row" id="search-results" style="display:none">
-        {% include 'views/search-results.htm' %}
+    <div class="row" id="search-results" style="display:block">
+        <div class="container s-results margin-bottom-50">
+            <div class="row" id="map-filter-container" style="margin-right: 20px;"> 
+                {% include 'views/search/map-filter.htm' %}
+            </div>
+            <div class="row" id="time-filter-container"> 
+                {% include 'views/search/time-filter.htm' %}
+            </div>
+            <div class="row" id="search-results-container"> 
+                {% include 'views/search/search-results.htm' %}
+            </div>
+        </div>
     </div>
 
 </div>
 
 {% endblock content %}
+
+{% block pre_require_js %}
+    <script>
+        define('resource-types', [], function () {
+            var resourceTypes = {
+                {% for type, type_data in resource_types %}
+                "{{type}}": {
+                    id: "{{type_data.resourcetypeid}}",
+                    icon: "{{type_data.icon_class}}",
+                    name: "{{type_data.name}}",
+                    description: "{{type_data.description}}",
+                    categories: [
+                        {% for category in type_data.categories %}
+                        "{{category}}"
+                        {% endfor %}
+                    ]
+                },
+                {% endfor %}
+            };
+
+            return resourceTypes;;
+        });
+    </script>
+{% endblock pre_require_js %}
