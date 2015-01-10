@@ -606,6 +606,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     border-radius: 3px 0px 0px 3px;
 }
 
+.arches-thumbnail-tc {
+    background-color: #ffffff;
+}
+
 .arches-layer-divider {
     margin-left: 15px;
     margin-right: 15px;

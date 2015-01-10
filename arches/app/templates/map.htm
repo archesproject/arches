@@ -122,7 +122,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Body Content -->
                         <div class="modal-body padding-top-10 padding-bottom-0" data-bind='foreach: baseLayers'>
-                            <div class="thumbnails thumbnail-style arches-thumbnail" style="">
+                            <div class="thumbnails thumbnail-style arches-thumbnail" style="background-color: #ffffff;">
                                 <a data-bind="attr: { id: id, title: name }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" href="javascript:void(0);">
                                     <span class="">  
                                         <img data-bind="attr: { src: icon }" class="img-responsive arches-basemap-thumbnail" alt="" />
@@ -171,14 +171,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="row">
                                 <div class="col-xs-12" data-bind="foreach: layers">
                                     <!-- Layer Entry -->
-                                    <div data-bind="css: {hidden: !onMap()}">
-                                        <div data-bind="css: { 'arches-ll-selected': active() }" class="row arches-overlay-item" style="padding-top: 10px; padding-bottom: 10px;">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="" data-bind="css: {hidden: !onMap()}">
+                                        <div data-bind="css: { 'arches-ll-selected': active() }" class="row arches-overlay-item" style="background-color: #fafafa; border-radius: 3px;">
 
                                             <!-- Layer Thumbnail -->
-                                            <div class="col-xs-2" style="padding-right: 0px;">
-                                                <div data-bind="style: { opacity: active() ? 1 : 0.5 }" style="border: 1px solid #cdcdcd;vertical-align: middle;text-align: center;width: 52px; height: 52px;">
-                                                    <div style="display: table-cell;vertical-align: middle;text-align: center;width: 52px; height: 52px; ">
-                                                        <div data-bind="attr: { class: icon + ' fa-3x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
+                                            <div class="col-xs-2" style="padding-right: 0px; padding-left: 0px;">
+                                                <div class="arches-thumbnail" data-bind="style: { opacity: active() ? 1 : 0.5 }" style="vertical-align: middle;text-align: center;width: 64px; height: 64px;">
+                                                    <div style="display: table-cell;vertical-align: middle;text-align: center;width: 64px; height: 64px; ">
+                                                        <div data-bind="attr: { class: icon + ' fa-2x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -187,16 +189,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="col-xs-10">
                                                 
                                                 <!-- Layer Title -->
-                                                <div class="row">
+                                                <div class="row" style="margin-top: 5px;">
                                                     <div class="col-xs-12">
-                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 5px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active(), 'fa-dot-circle-o': active()}"></i> <span data-bind="text: name"></span></a>
+                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 15px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active(), 'fa-dot-circle-o': active()}"></i> <span data-bind="text: name"></span></a>
                                                     </div>
                                                 </div>
 
                                                 <!-- Layer Controls -->
                                                 <div class="row">
                                                     <div class="col-xs-12">
-                                                        <div class="knobs-demo" data-bind="css: { 'hidden': !active() }" style="margin-left: 5px; display: block;">
+                                                        <div class="knobs-demo" data-bind="css: { 'hidden': !active() }" style="margin-left: 15px; display: block;">
                                                             
                                                             <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
 
@@ -211,9 +213,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                         <!-- End Layer Entry -->
 
-
-                                        <!-- Spacer -->
-                                         <hr class="arches-layer-divider" style="margin-left: 0px; margin-right: 0px;">
                                     </div>
                                 </div>
                             </div>
