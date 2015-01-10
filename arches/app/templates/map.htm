@@ -189,7 +189,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- Layer Title -->
                                                 <div class="row">
                                                     <div class="col-xs-12">
-                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 5px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}, css: { 'arches-ll-selected': active() }"><i class="fa" data-bind="css:{'fa-ban':!active(), 'fa-dot-circle-o': active()}"></i> <span data-bind="text: name"></span></a>
+                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 5px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active(), 'fa-dot-circle-o': active()}"></i> <span data-bind="text: name"></span></a>
                                                     </div>
                                                 </div>
 
@@ -331,7 +331,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Layer Filter Widget -->
             <div class="row">
-                <div class="col-xs-12 col-sm-9 col-md-8">
+                <div class="col-xs-12 col-md-8">
                     <div class="form-group">       
                         <input class="layerfilter" id="" name="" style="width:100%"  value="">
                     </div>
@@ -343,38 +343,38 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="col-xs-12">
 
                     <!-- Form for screens > XS -->
-                    <dl class="hidden-xs" data-bind="foreach: layers">   
+                    <dl class="" data-bind="foreach: layers">   
 
                         <dd class="heritage" data-bind="css: {hidden: filtered}">
                             <div class="row arches-layer-library" data-bind="css: {'arches-ll-selected': onMap()}">
 
                                 <!-- Layer Thumbnail -->
                                 <div class="col-sm-2 col-md-1" style="padding-right: 0px; padding-left: 0px;">
-                                    <div data-bind="style: { opacity: onMap() ? 1 : 0.5 }" style="border: 1px solid #cdcdcd;vertical-align: middle;text-align: center;width: 64px; height: 64px;">
+                                    <div class="arches-thumbnail" data-bind="style: { opacity: onMap() ? 1 : 0.5 }" style="vertical-align: middle;text-align: center;width: 64px; height: 64px;">
                                         <div style="display: table-cell;vertical-align: middle;text-align: center;width: 64px; height: 64px; ">
-                                            <div data-bind="attr: { class: icon + ' fa-4x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
+                                            <div data-bind="attr: { class: icon + ' fa-2x layer-thumb', style: 'display: inline-block;text-align: left;color: ' + iconColor + ';' }"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Layer Name/Categories -->
-                                <div class="col-sm-9 col-md-11">
+                                <div class="col-sm-9 col-md-11" style="margin-top: 8px; padding-left: 1px;">
                                     <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap(), 'fa-dot-circle-o': onMap()}"></i> <span data-bind="text: name"></span></a>
 
-                                    <span class="arches-ll-category pull-right" style="margin-top: 5px;">
+                                    <span class="arches-ll-category pull-right hidden-xs" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: <span data-bind="text:categories.join(', ')"
                                     </span>  
                                 </div>
 
                                 <!-- Layer description -->
-                                <div class="col-sm-9 col-md-11">
-                                    <span class="arches-subtitle" data-bind="text:description"></span>  
+                                <div class="col-sm-9 col-md-11" style="padding-left: 1px;">
+                                    <span class="arches-subtitle hidden-xs" data-bind="text:description"></span>  
                                 </div>    
 
                             </div>
 
                             <!-- Spacer -->
-                            <hr class="arches-layer-divider">
+                            <hr class="arches-layer-divider" style="border-top: 0px;">
 
                         </dd>
 

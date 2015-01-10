@@ -601,22 +601,27 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background: #f7f7f7;
 }
 
+.arches-thumbnail {
+    background-color: #dedede;
+    border-radius: 3px 0px 0px 3px;
+}
+
 .arches-layer-divider {
     margin-left: 15px;
     margin-right: 15px;
-    margin-top: 0px;
+    margin-top: 10px;
     margin-bottom: 0px;
-    border-top: 1px solid #dedede;
+    /*border-top: 1px solid #dedede;*/
 }
 
 
 /* Layer Library */
 .arches-layer-library {
-    padding-bottom: 25px;
-    padding-top: 15px;
+    padding-bottom: 0px;
+    padding-top: 0px;
     margin-left: 0px;
     margin-right: 5px;
-    background: #f9f9f9;
+    background: #fcfcfc;
 }
 
 /*.arches-layer-library:hover {
@@ -636,15 +641,21 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .arches-ll-selected {
-    background: #ffffff;
+    background: #f9f9f9;
+    border-radius: 3px;
 }
 
 .layer-selector {
-    color: #888;
+    color: #bfbfbf;
 }
 
 .layer-selected-title {
     color: #285e8e;
+}
+
+.arches-subtitle {
+    color: #bfbfbf;
+    text-transform: lowercase;
 }
 
 
@@ -852,7 +863,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .arches-overlay-item {
-    background: #fafafa;
+    background: #ffffff;
 }
 
 
