@@ -23,6 +23,7 @@ require(['jquery',
 
             events: {
                 'click #view-saved-searches': 'showSavedSearches',
+                'click #clear-search': 'clear',
                 'click #map-filter-button': 'toggleMapFilter',
                 'click #time-filter-button': 'toggleTimeFilter'
             },
@@ -56,7 +57,7 @@ require(['jquery',
                             temporalFilter: ko.toJSON(self.timeFilter.query.filter.filters()),
                             spatialFilter: ko.toJSON(self.mapFilter.query.filter),
                             mapExpanded: self.mapFilter.expanded(),
-                            timeExpaned: self.timeFilter.expanded()
+                            timeExpanded: self.timeFilter.expanded()
                         }; 
                         return $.param(params);
                     }, 
@@ -79,16 +80,19 @@ require(['jquery',
                 this.getSearchQuery();
 
                 this.searchResults.page.subscribe(function(){
+                    console.log('in this.searchResults.page.subscribe');
                     self.doQuery();
                 })
 
                 this.searchQuery.changed.subscribe(function(){
+                    console.log('in this.searchQuery.changed.subscribe');
                     self.searchResults.page(1);
                     self.doQuery();
                 });
             },
 
             doQuery: function () {
+                console.log('in doQuery');
                 var self = this;
                 var queryString = this.searchQuery.queryString();
                 if (this.updateRequest) {
@@ -102,6 +106,7 @@ require(['jquery',
                     url: arches.urls.search_results,
                     data: queryString,
                     success: function(results){
+                        console.log('after success');
                         self.searchResults.updateResults(results);
                         self.toggleSearchResults('show');
                         self.toggleSavedSearches('hide');
@@ -176,61 +181,55 @@ require(['jquery',
                     .value();
 
                 if('page' in query){
-                    this.searchResults.page(JSON.parse(query.page));
+                    query.page = JSON.parse(query.page);
                     doQuery = true;
                 }
+                this.searchResults.restoreState(query.page);
+
+
                 if('termFilter' in query){
-                    this.termFilter.query.filter.terms(JSON.parse(query.termFilter));
+                    query.termFilter = JSON.parse(query.termFilter);
                     doQuery = true;
                 }
+                this.termFilter.restoreState(query.termFilter);
+
+
                 if('temporalFilter' in query){
                     query.temporalFilter = JSON.parse(query.temporalFilter);
-                    if(query.temporalFilter.length > 0){
-                        this.timeFilter.query.filter.filters(query.temporalFilter);
-                        doQuery = true;
-                    }
+                    doQuery = true;
                 }
                 if('year_min_max' in query){
                     query.year_min_max = JSON.parse(query.year_min_max);
-                    if(query.year_min_max.length === 2){
-                        this.timeFilter.query.filter.year_min_max(query.year_min_max);
-                        doQuery = true;
-                    }
-                }
-                if('spatialFilter' in query){
-                    query.spatialFilter = JSON.parse(query.spatialFilter);
-                    if(query.spatialFilter.geometry.coordinates.length > 0){
-                        this.mapFilter.query.filter.geometry.type(ko.utils.unwrapObservable(query.spatialFilter.geometry.type));
-                        this.mapFilter.query.filter.geometry.coordinates(ko.utils.unwrapObservable(query.spatialFilter.geometry.coordinates));
-                        this.mapFilter.query.filter.buffer.width(ko.utils.unwrapObservable(query.spatialFilter.buffer.width));
-                        this.mapFilter.query.filter.buffer.unit(ko.utils.unwrapObservable(query.spatialFilter.buffer.unit));
-                        doQuery = true;
-
-                        var coordinates = this.mapFilter.query.filter.geometry.coordinates();
-                        var type = this.mapFilter.query.filter.geometry.type();
-                        if(type === 'bbox'){
-                            this.mapFilter.zoomToExtent(coordinates);
-                        }else{
-                            this.mapFilter.zoomToExtent(new ol.geom[type](coordinates).getExtent());
-                        }
-                    }
-                }
-                if('mapExpanded' in query){
-                    this.mapFilter.expanded(JSON.parse(query.mapExpanded))
+                    doQuery = true;
                 }
                 if('timeExpanded' in query){
-                    this.timeFilter.expanded(JSON.parse(query.timeExpanded))
+                    query.timeExpanded = JSON.parse(query.timeExpanded);
+                    doQuery = true;
                 }
+                this.timeFilter.restoreState(query.temporalFilter, query.year_min_max, query.timeExpanded);
+
+
+                if('spatialFilter' in query){
+                    query.spatialFilter = JSON.parse(query.spatialFilter);
+                    doQuery = true;
+                }
+                if('mapExpanded' in query){
+                    query.mapExpanded = JSON.parse(query.mapExpanded);
+                    doQuery = true;
+                }
+                this.mapFilter.restoreState(query.spatialFilter, query.mapExpanded);
+                
 
                 if(doQuery){
                     this.doQuery();
                 }
                 
+            },
 
-                window.onpopstate = function(event) {
-                  //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-                    //window.location = document.location;
-                };
+            clear: function(){
+                this.termFilter.clear();
+                this.mapFilter.clear();
+                this.timeFilter.clear();
             }
 
         });

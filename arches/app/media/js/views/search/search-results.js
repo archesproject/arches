@@ -68,6 +68,12 @@ define(['jquery',
                         typeName: resourceTypes[this._source.entitytypeid].name
                     });
                 });
+            },
+
+            restoreState: function(page){
+                if(typeof page !== 'undefined'){
+                    this.page(ko.utils.unwrapObservable(page));
+                }
             }
 
         });

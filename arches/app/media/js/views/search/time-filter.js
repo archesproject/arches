@@ -17,16 +17,16 @@ define(['jquery',
             initialize: function(options) { 
                 var self = this;
                 var date_picker = $('.datetimepicker').datetimepicker({pickTime: false});
-                var slider = new Slider('input.slider', {});
                 
                 date_picker.on('dp.change', function(evt){
                     $('#date').trigger('change'); 
                 });
 
-                slider.on('slideStop', function(evt){
+                this.slider = new Slider('input.slider', {});
+                this.slider.on('slideStop', function(evt){
                     // if ther user has the slider at it's min and max, then essentially they don't want to filter by year
-                    if(slider.getAttribute('min') === evt.value[0] && slider.getAttribute('max') === evt.value[1]){
-                        self.query.filter.year_min_max([]);
+                    if(self.slider.getAttribute('min') === evt.value[0] && self.slider.getAttribute('max') === evt.value[1]){
+                        self.query.filter.year_min_max.removeAll();
                     }else{
                         self.query.filter.year_min_max(evt.value);
                     }
@@ -73,7 +73,7 @@ define(['jquery',
 
                 this.query.filter.year_min_max.subscribe(function(newValue){
                     if(newValue.length == 2){
-                        slider.setValue(newValue);
+                        self.slider.setValue(newValue);
                     }
                 });
 
@@ -115,6 +115,27 @@ define(['jquery',
                 if (!showOrHide){
                     ele.slideToggle('slow');                    
                 }
+            },
+
+            restoreState: function(filter, year_min_max, expanded){
+                if(typeof filter !== 'undefined' && filter.length > 0){
+                    this.query.filter.filters(filter);
+                }
+                if(typeof year_min_max !== 'undefined' && year_min_max.length === 2){
+                    this.query.filter.year_min_max(year_min_max);
+                }
+
+                if(typeof expanded === 'undefined'){
+                    expanded = false;
+                }
+                this.expanded(expanded);
+
+            },
+
+            clear: function(){
+                this.query.filter.filters.removeAll();
+                this.query.filter.year_min_max.removeAll();
+                this.slider.setValue([this.slider.getAttribute('min'),this.slider.getAttribute('max')]);
             }
 
         });

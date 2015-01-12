@@ -16,10 +16,15 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     return false;
                 },
                 changed: ko.pureComputed(function(){
+                    console.log('in changed');
                     var ret = ko.toJSON(this.query.filter.terms());
                     return ret;
-                }, this).extend({ rateLimit: 200 })
+                }, this)//.extend({ rateLimit: 200 })
             };
+
+            this.query.filter.terms.subscribe(function(){
+                console.log('in subscribe');
+            })
 
         	this.render();
         },
@@ -41,7 +46,6 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     },
                     results: function (data, page) {
                         var value = $('div.resource_search_widget').find('.select2-input').val();
-                        //var value = self.searchbox.select2('data');
                         var results = [{
                             inverted: false,
                             type: 'string',
@@ -77,16 +81,48 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 self.trigger("change", e, el);
 
                 if(e.added){
+                    console.log('in added');
                     self.query.filter.terms.push(e.added);
                 }
                 if(e.removed){
-                    self.query.filter.terms.remove(e.removed);
+                    console.log('in removed');
+                    self.query.filter.terms.remove(function(item){
+                        return item.id === e.removed.id && item.context === e.removed.context;
+                    });
                 }
             });     
+
+            s = this;
         },
 
         getUrl: function(){
             return arches.urls.search_terms;
+        },
+
+        restoreState: function(filter){
+            var self = this;
+            if(typeof filter !== 'undefined' && filter.length > 0){
+                var results = [];
+                $.each(filter, function(){
+                    self.query.filter.terms.push(this);
+
+                    results.push({
+                        inverted: this.inverted,
+                        type: this.type,
+                        context: this.context,
+                        id: this.id,
+                        text: this.text,
+                        value: this.value
+                    });
+                });
+
+                this.searchbox.select2('data', results).trigger('change');
+            }
+        },
+
+        clear: function(){
+            this.query.filter.terms.removeAll();
+            this.searchbox.select2('data', []);
         }
 
     });

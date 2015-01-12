@@ -39,13 +39,14 @@ define(['jquery',
                         }
                     },
                     isEmpty: function(){
-                        if (self.query.filter.geometry.type() === ''){
+                        if (this.filter.geometry.type() === ''){
                             return true;
                         }
                         return false;
                     },
                     changed: ko.pureComputed(function(){
-                        return ko.toJSON(this.query.filter.geometry.coordinates());
+                        return (ko.toJSON(this.query.filter.geometry.coordinates()) + 
+                            ko.toJSON(this.query.filter.buffer.width()));
                     }, this).extend({ rateLimit: 200 })
                 }
 
@@ -54,11 +55,6 @@ define(['jquery',
                 this.query.filter.buffer.width.subscribe(function(){
                     self.applyBuffer();
                 });
-
-                this.addResourceLayer();
-            },
-
-            addResourceLayer: function(){
 
                 var style = new ol.style.Style({
                     fill: new ol.style.Fill({
@@ -137,11 +133,38 @@ define(['jquery',
                     }
                 });
 
-                //this.zoomToExtent(this.vectorLayer.getSource().getExtent())
+                this.bufferFeatureOverlay = new ol.FeatureOverlay({
+                    style: new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(123, 123, 255, 0.5)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#ff6633',
+                            width: 2,
+                            lineDash: [4,4]
+                        })
+                    })
+                }); 
+                this.bufferFeatureOverlay.setMap(this.map.map);                   
+                
+                this.drawingFeatureOverlay = new ol.FeatureOverlay({
+                    style: new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#ffcc33',
+                            width: 2
+                        })
+                    })
+                });
+                this.drawingFeatureOverlay.setMap(this.map.map);
+
+                this.zoomToExtent(this.vectorLayer.getSource().getExtent())
+
             },
 
             zoomToExtent: function(extent){
-                var extent = ol.proj.transformExtent(extent, 'EPSG:4326', 'EPSG:3857');
                 var size = this.map.map.getSize();
                 var view = this.map.map.getView()
                 view.fitExtent(
@@ -205,37 +228,6 @@ define(['jquery',
             },
 
             enableDrawingTools: function(map, tooltype){
-                if (!this.bufferFeatureOverlay){
-                    this.bufferFeatureOverlay = new ol.FeatureOverlay({
-                        style: new ol.style.Style({
-                            fill: new ol.style.Fill({
-                                color: 'rgba(123, 123, 255, 0.5)'
-                            }),
-                            stroke: new ol.style.Stroke({
-                                color: '#ff6633',
-                                width: 2,
-                                lineDash: [4,4]
-                            })
-                        })
-                    }); 
-                    this.bufferFeatureOverlay.setMap(map);                   
-                }
-                
-                if (!this.drawingFeatureOverlay){
-                    this.drawingFeatureOverlay = new ol.FeatureOverlay({
-                        style: new ol.style.Style({
-                            fill: new ol.style.Fill({
-                                color: 'rgba(255, 255, 255, 0.2)'
-                            }),
-                            stroke: new ol.style.Stroke({
-                                color: '#ffcc33',
-                                width: 2
-                            })
-                        })
-                    });
-                    this.drawingFeatureOverlay.setMap(map);
-                }
-
                 var modify = new ol.interaction.Modify({
                     features: this.drawingFeatureOverlay.getFeatures(),
                     // the SHIFT key must be pressed to delete vertices, so
@@ -297,20 +289,29 @@ define(['jquery',
 
             applyBuffer: function(){
                 var self = this;
+                var params = {
+                    filter: ko.toJSON(this.query.filter)
+                }; 
                 if(this.query.filter.buffer.width() > 0 && this.drawingFeatureOverlay.getFeatures().getLength() > 0){
                     $.ajax({
                         type: "GET",
                         url: arches.urls.buffer,
-                        data: this.query.queryString(),
+                        data: {
+                            filter: ko.toJSON(this.query.filter)
+                        },
                         success: function(results){
                             var source = new ol.source.GeoJSON(({object:{type: 'FeatureCollection', features: [{type:'Feature', geometry: JSON.parse(results)}]}}));
                             var feature = source.getFeatures()[0];
+                            
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
                             self.bufferFeatureOverlay.getFeatures().clear();  
                             self.bufferFeatureOverlay.addFeature(feature);
+                            self.zoomToExtent(feature.getGeometry().getExtent());
                         },
                         error: function(){}
                     });                    
+                }else{
+                    this.bufferFeatureOverlay.getFeatures().clear();  
                 }
             },
 
@@ -346,23 +347,54 @@ define(['jquery',
             },
 
             restoreState: function(filter, expanded){
-                if(query.spatialFilter.geometry.coordinates.length > 0){
-                    this.searchQuery.spatialFilter.geometry.type(ko.utils.unwrapObservable(query.spatialFilter.geometry.type));
-                    this.searchQuery.spatialFilter.geometry.coordinates(ko.utils.unwrapObservable(query.spatialFilter.geometry.coordinates));
-                    this.searchQuery.spatialFilter.buffer.width(ko.utils.unwrapObservable(query.spatialFilter.buffer.width));
-                    this.searchQuery.spatialFilter.buffer.unit(ko.utils.unwrapObservable(query.spatialFilter.buffer.unit));
-                    doQuery = true;
+                this.map.map.once('change:size', function(){
+                    if(typeof filter !== 'undefined' && 'geometry' in filter && filter.geometry.coordinates.length > 0){
+                        this.query.filter.geometry.type(ko.utils.unwrapObservable(filter.geometry.type));
+                        this.query.filter.geometry.coordinates(ko.utils.unwrapObservable(filter.geometry.coordinates));
+                        this.query.filter.buffer.width(ko.utils.unwrapObservable(filter.buffer.width));
+                        this.query.filter.buffer.unit(ko.utils.unwrapObservable(filter.buffer.unit));
 
-                    var coordinates = this.searchQuery.spatialFilter.geometry.coordinates();
-                    var type = this.searchQuery.spatialFilter.geometry.type();
-                    if(type === 'bbox'){
-                        this.mapFilter.zoomToExtent(coordinates);
-                    }else{
-                        this.mapFilter.zoomToExtent(new ol.geom[type](coordinates).getExtent());
+                        var coordinates = this.query.filter.geometry.coordinates();
+                        var type = this.query.filter.geometry.type();
+                        if(type === 'bbox'){
+                            this.map.map.on('moveend', this.onMoveEnd, this); 
+
+                            var extent = ol.proj.transformExtent(coordinates, 'EPSG:4326', 'EPSG:3857');
+                            this.zoomToExtent(extent);
+
+                        }else{
+                            var feature = new ol.Feature({
+                                geometry: new ol.geom[type](coordinates)
+                            });
+
+                            feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
+                            this.zoomToExtent(feature.getGeometry().getExtent());
+                            this.drawingFeatureOverlay.addFeature(feature);
+                            this.enableDrawingTools(this.map.map, type);
+
+                            feature.on('change', function(evt) {
+                                var geometry = evt.target.getGeometry().clone();
+                                geometry.transform('EPSG:3857', 'EPSG:4326');
+                                this.query.filter.geometry.coordinates(geometry.getCoordinates());
+                                //self.applyBuffer();
+                            }, this);
+                        }
                     }
-                }
-            }
 
+                }, this);
+
+                if(typeof expanded === 'undefined'){
+                    expanded = false;
+                }
+                this.expanded(expanded);
+
+            },
+
+            clear: function(){
+                this.query.filter.geometry.type('');
+                this.query.filter.geometry.coordinates([]);
+                this.disableDrawingTools();
+            }
 
         });
 });
