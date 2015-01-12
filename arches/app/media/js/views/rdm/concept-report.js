@@ -41,7 +41,7 @@ define([
             self.$el.find('.concept-report-content').addClass('hidden');
 
             $.ajax({
-                url: '../Concepts/' + conceptid + '?f=html',
+                url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid) + '?f=html',
                 success: function(response) {
                     self.$el.find('.concept-report-loading').addClass('hidden');
                     self.$el.html(response);

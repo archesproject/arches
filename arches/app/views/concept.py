@@ -76,7 +76,7 @@ def concept(request, conceptid):
 
         if f == 'html':
             depth_limit = 1
-            if conceptid == None:
+            if not conceptid:
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'concept_count': models.Concepts.objects.filter(nodetype='Concept').count(),
