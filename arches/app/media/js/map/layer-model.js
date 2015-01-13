@@ -10,9 +10,9 @@ define([
                 description: "",
                 categories: [],
                 onMap: false,
-                iconColor: "#000000"
+                iconColor: "#FFFFFF"
             };
         _.extend(layerModel, config);
         return layerModel;
-    }
+    };
 });
