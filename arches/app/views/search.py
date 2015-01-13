@@ -39,7 +39,6 @@ def home_page(request):
     return render_to_response('search.htm', {
             'main_script': 'search',
             'active_page': 'Search',
-            'resource_count': resource_count,
             'user_can_edit': False
         }, 
         context_instance=RequestContext(request))
