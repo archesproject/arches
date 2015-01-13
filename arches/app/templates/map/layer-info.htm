@@ -2,6 +2,18 @@
 <script>
     define('layer-info', [], function () {
         var layerInfo = {
+            "all": {
+                id: "all",
+                icon: "fa fa-bookmark",
+                name: "Arches Resources",
+                description: "All Arches resources...",
+                categories: [
+                    "resource"
+                ],
+                onMap: true,
+                vectorColor: "#808080",
+                iconColor: "#808080"
+            },
             {% for type, type_data in resource_types %}
             {% if type_data.has_layer %}
             "{{type}}": {

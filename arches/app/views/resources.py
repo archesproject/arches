@@ -167,7 +167,11 @@ def map_layers(request, entitytypeid, get_centroids=False):
     
     se = SearchEngineFactory().create()
     query = Query(se, limit=limit)
-    data = query.search(index='maplayers', type=entitytypeid) 
+
+    if entitytypeid == 'all':
+        data = query.search(index='maplayers') 
+    else:
+        data = query.search(index='maplayers', type=entitytypeid) 
 
     geojson_collection = {
       "type": "FeatureCollection",

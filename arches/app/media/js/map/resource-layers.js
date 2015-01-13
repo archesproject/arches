@@ -43,12 +43,12 @@ define([
 
       var pointSource = new ol.source.GeoJSON({
         projection: 'EPSG:3857',
-        url: arches.urls.map_markers + entitytypeid + '/'
+        url: arches.urls.map_markers + entitytypeid
       });
 
       var source = new ol.source.GeoJSON({
         projection: 'EPSG:3857',
-        url: arches.urls.map_layers + entitytypeid + '/'
+        url: arches.urls.map_layers + entitytypeid
       });
 
       var vectorLayer = new ol.layer.Vector({

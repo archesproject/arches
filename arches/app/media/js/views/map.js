@@ -80,25 +80,29 @@ define([
             if (this.enableSelection) {
                 this.select = new ol.interaction.Select({
                     condition: ol.events.condition.click,
-                    style: new ol.style.Style({
-                        fill: new ol.style.Fill({
-                            color: 'rgba(0, 255, 255, 0.3)'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: 'rgba(0, 255, 255, 0.9)',
-                            width: 3
-                        }),
-                        image: new ol.style.Circle({
-                            radius: 10,
+                    style: function(feature, resolution) {
+                        var fillOpacity = self.isFeatureSelectable(feature) ? 0.3 : 0;
+                        var strokeOpacity = self.isFeatureSelectable(feature) ? 0.9 : 0;
+                        return [new ol.style.Style({
                             fill: new ol.style.Fill({
-                                color: 'rgba(0, 255, 255, 0.3)'
+                                color: 'rgba(0, 255, 255, ' + fillOpacity + ')'
                             }),
                             stroke: new ol.style.Stroke({
-                                color: 'rgba(0, 255, 255, 0.9)',
+                                color: 'rgba(0, 255, 255, ' + strokeOpacity + ')',
                                 width: 3
+                            }),
+                            image: new ol.style.Circle({
+                                radius: 10,
+                                fill: new ol.style.Fill({
+                                    color: 'rgba(0, 255, 255, ' + fillOpacity + ')'
+                                }),
+                                stroke: new ol.style.Stroke({
+                                    color: 'rgba(0, 255, 255, ' + strokeOpacity + ')',
+                                    width: 3
+                                })
                             })
-                        })
-                    })
+                        })];
+                    }
                 });
 
                 this.map.addInteraction(this.select);
@@ -124,19 +128,22 @@ define([
                             extent = ol.extent.extend(extent, featureExtent);
                         });
                         self.map.getView().fitExtent(extent, (self.map.getSize()));
-                        self.select.getFeatures().clear();
+                        _.defer(function () {
+                            self.select.getFeatures().clear()
+                        });
                     }
                 }
             });
         },
 
         handleMouseMove: function(e) {
+            var self = this;
             var pixels = [e.offsetX, e.offsetY];
             var coords = this.map.getCoordinateFromPixel(pixels);
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
-                return true;
+                return self.isFeatureSelectable(feature);
             });
             var cursorStyle = overFeature ? "pointer" : "";
             if (this.enableSelection) {
@@ -150,6 +157,11 @@ define([
 
         handleMouseOut: function () {
             this.trigger('mousePositionChanged', '');
+        },
+
+        isFeatureSelectable: function (feature) {
+            var keys = feature.getKeys();
+            return (_.contains(keys, 'features') || _.contains(keys, 'entitytypeid'));
         }
     });
 });

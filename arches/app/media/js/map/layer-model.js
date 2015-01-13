@@ -4,7 +4,7 @@ define([
     return function(config) {
         var layerModel = {
                 layer: null,
-                id: "",
+                id: _.uniqueId('layer_'),
                 icon: "",
                 name: "",
                 description: "",

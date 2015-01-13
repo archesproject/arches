@@ -143,6 +143,10 @@ require([
             map.select.getFeatures().on('change:length', function(e) {
                 if (e.target.getArray().length === 0) {
                     $('#resource-info').hide();
+                } else if (!map.isFeatureSelectable(e.target.getArray()[0])) {
+                    _.defer(function () {
+                        map.select.getFeatures().clear();
+                    });
                 } else {
                     var clickFeature = e.target.getArray()[0];
                     var resourceData = {
