@@ -22,33 +22,19 @@ define([
       var rgb = hexToRgb(item.vectorColor);
 
       var style = new ol.style.Style({
-        fill: new ol.style.Fill({
-          color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.3)',
-        }),
-        stroke: new ol.style.Stroke({
-          color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
-          width: 2
-        }),
-        image: new ol.style.Circle({
-          radius: 8,
-          stroke: new ol.style.Stroke({
-            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
-            width: 2
-          }),
+        text: new ol.style.Text({
+          text: '\uf041',
+          font: 'normal 33px FontAwesome',
+          textBaseline: 'Bottom',
           fill: new ol.style.Fill({
-            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.3)',
+            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
           })
         })
       });
 
-      var pointSource = new ol.source.GeoJSON({
-        projection: 'EPSG:3857',
-        url: arches.urls.map_markers + entitytypeid
-      });
-
       var source = new ol.source.GeoJSON({
         projection: 'EPSG:3857',
-        url: arches.urls.map_layers + entitytypeid
+        url: arches.urls.map_markers + entitytypeid
       });
 
       var vectorLayer = new ol.layer.Vector({
@@ -59,7 +45,7 @@ define([
 
       var clusterSource = new ol.source.Cluster({
         distance: 40,
-        source: pointSource
+        source: source
       });
 
       var styleCache = {};

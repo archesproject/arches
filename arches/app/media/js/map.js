@@ -143,27 +143,38 @@ require([
             map.select.getFeatures().on('change:length', function(e) {
                 if (e.target.getArray().length === 0) {
                     $('#resource-info').hide();
-                } else if (!map.isFeatureSelectable(e.target.getArray()[0])) {
-                    _.defer(function () {
-                        map.select.getFeatures().clear();
-                    });
                 } else {
                     var clickFeature = e.target.getArray()[0];
-                    var resourceData = {
-                        id: clickFeature.getId(),
-                        reportLink: arches.urls.reports + clickFeature.getId()
-                    }
-                    var typeInfo = layerInfo[clickFeature.get('entitytypeid')]
-                    if (typeInfo) {
-                        resourceData.typeName = typeInfo.name;
-                        resourceData.typeIcon = typeInfo.icon;
-                    }
-                    _.each(clickFeature.getKeys(), function (key) {
-                        resourceData[key] = clickFeature.get(key);
-                    });
+                    var keys = clickFeature.getKeys();
+                    if (!_.contains(keys, 'select_feature')) {
+                        _.defer(function () {
+                            map.select.getFeatures().clear();
+                            if (_.contains(keys, 'entitytypeid')) {
+                                var resourceData = {
+                                    id: clickFeature.getId(),
+                                    reportLink: arches.urls.reports + clickFeature.getId()
+                                };
+                                var typeInfo = layerInfo[clickFeature.get('entitytypeid')];
+                                var selectFeature = clickFeature.clone();
+                                var geom = geoJSON.readGeometry(clickFeature.get('geometry_collection'));
+                                if (typeInfo) {
+                                    resourceData.typeName = typeInfo.name;
+                                    resourceData.typeIcon = typeInfo.icon;
+                                }
+                                _.each(clickFeature.getKeys(), function (key) {
+                                    resourceData[key] = clickFeature.get(key);
+                                });
+                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                                selectFeature.setGeometry(geom);
+                                selectFeature.set('select_feature', true);
+                                selectFeature.set('entityid', clickFeature.getId());
+                                map.select.getFeatures().push(selectFeature);
 
-                    self.viewModel.selectedResource(resourceData)
-                    $('#resource-info').show();
+                                self.viewModel.selectedResource(resourceData);
+                                $('#resource-info').show();
+                            }
+                        });
+                    }
                 }
             });
 

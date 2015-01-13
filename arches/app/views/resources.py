@@ -180,6 +180,7 @@ def map_layers(request, entitytypeid, get_centroids=False):
 
     for item in data['hits']['hits']:
         if get_centroids:
+            item['_source']['properties']['geometry_collection'] = item['_source']['geometry']
             item['_source']['geometry'] = item['_source']['properties']['centroid']
         else:
             item['_source']['properties'].pop('extent', None)
