@@ -4,11 +4,11 @@
         var layerInfo = {
             "all": {
                 id: "all",
-                icon: "fa fa-bookmark",
-                name: "Arches Resources",
-                description: "All Arches resources...",
+                icon: "fa fa-map-marker",
+                name: "{% trans 'Arches Resources' %}",
+                description: "{% trans 'All Arches resources...' %}",
                 categories: [
-                    "resource"
+                    "{% trans 'resource' %}"
                 ],
                 onMap: true,
                 vectorColor: "#808080",
@@ -18,7 +18,7 @@
             {% if type_data.has_layer %}
             "{{type}}": {
                 id: "{{type_data.resourcetypeid}}",
-                icon: "{{type_data.icon_class}}",
+                icon: "fa fa-map-marker",
                 name: "{{type_data.name}}",
                 description: "{{type_data.description}}",
                 categories: [
