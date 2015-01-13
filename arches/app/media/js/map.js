@@ -64,12 +64,14 @@ require([
                     map.select.getFeatures().push(feature);
                 }
             };
-            _.each(resourceLayers.features(), selectFeatureIfDefault);
+            if (selectedResourceId) {
+                _.each(resourceLayers.features(), selectFeatureIfDefault);
 
-            resourceLayers.features.subscribe(function (features) {
-                var feature = features[features.length-1];
-                selectFeatureIfDefault(features[features.length-1]);
-            });
+                resourceLayers.features.subscribe(function (features) {
+                    var feature = features[features.length-1];
+                    selectFeatureIfDefault(feature);
+                });
+            }
 
             self.viewModel.filterTerms.subscribe(function () {
                 var terms = self.viewModel.filterTerms()
