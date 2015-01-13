@@ -9,19 +9,19 @@
             <div class="row" style="margin-right: 0px; margin-top: 0px;">
                 <!-- Filter Tools -->
                 <div class="col-sm-5 col-md-4 pull-right hidden-xs" style="padding-right: 0px;">
-                    <div class="btn-group pull-right margin-10 margin-right-10" style="margin-top: 15px;">
+                    <div id="map-tools-btn" class="btn-group pull-right margin-10 margin-right-10" style="margin-top: 15px;">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                             Map Tools
                             <i class="fa fa-chevron-down"></i>
                             <span class="sr-only">Toggle Dropdown</span>                            
                         </button>
                         <ul id="map-tools-dropdown" class="dropdown-menu" role="menu">
-                            <li name="map-tools"><a id="map-extent-filter" data-tooltype="map-extent" href="#" class="info-link"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'bbox'}"></i>Limit search results to map extent</a></li>
+                            <li><a name="map-tools" id="map-extent-filter" data-tooltype="map-extent" href="#" class="info-link"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'bbox'}"></i>Limit search results to map extent</a></li>
                             <li class="divider"></li>
-                            <li name="map-tools"><a id="polygon-filter" data-tooltype="Polygon" href="#" class="info-link polygon-filter"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Polygon'}"></i>Draw Polygon to Filter Map</a></li>
-                            <li name="map-tools"><a id="line-filter" data-tooltype="LineString" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'LineString'}"></i>Draw Line to Filter Map</a></li>
-                            <li name="map-tools"><a id="point-filter" data-tooltype="Point" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Point'}"></i>Draw Point to Filter Map</a></li>
-                            <li class="divider"></li>
+                            <li><a name="map-tools" id="polygon-filter" data-tooltype="Polygon" href="#" class="info-link polygon-filter"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Polygon'}"></i>Draw Polygon to Filter Map</a></li>
+                            <li><a name="map-tools" id="line-filter" data-tooltype="LineString" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'LineString'}"></i>Draw Line to Filter Map</a></li>
+                            <li><a name="map-tools" id="point-filter" data-tooltype="Point" href="#"><i class="fa fa-xxx" data-bind="css: {'fa-check' : geometry.type() == 'Point'}"></i>Draw Point to Filter Map</a></li>
+                            <li class="divider"></li> 
                             <li>
                                 <a id="spatial-buffer" href="#" style="padding-left: 13px;"><i class="fa fa-xxx"></i>Buffer (ft)<input id="map-buffer" type="text" class="" style="width: 30%; margin-left: 5px;" data-bind="textInput: buffer.width" /></a>
                             </li>

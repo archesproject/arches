@@ -11,16 +11,34 @@ define(['jquery',
         return Backbone.View.extend({
 
             events: {
-                'click .layer-zoom': 'layerZoom',
-                'click #map-extent-filter': 'applyfilter',
-                'click #polygon-filter': 'applyfilter',
-                'click #point-filter': 'applyfilter',
-                'click #line-filter': 'applyfilter',
-                'click #map-tools-dropdown': 'handleMapToolsBtn'
+                'click .layer-zoom': 'layerZoom'
             },
 
             initialize: function(options) { 
                 var self = this;
+                x = this;
+
+               //  Handle show/hide toggle ourselves
+                $('#map-tools-btn').on('click', function(evt) {
+                    if($(evt.currentTarget).hasClass('open')){
+                        self.disableDrawingTools();
+                    }
+                    else {
+                        self.enableDrawingTools();
+                    }
+                    $(evt.currentTarget).toggleClass('open');
+                    return false;
+                });
+                $('#map-tools-dropdown').on('click', 'a', function(evt) {
+                    if($(evt.target).attr('name') === 'map-tools'){
+                        self.applyfilter(evt);
+                    }
+                    return false;
+                });
+
+                //  suppress default bahavior of the bootstrap menu to auto close
+                $('#map-tools-btn').on('hide.bs.dropdown', false);            
+                $('#map-tools-btn').on('show.bs.dropdown', false);
 
                 this.expanded = ko.observable(false);
                 this.expanded.subscribe(function(status){
@@ -197,19 +215,20 @@ define(['jquery',
                 var data = link.data();
                 var item = link.find('i');
 
-                this.disableDrawingTools();
-                
+                this.clearDrawingFeatures();
+ 
                 if (!(item.hasClass("fa-check"))){
                     //User is adding filter
 
                     if(data.tooltype){
                         if(data.tooltype === 'map-extent'){
+                            this.removeDrawingTools();
                             this.query.filter.geometry.type('bbox');
                             this.query.filter.geometry.coordinates(this.getMapExtent());
                             this.map.map.on('moveend', this.onMoveEnd, this);
                         }else{
                             this.query.filter.geometry.type(data.tooltype);
-                            this.enableDrawingTools(this.map.map, data.tooltype);
+                            this.changeDrawingTool(this.map.map, data.tooltype);
                             this.map.map.un('moveend', this.onMoveEnd, this);     
                         }                  
                     }
@@ -217,6 +236,7 @@ define(['jquery',
                 }else{
                     //User is removing filter
                     if(data.tooltype){
+                        this.removeDrawingTools();
                         this.query.filter.geometry.type('');
                         this.query.filter.geometry.coordinates([]);
 
@@ -227,8 +247,10 @@ define(['jquery',
                 }
             },
 
-            enableDrawingTools: function(map, tooltype){
-                var modify = new ol.interaction.Modify({
+            changeDrawingTool: function(map, tooltype){
+                this.disableDrawingTools();
+
+                this.modifyTool = new ol.interaction.Modify({
                     features: this.drawingFeatureOverlay.getFeatures(),
                     // the SHIFT key must be pressed to delete vertices, so
                     // that new vertices can be drawn at the same position
@@ -238,7 +260,7 @@ define(['jquery',
                                 ol.events.condition.singleClick(event);
                     }
                 });
-                map.addInteraction(modify);
+                map.addInteraction(this.modifyTool);                
 
                 this.drawingtool = new ol.interaction.Draw({
                     features: this.drawingFeatureOverlay.getFeatures(),
@@ -267,21 +289,30 @@ define(['jquery',
                     });
                 }, this);
 
-                map.addInteraction(this.drawingtool);
+                this.enableDrawingTools();
+            },
+
+            enableDrawingTools: function(){
+                if(this.drawingtool){
+                    this.map.map.addInteraction(this.drawingtool);
+                }
             },
 
             disableDrawingTools: function(){
                 if(this.drawingtool){
                     this.map.map.removeInteraction(this.drawingtool);
-                    this.clearDrawingFeatures();
                 }
+            },
+
+            removeDrawingTools: function(){
+                this.disableDrawingTools();
+                delete this.drawingtool;
             },
 
             clearDrawingFeatures: function(){
                 if (this.bufferFeatureOverlay){
                     this.bufferFeatureOverlay.getFeatures().clear();                 
                 }
-                
                 if (this.drawingFeatureOverlay){
                     this.drawingFeatureOverlay.getFeatures().clear();
                 }
@@ -342,10 +373,6 @@ define(['jquery',
                 }
             },
 
-            handleMapToolsBtn: function(evt){
-                evt.stopPropagation();
-            },
-
             restoreState: function(filter, expanded){
                 this.map.map.once('change:size', function(){
                     if(typeof filter !== 'undefined' && 'geometry' in filter && filter.geometry.coordinates.length > 0){
@@ -394,6 +421,7 @@ define(['jquery',
                 this.query.filter.geometry.type('');
                 this.query.filter.geometry.coordinates([]);
                 this.disableDrawingTools();
+                this.clearDrawingFeatures();
             }
 
         });
