@@ -397,7 +397,8 @@ define(['jquery',
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
                             this.zoomToExtent(feature.getGeometry().getExtent());
                             this.drawingFeatureOverlay.addFeature(feature);
-                            this.enableDrawingTools(this.map.map, type);
+                            this.changeDrawingTool(this.map.map, type);
+                            this.disableDrawingTools();
 
                             feature.on('change', function(evt) {
                                 var geometry = evt.target.getGeometry().clone();
