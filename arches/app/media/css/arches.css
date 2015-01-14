@@ -406,6 +406,11 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     display: none !important; /*removes the down arrow from dropdowns*/
 }
 
+.filter-flag{
+    background-color: #5CB85C !important; 
+    border: 1px solid #4CAE4C !important;
+}
+
 /*
 .sidebar-nav-v1 > li.active > a {
   color: #333;

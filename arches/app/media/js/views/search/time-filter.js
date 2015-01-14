@@ -58,12 +58,6 @@ define(['jquery',
                             }
                         } 
                     },
-                    isEmpty: function(){
-                        if (this.filter.year_min_max.length === 0){
-                            return true;
-                        }
-                        return false;
-                    },
                     changed: ko.pureComputed(function(){
                         var ret = ko.toJSON(this.query.filter.year_min_max()) +
                             ko.toJSON(this.query.filter.filters());
@@ -76,6 +70,16 @@ define(['jquery',
                         self.slider.setValue(newValue);
                     }
                 });
+
+                this.enabled = ko.computed(function(){
+                    var enabled = (this.query.filter.year_min_max().length !== 0 || this.query.filter.filters().length !== 0);
+                    this.trigger('enabled', enabled);
+                    return enabled;
+                }, this);
+
+                this.enabled.subscribe(function(enabled){
+                    this.trigger('enabled', enabled);
+                }, this);
 
                 new BranchList({
                     el: $('#time-filter')[0],

@@ -29,8 +29,8 @@ require(['jquery',
             },
 
             initialize: function(options) { 
+                var mapFilterText, timeFilterText;
                 var self = this;
-                var initialcount = $('#search-results-count').data().count;
 
                 this.termFilter = new TermFilter({
                     el: $.find('input.resource_search_widget')[0]
@@ -48,6 +48,9 @@ require(['jquery',
                     el: $('#search-results-container')[0]
                 });
 
+                mapFilterText = this.mapFilter.$el.data().filtertext;
+                timeFilterText = this.timeFilter.$el.data().filtertext;
+
                 this.searchQuery = {
                     queryString: function(){
                         var params = {
@@ -60,14 +63,6 @@ require(['jquery',
                             timeExpanded: self.timeFilter.expanded()
                         }; 
                         return $.param(params);
-                    }, 
-                    isEmpty: function(){
-                        if (self.mapFilter.query.isEmpty() && 
-                            self.termFilter.query.isEmpty() && 
-                            self.timeFilter.query.isEmpty()){
-                            return true;
-                        }
-                        return false;
                     },
                     changed: ko.pureComputed(function(){
                         var ret = ko.toJSON(this.termFilter.query.changed()) +
@@ -89,6 +84,31 @@ require(['jquery',
                     self.searchResults.page(1);
                     self.doQuery();
                 });
+
+                this.mapFilter.on('enabled', function(enabled){
+                    if(enabled){
+                        this.termFilter.addTag(mapFilterText);
+                    }else{
+                        this.termFilter.removeTag(mapFilterText);
+                    }
+                }, this);
+
+                this.timeFilter.on('enabled', function(enabled){
+                    if(enabled){
+                        this.termFilter.addTag(timeFilterText);
+                    }else{
+                        this.termFilter.removeTag(timeFilterText);
+                    }
+                }, this);
+
+                this.termFilter.on('filter-removed', function(item){
+                    if(item.text === mapFilterText){
+                        this.mapFilter.clear();
+                    }
+                    if(item.text === timeFilterText){
+                        this.timeFilter.clear();
+                    }
+                }, this);
             },
 
             doQuery: function () {

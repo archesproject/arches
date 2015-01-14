@@ -89,10 +89,10 @@
         <!-- Results Header -->      
           
         <div class="s-results margin-bottom-50">
-            <div class="row" id="map-filter-container" style="margin-right: 20px;"> 
+            <div class="row" id="map-filter-container" data-filtertext="{% trans "Map Filter Enabled" %}" style="margin-right: 20px;"> 
                 {% include 'views/search/map-filter.htm' %}
             </div>
-            <div class="row" id="time-filter-container"> 
+            <div class="row" id="time-filter-container" data-filtertext="{% trans "Time Filter Enabled" %}"> 
                 {% include 'views/search/time-filter.htm' %}
             </div>
             <div class="row" id="search-results-container"> 

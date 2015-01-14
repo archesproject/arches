@@ -16,7 +16,6 @@ define(['jquery',
 
             initialize: function(options) { 
                 var self = this;
-                x = this;
 
                //  Handle show/hide toggle ourselves
                 $('#map-tools-btn').on('click', function(evt) {
@@ -31,7 +30,7 @@ define(['jquery',
                 });
                 $('#map-tools-dropdown').on('click', 'a', function(evt) {
                     if($(evt.target).attr('name') === 'map-tools'){
-                        self.applyfilter(evt);
+                        self.togglefilter(evt);
                     }
                     return false;
                 });
@@ -56,12 +55,6 @@ define(['jquery',
                             unit: ko.observable('ft')
                         }
                     },
-                    isEmpty: function(){
-                        if (this.filter.geometry.type() === ''){
-                            return true;
-                        }
-                        return false;
-                    },
                     changed: ko.pureComputed(function(){
                         return (ko.toJSON(this.query.filter.geometry.coordinates()) + 
                             ko.toJSON(this.query.filter.buffer.width()));
@@ -73,6 +66,12 @@ define(['jquery',
                 this.query.filter.buffer.width.subscribe(function(){
                     self.applyBuffer();
                 });
+
+                this.enabled = ko.computed(function(){
+                    var enabled = (this.query.filter.geometry.type() !== '' && this.query.filter.geometry.coordinates().length !== 0);
+                    this.trigger('enabled', enabled);
+                    return enabled;
+                }, this);
 
                 var style = new ol.style.Style({
                     fill: new ol.style.Fill({
@@ -104,7 +103,8 @@ define(['jquery',
 
                 this.map = new MapView({
                     el: $('#map'),
-                    overlays: [this.vectorLayer]
+                    overlays: [this.vectorLayer],
+                    interactions: ol.interaction.defaults({'mouseWheelZoom': false}) 
                 });
 
                 var highlightStyleCache = {};
@@ -210,40 +210,32 @@ define(['jquery',
                 this.query.filter.geometry.coordinates(this.getMapExtent());
             },
 
-            applyfilter: function(evt){
+            togglefilter: function(evt){
                 var link = $(evt.target).closest('a');
                 var data = link.data();
                 var item = link.find('i');
-
-                this.clearDrawingFeatures();
  
                 if (!(item.hasClass("fa-check"))){
-                    //User is adding filter
-
-                    if(data.tooltype){
-                        if(data.tooltype === 'map-extent'){
-                            this.removeDrawingTools();
-                            this.query.filter.geometry.type('bbox');
-                            this.query.filter.geometry.coordinates(this.getMapExtent());
-                            this.map.map.on('moveend', this.onMoveEnd, this);
-                        }else{
-                            this.query.filter.geometry.type(data.tooltype);
-                            this.changeDrawingTool(this.map.map, data.tooltype);
-                            this.map.map.un('moveend', this.onMoveEnd, this);     
-                        }                  
-                    }
-
+                    this.enableFilter(data.tooltype);
                 }else{
-                    //User is removing filter
-                    if(data.tooltype){
-                        this.removeDrawingTools();
-                        this.query.filter.geometry.type('');
-                        this.query.filter.geometry.coordinates([]);
+                    this.clear();
+                }
+            },
 
-                        if(data.tooltype === 'map-extent'){
-                            this.map.map.un('moveend', this.onMoveEnd, this);
-                        } 
-                    }
+            enableFilter: function(tooltype){
+                if(tooltype){
+                    if(tooltype === 'map-extent'){
+                        this.removeDrawingTools();
+                        this.clearDrawingFeatures();
+                        this.query.filter.geometry.type('bbox');
+                        this.query.filter.geometry.coordinates(this.getMapExtent());
+                        this.map.map.on('moveend', this.onMoveEnd, this);
+                    }else{
+                        this.clearDrawingFeatures();
+                        this.query.filter.geometry.type(tooltype);
+                        this.changeDrawingTool(this.map.map, tooltype);
+                        this.map.map.un('moveend', this.onMoveEnd, this);     
+                    }                  
                 }
             },
 
@@ -266,9 +258,10 @@ define(['jquery',
                     features: this.drawingFeatureOverlay.getFeatures(),
                     type: tooltype
                 });
+                this.drawingtool.set('type', tooltype);
 
                 this.drawingtool.on('drawstart', function(){
-                    if(this.drawingtool.o !== 'Point'){
+                    if(this.drawingtool.get('type') !== 'Point'){
                         this.clearDrawingFeatures();                       
                     }
                 }, this);
@@ -419,10 +412,11 @@ define(['jquery',
             },
 
             clear: function(){
+                this.removeDrawingTools();
+                this.clearDrawingFeatures();
                 this.query.filter.geometry.type('');
                 this.query.filter.geometry.coordinates([]);
-                this.disableDrawingTools();
-                this.clearDrawingFeatures();
+                this.map.map.un('moveend', this.onMoveEnd, this);
             }
 
         });

@@ -74,6 +74,10 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     //var formatedresult = '<div class="search_term_result" data-id="' + result.id + '"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + markup.join("") + '</div>';
                     return formatedresult;
                 },
+                formatSelection: function(result){
+                    var markup = '<div data-filter="external-filter">' + result.text + '</div>';
+                    return markup;
+                },
                 escapeMarkup: function(m) { return m; }
             }).on("select2-selecting", function(e, el) {
                 self.trigger("select2-selecting", e, el);
@@ -82,13 +86,20 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
 
                 if(e.added){
                     console.log('in added');
-                    self.query.filter.terms.push(e.added);
+                    if(e.added.type !== 'filter-flag'){
+                        self.query.filter.terms.push(e.added);                        
+                    }
+
                 }
                 if(e.removed){
                     console.log('in removed');
-                    self.query.filter.terms.remove(function(item){
-                        return item.id === e.removed.id && item.context === e.removed.context;
-                    });
+                    if(e.removed.type === 'filter-flag'){
+                        self.trigger('filter-removed', e.removed);
+                    }else{
+                        self.query.filter.terms.remove(function(item){
+                            return item.id === e.removed.id && item.context === e.removed.context;
+                        });                   
+                    }
                 }
             });     
 
@@ -97,6 +108,37 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
 
         getUrl: function(){
             return arches.urls.search_terms;
+        },
+
+        addTag: function(term){
+            var terms = this.searchbox.select2('data');
+            terms.unshift({
+                inverted: '',
+                type: 'filter-flag',
+                context: '',
+                id: term,
+                text: term,
+                value: term
+            });
+
+            this.searchbox.select2('data', terms);
+
+            $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+                if ($(el).data('select2-data').type === 'filter-flag') {
+                    $(el).addClass('filter-flag');
+                }
+            });
+        },
+
+        removeTag: function(term){
+            var terms = this.searchbox.select2('data');
+            for (var i=terms.length-1; i>=0; i--) {
+                if(terms[i].id == term && terms[i].text == term && terms[i].value == term){
+                    terms.splice(i, 1);
+                    break;
+                }
+            }
+            this.searchbox.select2('data', terms);
         },
 
         restoreState: function(filter){
