@@ -10,7 +10,8 @@ define([
                 description: "",
                 categories: [],
                 onMap: false,
-                iconColor: "#FFFFFF"
+                iconColor: "#FFFFFF",
+                visibleZoomRange: 'all'
             };
         _.extend(layerModel, config);
         return layerModel;

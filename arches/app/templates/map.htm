@@ -26,11 +26,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         
         <!-- Map -->
         <div id="map" class="map map-space-panel"></div>
-        <div id="popup" class="ol-popup">
-            <a href="javascript:void(0);" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content" style="width: 250px;">
-                <h4 data-bind="text:selectedAddress()" style="margin:5px;"></h4>
-            </div>
+        <div id="popup">
+            <i class="fa fa-map-marker" style="color:#808080;font-size:45px;"></i>
         </div>
         
         
@@ -191,7 +188,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- Layer Title -->
                                                 <div class="row" style="margin-top: 5px;">
                                                     <div class="col-xs-12">
-                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 15px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active(), 'fa-dot-circle-o': active()}"></i> <span data-bind="text: name"></span></a>
+                                                        <a href="javascript:void(0);" class="overlay-entry layer-selector visibility-toggle" style="margin-left: 15px;" id="map-layer-10-button" data-bind="attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!active()}"></i> <span data-bind="text: name"></span></a>
                                                     </div>
                                                 </div>
 
@@ -204,6 +201,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <div style="margin-top: -63px; margin-left: 47px;">
                                                                 <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa fa-search" style="font-size: 23px;"></i></a> &nbsp;
+                                                                <span style="color: #808080;font-size: 11px;">visible zoom range: <span data-bind="text: visibleZoomRange"></span></span>
                                                             </div>
 
                                                         </div>
@@ -358,7 +356,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                 <!-- Layer Name/Categories -->
                                 <div class="col-sm-9 col-md-11" style="margin-top: 8px; padding-left: 1px;">
-                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap(), 'fa-dot-circle-o': onMap()}"></i> <span data-bind="text: name"></span></a>
+                                    <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap()}"></i> <span data-bind="text: name"></span></a>
 
                                     <span class="arches-ll-category pull-right hidden-xs" style="margin-top: 5px;">
                                         <i class="fa-fw fa fa-info-circle"></i>Categories: <span data-bind="text:categories.join(', ')"
