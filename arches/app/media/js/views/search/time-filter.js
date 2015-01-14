@@ -75,11 +75,7 @@ define(['jquery',
                     var enabled = (this.query.filter.year_min_max().length !== 0 || this.query.filter.filters().length !== 0);
                     this.trigger('enabled', enabled);
                     return enabled;
-                }, this);
-
-                this.enabled.subscribe(function(enabled){
-                    this.trigger('enabled', enabled);
-                }, this);
+                }, this).extend({ rateLimit: 200 });
 
                 new BranchList({
                     el: $('#time-filter')[0],
@@ -123,10 +119,14 @@ define(['jquery',
 
             restoreState: function(filter, year_min_max, expanded){
                 if(typeof filter !== 'undefined' && filter.length > 0){
-                    this.query.filter.filters(filter);
+                    _.each(filter, function(filter){
+                        this.query.filter.filters.push(filter);
+                    }, this);
                 }
                 if(typeof year_min_max !== 'undefined' && year_min_max.length === 2){
-                    this.query.filter.year_min_max(year_min_max);
+                    _.each(year_min_max, function(year){
+                        this.query.filter.year_min_max.push(year);
+                    }, this);
                 }
 
                 if(typeof expanded === 'undefined'){
