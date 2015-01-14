@@ -339,7 +339,6 @@ require([
                 self.viewModel.selectedAddress(e.object.text)
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
                 overlay.setPositioning('bottom-center');
-                console.log(overlay.getPositioning());
                 $('#popup').show();
             });
 
