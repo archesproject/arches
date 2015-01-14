@@ -14,7 +14,7 @@
                 <div class="row">
 
                     <h4 class="margin-top-20 margin-bottom-5 margin-left-15" style="font-style: normal;">
-                        Years <small>(show resources with any date that falls between these years)</small>
+                        {% trans "Years" %} <small>{% trans "(show resources with any date that falls between these years)" %}</small>
                     </h4>
                     
                     <form>
@@ -41,7 +41,7 @@
                 <div class="row" style="min-height: 180px;">
 
                     <h4 class="margin-top-0 margin-bottom-5 margin-left-15" style="font-style: normal">
-                        Start/End Dates <small>(show resources that meet these date criteria)</small>
+                        {% trans "Start/End Dates" %} <small>{% trans "(show resources that meet these date criteria)" %}</small>
                     </h4>
 
                     <!-- Date Form -->
@@ -90,7 +90,7 @@
                                 
                                 <!-- Add Button -->
                                 <div class="col-sm-2 btn-group" style="padding-top: 3px;">
-                                    <button type="button" class="add-button btn btn-primary" style="height: 32px;" id="add-temporal-filter-btn"><i class=" fa fa-plus"></i> Add</button>
+                                    <button type="button" class="add-button btn btn-primary" style="height: 32px;" id="add-temporal-filter-btn"><i class=" fa fa-plus"></i> {% trans "Add" %}</button>
                                 </div>
                                 <!-- End Add Button -->
 
@@ -107,7 +107,7 @@
                         <div class="">
                             <dl>
                                 <dd class="arches-CRUD-child margin-left-5 text-muted" style="margin-top: -15px;">
-                                    You have selected the following date filters:
+                                    {% trans "You have selected the following date filters:" %}
                                 </dd>
 
                                 <dd class="margin-left-5" style="display: block;" data-bind="visible: true">
