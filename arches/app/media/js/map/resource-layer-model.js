@@ -60,36 +60,36 @@ define([
         var styleCache = {};
 
         var clusterStyle = function(feature, resolution) {
-                var size = feature.get('features').length;
-                var radius = 10;
-                if (size > 200) {
-                    radius = 18;
-                } else if (size > 150) {
-                    radius = 16;
-                } else if (size > 100) {
-                    radius = 14;
-                } else if (size > 50) {
-                    radius = 12;
-                }
-                var style = [new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: radius,
-                        stroke: new ol.style.Stroke({
-                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.4)',
-                            width: radius
-                        }),
-                        fill: new ol.style.Fill({
-                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
-                        })
+            var size = feature.get('features').length;
+            var radius = 10;
+            if (size > 200) {
+                radius = 18;
+            } else if (size > 150) {
+                radius = 16;
+            } else if (size > 100) {
+                radius = 14;
+            } else if (size > 50) {
+                radius = 12;
+            }
+            var style = [new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: radius,
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.4)',
+                        width: radius
                     }),
-                    text: new ol.style.Text({
-                        text: size.toString(),
-                        fill: new ol.style.Fill({
-                            color: '#fff'
-                        })
+                    fill: new ol.style.Fill({
+                        color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.8)',
                     })
-                })];
-                return style;
+                }),
+                text: new ol.style.Text({
+                    text: size.toString(),
+                    fill: new ol.style.Fill({
+                        color: '#fff'
+                    })
+                })
+            })];
+            return style;
         };
 
         var clusterLayer = new ol.layer.Vector({
