@@ -103,52 +103,7 @@ define(['jquery',
 
                 this.map = new MapView({
                     el: $('#map'),
-                    overlays: [this.vectorLayer],
-                    interactions: ol.interaction.defaults({'mouseWheelZoom': false}) 
-                });
-
-                var highlightStyleCache = {};
-                this.featureOverlay = new ol.FeatureOverlay({
-                    map: this.map.map,
-                    style: function(feature, resolution) {
-                        var text = resolution < 5000 ? feature.get('primaryname') : '';
-                        if (!highlightStyleCache[text]) {
-                            highlightStyleCache[text] = [
-                                new ol.style.Style({
-                                    fill: new ol.style.Fill({
-                                        color: '#00C819'
-                                    }),
-                                    stroke: new ol.style.Stroke({
-                                        color: '#00C819',
-                                        width: 1
-                                    }),
-                                    image: new ol.style.Circle({
-                                        radius: 5,
-                                        stroke: new ol.style.Stroke({
-                                            color: '#fff'
-                                        }),
-                                        fill: new ol.style.Fill({
-                                            color: '#00C819'
-                                        })
-                                    }),
-                                    text: new ol.style.Text({
-                                        font: '12px Calibri,sans-serif',
-                                        text: text,
-                                        offsetY: -12,
-                                        fill: new ol.style.Fill({
-                                            color: '#fff',
-                                            width: 4
-                                        }),
-                                        stroke: new ol.style.Stroke({
-                                            color: '#006E2B',
-                                            width: 4
-                                        })
-                                    })
-                                })
-                            ];
-                        }
-                        return highlightStyleCache[text];
-                    }
+                    overlays: [this.vectorLayer]
                 });
 
                 this.bufferFeatureOverlay = new ol.FeatureOverlay({
@@ -179,7 +134,46 @@ define(['jquery',
                 this.drawingFeatureOverlay.setMap(this.map.map);
 
                 this.zoomToExtent(this.vectorLayer.getSource().getExtent())
+                
+                ko.applyBindings(this.map, $('#basemaps-panel')[0]);
 
+                var hideAllPanels = function(){
+                    $("#basemaps-panel").addClass("hidden");
+
+                    //Update state of remaining buttons
+                    $("#inventory-basemaps")
+                        .removeClass("arches-map-tools-pressed")
+                        .addClass("arches-map-tools")
+                        .css("border-bottom-left-radius", "1px");
+                };
+
+                //Inventory-basemaps button opens basemap panel
+                $("#inventory-basemaps").click(function (){
+                    if ($(this).hasClass('arches-map-tools-pressed')) {
+                        hideAllPanels();
+                    } else {
+                        $("#basemaps-panel").removeClass("hidden");
+
+                        //Update state of current button and adjust position
+                        $("#inventory-basemaps")
+                            .addClass("arches-map-tools-pressed")
+                            .removeClass("arches-map-tools")
+                            .css("border-bottom-left-radius", "5px");
+                    }
+                });
+
+                $(".basemap").click(function (){ 
+                    var basemap = $(this).attr('id');
+                    _.each(self.map.baseLayers, function(baseLayer){ 
+                        baseLayer.layer.setVisible(baseLayer.id == basemap);
+                    });
+                    hideAllPanels();
+                });
+
+                //Close Button
+                $(".close").click(function (){ 
+                    hideAllPanels();
+                });
             },
 
             zoomToExtent: function(extent){
@@ -192,9 +186,55 @@ define(['jquery',
             },
 
             highlightFeatures: function(resultsarray){
+                var highlightStyleCache = {};
+                if(!this.featureOverlay){
+                    this.featureOverlay = new ol.FeatureOverlay({
+                        map: this.map.map,
+                        style: function(feature, resolution) {
+                            var text = resolution < 5000 ? feature.get('primaryname') : '';
+                            if (!highlightStyleCache[text]) {
+                                highlightStyleCache[text] = [
+                                    new ol.style.Style({
+                                        fill: new ol.style.Fill({
+                                            color: '#00C819'
+                                        }),
+                                        stroke: new ol.style.Stroke({
+                                            color: '#00C819',
+                                            width: 1
+                                        }),
+                                        image: new ol.style.Circle({
+                                            radius: 5,
+                                            stroke: new ol.style.Stroke({
+                                                color: '#fff'
+                                            }),
+                                            fill: new ol.style.Fill({
+                                                color: '#00C819'
+                                            })
+                                        }),
+                                        text: new ol.style.Text({
+                                            font: '12px Calibri,sans-serif',
+                                            text: text,
+                                            offsetY: -12,
+                                            fill: new ol.style.Fill({
+                                                color: '#fff',
+                                                width: 4
+                                            }),
+                                            stroke: new ol.style.Stroke({
+                                                color: '#006E2B',
+                                                width: 4
+                                            })
+                                        })
+                                    })
+                                ];
+                            }
+                            return highlightStyleCache[text];
+                        }
+                    });                    
+                }
                 this.featureOverlay.getFeatures().clear();
-                _.each(resultsarray, function(result){
-                    var feature = this.vectorLayer.getSource().getFeatureById(result.resourceid);
+
+                _.each(resultsarray.results.hits.hits, function(result){
+                    var feature = this.vectorLayer.getSource().getFeatureById(result._id);
                     if(feature){
                         this.featureOverlay.addFeature(feature);
                     }

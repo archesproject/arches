@@ -42,6 +42,56 @@
                 <button data-bind="attr: { id: id }, text: name" type="button" class="btn btn-primary basemap info-click" style="background:rgba(0,60,136,.5);"></button>
                 </div>
             </div>
+
+            <!-- Map: Project Info Panel -->
+            <div class="container">
+                
+                <!-- Map Tools Panel -->
+                <div class="row">
+                    <div class="col-xs-4" style="">
+
+                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 175px; margin-left: 15px;">
+                            <div class="modal-header arches-modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    ×
+                                </button>
+                                <h4 class="modal-title">
+                                    {% trans "Basemaps" %}
+                                </h4>
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-10 padding-bottom-0" data-bind='foreach: baseLayers'>
+                                <div class="thumbnails thumbnail-style arches-thumbnail" style="background-color: #ffffff; width:100%;">
+                                    <a data-bind="attr: { id: id, title: name }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" href="javascript:void(0);">
+                                        <span class="">  
+                                            <img data-bind="attr: { src: icon }" class="img-responsive arches-basemap-thumbnail" alt="" />
+                                            <span class="zoom-icon"></span>                   
+                                        </span>                                              
+                                    </a>                    
+                                    <div class="caption">
+                                        <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue font-120 basemap info-click" href="javascript:void(0);"> </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Body Content -->
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Map Tools Panel -->
+            </div>
+
+            <!-- Map Tools -->
+            <div class="row">
+                <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -77px; margin-left: 30px;">
+                    <div class="btn-group">
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-globe"></i> {% trans "Basemaps" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- End Map Tools -->
         </div>
         
     </div>

@@ -123,7 +123,8 @@ require(['jquery',
                     url: arches.urls.search_results,
                     data: queryString,
                     success: function(results){
-                        self.searchResults.updateResults(results);
+                        var data = self.searchResults.updateResults(results);
+                        self.mapFilter.highlightFeatures(data);
                         self.toggleSearchResults('show');
                         self.toggleSavedSearches('hide');
                         self.mapFilter.applyBuffer();

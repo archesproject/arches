@@ -68,6 +68,8 @@ define(['jquery',
                         typeName: resourceTypes[this._source.entitytypeid].name
                     });
                 });
+
+                return data;
             },
 
             restoreState: function(page){
