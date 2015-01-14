@@ -15,7 +15,8 @@ define(['jquery',
 
             events: {
                 'click .page-button': 'newPage',
-                'click .related-resources-graph': 'showRelatedResouresGraph'
+                'click .related-resources-graph': 'showRelatedResouresGraph',
+                'mouseover .arches-search-item': 'itemMouseover'
             },
 
             initialize: function(options) { 
@@ -29,6 +30,8 @@ define(['jquery',
                 ko.applyBindings(this, $('#search-results-list')[0]);
                 ko.applyBindings(this, $('#search-results-count')[0]);
                 ko.applyBindings(this, $('#paginator')[0]);
+
+                this.$el.on('mouseover', this, this.itemMouseout);
             },
 
             showRelatedResouresGraph: function (e) {
@@ -76,6 +79,21 @@ define(['jquery',
                 if(typeof page !== 'undefined'){
                     this.page(ko.utils.unwrapObservable(page));
                 }
+            },
+
+            itemMouseover: function(evt){
+                if(this.currentTarget !== evt.currentTarget){
+                    var data = $(evt.currentTarget).data();
+                    this.trigger('mouseover', data.resourceid);    
+                    this.currentTarget = evt.currentTarget;              
+                }
+                return false;    
+            },
+
+            itemMouseout: function(evt){
+                evt.data.trigger('mouseout');    
+                delete evt.data.currentTarget;              
+                return false;
             }
 
         });

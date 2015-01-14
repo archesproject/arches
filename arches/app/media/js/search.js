@@ -107,6 +107,14 @@ require(['jquery',
                         this.timeFilter.clear();
                     }
                 }, this);
+
+                this.searchResults.on('mouseover', function(resourceid){
+                    this.mapFilter.selectFeatureById(resourceid);
+                }, this);
+
+                this.searchResults.on('mouseout', function(){
+                    this.mapFilter.unselectAllFeatures();
+                }, this);
             },
 
             doQuery: function () {
@@ -136,6 +144,9 @@ require(['jquery',
             showSavedSearches: function(){
                 this.toggleSavedSearches('show');
                 this.toggleSearchResults('hide');
+                this.mapFilter.expanded(false);
+                this.timeFilter.expanded(false);
+                this.clear();
             },
 
             hideSavedSearches: function(){
@@ -244,9 +255,9 @@ require(['jquery',
             },
 
             clear: function(){
-                this.termFilter.clear();
                 this.mapFilter.clear();
                 this.timeFilter.clear();
+                this.termFilter.clear();
             }
 
         });

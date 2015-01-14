@@ -164,25 +164,57 @@ define(['jquery',
                 if(!this.featureOverlay){
                     this.featureOverlay = new ol.FeatureOverlay({
                         map: this.map.map,
-                        style: new ol.style.Style({
-                            text: new ol.style.Text({
-                                text: '\uf041',
-                                font: 'normal 33px FontAwesome',
-                                textBaseline: 'Bottom',
-                                fill: new ol.style.Fill({
-                                    color: '#C4171D'
-                                })
-                            })
-                        })
+                        style: function(feature, resolution) {
+                            if (feature.get('selected')) {
+                                return [new ol.style.Style({
+                                    text: new ol.style.Text({
+                                        text: '\uf041',
+                                        font: 'normal 33px FontAwesome',
+                                        textBaseline: 'Bottom',
+                                        fill: new ol.style.Fill({
+                                            color: '#4CAE4C'
+                                        })
+                                    })
+                                })];
+                            }else{
+                                return [new ol.style.Style({
+                                    text: new ol.style.Text({
+                                        text: '\uf041',
+                                        font: 'normal 33px FontAwesome',
+                                        textBaseline: 'Bottom',
+                                        fill: new ol.style.Fill({
+                                            color: '#C4171D'
+                                        })
+                                    })
+                                })];
+                            }
+                        }
                     });                    
                 }
                 this.featureOverlay.getFeatures().clear();
 
                 _.each(resultsarray.results.hits.hits, function(result){
-                    var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
-                    if(feature){
-                        this.featureOverlay.addFeature(feature);
+                    if(result._source.geometries.length > 0){
+                        var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
+                        if(feature){
+                            this.featureOverlay.addFeature(feature);
+                        }                        
                     }
+                }, this);
+            },
+
+            selectFeatureById: function(resourceid){
+                this.unselectAllFeatures();
+                var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(resourceid);
+                if(feature){
+                    feature.set('selected', true);
+                    return feature;
+                } 
+            },
+
+            unselectAllFeatures: function(){
+                this.vectorLayer.getLayers().item(0).getSource().getFeatures().forEach(function(feature){
+                    feature.set('selected', false);
                 }, this);
             },
 
