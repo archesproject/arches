@@ -114,13 +114,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 value: term
             });
 
-            this.searchbox.select2('data', terms);
-
-            $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
-                if ($(el).data('select2-data').type === 'filter-flag') {
-                    $(el).addClass('filter-flag');
-                }
-            });
+            this.updateTerms(terms);
         },
 
         removeTag: function(term){
@@ -131,7 +125,18 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     break;
                 }
             }
+
+            this.updateTerms(terms);
+        },
+
+        updateTerms: function(terms){
             this.searchbox.select2('data', terms);
+
+            $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+                if ($(el).data('select2-data').type === 'filter-flag') {
+                    $(el).addClass('filter-flag');
+                }
+            });
         },
 
         restoreState: function(filter){
