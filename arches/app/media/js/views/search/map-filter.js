@@ -6,8 +6,8 @@ define(['jquery',
     'views/map',
     'openlayers', 
     'knockout',
-    'resource-types'], 
-    function($, _, Backbone, bootstrap, arches, MapView, ol, ko, resourceTypes) {
+    'map/resource-layer-model'], 
+    function($, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel) {
         return Backbone.View.extend({
 
             events: {
@@ -17,7 +17,7 @@ define(['jquery',
             initialize: function(options) { 
                 var self = this;
 
-               //  Handle show/hide toggle ourselves
+                //  Handle show/hide toggle ourselves
                 $('#map-tools-btn').on('click', function(evt) {
                     if($(evt.currentTarget).hasClass('open')){
                         self.disableDrawingTools();
@@ -38,6 +38,7 @@ define(['jquery',
                 //  suppress default bahavior of the bootstrap menu to auto close
                 $('#map-tools-btn').on('hide.bs.dropdown', false);            
                 $('#map-tools-btn').on('show.bs.dropdown', false);
+
 
                 this.expanded = ko.observable(false);
                 this.expanded.subscribe(function(status){
@@ -73,34 +74,8 @@ define(['jquery',
                     return enabled;
                 }, this);
 
-                var style = new ol.style.Style({
-                    fill: new ol.style.Fill({
-                        color: '#9E9E9E'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: '#9E9E9E',
-                        width: 1
-                    }),
-                    image: new ol.style.Circle({
-                        radius: 5,
-                        stroke: new ol.style.Stroke({
-                            color: '#fff'
-                        }),
-                        fill: new ol.style.Fill({
-                            color: '#9E9E9E'
-                        })
-                    })
-                });
 
-                this.vectorLayer = new ol.layer.Vector({
-                    //maxResolution: arches.mapDefaults.cluster_min,
-                    source: new ol.source.GeoJSON({
-                        projection: 'EPSG:3857',
-                        url: 'resources/layers/'
-                    }),
-                    style: style
-                });
-
+                this.vectorLayer = new ResourceLayerModel().layer;
                 this.map = new MapView({
                     el: $('#map'),
                     overlays: [this.vectorLayer]
@@ -133,7 +108,7 @@ define(['jquery',
                 });
                 this.drawingFeatureOverlay.setMap(this.map.map);
 
-                this.zoomToExtent(this.vectorLayer.getSource().getExtent())
+                this.zoomToExtent(this.vectorLayer.getLayers().item(0).getSource().getExtent())
                 
                 ko.applyBindings(this.map, $('#basemaps-panel')[0]);
 
@@ -186,55 +161,25 @@ define(['jquery',
             },
 
             highlightFeatures: function(resultsarray){
-                var highlightStyleCache = {};
                 if(!this.featureOverlay){
                     this.featureOverlay = new ol.FeatureOverlay({
                         map: this.map.map,
-                        style: function(feature, resolution) {
-                            var text = resolution < 5000 ? feature.get('primaryname') : '';
-                            if (!highlightStyleCache[text]) {
-                                highlightStyleCache[text] = [
-                                    new ol.style.Style({
-                                        fill: new ol.style.Fill({
-                                            color: '#00C819'
-                                        }),
-                                        stroke: new ol.style.Stroke({
-                                            color: '#00C819',
-                                            width: 1
-                                        }),
-                                        image: new ol.style.Circle({
-                                            radius: 5,
-                                            stroke: new ol.style.Stroke({
-                                                color: '#fff'
-                                            }),
-                                            fill: new ol.style.Fill({
-                                                color: '#00C819'
-                                            })
-                                        }),
-                                        text: new ol.style.Text({
-                                            font: '12px Calibri,sans-serif',
-                                            text: text,
-                                            offsetY: -12,
-                                            fill: new ol.style.Fill({
-                                                color: '#fff',
-                                                width: 4
-                                            }),
-                                            stroke: new ol.style.Stroke({
-                                                color: '#006E2B',
-                                                width: 4
-                                            })
-                                        })
-                                    })
-                                ];
-                            }
-                            return highlightStyleCache[text];
-                        }
+                        style: new ol.style.Style({
+                            text: new ol.style.Text({
+                                text: '\uf041',
+                                font: 'normal 33px FontAwesome',
+                                textBaseline: 'Bottom',
+                                fill: new ol.style.Fill({
+                                    color: '#C4171D'
+                                })
+                            })
+                        })
                     });                    
                 }
                 this.featureOverlay.getFeatures().clear();
 
                 _.each(resultsarray.results.hits.hits, function(result){
-                    var feature = this.vectorLayer.getSource().getFeatureById(result._id);
+                    var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
                     if(feature){
                         this.featureOverlay.addFeature(feature);
                     }
