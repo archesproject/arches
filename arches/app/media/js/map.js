@@ -327,7 +327,9 @@ require([
                 },
 
                 placeholder: "Find an Address or Parcel Number",
-                minimumInputLength: 4
+                minimumInputLength: 4,
+                multiple: true,
+                maximumSelectionSize: 1
             });
 
             $('.geocodewidget').on("select2-selecting", function(e) {
@@ -336,7 +338,13 @@ require([
                 self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
                 self.viewModel.selectedAddress(e.object.text)
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
+                overlay.setPositioning('bottom-center');
+                console.log(overlay.getPositioning());
                 $('#popup').show();
+            });
+
+            $('.geocodewidget').on('select2-removing', function () {
+                $('#popup').hide();
             });
 
             var overlay = new ol.Overlay({
@@ -344,12 +352,6 @@ require([
             });
 
             map.map.addOverlay(overlay);
-
-            $('#popup-closer').click(function() {
-                $('#popup').hide();
-                $('#popup-closer')[0].blur();
-                $('.geocodewidget').select2('val', '');
-            });
         },
         getLayerById: function(layerId) {
             return ko.utils.arrayFirst(this.viewModel.layers(), function(item) {
