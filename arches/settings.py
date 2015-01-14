@@ -111,6 +111,8 @@ RESOURCE_TYPE_CONFIGS = {
 
 GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
+EXPORT_CONFIG = ''
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
