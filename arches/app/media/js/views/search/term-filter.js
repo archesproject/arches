@@ -16,15 +16,10 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     return false;
                 },
                 changed: ko.pureComputed(function(){
-                    console.log('in changed');
                     var ret = ko.toJSON(this.query.filter.terms());
                     return ret;
                 }, this)//.extend({ rateLimit: 200 })
             };
-
-            this.query.filter.terms.subscribe(function(){
-                console.log('in subscribe');
-            })
 
         	this.render();
         },
@@ -85,14 +80,12 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 self.trigger("change", e, el);
 
                 if(e.added){
-                    console.log('in added');
                     if(e.added.type !== 'filter-flag'){
                         self.query.filter.terms.push(e.added);                        
                     }
 
                 }
                 if(e.removed){
-                    console.log('in removed');
                     if(e.removed.type === 'filter-flag'){
                         self.trigger('filter-removed', e.removed);
                     }else{

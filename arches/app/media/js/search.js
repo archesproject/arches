@@ -75,12 +75,10 @@ require(['jquery',
                 this.getSearchQuery();
 
                 this.searchResults.page.subscribe(function(){
-                    console.log('in this.searchResults.page.subscribe');
                     self.doQuery();
                 })
 
                 this.searchQuery.changed.subscribe(function(){
-                    console.log('in this.searchQuery.changed.subscribe');
                     self.searchResults.page(1);
                     self.doQuery();
                 });
@@ -112,7 +110,6 @@ require(['jquery',
             },
 
             doQuery: function () {
-                console.log('in doQuery');
                 var self = this;
                 var queryString = this.searchQuery.queryString();
                 if (this.updateRequest) {
@@ -126,7 +123,6 @@ require(['jquery',
                     url: arches.urls.search_results,
                     data: queryString,
                     success: function(results){
-                        console.log('after success');
                         self.searchResults.updateResults(results);
                         self.toggleSearchResults('show');
                         self.toggleSavedSearches('hide');
