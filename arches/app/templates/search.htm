@@ -42,7 +42,7 @@
                         <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a id="view-saved-searches">{% trans "View Saved Searches" %}</a></li>
+                        <li><a href="javascript:void(0);" id="view-saved-searches">{% trans "View Saved Searches" %}</a></li>
                         <li class="divider"></li>
                         <li><a href="#">{% trans "Export results to .SHP" %}</a></li>
                         <li><a href="#">{% trans "Export results to .CSV" %}</a></li>
@@ -63,7 +63,7 @@
 <!--=== Default Resource Summary ===-->
 <div class="container margin-bottom-50">
 
-    <div class="row" id="saved-searches" style="margin-top:8px; margin-left:0px; margin-right:0px;">
+    <div class="row" id="saved-searches" style="margin-left:0px; margin-right:0px;">
         <!-- Results Header -->
         <h2 style="margin-bottom:8px;">
             <div class="row">        
@@ -77,7 +77,7 @@
         {% include 'views/saved-searches.htm' %}
     </div>
 
-    <div class="row" id="search-results" style="margin-top:8px; margin-left:0px; margin-right:0px;">
+    <div class="row" id="search-results" style="margin-left:0px; margin-right:0px;">
        <!-- Results Header -->
         <h2 style="margin-bottom:8px;">
             <div class="row" id="search-results-count" data-count="">        
