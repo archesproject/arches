@@ -133,8 +133,6 @@ require(['jquery',
                     success: function(results){
                         var data = self.searchResults.updateResults(results);
                         self.mapFilter.highlightFeatures(data);
-                        self.toggleSearchResults('show');
-                        self.toggleSavedSearches('hide');
                         self.mapFilter.applyBuffer();
                     },
                     error: function(){}
@@ -142,11 +140,11 @@ require(['jquery',
             },
 
             showSavedSearches: function(){
+                this.clear();
                 this.toggleSavedSearches('show');
                 this.toggleSearchResults('hide');
                 this.mapFilter.expanded(false);
                 this.timeFilter.expanded(false);
-                this.clear();
             },
 
             hideSavedSearches: function(){
@@ -167,6 +165,7 @@ require(['jquery',
             toggleMapFilter: function(){
                 if($('#saved-searches').is(":visible")){
                     this.doQuery();
+                    this.hideSavedSearches();
                 }
                 this.mapFilter.expanded(!this.mapFilter.expanded());
             },
@@ -174,6 +173,7 @@ require(['jquery',
             toggleTimeFilter: function(showOrHide){
                 if($('#saved-searches').is(":visible")){
                     this.doQuery();
+                    this.hideSavedSearches();
                 }
                 this.timeFilter.expanded(!this.timeFilter.expanded());
             },
@@ -250,6 +250,7 @@ require(['jquery',
 
                 if(doQuery){
                     this.doQuery();
+                    this.hideSavedSearches();
                 }
                 
             },
