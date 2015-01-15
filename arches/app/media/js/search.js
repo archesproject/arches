@@ -62,7 +62,7 @@ require(['jquery',
                             mapExpanded: self.mapFilter.expanded(),
                             timeExpanded: self.timeFilter.expanded()
                         }; 
-                        return $.param(params).replace('+', '%20');
+                        return $.param(params).split('+').join('%20');
                     },
                     changed: ko.pureComputed(function(){
                         var ret = ko.toJSON(this.termFilter.query.changed()) +
