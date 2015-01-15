@@ -57,19 +57,24 @@ require([
                 selectedAddress: ko.observable('')
             };
             self.map = map;
-            selectFeatureIfDefault = function (feature) {
-                if (feature.getId() === selectedResourceId) {
-                    map.map.getView().fitExtent(feature.getGeometry().getExtent(), map.map.getSize());
+            var selectDeafultFeature = function (features) {
+                var feature = _.find(features, function (feature) {
+                    return feature.getId() === selectedResourceId;
+                });
+                if (feature) {
+                    var geom = geoJSON.readGeometry(feature.get('geometry_collection'));
+                    geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                    map.map.getView().fitExtent(geom.getExtent(), map.map.getSize());
                     map.select.getFeatures().clear();
                     map.select.getFeatures().push(feature);
+                    selectedResourceId = null;
                 }
             };
             if (selectedResourceId) {
-                _.each(resourceLayers.features(), selectFeatureIfDefault);
+                selectDeafultFeature(resourceLayers.features());
 
                 resourceLayers.features.subscribe(function (features) {
-                    var feature = features[features.length-1];
-                    selectFeatureIfDefault(feature);
+                    selectDeafultFeature(features);
                 });
             }
 
