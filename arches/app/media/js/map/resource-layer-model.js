@@ -20,14 +20,20 @@ define([
         }, config);
 
         var rgb = hexToRgb(config.vectorColor);
+        var iconUnicode = '\uf060';
 
         var style = new ol.style.Style({
             text: new ol.style.Text({
-                text: '\uf041',
-                font: 'normal 33px FontAwesome',
+                text: iconUnicode,
+                font: 'normal 33px octicons',
+                stroke: new ol.style.Stroke({
+                    // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
+                    color: 'white',
+                    width: 3
+                }),
                 textBaseline: 'Bottom',
                 fill: new ol.style.Fill({
-                    color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
+                    color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
                 })
             })
         });
@@ -50,6 +56,23 @@ define([
             maxResolution: arches.mapDefaults.cluster_min,
             source: source,
             style: style
+        });
+
+        var shadowLayer = new ol.layer.Vector({
+            maxResolution: arches.mapDefaults.cluster_min,
+            source: source,
+            style: new ol.style.Style({
+                text: new ol.style.Text({
+                    text: iconUnicode,
+                    font: 'normal 38px octicons',
+                    offsetX: 0,
+                    rotation: 0.25,
+                    textBaseline: 'Bottom',
+                    fill: new ol.style.Fill({
+                        color: 'rgba(126,126,126,0.3)',
+                    })
+                })
+            })
         });
 
         var clusterSource = new ol.source.Cluster({
@@ -100,6 +123,7 @@ define([
 
         var layerGroup = new ol.layer.Group({
             layers: [
+                shadowLayer,
                 vectorLayer,
                 clusterLayer
             ]
