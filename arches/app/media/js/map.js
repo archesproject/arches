@@ -338,6 +338,11 @@ require([
                 maximumSelectionSize: 1
             });
 
+            //Override default style of Select2 geocode mask
+            $(".select2-search-field").css("font-size", "15px");
+            $(".select2-search-field").css("font-weight", "200");
+            $(".select2-search-choice").css("margin-top", "8px");
+
             $('.geocodewidget').on("select2-selecting", function(e) {
                 var geom = geoJSON.readGeometry(e.object.geometry)
                 geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
