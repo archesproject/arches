@@ -2887,8 +2887,45 @@ ul.labels-demo li {
 
 .arches-basemap-thumbnail {
     border: 1px solid rgba(0,10,0,.3);
-    width: 120px;
-    height: 100px;
+    width: 68px;
+    height: 64px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+.arches-basemap-entry {
+    background-color: #f9f9f9;
+    border-radius: 3px 3px 3px 3px;
+}
+
+.arches-basemap-entry:active {
+    background-color: #f0f0f0;
+}
+
+.arches-basemap-caption {
+    font-size: 18px;
+    margin-left: 15px;
+}
+
+.caption-text {
+    color: #999;
+    font-weight: 300;
+}
+
+.caption-text:active {
+    color: #555;
+    font-weight: 400;
+}
+
+.arches-basemap-caption-search {
+    font-size: 18px;
+    margin-left: 5px;
+    width: 150px;
+    overflow: hidden;
+}
+
+.caption-text-search {
+    color: #999;
+    font-weight: 300;
 }
 
 .arches-form-inline {

@@ -42,9 +42,9 @@
                 
                 <!-- Map Tools Panel -->
                 <div class="row">
-                    <div class="col-xs-4" style="">
+                    <div class="col-xs-12 col-sm-6" style="">
 
-                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 175px; margin-left: 15px;">
+                        <div id="basemaps-panel" class="tools-panel hidden" style="overflow-y: scroll; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-top: -408px; height: 332px; width: 250px; margin-left: 15px;">
                             <div class="modal-header arches-modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                                     ×
@@ -55,7 +55,37 @@
                             </div>
 
                             <!-- Body Content -->
-                            <div class="modal-body padding-top-10 padding-bottom-0" data-bind='foreach: baseLayers'>
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind='foreach: baseLayers'>
+                                
+
+
+                                <div class="row">
+                                    <hr class="arches-layer-divider" style="border-top: 0px; margin-top: 5px;">
+
+                                    <div class="arches-basemap-entry" style="margin-right: 7px;">
+                                
+                                        <div class="" style="">
+                                            <a data-bind="attr: { id: id, title: name }" class="basemap info-click" data-rel="" href="javascript:void(0);">
+                                                <span class="">  
+                                                    <img data-bind="attr: { src: icon }" class="arches-basemap-thumbnail" alt="" />
+                                                    <span class="zoom-icon"></span>                   
+                                                </span>                                              
+                                            </a>                    
+                                            <span class="arches-basemap-caption-search">
+                                                <a data-bind="attr: { id: id }, text: name" class="caption-text-search hover-effect basemap info-click" href="javascript:void(0);"> </a>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+                                <!--
                                 <div class="thumbnails thumbnail-style arches-thumbnail" style="background-color: #ffffff; width:100%;">
                                     <a data-bind="attr: { id: id, title: name }" class="fancybox-button zoomer basemap info-click" data-rel="fancybox-button" href="javascript:void(0);">
                                         <span class="">  
@@ -64,9 +94,12 @@
                                         </span>                                              
                                     </a>                    
                                     <div class="caption">
-                                        <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue font-120 basemap info-click" href="javascript:void(0);"> </a>
+                                        <a data-bind="attr: { id: id }, text: name" class="hover-effect txt-color-blue basemap info-click" href="javascript:void(0);"> </a>
                                     </div>
                                 </div>
+                                -->
+
+
                             </div>
                             <!-- End Body Content -->
 
@@ -80,7 +113,7 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -77px; margin-left: 30px;">
                     <div class="btn-group">
-                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-globe"></i> {% trans "Basemaps" %}
+                        <button id="inventory-basemaps" type="button" class="btn btn-primary arches-map-tools" style="width:250px;"><i class="fa fa-globe"></i> {% trans "Basemaps" %}
                         </button>
                     </div>
                 </div>
