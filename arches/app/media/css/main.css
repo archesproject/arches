@@ -2939,6 +2939,11 @@ ul.labels-demo li {
     line-height: normal;
 }
 
+.arches-layer-icon {
+    -webkit-text-stroke: white 0.05em;
+    font-size: 33px;
+}
+
 .arches-form-inline {
     display: inline;
 }
