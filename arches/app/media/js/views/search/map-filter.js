@@ -160,20 +160,50 @@ define(['jquery',
                 );
             },
 
+            hexToRgb: function (hex) {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            },
+
             highlightFeatures: function(resultsarray){
+                var rgb = this.hexToRgb('#C4171D');
+                var iconUnicode = '\uf060';
+
+                var style = new ol.style.Style({
+                    text: new ol.style.Text({
+                        text: iconUnicode,
+                        font: 'normal 33px octicons',
+                        stroke: new ol.style.Stroke({
+                            // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
+                            color: 'white',
+                            width: 3
+                        }),
+                        textBaseline: 'Bottom',
+                        fill: new ol.style.Fill({
+                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
+                        })
+                    })
+                });
+                var shadowStyle = new ol.style.Style({
+                    text: new ol.style.Text({
+                        text: iconUnicode,
+                        font: 'normal 38px octicons',
+                        offsetX: 0,
+                        rotation: 0.25,
+                        textBaseline: 'Bottom',
+                        fill: new ol.style.Fill({
+                            color: 'rgba(126,126,126,0.3)',
+                        })
+                    })
+                });
                 if(!this.featureOverlay){
                     this.featureOverlay = new ol.FeatureOverlay({
                         map: this.map.map,
-                        style: new ol.style.Style({
-                            text: new ol.style.Text({
-                                text: '\uf041',
-                                font: 'normal 33px FontAwesome',
-                                textBaseline: 'Bottom',
-                                fill: new ol.style.Fill({
-                                    color: '#C4171D'
-                                })
-                            })
-                        })
+                        style: [shadowStyle,style]
                     });                    
                 }
                 this.featureOverlay.getFeatures().clear();
@@ -189,16 +219,24 @@ define(['jquery',
             },
 
             selectFeatureById: function(resourceid){
+                var rgb = this.hexToRgb('#4CAE4C');
+                var iconUnicode = '\uf060';
+                
                 if(!this.featureHightlightOverlay){
                     this.featureHightlightOverlay = new ol.FeatureOverlay({
                         map: this.map.map,
                         style: new ol.style.Style({
                             text: new ol.style.Text({
-                                text: '\uf041',
-                                font: 'normal 33px FontAwesome',
+                                text: iconUnicode,
+                                font: 'normal 33px octicons',
+                                stroke: new ol.style.Stroke({
+                                    // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
+                                    color: 'white',
+                                    width: 3
+                                }),
                                 textBaseline: 'Bottom',
                                 fill: new ol.style.Fill({
-                                    color: '#4CAE4C'
+                                    color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
                                 })
                             })
                         })
