@@ -276,7 +276,8 @@ require([
             $(".knob").css("font-size", 11);
             $(".knob").css("font-weight", 200);
 
-            $(".ol-zoom").css("top", "70px");
+            $(".ol-zoom").css("top", "10px");
+            $(".ol-zoom").css("z-index", "500");
             $(".ol-attribution").css("margin-bottom", "70px")
 
             //Select2 Simple Search initialize

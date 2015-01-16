@@ -3224,7 +3224,6 @@ a.disabled {
 
 .arches-map-inventory-header {
     height: 55px;
-    background: steelblue;
     opacity: .85;
     margin-top: -650px;
 }
@@ -3232,8 +3231,8 @@ a.disabled {
 .arches-map-inventory-footer {
     margin-top: 535px;
     height: 60px; 
-    opacity: .80;
-    background: steelblue;
+    opacity: .50;
+    background: #999;
 }
 
 .arches-map-inventory-footer-text {
