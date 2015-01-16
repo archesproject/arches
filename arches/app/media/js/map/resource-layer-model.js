@@ -68,7 +68,7 @@ define([
         var vectorLayer = new ol.layer.Vector({
             maxResolution: arches.mapDefaults.cluster_min,
             source: source,
-            style: [style,shadowStyle]
+            style: [shadowStyle,style]
         });
 
         var clusterSource = new ol.source.Cluster({
