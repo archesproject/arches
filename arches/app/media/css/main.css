@@ -3237,8 +3237,9 @@ a.disabled {
 
 .arches-map-inventory-footer-text {
     font-size: 15px;
-    font-weight: 300;
+    font-weight: 500;
     margin-top: 10px;
+    color: #000000;
 }
 
 
