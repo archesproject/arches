@@ -2921,11 +2921,22 @@ ul.labels-demo li {
     margin-left: 5px;
     width: 150px;
     overflow: hidden;
+    float: right;
+    margin-bottom: 0;
+    display: block;
+    height: 64px;
+    line-height: 64px;
 }
 
 .caption-text-search {
     color: #999;
     font-weight: 300;
+}
+
+.caption-text-search.basemap {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
 }
 
 .arches-form-inline {
