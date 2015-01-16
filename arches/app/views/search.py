@@ -31,10 +31,7 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
-    se = SearchEngineFactory().create()
-
     lang = request.GET.get('lang', 'en-us')
-    resource_count = se.search(index='resource', search_type='_count')['count']
 
     return render_to_response('search.htm', {
             'main_script': 'search',
@@ -52,11 +49,11 @@ def search_terms(request):
     phrase = Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO')
     query.add_query(phrase)
 
-    return JSONResponse(query.search(index='term', type='value'))
+    return JSONResponse(query.search(index='term', doc_type='value'))
 
 def search_results(request, as_text=False):
     dsl = build_query_dsl(request)
-    results = dsl.search(index='entity', type='') 
+    results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
@@ -222,7 +219,7 @@ def export_results(request):
 
     #search_results = search_resources(request, district_number) 
     dsl = build_query_dsl(request)
-    search_results = dsl.search(index='entity', type='') 
+    search_results = dsl.search(index='entity', doc_type='') 
     response = None
     format = request.GET.get('export', 'csv')
 

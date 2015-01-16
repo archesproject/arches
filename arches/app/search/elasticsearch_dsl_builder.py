@@ -57,10 +57,20 @@ class Query(Dsl):
             }
         }
 
-    def add_filter(self, dsl=None):
+    def add_filter(self, dsl=None, operator=None):
+        """
+        Wrap the filter in an "and" or "or" clause by specifying an operator value of "and" or "or"
+
+        """
+
         if dsl is not None:
             self._filtered = True
             dsl = Dsl(dsl).dsl
+
+            if operator:
+                dsl = {   
+                    operator: dsl
+                }
 
             self.dsl = {
                 'query':{
@@ -83,14 +93,14 @@ class Query(Dsl):
                 else:
                     self.dsl['query'] = dsl
 
-    def search(self, index='', type=''):
+    def search(self, index='', doc_type=''):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
-        #print self
-        return self.se.search(index=index, type=type, data=self.dsl)
+        print self
+        return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
-    def delete(self, index='', type=''):
-        return self.se.delete(index=index, data=self.dsl)
+    def delete(self, index=''):
+        return self.se.delete(index=index, body=self.dsl)
 
 class Bool(Dsl):
     """
@@ -165,7 +175,7 @@ class Nested(Dsl):
     http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html
 
     Note:
-        score_mode can only be used when the nested dsl is used within a queyr but not within a filter
+        score_mode can only be used when the nested dsl is used within a query but not within a filter
 
     """
 
@@ -200,6 +210,9 @@ class Terms(Dsl):
     def __init__(self, **kwargs):
         self.field = kwargs.pop('field', '_all')
         self.terms = kwargs.pop('terms', [])
+
+        if not isinstance(self.terms, list):
+            self.terms = [self.terms]
 
         self.dsl = {
             'terms' : {

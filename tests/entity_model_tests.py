@@ -114,7 +114,7 @@ def load_authority_files(path_to_files=None):
 
 def delete_index(index=None):
     se = SearchEngineFactory().create()
-    se.delete(index=index, force=True)
+    se.delete_index(index=index)
     pass
 
 def load_resources(external_file=None):

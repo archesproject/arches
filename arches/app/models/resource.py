@@ -278,6 +278,18 @@ class Resource(Entity):
 
         pass
 
+    def bulk_index(self, resources=[]):
+        report_documents = []
+        search_documents = []
+        geojson_documents = []
+        terms = []
+
+        for resource in resources:
+            report_documents = report_documents + resource.prepare_documents_for_report_index()
+            search_documents = search_documents + resource.prepare_documents_for_search_index()
+            geojson_documents = geojson_documents + resource.prepare_documents_for_map_index(geom_entities=document['geometries'])
+
+
     def index(self):
         """
         Indexes all the nessesary documents related to resources to support the map, search, and reports
@@ -298,7 +310,8 @@ class Resource(Entity):
             for geojson in geojson_documents:
                 se.index_data('maplayers', self.entitytypeid, geojson, idfield='id')
 
-        self.index_terms()
+        for term in self.prepare_terms_for_search_index():
+           se.index_term(term['term'], term['entityid'], term['context'], term['options'])
 
     def prepare_documents_for_search_index(self):
         """
@@ -364,27 +377,28 @@ class Resource(Entity):
 
         return document
 
-    def index_terms(self):
+    def prepare_terms_for_search_index(self):
         """
-        Indexes any string less then 10 words long and any concept associated with a resource to support term search  
+        Generates a list of term objects with composed of any string less then the length of settings.WORDS_PER_SEARCH_TERM  
+        long and any concept associated with a resource to support term search  
 
         """
 
-        se = SearchEngineFactory().create()
+        terms = []
 
         def gather_entities(entity):
             if entity.businesstablename == '':
                 pass
             elif entity.businesstablename == 'strings':
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(entity.value.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
-                    se.index_term(entity.value, entity.entityid, context=entity.entitytypeid)
+                    terms.append({'term': entity.value, 'entityid': entity.entityid, 'context': entity.entitytypeid, 'options':{}})
             elif entity.businesstablename == 'domains':
                 value = archesmodels.Values.objects.get(pk=entity.value)
                 if value:
                     concept = Concept(value.conceptid).get(include=['label'])
                     if concept:
                         scheme_pref_label = concept.get_context().get_preflabel().value
-                        se.index_term(concept.get_preflabel().value, entity.entityid, context=scheme_pref_label, options={'conceptid': value.conceptid_id})
+                        terms.append({'term': concept.get_preflabel().value, 'entityid': entity.entityid, 'context': scheme_pref_label, 'options':{'conceptid': value.conceptid_id}})
             elif entity.businesstablename == 'geometries':
                 pass
             elif entity.businesstablename == 'dates':
@@ -395,6 +409,7 @@ class Resource(Entity):
                 pass
 
         self.traverse(gather_entities)
+        return terms
 
     def prepare_documents_for_report_index(self):
         """
@@ -408,16 +423,7 @@ class Resource(Entity):
         entity.primaryname = self.get_primary_name()
         
         entity_dict = JSONSerializer().serializeToPython(entity)
-        entity_dict['related_resources'] = []
-        for resource in self.get_related_resources():
-            resource.primaryname = resource.get_primary_name()
-            entity_dict['related_resources'].append(JSONSerializer().serializeToPython(resource))
-        entity_dict['resource_relationships'] = []
-        for relationship in self.get_related_resources(return_entities=False):
-            relationship_dict = model_to_dict(relationship)
-            entity_dict['resource_relationships'].append(relationship_dict)
         entity_dict['graph'] = self.dictify()
-
         return [entity_dict]
 
     def delete_index(self):
@@ -426,20 +432,16 @@ class Resource(Entity):
 
         """
 
-        if self.get_rank() == 0:
-            se = SearchEngineFactory().create()
-            def delete_indexes(entity):
-                if entity.get_rank() == 0:
-                    se.delete(index='entity', type=entity.entitytypeid, id=entity.entityid)
+        se = SearchEngineFactory().create()
+        se.delete(index='entity', doc_type=entity.entitytypeid, id=self.entityid)
+        se.delete(index='maplayers', doc_type=self.entitytypeid, id=self.entityid)
 
-                if entity.entitytypeid in settings.ENTITY_TYPE_FOR_MAP_DISPLAY:
-                    se.delete(index='maplayers', type=self.entitytypeid, id=entity.entityid)
+        def delete_indexes(entity):
+            if entity.businesstablename == 'strings' or entity.businesstablename == 'domains':
+                se.delete_terms(entity)
 
-                if entity.entitytypeid in settings.SEARCHABLE_ENTITY_TYPES:
-                    se.delete_terms(entity)
-
-            entity = Entity().get(self.entityid)
-            entity.traverse(delete_indexes)
+        entity = Entity().get(self.entityid)
+        entity.traverse(delete_indexes)
 
     def prepare_search_mappings(self, resource_type_id):
         """
@@ -451,6 +453,20 @@ class Resource(Entity):
 
         se.create_mapping('term', 'value', 'ids', 'string', 'not_analyzed')
         
+        resource_relation_mapping = { 
+            'all': {
+                'properties': {
+                    'resourcexid': {'type': 'long'},
+                    'notes': { 'type': 'string'},
+                    'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
+                    'entityid2': {'type': 'string', 'index' : 'not_analyzed'},
+                    'entityid1': {'type': 'string', 'index' : 'not_analyzed'}
+                }       
+            }
+        }
+        se.create_mapping('resource_relations', 'all', mapping=resource_relation_mapping)
+
+
         mapping =  { 
             resource_type_id : {
                 'properties' : {
@@ -534,7 +550,6 @@ class Resource(Entity):
                 }
             }
         }
-
         se.create_mapping('entity', resource_type_id, mapping=mapping)
 
     @staticmethod

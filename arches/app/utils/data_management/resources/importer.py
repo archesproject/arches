@@ -1,21 +1,23 @@
 import os
-from time import time
+import csv
 import datetime
+from time import time
 from django.conf import settings
 from django.db import connection, transaction
 from django.contrib.auth.models import User
+from django.forms.models import model_to_dict
+from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.entity import Entity
 from arches.app.models.resource import Resource
 from arches.app.models.models import Concepts
 from arches.app.models.models import Values
 from arches.app.models.models import RelatedResource
 from arches.app.models.concept import Concept
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.management.commands import utils
 from optparse import make_option
 from formats.archesfile import ArchesReader
 from formats.shapefile import ShapeReader
-from django.core.management.base import BaseCommand, CommandError
-import csv
-from arches.management.commands import utils
 
 
 class ResourceLoader(object):
@@ -24,6 +26,7 @@ class ResourceLoader(object):
         self.user = User()
         self.user.first_name = settings.ETL_USERNAME
         self.resources = []
+        self.se = SearchEngineFactory().create()
 
     option_list = BaseCommand.option_list + (
         make_option('--source',
@@ -52,6 +55,7 @@ class ResourceLoader(object):
 
         resources = reader.load_file(source)
         relationships = None
+        related_resource_records = []
         relationships_file = file_name + '.relations'
         elapsed = (time() - start)
         print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
@@ -59,12 +63,12 @@ class ResourceLoader(object):
         if os.path.exists(relationships_file):
             relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
             for relationship in relationships:
-                self.relate_resources(relationship, results['legacyid_to_entityid'])
+                related_resource_records.append(self.relate_resources(relationship, results['legacyid_to_entityid']))
         else:
             print 'No relationship file'
 
-        for resource in self.resources:
-            resource.index()
+        #self.se.bulk_index(self.resources)
+
 
     def resource_list_to_entities(self, resource_list):
         '''Takes a collection of imported resource records and saves them as arches entities'''
@@ -93,11 +97,18 @@ class ResourceLoader(object):
 
             self.pre_save(master_graph)
             master_graph.save(user=self.user, note=load_id)
+            master_graph.index()
             resource.entityid = master_graph.entityid
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             
             ret['successfully_saved'] += 1
-            self.resources.append(master_graph)
+            # self.resources.append({
+            #     '_index': 'entity',
+            #     '_type': master_graph.entitytypeid,
+            #     '_id': master_graph.entityid,
+            #     '_source': master_graph.prepare_documents_for_search_index()[0]
+            # })
+            
 
         ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)
@@ -157,3 +168,4 @@ class ResourceLoader(object):
             dateended = end_date,
             )
         related_resource_record.save()
+        self.se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')

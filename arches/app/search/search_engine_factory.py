@@ -21,10 +21,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 class SearchEngineFactory(object):
 
-    def create(self, connectionName='default'):
-        backend = settings.SEARCH_CONNECTION.get(connectionName)['backend']
+    def create(self):
+        backend = settings.SEARCH_BACKEND
         components = backend.split('.')
         classname = components[len(components)-1]
         modulename = ('.').join(components[0:len(components)-1])
         _temp = __import__(modulename, globals(), locals(), [classname], -1)
-        return getattr(_temp, classname)(connectionName=connectionName)
+        return getattr(_temp, classname)()

@@ -49,16 +49,15 @@ ENTITY_MODEL = {
     'default': 'arches.app.models.entity.Entity'
 }
 
+
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
-SEARCH_CONNECTION = {
-    # override this setting in your packages settings.py file
-    'default': {
-        'backend': 'arches.app.search.search.SearchEngine',
-        'host': 'localhost',
-        'timeout': 30,
-        'connection_type': 'http'
-    }
-}
+SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
+# see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
+ELASTICSEARCH_HOSTS = [
+    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
+]
+ELASTICSEARCH_CONNECTION_OPTIONS = {'timeout': 30}
+
 
 SEARCH_ITEMS_PER_PAGE = 5
 

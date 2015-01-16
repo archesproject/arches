@@ -33,7 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms, Bool
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -74,11 +74,37 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         context_instance=RequestContext(request))        
 
 
-def get(request, resourceid):
-    se = SearchEngineFactory().create()
-    result = se.search(index='resource', id=resourceid, type="_all")
-    return JSONResponse(result)
+def related_resoures(request, resourceid):
+    return JSONResponse(get_related_resources(resourceid))
 
+def get_related_resources(resourceid):
+    ret = {
+        'resource_relationships': [],
+        'related_resources': []
+    }
+    terms = []    
+    se = SearchEngineFactory().create()
+
+    query = Query(se)
+    terms.append(Terms(field='entityid1', terms=resourceid).dsl)
+    terms.append(Terms(field='entityid2', terms=resourceid).dsl)
+    query.add_filter(terms, operator='or')
+    resource_relations = query.search(index='resource_relations', doc_type='all') 
+
+    entityids = set()
+    for relation in resource_relations['hits']['hits']:
+        ret['resource_relationships'].append(relation['_source'])
+        entityids.add(relation['_source']['entityid1'])
+        entityids.add(relation['_source']['entityid2'])
+    if len(entityids) > 0:
+        entityids.remove(resourceid)   
+
+    related_resources = se.search(index='entity', doc_type='_all', id=list(entityids))
+    if related_resources:
+        for resource in related_resources['docs']:
+            ret['related_resources'].append(resource['_source'])
+
+    return ret 
 
 def report(request, resourceid):
     report_info = Resource().get_report(resourceid)
@@ -171,7 +197,7 @@ def map_layers(request, entitytypeid, get_centroids=False):
     if entitytypeid == 'all':
         data = query.search(index='maplayers') 
     else:
-        data = query.search(index='maplayers', type=entitytypeid) 
+        data = query.search(index='maplayers', doc_type=entitytypeid) 
 
     geojson_collection = {
       "type": "FeatureCollection",

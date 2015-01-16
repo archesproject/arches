@@ -166,5 +166,5 @@ class Command(BaseCommand):
 
     def delete_index(self, index):
         se = SearchEngineFactory().create()
-        se.delete(index=index, force=True)
+        se.delete_index(index=index)
 

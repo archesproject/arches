@@ -52,25 +52,7 @@ ENTITY_MODEL = {
 
 
 ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
-SEARCH_CONNECTION = {
-    # override this setting in your packages settings.py file
-    'default': {
-        'backend': 'arches.app.search.search.SearchEngine',
-        'host': 'localhost',
-        'timeout': 30,
-        'connection_type': 'http'
-    }
-}
-
-SEARCHABLE_ENTITY_TYPES = (
-    # override this setting in your packages settings.py file
-    # entity types that are used to index terms for simple search
-)
-
-ADV_SEARCHABLE_ENTITY_TYPES = (
-    # override this setting in your packages settings.py file
-    # entity types to index for advanced search
-)
+SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
 
 DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
 
