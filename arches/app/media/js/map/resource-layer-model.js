@@ -38,6 +38,19 @@ define([
             })
         });
 
+        var shadowStyle = new ol.style.Style({
+            text: new ol.style.Text({
+                text: iconUnicode,
+                font: 'normal 38px octicons',
+                offsetX: 0,
+                rotation: 0.25,
+                textBaseline: 'Bottom',
+                fill: new ol.style.Fill({
+                    color: 'rgba(126,126,126,0.3)',
+                })
+            })
+        });
+
         var source = new ol.source.GeoJSON({
             projection: 'EPSG:3857',
             url: arches.urls.map_markers + config.entitytypeid
@@ -55,24 +68,7 @@ define([
         var vectorLayer = new ol.layer.Vector({
             maxResolution: arches.mapDefaults.cluster_min,
             source: source,
-            style: style
-        });
-
-        var shadowLayer = new ol.layer.Vector({
-            maxResolution: arches.mapDefaults.cluster_min,
-            source: source,
-            style: new ol.style.Style({
-                text: new ol.style.Text({
-                    text: iconUnicode,
-                    font: 'normal 38px octicons',
-                    offsetX: 0,
-                    rotation: 0.25,
-                    textBaseline: 'Bottom',
-                    fill: new ol.style.Fill({
-                        color: 'rgba(126,126,126,0.3)',
-                    })
-                })
-            })
+            style: [style,shadowStyle]
         });
 
         var clusterSource = new ol.source.Cluster({
@@ -123,7 +119,6 @@ define([
 
         var layerGroup = new ol.layer.Group({
             layers: [
-                shadowLayer,
                 vectorLayer,
                 clusterLayer
             ]
