@@ -1,19 +1,22 @@
 define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
     return Backbone.View.extend({
         resourceId: null,
+        resourceName: '',
+        newNodeId: 0,
+        nodeIdMap: {},
 
         initialize: function(options) {
             var self = this,
                 data;
 
-            _.extend(this, _.pick(options, 'resourceId'));
+            _.extend(this, _.pick(options, 'resourceId', 'resourceName'));
 
             if (self.resourceId) {
                 self.$el.addClass('loading');
-                self.getResourceData(self.resourceId, function (data) {
+                self.getResourceData(self.resourceId, this.resourceName, function (data) {
                     self.$el.removeClass('loading');
                     self.render(data);
-                });
+                }, true);
             }
         },
         render: function (data) {
@@ -69,20 +72,10 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                         + " scale(" + d3.event.scale + ")");
                 }
 
-
-            var nodes = force.nodes(),
-                links = force.links();
-            
-            //Load initial nodes/links
-            nodes = data.nodes;
-
-            links = data.links;
-
-
             //pin first node to center of svg
-            nodes[0].fixed = true;
-            nodes[0].x = width/2;
-            nodes[0].y = height/2;
+            data.nodes[0].fixed = true;
+            data.nodes[0].x = width/2;
+            data.nodes[0].y = height/2;
 
 
             var canvasd3 = $(".arches-search-item-description"),
@@ -106,25 +99,23 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                 }).trigger("resize");
 
 
-            // force
-            //     .nodes(nodes)
-            //     .links(links)
-            //     .start();
+            data.nodes = force.nodes(data.nodes).nodes();
+            data.links = force.links(data.links).links();
 
-
+            var findNode = function (id) {
+                for (var i=0; i < data.nodes.length; i++) {
+                    if (data.nodes[i].id === id)
+                        return data.nodes[i]
+                };
+            }
 
             var update = function () {
 
-
-                force
-                .nodes(nodes)
-                .links(links)
-                .start();
-
                 //Enter links, style as lines
                 var link = svg.selectAll(".link")
-                    .data(links)
-                    .enter().insert("line", "circle")  //the "circle" makes sure that new links render under new nodes!
+                    .data(data.links);
+
+                link.enter().insert("line", "circle")  //the "circle" makes sure that new links render under new nodes!
                     .attr("class", "link")
 
                     //add interactivity
@@ -143,24 +134,27 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                         .attr("class", "link");
                     })
 
+                link.exit().remove();
+
 
                 //Enter nodes, style as circles
                 var node = svg.selectAll("circle") 
-                    .data(nodes, function(d) { return d.id; })
-                    .enter().append("circle")
-                    .attr("r",function(d){if(d.conceptType == "Current"){ return 24 } else if (d.conceptType == "Ancestor"){ return 18 }else { return 8 }})
+                    .data(data.nodes, function(d) { return d.id; });
 
-                    .attr("r",function(d){if(d.conceptType == "Current"){ return currentNode } else if (d.conceptType == "Ancestor"){ return ancestorNode }else { return descendentNode }})
+                node.enter().append("circle")
+                    .attr("r",function(d){if(d.relationType == "Current"){ return 24 } else if (d.relationType == "Ancestor"){ return 18 }else { return 8 }})
+
+                    .attr("r",function(d){if(d.relationType == "Current"){ return currentNode } else if (d.relationType == "Ancestor"){ return ancestorNode }else { return descendentNode }})
 
                     //.attr("class", "node")
-                    .attr("class", function(d){if(d.conceptType == "Current"){ return "node-current"} else if (d.conceptType == "Ancestor"){ return "node-ancestor" } else { return "node-descendent" } })
+                    .attr("class", function(d){if(d.relationType == "Current"){ return "node-current"} else if (d.relationType == "Ancestor"){ return "node-ancestor" } else { return "node-descendent" } })
                     
                     .on("mouseover", function(){
 
                         d3.select(this).attr("class", function(d) { 
 
-                            if (d.conceptType == "Current") { return "node-current-over"} 
-                            else if (d.conceptType == "Ancestor") { return "node-ancestor-over"} 
+                            if (d.relationType == "Current") { return "node-current-over"} 
+                            else if (d.relationType == "Ancestor") { return "node-ancestor-over"} 
                             else { return "node-descendent-over"};
 
                         })
@@ -172,8 +166,8 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                         d3.select(this).attr("class", function(d) { 
                             
                             //Update node class
-                            if (d.conceptType == "Current") { return "node-current"} 
-                            else if (d.conceptType == "Ancestor") { return "node-ancestor"} 
+                            if (d.relationType == "Current") { return "node-current"} 
+                            else if (d.relationType == "Ancestor") { return "node-ancestor"} 
                             else { return "node-descendent"};
 
          
@@ -183,52 +177,35 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                     
 
                     .on("click", function (d) {
-                        d3.select(this)
-                        var nodeName = d.id;
-                        
-                        //Use the node id to power a call to Arches to see if the clicked node has any related resources.
-                        //If so, then push links/nodes for the new resource and then update graph
-                        
-                        //For now, just hard code new links/nodes
-                        links.push(
-                            {"source": 5, "target": 10, "relationship": "Built", "weight": 1}
-                            
-                        );
-
-
-                        // Update nodes.
-                        nodes.push({ id: "10", conceptName: "St Albans Church", conceptType: "Ancestor" });
-                    
-                        //Re-render graph with new nodes/links
-                        // update();
-
+                        self.getResourceData(d.entityid, d.name, function (newData) {
+                            texts.remove();
+                            data.nodes = data.nodes.concat(newData.nodes);
+                            data.links = data.links.concat(newData.links);
+                            update();
+                        }, false);
                     })
 
                     .call(force.drag);
 
+                node.exit().remove();
+
 
                 //Label Nodes
                 var texts = svg.selectAll("text.nodeLabels")
-                    .data(nodes)
+                    .data(data.nodes)
                     .enter().append("text")
                     .attr("class", function(d){
 
-                        if (d.conceptType == "Current") { return "node-current-label"} 
-                        else if (d.conceptType == "Ancestor") { return "node-ancestor-label"} 
+                        if (d.relationType == "Current") { return "node-current-label"} 
+                        else if (d.relationType == "Ancestor") { return "node-ancestor-label"} 
                         else { return "node-descendent-label"};
 
                     })
 
                     .attr("dy", ".35em")
 
-                    .text(function(d) { return d.conceptName; }); 
+                    .text(function(d) { return d.name; }); 
                  
-
-                // Label edges
-                var labels = svg.selectAll('text.edgeLabels')
-                    .data(links)
-                    .enter().append('text')
-                    .attr('class', 'edgeLabels')
 
                     //Label the edge.  Get the edge label from the target node
                     //.text(function(d) { return d.target.property; });  
@@ -236,7 +213,8 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
 
                 //Tooltip on nodes
                 // node.append("title")
-                //     .text(function(d) { return d.conceptType; });
+                //     .text(function(d) { return d.relationType; });
+
              
 
                 force.on("tick", function() {
@@ -255,13 +233,11 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                         .attr("x", function(d) { return d.x; })
                         .attr("y", function(d) { return d.y; })
              
-                    labels
-                        .attr("x", function(d) { return (d.source.x + d.target.x) / 2; }) 
-                        .attr("y", function(d) { return (d.source.y + d.target.y) / 2; }) 
                     });
 
 
                 // Restart the force layout.
+                self.data = data;
                 force.start();
             }
 
@@ -271,38 +247,46 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
 
             self.$el.addClass('view-created');
         },
-        getResourceData: function (resourceId, callback) {
+        getResourceData: function (resourceId, resourceName, callback, includeRoot) {
+            var self = this;
             $.ajax({
                 url: '../resources/get/' + resourceId,
                 success: function(response) {
 
                     var links = [],
-                        nodes = [{
-                            id: 0,
-                            entityid: response['_source'].entityid,
-                            conceptName: response['_source'].primaryname,
-                            conceptType: 'Current'
-                        }],
-                        nodeIdMap = {},
-                        nodeId = 1;
+                        nodes = [];
 
-                    nodeIdMap[response['_source'].entityid] = 0
-                    _.each(response['_source'].related_resources, function (related_resources) {
-                        nodes.push({
-                            id: nodeId,
-                            entityid: related_resources.entityid,
-                            conceptName: related_resources.primaryname,
-                            conceptType: 'Ancestor'
-                        });
-                        nodeIdMap[related_resources.entityid] = nodeId
-                        nodeId += 1;
+                    if (includeRoot){
+                        var node = {
+                            id: self.newNodeId,
+                            entityid: resourceId,
+                            name: resourceName,
+                            relationType: 'Current'
+                        };
+                        nodes.push(node);
+                        self.nodeIdMap[resourceId] = node;
+                        self.newNodeId += 1;
+                    }
+                    _.each(response.related_resources, function (related_resource) {
+                        if (!self.nodeIdMap[related_resource.entityid]) {
+                            var node = {
+                                id: self.newNodeId,
+                                entityid: related_resource.entityid,
+                                name: related_resource.primaryname,
+                                relationType: 'Ancestor'
+                            };
+                            nodes.push(node);
+                            self.nodeIdMap[related_resource.entityid] = node;
+                            self.newNodeId += 1;
+                        }
                     });
 
-                    _.each(response['_source'].resource_relationships, function (resource_relationships) {
+                    _.each(response.resource_relationships, function (resource_relationships) {
                         links.push({
-                            source: nodeIdMap[resource_relationships.entityid1],
-                            target: nodeIdMap[resource_relationships.entityid2],
-                            relationship: resource_relationships.relationshiptype
+                            source: self.nodeIdMap[resource_relationships.entityid1],
+                            target: self.nodeIdMap[resource_relationships.entityid2],
+                            relationship: resource_relationships.relationshiptype,
+                            "weight": 1
                         })
                     });
 
@@ -316,63 +300,3 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
     });
 });
 
-
-    // "resource_relationships": [
-    //   {
-    //     "notes": "",
-    //     "entityid2": "dea3ed16-13a2-438f-bf9c-9cd465ea3046",
-    //     "entityid1": "6ea3e924-ecd4-432d-9c05-c93dab578899",
-    //     "datestarted": null,
-    //     "resourcexid": 2,
-    //     "dateended": null,
-    //     "relationshiptype": "ea1d6f73-24a5-4a7a-9491-347ed8a10d2f"
-    //   },
-    //   {
-    //     "notes": "",
-    //     "entityid2": "18688c0e-4950-4e67-a7b2-375d45b5822e",
-    //     "entityid1": "6ea3e924-ecd4-432d-9c05-c93dab578899",
-    //     "datestarted": null,
-    //     "resourcexid": 3,
-    //     "dateended": null,
-    //     "relationshiptype": "17298183-5c74-4000-904c-bee6a95faaf8"
-    //   },
-    //   {
-    //     "notes": "",
-    //     "entityid2": "6ea3e924-ecd4-432d-9c05-c93dab578899",
-    //     "entityid1": "a5de75a9-04c0-47a3-b929-3f74b387ff58",
-    //     "datestarted": null,
-    //     "resourcexid": 8,
-    //     "dateended": null,
-    //     "relationshiptype": "a100f1b1-59e7-4495-bc09-9aab31f81ae4"
-    //   }
-    // ],
-
-    // "related_resources": [
-    //   {
-    //     "label": "",
-    //     "primaryname": "Historic Resources Group",
-    //     "value": "",
-    //     "entitytypeid": "ACTOR.E39",
-    //     "entityid": "dea3ed16-13a2-438f-bf9c-9cd465ea3046",
-    //     "property": "",
-    //     "businesstablename": ""
-    //   },
-    //   {
-    //     "label": "",
-    //     "primaryname": "SurveyLA: Sherman Oaks-Studio City-Toluca Lake-Cahuenga Pass Historic Resources Survey Report",
-    //     "value": "",
-    //     "entitytypeid": "INFORMATION_RESOURCE.E73",
-    //     "entityid": "18688c0e-4950-4e67-a7b2-375d45b5822e",
-    //     "property": "",
-    //     "businesstablename": ""
-    //   },
-    //   {
-    //     "label": "",
-    //     "primaryname": "3264 N WRIGHTWOOD DR",
-    //     "value": "",
-    //     "entitytypeid": "HERITAGE_RESOURCE.E18",
-    //     "entityid": "a5de75a9-04c0-47a3-b929-3f74b387ff58",
-    //     "property": "",
-    //     "businesstablename": ""
-    //   }
-    // ],

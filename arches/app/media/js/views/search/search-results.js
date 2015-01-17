@@ -36,12 +36,14 @@ define(['jquery',
 
             showRelatedResouresGraph: function (e) {
                 var resourceId = $(e.target).data('resourceid')
+                var primaryName = $(e.target).data('primaryname')
                 var searchItem = $(e.target).closest('.arches-search-item');
                 var graphPanel = searchItem.find('.arches-related-resource-panel');
                 if (!graphPanel.hasClass('view-created')) {
                     new RelatedResourcesGraph({
                         el: graphPanel[0],
-                        resourceId: resourceId
+                        resourceId: resourceId,
+                        resourceName: primaryName
                     });
                 }
                 graphPanel.slideToggle(500);
