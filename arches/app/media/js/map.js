@@ -342,6 +342,8 @@ require([
             $(".select2-search-field").css("font-size", "15px");
             $(".select2-search-field").css("font-weight", "200");
             $(".select2-search-choice").css("margin-top", "8px");
+            $(".select2-container-multi .select2-choices").css("border-radius", "3px");
+
 
             $('.geocodewidget').on("select2-selecting", function(e) {
                 var geom = geoJSON.readGeometry(e.object.geometry)

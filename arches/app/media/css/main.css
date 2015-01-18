@@ -3232,12 +3232,12 @@ a.disabled {
     margin-top: 535px;
     height: 60px; 
     opacity: .50;
-    background: #bbb;
+    background: #eaeaea;
 }
 
 .arches-map-inventory-footer-text {
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 400;
     margin-top: 10px;
     color: #000000;
 }
