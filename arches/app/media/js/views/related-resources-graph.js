@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
+define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbone, _, arches) {
     return Backbone.View.extend({
         resourceId: null,
         resourceName: '',
@@ -21,18 +21,10 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
         },
         render: function (data) {
             var self = this,
-                panelWidth = this.$el.parent().width(),
-                width = panelWidth,
-                height = 400,
-                nodesize = 12,
-                nodeMouseOver = 14,
-                opacity = 0.5,
-                currentNode = 30,
-                ancestorNode = 22,
-                descendentNode = 16,
-                selectSize = 4;
+                width = this.$el.parent().width(),
+                height = 400;
 
-            var force = d3.layout.force()
+            self.force = d3.layout.force()
                 .charge(-750)
                 .linkDistance(150)
                 .gravity(0.05)
@@ -40,16 +32,14 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                 .linkStrength(function(l, i) {return 1; })
                 .theta(0.8)
                 .size([width, height]);
-             
-            var color = d3.scale.category20();
 
             var redraw = function() {
-                svg.attr("transform",
+                self.svg.attr("transform",
                     "translate(" + d3.event.translate + ")" +
                     " scale(" + d3.event.scale + ")");
             };
 
-            var svg = d3.select(this.el).append("svg")
+            self.svg = d3.select(this.el).append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .call(d3.behavior.zoom().on("zoom", redraw))
@@ -72,150 +62,144 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
             }).trigger("resize");
 
 
-            data.nodes = force.nodes(data.nodes).nodes();
-            data.links = force.links(data.links).links();
+            data.nodes = self.force.nodes(data.nodes).nodes();
+            data.links = self.force.links(data.links).links();
 
-            var findNode = function (id) {
-                for (var i=0; i < data.nodes.length; i++) {
-                    if (data.nodes[i].id === id) {
-                        return data.nodes[i];
-                    }
-                }
-            };
+            self.update(data);
 
-            var update = function () {
+            self.$el.addClass('view-created');
+        },
 
-                //Enter links, style as lines
-                var link = svg.selectAll(".link")
-                    .data(data.links);
+        update: function (data) {
+            var self = this;
+            var link = self.svg.selectAll(".link")
+                .data(data.links);
 
-                link.enter().insert("line", "circle")
-                    .attr("class", "link")
-                    .on("mouseover", function(d) {
-                        d3.select(this).attr("class", "linkMouseover");
-                        link.append("title").text(function(d) {
-                            return d.relationship;
-                        });
-                    })
-                    .on("mouseout", function(d) {
-                        d3.select(this)
-                        .attr("class", "link");
+            link.enter().insert("line", "circle")
+                .attr("class", "link")
+                .on("mouseover", function(d) {
+                    d3.select(this).attr("class", "linkMouseover");
+                    link.append("title").text(function(d) {
+                        return d.relationship;
                     });
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this)
+                    .attr("class", "link");
+                });
 
-                link.exit().remove();
+            link.exit().remove();
 
-                var node = svg.selectAll("circle")
-                    .data(data.nodes, function(d) { return d.id; });
+            var node = self.svg.selectAll("circle")
+                .data(data.nodes, function(d) { return d.id; });
 
-                node.enter().append("circle")
-                    .attr("r",function(d){
-                        if(d.relationType == "Current"){
-                            return 24;
-                        } else if (d.relationType == "Ancestor"){
-                            return 18;
+            node.enter().append("circle")
+                .attr("r",function(d){
+                    if(d.relationType == "Current"){
+                        return 24;
+                    } else if (d.relationType == "Ancestor"){
+                        return 18;
+                    } else {
+                        return 8;
+                    }
+                })
+                .attr("r",function(d){
+                    if(d.relationType == "Current"){
+                        return 30;
+                    } else if (d.relationType == "Ancestor"){
+                        return 22;
+                    } else {
+                        return 16;
+                    }
+                })
+                .attr("class", function(d){
+                    if(d.relationType == "Current"){
+                        return "node-current";
+                    } else if (d.relationType == "Ancestor"){
+                        return "node-ancestor";
+                    } else {
+                        return "node-descendent";
+                    }
+                })
+                .on("mouseover", function(){
+                    d3.select(this).attr("class", function(d) {
+                        if (d.relationType == "Current") {
+                            return "node-current-over";
+                        } else if (d.relationType == "Ancestor") {
+                            return "node-ancestor-over";
                         } else {
-                            return 8;
+                            return "node-descendent-over";
                         }
-                    })
-                    .attr("r",function(d){
-                        if(d.relationType == "Current"){
-                            return currentNode;
-                        } else if (d.relationType == "Ancestor"){
-                            return ancestorNode;
-                        } else {
-                            return descendentNode;
-                        }
-                    })
-                    .attr("class", function(d){
-                        if(d.relationType == "Current"){
+                    });
+                })
+                .on("mouseout", function(){
+                    d3.select(this).attr("class", function(d) {
+                        if (d.relationType == "Current") {
                             return "node-current";
-                        } else if (d.relationType == "Ancestor"){
+                        } else if (d.relationType == "Ancestor") {
                             return "node-ancestor";
                         } else {
                             return "node-descendent";
                         }
-                    })
-                    .on("mouseover", function(){
-                        d3.select(this).attr("class", function(d) {
-                            if (d.relationType == "Current") {
-                                return "node-current-over";
-                            } else if (d.relationType == "Ancestor") {
-                                return "node-ancestor-over";
-                            } else {
-                                return "node-descendent-over";
-                            }
-                        });
-                    })
-                    .on("mouseout", function(){
-                        d3.select(this).attr("class", function(d) {
-                            if (d.relationType == "Current") {
-                                return "node-current";
-                            } else if (d.relationType == "Ancestor") {
-                                return "node-ancestor";
-                            } else {
-                                return "node-descendent";
-                            }
-                        });
-                    })
-                    .on("click", function (d) {
-                        self.getResourceData(d.entityid, d.name, function (newData) {
-                            texts.remove();
-                            data.nodes = data.nodes.concat(newData.nodes);
-                            data.links = data.links.concat(newData.links);
-                            update();
-                        }, false);
-                    })
-                    .call(force.drag);
-
-                node.exit().remove();
-
-                var texts = svg.selectAll("text.nodeLabels")
-                    .data(data.nodes)
-                    .enter().append("text")
-                    .attr("class", function(d){
-                        if (d.relationType == "Current") {
-                            return "node-current-label";
-                        } else if (d.relationType == "Ancestor") {
-                            return "node-ancestor-label";
-                        } else {
-                            return "node-descendent-label";
-                        }
-                    })
-                    .attr("dy", ".35em")
-                    .text(function(d) {
-                        return d.name;
                     });
+                })
+                .on("click", function (d) {
+                    self.getResourceData(d.entityid, d.name, function (newData) {
+                        texts.remove();
+                        data.nodes = data.nodes.concat(newData.nodes);
+                        data.links = data.links.concat(newData.links);
+                        self.update(data);
+                    }, false);
+                })
+                .call(self.force.drag);
 
-                force.on("tick", function() {
-                    link
-                        .attr("x1", function(d) { return d.source.x; })
-                        .attr("y1", function(d) { return d.source.y; })
-                        .attr("x2", function(d) { return d.target.x; })
-                        .attr("y2", function(d) { return d.target.y; });
-             
-                    node
-                        .attr("cx", function(d) { return d.x; })
-                        .attr("cy", function(d) { return d.y; });
-             
-                    texts
-                        .attr("x", function(d) { return d.x; })
-                        .attr("y", function(d) { return d.y; });
-             
+            node.exit().remove();
+
+            var texts = self.svg.selectAll("text.nodeLabels")
+                .data(data.nodes);
+
+            texts.enter().append("text")
+                .attr("class", function(d){
+                    if (d.relationType == "Current") {
+                        return "node-current-label";
+                    } else if (d.relationType == "Ancestor") {
+                        return "node-ancestor-label";
+                    } else {
+                        return "node-descendent-label";
+                    }
+                })
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d.name;
                 });
 
-                self.data = data;
-                force.start();
-            };
+            texts.exit().remove();
 
-            update();
+            self.force.on("tick", function() {
+                link
+                    .attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+         
+                node
+                    .attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+         
+                texts
+                    .attr("x", function(d) { return d.x; })
+                    .attr("y", function(d) { return d.y; });
+         
+            });
 
-            self.$el.addClass('view-created');
+            self.data = data;
+            self.force.start();
         },
 
         getResourceData: function (resourceId, resourceName, callback, includeRoot) {
             var self = this;
             $.ajax({
-                url: '../resources/get/' + resourceId,
+                url: arches.urls.related_resources + resourceId,
                 success: function(response) {
 
                     var links = [],
@@ -254,6 +238,8 @@ define(['jquery', 'backbone', 'underscore', 'd3'], function($, Backbone, _) {
                             "weight": 1
                         });
                     });
+
+                    console.log(nodes, links);
 
                     callback({
                         nodes: nodes,
