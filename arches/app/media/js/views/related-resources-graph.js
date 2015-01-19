@@ -3,23 +3,27 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
         resourceId: null,
         resourceName: '',
         newNodeId: 0,
-        nodeIdMap: {},
 
         initialize: function(options) {
-            var self = this,
-                data;
+            var self = this;
 
             _.extend(this, _.pick(options, 'resourceId', 'resourceName'));
+            this.nodeIdMap = {};
+            this.data = {
+                nodes: [],
+                links: []
+            };
 
             if (self.resourceId) {
                 self.$el.addClass('loading');
                 self.getResourceData(self.resourceId, this.resourceName, function (data) {
                     self.$el.removeClass('loading');
-                    self.render(data);
+                    self.data = data;
+                    self.render();
                 }, true);
             }
         },
-        render: function (data) {
+        render: function () {
             var self = this,
                 width = this.$el.parent().width(),
                 height = 400;
@@ -45,9 +49,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 .call(d3.behavior.zoom().on("zoom", redraw))
                 .append('svg:g');
 
-            data.nodes[0].fixed = true;
-            data.nodes[0].x = width/2;
-            data.nodes[0].y = height/2;
+            self.data.nodes[0].fixed = true;
+            self.data.nodes[0].x = width/2;
+            self.data.nodes[0].y = height/2;
 
 
             var canvasd3 = $(".arches-search-item-description"),
@@ -61,19 +65,20 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 canvasd3.attr("height", targetHeight);
             }).trigger("resize");
 
-
-            data.nodes = self.force.nodes(data.nodes).nodes();
-            data.links = self.force.links(data.links).links();
-
-            self.update(data);
+            self.update(self.data);
 
             self.$el.addClass('view-created');
         },
 
-        update: function (data) {
+        update: function () {
             var self = this;
+            self.data = {
+                nodes: self.force.nodes(self.data.nodes).nodes(),
+                links: self.force.links(self.data.links).links()
+            };
+
             var link = self.svg.selectAll(".link")
-                .data(data.links);
+                .data(self.data.links);
 
             link.enter().insert("line", "circle")
                 .attr("class", "link")
@@ -91,9 +96,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
             link.exit().remove();
 
             var node = self.svg.selectAll("circle")
-                .data(data.nodes, function(d) { return d.id; });
+                .data(self.data.nodes, function(d) { return d.id; });
 
-            node.enter().append("circle")
+            nodeEnter = node.enter().append("circle")
                 .attr("r",function(d){
                     if(d.relationType == "Current"){
                         return 24;
@@ -145,18 +150,19 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 })
                 .on("click", function (d) {
                     self.getResourceData(d.entityid, d.name, function (newData) {
-                        texts.remove();
-                        data.nodes = data.nodes.concat(newData.nodes);
-                        data.links = data.links.concat(newData.links);
-                        self.update(data);
+                        if (newData.nodes.length > 0 || newData.links.length > 0) {
+                            texts.remove();
+                            self.data.nodes = self.data.nodes.concat(newData.nodes);
+                            self.data.links = self.data.links.concat(newData.links);
+                            self.update(self.data);
+                        }
                     }, false);
                 })
-                .call(self.force.drag);
 
             node.exit().remove();
 
-            var texts = self.svg.selectAll("text.nodeLabels")
-                .data(data.nodes);
+            self.svg.selectAll("text.nodeLabels").remove();
+            texts = self.svg.selectAll("text.nodeLabels").data(self.data.nodes);
 
             texts.enter().append("text")
                 .attr("class", function(d){
@@ -173,7 +179,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                     return d.name;
                 });
 
-            texts.exit().remove();
 
             self.force.on("tick", function() {
                 link
@@ -192,8 +197,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
          
             });
 
-            self.data = data;
             self.force.start();
+            node.call(self.force.drag);
         },
 
         getResourceData: function (resourceId, resourceName, callback, includeRoot) {
@@ -201,7 +206,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
             $.ajax({
                 url: arches.urls.related_resources + resourceId,
                 success: function(response) {
-
                     var links = [],
                         nodes = [];
 
@@ -210,7 +214,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             id: self.newNodeId,
                             entityid: resourceId,
                             name: resourceName,
-                            relationType: 'Current'
+                            relationType: 'Current',
+                            weight: 1
                         };
                         nodes.push(node);
                         self.nodeIdMap[resourceId] = node;
@@ -222,7 +227,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                                 id: self.newNodeId,
                                 entityid: related_resource.entityid,
                                 name: related_resource.primaryname,
-                                relationType: 'Ancestor'
+                                relationType: 'Ancestor',
+                                weight: 1
                             };
                             nodes.push(node);
                             self.nodeIdMap[related_resource.entityid] = node;
@@ -231,15 +237,20 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                     });
 
                     _.each(response.resource_relationships, function (resource_relationships) {
-                        links.push({
-                            source: self.nodeIdMap[resource_relationships.entityid1],
-                            target: self.nodeIdMap[resource_relationships.entityid2],
-                            relationship: resource_relationships.relationshiptype,
-                            "weight": 1
+                        var sourceId = self.nodeIdMap[resource_relationships.entityid1];
+                        var targetId = self.nodeIdMap[resource_relationships.entityid2];
+                        var linkExists = _.find(self.data.links, function(link){
+                            return (link.source === sourceId && link.target === targetId);
                         });
+                        if (!linkExists) {
+                            links.push({
+                                source: sourceId,
+                                target: targetId,
+                                relationship: resource_relationships.relationshiptype,
+                                weight: 1
+                            });
+                        }
                     });
-
-                    console.log(nodes, links);
 
                     callback({
                         nodes: nodes,
