@@ -252,7 +252,9 @@ define(['jquery',
             },
 
             unselectAllFeatures: function(){
-                this.featureHightlightOverlay.getFeatures().clear();
+                if(this.featureHightlightOverlay) {
+                    this.featureHightlightOverlay.getFeatures().clear();
+                }
             },
 
             getMapExtent: function(){
