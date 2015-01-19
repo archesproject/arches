@@ -214,8 +214,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             id: self.newNodeId,
                             entityid: resourceId,
                             name: resourceName,
-                            relationType: 'Current',
-                            weight: 1
+                            relationType: 'Current'
                         };
                         nodes.push(node);
                         self.nodeIdMap[resourceId] = node;
@@ -227,8 +226,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                                 id: self.newNodeId,
                                 entityid: related_resource.entityid,
                                 name: related_resource.primaryname,
-                                relationType: 'Ancestor',
-                                weight: 1
+                                relationType: 'Ancestor'
                             };
                             nodes.push(node);
                             self.nodeIdMap[related_resource.entityid] = node;
