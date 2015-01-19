@@ -339,10 +339,10 @@ require([
             });
 
             $('.geocodewidget').on("select2-selecting", function(e) {
-                var geom = geoJSON.readGeometry(e.object.geometry)
+                var geom = geoJSON.readGeometry(e.object.geometry);
                 geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
                 self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
-                self.viewModel.selectedAddress(e.object.text)
+                self.viewModel.selectedAddress(e.object.text);
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
                 overlay.setPositioning('bottom-center');
                 $('#popup').show();
