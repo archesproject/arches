@@ -159,11 +159,11 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                                 valuetype.category = 'undefined'
                                 valuetype.namespace = 'arches'
                                 valuetype.save()
-                                value_types = models.ValueTypes.objects.all()
-
-                                concept = lookups.get_lookup(legacyoid=row[u'CONCEPTID'])
-                                category = value_types.get(valuetype=row_valuetype).category
-                                concept.addvalue({'value':row[u'VALUE'], 'type': row[u'VALUETYPE'], 'category': category})
+                            
+                            value_types = models.ValueTypes.objects.all()
+                            concept = lookups.get_lookup(legacyoid=row[u'CONCEPTID'])
+                            category = value_types.get(valuetype=row_valuetype).category
+                            concept.addvalue({'value':row[u'VALUE'], 'type': row[u'VALUETYPE'], 'category': category})
 
                     except Exception as e:
                         errors.append('ERROR in row %s (%s): %s' % (rows.line_num, str(e), row))
