@@ -902,37 +902,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     color: #555;
 }
 
-#info {
-    position: absolute;
-    z-index: 100;
-}
-.tooltip {
-    opacity: 1;
-    filter: alpha(opacity=100);  
-}
-.tooltip.in {
-    opacity: 1;
-    filter: alpha(opacity=100);
-}
-.tooltip.top .tooltip-arrow {
-    border-top-color: rgb(134, 134, 134);
-} 
-.tooltip.bottom .tooltip-arrow {
-    border-bottom-color: rgb(134, 134, 134);
-} 
-.tooltip.left .tooltip-arrow {
-    border-left-color: rgb(134, 134, 134);
-} 
-.tooltip.right .tooltip-arrow {
-    border-right-color: rgb(134, 134, 134);
-}
-.tooltip-inner {
-    border: 1px solid rgb(197, 197, 197);
-    background-color: #FFF;
-    color: #416CA9;
-}
-
-
 
 
 /* Search */
@@ -977,7 +946,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     color: white;
 }
 
+.select2-search-choice.inverted {
+    background-color: #B41F1F !important;
+    border: 1px solid #943434 !important;
+}
+
 /* Map Filter*/
+
 /*element.style {
     position: relative;
     overflow: hidden;
@@ -1000,6 +975,37 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     margin-right: 25px;
     margin-bottom: 20px;
 }
+
+#info {
+    position: absolute;
+    z-index: 100;
+}
+.map .tooltip {
+    opacity: 1;
+    filter: alpha(opacity=100);  
+}
+.map .tooltip.in {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+.map .tooltip.top .tooltip-arrow {
+    border-top-color: rgb(134, 134, 134);
+} 
+.map .tooltip.bottom .tooltip-arrow {
+    border-bottom-color: rgb(134, 134, 134);
+} 
+.map .tooltip.left .tooltip-arrow {
+    border-left-color: rgb(134, 134, 134);
+} 
+.map .tooltip.right .tooltip-arrow {
+    border-right-color: rgb(134, 134, 134);
+}
+.map .tooltip-inner {
+    border: 1px solid rgb(197, 197, 197);
+    background-color: #FFF;
+    color: #416CA9;
+}
+
 
 /* Time Filter*/
 
