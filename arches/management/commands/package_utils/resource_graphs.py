@@ -4,6 +4,7 @@ import traceback
 import unicodecsv
 from os import listdir
 from os.path import isfile, join
+from django.core import management
 from django.db import connection, transaction
 import concepts
 from .. import utils
@@ -11,6 +12,7 @@ from .. import utils
 def load_graphs(break_on_error=True, settings=None):
     """
     Iterates through the resource node and edge files to load entitytypes and mappings into the database.
+    Generates node level permissions for each resourcetype/entitytype combination
 
     """
 
@@ -61,6 +63,8 @@ def load_graphs(break_on_error=True, settings=None):
         print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'))
         if break_on_error:
             sys.exit(101)
+
+    management.call_command('packages', operation='build_permissions') 
 
 def append_branch(path_to_branch, node_list, edge_list):
     """

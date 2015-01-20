@@ -75,9 +75,6 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
 
 def related_resoures(request, resourceid):
-    return JSONResponse(get_related_resources(resourceid))
-
-def get_related_resources(resourceid):
     ret = {
         'resource_relationships': [],
         'related_resources': []
@@ -104,7 +101,7 @@ def get_related_resources(resourceid):
         for resource in related_resources['docs']:
             ret['related_resources'].append(resource['_source'])
 
-    return ret 
+    return JSONResponse(ret)
 
 def report(request, resourceid):
     report_info = Resource().get_report(resourceid)

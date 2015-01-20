@@ -151,7 +151,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 .on("click", function (d) {
                     self.getResourceData(d.entityid, d.name, function (newData) {
                         if (newData.nodes.length > 0 || newData.links.length > 0) {
-                            texts.remove();
+                            if (self.texts) {
+                                self.texts.remove();
+                            }
                             self.data.nodes = self.data.nodes.concat(newData.nodes);
                             self.data.links = self.data.links.concat(newData.links);
                             self.update(self.data);
@@ -162,9 +164,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
             node.exit().remove();
 
             self.svg.selectAll("text.nodeLabels").remove();
-            texts = self.svg.selectAll("text.nodeLabels").data(self.data.nodes);
+            self.texts = self.svg.selectAll("text.nodeLabels").data(self.data.nodes);
 
-            texts.enter().append("text")
+            self.texts.enter().append("text")
                 .attr("class", function(d){
                     if (d.relationType == "Current") {
                         return "node-current-label";
@@ -191,7 +193,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                     .attr("cx", function(d) { return d.x; })
                     .attr("cy", function(d) { return d.y; });
          
-                texts
+                self.texts
                     .attr("x", function(d) { return d.x; })
                     .attr("y", function(d) { return d.y; });
          
