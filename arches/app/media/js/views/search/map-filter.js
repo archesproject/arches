@@ -1,4 +1,5 @@
 define(['jquery', 
+    'jquery-ui',
     'underscore',
     'backbone',
     'bootstrap',
@@ -7,7 +8,7 @@ define(['jquery',
     'openlayers', 
     'knockout',
     'map/resource-layer-model'], 
-    function($, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel) {
+    function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel) {
         return Backbone.View.extend({
 
             events: {
@@ -148,6 +149,62 @@ define(['jquery',
                 //Close Button
                 $(".close").click(function (){ 
                     hideAllPanels();
+                });
+
+                var hoverFeatureInfo = function(pixel) {
+                    var info = $('#info');
+                    var mapheight = $(self.map.map.getViewport()).height();
+                    var mapwidth = $(self.map.map.getViewport()).width();
+                    var feature = self.map.map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                        if (_.contains(feature.getKeys(), 'primaryname')){
+                            return feature.get('primaryname');
+                        }
+                        if (_.contains(feature.getKeys(), 'features')){
+                            // var html = '';
+                            // _.find(feature.get('features'), function(feat, index, all){
+                            //     if(index < 4){
+                            //         html += '<li>' + feat.get("primaryname") + '</li>';
+                            //     }else{
+                            //         html += '<li>....</li>';
+                            //         return false;
+                            //     }
+                            // });
+                            // return html;
+                            if(feature.get('features').length === 1){
+                                return feature.get('features')[0].get('primaryname');
+                            }
+                        }
+                    });
+                    if (feature) {
+                        info.find('#tooltip-text').html(feature);
+                        if(pixel[0] < mapwidth*.33){
+                            info.removeClass('left')
+                                .addClass('right');
+                        }
+                        if(pixel[0] > mapwidth*.66){
+                            info.removeClass('right')
+                                .addClass('left');
+                        }
+                        if(info.hasClass('left')){
+                            info.css({
+                                left: (pixel[0] - info.width() + 20) + 'px',
+                                top: (pixel[1] - info.height()/2 - 10) + 'px'
+                            });
+                        }    
+                        if(info.hasClass('right')){
+                            info.css({
+                                left: (pixel[0] + 50) + 'px',
+                                top: (pixel[1] - info.height()/2 - 10) + 'px'
+                            });
+                        }                 
+                        info.fadeIn('fast');
+                    } else {
+                        info.fadeOut('fast');
+                    }
+                };
+
+                $(this.map.map.getViewport()).on('mousemove', function(evt) {
+                    hoverFeatureInfo(self.map.map.getEventPixel(evt.originalEvent));
                 });
             },
 
