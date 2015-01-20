@@ -545,7 +545,6 @@ class MappingSteps(models.Model):
     mappingid = models.ForeignKey('Mappings', primary_key=True, db_column='mappingid')
     ruleid = models.ForeignKey('Rules', db_column='ruleid')
     order = models.IntegerField()
-    defaultvalue = models.TextField()
     class Meta:
         db_table = u'mapping_steps'
 
