@@ -240,7 +240,7 @@ class Command(BaseCommand):
         mapping_steps = models.MappingSteps.objects.all()
         rules = models.Rules.objects.all()
         for mapping in mappings:
-            print '%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id)
+            #print '%s -- %s' % (mapping.entitytypeidfrom_id, mapping.entitytypeidto_id)
             if mapping.entitytypeidfrom_id not in resourcetypes:
                 resourcetypes[mapping.entitytypeidfrom_id] = set([mapping.entitytypeidfrom_id])
             for step in mapping_steps.filter(pk=mapping.pk):
