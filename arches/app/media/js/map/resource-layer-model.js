@@ -32,9 +32,9 @@ define([
                 var styles = [new ol.style.Style({
                     text: new ol.style.Text({
                         text: iconUnicode,
-                        font: 'normal ' + shadowSize + 'px octicons',
-                        offsetX: 0,
-                        rotation: 0.25,
+                        font: 'normal ' + iconSize + 'px octicons',
+                        offsetX: 5,
+                        offsetY: -5,
                         textBaseline: 'Bottom',
                         fill: new ol.style.Fill({
                             color: 'rgba(126,126,126,0.3)',
@@ -92,17 +92,26 @@ define([
 
             var clusterStyle = function(feature, resolution) {
                 var size = feature.get('features').length;
-                var radius = 10;
-                if (size > 200) {
-                    radius = 18;
-                } else if (size > 150) {
-                    radius = 16;
-                } else if (size > 100) {
-                    radius = 14;
-                } else if (size > 50) {
-                    radius = 12;
+                var mouseOver = feature.get('mouseover');
+                var shadowSize = mouseOver ? 42 : 38;
+                var iconSize = mouseOver ? 37 : 33;
+                var radius = mouseOver ? 12 : 10;
+
+                if (size === 1) {
+                    return style(feature, resolution);
                 }
-                var style = [new ol.style.Style({
+
+                if (size > 200) {
+                    radius = mouseOver ? 20 : 18;
+                } else if (size > 150) {
+                    radius = mouseOver ? 18 : 16;
+                } else if (size > 100) {
+                    radius = mouseOver ? 16 : 14;
+                } else if (size > 50) {
+                    radius = mouseOver ? 14 : 12;
+                }
+
+                return [new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: radius,
                         stroke: new ol.style.Stroke({
@@ -120,18 +129,15 @@ define([
                         })
                     })
                 })];
-                return style;
             };
 
             var clusterLayer = new ol.layer.Vector({
-                minResolution: arches.mapDefaults.cluster_min,
                 source: clusterSource,
                 style: clusterStyle
             });
 
             return new ol.layer.Group({
                 layers: [
-                    vectorLayer,
                     clusterLayer
                 ]
             });

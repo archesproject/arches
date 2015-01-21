@@ -15,6 +15,7 @@ define([
 
         overlays: [],
         enableSelection: true,
+        hoverFeature: null,
         initialize: function(options) {
             var self = this;
             var projection = ol.proj.get('EPSG:3857');
@@ -48,13 +49,13 @@ define([
                 var vectorLayer = new ol.layer.Vector({
                     source: vectorSource,
                     style: new ol.style.Style({
-                            fill: new ol.style.Fill({
-                                color: 'rgba(92, 184, 92, 0.5)'
-                            }),
-                            stroke: new ol.style.Stroke({
-                                color: '#0ff',
-                                width: 1
-                            })
+                        fill: new ol.style.Fill({
+                            color: 'rgba(92, 184, 92, 0.5)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#0ff',
+                            width: 1
+                        })
                     })
                 });
                 self.map.addLayer(vectorLayer);
@@ -114,27 +115,6 @@ define([
                 var extent = view.calculateExtent(self.map.getSize());
                 self.trigger('viewChanged', view.getZoom(), extent);
             });
-
-            this.select.getFeatures().on('change:length', function(e) {
-                if (e.target.getArray().length !== 0) {
-                    var feature = e.target.item(0);
-                    var isClustered = _.contains(feature.getKeys(), "features");
-                    if (isClustered) {
-                        var extent = feature.getGeometry().getExtent();
-                        _.each(feature.get("features"), function (feature) {
-                            featureExtent = feature.getGeometry().getExtent()
-                            if (_.contains(feature.getKeys(), 'extent')) {
-                                featureExtent = ol.extent.applyTransform(feature.get('extent'), ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
-                            }
-                            extent = ol.extent.extend(extent, featureExtent);
-                        });
-                        self.map.getView().fitExtent(extent, (self.map.getSize()));
-                        _.defer(function () {
-                            self.select.getFeatures().clear()
-                        });
-                    }
-                }
-            });
         },
 
         handleMouseMove: function(e) {
@@ -144,9 +124,18 @@ define([
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
-                return self.isFeatureSelectable(feature);
+                return self.isFeatureSelectable(feature) ? feature : null;
             });
             var cursorStyle = overFeature ? "pointer" : "";
+            if (this.hoverFeature) {
+                this.hoverFeature.set('mouseover', false);
+                this.hoverFeature = null;
+            }
+            if (overFeature) {
+                this.hoverFeature = overFeature;
+                this.hoverFeature.set('mouseover', true);
+            }
+
             if (this.enableSelection) {
                 this.$el.css("cursor", cursorStyle);
             }
@@ -157,6 +146,10 @@ define([
         },
 
         handleMouseOut: function () {
+            if (this.hoverFeature) {
+                this.hoverFeature.set('mouseover', false);
+                this.hoverFeature = null;
+            }
             this.trigger('mousePositionChanged', '');
         },
 

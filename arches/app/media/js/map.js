@@ -155,40 +155,62 @@ require([
             });
 
             map.select.getFeatures().on('change:length', function(e) {
-                if (e.target.getArray().length === 0) {
-                    $('#resource-info').hide();
-                } else {
-                    var clickFeature = e.target.getArray()[0];
+
+                if (e.target.getArray().length !== 0) {
+                    var clickFeature = e.target.item(0);
                     var keys = clickFeature.getKeys();
-                    if (!_.contains(keys, 'select_feature')) {
+                    var isCluster = _.contains(keys, "features");
+                    if (isCluster && clickFeature.get('features').length > 1) {
+                        var extent = clickFeature.getGeometry().getExtent();
+                        _.each(clickFeature.get("features"), function (feature) {
+                            if (_.contains(keys, 'extent')) {
+                                featureExtent = ol.extent.applyTransform(feature.get('extent'), ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
+                            } else {
+                                featureExtent = feature.getGeometry().getExtent();
+                            }
+                            extent = ol.extent.extend(extent, featureExtent);
+                        });
+                        map.map.getView().fitExtent(extent, (map.map.getSize()));
                         _.defer(function () {
                             map.select.getFeatures().clear();
-                            if (_.contains(keys, 'entitytypeid')) {
-                                var resourceData = {
-                                    id: clickFeature.getId(),
-                                    reportLink: arches.urls.reports + clickFeature.getId()
-                                };
-                                var typeInfo = layerInfo[clickFeature.get('entitytypeid')];
-                                var selectFeature = clickFeature.clone();
-                                var geom = geoJSON.readGeometry(clickFeature.get('geometry_collection'));
-                                if (typeInfo) {
-                                    resourceData.typeName = typeInfo.name;
-                                    resourceData.typeIcon = typeInfo.icon;
-                                }
-                                _.each(clickFeature.getKeys(), function (key) {
-                                    resourceData[key] = clickFeature.get(key);
-                                });
-                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                                selectFeature.setGeometry(geom);
-                                selectFeature.set('select_feature', true);
-                                selectFeature.set('entityid', clickFeature.getId());
-                                map.select.getFeatures().push(selectFeature);
-
-                                self.viewModel.selectedResource(resourceData);
-                                $('#resource-info').show();
-                            }
                         });
+                    } else {
+                        if (isCluster) {
+                            clickFeature = clickFeature.get('features')[0];
+                            keys = clickFeature.getKeys();
+                        }
+                        if (!_.contains(keys, 'select_feature')) {
+                            _.defer(function () {
+                                map.select.getFeatures().clear();
+                                if (_.contains(keys, 'entitytypeid')) {
+                                    var resourceData = {
+                                        id: clickFeature.getId(),
+                                        reportLink: arches.urls.reports + clickFeature.getId()
+                                    };
+                                    var typeInfo = layerInfo[clickFeature.get('entitytypeid')];
+                                    var selectFeature = clickFeature.clone();
+                                    var geom = geoJSON.readGeometry(clickFeature.get('geometry_collection'));
+                                    if (typeInfo) {
+                                        resourceData.typeName = typeInfo.name;
+                                        resourceData.typeIcon = typeInfo.icon;
+                                    }
+                                    _.each(clickFeature.getKeys(), function (key) {
+                                        resourceData[key] = clickFeature.get(key);
+                                    });
+                                    geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                                    selectFeature.setGeometry(geom);
+                                    selectFeature.set('select_feature', true);
+                                    selectFeature.set('entityid', clickFeature.getId());
+                                    map.select.getFeatures().push(selectFeature);
+
+                                    self.viewModel.selectedResource(resourceData);
+                                    $('#resource-info').show();
+                                }
+                            });
+                        }
                     }
+                } else {
+                    $('#resource-info').hide();
                 }
             });
 
