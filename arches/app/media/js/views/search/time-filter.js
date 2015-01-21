@@ -45,6 +45,7 @@ define(['jquery',
                         domains: this.viewModel.domains,
                         year_min_max: ko.observableArray(),
                         filters: ko.observableArray(),
+                        inverted: ko.observable(false),
                         editing:{
                             filters: {}
                         },
@@ -60,7 +61,8 @@ define(['jquery',
                     },
                     changed: ko.pureComputed(function(){
                         var ret = ko.toJSON(this.query.filter.year_min_max()) +
-                            ko.toJSON(this.query.filter.filters());
+                            ko.toJSON(this.query.filter.filters()) + 
+                            ko.toJSON(this.query.filter.inverted());
                         return ret;
                     }, this).extend({ rateLimit: 200 })
                 };
@@ -72,8 +74,8 @@ define(['jquery',
                 });
 
                 this.enabled = ko.computed(function(){
-                    var enabled = (this.query.filter.year_min_max().length !== 0 || this.query.filter.filters().length !== 0);
-                    this.trigger('enabled', enabled);
+                    var enabled = this.query.filter.year_min_max().length !== 0 || this.query.filter.filters().length !== 0;
+                    this.trigger('enabled', enabled, this.query.filter.inverted());
                     return enabled;
                 }, this).extend({ rateLimit: 200 });
 
@@ -87,7 +89,7 @@ define(['jquery',
                         }
                         return false;
                     }
-                })
+                });
 
                 ko.applyBindings(this.query.filter, $('#time-filter')[0]);
             },
@@ -117,16 +119,21 @@ define(['jquery',
                 }
             },
 
-            restoreState: function(filter, year_min_max, expanded){
-                if(typeof filter !== 'undefined' && filter.length > 0){
-                    _.each(filter, function(filter){
-                        this.query.filter.filters.push(filter);
-                    }, this);
-                }
-                if(typeof year_min_max !== 'undefined' && year_min_max.length === 2){
-                    _.each(year_min_max, function(year){
-                        this.query.filter.year_min_max.push(year);
-                    }, this);
+            restoreState: function(filter, expanded){
+                if(typeof filter !== 'undefined'){
+                    if('filters' in filter && filter.filters.length > 0){
+                        _.each(filter.filters, function(filter){
+                            this.query.filter.filters.push(filter);
+                        }, this);
+                    }
+                    if('year_min_max' in filter && filter.year_min_max.length === 2){
+                        _.each(filter.year_min_max, function(year){
+                            this.query.filter.year_min_max.push(year);
+                        }, this);
+                    }
+                    if('inverted' in filter){
+                        this.query.filter.inverted(filter.inverted);
+                    }
                 }
 
                 if(typeof expanded === 'undefined'){

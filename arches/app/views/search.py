@@ -61,10 +61,10 @@ def search_results(request, as_text=False):
 
 def build_query_dsl(request):
     term_filter = request.GET.get('termFilter', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    year_min_max = JSONDeserializer().deserialize(request.GET.get('year_min_max', []))
+    temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
 
     se = SearchEngineFactory().create()
     if export != None:
@@ -79,50 +79,63 @@ def build_query_dsl(request):
             if term['type'] == 'term':
                 phrase = Match(field='child_entities.value', query=term['value'], type='phrase')
                 nested = Nested(path='child_entities', query=phrase)
-                boolquery.must(nested)
+                if term['inverted']:
+                    boolfilter.must_not(nested)
+                else:    
+                    boolfilter.must(nested)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
                 terms = Terms(field='domains.conceptid', terms=concept_ids)
                 nested = Nested(path='domains', query=terms)
-                boolfilter.must(nested)
+                if term['inverted']:
+                    boolfilter.must_not(nested)
+                else:
+                    boolfilter.must(nested)
             elif term['type'] == 'string':
                 phrase = Match(field='child_entities.value', query=term['value'], type='phrase_prefix')
                 nested = Nested(path='child_entities', query=phrase)
-                boolquery.must(nested)
-            elif term['type'] == 'string_inverted':
-                phrase = Match(field='child_entities.value', query=term['value'], type='phrase')
-                nested = Nested(path='child_entities', query=phrase)
-                boolquery.must_not(nested)
-            elif term['type'] == 'concept_inverted':
-                concept_lables = _get_child_concepts(term['value'])
-                terms = Terms(field='domains.conceptid', terms=concept_lables)
-                nested = Nested(path='domains', query=terms)
-                boolfilter.must_not(nested)
+                if term['inverted']:
+                    boolquery.must_not(nested)
+                else:    
+                    boolquery.must(nested)
 
-    if spatial_filter['geometry']['type'] != '':
+    if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
         geojson = spatial_filter['geometry']
         if geojson['type'] == 'bbox':
             coordinates = [[geojson['coordinates'][0],geojson['coordinates'][3]], [geojson['coordinates'][2],geojson['coordinates'][1]]]
             geoshape = GeoShape(field='geometries.value', type='envelope', coordinates=coordinates )
             nested = Nested(path='geometries', query=geoshape)
-            boolquery.must(nested)
         else:
             buffer = spatial_filter['buffer']
             geojson = JSONDeserializer().deserialize(_buffer(geojson,buffer['width'],buffer['unit']).json)
             geoshape = GeoShape(field='geometries.value', type=geojson['type'], coordinates=geojson['coordinates'] )
             nested = Nested(path='geometries', query=geoshape)
-            boolquery.must(nested)
 
-    if len(year_min_max) == 2:
-        start_date = date(year_min_max[0], 1, 1)
-        end_date = date(year_min_max[1], 12, 31)
+        if 'inverted' not in spatial_filter:
+            spatial_filter['inverted'] = False
+
+        if spatial_filter['inverted']:
+            boolfilter.must_not(nested)
+        else:
+            boolfilter.must(nested)
+
+    if 'year_min_max' in temporal_filter and len(temporal_filter['year_min_max']) == 2:
+        start_date = date(temporal_filter['year_min_max'][0], 1, 1)
+        end_date = date(temporal_filter['year_min_max'][1], 12, 31)
         if start_date:
             start_date = start_date.strftime('%Y-%m-%d')
         if end_date:
             end_date = end_date.strftime('%Y-%m-%d')
         range = Range(field='dates.value', gte=start_date, lte=end_date)
         nested = Nested(path='dates', query=range)
-        boolquery.must(nested)
+        
+        if 'inverted' not in temporal_filter:
+            temporal_filter['inverted'] = False
+
+        if temporal_filter['inverted']:
+            boolfilter.must_not(nested)
+        else:
+            boolfilter.must(nested)
         
     if not boolquery.empty:
         query.add_query(boolquery)

@@ -56,37 +56,19 @@
                                     <div style="height: 36px; padding-top: 2px; width:100%" class="select2 arches-select2-crud-form" id="date-type" placeholder="type" data-bind="select2: { data: domains.date_types, placeholder: 'Type', viewModel: editing.filters, conceptKey: 'date_types'}">
                                     </div>
                                 </div>
-                         
-                                <!-- Date Type -->
-                             <!--    <select style="width:30%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form" id="date-type" placeholder="type">
-                                    <option value="00">Search by Date</option>
-                                    {% for date_type in date_types %}
-                                    <option value="{conceptid:'{{date_type.conceptid}}',entitytypeid:'{{date_type.entitytypeid}}'}">{{date_type.value}}</option>
-                                    {% endfor %} 
-                                </select> -->
-                                <!-- Date Type -->
                                 
                                 <!-- Date comparison -->
                                 <div class="col-sm-3" style="padding-right: 5px;">
                                     <div style="height: 36px; padding-top: 2px; width:100%" class="select2 arches-select2-crud-form" id="date-operator" placeholder="" data-bind="select2: { data: domains.date_operators, placeholder: '', viewModel: editing.filters, conceptKey: 'date_operators'}">
                                     </div>
                                 </div>
-
-                                <!-- <select style="width:30%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form" id="date-operator" placeholder="" data-bind="select2: { data: domains.date_operators, placeholder: 'Type', viewModel: editing.filters, conceptKey: 'date_operators__conceptid'}">
-                                    <option value="<">Before</option>
-                                    <option value="=">On</option>
-                                    <option value=">">After</option>  
-                                </select> -->
-                                <!-- Date Type -->
-
-                                
+                            
                                 <div class="col-sm-3 form-group" style="padding-right: 5px;">
                                     <div class="input-group datetimepicker" style ="width:100%; height: 36px; padding-top: 2px;" >
                                         <input type="text" id="date" placeholder="Date assessed" class="form-control datepicker" data-date-format="DD/MM/YYYY" data-bind='{value: editing.filters.date}' >
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
-                             
                                 
                                 <!-- Add Button -->
                                 <div class="col-sm-2 btn-group" style="padding-top: 3px;">

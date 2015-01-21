@@ -55,11 +55,13 @@ define(['jquery',
                         buffer: {
                             width: ko.observable('0'),
                             unit: ko.observable('ft')
-                        }
+                        },
+                        inverted: ko.observable(false)
                     },
                     changed: ko.pureComputed(function(){
                         return (ko.toJSON(this.query.filter.geometry.coordinates()) + 
-                            ko.toJSON(this.query.filter.buffer.width()));
+                            ko.toJSON(this.query.filter.buffer.width()) + 
+                            ko.toJSON(this.query.filter.inverted()));
                     }, this).extend({ rateLimit: 200 })
                 }
 
@@ -70,8 +72,8 @@ define(['jquery',
                 });
 
                 this.enabled = ko.computed(function(){
-                    var enabled = (this.query.filter.geometry.type() !== '' && this.query.filter.geometry.coordinates().length !== 0);
-                    this.trigger('enabled', enabled);
+                    var enabled = this.query.filter.geometry.type() !== '';
+                    this.trigger('enabled', enabled, this.query.filter.inverted());
                     return enabled;
                 }, this);
 
@@ -486,6 +488,7 @@ define(['jquery',
                         this.query.filter.geometry.coordinates(ko.utils.unwrapObservable(filter.geometry.coordinates));
                         this.query.filter.buffer.width(ko.utils.unwrapObservable(filter.buffer.width));
                         this.query.filter.buffer.unit(ko.utils.unwrapObservable(filter.buffer.unit));
+                        this.query.filter.inverted(ko.utils.unwrapObservable(filter.inverted));
 
                         var coordinates = this.query.filter.geometry.coordinates();
                         var type = this.query.filter.geometry.type();

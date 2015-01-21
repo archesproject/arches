@@ -257,13 +257,18 @@ class Range(Dsl):
         self.gt = kwargs.pop('gt', None)
         self.lte = kwargs.pop('lte', None)
         self.lt = kwargs.pop('lt', None)
-        self.boost = kwargs.pop('boost', '1.0')
+        self.boost = kwargs.pop('boost', None)
 
+        if self.boost:
+            boost = {
+                'boost': self.boost
+            }
+        else:
+            boost = {}
+            
         self.dsl = {
             'range' : {
-                self.field : {
-                    'boost': self.boost
-                }
+                self.field : boost
             }
         }
 

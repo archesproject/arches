@@ -35,14 +35,47 @@ require(['jquery',
                 this.termFilter = new TermFilter({
                     el: $.find('input.resource_search_widget')[0]
                 });
+                this.termFilter.on('filter-removed', function(item){
+                    if(item.text === mapFilterText){
+                        this.mapFilter.clear();
+                    }
+                    if(item.text === timeFilterText){
+                        this.timeFilter.clear();
+                    }
+                }, this);
+                this.termFilter.on('filter-inverted', function(item){
+                    if(item.text === mapFilterText){
+                        this.mapFilter.query.filter.inverted(item.inverted);
+                    }
+                    if(item.text === timeFilterText){
+                        this.timeFilter.query.filter.inverted(item.inverted);
+                    }
+                }, this);
+
 
                 this.mapFilter = new MapFilter({
                     el: $('#map-filter-container')[0]
                 });
+                this.mapFilter.on('enabled', function(enabled, inverted){
+                    if(enabled){
+                        this.termFilter.addTag(mapFilterText, inverted);
+                    }else{
+                        this.termFilter.removeTag(mapFilterText);
+                    }
+                }, this);
+
 
                 this.timeFilter = new TimeFilter({
                     el: $('#time-filter-container')[0]
                 });
+                this.timeFilter.on('enabled', function(enabled, inverted){
+                    if(enabled){
+                        this.termFilter.addTag(timeFilterText, inverted);
+                    }else{
+                        this.termFilter.removeTag(timeFilterText);
+                    }
+                }, this);
+
 
                 this.searchResults = new SearchResults({
                     el: $('#search-results-container')[0]
@@ -56,8 +89,11 @@ require(['jquery',
                         var params = {
                             page: self.searchResults.page(),
                             termFilter: ko.toJSON(self.termFilter.query.filter.terms()),
-                            year_min_max: ko.toJSON(self.timeFilter.query.filter.year_min_max()),
-                            temporalFilter: ko.toJSON(self.timeFilter.query.filter.filters()),
+                            temporalFilter: ko.toJSON({
+                                year_min_max: self.timeFilter.query.filter.year_min_max(),
+                                filters: self.timeFilter.query.filter.filters(),
+                                inverted: self.timeFilter.query.filter.inverted()
+                            }),
                             spatialFilter: ko.toJSON(self.mapFilter.query.filter),
                             mapExpanded: self.mapFilter.expanded(),
                             timeExpanded: self.timeFilter.expanded()
@@ -70,43 +106,18 @@ require(['jquery',
                             ko.toJSON(this.mapFilter.query.changed());
                         return ret;
                     }, this).extend({ rateLimit: 200 })
-                }
+                };
 
                 this.getSearchQuery();
 
                 this.searchResults.page.subscribe(function(){
                     self.doQuery();
-                })
+                });
 
                 this.searchQuery.changed.subscribe(function(){
                     self.searchResults.page(1);
                     self.doQuery();
                 });
-
-                this.mapFilter.on('enabled', function(enabled){
-                    if(enabled){
-                        this.termFilter.addTag(mapFilterText);
-                    }else{
-                        this.termFilter.removeTag(mapFilterText);
-                    }
-                }, this);
-
-                this.timeFilter.on('enabled', function(enabled){
-                    if(enabled){
-                        this.termFilter.addTag(timeFilterText);
-                    }else{
-                        this.termFilter.removeTag(timeFilterText);
-                    }
-                }, this);
-
-                this.termFilter.on('filter-removed', function(item){
-                    if(item.text === mapFilterText){
-                        this.mapFilter.clear();
-                    }
-                    if(item.text === timeFilterText){
-                        this.timeFilter.clear();
-                    }
-                }, this);
 
                 this.searchResults.on('mouseover', function(resourceid){
                     this.mapFilter.selectFeatureById(resourceid);
@@ -168,6 +179,7 @@ require(['jquery',
                     this.hideSavedSearches();
                 }
                 this.mapFilter.expanded(!this.mapFilter.expanded());
+                window.history.pushState({}, '', '?'+this.searchQuery.queryString());
             },
 
             toggleTimeFilter: function(showOrHide){
@@ -176,6 +188,7 @@ require(['jquery',
                     this.hideSavedSearches();
                 }
                 this.timeFilter.expanded(!this.timeFilter.expanded());
+                window.history.pushState({}, '', '?'+this.searchQuery.queryString());
             },
 
             slideToggle: function(ele, showOrHide){
@@ -226,15 +239,11 @@ require(['jquery',
                     query.temporalFilter = JSON.parse(query.temporalFilter);
                     doQuery = true;
                 }
-                if('year_min_max' in query){
-                    query.year_min_max = JSON.parse(query.year_min_max);
-                    doQuery = true;
-                }
                 if('timeExpanded' in query){
                     query.timeExpanded = JSON.parse(query.timeExpanded);
                     doQuery = true;
                 }
-                this.timeFilter.restoreState(query.temporalFilter, query.year_min_max, query.timeExpanded);
+                this.timeFilter.restoreState(query.temporalFilter, query.timeExpanded);
 
 
                 if('spatialFilter' in query){

@@ -18,7 +18,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 changed: ko.pureComputed(function(){
                     var ret = ko.toJSON(this.query.filter.terms());
                     return ret;
-                }, this)//.extend({ rateLimit: 200 })
+                }, this)
             };
 
         	this.render();
@@ -28,7 +28,6 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
             var self = this;
             this.searchbox = this.$el.select2({
                 multiple: true,
-                //maximumselectionsize: 1,
                 minimumInputLength: 2,
                 ajax: {
                     url: this.getUrl(),
@@ -66,18 +65,20 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     var markup=[];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
                     var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
-                    //var formatedresult = '<div class="search_term_result" data-id="' + result.id + '"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + markup.join("") + '</div>';
                     return formatedresult;
                 },
                 formatSelection: function(result){
-                    var markup = '<div data-filter="external-filter">' + result.text + '</div>';
+                    var markup = '<div data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</div>';
+                    if(result.inverted){
+                        markup = '<div data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</div>';
+                    }
                     return markup;
                 },
                 escapeMarkup: function(m) { return m; }
-            }).on("select2-selecting", function(e, el) {
-                self.trigger("select2-selecting", e, el);
-            }).on("change", function(e, el){
-                self.trigger("change", e, el);
+            }).on('select2-selecting', function(e, el) {
+                self.trigger('select2-selecting', e, el);
+            }).on('change', function(e, el){
+                self.trigger('change', e, el);
 
                 if(e.added){
                     if(e.added.type !== 'filter-flag'){
@@ -94,19 +95,41 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                         });                   
                     }
                 }
-            });     
+            }).on('choice-selected', function(e, el) {
+                var data = $(el).data('select2-data');
+                self.trigger('choice-selected', e, el);
 
-            s = this;
+                if ($(el).hasClass('inverted')) {
+                    $(el).removeClass('inverted');
+                    $(el).find('.fa-minus').hide();
+                } else {
+                    $(el).addClass('inverted');
+                    $(el).find('.fa-minus').show();
+                }
+                data.inverted = $(el).hasClass('inverted');
+
+                // filter-flag types don't rebuild the array and hence don't trigger a an updated search
+                // instead they listen to choice-selected events and use that
+                if (data.type == 'string' || data.type == 'concept' || data.type == 'term') {
+                    self.query.filter.terms.removeAll();
+                    $.each(self.searchbox.select2('data'), function(index, term){
+                        self.query.filter.terms.push(term);
+                    });
+                }
+                if (data.type == 'filter-flag'){
+                    self.trigger('filter-inverted', data);
+                }
+            });    
         },
 
         getUrl: function(){
             return arches.urls.search_terms;
         },
 
-        addTag: function(term){
+        addTag: function(term, inverted){
             var terms = this.searchbox.select2('data');
             terms.unshift({
-                inverted: '',
+                inverted: inverted,
                 type: 'filter-flag',
                 context: '',
                 id: term,
@@ -136,6 +159,9 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 if ($(el).data('select2-data').type === 'filter-flag') {
                     $(el).addClass('filter-flag');
                 }
+                if ($(el).data('select2-data').inverted) {
+                    $(el).addClass('inverted');
+                }
             });
         },
 
@@ -157,6 +183,12 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 });
 
                 this.searchbox.select2('data', results).trigger('change');
+
+                $('.resource_search_widget').find('.select2-search-choice').each(function(i, el) {
+                    if ($(el).data('select2-data').inverted) {
+                        $(el).addClass('inverted');
+                    }
+                });
             }
         },
 
