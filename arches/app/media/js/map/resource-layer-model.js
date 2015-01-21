@@ -128,12 +128,14 @@ define([
             };
 
             var clusterLayer = new ol.layer.Vector({
+                minResolution: arches.mapDefaults.cluster_min,
                 source: clusterSource,
                 style: clusterStyle
             });
 
             return new ol.layer.Group({
                 layers: [
+                    vectorLayer,
                     clusterLayer
                 ]
             });
