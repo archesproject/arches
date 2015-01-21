@@ -85,6 +85,16 @@ require(['jquery',
                 this.searchResults = new SearchResults({
                     el: $('#search-results-container')[0]
                 });
+                this.searchResults.on('mouseover', function(resourceid){
+                    this.mapFilter.selectFeatureById(resourceid);
+                }, this);
+                this.searchResults.on('mouseout', function(){
+                    this.mapFilter.unselectAllFeatures();
+                }, this);
+                this.searchResults.on('find_on_map', function(resourceid){
+                    this.mapFilter.zoomToResource(resourceid);
+                }, this);
+
 
                 mapFilterText = this.mapFilter.$el.data().filtertext;
                 timeFilterText = this.timeFilter.$el.data().filtertext;
@@ -123,14 +133,6 @@ require(['jquery',
                     self.searchResults.page(1);
                     self.doQuery();
                 });
-
-                this.searchResults.on('mouseover', function(resourceid){
-                    this.mapFilter.selectFeatureById(resourceid);
-                }, this);
-
-                this.searchResults.on('mouseout', function(){
-                    this.mapFilter.unselectAllFeatures();
-                }, this);
             },
 
             doQuery: function () {

@@ -17,7 +17,7 @@
 
                     <!-- Item Header -->
                     <h4>
-                        <a class="arches-search-title" style="" href="javascript:void(0);" data-bind="text: primaryname"></a> 
+                        <a class="arches-search-title" style="" data-bind="text: primaryname, attr: { href: 'reports/' + resourceid }" target="_blank"></a> 
                         &nbsp;
                         <span class="">
                             <small class="arches-search-subtitle"><i data-bind="attr: { class: typeIcon }"></i><span data-bind="text: typeName"></span></small>
@@ -34,13 +34,13 @@
                         {% endif %}
 
                         <li>
-                            <i class="arches-search-link fa fa-book"></i>&nbsp;
-                            <a data-bind="attr: { href: 'reports/' + resourceid }"><span class="arches-search-link">{% trans "Report" %}</span></a>
-                        </li>
-
-                        <li>
                             <i class="arches-search-link fa fa-sitemap"></i>&nbsp;
                             <a href="javascript:void(0);" class="info-link related-resources-graph" id="rr-1" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname}"><span class="arches-search-link" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname}">{% trans "Related Resources" %}</span></a>
+                        </li>
+
+                        <li data-bind="visible: geometries().length > 0" >
+                            <i class="arches-search-link fa fa-book"></i>&nbsp;
+                            <a href="javascript:void(0);" data-bind="attr: { 'data-resourceid': resourceid }" class="info-link navigate-map"><span class="arches-search-link">{% trans "Map" %}</span></a>
                         </li>
 
                     </ul>

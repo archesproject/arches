@@ -207,6 +207,11 @@ define(['jquery',
                     hoverFeatureInfo(self.map.map.getEventPixel(evt.originalEvent));
                 });
             },
+
+            zoomToResource: function(resourceid){
+                var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(resourceid);
+                this.map.map.getView().fitGeometry(feature.getGeometry(), this.map.map.getSize(), {maxZoom:16});
+            },
             
             zoomToExtent: function(extent){
                 var size = this.map.map.getSize();

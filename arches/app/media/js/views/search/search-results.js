@@ -16,6 +16,7 @@ define(['jquery',
             events: {
                 'click .page-button': 'newPage',
                 'click .related-resources-graph': 'showRelatedResouresGraph',
+                'click .navigate-map': 'zoomToFeature',
                 'mouseover .arches-search-item': 'itemMouseover'
             },
 
@@ -96,6 +97,11 @@ define(['jquery',
                 evt.data.trigger('mouseout');    
                 delete evt.data.currentTarget;              
                 return false;
+            },
+
+            zoomToFeature: function(evt){
+                var data = $(evt.currentTarget).data();
+                this.trigger('find_on_map', data.resourceid);   
             }
 
         });
