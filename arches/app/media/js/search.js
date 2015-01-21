@@ -35,6 +35,11 @@ require(['jquery',
                 this.termFilter = new TermFilter({
                     el: $.find('input.resource_search_widget')[0]
                 });
+                this.termFilter.on('change', function(){
+                    if($('#saved-searches').is(":visible")){
+                        this.hideSavedSearches();
+                    }
+                }, this);
                 this.termFilter.on('filter-removed', function(item){
                     if(item.text === mapFilterText){
                         this.mapFilter.clear();
@@ -152,25 +157,15 @@ require(['jquery',
 
             showSavedSearches: function(){
                 this.clear();
-                this.toggleSavedSearches('show');
-                this.toggleSearchResults('hide');
+                $('#saved-searches').slideDown('slow');
+                $('#search-results').slideUp('slow');
                 this.mapFilter.expanded(false);
                 this.timeFilter.expanded(false);
             },
 
             hideSavedSearches: function(){
-                this.toggleSavedSearches('hide');
-                this.toggleSearchResults('show');
-            },
-
-            toggleSavedSearches: function(showOrHide){
-                var ele = $('#saved-searches');
-                this.slideToggle(ele, showOrHide);
-            },
-
-            toggleSearchResults: function(showOrHide){
-                var ele = $('#search-results');
-                this.slideToggle(ele, showOrHide);
+                $('#saved-searches').slideUp('slow');
+                $('#search-results').slideDown('slow');
             },
 
             toggleMapFilter: function(){
@@ -182,30 +177,13 @@ require(['jquery',
                 window.history.pushState({}, '', '?'+this.searchQuery.queryString());
             },
 
-            toggleTimeFilter: function(showOrHide){
+            toggleTimeFilter: function(){
                 if($('#saved-searches').is(":visible")){
                     this.doQuery();
                     this.hideSavedSearches();
                 }
                 this.timeFilter.expanded(!this.timeFilter.expanded());
                 window.history.pushState({}, '', '?'+this.searchQuery.queryString());
-            },
-
-            slideToggle: function(ele, showOrHide){
-                var self = this;
-                if ($(ele).is(":visible") && showOrHide === 'hide'){
-                    ele.slideToggle('slow');
-                    return;
-                }
-
-                if (!($(ele).is(":visible")) && showOrHide === 'show'){
-                    ele.slideToggle('slow');
-                    return;
-                }
-
-                if (!showOrHide){
-                    ele.slideToggle('slow');                    
-                }
             },
 
             getSearchQuery: function(){
