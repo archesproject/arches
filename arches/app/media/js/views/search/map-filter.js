@@ -43,8 +43,8 @@ define(['jquery',
 
                 this.expanded = ko.observable(false);
                 this.expanded.subscribe(function(status){
-                    self.toggleFilterSection($('#map-filter'), status)
-                });
+                    this.toggleFilterSection($('#map-filter'), status);
+                }, this);
 
                 this.query = {
                     filter: {
@@ -110,8 +110,6 @@ define(['jquery',
                     })
                 });
                 this.drawingFeatureOverlay.setMap(this.map.map);
-
-                this.zoomToExtent(this.vectorLayer.getLayers().item(0).getSource().getExtent())
                 
                 ko.applyBindings(this.map, $('#basemaps-panel')[0]);
 
@@ -209,7 +207,7 @@ define(['jquery',
                     hoverFeatureInfo(self.map.map.getEventPixel(evt.originalEvent));
                 });
             },
-
+            
             zoomToExtent: function(extent){
                 var size = this.map.map.getSize();
                 var view = this.map.map.getView()
@@ -229,6 +227,7 @@ define(['jquery',
             },
 
             highlightFeatures: function(resultsarray){
+                var self = this;
                 var rgb = this.hexToRgb('#C4171D');
                 var iconUnicode = '\uf060';
 
@@ -267,14 +266,24 @@ define(['jquery',
                 }
                 this.featureOverlay.getFeatures().clear();
 
-                _.each(resultsarray.results.hits.hits, function(result){
-                    if(result._source.geometries.length > 0){
-                        var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
-                        if(feature){
-                            this.featureOverlay.addFeature(feature);
-                        }                        
-                    }
-                }, this);
+                var addSelectedFeatures = function(){
+                    _.each(resultsarray.results.hits.hits, function(result){
+                        if(result._source.geometries.length > 0){
+                            var feature = self.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
+                            if(feature){
+                                self.featureOverlay.addFeature(feature);
+                            }                        
+                        }
+                    }, self);
+                };
+
+                if(this.vectorLayer.getLayers().item(0).getSource().getState() === 'ready'){
+                    addSelectedFeatures();
+                }else{
+                    this.vectorLayer.getLayers().item(0).getSource().once('change', function(evt){
+                        addSelectedFeatures();
+                    }, this);                     
+                }
             },
 
             selectFeatureById: function(resourceid){
