@@ -854,8 +854,8 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background: #ffffff; 
     border: 1px solid rgba(0,0,0,.2); 
     opacity: 1.0; 
-    border-top-left-radius: 1px; 
-    border-top-right-radius: 1px;
+    border-top-left-radius: 3px; 
+    border-top-right-radius: 3px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 

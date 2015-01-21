@@ -227,12 +227,12 @@ require([
                     //Update state of remaining buttons
                     $("#inventory-overlays").removeClass("arches-map-tools-pressed");
                     $("#inventory-overlays").addClass("arches-map-tools");
-                    $("#inventory-overlays").css("border-bottom-right-radius", "5px");
+                    $("#inventory-overlays").css("border-bottom-right-radius", "3px");
 
                     //Update state of current button and adjust position
                     $("#inventory-basemaps").addClass("arches-map-tools-pressed");
                     $("#inventory-basemaps").removeClass("arches-map-tools");
-                    $("#inventory-basemaps").css("border-bottom-left-radius", "5px");
+                    $("#inventory-basemaps").css("border-bottom-left-radius", "3px");
                 }
             });
 
