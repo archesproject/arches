@@ -26,16 +26,14 @@ define([
 
             var style = function(feature, resolution) {
                 var mouseOver = feature.get('mouseover');
-                var shadowSize = mouseOver ? 42 : 38;
-                var iconSize = mouseOver ? 37 : 33;
+                var iconSize = mouseOver ? 38 : 32;
 
                 var styles = [new ol.style.Style({
                     text: new ol.style.Text({
                         text: iconUnicode,
                         font: 'normal ' + iconSize + 'px octicons',
                         offsetX: 5,
-                        offsetY: -5,
-                        textBaseline: 'Bottom',
+                        offsetY: ((iconSize/2)*-1)-5,
                         fill: new ol.style.Fill({
                             color: 'rgba(126,126,126,0.3)',
                         })
@@ -45,12 +43,12 @@ define([
                     text: new ol.style.Text({
                         text: iconUnicode,
                         font: 'normal ' + iconSize + 'px octicons',
+                        offsetY: (iconSize/2)*-1,
                         stroke: new ol.style.Stroke({
                             // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
                             color: 'white',
                             width: 3
                         }),
-                        textBaseline: 'Bottom',
                         fill: new ol.style.Fill({
                             color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
                         })
@@ -93,8 +91,6 @@ define([
             var clusterStyle = function(feature, resolution) {
                 var size = feature.get('features').length;
                 var mouseOver = feature.get('mouseover');
-                var shadowSize = mouseOver ? 42 : 38;
-                var iconSize = mouseOver ? 37 : 33;
                 var radius = mouseOver ? 12 : 10;
 
                 if (size === 1) {
