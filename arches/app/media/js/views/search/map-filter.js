@@ -71,8 +71,8 @@ define(['jquery',
                     self.applyBuffer();
                 });
 
-                this.enabled = ko.computed(function(){
-                    var enabled = this.query.filter.geometry.type() !== '';
+                this.query.filter.geometry.type.subscribe(function(type){
+                    var enabled = type !== '';
                     this.trigger('enabled', enabled, this.query.filter.inverted());
                     return enabled;
                 }, this);
@@ -484,11 +484,11 @@ define(['jquery',
             restoreState: function(filter, expanded){
                 this.map.map.once('change:size', function(){
                     if(typeof filter !== 'undefined' && 'geometry' in filter && filter.geometry.coordinates.length > 0){
+                        this.query.filter.inverted(ko.utils.unwrapObservable(filter.inverted));                        
                         this.query.filter.geometry.type(ko.utils.unwrapObservable(filter.geometry.type));
                         this.query.filter.geometry.coordinates(ko.utils.unwrapObservable(filter.geometry.coordinates));
                         this.query.filter.buffer.width(ko.utils.unwrapObservable(filter.buffer.width));
                         this.query.filter.buffer.unit(ko.utils.unwrapObservable(filter.buffer.unit));
-                        this.query.filter.inverted(ko.utils.unwrapObservable(filter.inverted));
 
                         var coordinates = this.query.filter.geometry.coordinates();
                         var type = this.query.filter.geometry.type();
@@ -530,6 +530,7 @@ define(['jquery',
             clear: function(){
                 this.removeDrawingTools();
                 this.clearDrawingFeatures();
+                this.query.filter.inverted(false);
                 this.query.filter.geometry.type('');
                 this.query.filter.geometry.coordinates([]);
                 this.map.map.un('moveend', this.onMoveEnd, this);

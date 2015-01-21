@@ -68,16 +68,18 @@ define(['jquery',
                 };
 
                 this.query.filter.year_min_max.subscribe(function(newValue){
-                    if(newValue.length == 2){
+                    var enabled = newValue.length === 2;
+                    if(enabled){
                         self.slider.setValue(newValue);
                     }
-                });
-
-                this.enabled = ko.computed(function(){
-                    var enabled = this.query.filter.year_min_max().length !== 0 || this.query.filter.filters().length !== 0;
                     this.trigger('enabled', enabled, this.query.filter.inverted());
-                    return enabled;
-                }, this).extend({ rateLimit: 200 });
+                }, this);
+
+                this.query.filter.filters.subscribe(function(filters){
+                    var enabled = filters.length > 0;
+                    this.trigger('enabled', enabled, this.query.filter.inverted());
+                }, this);
+
 
                 new BranchList({
                     el: $('#time-filter')[0],
@@ -121,6 +123,9 @@ define(['jquery',
 
             restoreState: function(filter, expanded){
                 if(typeof filter !== 'undefined'){
+                    if('inverted' in filter){
+                        this.query.filter.inverted(filter.inverted);
+                    }
                     if('filters' in filter && filter.filters.length > 0){
                         _.each(filter.filters, function(filter){
                             this.query.filter.filters.push(filter);
@@ -130,9 +135,6 @@ define(['jquery',
                         _.each(filter.year_min_max, function(year){
                             this.query.filter.year_min_max.push(year);
                         }, this);
-                    }
-                    if('inverted' in filter){
-                        this.query.filter.inverted(filter.inverted);
                     }
                 }
 
@@ -144,6 +146,7 @@ define(['jquery',
             },
 
             clear: function(){
+                this.query.filter.inverted(false);
                 this.query.filter.filters.removeAll();
                 this.query.filter.year_min_max.removeAll();
                 this.slider.setValue([this.slider.getAttribute('min'),this.slider.getAttribute('max')]);
