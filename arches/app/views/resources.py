@@ -186,7 +186,7 @@ def report(request, resourceid):
 def map_layers(request, entitytypeid, get_centroids=False):
     data = []
     bbox = request.GET.get('bbox', '')
-    limit = request.GET.get('limit', 10000)
+    limit = request.GET.get('limit', settings.MAP_LAYER_FEATURE_LIMIT)
     
     se = SearchEngineFactory().create()
     query = Query(se, limit=limit)
