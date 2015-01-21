@@ -76,7 +76,7 @@ define(['jquery',
                 }, this);
 
 
-                this.vectorLayer = new ResourceLayerModel().layer;
+                this.vectorLayer = new ResourceLayerModel().layer();
                 this.map = new MapView({
                     el: $('#map'),
                     overlays: [this.vectorLayer]

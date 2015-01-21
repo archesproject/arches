@@ -22,15 +22,22 @@ require([
             'click .on-map-toggle': 'onMapToggle',
             'click .layer-zoom': 'layerZoom'
         },
-        initialize: function(options) { 
+        initialize: function(options) {
             var self = this;
             var mapLayers = [];
             _.each(layers, function(layer, index) {
                 if (layer.onMap) {
+                    if (typeof layer.layer == 'function') {
+                        layer.layer = layer.layer();
+                    }
                     mapLayers.push(layer.layer);
                 }
                 layer.onMap = ko.observable(layer.onMap);
                 layers[index].onMap.subscribe(function(add) {
+                    // allow for lazy instantiation (and thus load)
+                    if (typeof layer.layer == 'function') {
+                        layer.layer = layer.layer();
+                    }
                     if (add) {
                         map.map.addLayer(layer.layer);
                     } else {
