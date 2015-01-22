@@ -55,7 +55,6 @@ define([
                         font: 'normal ' + iconSize + 'px octicons',
                         offsetY: (iconSize/2)*-1,
                         stroke: new ol.style.Stroke({
-                            // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
                             color: 'white',
                             width: 3
                         }),

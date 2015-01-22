@@ -205,8 +205,9 @@ require([
                                     if (_.contains(keys, 'arches_feature')){
                                         showFeaturePopup(clickFeature.get('arches_feature'));
                                     } else {
+                                        $('.map-loading').show();
                                         $.ajax({
-                                            url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(), 
+                                            url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(),
                                             success: function(response) {
                                                 var feature = geoJSON.readFeature(response);
                                                 var geom = feature.getGeometry();
@@ -216,6 +217,7 @@ require([
                                                 feature.set('entityid', feature.getId());
 
                                                 clickFeature.set('arches_feature', feature);
+                                                $('.map-loading').hide();
                                                 showFeaturePopup(feature);
                                             }
                                         });
