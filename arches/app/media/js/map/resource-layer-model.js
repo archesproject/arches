@@ -86,12 +86,6 @@ define([
                 }
             });
 
-            var vectorLayer = new ol.layer.Vector({
-                maxResolution: arches.mapDefaults.cluster_min,
-                source: source,
-                style: style
-            });
-
             var clusterSource = new ol.source.Cluster({
                 distance: 50,
                 source: source
@@ -147,14 +141,12 @@ define([
             };
 
             var clusterLayer = new ol.layer.Vector({
-                minResolution: arches.mapDefaults.cluster_min,
                 source: clusterSource,
                 style: clusterStyle
             });
 
             return new ol.layer.Group({
                 layers: [
-                    vectorLayer,
                     clusterLayer
                 ]
             });
