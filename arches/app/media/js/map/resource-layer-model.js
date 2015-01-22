@@ -58,6 +58,7 @@ define([
 
                 zIndex += 2;
 
+                feature.set('arches_marker', true);
                 return styles;
             };
 
@@ -106,7 +107,8 @@ define([
                 } else if (size > 50) {
                     radius = mouseOver ? 14 : 12;
                 }
-
+                
+                feature.set('arches_cluster', true);
                 return [new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: radius,

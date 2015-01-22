@@ -83,8 +83,9 @@ define([
                 this.select = new ol.interaction.Select({
                     condition: ol.events.condition.click,
                     style: function(feature, resolution) {
-                        var fillOpacity = self.isFeatureSelectable(feature) ? 0.3 : 0;
-                        var strokeOpacity = self.isFeatureSelectable(feature) ? 0.9 : 0;
+                        var isSelectFeature = _.contains(feature.getKeys(), 'select_feature');
+                        var fillOpacity = isSelectFeature ? 0.3 : 0;
+                        var strokeOpacity = isSelectFeature ? 0.9 : 0;
                         return [new ol.style.Style({
                             fill: new ol.style.Fill({
                                 color: 'rgba(0, 255, 255, ' + fillOpacity + ')'
@@ -155,7 +156,7 @@ define([
 
         isFeatureSelectable: function (feature) {
             var keys = feature.getKeys();
-            return (_.contains(keys, 'features') || _.contains(keys, 'entitytypeid'));
+            return (_.contains(keys, 'arches_cluster') || _.contains(keys, 'arches_marker'));
         }
     });
 });

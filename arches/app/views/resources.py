@@ -183,18 +183,22 @@ def report(request, resourceid):
         },
         context_instance=RequestContext(request))        
 
-def map_layers(request, entitytypeid, get_centroids=False):
+def map_layers(request, entitytypeid='all', get_centroids=False):
     data = []
     bbox = request.GET.get('bbox', '')
     limit = request.GET.get('limit', settings.MAP_LAYER_FEATURE_LIMIT)
+    entityid = request.GET.get('entityid', '')
     
     se = SearchEngineFactory().create()
     query = Query(se, limit=limit)
 
-    if entitytypeid == 'all':
-        data = query.search(index='maplayers') 
-    else:
-        data = query.search(index='maplayers', doc_type=entitytypeid) 
+    args = { 'index': 'maplayers' }
+    if entitytypeid != 'all':
+        args['doc_type'] = entitytypeid
+    if entityid != '':
+        return JSONResponse(se.search(index='maplayers', id=entityid)['_source'])
+
+    data = query.search(**args)
 
     geojson_collection = {
       "type": "FeatureCollection",
@@ -203,11 +207,8 @@ def map_layers(request, entitytypeid, get_centroids=False):
 
     for item in data['hits']['hits']:
         if get_centroids:
-            item['_source']['properties']['geometry_collection'] = item['_source']['geometry']
             item['_source']['geometry'] = item['_source']['properties']['centroid']
-        else:
-            item['_source']['properties'].pop('extent', None)
-        item['_source']['properties'].pop('centroid', None)
+            item['_source'].pop('properties', None)
         geojson_collection['features'].append(item['_source'])
 
     return JSONResponse(geojson_collection)

@@ -154,12 +154,31 @@ require([
                 $('.resource-info-closer')[0].blur();
             });
 
-            map.select.getFeatures().on('change:length', function(e) {
+            var showFeaturePopup = function(feature) {
+                var resourceData = {
+                    id: feature.getId(),
+                    reportLink: arches.urls.reports + feature.getId()
+                };
+                var typeInfo = layerInfo[feature.get('entitytypeid')];
+                if (typeInfo) {
+                    resourceData.typeName = typeInfo.name;
+                    resourceData.typeIcon = typeInfo.icon;
+                }
+                _.each(feature.getKeys(), function (key) {
+                    resourceData[key] = feature.get(key);
+                });
+                
+                map.select.getFeatures().push(feature);
+                self.viewModel.selectedResource(resourceData);
+                $('#resource-info').show();
+            };
 
+            map.select.getFeatures().on('change:length', function(e) {
                 if (e.target.getArray().length !== 0) {
                     var clickFeature = e.target.item(0);
                     var keys = clickFeature.getKeys();
                     var isCluster = _.contains(keys, "features");
+                    var isArchesFeature = (_.contains(keys, 'arches_cluster') || _.contains(keys, 'arches_marker'));
                     if (isCluster && clickFeature.get('features').length > 1) {
                         var extent = clickFeature.getGeometry().getExtent();
                         _.each(clickFeature.get("features"), function (feature) {
@@ -182,29 +201,25 @@ require([
                         if (!_.contains(keys, 'select_feature')) {
                             _.defer(function () {
                                 map.select.getFeatures().clear();
-                                if (_.contains(keys, 'entitytypeid')) {
-                                    var resourceData = {
-                                        id: clickFeature.getId(),
-                                        reportLink: arches.urls.reports + clickFeature.getId()
-                                    };
-                                    var typeInfo = layerInfo[clickFeature.get('entitytypeid')];
-                                    var selectFeature = clickFeature.clone();
-                                    var geom = geoJSON.readGeometry(clickFeature.get('geometry_collection'));
-                                    if (typeInfo) {
-                                        resourceData.typeName = typeInfo.name;
-                                        resourceData.typeIcon = typeInfo.icon;
-                                    }
-                                    _.each(clickFeature.getKeys(), function (key) {
-                                        resourceData[key] = clickFeature.get(key);
-                                    });
-                                    geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-                                    selectFeature.setGeometry(geom);
-                                    selectFeature.set('select_feature', true);
-                                    selectFeature.set('entityid', clickFeature.getId());
-                                    map.select.getFeatures().push(selectFeature);
+                                if (isArchesFeature) {
+                                    if (_.contains(keys, 'arches_feature')){
+                                        showFeaturePopup(clickFeature.get('arches_feature'));
+                                    } else {
+                                        $.ajax({
+                                            url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(), 
+                                            success: function(response) {
+                                                var feature = geoJSON.readFeature(response);
+                                                var geom = feature.getGeometry();
+                                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
 
-                                    self.viewModel.selectedResource(resourceData);
-                                    $('#resource-info').show();
+                                                feature.set('select_feature', true);
+                                                feature.set('entityid', feature.getId());
+
+                                                clickFeature.set('arches_feature', feature);
+                                                showFeaturePopup(feature);
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         }
