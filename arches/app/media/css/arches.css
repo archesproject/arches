@@ -1119,12 +1119,19 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .map-loading {
-    background-image: url("../img/spinner.gif");
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-size: 100%;
-    float: right;
-    height: 60px;
-    width: 60px;
-    margin: 6px;
+    height: 36px;
+    margin-top: -52px;
+    background-color: #5cb85c;
+    opacity: 0.9;
+    border: 1px solid #4cae4c; 
+    border-radius: 2px 2px 2px 2px;
+    padding-top: 1px;
+}
+
+.map-loading-text {
+    font-size: 15px;
+    font-weight: 300;
+    color: #fdfdfd;
+    margin-left: 40px;
+    margin-top: -27px;
 }

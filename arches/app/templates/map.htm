@@ -33,28 +33,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
         
         
-
         <!-- Map Header -->
         <div class="arches-map-inventory-header">
 
-            <div class="container padding-left-0">
+                <div class="container padding-left-0">
+                    <div class="row">
 
-                <!-- Map Search Box (Address/APN) Screens greater than XS-->
-                <div class="hidden-xs col-sm-7 col-md-7">
+                        <!-- Map Search Box (Address/APN) Screens greater than XS-->
+                        <div class="col-xs-11 col-xs-offset-1 col-sm-7 col-sm-offset-0 col-md-7">
 
-                    <!-- Geocoding Widget -->
-                    <div class="">
-                        <div class="form-group">       
-                            <input class="geocodewidget margin-top-10" id="geocodewidget" name="" style="width:100%"  value="">
+                            <!-- Geocoding Widget -->
+                            <div class="">
+                                <div class="form-group">       
+                                    <input class="geocodewidget margin-top-10" id="geocodewidget" name="" style="width:100%"  value="">
+                                </div>
+                            </div>
+                            <!-- End Geocoding Widget -->
+
+                        </div>
+                        
+                        <!-- Data loading mask -->
+                        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading" style="">
+                            
+                            <img src="../media/img/spinner.gif" height="28" width="28" style="margin-top: 2px;"></img>
+                            <p class="map-loading-text">Loading resources...</p>
+                           
                         </div>
                     </div>
-                    <!-- End Geocoding Widget -->
-
                 </div>
-                <!-- End Map Search Box (Address/APN) Screens greater than XS -->
-                <div class="map-loading" style="display:none;"></div>
-
-            </div>
 
         </div>
         <!-- End Map Header -->
