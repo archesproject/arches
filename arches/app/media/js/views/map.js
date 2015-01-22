@@ -75,7 +75,8 @@ define([
                 target: this.el,
                 view: new ol.View({
                     center: [arches.mapDefaults.x, arches.mapDefaults.y],
-                    zoom: arches.mapDefaults.zoom
+                    zoom: arches.mapDefaults.zoom,
+                    minResolution: 0.29858214173896974
                 })
             });
             
