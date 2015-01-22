@@ -1,9 +1,10 @@
 define([
+    'jquery',
     'openlayers',
     'underscore',
     'arches',
     'map/layer-model'
-], function(ol, _, arches, LayerModel) {
+], function($, ol, _, arches, LayerModel) {
     var hexToRgb = function (hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
@@ -67,14 +68,14 @@ define([
                 url: arches.urls.map_markers + config.entitytypeid
             });
 
-            if (typeof featureCallback === 'function') {
-                var loadListener = source.on('change', function(e) {
-                    if (source.getState() == 'ready') {
-                        featureCallback(source.getFeatures());
-                        ol.Observable.unByKey(loadListener);
-                    }
-                });
-            }
+            $('.map-loading').show();
+            var loadListener = source.on('change', function(e) {
+                if (source.getState() == 'ready') {
+                    featureCallback(source.getFeatures());
+                    ol.Observable.unByKey(loadListener);
+                    $('.map-loading').hide();
+                }
+            });
 
             var vectorLayer = new ol.layer.Vector({
                 maxResolution: arches.mapDefaults.cluster_min,

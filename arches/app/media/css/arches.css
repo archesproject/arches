@@ -1117,3 +1117,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .select2-container-multi .select2-choices {
     border-radius: 3px;
 }
+
+.map-loading {
+    background-image: url("../img/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: 100%;
+    float: right;
+    height: 60px;
+    width: 60px;
+    margin: 6px;
+}
