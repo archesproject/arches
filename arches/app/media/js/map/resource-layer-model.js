@@ -24,9 +24,18 @@ define([
             var rgb = hexToRgb(config.vectorColor);
             var iconUnicode = '\uf060';
             var zIndex = 0;
+            var styleCache = {};
 
             var style = function(feature, resolution) {
                 var mouseOver = feature.get('mouseover');
+                var text = '1 ' + mouseOver;
+
+                feature.set('arches_marker', true);
+
+                if (styleCache[text]) {
+                    return styleCache[text];
+                }
+                
                 var iconSize = mouseOver ? 38 : 32;
 
                 var styles = [new ol.style.Style({
@@ -59,7 +68,7 @@ define([
 
                 zIndex += 2;
 
-                feature.set('arches_marker', true);
+                styleCache[text] = styles;
                 return styles;
             };
 
@@ -88,11 +97,17 @@ define([
                 source: source
             });
 
-            var styleCache = {};
-
             var clusterStyle = function(feature, resolution) {
                 var size = feature.get('features').length;
                 var mouseOver = feature.get('mouseover');
+                var text = size + ' ' + mouseOver;
+
+                feature.set('arches_cluster', true);
+
+                if (styleCache[text]) {
+                    return styleCache[text];
+                }
+
                 var radius = mouseOver ? 12 : 10;
 
                 if (size === 1) {
@@ -108,9 +123,8 @@ define([
                 } else if (size > 50) {
                     radius = mouseOver ? 14 : 12;
                 }
-                
-                feature.set('arches_cluster', true);
-                return [new ol.style.Style({
+
+                var styles = [new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: radius,
                         stroke: new ol.style.Stroke({
@@ -128,6 +142,8 @@ define([
                         })
                     })
                 })];
+                styleCache[text] = styles;
+                return styles;
             };
 
             var clusterLayer = new ol.layer.Vector({
