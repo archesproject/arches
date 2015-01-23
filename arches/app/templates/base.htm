@@ -376,7 +376,8 @@
                         x: {{ map_info.x }},
                         y: {{ map_info.y }},
                         zoom: {{ map_info.zoom }},
-                        cluster_min: {{ map_info.resource_cluster_min_resolution }}
+                        minZoom: {{ map_info.map_min_zoom }},
+                        maxZoom: {{ map_info.map_max_zoom }}
                     },
                     bingKey: "{{ map_info.bing_key }}",
                     bingLayers: [{

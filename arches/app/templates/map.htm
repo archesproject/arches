@@ -303,6 +303,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 </div>
             </div>
+            
+            <div id="cluster-info" class="row" style="display:none;">
+                <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+                    <div class="modal-content no-corners arches-map-inventory-panel">
+                        <div class="modal-header">
+                            <button type="button" class="close cluster-info-closer" aria-hidden="true">
+                                ×
+                            </button>
+
+                            <h4 class="modal-title">
+                                {% trans 'Clustered Resources' %}
+                            </h4>
+
+                        </div>
+
+                        <!-- Body Content -->
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length === 0">
+                            <div class="loading-cluster-info"></div>
+                        </div>
+
+                        <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length > 0">
+                            <div data-bind='foreach: clusterFeatures' style="margin-top:12px;">
+                                <div> 
+                                    <a href="javascript:void(0);" data-bind="text: properties.primaryname, attr: {'data-entityid': id}" class='cluster-item-link'></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Body Content -->
+
+                        <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                            <button type="button" class="btn btn-default cluster-info-closer">
+                                Close
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+
+                </div>
+            </div>
         </div>
         <!-- End Map Project Info Panel -->
     

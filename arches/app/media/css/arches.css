@@ -1102,6 +1102,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background-position: 50% 50%;
 }
 
+.loading-cluster-info {
+    background-image: url("../img/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size:100px;
+    height: 100px;
+    margin-top: 12px;
+}
+
 .select2-search-field {
     font-size: 15px;
 }
@@ -1134,4 +1143,8 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     color: #fdfdfd;
     margin-left: 40px;
     margin-top: -27px;
+}
+
+.cluster-item-link {
+
 }

@@ -189,7 +189,11 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
     data = []
     bbox = request.GET.get('bbox', '')
     limit = request.GET.get('limit', settings.MAP_LAYER_FEATURE_LIMIT)
-    entityid = request.GET.get('entityid', '')
+    entityids = request.GET.get('entityid', '')
+    geojson_collection = {
+      "type": "FeatureCollection",
+      "features": []
+    }
     
     se = SearchEngineFactory().create()
     query = Query(se, limit=limit)
@@ -197,15 +201,12 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
     args = { 'index': 'maplayers' }
     if entitytypeid != 'all':
         args['doc_type'] = entitytypeid
-    if entityid != '':
-        return JSONResponse(se.search(index='maplayers', id=entityid)['_source'])
+    if entityids != '':
+        for entityid in entityids.split(','):
+            geojson_collection['features'].append(se.search(index='maplayers', id=entityid)['_source'])
+        return JSONResponse(geojson_collection)
 
     data = query.search(**args)
-
-    geojson_collection = {
-      "type": "FeatureCollection",
-      "features": []
-    }
 
     for item in data['hits']['hits']:
         if get_centroids:
