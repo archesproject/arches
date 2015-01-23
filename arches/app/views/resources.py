@@ -51,6 +51,8 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         form.update(data)
 
         with transaction.atomic():
+            if resource.entityid != '':
+                resource.delete_index()
             resource.save(user=request.user)
             resource.index()
             resourceid = resource.entityid
