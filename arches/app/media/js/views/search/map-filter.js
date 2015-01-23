@@ -78,11 +78,19 @@ define(['jquery',
                 }, this);
 
 
-                this.vectorLayer = new ResourceLayerModel().layer();
+                this.vectorLayer = new ResourceLayerModel({}, function(features){
+                    self.trigger('vectorlayerloaded', features);
+                    if (!self.cancelFitBaseLayer){
+                        setTimeout(function() {
+                              self.zoomToExtent(self.vectorLayer.getLayers().item(0).getSource().getExtent());
+                        }, 500);                        
+                    }
+                }).layer();
                 this.map = new MapView({
                     el: $('#map'),
                     overlays: [this.vectorLayer]
                 });
+
 
                 this.bufferFeatureOverlay = new ol.FeatureOverlay({
                     style: new ol.style.Style({
@@ -151,7 +159,7 @@ define(['jquery',
                     hideAllPanels();
                 });
 
-                var hoverFeatureInfo = function(pixel) {
+                var hoverFeature = function(pixel) {
                     var info = $('#info');
                     var mapheight = $(self.map.map.getViewport()).height();
                     var mapwidth = $(self.map.map.getViewport()).width();
@@ -204,13 +212,26 @@ define(['jquery',
                 };
 
                 $(this.map.map.getViewport()).on('mousemove', function(evt) {
-                    hoverFeatureInfo(self.map.map.getEventPixel(evt.originalEvent));
+                    hoverFeature(self.map.map.getEventPixel(evt.originalEvent));
                 });
             },
 
             zoomToResource: function(resourceid){
-                var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(resourceid);
-                this.map.map.getView().fitGeometry(feature.getGeometry(), this.map.map.getSize(), {maxZoom:16});
+                this.cancelFitBaseLayer = true;
+                var feature = this.selectedFeatureLayer.getSource().getFeatureById(resourceid);
+                if(feature.getGeometry().getGeometries().length > 1){
+                    var extent = feature.getGeometry().getExtent();
+                    var minX = extent[0];
+                    var minY = extent[1];
+                    var maxX = extent[2];
+                    var maxY = extent[3];
+                    var polygon = new ol.geom.Polygon([[[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY], [minX, minY]]]);
+                    //polygon.transform('EPSG:3857', 'EPSG:4326');
+                    this.map.map.getView().fitGeometry(polygon, this.map.map.getSize(), {maxZoom:16}); 
+                    //this.zoomToExtent(feature.getGeometry().getExtent());
+                }else{
+                    this.map.map.getView().fitGeometry(feature.getGeometry().getGeometries()[0], this.map.map.getSize(), {maxZoom:16});                    
+                }
             },
             
             zoomToExtent: function(extent){
@@ -232,63 +253,73 @@ define(['jquery',
             },
 
             highlightFeatures: function(resultsarray){
+                var source, geometries;
                 var self = this;
-                var rgb = this.hexToRgb('#C4171D');
-                var iconUnicode = '\uf060';
+                var f = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
 
-                var style = new ol.style.Style({
-                    text: new ol.style.Text({
-                        text: iconUnicode,
-                        font: 'normal 33px octicons',
-                        stroke: new ol.style.Stroke({
-                            // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
-                            color: 'white',
-                            width: 3
-                        }),
-                        textBaseline: 'Bottom',
-                        fill: new ol.style.Fill({
-                            color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
+                if(!this.selectedFeatureLayer){
+                    var rgb = this.hexToRgb('#C4171D');
+                    var iconUnicode = '\uf060';                    
+                    var style = new ol.style.Style({
+                        text: new ol.style.Text({
+                            text: iconUnicode,
+                            font: 'normal 33px octicons',
+                            stroke: new ol.style.Stroke({
+                                // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
+                                color: 'white',
+                                width: 3
+                            }),
+                            textBaseline: 'Bottom',
+                            fill: new ol.style.Fill({
+                                color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
+                            })
                         })
-                    })
-                });
-                var shadowStyle = new ol.style.Style({
-                    text: new ol.style.Text({
-                        text: iconUnicode,
-                        font: 'normal 38px octicons',
-                        offsetX: 0,
-                        rotation: 0.25,
-                        textBaseline: 'Bottom',
-                        fill: new ol.style.Fill({
-                            color: 'rgba(126,126,126,0.3)',
+                    });
+                    var shadowStyle = new ol.style.Style({
+                        text: new ol.style.Text({
+                            text: iconUnicode,
+                            font: 'normal 38px octicons',
+                            offsetX: 0,
+                            rotation: 0.25,
+                            textBaseline: 'Bottom',
+                            fill: new ol.style.Fill({
+                                color: 'rgba(126,126,126,0.3)',
+                            })
                         })
-                    })
-                });
-                if(!this.featureOverlay){
-                    this.featureOverlay = new ol.FeatureOverlay({
-                        map: this.map.map,
-                        style: [shadowStyle,style]
                     });                    
+                    // this.selectedFeatureLayer = new ol.selectedFeatureLayer({
+                    //     map: this.map.map,
+                    //     style: [shadowStyle,style]
+                    // });             
+                    this.selectedFeatureLayer = new ol.layer.Vector({
+                        source: new ol.source.GeoJSON(),
+                        style: [shadowStyle,style]
+                    });
+                    this.map.map.addLayer(this.selectedFeatureLayer);  
                 }
-                this.featureOverlay.getFeatures().clear();
+                this.selectedFeatureLayer.getSource().clear();
 
-                var addSelectedFeatures = function(){
-                    _.each(resultsarray.results.hits.hits, function(result){
-                        if(result._source.geometries.length > 0){
-                            var feature = self.vectorLayer.getLayers().item(0).getSource().getFeatureById(result._id);
-                            if(feature){
-                                self.featureOverlay.addFeature(feature);
-                            }                        
+                _.each(resultsarray.results.hits.hits, function(result){
+                    var feature;
+                    geometries = [];
+                    _.each(result._source.geometries, function(geometry){
+                        geometries.push(geometry.value);
+                    }, this);
+                    feature = {
+                        'type': 'Feature',
+                        'id': result._id,
+                        'geometry':  {
+                            'type': 'GeometryCollection',
+                            'geometries': geometries
+                        },
+                        'properties': {
+                            'resourceid': result._id,
+                            'entitytypeid': result.type,
+                            'primaryname': result._source.primaryname
                         }
-                    }, self);
-                };
-
-                if(this.vectorLayer.getLayers().item(0).getSource().getState() === 'ready'){
-                    addSelectedFeatures();
-                }else{
-                    this.vectorLayer.getLayers().item(0).getSource().once('change', function(evt){
-                        addSelectedFeatures();
-                    }, this);                     
-                }
+                    };
+                    this.selectedFeatureLayer.getSource().addFeature(f.readFeature(feature, {featureProjection: 'EPSG:3857'}));
+                }, this);
             },
 
             selectFeatureById: function(resourceid){
@@ -317,7 +348,7 @@ define(['jquery',
                 }
 
                 this.unselectAllFeatures();
-                var feature = this.vectorLayer.getLayers().item(0).getSource().getFeatureById(resourceid);
+                var feature = this.selectedFeatureLayer.getSource().getFeatureById(resourceid);
                 if(feature){
                     this.featureHightlightOverlay.addFeature(feature);
                     return feature;
