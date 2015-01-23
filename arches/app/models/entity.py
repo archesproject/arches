@@ -332,7 +332,7 @@ class Entity(object):
         when entitytotest is a version of self)
 
         """
-        
+
         ret = {'deleted_nodes':[], 'updated_nodes':[], 'inserted_nodes': []}
 
         self_flattened = set(self.flatten())
@@ -370,7 +370,7 @@ class Entity(object):
         copiedself = self.copy()
         copiedself.traverse(gather_entities)
         for item in ret:
-            del item.child_entities
+            item.child_entities = []
 
         return ret
 
@@ -708,7 +708,7 @@ class Entity(object):
                 if collectsdata:
                     data[child_entity.undotify()] = self.get_group_nodes(child_entity.entitytypeid, keys=keys)
                 else:
-                    data[child_entity.undotify()] = child_entity.dictify()
+                    data[child_entity.undotify()] = child_entity.dictify(keys=keys)
         return [data]
 
     def get_group_nodes(self, entitytypeid, keys=[]):
@@ -765,6 +765,7 @@ class Entity(object):
         """
 
         ret = {}
+
         for key, value in self.__dict__.items():
             if key in keys:
                 ret['%s__%s' % (self.undotify(), key)] = value

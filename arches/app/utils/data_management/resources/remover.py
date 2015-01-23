@@ -19,7 +19,7 @@ def delete_resources(load_id):
             resource.delete_index()
             note = '{0} Deleted'.format(load_id)
             resource.delete_all_resource_relationships()
-            resource.delete(delete_root=True, note=note)
+            resource.delete(note=note)
         except ObjectDoesNotExist:
             print 'Entity does not exist. Nothing to delete'
 

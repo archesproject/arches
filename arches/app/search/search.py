@@ -41,13 +41,13 @@ class SearchEngine(object):
         body = kwargs.get('body', None)
         if body != None:
             try:
-                return self.es.delete_by_query(**kwargs)
+                return self.es.delete_by_query(ignore=[404], **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
                 raise detail   
         else:
             try:
-                return self.es.delete(**kwargs)
+                return self.es.delete(ignore=[404], **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document: %s \nException detail: %s\n' % (datetime.now(), body, detail))
                 raise detail   
@@ -118,7 +118,7 @@ class SearchEngine(object):
                 else:
                     ids = [id]
 
-                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options, 'count': len(ids), 'ids': ids}, idfield=None, id=_id)
+                self.index_data('term', 'value', {'term': term, 'context': context, 'options': options, 'count': len(ids), 'ids': ids}, id=_id)
 
             except Exception as detail:
                 self.logger.warning('%s: WARNING: search failed to index term: %s \nException detail: %s\n' % (datetime.now(), term, detail))
@@ -137,17 +137,34 @@ class SearchEngine(object):
             entities = [entities]
 
         for entity in entities:
-            result = self.es.get(index='term', doc_type='value', id=entity.value, ignore=404)
+            result = self.es.search(index='term', doc_type='value', body={
+                "query": {
+                    "filtered": {
+                        "filter":{
+                            "terms": {
+                                "ids": [entity.entityid]
+                            }
+                        }, 
+                        "query": {
+                            "match_all": {}
+                        }
+                    }
+                }, 
+                "from": 0, 
+                "size": 10
+            }, ignore=404)
 
-            if entity.entityid in result['_source']['ids']:
-                count = len(result['_source']['ids'].remove(entity.entityid))
-                if count > 0:
-                    result['_source']['count'] = count
-                    self.index_data('term', 'value', result['_source'], idfield=None, id=result['_id'])
-                else:
-                    self.delete(index='term', type='value', id=result['_id'])
+            if 'hits' in result:
+                for document in result['hits']['hits']:
+                    document['_source']['ids'].remove(entity.entityid)
+                    count = len(document['_source']['ids'])
+                    if count > 0:
+                        document['_source']['count'] = count
+                        self.index_data('term', 'value', document['_source'], id=document['_id'])
+                    else:
+                        self.delete(index='term', doc_type='value', id=document['_id'])
 
-    def create_mapping(self, index, type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
+    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
         """
         Creates an Elasticsearch mapping for a single field given an index name and type name
 
@@ -155,7 +172,7 @@ class SearchEngine(object):
 
         if not mapping:
             mapping =  { 
-                type : {
+                doc_type : {
                     'properties' : {
                         fieldname : { 'type' : fieldtype, 'index' : fieldindex }
                     }
@@ -164,7 +181,7 @@ class SearchEngine(object):
 
         if fieldtype == 'geo_shape':
             mapping =  { 
-                type : {
+                doc_type : {
                     'properties' : {
                         fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
                     }
@@ -172,7 +189,7 @@ class SearchEngine(object):
             }
 
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type=type, body=mapping)
+        self.es.indices.put_mapping(index=index, doc_type=doc_type, body=mapping)
 
     def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
         """

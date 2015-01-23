@@ -157,31 +157,29 @@ class Resource(Entity):
 
     def delete(self, user={}, note=''):
         """
-        Deltes a resource from the db wrapped in a transaction 
+        Deltes a resource from the db
         
         """
 
         timestamp = datetime.now()
         for entity in self.flatten():
-            if not delete_root and entity.entitytypeid != self.entitytypeid:
-                edit = archesmodels.EditLog()        
-                edit.editlogid = str(uuid.uuid4())
-                edit.resourceentitytypeid = self.entitytypeid
-                edit.resourceid = self.entityid
-                edit.userid = getattr(user, 'id', '')
-                edit.user_email = getattr(user, 'email', '')
-                edit.user_firstname = getattr(user, 'first_name', '')
-                edit.user_lastname = getattr(user, 'last_name', '') 
-                edit.note = note                               
-                edit.timestamp = timestamp
-                edit.attributeentitytypeid = entity.entitytypeid
-                edit.edittype = 'delete'
-                edit.oldvalue = entity.label if entity.label != '' else entity.value
-                edit.newvalue = None
-                edit.save()
+            edit = archesmodels.EditLog()        
+            edit.editlogid = str(uuid.uuid4())
+            edit.resourceentitytypeid = self.entitytypeid
+            edit.resourceid = self.entityid
+            edit.userid = getattr(user, 'id', '')
+            edit.user_email = getattr(user, 'email', '')
+            edit.user_firstname = getattr(user, 'first_name', '')
+            edit.user_lastname = getattr(user, 'last_name', '') 
+            edit.note = note                               
+            edit.timestamp = timestamp
+            edit.attributeentitytypeid = entity.entitytypeid
+            edit.edittype = 'delete'
+            edit.oldvalue = entity.label if entity.label != '' else entity.value
+            edit.newvalue = None
+            edit.save()
 
-        #super(Resource, self).delete(delete_root=delete_root)
-        self._delete(delete_root=delete_root)
+        self._delete(delete_root=True)
 
     def get_form(self, form_id):
         selected_form = None
@@ -298,13 +296,13 @@ class Resource(Entity):
 
         se = SearchEngineFactory().create()
 
-        report_documents = self.prepare_documents_for_report_index()
-        for document in report_documents:
-            se.index_data('resource', self.entitytypeid, document, id=self.entityid)
-
         search_documents = self.prepare_documents_for_search_index()
         for document in search_documents:
             se.index_data('entity', self.entitytypeid, document, id=self.entityid)
+
+            report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
+            for report_document in report_documents:
+                se.index_data('resource', self.entitytypeid, report_document, id=self.entityid)
 
             geojson_documents = self.prepare_documents_for_map_index(geom_entities=document['geometries'])
             for geojson in geojson_documents:
@@ -411,20 +409,31 @@ class Resource(Entity):
         self.traverse(gather_entities)
         return terms
 
-    def prepare_documents_for_report_index(self):
+    def prepare_documents_for_report_index(self, geom_entities=[]):
         """
         Generates a list of specialized resource based documents to support resource reports
 
         """
-        entity = Entity()
-        entity.property = self.property
-        entity.entitytypeid = self.entitytypeid
-        entity.entityid = self.entityid
-        entity.primaryname = self.get_primary_name()
+
+        geojson_geom = None
+        if len(geom_entities) > 0:
+            geojson_geom = {
+                'type': 'GeometryCollection',
+                'geometries': [geom_entity['value'] for geom_entity in geom_entities]
+            }
+
+        entity_dict = Entity()
+        entity_dict.property = self.property
+        entity_dict.entitytypeid = self.entitytypeid
+        entity_dict.entityid = self.entityid
+        entity_dict.primaryname = self.get_primary_name()
+        entity_dict.geometry = geojson_geom
         
-        entity_dict = JSONSerializer().serializeToPython(entity)
-        entity_dict['graph'] = self.dictify()
-        return [entity_dict]
+        #entity_dict = JSONSerializer().serializeToPython(entity)
+        entity_dict.graph = self.dictify(keys=['label', 'value'])
+        x = JSONSerializer().serializeToPython(self)
+        #raise Exception()
+        return [JSONSerializer().serializeToPython(entity_dict)]
 
     def delete_index(self):
         """
@@ -433,7 +442,8 @@ class Resource(Entity):
         """
 
         se = SearchEngineFactory().create()
-        se.delete(index='entity', doc_type=entity.entitytypeid, id=self.entityid)
+        se.delete(index='entity', doc_type=self.entitytypeid, id=self.entityid)
+        se.delete(index='resource', doc_type=self.entitytypeid, id=self.entityid)        
         se.delete(index='maplayers', doc_type=self.entitytypeid, id=self.entityid)
 
         def delete_indexes(entity):
