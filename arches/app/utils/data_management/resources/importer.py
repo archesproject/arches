@@ -117,6 +117,8 @@ class ResourceLoader(object):
             print 'total time to etl = %s' % (elapsed)
             print 'average time per entity = %s' % (elapsed/len(resource_list))
             print 'Load Identifier =', load_id
+            print '***You can reverse this load with the following command:'
+            print 'python hip remove_resources --load_id', load_id
         return ret
 
     def build_master_graph(self, resource, schema):
