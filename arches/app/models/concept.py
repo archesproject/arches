@@ -642,6 +642,8 @@ class ConceptValue(object):
                 scheme = self.get_scheme_id()
             if scheme == None:
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
+
+            se.create_mapping('concept_labels', scheme, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
             se.index_data('concept_labels', scheme, data, 'id')
     
     def delete_index(self):      
