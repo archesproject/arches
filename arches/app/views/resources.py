@@ -231,11 +231,11 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
 
     for item in data['hits']['hits']:
         if get_centroids:
-            item['_source']['properties']['geometry_collection'] = item['_source']['geometry']
             item['_source']['geometry'] = item['_source']['properties']['centroid']
+            item['_source'].pop('properties', None)
         else:
             item['_source']['properties'].pop('extent', None)
-        item['_source']['properties'].pop('centroid', None)
+            item['_source']['properties'].pop('centroid', None)
         geojson_collection['features'].append(item['_source'])
 
     return JSONResponse(geojson_collection)
