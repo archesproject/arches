@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -33,7 +34,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms, Bool
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms, Bool, Match
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -51,7 +52,7 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         form.update(data)
 
         with transaction.atomic():
-            if resource.entityid != '':
+            if resourceid != '':
                 resource.delete_index()
             resource.save(user=request.user)
             resource.index()
@@ -77,6 +78,9 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
 
 def related_resoures(request, resourceid):
+    return JSONResponse(get_related_resources(resourceid), indent=4)
+
+def get_related_resources(resourceid):
     ret = {
         'resource_relationships': [],
         'related_resources': []
@@ -106,79 +110,96 @@ def related_resoures(request, resourceid):
     return JSONResponse(ret)
 
 def report(request, resourceid):
-    report_info = Resource().get_report(resourceid)
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    se = SearchEngineFactory().create()
+    report_info = se.search(index='resource', id=resourceid)
+    report_info['source'] = report_info['_source']
+    report_info['type'] = report_info['_type']
+    report_info['source']['graph'] = report_info['source']['graph'][0]
+    del report_info['_source']
+    del report_info['_type']
 
-    report_info = {
-        # 'id':'00000000-0000-0000-0000-000000000000',
-        'id':'heritage-resource',
-        'ADDRESS_TYPE_E55':'ADDRESS_TYPE:1',
-        'ADMINISTRATIVE_SUBDIVISION_TYPE_E55':'ADMINISTRATIVE_SUBDIVISION:1',
-        'ADMINISTRATIVE_SUBDIVISION_E48':'San Francisco',
-        'ANCILLARY_FEATURE_TYPE_E55':'RELATED_FEATURE:1',
-        'BEGINNING_OF_EXISTENCE_TYPE_E55':'BEGIN_EXIST:1',
-        'COMPONENT_TYPE_E55':'COMPONENT_TYPE:1',
-        'CONDITION_DESCRIPTION_IMAGE_E62':'',
-        'CONDITION_DESCRIPTION_E62':'Example image description.',
-        'CONDITION_TYPE_E55':'CONDITION:1',
-        'CONSTRUCTION_TECHNIQUE_E55':'CONSTRUCTION_TECHNIQUE:1',
-        'CULTURAL_PERIOD_E55':'PERIOD_UID:52',
-        'DATE_CONDITION_ASSESSED_E49':'12/8/14',
-        'DESCRIPTION_OF_LOCATION_E62':'Example location description.',
-        'DESCRIPTION_TYPE_E55':'DESCRIPTION_TYPE:1',
-        'DESCRIPTION_E62':'Example resource description',
-        'PROTECTION_EVENT_E65':[
-            {
-            'TYPE_OF_DESIGNATION_OR_PROTECTION_E55':'DESIGNATION:1',
-            'DESIGNATION_OR_PROTECTION_FROM_DATE_E49':'12/8/10',
-            'DESIGNATION_OR_PROTECTION_TO_DATE_E49':'12/8/11'
-            },
-            {
-            'TYPE_OF_DESIGNATION_OR_PROTECTION_E55':'DESIGNATION:2',
-            'DESIGNATION_OR_PROTECTION_FROM_DATE_E49':'12/8/13',
-            'DESIGNATION_OR_PROTECTION_TO_DATE_E49':'12/8/14'
-            },
-        ],
-        'DISTURBANCE_TYPE_E55':'DISTURBANCE_TYPE:1',
-        'END_DATE_OF_EXISTENCE_E49':'12/10/14',
-        'END_OF_EXISTENCE_TYPE_E55':'END_EXIST:1',
-        'EVALUATION_CRITERIA_ASSIGNMENT_E13':[
-            {'EVALUATION_CRITERIA_TYPE_E55':'CTP:1'},
-            {'EVALUATION_CRITERIA_TYPE_E55':'CTP:1'}],# 'ELIGIBILITY_REQUIREMENT_TYPE_E55':'Eligibility Type:1' belongs to EVALUATION_CRITERIA_ASSIGNMENT_E13
-        'EXTERNAL_XREF_TYPE_E55':'XREF_TYPE:1',
-        'EXTERNAL_XREF_E42':'xxxxxxxxxxxxxxxxxxx',
-        'FROM_DATE_E49':'11/8/13',
-        'GEOMETRY_QUALIFIER_E55':'GEOMETRY_QUALIFIER:1',
-        'HERITAGE_RESOURCE_TYPE_E55':['First example resource type', 'Second example resource type', 'Third example resource type'],
-        'HERITAGE_RESOURCE_USE_TYPE_E55':'USE_TYPE:1',
-        'INTEGRITY_TYPE_E55':'INTEGRITY:1',
-        'KEYWORD_E55':'SUBJECT:1',
-        'MATERIAL_E57':'MATERIAL:1',
-        'MEASUREMENT_TYPE_E55':'MEASUREMENT_TYPE:1',
-        'MODIFICATION_EVENT_E11':[{'MODIFICATION_DESCRIPTION_E62':'Example modification description.','MODIFICATION_TYPE_E55':'MODIFICATION_TYPE:1'},
-            {'MODIFICATION_DESCRIPTION_E62':'Example modification description.','MODIFICATION_TYPE_E55':'MODIFICATION_TYPE:2'},
-            {'MODIFICATION_DESCRIPTION_E62':'Example modification description.','MODIFICATION_TYPE_E55':'MODIFICATION_TYPE:3'}],
-        'NAME_E41':[{'NAME_E41':'Primary name example.','NAME_TYPE_E55':'NAME_TYPE:1'}, {'NAME_E41':'Alternate name example 1', 'NAME_TYPE_E55':'Alternate Name'}, {'NAME_E41':'Alternate name example 2', 'NAME_TYPE_E55':'Alternate Name'}],
-        'PHASE_TYPE_ASSIGNMENT_E17':[
-            {'ANCILLARY_FEATURE_TYPE_E55':'RELATED_FEATURE:1'}, 
-            {'ANCILLARY_FEATURE_TYPE_E55':'RELATED_FEATURE:2'}],
-        'PLACE_ADDRESS_E45':'601 Montgomery Street. San Francisco, CA. 94111',
-        'PLACE_APPELLATION_CADASTRAL_REFERENCE_E44':'Example cadastral reference.',
-        'REASONS_E62':'Example reasons.',
-        'RECOMMENDATION_TYPE_E55':'RECOMMENDATION_TYPE:1',
-        'RESOURCE_TYPE_CLASSIFICATION_E55':'RESOURCE_CLASSIFICATION:1',
-        'SETTING_TYPE_E55':'SETTING_TYPE:1',
-        'START_DATE_OF_EXISTENCE_E49':'11/8/13',
-        'STATUS_E55':'STATUS_CODE:65',
-        'STYLE_E55':'STYLE:1',
-        'THREAT_TYPE_E55':'THREAT_TYPE:1',
-        'TO_DATE_E49':'11/8/14',
-        'UNIT_OF_MEASUREMENT_E55':'UNIT_OF_MEASUREMENT:1',
-        'VALUE_OF_MEASUREMENT_E60':'43',
-        'SPATIAL_COORDINATES_GEOMETRY_E47':'POLYGON ((-118.37156 34.13212,-118.37162 34.13168,-118.372 34.13149,-118.37211 34.13169,-118.37226 34.13174,-118.37237 34.13173,-118.37303 34.13149,-118.37309 34.13149,-118.37316 34.1315,-118.37405 34.13178,-118.37449 34.13174,-118.37478 34.13165,-118.37486 34.13155,-118.37478 34.13108,-118.37483 34.13102,-118.37492 34.131,-118.37498 34.13104,-118.37499 34.13152,-118.37481 34.13181,-118.37464 34.13194,-118.37453 34.13183,-118.37394 34.13198,-118.37341 34.13184,-118.37335 34.13202,-118.37298 34.13181,-118.37263 34.13206,-118.37255 34.1319,-118.3722 34.13196,-118.37204 34.1321,-118.37156 34.13212))'
-        }
+    related_resource_info = get_related_resources(resourceid)
+
+    #return JSONResponse(report_info, indent=4)
+    
+    def get_evaluation_path(valueid):
+        value = models.Values.objects.get(pk=valueid)
+        concept_graph = Concept().get(id=value.conceptid_id, include_subconcepts=False, 
+            include_parentconcepts=True, include_relatedconcepts=False, up_depth_limit=None, lang=lang)
+        
+        paths = []
+        for path in concept_graph.get_paths(lang=lang)[0]:
+            if path['label'] != 'Arches' and path['label'] != 'Evaluation Criteria Type':
+                paths.append(path['label'])
+        return '; '.join(paths)
+
+
+    concept_label_ids = set()
+    uuid_regex = re.compile('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
+    # gather together all uuid's referenced in the resource graph
+    def crawl(items):
+        for item in items:
+            for key in item:
+                if isinstance(item[key], list):
+                    crawl(item[key])
+                else:
+                    if uuid_regex.match(item[key]):
+                        if key == 'EVALUATION_CRITERIA_TYPE_E55__value':
+                            item[key] = get_evaluation_path(item[key])
+                        concept_label_ids.add(item[key])
+
+    crawl([report_info['source']['graph']])
+
+    # get all the concept labels from the uuid's
+    concept_labels = se.search(index='concept_labels', id=list(concept_label_ids))
+    
+    #print concept_labels
+    temp = {}
+
+    # convert all labels to their localized prefLabel
+    for concept_label in concept_labels['docs']:
+        #temp[concept_label['_id']] = concept_label
+        if concept_label['found']:
+            # the resource graph already referenced the preferred label in the desired language
+            if concept_label['_source']['type'] == 'prefLabel' and concept_label['_source']['language'] == lang:
+                temp[concept_label['_id']] = concept_label['_source']
+            else: 
+                # the resource graph referenced a non-preferred label or a label not in our target language, so we need to get the right label
+                query = Query(se)
+                terms = Terms(field='conceptid', terms=[concept_label['_source']['conceptid']])
+                match = Match(field='type', query='preflabel', type='phrase')
+                query.add_filter(terms)
+                query.add_query(match)
+                preflabels = query.search(index='concept_labels')['hits']['hits'] 
+                for preflabel in preflabels:
+                    # get the label in the preferred language, otherwise get the label in the default language
+                    if preflabel['_source']['language'] == lang:
+                        temp[concept_label['_id']] = preflabel['_source']
+                        break
+                    if preflabel['_source']['language'] == settings.LANGUAGE_CODE:
+                        temp[concept_label['_id']] = preflabel['_source']
+
+    # replace the uuid's in the resource graph with their preferred and localized label                    
+    def crawl_again(items):
+        for item in items:
+            for key in item:
+                if isinstance(item[key], list):
+                    crawl_again(item[key])
+                else:
+                    if uuid_regex.match(item[key]):
+                        try:
+                            item[key] = temp[item[key]]['value']
+                        except:
+                            pass
+
+    crawl_again([report_info['source']['graph']])
+
+    #return JSONResponse(report_info, indent=4)
 
     return render_to_response('resource-report.htm', {
-            'report_template': 'views/reports/' + report_info['id'] + '.htm',
+            'resourceid': resourceid,
+            'report_template': 'views/reports/' + report_info['type'] + '.htm',
             'report_info': report_info,
             'main_script': 'resource-report',
             'active_page': 'ResourceReport'
@@ -210,8 +231,11 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
 
     for item in data['hits']['hits']:
         if get_centroids:
+            item['_source']['properties']['geometry_collection'] = item['_source']['geometry']
             item['_source']['geometry'] = item['_source']['properties']['centroid']
-            item['_source'].pop('properties', None)
+        else:
+            item['_source']['properties'].pop('extent', None)
+        item['_source']['properties'].pop('centroid', None)
         geojson_collection['features'].append(item['_source'])
 
     return JSONResponse(geojson_collection)
