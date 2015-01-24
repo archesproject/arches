@@ -429,10 +429,7 @@ class Resource(Entity):
         entity_dict.primaryname = self.get_primary_name()
         entity_dict.geometry = geojson_geom
         
-        #entity_dict = JSONSerializer().serializeToPython(entity)
         entity_dict.graph = self.dictify(keys=['label', 'value'])
-        x = JSONSerializer().serializeToPython(self)
-        #raise Exception()
         return [JSONSerializer().serializeToPython(entity_dict)]
 
     def delete_index(self):
