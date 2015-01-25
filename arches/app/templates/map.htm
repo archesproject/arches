@@ -44,8 +44,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Geocoding Widget -->
                             <div class="">
-                                <div class="form-group">       
-                                    <input class="geocodewidget margin-top-10" id="geocodewidget" name="" style="width:100%"  value="">
+                                <div class="form-group">
+
+                                    <!-- Add basemap button for xs-screens -->
+                                    <button id="" type="button" class="btn btn-primary hidden-sm hidden-md hidden-lg" style="width: 36px; height: 46; margin-top: 10px; margin-left: 2px; background: #F5F7FB; border: 1px solid rgba(206,217,233,.95); padding-top: 8px; padding-bottom: 8px;"><i class="fa fa-globe" style="color: #3A67A6;"></i>
+                                    </button>
+
+                                    <input class="geocodewidget margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;"  value="">
+
+                                    <input class="geocodewidget margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;"  value="">
                                 </div>
                             </div>
                             <!-- End Geocoding Widget -->
@@ -199,16 +206,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="col-xs-12">
                                                         <div class="knobs-demo" data-bind="css: { 'hidden': !active() }" style="margin-left: 15px; display: block;">
                                                             
-                                                            <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#428BCA" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
+                                                            <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#65a5da" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
 
                                                             <div style="margin-top: -63px; margin-left: 47px;">
-                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #428BCA;"></i></a> &nbsp;
+                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
                                                                 
                                                                 <span class="hidden" style="color: #808080;font-size: 11px;">visible zoom range: 
                                                                     <span data-bind="text: visibleZoomRange"></span>
                                                                 </span>
 
-                                                                <a href="javascript:void(0);" class="" rel="popover-hover" data-placement="right" title="Layer info" data-content="Visible zoom range:"><i class="fa fa-2x fa-info-circle" style="color: #428BCA;"></i></a>
+                                                                <a href="javascript:void(0);" class="" rel="popover-hover" data-placement="right" title="Layer info" data-content="Visible zoom range:"><i class="fa fa-2x fa-info-circle" style="color: #65a5da;"></i></a>
 
                                                             </div>
 
@@ -231,7 +238,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- End Overlays Panel -->
 
             <!-- Map Tools -->
-            <div class="row">
+            <div class="row hidden-xs">
                 <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" style="margin-top: -121px;margin-left: -1px;">
 
                     <div class="btn-group">

@@ -1127,9 +1127,14 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     border-radius: 3px;
 }
 
+.geocodewidget {
+    margin-left: 10px;
+}
+
 .map-loading {
     height: 36px;
-    margin-top: -52px;
+    margin-top: 11px;
+    margin-left: 22px;
     background-color: #5cb85c;
     opacity: 0.9;
     border: 1px solid #4cae4c; 
