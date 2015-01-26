@@ -74,13 +74,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
             'resource_type_name': resource.get_type_name(),
             'form_groups': resource.form_groups
         },
-        context_instance=RequestContext(request))        
-
+        context_instance=RequestContext(request))
+    
 
 def related_resoures(request, resourceid):
-    return JSONResponse(get_related_resources(resourceid), indent=4)
-
-def get_related_resources(resourceid):
     ret = {
         'resource_relationships': [],
         'related_resources': []
