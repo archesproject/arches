@@ -144,23 +144,6 @@ class Command(BaseCommand):
             os.system("./plugin -install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
-        #self.setup_indexes(package_name)
-
-    def setup_indexes(self, package_name):
-        import time, signal
-        # p = self.start_elasticsearch(package_name)
-        # time.sleep(10)
-        se = SearchEngineFactory().create()
-        #create_mapping(self, index, type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
-        se.create_mapping('concept', 'Arches', 'label', 'string', 'analyzed')
-        #os.kill(p.pid, signal.CTRL_C_EVENT)
-        # print p.pid
-        # os.system('taskkill /F /PID %s' % p.pid)
-        #p = subprocess.Popen(['service.bat', 'remove'], cwd=es_start, shell=True) 
-        
-        # es_start = os.path.join(self.get_elasticsearch_install_location(package_name), 'bin', 'service.bat')
-        # os.system('%s remove' % (es_start))
-
     def start_elasticsearch(self, package_name):
         """
         Starts the Elasticsearch process (blocking)
