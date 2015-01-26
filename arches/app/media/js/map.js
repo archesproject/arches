@@ -293,7 +293,7 @@ require([
             });
 
             //Inventory-basemaps button opens basemap panel
-            $("#inventory-basemaps").click(function (){
+            $(".inventory-basemaps").click(function (){
                 if ($(this).hasClass('arches-map-tools-pressed')) {
                     hideAllPanels();
                 } else {
