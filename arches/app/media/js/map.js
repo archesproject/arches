@@ -147,8 +147,61 @@ require([
                 self.viewModel.zoom(zoom);
             });
 
-            map.on('mousePositionChanged', function (mousePosition) {
+            var mouseoverFeatureTooltip = $('#feature_tooltip');
+
+            var showMouseoverFeatureTooltip = function(feature, pixels) {
+                var mapheight = map.$el.height();
+                var mapwidth = map.$el.width();
+                mouseoverFeatureTooltip.find('#tooltip-text').html(feature.get('primaryname'));
+                if(pixels[0] < mapwidth*0.33){
+                    mouseoverFeatureTooltip.removeClass('left')
+                        .addClass('right');
+                }
+                if(pixels[0] > mapwidth*0.66){
+                    mouseoverFeatureTooltip.removeClass('right')
+                        .addClass('left');
+                }
+                if(mouseoverFeatureTooltip.hasClass('left')){
+                    mouseoverFeatureTooltip.css({
+                        left: (pixels[0] - mouseoverFeatureTooltip.width() - 15) + 'px',
+                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
+                    });
+                }
+                if(mouseoverFeatureTooltip.hasClass('right')){
+                    mouseoverFeatureTooltip.css({
+                        left: (pixels[0] + 10) + 'px',
+                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
+                    });
+                }
+                mouseoverFeatureTooltip.show();
+            };
+
+            map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
                 self.viewModel.mousePosition(mousePosition);
+                if (feature && (feature.get('arches_marker') || feature.get('arches_cluster') && feature.get('features').length === 1)) {
+                    feature = feature.get('features')[0];
+                    var fullFeature = feature.get('arches_feature');
+                    if (fullFeature && fullFeature != 'loading') {
+                        showMouseoverFeatureTooltip(fullFeature, pixels);
+                    } else if (fullFeature != 'loading') {
+                        $.ajax({
+                            url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
+                            success: function(response) {
+                                fullFeature = geoJSON.readFeature(response.features[0]);
+                                var geom = fullFeature.getGeometry();
+                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+
+                                fullFeature.set('select_feature', true);
+                                fullFeature.set('entityid', fullFeature.getId());
+
+                                feature.set('arches_feature', fullFeature);
+                                showMouseoverFeatureTooltip(fullFeature, pixels);
+                            }
+                        });
+                    }
+                } else {
+                    mouseoverFeatureTooltip.hide();
+                }
             });
 
             $('.resource-info-closer').click(function() {
@@ -269,64 +322,6 @@ require([
                 }
             });
             
-            var mouseoverFeatureTooltip = $('#feature_tooltip');
-
-            var showMouseoverFeatureTooltip = function(feature, pixels) {
-                var mapheight = map.$el.height();
-                var mapwidth = map.$el.width();
-                mouseoverFeatureTooltip.find('#tooltip-text').html(feature.get('primaryname'));
-                if(pixels[0] < mapwidth*0.33){
-                    mouseoverFeatureTooltip.removeClass('left')
-                        .addClass('right');
-                }
-                if(pixels[0] > mapwidth*0.66){
-                    mouseoverFeatureTooltip.removeClass('right')
-                        .addClass('left');
-                }
-                if(mouseoverFeatureTooltip.hasClass('left')){
-                    mouseoverFeatureTooltip.css({
-                        left: (pixels[0] - mouseoverFeatureTooltip.width() - 15) + 'px',
-                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
-                    });
-                }
-                if(mouseoverFeatureTooltip.hasClass('right')){
-                    mouseoverFeatureTooltip.css({
-                        left: (pixels[0] + 10) + 'px',
-                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
-                    });
-                }
-                mouseoverFeatureTooltip.show();
-            };
-
-            map.on('feature_mouseover', function (feature, pixels) {
-                if (feature.get('arches_marker') || feature.get('arches_cluster') && feature.get('features').length === 1) {
-                    feature = feature.get('features')[0];
-                    var fullFeature = feature.get('arches_feature');
-                    if (fullFeature && fullFeature != 'loading') {
-                        showMouseoverFeatureTooltip(fullFeature, pixels);
-                    } else if (fullFeature != 'loading') {
-                        $.ajax({
-                            url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
-                            success: function(response) {
-                                fullFeature = geoJSON.readFeature(response.features[0]);
-                                var geom = fullFeature.getGeometry();
-                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
-
-                                fullFeature.set('select_feature', true);
-                                fullFeature.set('entityid', fullFeature.getId());
-
-                                feature.set('arches_feature', fullFeature);
-                                showMouseoverFeatureTooltip(fullFeature, pixels);
-                            }
-                        });
-                    }
-                }
-            });
-
-            map.on('feature_mouseout', function (feature) {
-                mouseoverFeatureTooltip.hide();
-            });
-
             var hideAllPanels = function () {
                 $("#overlay-panel").addClass("hidden");
                 $("#basemaps-panel").addClass("hidden");

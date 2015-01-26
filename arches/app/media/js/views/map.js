@@ -132,13 +132,11 @@ define([
             var cursorStyle = overFeature ? "pointer" : "";
             if (this.hoverFeature) {
                 this.hoverFeature.set('mouseover', false);
-                self.trigger('feature_mouseout', this.hoverFeature, pixels);
                 this.hoverFeature = null;
             }
             if (overFeature) {
                 this.hoverFeature = overFeature;
                 this.hoverFeature.set('mouseover', true);
-                self.trigger('feature_mouseover', this.hoverFeature, pixels);
             }
 
             if (this.enableSelection) {
@@ -146,7 +144,7 @@ define([
             }
             coords = point.transform("EPSG:3857", "EPSG:4326").getCoordinates();
             if (coords.length > 0) {
-                this.trigger('mousePositionChanged', format(coords));
+                this.trigger('mousePositionChanged', format(coords), pixels, this.hoverFeature);
             }
         },
 
