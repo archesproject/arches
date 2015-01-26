@@ -450,115 +450,187 @@ class Resource(Entity):
         entity = Entity().get(self.entityid)
         entity.traverse(delete_indexes)
 
-    def prepare_search_mappings(self, resource_type_id):
+    def prepare_search_index(self, resource_type_id, create=False):
         """
-        Creates Elasticsearch document mappings
+        Creates the settings and mappings in Elasticsearch to support resource search
 
         """
 
-        se = SearchEngineFactory().create()
-
-        se.create_mapping('term', 'value', 'ids', 'string', 'not_analyzed')
-        
-        resource_relation_mapping = { 
-            'all': {
-                'properties': {
-                    'resourcexid': {'type': 'long'},
-                    'notes': { 'type': 'string'},
-                    'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
-                    'entityid2': {'type': 'string', 'index' : 'not_analyzed'},
-                    'entityid1': {'type': 'string', 'index' : 'not_analyzed'}
-                }       
-            }
-        }
-        se.create_mapping('resource_relations', 'all', mapping=resource_relation_mapping)
-
-
-        mapping =  { 
-            resource_type_id : {
-                'properties' : {
-                    'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'value' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-                    'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
-                    'child_entities' : { 
-                        'type' : 'nested', 
-                        'index' : 'analyzed',
-                        'properties' : {
-                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'value' : {
-                                'type' : 'string',
-                                'index' : 'analyzed',
-                                'fields' : {
-                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+        index_settings = { 
+            'settings':{
+                'analysis': {
+                    'analyzer': {
+                        'folding': {
+                            'tokenizer': 'standard',
+                            'filter':  [ 'lowercase', 'asciifolding' ]
+                        }
+                    }
+                }
+            },
+            'mappings': {
+                resource_type_id : {
+                    'properties' : {
+                        'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'value' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                        'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
+                        'child_entities' : { 
+                            'type' : 'nested', 
+                            'index' : 'analyzed',
+                            'properties' : {
+                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'value' : {
+                                    'type' : 'string',
+                                    'index' : 'analyzed',
+                                    'fields' : {
+                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'},
+                                        'folded': { 'type': 'string', 'analyzer': 'folding'}
+                                    }
                                 }
                             }
-                        }
-                    },
-                    'domains' : { 
-                        'type' : 'nested', 
-                        'index' : 'analyzed',
-                        'properties' : {
-                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'value' : {
-                                'type' : 'string',
-                                'index' : 'analyzed',
-                                'fields' : {
-                                    'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
-                                }
-                            },
-                            'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                        }
-                    },
-                    'geometries' : { 
-                        'type' : 'nested', 
-                        'index' : 'analyzed',
-                        'properties' : {
-                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'value' : {
-                                "type": "geo_shape"
+                        },
+                        'domains' : { 
+                            'type' : 'nested', 
+                            'index' : 'analyzed',
+                            'properties' : {
+                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'value' : {
+                                    'type' : 'string',
+                                    'index' : 'analyzed',
+                                    'fields' : {
+                                        'raw' : { 'type' : 'string', 'index' : 'not_analyzed'}
+                                    }
+                                },
+                                'conceptid' : {'type' : 'string', 'index' : 'not_analyzed'},
                             }
-                        }
-                    },
-                    'dates' : { 
-                        'type' : 'nested', 
-                        'index' : 'analyzed',
-                        'properties' : {
-                            'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'property' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'label' : {'type' : 'string', 'index' : 'not_analyzed'},
-                            'value' : {
-                                "type" : "date"
+                        },
+                        'geometries' : { 
+                            'type' : 'nested', 
+                            'index' : 'analyzed',
+                            'properties' : {
+                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'value' : {
+                                    "type": "geo_shape"
+                                }
+                            }
+                        },
+                        'dates' : { 
+                            'type' : 'nested', 
+                            'index' : 'analyzed',
+                            'properties' : {
+                                'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'property' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'entitytypeid' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'businesstablename' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'label' : {'type' : 'string', 'index' : 'not_analyzed'},
+                                'value' : {
+                                    "type" : "date"
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        se.create_mapping('entity', resource_type_id, mapping=mapping)
 
+        if create:
+            se = SearchEngineFactory().create()
+            try:
+                se.create_index(index='entity', body=index_settings)
+            except:
+                index_settings = index_settings['mappings']
+                se.create_mapping(index='entity', doc_type=resource_type_id, body=index_settings)
+
+        return index_settings
+
+    def prepare_term_index(self, create=False):
+        """
+        Creates the settings and mappings in Elasticsearch to support term search
+
+        """
+
+        index_settings = {
+            'settings':{
+                'analysis': {
+                    'analyzer': {
+                        'folding': {
+                            'tokenizer': 'standard',
+                            'filter':  [ 'lowercase', 'asciifolding' ]
+                        }
+                    }
+                }
+            },
+            'mappings':{
+                'value':{
+                    'properties': {
+                        'ids':{'type': 'string', 'index' : 'not_analyzed'},
+                        'term': { 
+                            'type': 'string',
+                            'analyzer': 'standard',
+                            'fields': {
+                                'folded': { 
+                                    'type': 'string',
+                                    'analyzer': 'folding'
+                                }
+                            }
+                        }
+                    }            
+                }            
+            }
+        }
+
+        if create:
+            se = SearchEngineFactory().create()
+            se.create_index(index='term', body=index_settings, ignore=400)
+
+        return index_settings
+
+    def prepare_resource_relations_index(self, create=False):
+        """
+        Creates the settings and mappings in Elasticsearch to support related resources
+
+        """
+
+        index_settings = { 
+            'mappings':{
+                'all': {
+                    'properties': {
+                        'resourcexid': {'type': 'long'},
+                        'notes': { 'type': 'string'},
+                        'relationshiptype': {'type': 'string', 'index' : 'not_analyzed'},
+                        'entityid2': {'type': 'string', 'index' : 'not_analyzed'},
+                        'entityid1': {'type': 'string', 'index' : 'not_analyzed'}
+                    }  
+                }
+            }
+        }    
+
+        if create:
+            se = SearchEngineFactory().create()
+            se.create_index(index='resource_relations', body=index_settings, ignore=400)
+
+        return index_settings
+           
     @staticmethod
     def get_report(resourceid):
         return {

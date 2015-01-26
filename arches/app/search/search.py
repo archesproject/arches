@@ -164,32 +164,35 @@ class SearchEngine(object):
                     else:
                         self.delete(index='term', doc_type='value', id=document['_id'])
 
-    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex='analyzed', mapping=None):
+    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex='analyzed', body=None):
         """
-        Creates an Elasticsearch mapping for a single field given an index name and type name
+        Creates an Elasticsearch body for a single field given an index name and type name
 
         """
 
-        if not mapping:
-            mapping =  { 
-                doc_type : {
-                    'properties' : {
-                        fieldname : { 'type' : fieldtype, 'index' : fieldindex }
+        if not body:
+            if fieldtype == 'geo_shape':
+                body =  { 
+                    doc_type : {
+                        'properties' : {
+                            fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
+                        }
+                    }
+                } 
+            else:           
+                body =  { 
+                    doc_type : {
+                        'properties' : {
+                            fieldname : { 'type' : fieldtype, 'index' : fieldindex }
+                        }
                     }
                 }
-            }
 
-        if fieldtype == 'geo_shape':
-            mapping =  { 
-                doc_type : {
-                    'properties' : {
-                        fieldname : { 'type' : 'geo_shape', 'tree' : 'geohash', 'precision': '1m' }
-                    }
-                }
-            }
+        self.create_index(index=index, ignore=400)
+        self.es.indices.put_mapping(index=index, doc_type=doc_type, body=body)
 
-        self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type=doc_type, body=mapping)
+    def create_index(self, **kwargs):
+        self.es.indices.create(**kwargs)
 
     def index_data(self, index=None, doc_type=None, body=None, idfield=None, id=None, **kwargs):
         """

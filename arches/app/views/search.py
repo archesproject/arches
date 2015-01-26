@@ -46,8 +46,11 @@ def search_terms(request):
     searchString = request.GET.get('q', '')
     
     query = Query(se, start=0, limit=settings.SEARCH_ITEMS_PER_PAGE)
-    phrase = Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO')
-    query.add_query(phrase)
+    boolquery = Bool()
+    boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
+    query.add_query(boolquery)
 
     return JSONResponse(query.search(index='term', doc_type='value'))
 
@@ -77,8 +80,10 @@ def build_query_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                phrase = Match(field='child_entities.value', query=term['value'], type='phrase')
-                nested = Nested(path='child_entities', query=phrase)
+                boolfilter_folded = Bool()
+                boolfilter_folded.should(Match(field='child_entities.value', query=term['value'], type='phrase'))
+                boolfilter_folded.should(Match(field='child_entities.value.folded', query=term['value'], type='phrase'))
+                nested = Nested(path='child_entities', query=boolfilter_folded)
                 if term['inverted']:
                     boolfilter.must_not(nested)
                 else:    
@@ -92,8 +97,11 @@ def build_query_dsl(request):
                 else:
                     boolfilter.must(nested)
             elif term['type'] == 'string':
-                phrase = Match(field='child_entities.value', query=term['value'], type='phrase_prefix')
-                nested = Nested(path='child_entities', query=phrase)
+                boolfilter_folded = Bool()
+                boolfilter_folded.should(Match(field='child_entities.value', query=term['value'], type='phrase_prefix'))
+                boolfilter_folded.should(Match(field='child_entities.value.folded', query=term['value'], type='phrase_prefix'))
+                #phrase = Match(field='child_entities.value', query=term['value'], type='phrase_prefix')
+                nested = Nested(path='child_entities', query=boolfilter_folded)
                 if term['inverted']:
                     boolquery.must_not(nested)
                 else:    
