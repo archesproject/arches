@@ -184,6 +184,7 @@ require([
                     if (fullFeature && fullFeature != 'loading') {
                         showMouseoverFeatureTooltip(fullFeature, pixels);
                     } else if (fullFeature != 'loading') {
+                        feature.set('arches_feature', 'loading');
                         $.ajax({
                             url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
                             success: function(response) {
@@ -297,6 +298,7 @@ require([
                                         showFeaturePopup(clickFeature.get('arches_feature'));
                                     } else {
                                         $('.map-loading').show();
+                                        clickFeature.set('arches_feature', 'loading');
                                         $.ajax({
                                             url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(),
                                             success: function(response) {
