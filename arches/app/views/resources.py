@@ -76,8 +76,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         },
         context_instance=RequestContext(request))
     
-
 def related_resoures(request, resourceid):
+    return JSONResponse(get_related_resources(resourceid))
+
+def get_related_resources(resourceid):
     ret = {
         'resource_relationships': [],
         'related_resources': []
@@ -104,7 +106,7 @@ def related_resoures(request, resourceid):
         for resource in related_resources['docs']:
             ret['related_resources'].append(resource['_source'])
 
-    return JSONResponse(ret)
+    return ret
 
 def report(request, resourceid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -119,7 +121,7 @@ def report(request, resourceid):
     related_resource_info = get_related_resources(resourceid)
 
     #return JSONResponse(report_info, indent=4)
-    
+
     def get_evaluation_path(valueid):
         value = models.Values.objects.get(pk=valueid)
         concept_graph = Concept().get(id=value.conceptid_id, include_subconcepts=False, 
