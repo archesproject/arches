@@ -14,7 +14,7 @@ define([
         },
 
         overlays: [],
-        enableSelection: true,
+        enableSelection: false,
         hoverFeature: null,
         initialize: function(options) {
             var self = this;
@@ -132,11 +132,13 @@ define([
             var cursorStyle = overFeature ? "pointer" : "";
             if (this.hoverFeature) {
                 this.hoverFeature.set('mouseover', false);
+                self.trigger('feature_mouseout', this.hoverFeature, pixels);
                 this.hoverFeature = null;
             }
             if (overFeature) {
                 this.hoverFeature = overFeature;
                 this.hoverFeature.set('mouseover', true);
+                self.trigger('feature_mouseover', this.hoverFeature, pixels);
             }
 
             if (this.enableSelection) {

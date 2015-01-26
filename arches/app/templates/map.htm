@@ -25,12 +25,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="map-space-panel" id="map-panel">
         
         <!-- Map -->
-        <div id="map" class="map map-space-panel"></div>
+        <div id="map" class="map map-space-panel">
+            <div id="feature_tooltip" class="tooltip left" role="tooltip" style="display:none;">
+                  <div class="tooltip-arrow"></div>
+                  <div id="tooltip-text" class="tooltip-inner">
+                  </div>
+                </div>
+            </div>
+        </div>
         <div style="visibility:hidden;">
             <div id="popup">
                 <i class="fa fa-dot-circle-o" style="color: #EBFA69; opacity: 0.7; font-size: 41px;-webkit-text-stroke-color: black;-webkit-text-stroke-width: 1px;"></i>
             </div>
         </div>
+        
         
         
         <!-- Map Header -->
