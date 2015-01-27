@@ -30,7 +30,9 @@ define([
                 var mouseOver = feature.get('mouseover');
                 var text = '1 ' + mouseOver;
 
-                feature.set('arches_marker', true);
+                if (!feature.get('arches_marker')) {
+                    feature.set('arches_marker', true);
+                }
 
                 if (styleCache[text]) {
                     return styleCache[text];
@@ -86,7 +88,7 @@ define([
             });
 
             var clusterSource = new ol.source.Cluster({
-                distance: 50,
+                distance: 55,
                 source: source
             });
 
@@ -95,7 +97,9 @@ define([
                 var mouseOver = feature.get('mouseover');
                 var text = size + ' ' + mouseOver;
 
-                feature.set('arches_cluster', true);
+                if (!feature.get('arches_cluster')) {
+                    feature.set('arches_cluster', true);
+                }
 
                 if (styleCache[text]) {
                     return styleCache[text];
