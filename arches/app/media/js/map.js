@@ -148,41 +148,43 @@ require([
             });
 
             var mouseoverFeatureTooltip = $('#feature_tooltip');
+            var currentMousePx = null;
 
-            var showMouseoverFeatureTooltip = function(feature, pixels) {
+            var showMouseoverFeatureTooltip = function(feature) {
                 var mapheight = map.$el.height();
                 var mapwidth = map.$el.width();
                 mouseoverFeatureTooltip.find('#tooltip-text').html(feature.get('primaryname'));
-                if(pixels[0] < mapwidth*0.33){
+                if(currentMousePx[0] < mapwidth*0.33){
                     mouseoverFeatureTooltip.removeClass('left')
                         .addClass('right');
                 }
-                if(pixels[0] > mapwidth*0.66){
+                if(currentMousePx[0] > mapwidth*0.66){
                     mouseoverFeatureTooltip.removeClass('right')
                         .addClass('left');
                 }
                 if(mouseoverFeatureTooltip.hasClass('left')){
                     mouseoverFeatureTooltip.css({
-                        left: (pixels[0] - mouseoverFeatureTooltip.width() - 15) + 'px',
-                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
+                        left: (currentMousePx[0] - mouseoverFeatureTooltip.width() - 15) + 'px',
+                        top: (currentMousePx[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
                     });
                 }
                 if(mouseoverFeatureTooltip.hasClass('right')){
                     mouseoverFeatureTooltip.css({
-                        left: (pixels[0] + 10) + 'px',
-                        top: (pixels[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
+                        left: (currentMousePx[0] + 10) + 'px',
+                        top: (currentMousePx[1] - mouseoverFeatureTooltip.height()/2 + map.$el.offset().top) + 'px'
                     });
                 }
                 mouseoverFeatureTooltip.show();
             };
 
             map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
+                currentMousePx = pixels;
                 self.viewModel.mousePosition(mousePosition);
                 if (feature && (feature.get('arches_marker') || feature.get('arches_cluster') && feature.get('features').length === 1)) {
                     feature = feature.get('features')[0];
                     var fullFeature = feature.get('arches_feature');
                     if (fullFeature && fullFeature != 'loading') {
-                        showMouseoverFeatureTooltip(fullFeature, pixels);
+                        showMouseoverFeatureTooltip(fullFeature);
                     } else if (fullFeature != 'loading') {
                         feature.set('arches_feature', 'loading');
                         $.ajax({
@@ -196,7 +198,7 @@ require([
                                 fullFeature.set('entityid', fullFeature.getId());
 
                                 feature.set('arches_feature', fullFeature);
-                                showMouseoverFeatureTooltip(fullFeature, pixels);
+                                showMouseoverFeatureTooltip(fullFeature);
                             }
                         });
                     }
