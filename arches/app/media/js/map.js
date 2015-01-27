@@ -67,6 +67,9 @@ require([
                 clusterFeatures: ko.observableArray()
             };
             self.map = map;
+            var clusterFeaturesCache = {};
+            var archesFeaturesCache = {};
+
             var selectDeafultFeature = function (features) {
                 var feature = _.find(features, function (feature) {
                     return feature.getId() === selectedResourceId;
@@ -184,11 +187,11 @@ require([
                 self.viewModel.mousePosition(mousePosition);
                 if (feature && (feature.get('arches_marker') || feature.get('arches_cluster') && feature.get('features').length === 1)) {
                     feature = feature.get('features')[0];
-                    var fullFeature = feature.get('arches_feature');
+                    var fullFeature = archesFeaturesCache[feature.getId()];
                     if (fullFeature && fullFeature != 'loading') {
                         showMouseoverFeatureTooltip(fullFeature);
                     } else if (fullFeature != 'loading') {
-                        feature.set('arches_feature', 'loading');
+                        archesFeaturesCache[feature.getId()] = 'loading';
                         $.ajax({
                             url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
                             success: function(response) {
@@ -199,7 +202,7 @@ require([
                                 fullFeature.set('select_feature', true);
                                 fullFeature.set('entityid', fullFeature.getId());
 
-                                feature.set('arches_feature', fullFeature);
+                                archesFeaturesCache[feature.getId()] = fullFeature;
                                 showMouseoverFeatureTooltip(fullFeature);
                             }
                         });
@@ -244,12 +247,14 @@ require([
 
             var showClusterPopup = function(feature) {
                 var ids = [];
+                var featureId = feature.getId();
+                var completeFeatures = clusterFeaturesCache[featureId];
                 self.viewModel.clusterFeatures.removeAll();
                 $('#resource-info').hide();
                 $('#cluster-info').show();
 
-                if (feature.get('complete_features')) {
-                    self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, feature.get('complete_features'));
+                if (completeFeatures) {
+                    self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, completeFeatures);
                 } else {
                     _.each(feature.get('features'), function(childFeature) {
                         ids.push(childFeature.getId());
@@ -258,7 +263,7 @@ require([
                     $.ajax({
                         url: arches.urls.map_markers + 'all?entityid=' + ids.join(','),
                         success: function(response) {
-                            feature.set('complete_features', response.features);
+                            clusterFeaturesCache[featureId] = response.features;
                             self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, response.features);
                         }
                     });
@@ -298,11 +303,11 @@ require([
                             _.defer(function () {
                                 map.select.getFeatures().clear();
                                 if (isArchesFeature) {
-                                    if (clickFeature.get('arches_feature') && clickFeature.get('arches_feature') !== 'loading'){
-                                        showFeaturePopup(clickFeature.get('arches_feature'));
+                                    if (archesFeaturesCache[clickFeature.getId()] && archesFeaturesCache[clickFeature.getId()] !== 'loading'){
+                                        showFeaturePopup(archesFeaturesCache[clickFeature.getId()]);
                                     } else {
                                         $('.map-loading').show();
-                                        clickFeature.set('arches_feature', 'loading');
+                                        archesFeaturesCache[clickFeature.getId()] = 'loading';
                                         $.ajax({
                                             url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(),
                                             success: function(response) {
@@ -313,7 +318,7 @@ require([
                                                 feature.set('select_feature', true);
                                                 feature.set('entityid', feature.getId());
 
-                                                clickFeature.set('arches_feature', feature);
+                                                archesFeaturesCache[clickFeature.getId()] = feature;
                                                 $('.map-loading').hide();
                                                 showFeaturePopup(feature);
                                             }
