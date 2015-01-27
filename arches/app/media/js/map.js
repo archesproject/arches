@@ -252,7 +252,7 @@ require([
                 });
                 var featureIds = ids.join(',');
                 var completeFeatures = clusterFeaturesCache[featureIds];
-                
+
                 self.viewModel.clusterFeatures.removeAll();
                 $('#resource-info').hide();
                 $('#cluster-info').show();
@@ -261,7 +261,7 @@ require([
                     self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, completeFeatures);
                 } else {
                     $.ajax({
-                        url: arches.urls.map_markers + 'all?entityid=' + ids.join(','),
+                        url: arches.urls.map_markers + 'all?entityid=' + featureIds,
                         success: function(response) {
                             clusterFeaturesCache[featureIds] = response.features;
                             self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, response.features);
