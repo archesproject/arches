@@ -88,7 +88,7 @@ define([
             });
 
             var clusterSource = new ol.source.Cluster({
-                distance: 65,
+                distance: 45,
                 source: source
             });
 

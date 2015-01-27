@@ -131,12 +131,12 @@ define([
             });
             var cursorStyle = overFeature ? "pointer" : "";
             if (this.hoverFeature) {
-                this.hoverFeature.set('mouseover', false);
+                // this.hoverFeature.set('mouseover', false);
                 this.hoverFeature = null;
             }
             if (overFeature) {
                 this.hoverFeature = overFeature;
-                this.hoverFeature.set('mouseover', true);
+                // this.hoverFeature.set('mouseover', true);
             }
 
             if (this.enableSelection) {
