@@ -88,9 +88,11 @@ define([
             });
 
             var clusterSource = new ol.source.Cluster({
-                distance: 55,
+                distance: 65,
                 source: source
             });
+
+
 
             var clusterStyle = function(feature, resolution) {
                 var size = feature.get('features').length;
