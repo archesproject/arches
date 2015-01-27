@@ -247,8 +247,12 @@ require([
 
             var showClusterPopup = function(feature) {
                 var ids = [];
-                var featureId = feature.getId();
-                var completeFeatures = clusterFeaturesCache[featureId];
+                _.each(feature.get('features'), function(childFeature) {
+                    ids.push(childFeature.getId());
+                });
+                var featureIds = ids.join(',');
+                var completeFeatures = clusterFeaturesCache[featureIds];
+                
                 self.viewModel.clusterFeatures.removeAll();
                 $('#resource-info').hide();
                 $('#cluster-info').show();
@@ -256,14 +260,10 @@ require([
                 if (completeFeatures) {
                     self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, completeFeatures);
                 } else {
-                    _.each(feature.get('features'), function(childFeature) {
-                        ids.push(childFeature.getId());
-                    });
-
                     $.ajax({
                         url: arches.urls.map_markers + 'all?entityid=' + ids.join(','),
                         success: function(response) {
-                            clusterFeaturesCache[featureId] = response.features;
+                            clusterFeaturesCache[featureIds] = response.features;
                             self.viewModel.clusterFeatures.push.apply(self.viewModel.clusterFeatures, response.features);
                         }
                     });
