@@ -55,7 +55,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
-        package_name = settings.PACKAGE_NAME
+        if hasattr(settings, 'SUBPACKAGE_NAME'):
+            package_name = settings.SUBPACKAGE_NAME
+        else:
+            package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'setup':
@@ -196,7 +199,11 @@ class Command(BaseCommand):
         contents.append('django: %s manage.py runserver' % (python_exe))
         contents.append('livereload: %s manage.py packages --operation livereload' % (python_exe))
 
-        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, '..', 'Procfile'), '\n'.join(contents))
+        package_root = settings.PACKAGE_ROOT
+        if hasattr(settings, 'SUBPACKAGE_ROOT'):
+            package_root = settings.SUBPACKAGE_ROOT
+
+        utils.write_to_file(os.path.join(package_root, '..', 'Procfile'), '\n'.join(contents))
 
     def get_elasticsearch_install_location(self, package_name):
         """
@@ -207,7 +214,10 @@ class Command(BaseCommand):
         url = get_elasticsearch_download_url()
         file_name = url.split('/')[-1]
         file_name_wo_extention = file_name[:-4]
-        return os.path.join(settings.PACKAGE_ROOT, 'elasticsearch', file_name_wo_extention)
+        package_root = settings.PACKAGE_ROOT
+        if hasattr(settings, 'SUBPACKAGE_ROOT'):
+            package_root = settings.SUBPACKAGE_ROOT
+        return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
 
     def build_permissions(self):
         """
