@@ -55,10 +55,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
-        if hasattr(settings, 'SUBPACKAGE_NAME'):
-            package_name = settings.SUBPACKAGE_NAME
-        else:
-            package_name = settings.PACKAGE_NAME
+        package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
         
         if options['operation'] == 'setup':
