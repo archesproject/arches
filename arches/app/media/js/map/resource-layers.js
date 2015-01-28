@@ -3,13 +3,13 @@ define([
         'underscore',
         'knockout',
         'arches',
-        'layer-info',
+        'resource-layer-info',
         'map/resource-layer-model'
-], function(ol, _, ko, arches, layerInfo, ResourceLayerModel) {
+], function(ol, _, ko, arches, resourceLayerInfo, ResourceLayerModel) {
         var resourceFeatures = ko.observableArray();
         var layers = [];
 
-        _.each(layerInfo, function (item, entitytypeid) {
+        _.each(resourceLayerInfo, function (item, entitytypeid) {
             item.entitytypeid = entitytypeid;
             layers.push(new ResourceLayerModel(item, function(features) {
                 resourceFeatures(resourceFeatures().concat(features));

@@ -58,9 +58,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <button id="" type="button" class="btn btn-primary hidden-sm hidden-md hidden-lg inventory-basemaps" style="width: 36px; height: 46; margin-top: 10px; margin-left: 15px; background: #F5F7FB; border: 1px solid rgba(206,217,233,.95); padding-top: 8px; padding-bottom: 8px;"><i class="fa fa-globe" style="color: #3A67A6;"></i>
                                     </button>
 
-                                    <input class="geocodewidget margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;"  value="">
+                                    <input class="geocodewidget margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;"  value="{% trans 'Find an Address or Parcel Number' %}">
 
-                                    <input class="geocodewidget margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;"  value="">
+                                    <input class="geocodewidget margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;"  value="{% trans 'Find an Address or Parcel Number' %}">
                                 </div>
                             </div>
                             <!-- End Geocoding Widget -->
@@ -92,8 +92,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="info-blocks-in margin-bottom-0">
                                 <p class="margin-top-5">
                                     <span class="arches-map-inventory-footer-text">
-                                        Map Zoom: <span data-bind="text:zoom"></span> &nbsp; &nbsp;
-                                        Cursor: <span data-bind="text:mousePosition"></span> <span class="hidden-xs">(long,lat)</span>
+                                        {% trans 'Map Zoom' %}: <span data-bind="text:zoom"></span> &nbsp; &nbsp;
+                                        {% trans 'Cursor' %}: <span data-bind="text:mousePosition"></span> <span class="hidden-xs">{% trans '(long,lat)' %}</span>
                                     </span>
                                 </p>
                             </div>
@@ -120,7 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 ×
                             </button>
                             <h4 class="modal-title">
-                                Basemaps
+                                {% trans 'Basemaps' %}
                             </h4>
                         </div>
 
@@ -168,13 +168,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <div class="btn-group pull-right" style="margin-top:-10px; margin-right: 10px;">
                                 <button type="button" id="add-layer" class="btn btn-primary arches-RDM-button-xs">
-                                    <i class="fa fa-plus"></i> Add Layer                         
+                                    <i class="fa fa-plus"></i> {% trans 'Add Layer' %}                         
                                 </button>
                                 
                             </div>
 
                             <h4 class="modal-title">
-                                Overlays
+                                {% trans 'Overlays' %}
                             </h4>
                         </div>
             
@@ -219,7 +219,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div style="margin-top: -63px; margin-left: 47px;">
                                                                 <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
                                                                 
-                                                                <span class="hidden" style="color: #808080;font-size: 11px;">visible zoom range: 
+                                                                <span class="hidden" style="color: #808080;font-size: 11px;">{% trans 'visible zoom range' %}: 
                                                                     <span data-bind="text: visibleZoomRange"></span>
                                                                 </span>
 
@@ -251,10 +251,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="btn-group">
 
-                        <button type="button" class="btn btn-primary arches-map-tools inventory-basemaps" style=""><i class="fa fa-globe"></i> Basemaps
+                        <button type="button" class="btn btn-primary arches-map-tools inventory-basemaps" style=""><i class="fa fa-globe"></i> {% trans 'Basemaps' %}
                         </button>
 
-                        <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-align-justify"></i> Overlays
+                        <button id="inventory-overlays" type="button" class="btn btn-primary arches-map-tools" style=""><i class="fa fa-align-justify"></i> {% trans 'Overlays' %}
                         </button>
 
                     </div>
@@ -306,11 +306,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
                             <button type="button" class="btn btn-default resource-info-closer">
-                                Close
+                                {% trans 'Close' %}
                             </button>
                             <a href="javascript:void(0);" class="text-primary" data-bind="attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}">
                                 <button type="button" class="btn btn-primary">
-                                    View Report
+                                    {% trans 'View Report' %}
                                 </button>
                             </a>
                         </div>
@@ -349,7 +349,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
                             <button type="button" class="btn btn-default cluster-info-closer">
-                                Close
+                                {% trans 'Close' %}
                             </button>
                         </div>
                     </div><!-- /.modal-content -->
@@ -372,11 +372,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="col-xs-12" style="padding-left: 0px; padding-right: 0px; margin-top: 5px;">
                     <button type="button" id="back-to-map" class="btn btn-primary arches-RDM-button-xs">
-                        <i class="fa fa-arrow-circle-down"></i> Back to map                         
+                        <i class="fa fa-arrow-circle-down"></i> {% trans 'Back to map' %}                         
                     </button>&nbsp;
 
                     <span style="color: #585f69; font-size: 18px; font-weight: 200; vertical-align: middle;">
-                        Manage Map Layers
+                        {% trans 'Manage Map Layers' %}
                     </span>
                 </div>
 
@@ -420,7 +420,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <a href="javascript:void(0);" class="arches-ll-title layer-selector on-map-toggle" data-bind="css: {'layer-selected-title': onMap()}, attr: {'data-layerid': id}"><i class="fa" data-bind="css:{'fa-ban':!onMap()}"></i> <span data-bind="text: name"></span></a>
 
                                     <span class="arches-ll-category pull-right hidden-xs" style="margin-top: 5px;">
-                                        <i class="fa-fw fa fa-info-circle"></i>Categories: <span data-bind="text:categories.join(', ')"
+                                        <i class="fa-fw fa fa-info-circle"></i>{% trans 'Categories' %}: <span data-bind="text:categories.join(', ')"
                                     </span>  
                                 </div>
 
@@ -448,7 +448,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock %}
 {% block pre_require_js %}
-    {% include 'map/layer-info.htm' %}
+    {% include 'map/resource-layers.htm' %}
+    {% include 'map/layers.htm' %}
     <script>
         define('selected-resource-id', [], function () {
             return '{{resource_id}}';
