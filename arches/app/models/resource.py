@@ -190,7 +190,7 @@ class Resource(Entity):
         return selected_form['class'](self)
 
     def get_type_name(self):
-        return settings.RESOURCE_TYPE_CONFIGS[self.entitytypeid]['name']
+        return settings.RESOURCE_TYPE_CONFIGS()[self.entitytypeid]['name']
 
     def get_primary_name(self):
         if self.entityid == '':
