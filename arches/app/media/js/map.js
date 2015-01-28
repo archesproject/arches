@@ -139,7 +139,7 @@ require([
                         var layer = ko.utils.arrayFirst(self.viewModel.layers(), function(item) {
                             return layerId === item.id;
                         });
-                        layer.layer.setOpacity(value/100)
+                        layer.layer.setOpacity(value/100);
                     }
                 });
                 $(".knob").css("font-size", 11);
@@ -403,12 +403,12 @@ require([
 
             //Show and hide Layer Library.  
             $("#add-layer").click(function(){
-                $( "#map-panel" ).slideToggle(600);
+                $( ".map-space" ).slideToggle(600);
                 $( "#layer-library" ).slideToggle(600);
             });
 
             $("#back-to-map").click(function(){
-                $( "#map-panel" ).slideToggle(600);
+                $( ".map-space" ).slideToggle(600);
                 $( "#layer-library" ).slideToggle(600);
             });
 
