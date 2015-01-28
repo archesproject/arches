@@ -260,40 +260,56 @@ define(['jquery',
                 if(!this.selectedFeatureLayer){
                     var rgb = this.hexToRgb('#C4171D');
                     var iconUnicode = '\uf060';                    
-                    var style = new ol.style.Style({
-                        text: new ol.style.Text({
-                            text: iconUnicode,
-                            font: 'normal 33px octicons',
-                            stroke: new ol.style.Stroke({
-                                // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
-                                color: 'white',
-                                width: 3
+                    var zIndex = 0;
+                    var styleCache = {};
+
+                    var style = function(feature, resolution) {
+                        var mouseOver = feature.get('mouseover');
+                        var text = '1 ' + mouseOver;
+
+                        feature.set('arches_marker', true);
+
+                        if (styleCache[text]) {
+                            return styleCache[text];
+                        }
+                        
+                        var iconSize = mouseOver ? 38 : 32;
+
+                        var styles = [new ol.style.Style({
+                            text: new ol.style.Text({
+                                text: iconUnicode,
+                                font: 'normal ' + iconSize + 'px octicons',
+                                offsetX: 5,
+                                offsetY: ((iconSize/2)*-1)-5,
+                                fill: new ol.style.Fill({
+                                    color: 'rgba(126,126,126,0.3)',
+                                })
                             }),
-                            textBaseline: 'Bottom',
-                            fill: new ol.style.Fill({
-                                color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
-                            })
-                        })
-                    });
-                    var shadowStyle = new ol.style.Style({
-                        text: new ol.style.Text({
-                            text: iconUnicode,
-                            font: 'normal 38px octicons',
-                            offsetX: 0,
-                            rotation: 0.25,
-                            textBaseline: 'Bottom',
-                            fill: new ol.style.Fill({
-                                color: 'rgba(126,126,126,0.3)',
-                            })
-                        })
-                    });                    
-                    // this.selectedFeatureLayer = new ol.selectedFeatureLayer({
-                    //     map: this.map.map,
-                    //     style: [shadowStyle,style]
-                    // });             
+                            zIndex: mouseOver ? zIndex*1000000000: zIndex
+                        }), new ol.style.Style({
+                            text: new ol.style.Text({
+                                text: iconUnicode,
+                                font: 'normal ' + iconSize + 'px octicons',
+                                offsetY: (iconSize/2)*-1,
+                                stroke: new ol.style.Stroke({
+                                    color: 'white',
+                                    width: 3
+                                }),
+                                fill: new ol.style.Fill({
+                                    color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
+                                })
+                            }),
+                            zIndex: mouseOver ? zIndex*2000000000 : zIndex+1
+                        })];
+
+                        zIndex += 2;
+
+                        styleCache[text] = styles;
+                        return styles;
+                    };                                            
                     this.selectedFeatureLayer = new ol.layer.Vector({
                         source: new ol.source.GeoJSON(),
-                        style: [shadowStyle,style]
+                        style: style
                     });
                     this.map.map.addLayer(this.selectedFeatureLayer);  
                 }
