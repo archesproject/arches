@@ -81,7 +81,9 @@ define([
             $('.map-loading').show();
             var loadListener = source.on('change', function(e) {
                 if (source.getState() == 'ready') {
-                    featureCallback(source.getFeatures());
+                    if(typeof(featureCallback) === 'function'){
+                        featureCallback(source.getFeatures());
+                    }
                     ol.Observable.unByKey(loadListener);
                     $('.map-loading').hide();
                 }
