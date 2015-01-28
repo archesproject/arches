@@ -1,7 +1,7 @@
 {% load i18n %}
 <script>
-    define('layer-info', [], function () {
-        var layerInfo = {
+    define('resource-layer-info', [], function () {
+        return {
             "all": {
                 id: "all",
                 icon: "mega-octicon octicon-location arches-layer-icon",
@@ -37,7 +37,5 @@
             {% endif %}
             {% endfor %}
         };
-
-        return layerInfo;
     });
 </script>

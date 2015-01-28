@@ -20,21 +20,15 @@ import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
-from django.contrib.auth import authenticate, login, logout
-from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
-from django.db import connection
 from arches.app.models import models
 from arches.app.models.resource import Resource
-from arches.app.models.concept import Concept
-from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms, Bool, Match
+from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -76,8 +70,8 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         },
         context_instance=RequestContext(request))
     
-def related_resoures(request, resourceid):
-    return JSONResponse(get_related_resources(resourceid))
+def related_resources(request, resourceid):
+    return JSONResponse(get_related_resources(resourceid), indent=4)
 
 def get_related_resources(resourceid):
     ret = {
@@ -107,103 +101,6 @@ def get_related_resources(resourceid):
             ret['related_resources'].append(resource['_source'])
 
     return ret
-
-def report(request, resourceid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    se = SearchEngineFactory().create()
-    report_info = se.search(index='resource', id=resourceid)
-    report_info['source'] = report_info['_source']
-    report_info['type'] = report_info['_type']
-    report_info['source']['graph'] = report_info['source']['graph'][0]
-    del report_info['_source']
-    del report_info['_type']
-
-    related_resource_info = get_related_resources(resourceid)
-
-    #return JSONResponse(report_info, indent=4)
-
-    def get_evaluation_path(valueid):
-        value = models.Values.objects.get(pk=valueid)
-        concept_graph = Concept().get(id=value.conceptid_id, include_subconcepts=False, 
-            include_parentconcepts=True, include_relatedconcepts=False, up_depth_limit=None, lang=lang)
-        
-        paths = []
-        for path in concept_graph.get_paths(lang=lang)[0]:
-            if path['label'] != 'Arches' and path['label'] != 'Evaluation Criteria Type':
-                paths.append(path['label'])
-        return '; '.join(paths)
-
-
-    concept_label_ids = set()
-    uuid_regex = re.compile('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
-    # gather together all uuid's referenced in the resource graph
-    def crawl(items):
-        for item in items:
-            for key in item:
-                if isinstance(item[key], list):
-                    crawl(item[key])
-                else:
-                    if uuid_regex.match(item[key]):
-                        if key == 'EVALUATION_CRITERIA_TYPE_E55__value':
-                            item[key] = get_evaluation_path(item[key])
-                        concept_label_ids.add(item[key])
-
-    crawl([report_info['source']['graph']])
-
-    # get all the concept labels from the uuid's
-    concept_labels = se.search(index='concept_labels', id=list(concept_label_ids))
-    
-    #print concept_labels
-    temp = {}
-
-    # convert all labels to their localized prefLabel
-    for concept_label in concept_labels['docs']:
-        #temp[concept_label['_id']] = concept_label
-        if concept_label['found']:
-            # the resource graph already referenced the preferred label in the desired language
-            if concept_label['_source']['type'] == 'prefLabel' and concept_label['_source']['language'] == lang:
-                temp[concept_label['_id']] = concept_label['_source']
-            else: 
-                # the resource graph referenced a non-preferred label or a label not in our target language, so we need to get the right label
-                query = Query(se)
-                terms = Terms(field='conceptid', terms=[concept_label['_source']['conceptid']])
-                match = Match(field='type', query='preflabel', type='phrase')
-                query.add_filter(terms)
-                query.add_query(match)
-                preflabels = query.search(index='concept_labels')['hits']['hits'] 
-                for preflabel in preflabels:
-                    # get the label in the preferred language, otherwise get the label in the default language
-                    if preflabel['_source']['language'] == lang:
-                        temp[concept_label['_id']] = preflabel['_source']
-                        break
-                    if preflabel['_source']['language'] == settings.LANGUAGE_CODE:
-                        temp[concept_label['_id']] = preflabel['_source']
-
-    # replace the uuid's in the resource graph with their preferred and localized label                    
-    def crawl_again(items):
-        for item in items:
-            for key in item:
-                if isinstance(item[key], list):
-                    crawl_again(item[key])
-                else:
-                    if uuid_regex.match(item[key]):
-                        try:
-                            item[key] = temp[item[key]]['value']
-                        except:
-                            pass
-
-    crawl_again([report_info['source']['graph']])
-
-    #return JSONResponse(report_info, indent=4)
-
-    return render_to_response('resource-report.htm', {
-            'resourceid': resourceid,
-            'report_template': 'views/reports/' + report_info['type'] + '.htm',
-            'report_info': report_info,
-            'main_script': 'resource-report',
-            'active_page': 'ResourceReport'
-        },
-        context_instance=RequestContext(request))        
 
 def map_layers(request, entitytypeid='all', get_centroids=False):
     data = []

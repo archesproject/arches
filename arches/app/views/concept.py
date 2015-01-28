@@ -304,3 +304,26 @@ def concept_tree(request):
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)
+
+def get_preflabel_from_valueid(valueid, lang):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='concept_labels', id=valueid)
+    if concept_label['found']:
+        return get_preflabel_from_conceptid(concept_label['_source']['conceptid'], lang)
+
+def get_preflabel_from_conceptid(conceptid, lang):
+    ret = None
+    se = SearchEngineFactory().create()
+    query = Query(se)
+    terms = Terms(field='conceptid', terms=[conceptid])
+    match = Match(field='type', query='preflabel', type='phrase')
+    query.add_filter(terms)
+    query.add_query(match)
+    preflabels = query.search(index='concept_labels')['hits']['hits'] 
+    for preflabel in preflabels:
+        # get the label in the preferred language, otherwise get the label in the default language
+        if preflabel['_source']['language'] == lang:
+            return preflabel['_source']
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE:
+            ret = preflabel['_source']
+    return ret

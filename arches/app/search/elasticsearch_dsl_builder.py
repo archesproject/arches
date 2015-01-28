@@ -96,7 +96,7 @@ class Query(Dsl):
     def search(self, index='', doc_type=''):
         self.dsl['from'] = self.start
         self.dsl['size'] = self.limit
-        print self
+        #print self
         return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
     def delete(self, index=''):

@@ -5,7 +5,7 @@ require([
     'openlayers',
     'knockout',
     'arches',
-    'layer-info',
+    'resource-layer-info',
     'views/map',
     'map/layers',
     'map/resource-layers',
@@ -139,7 +139,7 @@ require([
                         var layer = ko.utils.arrayFirst(self.viewModel.layers(), function(item) {
                             return layerId === item.id;
                         });
-                        layer.layer.setOpacity(value/100)
+                        layer.layer.setOpacity(value/100);
                     }
                 });
                 $(".knob").css("font-size", 11);
@@ -403,12 +403,12 @@ require([
 
             //Show and hide Layer Library.  
             $("#add-layer").click(function(){
-                $( "#map-panel" ).slideToggle(600);
+                $( ".map-space" ).slideToggle(600);
                 $( "#layer-library" ).slideToggle(600);
             });
 
             $("#back-to-map").click(function(){
-                $( "#map-panel" ).slideToggle(600);
+                $( ".map-space" ).slideToggle(600);
                 $( "#layer-library" ).slideToggle(600);
             });
 
@@ -464,6 +464,8 @@ require([
             });
 
             //Select2 Simple Search initialize
+            var placeholder = $('.geocodewidget').val();
+            $('.geocodewidget').val('');
             $('.geocodewidget').select2({
                 ajax: {
                     url: "geocoder",
@@ -480,7 +482,7 @@ require([
                     cache: true
                 },
 
-                placeholder: "Find an Address or Parcel Number",
+                placeholder: placeholder,
                 minimumInputLength: 4,
                 multiple: true,
                 maximumSelectionSize: 1
