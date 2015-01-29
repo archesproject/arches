@@ -29,6 +29,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.entity import Entity
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
+from arches.app.views.concept import get_preflabel_from_valueid
 
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
@@ -71,9 +72,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
         context_instance=RequestContext(request))
     
 def related_resources(request, resourceid):
-    return JSONResponse(get_related_resources(resourceid), indent=4)
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    return JSONResponse(get_related_resources(resourceid, lang), indent=4)
 
-def get_related_resources(resourceid):
+def get_related_resources(resourceid, lang):
     ret = {
         'resource_relationships': [],
         'related_resources': []
@@ -89,6 +91,7 @@ def get_related_resources(resourceid):
 
     entityids = set()
     for relation in resource_relations['hits']['hits']:
+        relation['_source']['preflabel'] = get_preflabel_from_valueid(relation['_source']['relationshiptype'], lang)
         ret['resource_relationships'].append(relation['_source'])
         entityids.add(relation['_source']['entityid1'])
         entityids.add(relation['_source']['entityid2'])
