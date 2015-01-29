@@ -159,8 +159,6 @@ class Validator(object):
         entity_type = row['ATTRIBUTENAME']
         resource_type = row['RESOURCETYPE']
         business_table = self.get_businesstable(resource_type, entity_type)
-        
-        self.validate_value_length(row, rownum)
 
         if business_table not in ['strings', 'dates', 'domains', 'files', 'geometries', 'numbers']:
             self.append_error('{0} is not a valid business table name.'.format(business_table), 'businesstable_error')
@@ -201,13 +199,12 @@ class Validator(object):
 
     def validate_geometries(self, row, rownum):
         try:
-            fromstr(row['ATTRIBUTEVALUE'])
+            geom = fromstr(row['ATTRIBUTEVALUE'])
+            coord_limit = 1500
+            if geom.num_coords > coord_limit:
+                self.append_error('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(rownum, row['ATTRIBUTEVALUE'][:75] + '......', geom.num_coords, coord_limit), 'geometry_errors')
         except:
             self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
-    def validate_value_length(self, row, rownum):
-        if len(row['ATTRIBUTEVALUE']) > 32766:
-            self.append_error('ERROR ROW: {0} - {1}..., string length of: {2} exceeds max length of ElasticSearch (32766).'.format(rownum, row['ATTRIBUTEVALUE'][0:20], str(len(row['ATTRIBUTEVALUE']))), 'geometry_errors')
 
     def validate_numbers(self, row, rownum):
         try:
