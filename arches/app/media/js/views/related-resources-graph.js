@@ -246,7 +246,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             links.push({
                                 source: sourceId,
                                 target: targetId,
-                                relationship: resource_relationships.relationshiptype,
+                                relationship: resource_relationships.preflabel.value,
                                 weight: 1
                             });
                         }

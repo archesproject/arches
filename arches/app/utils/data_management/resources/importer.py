@@ -166,8 +166,6 @@ class ResourceLoader(object):
             relationshiptype = concept_value[0].valueid,
             datestarted = start_date,
             dateended = end_date,
-        )
+            )
         related_resource_record.save()
-        index_doc = model_to_dict(related_resource_record)
-        index_doc['relationshiptype'] = concept_value[0].value
-        self.se.index_data(index='resource_relations', doc_type='all', body=index_doc, idfield='resourcexid')
+        self.se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')
