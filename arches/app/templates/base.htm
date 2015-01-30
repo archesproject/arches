@@ -300,8 +300,13 @@
             });
 
             require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
-                var search = new SimpleSearch({ el: $('#simple-search')[0] });
-                scrollToTop.init();
+                var search = new SimpleSearch({ el: $('#simple-search')[0] });                
+                var scrollableElement;
+                {% if active_page == 'ResourceReport' %}
+                    scrollableElement = $('#report-body'); 
+                {% endif %}
+
+                scrollToTop.init(scrollableElement);
                 // include all base_page instances here that page scripts may need access to
                 // NOTE: this module should only ever be required from within main page scripts
                 define('base_page', [], function () {
@@ -312,8 +317,8 @@
                 });
 
                 {% if main_script %}
-                // main page script require
-                require(["{{ main_script }}"]);
+                    // main page script require
+                    require(["{{ main_script }}"]);
                 {% endif %}
             });
         });

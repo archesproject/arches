@@ -28,7 +28,7 @@ define(['arches', 'jquery'], function (arches, jQuery) {
         },
 
         togglecontrol:function(){
-            var scrolltop=jQuery(window).scrollTop()
+            var scrolltop = self.setting.scrollableElement.scrollTop();
             if (!this.cssfixedsupport)
                 this.keepfixed()
             this.state.shouldvisible=(scrolltop>=this.setting.startline)? true : false
@@ -42,12 +42,13 @@ define(['arches', 'jquery'], function (arches, jQuery) {
             }
         },
         
-        init:function(){
+        init:function(scrollableElement){
             jQuery(document).ready(function($){
-                var mainobj=self
-                var iebrws=document.all
+                var mainobj=self;
+                var iebrws=document.all;
                 mainobj.cssfixedsupport=!iebrws || iebrws && document.compatMode=="CSS1Compat" && window.XMLHttpRequest //not IE or IE7+ browsers in standards mode
-                mainobj.$body=(window.opera)? (document.compatMode=="CSS1Compat"? $('html') : $('body')) : $('html,body')
+                mainobj.setting.scrollableElement = scrollableElement ? scrollableElement : $(window);
+                mainobj.$body= scrollableElement ? scrollableElement : (window.opera)? (document.compatMode=="CSS1Compat"? $('html') : $('body')) : $('html,body')
                 mainobj.$control=$('<div id="topcontrol">'+mainobj.controlHTML+'</div>')
                     .css({position:mainobj.cssfixedsupport? 'fixed' : 'absolute', bottom:mainobj.controlattrs.offsety, right:mainobj.controlattrs.offsetx, opacity:0, cursor:'pointer'})
                     .attr({title:'Scroll Back to Top'})
@@ -60,7 +61,7 @@ define(['arches', 'jquery'], function (arches, jQuery) {
                     mainobj.scrollup()
                     return false
                 })
-                $(window).bind('scroll resize', function(e){
+                mainobj.setting.scrollableElement.bind('scroll resize', function(e){
                     mainobj.togglecontrol()
                 })
             })
