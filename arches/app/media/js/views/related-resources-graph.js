@@ -29,8 +29,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 height = 400;
 
             self.force = d3.layout.force()
-                .charge(-750)
-                .linkDistance(150)
+                .charge(-2750)
+                .linkDistance(200)
                 .gravity(0.05)
                 .friction(0.55)
                 .linkStrength(function(l, i) {return 1; })

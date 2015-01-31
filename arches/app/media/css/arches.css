@@ -178,7 +178,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-current-label {
     stroke: #999; /*#3275b1;*/
-    font-size: 36px;
+    font-size: 21px;
     font-weight: 900;
     fill: #fcfcfc; /*#fdfdfd; */
     opacity: 1.;
@@ -230,7 +230,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-ancestor-label {
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 300;
     fill: #a2a2a2;
     opacity: 1.;
     text-anchor: middle;
@@ -250,8 +250,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .linkMouseover {
-    stroke: #b0b0b0;
+    stroke: #3275b1;
     stroke-opacity: .6;
+    stroke-width: 5px;
 }
 
 
