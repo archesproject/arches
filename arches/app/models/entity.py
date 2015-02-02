@@ -775,4 +775,4 @@ class Entity(object):
         return self.undotify_entitytypeid()
 
     def undotify_entitytypeid(self):
-        return self.entitytypeid.replace('.', '_');
+        return self.entitytypeid.replace('.', '_').replace('-', '___');
