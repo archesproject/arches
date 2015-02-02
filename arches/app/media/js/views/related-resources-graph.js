@@ -50,6 +50,21 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 .call(d3.behavior.zoom().on("zoom", redraw))
                 .append('svg:g');
 
+            self.svg.append("defs").selectAll("marker")
+                .data(["suit", "licensing", "resolved"])
+              .enter().append("marker")
+                .attr("id", function(d) { return d; })
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 25)
+                .attr("refY", 0)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+              .append("path")
+                .attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
+                .style("stroke", "#b3b3b3")
+                .style("opacity", "0.6");
+
             self.data.nodes[0].fixed = true;
             self.data.nodes[0].x = width/2;
             self.data.nodes[0].y = height/2;
@@ -83,6 +98,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
 
             link.enter().insert("line", "circle")
                 .attr("class", "link")
+                .style("marker-end",  "url(#suit)")
                 .on("mouseover", function(d) {
                     d3.select(this).attr("class", "linkMouseover");
                     link.append("title").text(function(d) {
@@ -126,8 +142,19 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     } else {
                         return "node-descendent";
                     }
+                }).attr("style", function(d){
+                    return "fill:" + resourceTypes[d.entitytypeid].color
                 })
                 .on("mouseover", function(d){
+                    self.svg.selectAll("circle").attr("class", function(d){
+                        if(d.relationType == "Current"){
+                            return "node-current";
+                        } else if (d.relationType == "Ancestor"){
+                            return "node-ancestor";
+                        } else {
+                            return "node-descendent";
+                        }
+                    });
                     d3.select(this).attr("class", function(d) {
                         if (d.relationType == "Current") {
                             return "node-current-over";
@@ -145,17 +172,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     iconEl.addClass('resource-type-icon');
                     iconEl.addClass(resourceTypes[d.entitytypeid].icon);
                     self.$el.find('.node_info').show();
-                })
-                .on("mouseout", function(){
-                    d3.select(this).attr("class", function(d) {
-                        if (d.relationType == "Current") {
-                            return "node-current";
-                        } else if (d.relationType == "Ancestor") {
-                            return "node-ancestor";
-                        } else {
-                            return "node-descendent";
-                        }
-                    });
                 })
                 .on("click", function (d) {
                     self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {

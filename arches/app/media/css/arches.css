@@ -161,7 +161,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .node-current {
-    stroke: #3275b1; /*#ffa293;*/
+    stroke: #b3b3b3;
     stroke-width: 4px;
     fill: #dcecfa; /*#d7f2af;*/
     opacity: 1.;

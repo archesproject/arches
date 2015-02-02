@@ -311,7 +311,8 @@
                             {% for category in type_data.categories %}
                             "{{category}}"
                             {% endfor %}
-                        ]
+                        ],
+                        color: "{{type_data.vector_color}}"
                     },
                     {% endfor %}
                 };
