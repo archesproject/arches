@@ -35,7 +35,7 @@
 
                         <li>
                             <i class="arches-search-link fa fa-sitemap"></i>&nbsp;
-                            <a href="javascript:void(0);" class="info-link related-resources-graph" id="rr-1" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname}"><span class="arches-search-link" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname}">{% trans "Related Resources" %}</span></a>
+                            <a href="javascript:void(0);" class="info-link related-resources-graph" id="rr-1" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname, 'data-entitytypeid': entitytypeid}"><span class="arches-search-link" data-bind="attr: {'data-resourceid': resourceid, 'data-primaryname': primaryname, 'data-entitytypeid': entitytypeid}">{% trans "Related Resources" %}</span></a>
                         </li>
 
                         <li data-bind="visible: geometries().length > 0" >
@@ -66,7 +66,10 @@
                     </ul> 
                     <!-- End Item Creator/Editor -->
 
-                    <div class="svg arches-related-resource-panel" style="display: none;"></div>
+                    <div class="svg arches-related-resource-panel" style="display: none;">
+                        {% include 'views/related-resources-graph.htm' %}
+                    </div>
+
 
                     <!-- Spacer -->
                     <hr class="margin-10 margin-top-20">

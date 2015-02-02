@@ -36,17 +36,21 @@ define(['jquery',
             },
 
             showRelatedResouresGraph: function (e) {
-                var resourceId = $(e.target).data('resourceid')
-                var primaryName = $(e.target).data('primaryname')
+                var resourceId = $(e.target).data('resourceid');
+                var primaryName = $(e.target).data('primaryname');
+                var typeId = $(e.target).data('entitytypeid');
                 var searchItem = $(e.target).closest('.arches-search-item');
                 var graphPanel = searchItem.find('.arches-related-resource-panel');
+                var nodeInfoPanel = graphPanel.find('.node_info');
                 if (!graphPanel.hasClass('view-created')) {
                     new RelatedResourcesGraph({
                         el: graphPanel[0],
                         resourceId: resourceId,
-                        resourceName: primaryName
+                        resourceName: primaryName,
+                        resourceTypeId: typeId
                     });
                 }
+                nodeInfoPanel.hide();
                 graphPanel.slideToggle(500);
             },
 

@@ -1,13 +1,14 @@
-define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbone, _, arches) {
+define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], function($, Backbone, _, arches, resourceTypes) {
     return Backbone.View.extend({
         resourceId: null,
         resourceName: '',
+        resourceTypeId: '',
         newNodeId: 0,
 
         initialize: function(options) {
             var self = this;
 
-            _.extend(this, _.pick(options, 'resourceId', 'resourceName'));
+            _.extend(this, _.pick(options, 'resourceId', 'resourceName', 'resourceTypeId'));
             this.nodeIdMap = {};
             this.data = {
                 nodes: [],
@@ -16,7 +17,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
 
             if (self.resourceId) {
                 self.$el.addClass('loading');
-                self.getResourceData(self.resourceId, this.resourceName, function (data) {
+                self.getResourceData(self.resourceId, this.resourceName, self.resourceTypeId, function (data) {
                     self.$el.removeClass('loading');
                     self.data = data;
                     self.render();
@@ -126,7 +127,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                         return "node-descendent";
                     }
                 })
-                .on("mouseover", function(){
+                .on("mouseover", function(d){
                     d3.select(this).attr("class", function(d) {
                         if (d.relationType == "Current") {
                             return "node-current-over";
@@ -136,6 +137,14 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             return "node-descendent-over";
                         }
                     });
+                    self.$el.find('.selected-resource-name').html(d.name);
+                    self.$el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
+                    self.$el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
+                    var iconEl = self.$el.find('.resource-type-icon');
+                    iconEl.removeClass();
+                    iconEl.addClass('resource-type-icon');
+                    iconEl.addClass(resourceTypes[d.entitytypeid].icon);
+                    self.$el.find('.node_info').show();
                 })
                 .on("mouseout", function(){
                     d3.select(this).attr("class", function(d) {
@@ -149,11 +158,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                     });
                 })
                 .on("click", function (d) {
-                    self.getResourceData(d.entityid, d.name, function (newData) {
+                    self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
                         if (newData.nodes.length > 0 || newData.links.length > 0) {
-                            if (self.texts) {
-                                self.texts.remove();
-                            }
                             self.data.nodes = self.data.nodes.concat(newData.nodes);
                             self.data.links = self.data.links.concat(newData.links);
                             self.update(self.data);
@@ -162,25 +168,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                 })
 
             node.exit().remove();
-
-            self.svg.selectAll("text.nodeLabels").remove();
-            self.texts = self.svg.selectAll("text.nodeLabels").data(self.data.nodes);
-
-            self.texts.enter().append("text")
-                .attr("class", function(d){
-                    if (d.relationType == "Current") {
-                        return "node-current-label";
-                    } else if (d.relationType == "Ancestor") {
-                        return "node-ancestor-label";
-                    } else {
-                        return "node-descendent-label";
-                    }
-                })
-                .attr("dy", ".35em")
-                .text(function(d) {
-                    return d.name;
-                });
-
 
             self.force.on("tick", function() {
                 link
@@ -193,17 +180,13 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                     .attr("cx", function(d) { return d.x; })
                     .attr("cy", function(d) { return d.y; });
          
-                self.texts
-                    .attr("x", function(d) { return d.x; })
-                    .attr("y", function(d) { return d.y; });
-         
             });
 
             self.force.start();
             node.call(self.force.drag);
         },
 
-        getResourceData: function (resourceId, resourceName, callback, includeRoot) {
+        getResourceData: function (resourceId, resourceName, resourceTypeId, callback, includeRoot) {
             var self = this;
             $.ajax({
                 url: arches.urls.related_resources + resourceId,
@@ -216,6 +199,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             id: self.newNodeId,
                             entityid: resourceId,
                             name: resourceName,
+                            entitytypeid: resourceTypeId,
                             relationType: 'Current'
                         };
                         nodes.push(node);
@@ -227,6 +211,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'd3'], function($, Backbon
                             var node = {
                                 id: self.newNodeId,
                                 entityid: related_resource.entityid,
+                                entitytypeid: related_resource.entitytypeid,
                                 name: related_resource.primaryname,
                                 relationType: 'Ancestor'
                             };

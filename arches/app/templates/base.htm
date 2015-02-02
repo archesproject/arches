@@ -299,6 +299,26 @@
                 };
             });
 
+            define('resource-types', [], function () {
+                var resourceTypes = {
+                    {% for type, type_data in resource_types %}
+                    "{{type}}": {
+                        id: "{{type_data.resourcetypeid}}",
+                        icon: "{{type_data.icon_class}}",
+                        name: "{{type_data.name}}",
+                        description: "{{type_data.description}}",
+                        categories: [
+                            {% for category in type_data.categories %}
+                            "{{category}}"
+                            {% endfor %}
+                        ]
+                    },
+                    {% endfor %}
+                };
+
+                return resourceTypes;;
+            });
+
             require(["plugins/scroll-to-top", "views/simple-search", "bootstrap", "jquery-ui"], function (scrollToTop, SimpleSearch) {
                 var search = new SimpleSearch({ el: $('#simple-search')[0] });                
                 var scrollableElement;
