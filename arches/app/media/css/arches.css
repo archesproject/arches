@@ -774,7 +774,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     color: #3A67A6;
     font-size: 15px;
     font-weight: 400;
-    z-index: 150;
     border: 1px solid rgba(206,217,233,.95);
 }
 
