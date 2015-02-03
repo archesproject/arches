@@ -170,7 +170,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-current-over {
     stroke: #115fa5;
-    stroke-width: 4px;
+    stroke-width: 8px;
+    fill: #dcecfa; /*#7cadd8;*/
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-current-neighbor {
+    stroke: #115fa5;
+    stroke-width: 8px;
     fill: #dcecfa; /*#7cadd8;*/
     opacity: 1.;
     cursor: pointer;
@@ -197,7 +205,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-descendent-over {
     stroke: #115fa5;
-    stroke-width: 3px;
+    stroke-width: 8px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-descendent-neighbor {
+    stroke: #115fa5;
+    stroke-width: 8px;
     fill: #dcecfa;
     opacity: 1.;
     cursor: pointer;
@@ -222,7 +238,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-ancestor-over {
     stroke: #115fa5;
-    stroke-width: 3px;
+    stroke-width: 8px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+
+.node-ancestor-neighbor {
+    stroke: #115fa5;
+    stroke-width: 8px;
     fill: #dcecfa;
     opacity: 1.;
     cursor: pointer;
@@ -241,6 +265,11 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .link {
     stroke: #ededed;
     stroke-width: 5px;
+}
+
+.link-highlight {
+    stroke: black;
+    stroke-width: 9px;
 }
 
 .relatedlink {
