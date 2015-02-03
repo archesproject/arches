@@ -83,11 +83,11 @@ def get_related_resources(resourceid, lang):
     terms = []    
     se = SearchEngineFactory().create()
 
-    query = Query(se)
+    query = Query(se, limit=10000)
     terms.append(Terms(field='entityid1', terms=resourceid).dsl)
     terms.append(Terms(field='entityid2', terms=resourceid).dsl)
     query.add_filter(terms, operator='or')
-    resource_relations = query.search(index='resource_relations', doc_type='all') 
+    resource_relations = query.search(index='resource_relations', doc_type='all')
 
     entityids = set()
     for relation in resource_relations['hits']['hits']:

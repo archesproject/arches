@@ -1,5 +1,5 @@
 define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], function($, Backbone, _, arches, resourceTypes) {
-    var colorLuminance  = function(hex, lum) {
+    var colorLuminance = function(hex, lum) {
         hex = String(hex).replace(/[^0-9a-f]/gi, '');
         if (hex.length < 6) {
             hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
@@ -14,7 +14,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
         }
 
         return rgb;
-    }
+    };
 
     return Backbone.View.extend({
         resourceId: null,
@@ -177,7 +177,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                         return className;
                     }).attr("style", function(d1){
-                        var modifier = (d ===  d1) ? 0.7 : -0.3;
                         return "fill:" + resourceTypes[d1.entitytypeid].color + ";stroke:" + colorLuminance(resourceTypes[d1.entitytypeid].color, -0.3);
                     });
                     self.svg.selectAll("line").attr('class', function(l) {
