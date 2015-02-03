@@ -284,7 +284,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                             links.push({
                                 source: sourceId,
                                 target: targetId,
-                                relationship: resource_relationships.preflabel.value,
+                                relationship: sourceId.name + ' ' + resource_relationships.preflabel.value.split('/')[0] + targetId.name,
                                 weight: 1
                             });
                             self.linkMap[sourceId.id+'_'+targetId.id] = true;
