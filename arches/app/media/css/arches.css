@@ -162,15 +162,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-current {
     stroke: #b3b3b3;
-    stroke-width: 4px;
+    stroke-width: 2px;
     fill: #dcecfa; /*#d7f2af;*/
     opacity: 1.;
     cursor: pointer;
 }
 
 .node-current-over {
-    stroke: #115fa5;
-    stroke-width: 8px;
+    stroke: #000000;
+    stroke-width: 3px;
     fill: #dcecfa; /*#7cadd8;*/
     opacity: 1.;
     cursor: pointer;
@@ -178,7 +178,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-current-neighbor {
     stroke: #115fa5;
-    stroke-width: 8px;
+    stroke-width: 3px;
     fill: #dcecfa; /*#7cadd8;*/
     opacity: 1.;
     cursor: pointer;
@@ -232,13 +232,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     stroke: #ededed; /*#ffa293;*/
     fill: #fefefe; /*#ebf9d6;*/
     opacity: 1.;
-    stroke-width: 4px;
+    stroke-width: 1px;
     cursor: pointer;
 }
 
 .node-ancestor-over {
-    stroke: #115fa5;
-    stroke-width: 8px;
+    stroke: #000000;
+    stroke-width: 3px;
     fill: #dcecfa;
     opacity: 1.;
     cursor: pointer;
@@ -246,7 +246,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .node-ancestor-neighbor {
     stroke: #115fa5;
-    stroke-width: 8px;
+    stroke-width: 3px;
     fill: #dcecfa;
     opacity: 1.;
     cursor: pointer;
@@ -279,7 +279,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .linkMouseover {
-    stroke: #3275b1;
+    stroke: #a1a1a1;
     stroke-opacity: .6;
     stroke-width: 5px;
 }
