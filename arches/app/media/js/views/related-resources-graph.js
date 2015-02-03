@@ -177,7 +177,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                         return className;
                     }).attr("style", function(d1){
-                        var modifier = (d ===  d1) ? 0.3 : -0.3;
+                        var modifier = (d ===  d1) ? 0.7 : -0.3;
                         return "fill:" + resourceTypes[d1.entitytypeid].color + ";stroke:" + colorLuminance(resourceTypes[d1.entitytypeid].color, modifier);
                     });
                     self.svg.selectAll("line").attr('class', function(l) {
