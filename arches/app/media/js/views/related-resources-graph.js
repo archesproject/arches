@@ -1,4 +1,21 @@
 define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], function($, Backbone, _, arches, resourceTypes) {
+    var colorLuminance  = function(hex, lum) {
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        }
+        lum = lum || 0;
+
+        var rgb = "#", c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i*2,2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00"+c).substr(c.length);
+        }
+
+        return rgb;
+    }
+
     return Backbone.View.extend({
         resourceId: null,
         resourceName: '',
@@ -10,6 +27,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
 
             _.extend(this, _.pick(options, 'resourceId', 'resourceName', 'resourceTypeId'));
             this.nodeIdMap = {};
+            this.linkMap = {};
             this.data = {
                 nodes: [],
                 links: []
@@ -55,7 +73,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
               .enter().append("marker")
                 .attr("id", function(d) { return d; })
                 .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 25)
+                .attr("refX", 20)
                 .attr("refY", 0)
                 .attr("markerWidth", 6)
                 .attr("markerHeight", 6)
@@ -93,12 +111,11 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 links: self.force.links(self.data.links).links()
             };
 
-            var link = self.svg.selectAll(".link")
+            var link = self.svg.selectAll("line")
                 .data(self.data.links);
 
-            link.enter().insert("line", "circle")
+            var linkEnter = link.enter().insert("line", "circle")
                 .attr("class", "link")
-                .style("marker-end",  "url(#suit)")
                 .on("mouseover", function(d) {
                     d3.select(this).attr("class", "linkMouseover");
                     link.append("title").text(function(d) {
@@ -115,7 +132,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
             var node = self.svg.selectAll("circle")
                 .data(self.data.nodes, function(d) { return d.id; });
 
-            nodeEnter = node.enter().append("circle")
+            var nodeEnter = node.enter().append("circle")
                 .attr("r",function(d){
                     if(d.relationType == "Current"){
                         return 24;
@@ -143,25 +160,28 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         return "node-descendent";
                     }
                 }).attr("style", function(d){
-                    return "fill:" + resourceTypes[d.entitytypeid].color
+                    return "fill:" + resourceTypes[d.entitytypeid].color + ";stroke:" + colorLuminance(resourceTypes[d.entitytypeid].color, -0.3);
                 })
                 .on("mouseover", function(d){
-                    self.svg.selectAll("circle").attr("class", function(d){
-                        if(d.relationType == "Current"){
-                            return "node-current";
-                        } else if (d.relationType == "Ancestor"){
-                            return "node-ancestor";
-                        } else {
-                            return "node-descendent";
+                    self.svg.selectAll("circle").attr("class", function(d1){
+                        var className = "node-descendent";
+                        if(d1.relationType == "Current"){
+                            className = "node-current";
+                        } else if (d1.relationType == "Ancestor"){
+                            className = "node-ancestor";
                         }
+                        if (d1 === d) {
+                            className += '-over';
+                        } else if (self.linkMap[d1.id+'_'+d.id] || self.linkMap[d.id+'_'+d1.id]){
+                            className += '-neighbor';
+                        }
+                        return className;
                     });
-                    d3.select(this).attr("class", function(d) {
-                        if (d.relationType == "Current") {
-                            return "node-current-over";
-                        } else if (d.relationType == "Ancestor") {
-                            return "node-ancestor-over";
+                    self.svg.selectAll("line").attr('class', function(l) {
+                        if (l.source === d || l.target === d) {
+                            return 'linkMouseover';
                         } else {
-                            return "node-descendent-over";
+                            return 'link';
                         }
                     });
                     self.$el.find('.selected-resource-name').html(d.name);
@@ -172,6 +192,23 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     iconEl.addClass('resource-type-icon');
                     iconEl.addClass(resourceTypes[d.entitytypeid].icon);
                     self.$el.find('.node_info').show();
+                })
+                .on('mouseout', function (d) {
+                    self.svg.selectAll("circle").attr("class", function(d1){
+                        var className = "node-descendent";
+                        if(d1.relationType == "Current"){
+                            className = "node-current";
+                        } else if (d1.relationType == "Ancestor"){
+                            className = "node-ancestor";
+                        }
+                        if (d1 === d) {
+                            className += '-over';
+                        }
+                        return className;
+                    });
+                    self.svg.selectAll("line").attr('class', function(l) {
+                        return 'link';
+                    });
                 })
                 .on("click", function (d) {
                     self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
@@ -250,6 +287,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                                 relationship: resource_relationships.preflabel.value,
                                 weight: 1
                             });
+                            self.linkMap[sourceId.id+'_'+targetId.id] = true;
                         }
                     });
 
