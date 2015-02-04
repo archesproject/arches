@@ -262,6 +262,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     self.$el.find('.load-more-relations-link').show();
                 }
             } else {
+                self.$el.find('.load-more-relations-link').show();
                 self.$el.find('.relation-count').hide();
                 self.$el.find('.relation-unloaded').show();
             }
