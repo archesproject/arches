@@ -309,7 +309,13 @@ def get_preflabel_from_valueid(valueid, lang):
     se = SearchEngineFactory().create()
     concept_label = se.search(index='concept_labels', id=valueid)
     if concept_label['found']:
-        return get_preflabel_from_conceptid(concept_label['_source']['conceptid'], lang)
+        return get_preflabel_from_conceptid(get_concept_label_from_valueid(valueid)['conceptid'], lang)
+
+def get_concept_label_from_valueid(valueid):
+    se = SearchEngineFactory().create()
+    concept_label = se.search(index='concept_labels', id=valueid)
+    if concept_label['found']:
+        return concept_label['_source']
 
 def get_preflabel_from_conceptid(conceptid, lang):
     ret = None
