@@ -129,14 +129,14 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d) {
-                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "</span>";
+                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
                 });
                 targetTip = d3.tip()
                     .attr('class', 'd3-tip')
                     .direction('s')
                     .offset([10, 0])
                     .html(function (d) {
-                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "</span>";
+                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
                 });
                 nodeTip = d3.tip()
                     .attr('class', 'd3-tip')
@@ -434,8 +434,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                                 links.push({
                                     source: sourceId,
                                     target: targetId,
-                                    relationshipSource: resource_relationships.preflabel.value.split('/')[0],
-                                    relationshipTarget: resource_relationships.preflabel.value.split('/')[1],
+                                    relationshipSource: resource_relationships.preflabel.value.split('/')[0].trim(),
+                                    relationshipTarget: resource_relationships.preflabel.value.split('/')[1].trim(),
                                     weight: 1
                                 });
                                 self.linkMap[sourceId.id+'_'+targetId.id] = true;
