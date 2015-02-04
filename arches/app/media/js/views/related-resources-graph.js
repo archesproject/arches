@@ -21,6 +21,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
         resourceName: '',
         resourceTypeId: '',
         newNodeId: 0,
+        events: {
+            'click .load-more-relations-link': 'loadMoreRelations'
+        },
 
         initialize: function(options) {
             var self = this;
@@ -186,14 +189,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                             return 'link';
                         }
                     });
-                    self.$el.find('.selected-resource-name').html(d.name);
-                    self.$el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
-                    self.$el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
-                    var iconEl = self.$el.find('.resource-type-icon');
-                    iconEl.removeClass();
-                    iconEl.addClass('resource-type-icon');
-                    iconEl.addClass(resourceTypes[d.entitytypeid].icon);
-                    self.$el.find('.node_info').show();
+                    self.updateNodeInfo(d);
                 })
                 .on('mouseout', function (d) {
                     self.svg.selectAll("circle").attr("class", function(d1){
@@ -213,13 +209,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     });
                 })
                 .on("click", function (d) {
-                    self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
-                        if (newData.nodes.length > 0 || newData.links.length > 0) {
-                            self.data.nodes = self.data.nodes.concat(newData.nodes);
-                            self.data.links = self.data.links.concat(newData.links);
-                            self.update(self.data);
-                        }
-                    }, false);
+                    self.getResourceDataForNode(d);
                 })
 
             node.exit().remove();
@@ -241,64 +231,135 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
             node.call(self.force.drag);
         },
 
-        getResourceData: function (resourceId, resourceName, resourceTypeId, callback, includeRoot) {
+        getResourceDataForNode: function(d) {
             var self = this;
-            $.ajax({
-                url: arches.urls.related_resources + resourceId,
-                success: function(response) {
-                    var links = [],
-                        nodes = [];
-
-                    if (includeRoot){
-                        var node = {
-                            id: self.newNodeId,
-                            entityid: resourceId,
-                            name: resourceName,
-                            entitytypeid: resourceTypeId,
-                            relationType: 'Current'
-                        };
-                        nodes.push(node);
-                        self.nodeIdMap[resourceId] = node;
-                        self.newNodeId += 1;
-                    }
-                    _.each(response.related_resources, function (related_resource) {
-                        if (!self.nodeIdMap[related_resource.entityid]) {
-                            var node = {
-                                id: self.newNodeId,
-                                entityid: related_resource.entityid,
-                                entitytypeid: related_resource.entitytypeid,
-                                name: related_resource.primaryname,
-                                relationType: 'Ancestor'
-                            };
-                            nodes.push(node);
-                            self.nodeIdMap[related_resource.entityid] = node;
-                            self.newNodeId += 1;
-                        }
-                    });
-
-                    _.each(response.resource_relationships, function (resource_relationships) {
-                        var sourceId = self.nodeIdMap[resource_relationships.entityid1];
-                        var targetId = self.nodeIdMap[resource_relationships.entityid2];
-                        var linkExists = _.find(self.data.links, function(link){
-                            return (link.source === sourceId && link.target === targetId);
-                        });
-                        if (!linkExists) {
-                            links.push({
-                                source: sourceId,
-                                target: targetId,
-                                relationship: sourceId.name + ' ' + resource_relationships.preflabel.value.split('/')[0] + targetId.name,
-                                weight: 1
-                            });
-                            self.linkMap[sourceId.id+'_'+targetId.id] = true;
-                        }
-                    });
-
-                    callback({
-                        nodes: nodes,
-                        links: links
-                    });
+            self.getResourceData(d.entityid, d.name, d.entitytypeid, function (newData) {
+                if (newData.nodes.length > 0 || newData.links.length > 0) {
+                    self.data.nodes = self.data.nodes.concat(newData.nodes);
+                    self.data.links = self.data.links.concat(newData.links);
+                    self.update(self.data);
                 }
-            });
+            }, false);
+        },
+
+        loadMoreRelations: function () {
+            this.getResourceDataForNode(this.selectedNode);
+        },
+
+        updateNodeInfo: function (d) {
+            var self = this;
+            self.$el.find('.selected-resource-name').html(d.name);
+            self.$el.find('.selected-resource-name').attr('href', arches.urls.reports + d.entityid);
+            self.$el.find('.resource-type-name').html(resourceTypes[d.entitytypeid].name);
+            if (d.relationCount) {
+                self.$el.find('.relation-unloaded').hide();
+                self.$el.find('.relation-count').show();
+                self.$el.find('.relation-load-count').html(d.relationCount.loaded);
+                self.$el.find('.relation-total-count').html(d.relationCount.total);
+                if (d.relationCount.loaded === d.relationCount.total) {
+                    self.$el.find('.load-more-relations-link').hide();
+                } else { 
+                    self.$el.find('.load-more-relations-link').show();
+                }
+            } else {
+                self.$el.find('.relation-count').hide();
+                self.$el.find('.relation-unloaded').show();
+            }
+            var iconEl = self.$el.find('.resource-type-icon');
+            iconEl.removeClass();
+            iconEl.addClass('resource-type-icon');
+            iconEl.addClass(resourceTypes[d.entitytypeid].icon);
+            self.$el.find('.node_info').show();
+            self.selectedNode = d;
+        },
+
+        getResourceData: function (resourceId, resourceName, resourceTypeId, callback, includeRoot) {
+            var load = true;
+            var self = this;
+            var start = 0;
+            var rootNode = this.nodeIdMap[resourceId];
+
+            if (rootNode) {
+                if (rootNode.relationCount) {
+                    load = (rootNode.relationCount.total > rootNode.relationCount.loaded);
+                    start = rootNode.relationCount.loaded;
+                }
+            }
+
+            if (load) {
+                $.ajax({
+                    url: arches.urls.related_resources + resourceId,
+                    data: {
+                        start: start
+                    },
+                    success: function(response) {
+                        var links = [],
+                            nodes = [];
+
+                        if (includeRoot){
+                            rootNode = {
+                                id: self.newNodeId,
+                                entityid: resourceId,
+                                name: resourceName,
+                                entitytypeid: resourceTypeId,
+                                relationType: 'Current',
+                                relationCount: {
+                                    total: response.total,
+                                    loaded: response.resource_relationships.length
+                                }
+                            };
+                            nodes.push(rootNode);
+                            self.nodeIdMap[resourceId] = rootNode;
+                            self.newNodeId += 1;
+                        } else if (rootNode.relationCount) {
+                            rootNode.relationCount.loaded = rootNode.relationCount.loaded + response.resource_relationships.length;
+                        } else {
+                            rootNode.relationCount = {
+                                total: response.total,
+                                loaded: response.resource_relationships.length
+                            };
+                        }
+                        self.updateNodeInfo(rootNode);
+                        _.each(response.related_resources, function (related_resource) {
+                            if (!self.nodeIdMap[related_resource.entityid]) {
+                                var node = {
+                                    id: self.newNodeId,
+                                    entityid: related_resource.entityid,
+                                    entitytypeid: related_resource.entitytypeid,
+                                    name: related_resource.primaryname,
+                                    relationType: 'Ancestor',
+                                    relationCount: null
+                                };
+                                nodes.push(node);
+                                self.nodeIdMap[related_resource.entityid] = node;
+                                self.newNodeId += 1;
+                            }
+                        });
+
+                        _.each(response.resource_relationships, function (resource_relationships) {
+                            var sourceId = self.nodeIdMap[resource_relationships.entityid1];
+                            var targetId = self.nodeIdMap[resource_relationships.entityid2];
+                            var linkExists = _.find(self.data.links, function(link){
+                                return (link.source === sourceId && link.target === targetId);
+                            });
+                            if (!linkExists) {
+                                links.push({
+                                    source: sourceId,
+                                    target: targetId,
+                                    relationship: sourceId.name + ' ' + resource_relationships.preflabel.value.split('/')[0] + targetId.name,
+                                    weight: 1
+                                });
+                                self.linkMap[sourceId.id+'_'+targetId.id] = true;
+                            }
+                        });
+
+                        callback({
+                            nodes: nodes,
+                            links: links
+                        });
+                    }
+                });
+            }
         }
     });
 });

@@ -73,9 +73,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
     
 def related_resources(request, resourceid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    return JSONResponse(get_related_resources(resourceid, lang), indent=4)
+    start = request.GET.get('start', 0)
+    return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
 
-def get_related_resources(resourceid, lang):
+def get_related_resources(resourceid, lang, limit=1000, start=0):
     ret = {
         'resource_relationships': [],
         'related_resources': []
@@ -83,11 +84,12 @@ def get_related_resources(resourceid, lang):
     terms = []    
     se = SearchEngineFactory().create()
 
-    query = Query(se, limit=10000)
+    query = Query(se, limit=limit, start=start)
     terms.append(Terms(field='entityid1', terms=resourceid).dsl)
     terms.append(Terms(field='entityid2', terms=resourceid).dsl)
     query.add_filter(terms, operator='or')
     resource_relations = query.search(index='resource_relations', doc_type='all')
+    ret['total'] = resource_relations['hits']['total']
 
     entityids = set()
     for relation in resource_relations['hits']['hits']:
