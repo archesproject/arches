@@ -700,32 +700,8 @@ class Entity(object):
             if child_entity.businesstablename != '':
                 data[child_entity.undotify()] = self.get_nodes(child_entity.entitytypeid, keys=keys)
             else:
-                collectsdata = False
-                for grand_child in child_entity.child_entities:
-                    if grand_child.businesstablename != '':
-                        collectsdata = True
-                        break
-                if collectsdata:
-                    data[child_entity.undotify()] = self.get_group_nodes(child_entity.entitytypeid, keys=keys)
-                else:
-                    data[child_entity.undotify()] = child_entity.dictify(keys=keys)
+                data[child_entity.undotify()] = child_entity.dictify(keys=keys)
         return [data]
-
-    def get_group_nodes(self, entitytypeid, keys=[]):
-        """
-        Used by dictify to gather and flatten groups of nodes
-
-        """
-
-        ret = []
-        entities = self.find_entities_by_type_id(entitytypeid)
-        for entity in entities:
-            data = {}
-
-            for child_entity in entity.child_entities:
-                data[child_entity.undotify_entitytypeid()] = self.get_nodes(child_entity.entitytypeid, keys=keys)
-            ret.append(data)
-        return ret
 
     def get_nodes(self, entitytypeid, keys=[]):
         """
