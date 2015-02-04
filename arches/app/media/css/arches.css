@@ -788,6 +788,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     margin-left: 0%;
 }
 
+.map-report-panel {
+    width: 100%; 
+    height: 500px;
+    margin-left: 0%;
+}
+
+
 #layer-library {
     /*margin-top: -650px;
     margin-left: 100%;*/
