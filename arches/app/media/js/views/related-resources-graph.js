@@ -63,6 +63,15 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 self.svg.attr("transform",
                     "translate(" + d3.event.translate + ")" +
                     " scale(" + d3.event.scale + ")");
+                if (self.sourceTip) {
+                    self.sourceTip.hide();
+                }
+                if (self.targetTip) {
+                    self.targetTip.hide();
+                }
+                if (self.nodeTip) {
+                    self.nodeTip.hide();
+                }
             };
 
             self.svg = d3.select(this.el).append("svg")
@@ -109,10 +118,40 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
 
         update: function () {
             var self = this;
+            var sourceTip, targetTip, nodeTip;
             self.data = {
                 nodes: self.force.nodes(self.data.nodes).nodes(),
                 links: self.force.links(self.data.links).links()
             };
+
+            require(['d3-tip'], function () {
+                sourceTip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "</span>";
+                });
+                targetTip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .direction('s')
+                    .offset([10, 0])
+                    .html(function (d) {
+                        return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "</span>";
+                });
+                nodeTip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .direction('n')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return  '<span class="graph-tooltip-name">' + d.name + "</span>";
+                });
+                self.sourceTip = sourceTip;
+                self.targetTip = targetTip;
+                self.nodeTip = nodeTip;
+                self.svg.call(sourceTip);
+                self.svg.call(targetTip);
+                self.svg.call(nodeTip);
+            });
 
             var link = self.svg.selectAll("line")
                 .data(self.data.links);
@@ -121,13 +160,55 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 .attr("class", "link")
                 .on("mouseover", function(d) {
                     d3.select(this).attr("class", "linkMouseover");
-                    link.append("title").text(function(d) {
-                        return d.relationship;
+                    // link.append("title").text(function(d) {
+                    //     return d.relationship;
+                    // });
+                    self.svg.selectAll("circle").attr("class", function(d1){
+                        var className = "node-descendent";
+                        if(d1.relationType == "Current"){
+                            className = "node-current";
+                        } else if (d1.relationType == "Ancestor"){
+                            className = "node-ancestor";
+                        }
+                        if (d.source === d1) {
+                            className += '-neighbor';
+                            if (sourceTip) {
+                                d1.relationship = d.relationshipSource;
+                                sourceTip.show(d1, this);
+                            }
+                        } else if (d.target === d1) {
+                            className += '-neighbor';
+                            if (targetTip) {
+                                d1.relationship = d.relationshipTarget;
+                                targetTip.show(d1, this);
+                            }
+                        } else if (d1 === self.selectedNode) {
+                            className += '-over';
+                        } 
+                        return className;
                     });
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
                     .attr("class", "link");
+                    self.svg.selectAll("circle").attr("class", function(d1){
+                        var className = "node-descendent";
+                        if(d1.relationType == "Current"){
+                            className = "node-current";
+                        } else if (d1.relationType == "Ancestor"){
+                            className = "node-ancestor";
+                        }
+                        if (d1 === self.selectedNode) {
+                            className += '-over';
+                        }
+                        if (sourceTip) {
+                            sourceTip.hide();
+                        }
+                        if (targetTip) {
+                            targetTip.hide();
+                        }
+                        return className;
+                    });
                 });
 
             link.exit().remove();
@@ -190,6 +271,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                     });
                     self.updateNodeInfo(d);
+                    if (nodeTip) {
+                        nodeTip.show(d, this);
+                    }
                 })
                 .on('mouseout', function (d) {
                     self.svg.selectAll("circle").attr("class", function(d1){
@@ -207,6 +291,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     self.svg.selectAll("line").attr('class', function(l) {
                         return 'link';
                     });
+                    if (nodeTip) {
+                        nodeTip.hide();
+                    }
                 })
                 .on("click", function (d) {
                     self.getResourceDataForNode(d);
@@ -347,7 +434,8 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                                 links.push({
                                     source: sourceId,
                                     target: targetId,
-                                    relationship: sourceId.name + ' ' + resource_relationships.preflabel.value.split('/')[0] + targetId.name,
+                                    relationshipSource: resource_relationships.preflabel.value.split('/')[0],
+                                    relationshipTarget: resource_relationships.preflabel.value.split('/')[1],
                                     weight: 1
                                 });
                                 self.linkMap[sourceId.id+'_'+targetId.id] = true;
