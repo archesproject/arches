@@ -26,7 +26,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
         },
 
         initialize: function(options) {
-            var self = this;
+            var self = this,
+                width = this.$el.parent().width(),
+                height = 400;
 
             _.extend(this, _.pick(options, 'resourceId', 'resourceName', 'resourceTypeId'));
             this.nodeIdMap = {};
@@ -35,20 +37,12 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 nodes: [],
                 links: []
             };
+            var canvasd3 = $(".arches-search-item-description");
 
-            if (self.resourceId) {
-                self.$el.addClass('loading');
-                self.getResourceData(self.resourceId, this.resourceName, self.resourceTypeId, function (data) {
-                    self.$el.removeClass('loading');
-                    self.data = data;
-                    self.render();
-                }, true);
-            }
-        },
-        render: function () {
-            var self = this,
-                width = this.$el.parent().width(),
-                height = 400;
+            $(window).on("resize", function() {
+                canvasd3.attr("width", canvasd3.parent().width());
+                canvasd3.attr("height", canvasd3.parent().height());
+            }).trigger("resize");
 
             self.force = d3.layout.force()
                 .charge(-2750)
@@ -60,7 +54,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 .size([width, height]);
 
             var redraw = function() {
-                self.svg.attr("transform",
+                self.vis.attr("transform",
                     "translate(" + d3.event.translate + ")" +
                     " scale(" + d3.event.scale + ")");
                 if (self.sourceTip) {
@@ -74,71 +68,27 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 }
             };
 
-            self.svg = d3.select(this.el).append("svg")
+            self.svg = d3.select(this.el).append("svg:svg")
                 .attr("width", width)
                 .attr("height", height)
-                .call(d3.behavior.zoom().on("zoom", redraw))
-                .append('svg:g');
+                .call(d3.behavior.zoom().on("zoom", redraw));
+            self.vis = self.svg.append('svg:g');
 
-            self.svg.append("defs").selectAll("marker")
-                .data(["suit", "licensing", "resolved"])
-              .enter().append("marker")
-                .attr("id", function(d) { return d; })
-                .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 20)
-                .attr("refY", 0)
-                .attr("markerWidth", 6)
-                .attr("markerHeight", 6)
-                .attr("orient", "auto")
-              .append("path")
-                .attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
-                .style("stroke", "#b3b3b3")
-                .style("opacity", "0.6");
-
-            self.data.nodes[0].fixed = true;
-            self.data.nodes[0].x = width/2;
-            self.data.nodes[0].y = height/2;
-
-
-            var canvasd3 = $(".arches-search-item-description"),
-                aspect = canvasd3.width() / canvasd3.height(),
-                containerd3 = canvasd3.parent();
-
-            $(window).on("resize", function() {
-                var targetWidth = containerd3.width();
-                var targetHeight = containerd3.height();
-                canvasd3.attr("width", targetWidth);
-                canvasd3.attr("height", targetHeight);
-            }).trigger("resize");
-
-            self.update(self.data);
-
-            self.$el.addClass('view-created');
-        },
-
-        update: function () {
-            var self = this;
-            var sourceTip, targetTip, nodeTip;
-            self.data = {
-                nodes: self.force.nodes(self.data.nodes).nodes(),
-                links: self.force.links(self.data.links).links()
-            };
-
-            require(['d3-tip'], function () {
-                sourceTip = d3.tip()
+            require(['plugins/d3-tip'], function (d3Tip) {
+                sourceTip = d3Tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d) {
                         return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
                 });
-                targetTip = d3.tip()
+                targetTip = d3Tip()
                     .attr('class', 'd3-tip')
                     .direction('s')
                     .offset([10, 0])
                     .html(function (d) {
                         return  '<span class="graph-tooltip-name">' + d.name + "</span> " + d.relationship + "...</span>";
                 });
-                nodeTip = d3.tip()
+                nodeTip = d3Tip()
                     .attr('class', 'd3-tip')
                     .direction('n')
                     .offset([-10, 0])
@@ -148,22 +98,43 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 self.sourceTip = sourceTip;
                 self.targetTip = targetTip;
                 self.nodeTip = nodeTip;
-                self.svg.call(sourceTip);
-                self.svg.call(targetTip);
-                self.svg.call(nodeTip);
+                self.vis.call(sourceTip);
+                self.vis.call(targetTip);
+                self.vis.call(nodeTip);
             });
 
-            var link = self.svg.selectAll("line")
+            if (self.resourceId) {
+                self.$el.addClass('loading');
+                self.getResourceData(self.resourceId, this.resourceName, self.resourceTypeId, function (data) {
+                    self.$el.removeClass('loading');
+                    self.data = data;
+                    self.data.nodes[0].fixed = true;
+                    self.data.nodes[0].x = width/2;
+                    self.data.nodes[0].y = height/2;
+                    self.update();
+                }, true);
+            }
+
+            self.$el.addClass('view-created');
+        },
+
+        update: function () {
+            var self = this;
+
+            self.data = {
+                nodes: self.force.nodes(self.data.nodes).nodes(),
+                links: self.force.links(self.data.links).links()
+            };
+
+            var link = self.vis.selectAll("line")
                 .data(self.data.links);
 
             var linkEnter = link.enter().insert("line", "circle")
                 .attr("class", "link")
                 .on("mouseover", function(d) {
                     d3.select(this).attr("class", "linkMouseover");
-                    // link.append("title").text(function(d) {
-                    //     return d.relationship;
-                    // });
-                    self.svg.selectAll("circle").attr("class", function(d1){
+
+                    self.vis.selectAll("circle").attr("class", function(d1){
                         var className = "node-descendent";
                         if(d1.relationType == "Current"){
                             className = "node-current";
@@ -172,15 +143,15 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                         if (d.source === d1) {
                             className += '-neighbor';
-                            if (sourceTip) {
+                            if (self.sourceTip) {
                                 d1.relationship = d.relationshipSource;
-                                sourceTip.show(d1, this);
+                                self.sourceTip.show(d1, this);
                             }
                         } else if (d.target === d1) {
                             className += '-neighbor';
-                            if (targetTip) {
+                            if (self.targetTip) {
                                 d1.relationship = d.relationshipTarget;
-                                targetTip.show(d1, this);
+                                self.targetTip.show(d1, this);
                             }
                         } else if (d1 === self.selectedNode) {
                             className += '-over';
@@ -191,7 +162,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                 .on("mouseout", function(d) {
                     d3.select(this)
                     .attr("class", "link");
-                    self.svg.selectAll("circle").attr("class", function(d1){
+                    self.vis.selectAll("circle").attr("class", function(d1){
                         var className = "node-descendent";
                         if(d1.relationType == "Current"){
                             className = "node-current";
@@ -201,11 +172,11 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         if (d1 === self.selectedNode) {
                             className += '-over';
                         }
-                        if (sourceTip) {
-                            sourceTip.hide();
+                        if (self.sourceTip) {
+                            self.sourceTip.hide();
                         }
-                        if (targetTip) {
-                            targetTip.hide();
+                        if (self.targetTip) {
+                            self.targetTip.hide();
                         }
                         return className;
                     });
@@ -213,7 +184,12 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
 
             link.exit().remove();
 
-            var node = self.svg.selectAll("circle")
+            var drag = self.force.drag()
+              .on("dragstart", function(d) {
+                d3.event.sourceEvent.stopPropagation();
+              });
+
+            var node = self.vis.selectAll("circle")
                 .data(self.data.nodes, function(d) { return d.id; });
 
             var nodeEnter = node.enter().append("circle")
@@ -247,7 +223,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     return "fill:" + resourceTypes[d.entitytypeid].color + ";stroke:" + colorLuminance(resourceTypes[d.entitytypeid].color, -0.3);
                 })
                 .on("mouseover", function(d){
-                    self.svg.selectAll("circle").attr("class", function(d1){
+                    self.vis.selectAll("circle").attr("class", function(d1){
                         var className = "node-descendent";
                         if(d1.relationType == "Current"){
                             className = "node-current";
@@ -263,7 +239,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                     }).attr("style", function(d1){
                         return "fill:" + resourceTypes[d1.entitytypeid].color + ";stroke:" + colorLuminance(resourceTypes[d1.entitytypeid].color, -0.3);
                     });
-                    self.svg.selectAll("line").attr('class', function(l) {
+                    self.vis.selectAll("line").attr('class', function(l) {
                         if (l.source === d || l.target === d) {
                             return 'linkMouseover';
                         } else {
@@ -271,12 +247,12 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                     });
                     self.updateNodeInfo(d);
-                    if (nodeTip) {
-                        nodeTip.show(d, this);
+                    if (self.nodeTip) {
+                        self.nodeTip.show(d, this);
                     }
                 })
                 .on('mouseout', function (d) {
-                    self.svg.selectAll("circle").attr("class", function(d1){
+                    self.vis.selectAll("circle").attr("class", function(d1){
                         var className = "node-descendent";
                         if(d1.relationType == "Current"){
                             className = "node-current";
@@ -288,16 +264,17 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                         }
                         return className;
                     });
-                    self.svg.selectAll("line").attr('class', function(l) {
+                    self.vis.selectAll("line").attr('class', function(l) {
                         return 'link';
                     });
-                    if (nodeTip) {
-                        nodeTip.hide();
+                    if (self.nodeTip) {
+                        self.nodeTip.hide();
                     }
                 })
                 .on("click", function (d) {
                     self.getResourceDataForNode(d);
                 })
+                .call(drag);
 
             node.exit().remove();
 
@@ -315,7 +292,6 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
             });
 
             self.force.start();
-            node.call(self.force.drag);
         },
 
         getResourceDataForNode: function(d) {
