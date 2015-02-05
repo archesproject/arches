@@ -26,6 +26,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 geocoder = import_module(settings.GEOCODING_PROVIDER)
@@ -44,6 +45,7 @@ def home_page(request):
 def search_terms(request):
     se = SearchEngineFactory().create()
     searchString = request.GET.get('q', '')
+    lang = request.GET.get('lang', 'en-us')
     
     query = Query(se, start=0, limit=settings.SEARCH_ITEMS_PER_PAGE)
     boolquery = Bool()
@@ -52,7 +54,13 @@ def search_terms(request):
     boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
     query.add_query(boolquery)
 
-    return JSONResponse(query.search(index='term', doc_type='value'))
+    results = query.search(index='term', doc_type='value')
+
+    # for result in results['hits']['hits']:
+    #     prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
+    #     result['_source']['context'] = prefLabel['value']
+
+    return JSONResponse(results)
 
 def search_results(request, as_text=False):
     dsl = build_query_dsl(request)

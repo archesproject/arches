@@ -397,7 +397,7 @@ class Concept(object):
         for value in self.values:
             if scheme == None:
                 scheme = self.get_context()
-            value.index(scheme=scheme.id)        
+            value.index(scheme=scheme)        
 
         for subconcept in self.subconcepts:
             subconcept.index(scheme=subconcept.get_context())
@@ -532,11 +532,12 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
+        #print 'self.nodetype=' + self.nodetype
         if self.nodetype == 'Concept' or self.nodetype == 'Collection':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             
             def get_scheme_id(concept):
-                if concept.nodetype == 'ConceptScheme':
+                if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
                     return concept
 
             return concept.traverse(get_scheme_id, direction='up')
@@ -643,8 +644,9 @@ class ConceptValue(object):
             if scheme == None:
                 raise Exception('Index of label failed.  Index type (scheme id) could not be derived from the label.')
 
-            se.create_mapping('concept_labels', scheme, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
-            se.index_data('concept_labels', scheme, data, 'id')
+            se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
+            se.index_data('concept_labels', scheme.id, data, 'id')
+            se.index_term(self.value, self.id, scheme.get_preflabel().value, {'conceptid': self.conceptid, 'context_pref_label':scheme.get_preflabel().value})
     
     def delete_index(self):      
         if self.category == 'label':
@@ -659,7 +661,7 @@ class ConceptValue(object):
     def get_scheme_id(self):
         se = SearchEngineFactory().create()
         result = se.search(index='concept_labels', id=self.id)
-        if not result['found']:
-            return None
-        else:
+        if result['found']:
             return result['_type']
+        else:
+            return None
