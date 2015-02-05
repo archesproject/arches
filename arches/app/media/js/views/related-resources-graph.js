@@ -406,12 +406,18 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3'], f
                             var linkExists = _.find(self.data.links, function(link){
                                 return (link.source === sourceId && link.target === targetId);
                             });
+                            var relationshipSource = resource_relationships.preflabel.value;
+                            var relationshipTarget = resource_relationships.preflabel.value;
+                            if (resource_relationships.preflabel.value.split('/').length === 2) {
+                                relationshipSource = resource_relationships.preflabel.value.split('/')[0].trim();
+                                relationshipTarget = resource_relationships.preflabel.value.split('/')[1].trim();
+                            }
                             if (!linkExists) {
                                 links.push({
                                     source: sourceId,
                                     target: targetId,
-                                    relationshipSource: resource_relationships.preflabel.value.split('/')[0].trim(),
-                                    relationshipTarget: resource_relationships.preflabel.value.split('/')[1].trim(),
+                                    relationshipSource: relationshipSource,
+                                    relationshipTarget: relationshipTarget,
                                     weight: 1
                                 });
                                 self.linkMap[sourceId.id+'_'+targetId.id] = true;
