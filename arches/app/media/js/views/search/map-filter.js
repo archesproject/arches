@@ -7,8 +7,9 @@ define(['jquery',
     'views/map',
     'openlayers', 
     'knockout',
-    'map/resource-layer-model'], 
-    function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel) {
+    'map/resource-layer-model',
+    'utils'], 
+    function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel, utils) {
         return Backbone.View.extend({
 
             events: {
@@ -243,22 +244,13 @@ define(['jquery',
                 );
             },
 
-            hexToRgb: function (hex) {
-                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : null;
-            },
-
             highlightFeatures: function(resultsarray){
                 var source, geometries;
                 var self = this;
                 var f = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
 
                 if(!this.selectedFeatureLayer){
-                    var rgb = this.hexToRgb('#C4171D');
+                    var rgb = utils.hexToRgb('#C4171D');
                     var iconUnicode = '\uf060';                    
                     var zIndex = 0;
                     var styleCache = {};
@@ -339,7 +331,7 @@ define(['jquery',
             },
 
             selectFeatureById: function(resourceid){
-                var rgb = this.hexToRgb('#4CAE4C');
+                var rgb = utils.hexToRgb('#4CAE4C');
                 var iconUnicode = '\uf060';
                 
                 if(!this.featureHightlightOverlay){
