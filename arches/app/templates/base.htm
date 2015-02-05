@@ -47,8 +47,8 @@
                     <!-- Topbar Message -->
                     <div class="arches-loginbar pull-left">
                         
-                        <a href="http://www.archesproject.org" class="">Arches </a> 
-                        <span class="hidden-xs">Cultural Heritage Inventory</span>
+                        <a href="http://www.archesproject.org" class="">{% trans "Arches" %} </a> 
+                        <span class="hidden-xs">{% trans "Cultural Heritage Inventory" %}</span>
 
                     </div>
 
@@ -56,18 +56,18 @@
                     <ul class="loginbar pull-right">
                         <li>
                             <i class="fa fa-globe"></i>
-                            <a>Languages</a>
+                            <a>{% trans "Languages" %}</a>
                             <ul class="lenguages">
                                 <li class="active">
-                                    <a href="javascript:void(0);">English <i class="fa fa-check"></i></a> 
+                                    <a href="javascript:void(0);">{% trans "English" %} <i class="fa fa-check"></i></a> 
                                 </li>
                             </ul>
                         </li>
                         <li class="topbar-devider"></li>   
-                        <li><a href="page_faq.html">Help</a></li>  
+                        <li><a href="page_faq.html">{% trans "Help" %}</a></li>  
                         <li class="topbar-devider"></li>   
                         <li>
-                            <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">Login{% else %}&logout=true">Welcome {{ user.username }} - Logout{% endif %}</a>
+                            <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">{% trans "Login" %}{% else %}&logout=true">Welcome {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
                         </li>
                         
                     </ul>
@@ -85,7 +85,7 @@
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                            <span class="sr-only">Toggle navigation</span>
+                            <span class="sr-only">{% trans "Toggle navigation" %}</span>
                             <span class="fa fa-bars"></span>
                         </button>
                         <a class="navbar-brand" href="{% url 'home' %}">
@@ -101,7 +101,7 @@
                             <!-- Home -->
                             <li class="{% if active_page = 'Home' %}active{% endif %}">
                                 <a href="{% url 'home' %}">
-                                    Home
+                                    {% trans "Home" %}
                                 </a>
                             </li>
                             <!-- End Home -->
@@ -109,7 +109,7 @@
                             <!-- New Search-->
                             <li class="{% if active_page = 'Search' %}active{% endif %}">
                                 <a href="{% url 'search_home' %}">
-                                    Search
+                                    {% trans "Search" %}
                                 </a>
                             </li>
                             <!-- End Search-->
@@ -117,7 +117,7 @@
                             <!-- Map-->
                             <li class="{% if active_page = 'Map' %}active{% endif %}">
                                 <a href="{% url 'map' %}">
-                                    Map
+                                    {% trans "Map View" %}
                                 </a>
                             </li>
                             <!-- End Map-->
@@ -125,7 +125,7 @@
                             <!-- Resource Editor-->
                             <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
                                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                                    Resource Manager
+                                    {% trans "Resource Manager" %}
                                 </a>
                                 <ul class="dropdown-menu">
                                     {% for type, type_data in resource_types %}
@@ -138,7 +138,7 @@
                              <!-- RDM-->
                             <li class="{% if user.is_anonymous %}{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
                                 <a href="{% url 'rdm' '' %}">
-                                    RDM {{what}}
+                                    {% trans "RDM" %}
                                 </a>
                             </li>
                             <!-- End RDM-->
