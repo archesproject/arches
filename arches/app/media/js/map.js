@@ -10,10 +10,11 @@ require([
     'map/layers',
     'map/resource-layers',
     'selected-resource-id',
+    'resource-types',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers, resourceLayers, selectedResourceId) {
+], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers, resourceLayers, selectedResourceId, resourceTypes) {
     var geoJSON = new ol.format.GeoJSON();
     var PageView = Backbone.View.extend({
         el: $('body'),
@@ -231,8 +232,8 @@ require([
                 var typeInfo = layerInfo[feature.get('entitytypeid')];
                 $('#cluster-info').hide();
                 if (typeInfo) {
-                    resourceData.typeName = typeInfo.name;
-                    resourceData.typeIcon = typeInfo.icon;
+                    resourceData.typeName = resourceTypes[feature.get('entitytypeid')].name;
+                    resourceData.typeIcon = resourceTypes[feature.get('entitytypeid')].icon;
                 }
                 _.each(feature.getKeys(), function (key) {
                     resourceData[key] = feature.get(key);
