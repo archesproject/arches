@@ -41,3 +41,10 @@ def resource_types(request):
     return {
         'resource_types': sorted_resource_types
     }
+
+def app_name(request):
+    return {
+        'APP_NAME': settings.APP_NAME
+    }
+
+

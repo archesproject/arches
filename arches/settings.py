@@ -114,6 +114,8 @@ GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
 EXPORT_CONFIG = ''
 
+APP_NAME = 'Arches v3.0'
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
@@ -271,6 +273,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'arches.app.utils.context_processors.livereload',
     'arches.app.utils.context_processors.resource_types',
     'arches.app.utils.context_processors.map_info',
+    'arches.app.utils.context_processors.app_name',
 )
 
 
