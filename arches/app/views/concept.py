@@ -24,6 +24,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -32,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 
+@login_required
 def rdm(request, conceptid):
     lang = request.GET.get('lang', 'en-us')    
     
@@ -59,6 +61,7 @@ def rdm(request, conceptid):
             'concept_scheme_groups': concept_scheme_groups
         }, context_instance=RequestContext(request))
 
+@login_required
 @csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')

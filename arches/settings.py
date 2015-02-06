@@ -297,6 +297,8 @@ LOGGING = {
     },
 }
 
+LOGIN_URL = 'auth'
+
 
 try:
     from settings_local import *

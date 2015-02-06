@@ -20,6 +20,7 @@ import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
@@ -31,6 +32,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 
+@login_required
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
