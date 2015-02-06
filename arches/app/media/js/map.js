@@ -272,6 +272,7 @@ require([
                     resourceData[key] = feature.get(key);
                 });
                 
+                selectFeatureOverlay.getFeatures().clear();
                 selectFeatureOverlay.getFeatures().push(feature);
                 self.viewModel.selectedResource(resourceData);
                 $('#resource-info').show();
