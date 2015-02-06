@@ -274,6 +274,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'arches.app.utils.context_processors.resource_types',
     'arches.app.utils.context_processors.map_info',
     'arches.app.utils.context_processors.app_name',
+    'arches.app.utils.context_processors.user_can_edit',
 )
 
 

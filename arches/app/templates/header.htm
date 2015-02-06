@@ -81,6 +81,7 @@
                     </li>
                     <!-- End Map-->
 
+                    {% if user_can_edit %}
                     <!-- Resource Editor-->
                     <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
                         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
@@ -101,6 +102,7 @@
                         </a>
                     </li>
                     <!-- End RDM-->
+                    {% endif %}
 
                     <!-- Search Block -->
                     <li>
