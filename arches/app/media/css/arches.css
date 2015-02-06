@@ -436,7 +436,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     display: none !important; /*removes the down arrow from dropdowns*/
 }
 
-.select2-results li:first-child{     
+.resource_search_widget_dropdown .select2-results li:first-child{     
     display:none;
 } 
 

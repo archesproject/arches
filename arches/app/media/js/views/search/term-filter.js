@@ -27,6 +27,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
         render: function(){
             var self = this;
             this.searchbox = this.$el.select2({
+                dropdownCssClass: 'resource_search_widget_dropdown',
                 multiple: true,
                 minimumInputLength: 2,
                 ajax: {
@@ -48,7 +49,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                         var results = [{
                             inverted: false,
                             type: 'string',
-                            context: 'string',
+                            context: '',
                             id: value,
                             text: value,
                             value: value
