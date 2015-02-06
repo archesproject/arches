@@ -14,8 +14,6 @@ define([
         },
 
         overlays: [],
-        enableSelection: false,
-        hoverFeature: null,
         initialize: function(options) {
             var self = this;
             var projection = ol.proj.get('EPSG:3857');
@@ -118,6 +116,14 @@ define([
                 var extent = view.calculateExtent(self.map.getSize());
                 self.trigger('viewChanged', view.getZoom(), extent);
             });
+
+
+            this.map.on('click', function(e) {
+                var clickFeature = self.map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
+                    return feature;
+                });
+                self.trigger('mapClicked', e, clickFeature);
+            });
         },
 
         handleMouseMove: function(e) {
@@ -127,35 +133,19 @@ define([
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
-                return self.isFeatureSelectable(feature) ? feature : null;
+                return feature;
             });
-            var cursorStyle = overFeature ? "pointer" : "";
-            if (this.hoverFeature) {
-                this.hoverFeature = null;
-            }
-            if (overFeature) {
-                this.hoverFeature = overFeature;
-            }
 
-            if (this.enableSelection) {
-                this.$el.css("cursor", cursorStyle);
-            }
             coords = point.transform("EPSG:3857", "EPSG:4326").getCoordinates();
             if (coords.length > 0) {
-                this.trigger('mousePositionChanged', format(coords), pixels, this.hoverFeature);
+                this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
+            } else {
+                this.trigger('mousePositionChanged', '');
             }
         },
 
         handleMouseOut: function () {
-            if (this.hoverFeature) {
-                this.hoverFeature = null;
-            }
             this.trigger('mousePositionChanged', '');
-        },
-
-        isFeatureSelectable: function (feature) {
-            var keys = feature.getKeys();
-            return (_.contains(keys, 'arches_cluster') || _.contains(keys, 'arches_marker'));
         }
     });
 });

@@ -86,8 +86,6 @@ define([
                 source: source
             });
 
-
-
             var clusterStyle = function(feature, resolution) {
                 var size = feature.get('features').length;
                 var mouseOver = feature.get('mouseover');

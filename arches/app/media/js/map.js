@@ -53,10 +53,37 @@ require([
                 layer.filtered = ko.observable(false);
             });
             var map = new MapView({
-                enableSelection: true,
                 el: $('#map'),
                 overlays: mapLayers.reverse()
             });
+            var selectFeatureOverlay = new ol.FeatureOverlay({
+                style: function(feature, resolution) {
+                    var isSelectFeature = _.contains(feature.getKeys(), 'select_feature');
+                    var fillOpacity = isSelectFeature ? 0.3 : 0;
+                    var strokeOpacity = isSelectFeature ? 0.9 : 0;
+                    return [new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(0, 255, 255, ' + fillOpacity + ')'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(0, 255, 255, ' + strokeOpacity + ')',
+                            width: 3
+                        }),
+                        image: new ol.style.Circle({
+                            radius: 10,
+                            fill: new ol.style.Fill({
+                                color: 'rgba(0, 255, 255, ' + fillOpacity + ')'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: 'rgba(0, 255, 255, ' + strokeOpacity + ')',
+                                width: 3
+                            })
+                        })
+                    })];
+                }
+            });
+            selectFeatureOverlay.setMap(map.map);
+
             self.viewModel = {
                 baseLayers: map.baseLayers,
                 layers: ko.observableArray(layers),
@@ -79,8 +106,8 @@ require([
                     var geom = geoJSON.readGeometry(feature.get('geometry_collection'));
                     geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
                     map.map.getView().fitExtent(geom.getExtent(), map.map.getSize());
-                    map.select.getFeatures().clear();
-                    map.select.getFeatures().push(feature);
+                    selectFeatureOverlay.getFeatures().clear();
+                    selectFeatureOverlay.getFeatures().push(feature);
                     selectedResourceId = null;
                 }
             };
@@ -184,38 +211,44 @@ require([
             };
 
             map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
+                var cursorStyle = "";
                 currentMousePx = pixels;
                 self.viewModel.mousePosition(mousePosition);
-                if (feature && (feature.get('arches_marker') || feature.get('arches_cluster') && feature.get('features').length === 1)) {
-                    feature = feature.get('features')[0];
-                    var fullFeature = archesFeaturesCache[feature.getId()];
-                    if (fullFeature && fullFeature != 'loading') {
-                        showMouseoverFeatureTooltip(fullFeature);
-                    } else if (fullFeature != 'loading') {
-                        archesFeaturesCache[feature.getId()] = 'loading';
-                        $.ajax({
-                            url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
-                            success: function(response) {
-                                fullFeature = geoJSON.readFeature(response.features[0]);
-                                var geom = fullFeature.getGeometry();
-                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
 
-                                fullFeature.set('select_feature', true);
-                                fullFeature.set('entityid', fullFeature.getId());
+                if (feature && (feature.get('arches_marker') || feature.get('arches_cluster'))) {
+                    cursorStyle = "pointer";
+                    if (feature.get('arches_marker') || feature.get('features').length === 1) {
+                        feature = feature.get('features')[0];
+                        var fullFeature = archesFeaturesCache[feature.getId()];
+                        if (fullFeature && fullFeature != 'loading') {
+                            showMouseoverFeatureTooltip(fullFeature);
+                        } else if (fullFeature != 'loading') {
+                            archesFeaturesCache[feature.getId()] = 'loading';
+                            $.ajax({
+                                url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
+                                success: function(response) {
+                                    fullFeature = geoJSON.readFeature(response.features[0]);
+                                    var geom = fullFeature.getGeometry();
+                                    geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
 
-                                archesFeaturesCache[feature.getId()] = fullFeature;
-                                showMouseoverFeatureTooltip(fullFeature);
-                            }
-                        });
+                                    fullFeature.set('select_feature', true);
+                                    fullFeature.set('entityid', fullFeature.getId());
+
+                                    archesFeaturesCache[feature.getId()] = fullFeature;
+                                    showMouseoverFeatureTooltip(fullFeature);
+                                }
+                            });
+                        }
                     }
                 } else {
                     mouseoverFeatureTooltip.hide();
                 }
+                map.$el.css("cursor", cursorStyle);
             });
 
             $('.resource-info-closer').click(function() {
                 $('#resource-info').hide();
-                map.select.getFeatures().clear();
+                selectFeatureOverlay.getFeatures().clear();
                 $('.resource-info-closer')[0].blur();
             });
 
@@ -239,7 +272,7 @@ require([
                     resourceData[key] = feature.get(key);
                 });
                 
-                map.select.getFeatures().push(feature);
+                selectFeatureOverlay.getFeatures().push(feature);
                 self.viewModel.selectedResource(resourceData);
                 $('#resource-info').show();
             };
@@ -271,9 +304,8 @@ require([
                 }
             };
 
-            map.select.getFeatures().on('change:length', function(e) {
-                if (e.target.getArray().length !== 0) {
-                    var clickFeature = e.target.item(0);
+            map.on('mapClicked', function(e, clickFeature) {
+                if (clickFeature) {
                     var keys = clickFeature.getKeys();
                     var isCluster = _.contains(keys, "features");
                     var isArchesFeature = (_.contains(keys, 'arches_cluster') || _.contains(keys, 'arches_marker'));
@@ -292,45 +324,40 @@ require([
                         } else {
                             showClusterPopup(clickFeature);
                         }
-                        _.defer(function () {
-                            map.select.getFeatures().clear();
-                        });
                     } else {
                         if (isCluster) {
                             clickFeature = clickFeature.get('features')[0];
                             keys = clickFeature.getKeys();
                         }
                         if (!_.contains(keys, 'select_feature')) {
-                            _.defer(function () {
-                                map.select.getFeatures().clear();
-                                if (isArchesFeature) {
-                                    if (archesFeaturesCache[clickFeature.getId()] && archesFeaturesCache[clickFeature.getId()] !== 'loading'){
-                                        showFeaturePopup(archesFeaturesCache[clickFeature.getId()]);
-                                    } else {
-                                        $('.map-loading').show();
-                                        archesFeaturesCache[clickFeature.getId()] = 'loading';
-                                        $.ajax({
-                                            url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(),
-                                            success: function(response) {
-                                                var feature = geoJSON.readFeature(response.features[0]);
-                                                var geom = feature.getGeometry();
-                                                geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+                            if (isArchesFeature) {
+                                if (archesFeaturesCache[clickFeature.getId()] && archesFeaturesCache[clickFeature.getId()] !== 'loading'){
+                                    showFeaturePopup(archesFeaturesCache[clickFeature.getId()]);
+                                } else {
+                                    $('.map-loading').show();
+                                    archesFeaturesCache[clickFeature.getId()] = 'loading';
+                                    $.ajax({
+                                        url: arches.urls.map_markers + 'all?entityid=' + clickFeature.getId(),
+                                        success: function(response) {
+                                            var feature = geoJSON.readFeature(response.features[0]);
+                                            var geom = feature.getGeometry();
+                                            geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
 
-                                                feature.set('select_feature', true);
-                                                feature.set('entityid', feature.getId());
+                                            feature.set('select_feature', true);
+                                            feature.set('entityid', feature.getId());
 
-                                                archesFeaturesCache[clickFeature.getId()] = feature;
-                                                $('.map-loading').hide();
-                                                showFeaturePopup(feature);
-                                            }
-                                        });
-                                    }
+                                            archesFeaturesCache[clickFeature.getId()] = feature;
+                                            $('.map-loading').hide();
+                                            showFeaturePopup(feature);
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     }
                 } else {
                     $('#resource-info').hide();
+                    selectFeatureOverlay.getFeatures().clear();
                 }
             });
             
