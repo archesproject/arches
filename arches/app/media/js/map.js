@@ -305,6 +305,8 @@ require([
             };
 
             map.on('mapClicked', function(e, clickFeature) {
+                selectFeatureOverlay.getFeatures().clear();
+                $('#resource-info').hide();
                 if (clickFeature) {
                     var keys = clickFeature.getKeys();
                     var isCluster = _.contains(keys, "features");
@@ -355,9 +357,6 @@ require([
                             }
                         }
                     }
-                } else {
-                    $('#resource-info').hide();
-                    selectFeatureOverlay.getFeatures().clear();
                 }
             });
             
