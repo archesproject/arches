@@ -98,7 +98,7 @@
                                     <div data-bind='foreach: filters'>
                                         <div class="arches-crud-record">
                                             <a href="javascript:void(0)" class="arches-CRUD-child" title="Remove this filter"><i data-bind='attr: {"data-index": $index}' class="arches-CRUD-delete fa fa-times-circle"></i></a>
-                                            <a href="javascript:void(0)" class="text-muted arches-CRUD-child arches-CRUD-edit" data-bind='attr: {"data-index": $index}' title="Edit this name"><span data-bind='text: date_types__label + " " + date_operators__label + " " + date' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
+                                            <a href="javascript:void(0)" class="text-muted arches-CRUD-child arches-CRUD-edit" data-bind='attr: {"data-index": $index}' title="Edit this name"><span data-bind='text: date_types__label.charAt(0).toUpperCase() + date_types__label.slice(1).toLowerCase() + " " + date_operators__label.toLowerCase() + " " + date' style="padding-right:2px;"></span><span class="text-muted arches-crud-type-identifier"></span>
                                             </a>
                                         </div>
                                     </div>
