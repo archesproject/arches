@@ -88,7 +88,8 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         concept.legacyoid = auth_doc_file_name
         concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'category': 'label'})
         scheme_id = concept
-        lookups.add_relationship(source='00000000-0000-0000-0000-000000000004', type='narrower', target=concept.id)
+        lookups.add_relationship(source='00000000-0000-0000-0000-000000000001', type='narrower', target=concept.id)
+
     else:
         concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
         concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
@@ -108,10 +109,11 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                     else:
                         concept = Concept()
                         concept.id = str(uuid.uuid4())
-                        concept.nodetype = 'Concept' if row[u'CONCEPTTYPE'].upper() == 'INDEX' else 'Collection'
+                        concept.nodetype = 'Concept'# if row[u'CONCEPTTYPE'].upper() == 'INDEX' else 'Collection'
                         concept.legacyoid = row[u'CONCEPTID']
-                        concept_type = 'collector' if row['CONCEPTTYPE'].lower() == 'collector' else 'prefLabel'
-                        concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': concept_type, 'category': 'label'})
+                        concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'prefLabel', 'category': 'label'})
+                        if row['CONCEPTTYPE'].lower() == 'collector':
+                            concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'collector', 'category': 'label'})
                         if row[u'ALTLABELS'] != '':
                             altlabel_list = row[u'ALTLABELS'].split(';')
                             for altlabel in altlabel_list:
@@ -120,6 +122,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                             lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
 
                         lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='narrower', target=concept.id, rownum=rows.line_num)
+                        
                         if auth_doc_file_name in auth_file_to_entity_concept_mapping:
                             lookups.add_relationship(source=auth_file_to_entity_concept_mapping[auth_doc_file_name]['ENTITYTYPE_CONCEPTID'], type='member', target=concept.id, rownum=rows.line_num)
 

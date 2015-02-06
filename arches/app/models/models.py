@@ -515,7 +515,7 @@ class Domains(models.Model):
                     # print value, 'attr value'
                     concepts = Concepts.objects.filter(legacyoid = value)
                     if len(concepts) == 1:
-                        value = Values.objects.get(Q(conceptid = concepts[0], valuetype = 'prefLabel') | Q(conceptid = concepts[0], valuetype = 'collector'))
+                        value = Values.objects.get(conceptid = concepts[0], valuetype = 'prefLabel')
                     else:
                         # print 'unable to find, or found more then 1 Concept with legacyoid: %s' % (value)
                         value = None

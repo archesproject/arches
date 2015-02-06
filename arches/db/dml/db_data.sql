@@ -81,6 +81,7 @@ INSERT INTO d_relationtypes VALUES ('hasTopConcept', 'Properties', 'skos');
 
 --Arches entityttype relations to concepts
 INSERT INTO d_relationtypes VALUES ('hasCollection', 'Entitytype Relations', 'arches');
+INSERT INTO d_relationtypes VALUES ('hasEntity', 'Entitynode Relations', 'arches');
 
 --OWL Class types and Arches specific types
 INSERT INTO d_nodetypes VALUES ('GroupingNode', 'arches');
@@ -91,23 +92,24 @@ INSERT INTO d_nodetypes VALUES ('Collection', 'skos');
 INSERT INTO d_nodetypes VALUES ('EntityType', 'arches');
 
 
---INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'GroupingNode', 'CONCEPTS');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'GroupingNode', 'ENTITY TYPES');
---INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'CONCEPT SCHEMES');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'ConceptSchemeGroup', 'ARCHES');
+
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptSchemeGroup', 'ARCHES');
+-- INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'GroupingNode', 'ENTITY TYPES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'GroupingNode', 'ENTITY NODES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ConceptScheme', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptSchemeGroup', 'CANDIDATES');
 
---INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'narrower');
---INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 'narrower');
+-- INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003', 'narrower');
+-- INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000004', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'narrower');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000005', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
---INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Concepts', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'Entity Types', 'en-us');
---INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'Concept Schemes', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'Arches', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-us');
+--INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'Entity Types', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'Dropdown Lists', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'Entity Nodes', 'en-us');
 INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-us');
 INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-us');
 

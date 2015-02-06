@@ -390,17 +390,9 @@ class Resource(Entity):
             elif entity.businesstablename == 'strings':
                 if settings.WORDS_PER_SEARCH_TERM == None or (len(entity.value.split(' ')) < settings.WORDS_PER_SEARCH_TERM):
                     entitytype = archesmodels.EntityTypes.objects.get(pk=entity.entitytypeid)
-                    concept = Concept(entitytype.conceptid).get(include=['label'])
-                    scheme_pref_label = concept.get_preflabel().value
-                    terms.append({'term': entity.value, 'entityid': entity.entityid, 'context': entitytype.pk, 'options':{'context_pref_label':scheme_pref_label}})
+                    terms.append({'term': entity.value, 'entityid': entity.entityid, 'context': entitytype.conceptid_id, 'options': {}})
             elif entity.businesstablename == 'domains':
                 pass
-                # value = archesmodels.Values.objects.get(pk=entity.value)
-                # if value:
-                #     concept = Concept(value.conceptid).get(include=['label'])
-                #     if concept:
-                #         scheme_pref_label = concept.get_context().get_preflabel().value
-                #         terms.append({'term': concept.get_preflabel().value, 'entityid': value.pk, 'context': concept.get_context().id, 'options':{'conceptid': value.conceptid_id, 'context_pref_label':scheme_pref_label}})
             elif entity.businesstablename == 'geometries':
                 pass
             elif entity.businesstablename == 'dates':

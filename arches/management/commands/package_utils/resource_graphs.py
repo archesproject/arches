@@ -64,6 +64,12 @@ def load_graphs(break_on_error=True, settings=None):
         if break_on_error:
             sys.exit(101)
 
+    print '\nINDEXING ENTITY NODES'
+    print '---------------------'
+    concepts.index_entity_concept_lables()
+
+    print '\nADDING NODE LEVEL PERMISSIONS'
+    print '-----------------------------'
     management.call_command('packages', operation='build_permissions') 
 
 def append_branch(path_to_branch, node_list, edge_list):
@@ -217,10 +223,17 @@ def link_entitytypes_to_concepts(nodes):
 
     cursor = connection.cursor()
     cursor.execute("""SELECT legacyoid FROM concepts.concepts 
-        WHERE conceptid = '00000000-0000-0000-0000-000000000002'
+        WHERE conceptid = '00000000-0000-0000-0000-000000000003'
         """)
-    sourcelegacyid = cursor.fetchone()[0]
+    domainlegacyid = cursor.fetchone()[0]
+
+    cursor.execute("""SELECT legacyoid FROM concepts.concepts 
+        WHERE conceptid = '00000000-0000-0000-0000-000000000004'
+        """)
+    otherlegacyid = cursor.fetchone()[0]
 
     for node in nodes:
         if node['BUSINESSTABLE'] == 'domains':
-            concepts.insert_concept_relations(str(sourcelegacyid), 'hasCollection', node["LABEL"])
+            concepts.insert_concept_relations(str(domainlegacyid), 'hasCollection', node["LABEL"])
+        else:
+            concepts.insert_concept_relations(str(otherlegacyid), 'hasEntity', node["LABEL"])

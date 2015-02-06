@@ -55,9 +55,9 @@ def search_terms(request):
 
     results = query.search(index='term', doc_type='value')
 
-    # for result in results['hits']['hits']:
-    #     prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
-    #     result['_source']['context'] = prefLabel['value']
+    for result in results['hits']['hits']:
+        prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
+        result['_source']['context'] = prefLabel['value']
 
     return JSONResponse(results)
 

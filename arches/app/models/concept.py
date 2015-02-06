@@ -91,6 +91,7 @@ class Concept(object):
             self.load(models.Concepts.objects.get(legacyoid=legacyoid))
 
         if self.id != '':
+            nodetype = kwargs.pop('nodetype', self.nodetype)
             uplevel = kwargs.pop('uplevel', 0)
             downlevel = kwargs.pop('downlevel', 0)
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
@@ -121,12 +122,15 @@ class Concept(object):
                         self.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
                             include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype))
 
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
             if include_parentconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
+                if nodetype == 'EntityType':
+                    conceptrealations = models.ConceptRelations.objects.filter(conceptidto = self.id, relationtype = 'member')
+                else:
+                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -134,7 +138,7 @@ class Concept(object):
                         self.parentconcepts.append(Concept().get(id=relation.conceptidfrom_id, include_subconcepts=False, 
                             include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, 
                             exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel))
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype))
 
             if include_relatedconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
@@ -532,10 +536,9 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
-        #print 'self.nodetype=' + self.nodetype
-        if self.nodetype == 'Concept' or self.nodetype == 'Collection':
+        if self.nodetype == 'Concept' or self.nodetype == 'Collection' or self.nodetype == 'EntityType':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
-            
+            print JSONSerializer().serializeToPython(concept)
             def get_scheme_id(concept):
                 if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
                     return concept
@@ -638,7 +641,7 @@ class ConceptValue(object):
     def index(self, scheme=None):
         if self.category == 'label':
             se = SearchEngineFactory().create()
-            data = JSONSerializer().serializeToPython(self)          
+            data = JSONSerializer().serializeToPython(self)            
             if scheme == None:
                 scheme = self.get_scheme_id()
             if scheme == None:
@@ -646,7 +649,9 @@ class ConceptValue(object):
 
             se.create_mapping('concept_labels', scheme.id, fieldname='conceptid', fieldtype='string', fieldindex='not_analyzed')
             se.index_data('concept_labels', scheme.id, data, 'id')
-            se.index_term(self.value, self.id, scheme.get_preflabel().value, {'conceptid': self.conceptid, 'context_pref_label':scheme.get_preflabel().value})
+            # don't create terms for entity type concepts
+            if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
+                se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
     
     def delete_index(self):      
         if self.category == 'label':
@@ -662,6 +667,6 @@ class ConceptValue(object):
         se = SearchEngineFactory().create()
         result = se.search(index='concept_labels', id=self.id)
         if result['found']:
-            return result['_type']
+            return Concept(result['_type'])
         else:
             return None

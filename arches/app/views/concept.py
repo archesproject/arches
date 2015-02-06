@@ -101,7 +101,7 @@ def concept(request, conceptid):
             depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
         if f == 'html':
-            if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme':
+            if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType':
                 languages = models.DLanguages.objects.all()
                 valuetypes = models.ValueTypes.objects.all()
                 relationtypes = models.DRelationtypes.objects.all()
