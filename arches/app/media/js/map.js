@@ -63,7 +63,7 @@ require([
                 filterTerms: ko.observableArray(),
                 zoom: ko.observable(arches.mapDefaults.zoom),
                 mousePosition: ko.observable(''),
-                selectedResource: ko.observable(null),
+                selectedResource: ko.observable({}),
                 selectedAddress: ko.observable(''),
                 clusterFeatures: ko.observableArray()
             };
