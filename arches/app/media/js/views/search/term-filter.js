@@ -53,7 +53,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                                 inverted: false,
                                 type: this._source.options.conceptid ? 'concept' : 'term',
                                 context: this._source.context,
-                                id: this._source.term,
+                                id: this._source.term + this._source.context,
                                 text: this._source.term,
                                 value: this._source.options.conceptid ? this._source.options.conceptid : this._source.term
                             });
@@ -68,9 +68,9 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     return formatedresult;
                 },
                 formatSelection: function(result){
-                    var markup = '<div data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</div>';
+                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
                     if(result.inverted){
-                        markup = '<div data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</div>';
+                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
                     }
                     return markup;
                 },
