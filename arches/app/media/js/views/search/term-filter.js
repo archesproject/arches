@@ -40,6 +40,11 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                     },
                     results: function (data, page) {
                         var value = $('div.resource_search_widget').find('.select2-input').val();
+
+                        // this result is being hidden by a style in arches.css 
+                        // .select2-results li:first-child{
+                        //     display:none;
+                        // } 
                         var results = [{
                             inverted: false,
                             type: 'string',
@@ -64,13 +69,15 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 formatResult:function(result, container, query, escapeMarkup){
                     var markup=[];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
-                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
+                    var context = result.context != '' ? '<i class="concept_result_schemaname">(' + result.context + ')</i>' : '';
+                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span>' + context;
                     return formatedresult;
                 },
                 formatSelection: function(result){
-                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
+                    var context = result.context != '' ? '<i class="concept_result_schemaname">(' + result.context + ')</i>' : '';
+                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
                     if(result.inverted){
-                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span><i class="concept_result_schemaname">(' + result.context + ')</i>';
+                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
                     }
                     return markup;
                 },
