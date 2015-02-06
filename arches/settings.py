@@ -114,8 +114,6 @@ GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
 EXPORT_CONFIG = ''
 
-APP_NAME = 'Arches v3.0'
-
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
@@ -273,8 +271,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'arches.app.utils.context_processors.livereload',
     'arches.app.utils.context_processors.resource_types',
     'arches.app.utils.context_processors.map_info',
-    'arches.app.utils.context_processors.app_name',
-    'arches.app.utils.context_processors.user_can_edit',
 )
 
 
@@ -297,8 +293,9 @@ LOGGING = {
     },
 }
 
-LOGIN_URL = 'auth'
-
+# Package specific validation.
+# Should be over-written in the package settings file.
+PACKAGE_VALIDATOR = ''
 
 try:
     from settings_local import *

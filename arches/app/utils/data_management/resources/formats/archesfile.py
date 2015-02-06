@@ -4,6 +4,7 @@ from django.db import connection
 import unicodecsv
 from datetime import datetime
 from django.contrib.gis.geos import fromstr
+from django.contrib.gis import geos
 import decimal
 import sys
 import os
@@ -201,10 +202,18 @@ class Validator(object):
         try:
             geom = fromstr(row['ATTRIBUTEVALUE'])
             coord_limit = 1500
+            bbox = geos.Polygon(settings.DATA_VALIDATION_BBOX)
+
             if geom.num_coords > coord_limit:
                 self.append_error('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(rownum, row['ATTRIBUTEVALUE'][:75] + '......', geom.num_coords, coord_limit), 'geometry_errors')
+
+            if bbox.contains(geom) == False:
+                self.append_error('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
+
         except:
             self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
+        
+
 
     def validate_numbers(self, row, rownum):
         try:
@@ -297,8 +306,14 @@ class ArchesReader():
         resource_list = []
         resource_id = ''
         group_id = ''
+        resource = ''
 
         resource_info = csv.DictReader(open(arches_file, 'r'), delimiter='|')
+        fully_qualified_modulename = settings.PACKAGE_VALIDATOR
+        components = fully_qualified_modulename.split('.')
+        classname = components[len(components)-1]
+        modulename = ('.').join(components[0:len(components)])
+        mod = __import__(modulename, globals(), locals(), [classname], -1)
 
         for row in resource_info:
             # print row
@@ -309,6 +324,8 @@ class ArchesReader():
 
             if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or resource_type_val in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
                 if resource_id_val != resource_id:
+                    if resource != '':
+                        mod.validate_resource(resource)
                     resource = Resource(row)
                     resource_list.append(resource)
                     resource_id = resource_id_val
@@ -324,4 +341,5 @@ class ArchesReader():
                 if group_val == '-1':
                     resource.appendrow(Row(row))
 
+        mod.validate_resource(resource)
         return resource_list
