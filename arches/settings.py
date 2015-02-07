@@ -297,6 +297,11 @@ LOGGING = {
 # Should be over-written in the package settings file.
 PACKAGE_VALIDATOR = ''
 
+
+# Bounding box for geometry data validation. By default set to coordinate system bounding box.
+# NOTE: This is not used by the front end of the application.
+DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
+
 try:
     from settings_local import *
 except ImportError:
