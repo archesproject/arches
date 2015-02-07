@@ -46,7 +46,7 @@ def search_terms(request):
     searchString = request.GET.get('q', '')
     lang = request.GET.get('lang', 'en-us')
     
-    query = Query(se, start=0, limit=settings.SEARCH_ITEMS_PER_PAGE)
+    query = Query(se, start=0, limit=settings.SEARCH_DROPDOWN_LENGTH)
     boolquery = Bool()
     boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
     boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))

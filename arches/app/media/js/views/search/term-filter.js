@@ -22,6 +22,12 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
             };
 
         	this.render();
+
+            var resize = function() {
+                $('.resource_search_widget_dropdown .select2-results').css('maxHeight', $(window).height() - self.$el.offset().top - 100 + 'px');
+            };       
+            resize();
+            $(window).resize(resize);             
         },
 
         render: function(){
