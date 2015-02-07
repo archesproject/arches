@@ -68,16 +68,18 @@ define(['jquery',
                 };
 
                 this.query.filter.year_min_max.subscribe(function(newValue){
-                    var enabled = newValue.length === 2;
-                    if(enabled){
+                    var sliderenabled = newValue.length === 2;
+                    var filtersenabled = this.query.filter.filters().length > 0;
+                    if(sliderenabled){
                         self.slider.setValue(newValue);
                     }
-                    this.trigger('enabled', enabled, this.query.filter.inverted());
+                    this.trigger('enabled', filtersenabled || sliderenabled, this.query.filter.inverted());
                 }, this);
 
                 this.query.filter.filters.subscribe(function(filters){
-                    var enabled = filters.length > 0;
-                    this.trigger('enabled', enabled, this.query.filter.inverted());
+                    var filtersenabled = filters.length > 0;
+                    var sliderenabled = this.query.filter.year_min_max().length === 2;
+                    this.trigger('enabled', filtersenabled || sliderenabled, this.query.filter.inverted());
                 }, this);
 
 
