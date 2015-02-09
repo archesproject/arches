@@ -9,12 +9,13 @@ require([
     'views/map',
     'map/layers',
     'map/resource-layers',
+    'map/layer-model',
     'selected-resource-id',
     'resource-types',
     'bootstrap',
     'select2',
     'plugins/jquery.knob.min'
-], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers, resourceLayers, selectedResourceId, resourceTypes) {
+], function($, _, Backbone, ol, ko, arches, layerInfo, MapView, layers, resourceLayers, LayerModel, selectedResourceId, resourceTypes) {
     var geoJSON = new ol.format.GeoJSON();
     var PageView = Backbone.View.extend({
         el: $('body'),
@@ -139,8 +140,7 @@ require([
             });
 
             map.on('layerDropped', function (layer, name) {
-                var layerModel = {
-                      id: _.uniqueId('layer'),
+                var layerModel = new LayerModel({
                       name: name,
                       description: '',
                       categories: [''],
@@ -149,7 +149,7 @@ require([
                       onMap:  ko.observable(true),
                       active: ko.observable(true),
                       filtered: ko.observable(false)
-                };
+                });
                 layerModel.onMap.subscribe(function(add) {
                     if (add) {
                         map.map.addLayer(layer);
