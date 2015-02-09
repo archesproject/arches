@@ -117,7 +117,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                         if (d.source === d1 || d.target === d1) {
                             var tip = (d.target === d1) ? self.targetTip : self.sourceTip;
                             className += '-neighbor';
-                            d1.relationship = d.relationshipSource;
+                            d1.relationship = (d.target === d1) ? d.relationshipTarget : d.relationshipSource;
                             tip.show(d1, this);
                         } else if (d1 === self.selectedNode) {
                             className += '-over';
@@ -264,12 +264,15 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
 
             if (rootNode) {
                 if (rootNode.relationCount) {
-                    load = (rootNode.relationCount.total > rootNode.relationCount.loaded);
+                    load = (rootNode.relationCount.total > rootNode.relationCount.loaded && !rootNode.loading);
                     start = rootNode.relationCount.loaded;
                 }
             }
 
             if (load) {
+                if (rootNode) {
+                    rootNode.loading = true;
+                }
                 $.ajax({
                     url: arches.urls.related_resources + resourceId,
                     data: {
@@ -303,6 +306,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                                 loaded: response.resource_relationships.length
                             };
                         }
+                        rootNode.loading = false;
                         self.updateNodeInfo(rootNode);
                         _.each(response.related_resources, function (related_resource) {
                             if (!self.nodeMap[related_resource.entityid]) {
