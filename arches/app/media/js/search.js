@@ -150,7 +150,7 @@ require(['jquery',
                     data: queryString,
                     success: function(results){
                         var data = self.searchResults.updateResults(results);
-                        self.mapFilter.highlightFeatures(data);
+                        self.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
                         self.mapFilter.applyBuffer();
                     },
                     error: function(){}

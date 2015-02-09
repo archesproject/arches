@@ -69,21 +69,30 @@ def search_results(request, as_text=False):
     results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+    full_dsl = build_search_results_dsl(request, limit=1000000, page=1)
+    full_results = full_dsl.search(index='entity', doc_type='')
+    all_entity_ids = []
+    for hit in full_results['hits']['hits']:
+        all_entity_ids.append(hit['_id'])
 
-    return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
+    return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
 
-def build_search_results_dsl(request):
+def build_search_results_dsl(request, limit=None, page=None):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
     export = request.GET.get('export', None)
-    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+    if page == None:
+        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
 
     se = SearchEngineFactory().create()
-    if export != None:
-        query = Query(se, start=settings.SEARCH_EXPORT_ITEMS_PER_PAGE*int(page-1), limit=settings.SEARCH_EXPORT_ITEMS_PER_PAGE)
-    else:
-        query = Query(se, start=settings.SEARCH_ITEMS_PER_PAGE*int(page-1), limit=settings.SEARCH_ITEMS_PER_PAGE)
+    if limit == None:
+        if export != None:
+            limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
+        else:
+            limit = settings.SEARCH_ITEMS_PER_PAGE
+    
+    query = Query(se, start=limit*int(page-1), limit=limit)
     boolquery = Bool()
     boolfilter = Bool()
     
@@ -199,7 +208,7 @@ def _get_child_concepts(conceptid):
         ret.add(row[1])
     return list(ret)
 
-def _get_pagination(results, total_count, page, count_per_page):
+def _get_pagination(results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
@@ -213,7 +222,7 @@ def _get_pagination(results, total_count, page, count_per_page):
         if len(after) > ct_after:
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
-    return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results)})
+    return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results), 'all_ids': JSONSerializer().serialize(all_ids)})
 
 def geocode(request):
     search_string = request.GET.get('q', '')    

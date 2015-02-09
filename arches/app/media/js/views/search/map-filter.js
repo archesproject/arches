@@ -10,6 +10,7 @@ define(['jquery',
     'map/resource-layer-model',
     'utils'], 
     function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel, utils) {
+        var geoJSON = new ol.format.GeoJSON();
         return Backbone.View.extend({
 
             events: {
@@ -83,7 +84,7 @@ define(['jquery',
                     self.trigger('vectorlayerloaded', features);
                     if (!self.cancelFitBaseLayer){
                         setTimeout(function() {
-                              self.zoomToExtent(self.vectorLayer.getLayers().item(0).getSource().getExtent());
+                              self.zoomToExtent(self.vectorLayer.getSource().getExtent());
                         }, 500);                        
                     }
                 }).layer();
@@ -160,60 +161,75 @@ define(['jquery',
                     hideAllPanels();
                 });
 
-                var hoverFeature = function(pixel) {
-                    var info = $('#info');
-                    var mapheight = $(self.map.map.getViewport()).height();
-                    var mapwidth = $(self.map.map.getViewport()).width();
-                    var feature = self.map.map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-                        if (_.contains(feature.getKeys(), 'primaryname')){
-                            return feature.get('primaryname');
-                        }
-                        if (_.contains(feature.getKeys(), 'features')){
-                            // var html = '';
-                            // _.find(feature.get('features'), function(feat, index, all){
-                            //     if(index < 4){
-                            //         html += '<li>' + feat.get("primaryname") + '</li>';
-                            //     }else{
-                            //         html += '<li>....</li>';
-                            //         return false;
-                            //     }
-                            // });
-                            // return html;
-                            if(feature.get('features').length === 1){
-                                return feature.get('features')[0].get('primaryname');
-                            }
-                        }
-                    });
-                    if (feature) {
-                        info.find('#tooltip-text').html(feature);
-                        if(pixel[0] < mapwidth*.33){
-                            info.removeClass('left')
+                
+                var mouseoverFeatureTooltip = $('#feature_tooltip');
+                var currentMousePx = null;
+                var archesFeaturesCache = {};
+
+                var showMouseoverFeatureTooltip = function(feature) {
+                    var mapheight = self.map.$el.height();
+                    var mapwidth = self.map.$el.width();
+                    if (currentMousePx) {
+                        mouseoverFeatureTooltip.find('#tooltip-text').html(feature.get('primaryname'));
+                        if(currentMousePx[0] < mapwidth*0.33){
+                            mouseoverFeatureTooltip.removeClass('left')
                                 .addClass('right');
                         }
-                        if(pixel[0] > mapwidth*.66){
-                            info.removeClass('right')
+                        if(currentMousePx[0] > mapwidth*0.66){
+                            mouseoverFeatureTooltip.removeClass('right')
                                 .addClass('left');
                         }
-                        if(info.hasClass('left')){
-                            info.css({
-                                left: (pixel[0] - info.width() + 20) + 'px',
-                                top: (pixel[1] - info.height()/2 - 10) + 'px'
+                        if(mouseoverFeatureTooltip.hasClass('left')){
+                            mouseoverFeatureTooltip.css({
+                                left: (currentMousePx[0] - mouseoverFeatureTooltip.width()+20) + 'px',
+                                top: (currentMousePx[1] - mouseoverFeatureTooltip.height()/2) + 'px'
                             });
-                        }    
-                        if(info.hasClass('right')){
-                            info.css({
-                                left: (pixel[0] + 50) + 'px',
-                                top: (pixel[1] - info.height()/2 - 10) + 'px'
+                        }
+                        if(mouseoverFeatureTooltip.hasClass('right')){
+                            mouseoverFeatureTooltip.css({
+                                left: (currentMousePx[0] + 45) + 'px',
+                                top: (currentMousePx[1] - mouseoverFeatureTooltip.height()/2) + 'px'
                             });
-                        }                 
-                        info.fadeIn('fast');
-                    } else {
-                        info.fadeOut('fast');
+                        }
+                        mouseoverFeatureTooltip.show();
                     }
                 };
 
-                $(this.map.map.getViewport()).on('mousemove', function(evt) {
-                    hoverFeature(self.map.map.getEventPixel(evt.originalEvent));
+                self.map.on('mousePositionChanged', function (mousePosition, pixels, feature) {
+                    var cursorStyle = "";
+                    currentMousePx = pixels;
+
+                    if (feature && (feature.get('arches_marker') || feature.get('arches_cluster'))) {
+                        cursorStyle = "pointer";
+                        if (feature.get('arches_marker') || feature.get('features').length === 1) {
+                            if (feature.get('features')) {
+                                feature = feature.get('features')[0];
+                            }
+                            var fullFeature = archesFeaturesCache[feature.getId()];
+                            if (fullFeature && fullFeature != 'loading') {
+                                showMouseoverFeatureTooltip(fullFeature);
+                            } else if (fullFeature != 'loading') {
+                                archesFeaturesCache[feature.getId()] = 'loading';
+                                $.ajax({
+                                    url: arches.urls.map_markers + 'all?entityid=' + feature.getId(),
+                                    success: function(response) {
+                                        fullFeature = geoJSON.readFeature(response.features[0]);
+                                        var geom = fullFeature.getGeometry();
+                                        geom.transform(ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+
+                                        fullFeature.set('select_feature', true);
+                                        fullFeature.set('entityid', fullFeature.getId());
+
+                                        archesFeaturesCache[feature.getId()] = fullFeature;
+                                        showMouseoverFeatureTooltip(fullFeature);
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        mouseoverFeatureTooltip.hide();
+                    }
+                    self.map.$el.css("cursor", cursorStyle);
                 });
             },
 
@@ -244,45 +260,33 @@ define(['jquery',
                 );
             },
 
-            highlightFeatures: function(resultsarray){
+            highlightFeatures: function(resultsarray, entityIdArray){
                 var source, geometries;
                 var self = this;
                 var f = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
 
                 if(!this.selectedFeatureLayer){
-                    var rgb = utils.hexToRgb('#C4171D');
-                    var iconUnicode = '\uf060';                    
-                    var zIndex = 0;
-                    var styleCache = {};
-
-                    var style = function(feature, resolution) {
-                        var mouseOver = feature.get('mouseover');
-                        var text = '1 ' + mouseOver;
-
-                        feature.set('arches_marker', true);
-
-                        if (styleCache[text]) {
-                            return styleCache[text];
-                        }
-                        
-                        var iconSize = mouseOver ? 38 : 32;
-
-                        var styles = [new ol.style.Style({
+                    var iconUnicode = '\uf060';
+                    this.selectedFeatureLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
+                    this.map.map.addLayer(this.selectedFeatureLayer);
+                    var styleFactory = function (color, zIndex) {
+                        var rgb = utils.hexToRgb(color);
+                        return [new ol.style.Style({
                             text: new ol.style.Text({
                                 text: iconUnicode,
-                                font: 'normal ' + iconSize + 'px octicons',
+                                font: 'normal 50px octicons',
                                 offsetX: 5,
-                                offsetY: ((iconSize/2)*-1)-5,
+                                offsetY: ((50/2)*-1)-5,
                                 fill: new ol.style.Fill({
                                     color: 'rgba(126,126,126,0.3)',
                                 })
                             }),
-                            zIndex: mouseOver ? zIndex*1000000000: zIndex
+                            zIndex: zIndex
                         }), new ol.style.Style({
                             text: new ol.style.Text({
                                 text: iconUnicode,
-                                font: 'normal ' + iconSize + 'px octicons',
-                                offsetY: (iconSize/2)*-1,
+                                font: 'normal 50px octicons',
+                                offsetY: (50/2)*-1,
                                 stroke: new ol.style.Stroke({
                                     color: 'white',
                                     width: 3
@@ -291,82 +295,63 @@ define(['jquery',
                                     color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
                                 })
                             }),
-                            zIndex: mouseOver ? zIndex*2000000000 : zIndex+1
-                        })];
+                            zIndex: zIndex
+                        })]
+                    }
+                    var normalStyle = styleFactory('#C4171D', 1000000);
+                    var highlightStyle = styleFactory('#4CAE4C', 9999999);
 
-                        zIndex += 2;
-
-                        styleCache[text] = styles;
-                        return styles;
-                    };                                            
-                    this.selectedFeatureLayer = new ol.layer.Vector({
+                    this.currentPageLayer = new ol.layer.Vector({
                         source: new ol.source.GeoJSON(),
-                        style: style
-                    });
-                    this.map.map.addLayer(this.selectedFeatureLayer);  
-                }
-                this.selectedFeatureLayer.getSource().clear();
-
-                _.each(resultsarray.results.hits.hits, function(result){
-                    var feature;
-                    geometries = [];
-                    _.each(result._source.geometries, function(geometry){
-                        geometries.push(geometry.value);
-                    }, this);
-                    feature = {
-                        'type': 'Feature',
-                        'id': result._id,
-                        'geometry':  {
-                            'type': 'GeometryCollection',
-                            'geometries': geometries
-                        },
-                        'properties': {
-                            'resourceid': result._id,
-                            'entitytypeid': result.type,
-                            'primaryname': result._source.primaryname
+                        style: function(feature) {
+                            if(feature.get('highlight')) {
+                                return highlightStyle;
+                            } else {
+                                return normalStyle;
+                            }
                         }
-                    };
-                    this.selectedFeatureLayer.getSource().addFeature(f.readFeature(feature, {featureProjection: 'EPSG:3857'}));
+                    });
+                    this.map.map.addLayer(this.currentPageLayer);  
+                }
+                var previousSelections = this.selectedFeatureLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures())
+                _.each(previousSelections, function(feature) {
+                    self.vectorLayer.vectorSource.addFeature(feature);
+                });
+                this.selectedFeatureLayer.vectorSource.clear();
+                this.currentPageLayer.getSource().clear();
+
+                var features = _.filter(this.vectorLayer.vectorSource.getFeatures(), function(feature){ return _.contains(entityIdArray, feature.getId()) });
+
+                _.each(features, function(feature) {
+                    self.vectorLayer.vectorSource.removeFeature(feature);
+                    if (!feature.get('arches_marker')) {
+                        feature.set('arches_marker', true);
+                    }
+                    if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId()})) {
+                        self.currentPageLayer.getSource().addFeature(feature);
+                    } else {
+                        self.selectedFeatureLayer.vectorSource.addFeature(feature);
+                    }
+                });
+
+                _.each(features, function(feature){
+                    
                 }, this);
             },
 
             selectFeatureById: function(resourceid){
-                var rgb = utils.hexToRgb('#4CAE4C');
-                var iconUnicode = '\uf060';
-                
-                if(!this.featureHightlightOverlay){
-                    this.featureHightlightOverlay = new ol.FeatureOverlay({
-                        map: this.map.map,
-                        style: new ol.style.Style({
-                            text: new ol.style.Text({
-                                text: iconUnicode,
-                                font: 'normal 33px octicons',
-                                stroke: new ol.style.Stroke({
-                                    // color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',1)',
-                                    color: 'white',
-                                    width: 3
-                                }),
-                                textBaseline: 'Bottom',
-                                fill: new ol.style.Fill({
-                                    color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
-                                })
-                            })
-                        })
-                    });                    
-                }
-
                 this.unselectAllFeatures();
-                var feature = this.selectedFeatureLayer.getSource().getFeatureById(resourceid);
+                var feature = this.currentPageLayer.getSource().getFeatureById(resourceid);
                 if(feature){
-                    this.featureHightlightOverlay.addFeature(feature);
+                    feature.set('highlight', true);
                     return feature;
                 } 
             },
 
             unselectAllFeatures: function(){
-                if(this.featureHightlightOverlay) {
-                    this.featureHightlightOverlay.getFeatures().clear();
-                }
+                this.currentPageLayer.getSource().forEachFeature(function(feature) {
+                    feature.set('highlight', false);
+                });
             },
 
             getMapExtent: function(){

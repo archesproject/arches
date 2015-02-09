@@ -65,10 +65,15 @@ define([
                 return styles;
             };
 
-            var source = new ol.source.GeoJSON({
-                projection: 'EPSG:3857',
-                url: arches.urls.map_markers + config.entitytypeid
-            });
+            var layerConfig = {
+                projection: 'EPSG:3857'
+            };
+
+            if (config.entitytypeid !== null) {
+                layerConfig.url = arches.urls.map_markers + config.entitytypeid;
+            }
+
+            var source = new ol.source.GeoJSON(layerConfig);
 
             $('.map-loading').show();
             var loadListener = source.on('change', function(e) {
@@ -142,11 +147,9 @@ define([
                 style: clusterStyle
             });
 
-            return new ol.layer.Group({
-                layers: [
-                    clusterLayer
-                ]
-            });
+            clusterLayer.vectorSource = source;
+
+            return clusterLayer;
         };
 
         return new LayerModel(_.extend({
