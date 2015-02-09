@@ -207,13 +207,14 @@ class Validator(object):
             if geom.num_coords > coord_limit:
                 self.append_error('ERROR ROW: {0} - {1} has too many coordinates ({2}), Please limit to less then {3} coordinates of 5 digits of precision or less.'.format(rownum, row['ATTRIBUTEVALUE'][:75] + '......', geom.num_coords, coord_limit), 'geometry_errors')
 
+            # if fromstr(row['ATTRIBUTEVALUE']).valid == False:
+            #     self.append_error('ERROR ROW: {0} - {1} is an invalid geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
+
             if bbox.contains(geom) == False:
                 self.append_error('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-
+            
         except:
             self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-        
-
 
     def validate_numbers(self, row, rownum):
         try:
@@ -293,7 +294,7 @@ class ArchesReader():
         if len(sorted_errors) > 1:
             del sorted_errors[-1]
 
-        print 'Validation of your Arches file took: {0} seconds.'.format(str(duration))
+        print 'General validation of your Arches file took: {0} seconds.'.format(str(duration))
         if len(sorted_errors) > 0:
             utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'), '\n'.join(sorted_errors))
             print "\n\nERROR: There were errors detected in your arches file."
@@ -309,11 +310,14 @@ class ArchesReader():
         resource = ''
 
         resource_info = csv.DictReader(open(arches_file, 'r'), delimiter='|')
+
+        # Import package specific validation module.
         fully_qualified_modulename = settings.PACKAGE_VALIDATOR
         components = fully_qualified_modulename.split('.')
         classname = components[len(components)-1]
         modulename = ('.').join(components[0:len(components)])
-        mod = __import__(modulename, globals(), locals(), [classname], -1)
+        validation_module = __import__(modulename, globals(), locals(), [classname], -1)
+        start_time = time.time()
 
         for row in resource_info:
             # print row
@@ -325,7 +329,7 @@ class ArchesReader():
             if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or resource_type_val in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
                 if resource_id_val != resource_id:
                     if resource != '':
-                        mod.validate_resource(resource)
+                        validation_module.validate_resource(resource)
                     resource = Resource(row)
                     resource_list.append(resource)
                     resource_id = resource_id_val
@@ -341,5 +345,24 @@ class ArchesReader():
                 if group_val == '-1':
                     resource.appendrow(Row(row))
 
-        mod.validate_resource(resource)
+        validation_module.validate_resource(resource)
+
+        sorted_errors = []
+        attr_length = len(validation_module.validation_errors.__dict__)
+        for attr, value in validation_module.validation_errors.__dict__.iteritems():
+            if value != []:
+                sorted_errors.extend(value)
+                sorted_errors.append('\n\n\n\n')
+        if len(sorted_errors) > 1:
+            del sorted_errors[-1]
+        duration = time.time() - start_time
+        print 'Package specific validation of your Arches file took: {0} seconds.'.format(str(duration))
+        if len(sorted_errors) > 0:
+            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', '{0}_validation_errors.txt'.format(settings.PACKAGE_NAME)), '\n'.join(sorted_errors))
+            print "\n\nERROR: There were HIP specific errors detected in your arches file."
+            print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', '{0}_validation_errors.txt'.format(settings.PACKAGE_NAME)))
+            break_on_error = True
+            if break_on_error:
+                sys.exit(101)
+
         return resource_list

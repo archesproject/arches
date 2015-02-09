@@ -301,8 +301,7 @@ LOGIN_URL = 'auth'
 
 # Package specific validation.
 # Should be over-written in the package settings file.
-PACKAGE_VALIDATOR = ''
-
+PACKAGE_VALIDATOR = 'arches.app.utils.mock_package_validator'
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.

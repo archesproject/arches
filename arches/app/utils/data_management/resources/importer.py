@@ -46,14 +46,15 @@ class ResourceLoader(object):
             reader = ShapeReader()
         elif file_format == '.arches':
             reader = ArchesReader()
+            print '\nVALIDATING ARCHES FILE ({0})'.format(source)
+            print '-----------------------'
             reader.validate_file(source)
 
         start = time()
+        resources = reader.load_file(source)
 
         print '\nLOADING RESOURCES ({0})'.format(source)
         print '-----------------------'
-
-        resources = reader.load_file(source)
         relationships = None
         related_resource_records = []
         relationships_file = file_name + '.relations'
