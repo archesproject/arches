@@ -40,19 +40,10 @@ def home_page(request):
         }, 
         context_instance=RequestContext(request))
 
-
 def search_terms(request):
-    se = SearchEngineFactory().create()
-    searchString = request.GET.get('q', '')
     lang = request.GET.get('lang', 'en-us')
     
-    query = Query(se, start=0, limit=settings.SEARCH_DROPDOWN_LENGTH)
-    boolquery = Bool()
-    boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
-    boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
-    query.add_query(boolquery)
-
+    query = build_search_terms_dsl(request)
     results = query.search(index='term', doc_type='value')
 
     for result in results['hits']['hits']:
@@ -61,15 +52,27 @@ def search_terms(request):
 
     return JSONResponse(results)
 
+def build_search_terms_dsl(request):
+    se = SearchEngineFactory().create()
+    searchString = request.GET.get('q', '')
+    query = Query(se, start=0, limit=settings.SEARCH_DROPDOWN_LENGTH)
+    boolquery = Bool()
+    boolquery.should(Match(field='term', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='term.folded', query=searchString.lower(), type='phrase_prefix', fuzziness='AUTO'))
+    boolquery.should(Match(field='term.folded', query=searchString.lower(), fuzziness='AUTO'))
+    query.add_query(boolquery)
+
+    return query
+
 def search_results(request, as_text=False):
-    dsl = build_query_dsl(request)
+    dsl = build_search_results_dsl(request)
     results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE)
 
-def build_query_dsl(request):
+def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
     export = request.GET.get('export', None)
@@ -156,7 +159,7 @@ def build_query_dsl(request):
         query.add_query(boolquery)
 
     if not boolfilter.empty:
-        query.add_query(boolfilter)
+        query.add_filter(boolfilter)
 
     return query
 
@@ -246,7 +249,7 @@ def export_results(request):
     '''
 
     #search_results = search_resources(request, district_number) 
-    dsl = build_query_dsl(request)
+    dsl = build_search_results_dsl(request)
     search_results = dsl.search(index='entity', doc_type='') 
     response = None
     format = request.GET.get('export', 'csv')

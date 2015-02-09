@@ -48,6 +48,7 @@ class Query(Dsl):
     def __init__(self, se, **kwargs):
         self.se = se
         self._filtered = False
+        self.filter_operator = None
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
 
@@ -57,50 +58,60 @@ class Query(Dsl):
             }
         }
 
-    def add_filter(self, dsl=None, operator=None):
+    def add_filter(self, dsl=None, operator='and'):
         """
         Wrap the filter in an "and" or "or" clause by specifying an operator value of "and" or "or"
 
         """
 
         if dsl is not None:
-            self._filtered = True
             dsl = Dsl(dsl).dsl
-
             if operator:
-                dsl = {   
-                    operator: dsl
-                }
+                self.filter_operator = operator
 
-            self.dsl = {
-                'query':{
-                    'filtered':{
-                        'query': self.dsl['query'],
-                        'filter': dsl
+            if self._filtered:
+                self.dsl['query']['filtered']['filter'].append(dsl)
+            else:
+                self._filtered = True
+                self.dsl = {
+                    'query':{
+                        'filtered':{
+                            'query': self.dsl['query'],
+                            'filter': [dsl]
+                        }
                     }
                 }
-            }
 
     def add_query(self, dsl=None):
         if dsl is not None:
             dsl = Dsl(dsl).dsl
 
             if self._filtered:
-                self.dsl['query']['filtered']['query'] = dsl
+                if 'bool' in dsl and 'bool' in self.dsl['query']['filtered']['query']:
+                    self.dsl['query']['filtered']['query'] = Bool(self.dsl['query']['filtered']['query']).merge(dsl).dsl
             else:
                 if 'bool' in dsl and 'bool' in self.dsl['query']:
-                    self.dsl['query']['bool']['must'] = self.dsl['query']['bool']['must'] + dsl['bool']['must']
+                    self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
                 else:
                     self.dsl['query'] = dsl
 
     def search(self, index='', doc_type=''):
-        self.dsl['from'] = self.start
-        self.dsl['size'] = self.limit
-        #print self
+        self.prepare()
+        print self
         return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
     def delete(self, index=''):
         return self.se.delete(index=index, body=self.dsl)
+
+    def prepare(self):
+        self.dsl['from'] = self.start
+        self.dsl['size'] = self.limit
+
+        if self._filtered:
+            self.dsl['query']['filtered']['filter'] = {   
+                self.filter_operator: self.dsl['query']['filtered']['filter']
+            }
+
 
 class Bool(Dsl):
     """
@@ -109,16 +120,17 @@ class Bool(Dsl):
     """
     
     def __init__(self, dsl=None, **kwargs):  
-        if dsl is None: 
-            self.dsl = {
-                'bool':{
-                    'should':[],
-                    'must':[],
-                    'must_not':[]
-                }
+        self.dsl = {
+            'bool':{
+                'should':[],
+                'must':[],
+                'must_not':[]
             }
-        else:
-            self.dsl = dsl
+        }
+        if isinstance(dsl, dict):
+            self.dsl['bool'] = dsl['bool']
+        elif isinstance(dsl, Bool):
+            self = dsl
 
         self.should(kwargs.pop('should', None))
         self.must(kwargs.pop('must', None))
@@ -141,6 +153,16 @@ class Bool(Dsl):
             self.empty = False
         return self
 
+    def merge(self, object):
+        if isinstance(object, dict):
+            object = Bool(object)
+
+        self.dsl['bool']['must'] = self.dsl['bool']['must'] + object.dsl['bool']['must']
+        self.dsl['bool']['should'] = self.dsl['bool']['should'] + object.dsl['bool']['should']
+        self.dsl['bool']['must_not'] = self.dsl['bool']['must_not'] + object.dsl['bool']['must_not']
+
+        return self
+       
 
 class Match(Dsl):
     """

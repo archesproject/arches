@@ -580,6 +580,7 @@ class Resource(Entity):
                 'value':{
                     'properties': {
                         'ids':{'type': 'string', 'index' : 'not_analyzed'},
+                        'context':{'type': 'string', 'index' : 'not_analyzed'},
                         'term': { 
                             'type': 'string',
                             'analyzer': 'standard',
