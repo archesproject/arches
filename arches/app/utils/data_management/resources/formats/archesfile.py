@@ -294,7 +294,7 @@ class ArchesReader():
         if len(sorted_errors) > 1:
             del sorted_errors[-1]
 
-        print 'General validation of your Arches file took: {0} seconds.'.format(str(duration))
+        print 'Validation of your Arches file took: {0} seconds.'.format(str(duration))
         if len(sorted_errors) > 0:
             utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'), '\n'.join(sorted_errors))
             print "\n\nERROR: There were errors detected in your arches file."
@@ -356,11 +356,11 @@ class ArchesReader():
         if len(sorted_errors) > 1:
             del sorted_errors[-1]
         duration = time.time() - start_time
-        print 'Package specific validation of your Arches file took: {0} seconds.'.format(str(duration))
+        print 'Validation of your business data took: {0} seconds.'.format(str(duration))
         if len(sorted_errors) > 0:
-            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', '{0}_validation_errors.txt'.format(settings.PACKAGE_NAME)), '\n'.join(sorted_errors))
-            print "\n\nERROR: There were HIP specific errors detected in your arches file."
-            print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', '{0}_validation_errors.txt'.format(settings.PACKAGE_NAME)))
+            utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'), '\n'.join(sorted_errors))
+            print "\n\nERROR: There were errors detected in your business data."
+            print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'validation_errors.txt'))
             break_on_error = True
             if break_on_error:
                 sys.exit(101)
