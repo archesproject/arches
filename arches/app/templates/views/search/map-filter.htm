@@ -90,6 +90,100 @@
                     </div>
                 </div>
                 <!-- End Map Tools Panel -->
+                <!-- Info Panel -->
+                <div id="resource-info" class="row" style="display:none;">
+
+                    <!-- Setup display, hide for xs screens -->
+                    <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+
+                        <!-- Using Bootstrap Model CSS classes to get the overall look of the info panel,
+                        but the actual info panel is NOT implemented as a model form -->
+                        <div class="modal-content no-corners arches-map-inventory-panel" style="margin-top: -360px;margin-right: 25px;">
+                            <div class="modal-header">
+                                <button type="button" class="close resource-info-closer" aria-hidden="true">
+                                    ×
+                                </button>
+
+                                <h4 class="modal-title">
+                                    <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}">
+                                        <i class="fa fa-trophy text-primary" data-bind="attr: { class: selectedResource() ? selectedResource().typeIcon + ' text-primary': '' }"></i> 
+                                        <span data-bind="text:selectedResource() ? selectedResource().primaryname : ''"></span>
+
+                                        <!-- Resource Type for larger screens -->
+                                        <span class="hidden-xs">
+                                            <small class="text-primary" data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                        </span>
+
+                                        <!-- Resource Type for small screens -->
+                                        <span class="hidden-sm hidden-md hidden-lg">
+                                            </br><small class="text-primary margin-left-30 margin-top-minus-10"  data-bind="text: selectedResource() ? selectedResource().typeName: ''"></small>
+                                        </span>
+
+                                    </a>
+                                </h4>
+
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0">
+                                <p> 
+                                    {% include 'map/resource-popup.htm' %}
+                                </p>
+                            </div>
+                            <!-- End Body Content -->
+
+                            <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                                <button type="button" class="btn btn-default resource-info-closer">
+                                    {% trans 'Close' %}
+                                </button>
+                                <a href="javascript:void(0);" class="text-primary" data-bind="attr:{ href: selectedResource() ? selectedResource().reportLink : 'javascript:void(0);'}">
+                                    <button type="button" class="btn btn-primary">
+                                        {% trans 'View Report' %}
+                                    </button>
+                                </a>
+                            </div>
+                        </div><!-- /.modal-content -->
+
+                    </div>
+                </div>
+                
+                <div id="cluster-info" class="row" style="display:none;">
+                    <div class="col-xs-11 col-xs-offset-1 col-sm-5 col-sm-offset-7 col-md-5 col-md-offset-7 pull-right">
+                        <div class="modal-content no-corners arches-map-inventory-panel" style="margin-top: -360px;margin-right: 25px;">
+                            <div class="modal-header">
+                                <button type="button" class="close cluster-info-closer" aria-hidden="true">
+                                    ×
+                                </button>
+
+                                <h4 class="modal-title">
+                                    {% trans 'Clustered Resources' %}
+                                </h4>
+
+                            </div>
+
+                            <!-- Body Content -->
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length === 0">
+                                <div class="loading-cluster-info"></div>
+                            </div>
+
+                            <div class="modal-body padding-top-0 padding-bottom-0" data-bind="if: clusterFeatures().length > 0">
+                                <div data-bind='foreach: clusterFeatures' style="margin-top:12px;">
+                                    <div> 
+                                        <a href="javascript:void(0);" data-bind="text: properties.primaryname, attr: {'data-entityid': id}" class='cluster-item-link'></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Body Content -->
+
+                            <div class="modal-footer" style="padding-top: 10px; padding-bottom: 10px;">
+                                <button type="button" class="btn btn-default cluster-info-closer">
+                                    {% trans 'Close' %}
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+
+                    </div>
+                </div>
             </div>
 
             <!-- Map Tools -->
