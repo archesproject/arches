@@ -397,8 +397,8 @@ define(['jquery',
                 });
 
                 var iconUnicode = '\uf060';
-                this.selectedFeatureLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
-                this.map.map.addLayer(this.selectedFeatureLayer);
+                this.resultLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
+                this.map.map.addLayer(this.resultLayer);
                 var styleFactory = function (color, zIndex) {
                     var rgb = utils.hexToRgb(color);
                     return [new ol.style.Style({
@@ -446,7 +446,7 @@ define(['jquery',
 
             zoomToResource: function(resourceid){
                 this.cancelFitBaseLayer = true;
-                var feature = this.selectedFeatureLayer.getSource().getFeatureById(resourceid);
+                var feature = this.resultLayer.getSource().getFeatureById(resourceid);
                 if(feature.getGeometry().getGeometries().length > 1){
                     var extent = feature.getGeometry().getExtent();
                     var minX = extent[0];
@@ -472,17 +472,15 @@ define(['jquery',
             },
 
             highlightFeatures: function(resultsarray, entityIdArray){
-                var source, geometries;
+                var resultFeatures = [];
+                var currentPageFeatures = [];
                 var self = this;
-                var f = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
 
                 if (this.vectorLayerLoaded) {
-                    var previousSelections = this.selectedFeatureLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures())
-                    _.each(previousSelections, function(feature) {
-                        self.vectorLayer.vectorSource.addFeature(feature);
-                    });
-                    this.selectedFeatureLayer.vectorSource.clear();
+                    var previousSelections = this.resultLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures());
+                    this.resultLayer.vectorSource.clear();
                     this.currentPageLayer.getSource().clear();
+                    self.vectorLayer.vectorSource.addFeatures(previousSelections);
 
                     _.each(entityIdArray, function(entityid) {
                         var feature = self.vectorLayer.vectorSource.getFeatureById(entityid);
@@ -492,12 +490,14 @@ define(['jquery',
                                 feature.set('arches_marker', true);
                             }
                             if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
-                                self.currentPageLayer.getSource().addFeature(feature);
+                                currentPageFeatures.push(feature);
                             } else {
-                                self.selectedFeatureLayer.vectorSource.addFeature(feature);
+                                resultFeatures.push(feature);
                             }
                         }
                     });
+                    self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
+                    self.resultLayer.vectorSource.addFeatures(resultFeatures);
                 } else {
                     this.highlightOnLoad = {
                         resultsarray: resultsarray,
