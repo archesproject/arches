@@ -85,7 +85,8 @@ define(['jquery',
                 this.vectorLayer = new ResourceLayerModel({}, function(features){
                     self.vectorLayerLoaded = true;
                     if (self.highlightOnLoad) {
-                        self.highlightFeatures(self.highlightOnLoad.resultsarray, self.highlightOnLoad.entityIdArray);
+                        self.highlightOnLoad = false;
+                        _.defer(function () { self.highlightFeatures(self.highlightOnLoad.resultsarray, self.highlightOnLoad.entityIdArray) });
                     }
                     self.trigger('vectorlayerloaded', features);
                     if (!self.cancelFitBaseLayer){
@@ -394,6 +395,53 @@ define(['jquery',
                         }
                     }
                 });
+
+                var iconUnicode = '\uf060';
+                this.selectedFeatureLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
+                this.map.map.addLayer(this.selectedFeatureLayer);
+                var styleFactory = function (color, zIndex) {
+                    var rgb = utils.hexToRgb(color);
+                    return [new ol.style.Style({
+                        text: new ol.style.Text({
+                            text: iconUnicode,
+                            font: 'normal 50px octicons',
+                            offsetX: 5,
+                            offsetY: ((50/2)*-1)-5,
+                            fill: new ol.style.Fill({
+                                color: 'rgba(126,126,126,0.3)',
+                            })
+                        }),
+                        zIndex: zIndex
+                    }), new ol.style.Style({
+                        text: new ol.style.Text({
+                            text: iconUnicode,
+                            font: 'normal 50px octicons',
+                            offsetY: (50/2)*-1,
+                            stroke: new ol.style.Stroke({
+                                color: 'white',
+                                width: 3
+                            }),
+                            fill: new ol.style.Fill({
+                                color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
+                            })
+                        }),
+                        zIndex: zIndex
+                    })];
+                };
+                var normalStyle = styleFactory('#C4171D', 1000000);
+                var highlightStyle = styleFactory('#4CAE4C', 9999999);
+
+                this.currentPageLayer = new ol.layer.Vector({
+                    source: new ol.source.GeoJSON(),
+                    style: function(feature) {
+                        if(feature.get('highlight')) {
+                            return highlightStyle;
+                        } else {
+                            return normalStyle;
+                        }
+                    }
+                });
+                this.map.map.addLayer(this.currentPageLayer);
             },
 
             zoomToResource: function(resourceid){
@@ -429,54 +477,6 @@ define(['jquery',
                 var f = new ol.format.GeoJSON({defaultDataProjection: 'EPSG:4326'});
 
                 if (this.vectorLayerLoaded) {
-                    if(!this.selectedFeatureLayer){
-                        var iconUnicode = '\uf060';
-                        this.selectedFeatureLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
-                        this.map.map.addLayer(this.selectedFeatureLayer);
-                        var styleFactory = function (color, zIndex) {
-                            var rgb = utils.hexToRgb(color);
-                            return [new ol.style.Style({
-                                text: new ol.style.Text({
-                                    text: iconUnicode,
-                                    font: 'normal 50px octicons',
-                                    offsetX: 5,
-                                    offsetY: ((50/2)*-1)-5,
-                                    fill: new ol.style.Fill({
-                                        color: 'rgba(126,126,126,0.3)',
-                                    })
-                                }),
-                                zIndex: zIndex
-                            }), new ol.style.Style({
-                                text: new ol.style.Text({
-                                    text: iconUnicode,
-                                    font: 'normal 50px octicons',
-                                    offsetY: (50/2)*-1,
-                                    stroke: new ol.style.Stroke({
-                                        color: 'white',
-                                        width: 3
-                                    }),
-                                    fill: new ol.style.Fill({
-                                        color: 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.9)',
-                                    })
-                                }),
-                                zIndex: zIndex
-                            })]
-                        }
-                        var normalStyle = styleFactory('#C4171D', 1000000);
-                        var highlightStyle = styleFactory('#4CAE4C', 9999999);
-
-                        this.currentPageLayer = new ol.layer.Vector({
-                            source: new ol.source.GeoJSON(),
-                            style: function(feature) {
-                                if(feature.get('highlight')) {
-                                    return highlightStyle;
-                                } else {
-                                    return normalStyle;
-                                }
-                            }
-                        });
-                        this.map.map.addLayer(this.currentPageLayer);  
-                    }
                     var previousSelections = this.selectedFeatureLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures())
                     _.each(previousSelections, function(feature) {
                         self.vectorLayer.vectorSource.addFeature(feature);
@@ -484,17 +484,18 @@ define(['jquery',
                     this.selectedFeatureLayer.vectorSource.clear();
                     this.currentPageLayer.getSource().clear();
 
-                    var features = _.filter(this.vectorLayer.vectorSource.getFeatures(), function(feature){ return _.contains(entityIdArray, feature.getId()) });
-
-                    _.each(features, function(feature) {
-                        self.vectorLayer.vectorSource.removeFeature(feature);
-                        if (!feature.get('arches_marker')) {
-                            feature.set('arches_marker', true);
-                        }
-                        if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
-                            self.currentPageLayer.getSource().addFeature(feature);
-                        } else {
-                            self.selectedFeatureLayer.vectorSource.addFeature(feature);
+                    _.each(entityIdArray, function(entityid) {
+                        var feature = self.vectorLayer.vectorSource.getFeatureById(entityid);
+                        if (feature) {
+                            self.vectorLayer.vectorSource.removeFeature(feature);
+                            if (!feature.get('arches_marker')) {
+                                feature.set('arches_marker', true);
+                            }
+                            if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                                self.currentPageLayer.getSource().addFeature(feature);
+                            } else {
+                                self.selectedFeatureLayer.vectorSource.addFeature(feature);
+                            }
                         }
                     });
                 } else {
