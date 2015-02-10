@@ -404,9 +404,9 @@ define(['jquery',
                     return [new ol.style.Style({
                         text: new ol.style.Text({
                             text: iconUnicode,
-                            font: 'normal 50px octicons',
+                            font: 'normal 42px octicons',
                             offsetX: 5,
-                            offsetY: ((50/2)*-1)-5,
+                            offsetY: ((42/2)*-1)-5,
                             fill: new ol.style.Fill({
                                 color: 'rgba(126,126,126,0.3)',
                             })
@@ -415,8 +415,8 @@ define(['jquery',
                     }), new ol.style.Style({
                         text: new ol.style.Text({
                             text: iconUnicode,
-                            font: 'normal 50px octicons',
-                            offsetY: (50/2)*-1,
+                            font: 'normal 42px octicons',
+                            offsetY: (42/2)*-1,
                             stroke: new ol.style.Stroke({
                                 color: 'white',
                                 width: 3
