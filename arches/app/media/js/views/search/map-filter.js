@@ -85,8 +85,8 @@ define(['jquery',
                 this.vectorLayer = new ResourceLayerModel({}, function(features){
                     self.resourceFeatures = features;
                     if (self.highlightOnLoad) {
-                        self.highlightOnLoad = false;
                         _.defer(function () { self.highlightFeatures(self.highlightOnLoad.resultsarray, self.highlightOnLoad.entityIdArray) });
+                        self.highlightOnLoad = false;
                     }
                     self.trigger('vectorlayerloaded', features);
                     if (!self.cancelFitBaseLayer){
