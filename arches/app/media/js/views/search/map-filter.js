@@ -83,7 +83,7 @@ define(['jquery',
 
 
                 this.vectorLayer = new ResourceLayerModel({}, function(features){
-                    self.vectorLayerLoaded = true;
+                    self.resourceFeatures = features;
                     if (self.highlightOnLoad) {
                         self.highlightOnLoad = false;
                         _.defer(function () { self.highlightFeatures(self.highlightOnLoad.resultsarray, self.highlightOnLoad.entityIdArray) });
@@ -474,30 +474,29 @@ define(['jquery',
             highlightFeatures: function(resultsarray, entityIdArray){
                 var resultFeatures = [];
                 var currentPageFeatures = [];
+                var nonResultFeatures = [];
                 var self = this;
 
-                if (this.vectorLayerLoaded) {
-                    var previousSelections = this.resultLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures());
-                    this.resultLayer.vectorSource.clear();
-                    this.currentPageLayer.getSource().clear();
-                    self.vectorLayer.vectorSource.addFeatures(previousSelections);
-
-                    _.each(entityIdArray, function(entityid) {
-                        var feature = self.vectorLayer.vectorSource.getFeatureById(entityid);
-                        if (feature) {
-                            self.vectorLayer.vectorSource.removeFeature(feature);
+                if (this.resourceFeatures) {
+                    _.each(this.resourceFeatures, function (feature) {
+                        if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
                             if (!feature.get('arches_marker')) {
                                 feature.set('arches_marker', true);
                             }
-                            if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
-                                currentPageFeatures.push(feature);
-                            } else {
-                                resultFeatures.push(feature);
-                            }
+                            currentPageFeatures.push(feature);
+                        } else if (_.contains(entityIdArray,feature.getId())) {
+                            resultFeatures.push(feature);
+                        } else {
+                            nonResultFeatures.push(feature);
                         }
                     });
+
+                    self.vectorLayer.vectorSource.clear();
+                    this.resultLayer.vectorSource.clear();
+                    this.currentPageLayer.getSource().clear();
                     self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                     self.resultLayer.vectorSource.addFeatures(resultFeatures);
+                    self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
                 } else {
                     this.highlightOnLoad = {
                         resultsarray: resultsarray,
