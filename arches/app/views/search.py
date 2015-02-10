@@ -69,11 +69,11 @@ def search_results(request, as_text=False):
     results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    full_dsl = build_search_results_dsl(request, limit=1000000, page=1)
-    full_results = full_dsl.search(index='entity', doc_type='')
-    all_entity_ids = []
-    for hit in full_results['hits']['hits']:
-        all_entity_ids.append(hit['_id'])
+    all_entity_ids = ['_all']
+    if request.GET.get('no_filters', '') != '':
+        full_dsl = build_search_results_dsl(request, limit=1000000, page=1)
+        full_results = full_dsl.search(index='entity', doc_type='')
+        all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
 

@@ -112,7 +112,14 @@ require(['jquery',
                             spatialFilter: ko.toJSON(self.mapFilter.query.filter),
                             mapExpanded: self.mapFilter.expanded(),
                             timeExpanded: self.timeFilter.expanded()
-                        }; 
+                        };
+                        if (self.termFilter.query.filter.terms().length === 0 &&
+                            self.timeFilter.query.filter.year_min_max().length === 0 &&
+                            self.timeFilter.query.filter.filters().length === 0 &&
+                            self.mapFilter.query.filter.geometry.coordinates().length === 0) {
+                            params.no_filters = true;
+                        }
+
                         return $.param(params).split('+').join('%20');
                     },
                     changed: ko.pureComputed(function(){

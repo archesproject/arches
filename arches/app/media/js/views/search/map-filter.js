@@ -478,22 +478,35 @@ define(['jquery',
                 var self = this;
 
                 if (this.resourceFeatures) {
-                    _.each(this.resourceFeatures, function (feature) {
-                        if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
-                            if (!feature.get('arches_marker')) {
-                                feature.set('arches_marker', true);
-                            }
-                            currentPageFeatures.push(feature);
-                        } else if (_.contains(entityIdArray,feature.getId())) {
-                            resultFeatures.push(feature);
-                        } else {
-                            nonResultFeatures.push(feature);
-                        }
-                    });
-
                     self.vectorLayer.vectorSource.clear();
                     this.resultLayer.vectorSource.clear();
                     this.currentPageLayer.getSource().clear();
+
+                    if (entityIdArray[0] === '_all') {
+                         _.each(this.resourceFeatures, function (feature) {
+                            if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                                if (!feature.get('arches_marker')) {
+                                    feature.set('arches_marker', true);
+                                }
+                                currentPageFeatures.push(feature);
+                            } else {
+                                resultFeatures.push(feature);
+                            }
+                        });
+                    } else {
+                        _.each(this.resourceFeatures, function (feature) {
+                            if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                                if (!feature.get('arches_marker')) {
+                                    feature.set('arches_marker', true);
+                                }
+                                currentPageFeatures.push(feature);
+                            } else if (_.contains(entityIdArray,feature.getId())) {
+                                resultFeatures.push(feature);
+                            } else {
+                                nonResultFeatures.push(feature);
+                            }
+                        });
+                    }
                     self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                     self.resultLayer.vectorSource.addFeatures(resultFeatures);
                     self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
