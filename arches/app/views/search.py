@@ -71,26 +71,25 @@ def search_results(request, as_text=False):
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
     if request.GET.get('no_filters', '') != '':
-        full_dsl = build_search_results_dsl(request, limit=1000000, page=1)
-        full_results = full_dsl.search(index='entity', doc_type='')
+        full_dsl = build_search_results_dsl(request)
+        full_results = full_dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
         all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
     return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
 
-def build_search_results_dsl(request, limit=None, page=None):
+def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
     export = request.GET.get('export', None)
-    if page == None:
-        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
 
     se = SearchEngineFactory().create()
-    if limit == None:
-        if export != None:
-            limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
-        else:
-            limit = settings.SEARCH_ITEMS_PER_PAGE
+
+    if export != None:
+        limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
+    else:
+        limit = settings.SEARCH_ITEMS_PER_PAGE
     
     query = Query(se, start=limit*int(page-1), limit=limit)
     boolquery = Bool()
