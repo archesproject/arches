@@ -494,6 +494,9 @@ define(['jquery',
                             var feature = self.resultLayer.vectorSource.getFeatureById(pageResult['_id']);
                             if (feature) {
                                 self.resultLayer.vectorSource.removeFeature(feature);
+                                if (!feature.get('arches_marker')) {
+                                    feature.set('arches_marker', true);
+                                }
                                 currentPageFeatures.push(feature);
                             }
                         });
