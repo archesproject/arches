@@ -483,7 +483,6 @@ define(['jquery',
                         sameResultSet = true;
                     }
                 }
-                console.log(sameResultSet);
 
                 if (this.resourceFeatures) {
                     if (sameResultSet) {
