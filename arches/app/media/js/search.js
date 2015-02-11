@@ -99,6 +99,7 @@ require(['jquery',
                 mapFilterText = this.mapFilter.$el.data().filtertext;
                 timeFilterText = this.timeFilter.$el.data().filtertext;
 
+                var isNewQuery = true;
                 this.searchQuery = {
                     queryString: function(){
                         var params = {
@@ -120,6 +121,8 @@ require(['jquery',
                             params.no_filters = true;
                         }
 
+                        params.include_ids = isNewQuery;
+                        isNewQuery = false;
                         return $.param(params).split('+').join('%20');
                     },
                     changed: ko.pureComputed(function(){
@@ -137,6 +140,7 @@ require(['jquery',
                 });
 
                 this.searchQuery.changed.subscribe(function(){
+                    isNewQuery = true;
                     self.searchResults.page(1);
                     self.doQuery();
                 });

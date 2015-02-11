@@ -476,13 +476,7 @@ define(['jquery',
                 var currentPageFeatures = [];
                 var nonResultFeatures = [];
                 var self = this;
-                var sameResultSet = false;
-
-                if (self.previousEntityIdArray.length == entityIdArray.length) {
-                    if (_.difference(self.previousEntityIdArray, entityIdArray).length === 0) {
-                        sameResultSet = true;
-                    }
-                }
+                var sameResultSet = (entityIdArray[0] === '_none');
 
                 if (this.resourceFeatures) {
                     if (sameResultSet) {

@@ -70,7 +70,9 @@ def search_results(request, as_text=False):
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
-    if request.GET.get('no_filters', '') != '':
+    if request.GET.get('include_ids', 'false') == 'false':
+        all_entity_ids = ['_none']
+    elif request.GET.get('no_filters', '') == '':
         full_dsl = build_search_results_dsl(request)
         full_results = full_dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
         all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
