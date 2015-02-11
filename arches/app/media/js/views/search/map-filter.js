@@ -499,7 +499,7 @@ define(['jquery',
                                     feature.set('arches_marker', true);
                                 }
                                 currentPageFeatures.push(feature);
-                            } else if (entityIdArray.indexOf(feature.getId())) {
+                            } else if (_.contains(entityIdArray,feature.getId())) {
                                 resultFeatures.push(feature);
                             } else {
                                 nonResultFeatures.push(feature);
