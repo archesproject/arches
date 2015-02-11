@@ -153,6 +153,7 @@ require(['jquery',
                     this.updateRequest.abort();
                 }
 
+                $('.loading-mask').show();
                 window.history.pushState({}, '', '?'+queryString);
 
                 this.updateRequest = $.ajax({
@@ -163,6 +164,7 @@ require(['jquery',
                         var data = self.searchResults.updateResults(results);
                         self.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
                         self.mapFilter.applyBuffer();
+                        $('.loading-mask').hide();
                     },
                     error: function(){}
                 });

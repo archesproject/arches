@@ -1254,6 +1254,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     font-weight: bold;
 }
 
-.graph-tooltip-relationship{
-
+.loading-mask {
+    position: absolute;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/spinner.gif");
+    background-size: 150px;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
 }
