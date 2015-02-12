@@ -68,8 +68,9 @@
         <h2 style="margin-bottom:8px;">
             <div class="row">        
                 <div class="col-xs-12">
-                    <span class="text-muted" style="margin-bottom: 5px;">{% trans "Popular Searches:" %}</span>                                 
+                    <span class="text-muted" style="margin-bottom: 5px;">{% trans "Popular Searches:" %}</span>
                 </div>
+
             </div>
         </h2>   
         <!-- Results Header -->
@@ -81,9 +82,10 @@
        <!-- Results Header -->
         <h2 style="margin-bottom:8px;">
             <div class="row" id="search-results-count" data-count="">        
-                <div class="col-xs-12" data-bind="if: total() >= 0">
+                <div class="col-xs-12 col-lg-2" data-bind="if: total() >= 0">
                     <span class="" style="font-size:23px;" data-bind="text: total() + ' {% trans "Results" %}'"></span>                               
                 </div>
+
             </div>
         </h2>   
         <!-- Results Header -->      
