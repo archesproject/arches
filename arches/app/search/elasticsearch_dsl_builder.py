@@ -102,7 +102,7 @@ class Query(Dsl):
         self.limit = kwargs.pop('limit', self.limit)
 
         self.prepare()
-        print self
+        #print self
         return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
     def delete(self, index=''):
