@@ -113,9 +113,10 @@ class Query(Dsl):
         self.dsl['size'] = self.limit
 
         if self._filtered:
-            self.dsl['query']['filtered']['filter'] = {   
-                self.filter_operator: self.dsl['query']['filtered']['filter']
-            }
+            if not ('or' in self.dsl['query']['filtered']['filter'] or 'and' in self.dsl['query']['filtered']['filter']):
+                self.dsl['query']['filtered']['filter'] = {   
+                    self.filter_operator: self.dsl['query']['filtered']['filter']
+                }
 
         if self.fields != None:
             self.dsl['fields'] = self.fields
