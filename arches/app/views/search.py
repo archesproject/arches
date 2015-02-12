@@ -64,7 +64,7 @@ def build_search_terms_dsl(request):
 
     return query
 
-def search_results(request, as_text=False):
+def search_results(request):
     dsl = build_search_results_dsl(request)
     results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
@@ -73,11 +73,10 @@ def search_results(request, as_text=False):
     if request.GET.get('include_ids', 'false') == 'false':
         all_entity_ids = ['_none']
     elif request.GET.get('no_filters', '') == '':
-        full_dsl = build_search_results_dsl(request)
-        full_results = full_dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
+        full_results = dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
         all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-    return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
+    return get_paginator(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
@@ -209,7 +208,7 @@ def _get_child_concepts(conceptid):
         ret.add(row[1])
     return list(ret)
 
-def _get_pagination(results, total_count, page, count_per_page, all_ids):
+def get_paginator(results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
