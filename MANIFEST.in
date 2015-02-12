@@ -1,4 +1,3 @@
-include manage.py
 recursive-include arches *
 exclude arches/logs/*.txt
 recursive-exclude tests *
