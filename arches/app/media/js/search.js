@@ -99,7 +99,7 @@ require(['jquery',
                 mapFilterText = this.mapFilter.$el.data().filtertext;
                 timeFilterText = this.timeFilter.$el.data().filtertext;
 
-                var isNewQuery = true;
+                self.isNewQuery = true;
                 this.searchQuery = {
                     queryString: function(){
                         var params = {
@@ -121,8 +121,7 @@ require(['jquery',
                             params.no_filters = true;
                         }
 
-                        params.include_ids = isNewQuery;
-                        isNewQuery = false;
+                        params.include_ids = self.isNewQuery;
                         return $.param(params).split('+').join('%20');
                     },
                     changed: ko.pureComputed(function(){
@@ -140,7 +139,7 @@ require(['jquery',
                 });
 
                 this.searchQuery.changed.subscribe(function(){
-                    isNewQuery = true;
+                    self.isNewQuery = true;
                     self.searchResults.page(1);
                     self.doQuery();
                 });
@@ -164,6 +163,7 @@ require(['jquery',
                         var data = self.searchResults.updateResults(results);
                         self.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
                         self.mapFilter.applyBuffer();
+                        self.isNewQuery = false;
                         $('.loading-mask').hide();
                     },
                     error: function(){}
