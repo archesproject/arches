@@ -1,5 +1,10 @@
-exclude .hgignore
-exclude .hgtags
+include manage.py
+recursive-include arches *
+exclude arches/logs/*.txt
 recursive-exclude tests *
-recursive-exclude packages *
 recursive-exclude virtualenv *
+recursive-exclude arches/elasticsearch *
+global-exclude *.log
+global-exclude *.pyc
+global-exclude *.zip
+global-exclude *.DS_Store

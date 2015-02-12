@@ -4,59 +4,57 @@ import subprocess
 import shutil
 import urllib2
 import zipfile
-
-env_name = 'ENV'
+import datetime
+from arches import settings
 
 here = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(here)
-install_dir = os.path.join(here, 'install')
-
 
 def install():
     if confirm_system_requirements():
 
         run_virtual_environment()
 
+        install_dir = os.path.join(site_packages_dir(), 'arches', 'install')
+        django_install_location = os.path.join(site_packages_dir(), 'django')
+
         # INSTALL DJANGO, RAWES, SPHINX AND OTHER DEPENDENCIES
-        tmpinstalldir = '%s/tmp' % (here)
+        tmpinstalldir = os.path.join(site_packages_dir(), 'arches', 'tmp')
         os.system("pip install -b %s setuptools --no-use-wheel --upgrade" % (tmpinstalldir))
         os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements.txt')))
+        if settings.MODE == 'DEV':
+            os.system("pip install -b %s -r %s" % (tmpinstalldir, os.path.join(install_dir, 'requirements_dev.txt')))
         shutil.rmtree(tmpinstalldir, True)
 
         #INSTALLING CUSTOM DJANGO EDITS/PATCHES
-        if sys.platform == 'win32':
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'base.py'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'db', 'backends', 'postgresql_psycopg2'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'creation.py'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'db', 'backends', 'postgresql_psycopg2'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'inspectdb.py'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'core', 'management', 'commands'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'contrib', 'auth'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'models.py'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'contrib', 'auth'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(sys.prefix, 'Lib', 'site-packages', 'django', 'contrib', 'admin', 'static', 'admin', 'css'))
-        else:
-            py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'base.py'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'db', 'backends', 'postgresql_psycopg2'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'creation.py'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'db', 'backends', 'postgresql_psycopg2'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'inspectdb.py'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'core', 'management', 'commands'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'contrib', 'auth'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'models.py'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'contrib', 'auth'))
-            shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(sys.prefix, 'lib', py_version, 'site-packages', 'django', 'contrib', 'admin', 'static', 'admin', 'css'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'base.py'), os.path.join(django_install_location, 'db', 'backends', 'postgresql_psycopg2'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'creation.py'), os.path.join(django_install_location, 'db', 'backends', 'postgresql_psycopg2'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'inspectdb.py'), os.path.join(django_install_location, 'core', 'management', 'commands'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(django_install_location, 'contrib', 'auth'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'models.py'), os.path.join(django_install_location, 'contrib', 'auth'))
+        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(django_install_location, 'contrib', 'admin', 'static', 'admin', 'css'))
+
+        # GET ELASTICSEARCH
+        download_elasticsearch(install_dir)
 
         # INSTALL PSYCOPG2
         if sys.platform == 'win32':
             is_64bit_python = sys.maxsize > 2**32
-
             if os.path.exists('C:\Program Files (x86)') and is_64bit_python:
-                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/psycopg2-2.4.5.win-amd64-py2.7-pg9.1.3-release.exe")
+                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/2.5.4/psycopg2-2.5.4.win-amd64-py2.7-pg9.3.5-release.exe")
             else:
-                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/psycopg2-2.4.5.win32-py2.7-pg9.1.3-release.exe")
+                os.system("easy_install http://www.stickpeople.com/projects/python/win-psycopg/2.5.4/psycopg2-2.5.4.win32-py2.7-pg9.3.5-release.exe")
         else:
-            # SYSTEM IS ASSUMED LINUX/OSX ETC...
             # Install psycopg2 through pip - Works fine if the correct header files are present
             # See http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
-            os.system("pip install psycopg2")
-            pass
+            os.system("pip install psycopg2==2.5.4")
 
-        download_elasticsearch()
-        get_version(path_to_file=os.path.abspath(os.path.dirname(__file__)))
+def site_packages_dir():
+    if sys.platform == 'win32':
+        return os.path.join(sys.prefix, 'Lib', 'site-packages')
+    else:
+        py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
+        return os.path.join(sys.prefix, 'lib', py_version, 'site-packages')        
 
 def confirm_system_requirements():
     # CHECK PYTHON VERSION
@@ -145,13 +143,13 @@ def unzip_file(file_name, unzip_location):
         print 'unzipping %s to: %s' % (file_name, unzip_location)
         myzip.extractall(unzip_location)
 
-def download_elasticsearch():
-    url = get_elasticsearch_download_url()
+def download_elasticsearch(install_dir):
+    url = get_elasticsearch_download_url(install_dir)
     file_name = url.split('/')[-1]
     if not os.path.isfile(os.path.join(install_dir, file_name)):
         download_file(url, os.path.join(install_dir, file_name))
 
-def get_elasticsearch_download_url():
+def get_elasticsearch_download_url(install_dir):
     with open(os.path.join(install_dir, "requirements.txt"), "r") as f:
         for line in f:
             if line.startswith('# https://'):
@@ -163,7 +161,51 @@ def get_elasticsearch_download_url():
         "# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-x.x.x.zip"
 ----------------------------------------------------------------------------------------------------\n""") 
 
-def get_version(path_to_file=None):
+def get_version(version=None):
+    "Returns a PEP 440-compliant version number from VERSION."
+    version = get_complete_version(version)
+
+    # Now build the two parts of the version number:
+    # major = X.Y[.Z]
+    # sub = .devN - for pre-alpha releases
+    #     | {a|b|rc}N - for alpha, beta and rc releases
+
+    major = get_major_version(version)
+
+    sub = ''
+    if version[3] == 'alpha' and version[4] == 0:
+        changeset = get_changeset()
+        if changeset:
+            sub = '.dev%s' % changeset
+
+    elif version[3] != 'final':
+        mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}
+        sub = mapping[version[3]] + str(version[4])
+
+    return str(major + sub)
+
+
+def get_major_version(version=None):
+    "Returns major version from VERSION."
+    version = get_complete_version(version)
+    parts = 2 if version[2] == 0 else 3
+    major = '.'.join(str(x) for x in version[:parts])
+    return major
+
+
+def get_complete_version(version=None):
+    """Returns a tuple of the django version. If version argument is non-empty,
+    then checks for correctness of the tuple provided.
+    """
+    if version is None:
+        from arches import VERSION as version
+    else:
+        assert len(version) == 5
+        assert version[3] in ('alpha', 'beta', 'rc', 'final')
+
+    return version
+
+def get_changeset(path_to_file=None):
     import os
     import subprocess
     from StringIO import StringIO
@@ -172,6 +214,7 @@ def get_version(path_to_file=None):
     sb = StringIO()
     if not path_to_file:
         path_to_file =os.path.abspath(os.path.dirname(__file__))
+    
     ver = ''
     try:
         hg_archival = open(os.path.abspath(os.path.join(here, '..', '.hg_archival.txt')),'r')
@@ -179,25 +222,36 @@ def get_version(path_to_file=None):
         hg_archival.close()
         node = ''
         latesttag = ''
+        date = ''
         for line in the_file:
             if line.startswith('node:'):
                 node = line.split(':')[1].strip()[:12]
             if line.startswith('latesttag:'):
                 latesttag = line.split(':')[1].strip()
+            if line.startswith('date:'):
+                date = line.split(':')[1].strip()
     
         sb.writelines(['__VERSION__="%s"' % latesttag])   
         sb.writelines(['\n__BUILD__="%s"' % node])  
         ver = '%s:%s' % (latesttag, node)
-        write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
+        ver = date
+        #write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
     except:
         try:
             ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{latesttag}:{node|short}'])
+            ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{node|short}'])
+            ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{date}'])
             sb.writelines(['__VERSION__="%s"' % ver.split(':')[0]])
             sb.writelines(['\n__BUILD__="%s"' % ver.split(':')[1]]) 
-            write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
+            #write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
         except:
             pass
-    return ver
+
+    try:
+        timestamp = datetime.datetime.utcfromtimestamp(float(ver))
+    except ValueError:
+        return None
+    return timestamp.strftime('%Y%m%d%H%M%S')
 
 if __name__ == "__main__":
     install()

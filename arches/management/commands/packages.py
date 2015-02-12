@@ -38,9 +38,10 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
+            '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
@@ -63,6 +64,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'install':
             self.install(package_name)
+
+        if options['operation'] == 'setup_db':
+            self.setup_db(package_name)
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
@@ -111,13 +115,13 @@ class Command(BaseCommand):
 
         install_location = self.get_elasticsearch_install_location(package_name)
         install_root = os.path.abspath(os.path.join(install_location, '..'))
-        url = get_elasticsearch_download_url()
+        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
         file_name = url.split('/')[-1]
 
         try:
             unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
         except:
-            download_elasticsearch()
+            download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
 
         es_config_directory = os.path.join(install_location, 'config')
         try:
@@ -208,12 +212,10 @@ class Command(BaseCommand):
 
         """
 
-        url = get_elasticsearch_download_url()
+        url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
         file_name = url.split('/')[-1]
         file_name_wo_extention = file_name[:-4]
         package_root = settings.PACKAGE_ROOT
-        if hasattr(settings, 'SUBPACKAGE_ROOT'):
-            package_root = settings.SUBPACKAGE_ROOT
         return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
 
     def build_permissions(self):
