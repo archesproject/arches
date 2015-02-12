@@ -682,7 +682,6 @@ define(['jquery',
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
                             self.bufferFeatureOverlay.getFeatures().clear();  
                             self.bufferFeatureOverlay.addFeature(feature);
-                            self.zoomToExtent(feature.getGeometry().getExtent());
                         },
                         error: function(){}
                     });                    
