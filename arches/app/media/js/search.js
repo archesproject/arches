@@ -12,10 +12,12 @@ require(['jquery',
     'plugins/bootstrap-slider/bootstrap-slider.min',
     'views/forms/sections/branch-list',
     'resource-types',
+    'openlayers',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, TermFilter, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, TermFilter, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes, ol) {
     $(document).ready(function() {
+        var wkt = new ol.format.WKT();
 
         var SearchView = Backbone.View.extend({
             el: $('body'),
@@ -91,8 +93,16 @@ require(['jquery',
                 this.searchResults.on('mouseout', function(){
                     this.mapFilter.unselectAllFeatures();
                 }, this);
-                this.searchResults.on('find_on_map', function(resourceid){
-                    this.mapFilter.zoomToResource(resourceid);
+                this.searchResults.on('find_on_map', function(resourceid, data){
+                    var extent;
+                    _.each(data.geometries, function (geometryData) {
+                        var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
+                        geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
+                        extent = extent ? ol.extent.extend(extent, geomExtent) : geomExtent;
+                    });
+                    if (extent) {
+                        self.mapFilter.zoomToExtent(extent);
+                    }
                 }, this);
 
 

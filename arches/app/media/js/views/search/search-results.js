@@ -105,7 +105,7 @@ define(['jquery',
 
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
-                this.trigger('find_on_map', data.resourceid);   
+                this.trigger('find_on_map', data.resourceid, data);   
             }
 
         });
