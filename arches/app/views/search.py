@@ -150,9 +150,9 @@ def build_search_results_dsl(request):
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)
         end_date = date(temporal_filter['year_min_max'][1], 12, 31)
         if start_date:
-            start_date = start_date.strftime('%Y-%m-%d')
+            start_date = start_date.isoformat()
         if end_date:
-            end_date = end_date.strftime('%Y-%m-%d')
+            end_date = end_date.isoformat()
         range = Range(field='dates.value', gte=start_date, lte=end_date)
         nested = Nested(path='dates', query=range)
         
