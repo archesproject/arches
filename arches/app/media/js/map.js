@@ -28,6 +28,14 @@ require([
         initialize: function(options) {
             var self = this;
             var mapLayers = [];
+            var elevateArchesResourceLayers = function () {
+                map.map.getLayers().forEach(function(layer, index) {
+                    if (layer.get('is_arches_layer')) {
+                        map.map.removeLayer(layer);
+                        map.map.addLayer(layer);
+                    }
+                });
+            };
             _.each(layers, function(layer, index) {
                 if (layer.onMap) {
                     if (typeof layer.layer == 'function') {
@@ -43,6 +51,7 @@ require([
                     }
                     if (add) {
                         map.map.addLayer(layer.layer);
+                        elevateArchesResourceLayers();
                     } else {
                         map.map.removeLayer(layer.layer);
                     }
@@ -57,6 +66,7 @@ require([
                 el: $('#map'),
                 overlays: mapLayers.reverse()
             });
+
             var selectFeatureOverlay = new ol.FeatureOverlay({
                 style: function(feature, resolution) {
                     var isSelectFeature = _.contains(feature.getKeys(), 'select_feature');
@@ -153,6 +163,7 @@ require([
                 layerModel.onMap.subscribe(function(add) {
                     if (add) {
                         map.map.addLayer(layer);
+                        elevateArchesResourceLayers();
                     } else {
                         map.map.removeLayer(layer);
                     }
