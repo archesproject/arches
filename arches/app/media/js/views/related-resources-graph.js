@@ -143,6 +143,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
             var drag = self.force.drag()
                 .on("dragstart", function(d) {
                     d3.event.sourceEvent.stopPropagation();
+                    d3.event.sourceEvent.preventDefault();
                 });
 
             var node = self.vis.selectAll("circle")
@@ -193,7 +194,9 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                     self.nodeTip.hide();
                 })
                 .on("click", function (d) {
-                    self.getResourceDataForNode(d);
+                    if (!d3.event.defaultPrevented){
+                        self.getResourceDataForNode(d);
+                    }
                 })
                 .call(drag);
             node.exit()
