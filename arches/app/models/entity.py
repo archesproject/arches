@@ -236,7 +236,6 @@ class Entity(object):
         node.entitytypeid = entitytypeid
         node.value = value
         node.entityid = entityid
-        # if entitytypeid == 'PLACE.E53': print 'in add related entity'
         self.append_child(node)
         return node
 
@@ -245,11 +244,9 @@ class Entity(object):
         Append a child entity to this entity instance
 
         """
+
         parent = self        
-        # if self.entitytypeid == 'PLACE.E53': print 'assigning parent:id:%s -- %s' % (id(self), self)
-        # if parent.entitytypeid == 'PLACE.E53': print 'assigning parent2:id:%s -- %s' % (id(parent), parent)
         def func(self):
-            # if parent.entitytypeid == 'PLACE.E53': print 'get parent:id:%s -- %s' % (id(parent), parent)
             return parent
 
         entity.get_parent = types.MethodType(func, entity, Entity)
@@ -292,6 +289,11 @@ class Entity(object):
             self.get_parent().append_child(entitytomerge)
 
     def can_merge(self, entitytomerge):
+        """
+        A test to see whether 2 nodes can merge or not
+        
+        """  
+
         # if the nodes are equal attempt a merge otherwise don't bother
         if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property):
             # if the value of each node is not blank then the nodes can't be merged
