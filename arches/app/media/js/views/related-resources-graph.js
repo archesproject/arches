@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'plugins/d3-tip', 'utils'], function($, Backbone, _, arches, resourceTypes, d3, d3Tip, utils) {
+define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'plugins/d3-tip'], function($, Backbone, _, arches, resourceTypes, d3, d3Tip) {
     return Backbone.View.extend({
         resourceId: null,
         resourceName: '',
@@ -156,7 +156,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                     return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                 })
                 .attr("style", function(d){
-                    return "fill:" + resourceTypes[d.entitytypeid].color + ";stroke:" + utils.colorLuminance(resourceTypes[d.entitytypeid].color, -0.3);
+                    return "fill:" + resourceTypes[d.entitytypeid].fillColor + ";stroke:" + resourceTypes[d.entitytypeid].strokeColor;
                 })
                 .on("mouseover", function(d){
                     self.vis.selectAll("circle")
@@ -170,7 +170,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                             return className;
                         })
                         .attr("style", function(d1){
-                            return "fill:" + resourceTypes[d1.entitytypeid].color + ";stroke:" + utils.colorLuminance(resourceTypes[d1.entitytypeid].color, -0.3);
+                            return "fill:" + resourceTypes[d1.entitytypeid].fillColor + ";stroke:" + resourceTypes[d1.entitytypeid].strokeColor;
                         });
                     self.vis.selectAll("line")
                         .attr('class', function(l) {

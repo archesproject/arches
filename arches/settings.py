@@ -101,7 +101,9 @@ RESOURCE_TYPE_CONFIGS = {
     #     'categories': [_('Resource')],
     #     'has_layer': True,
     #     'on_map': True,
-    #     'vector_color': '#3366FF',
+    #     'marker_color': '#3366FF',
+    #     'stroke_color': '#3366FF',
+    #     'fill_color': '#3366FF',
     #     'primary_name_lookups': {
     #         'entity_type': 'NAME.E41',
     #         'lookup_value': 'Primary'

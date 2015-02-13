@@ -175,7 +175,9 @@
                             "{{category}}"
                             {% endfor %}
                         ],
-                        color: "{{type_data.vector_color}}"
+                        color: "{{type_data.marker_color}}",
+                        strokeColor: "{{type_data.stroke_color}}",
+                        fillColor: "{{type_data.fill_color}}"
                     },
                     {% endfor %}
                 };
