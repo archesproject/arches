@@ -60,7 +60,7 @@ class Entity(object):
                 self.load(args[0])  
 
     def __repr__(self):
-        return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, self.value)
+        return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, JSONSerializer().serialize(self.value))
 
     def __hash__(self): return hash(JSONSerializer().serialize(self))
     def __eq__(self, x):return hash(self) == hash(x)
@@ -253,21 +253,7 @@ class Entity(object):
             return parent
 
         entity.get_parent = types.MethodType(func, entity, Entity)
-        if entity not in self.child_entities:
-            self.child_entities.append(entity)
-
-    def equals(self, entitytocompare, strict=False):
-        """
-        Test to compare if 2 entities are equal, if strict=True then compare node values as well
-
-        """
-        if (self.entitytypeid == entitytocompare.entitytypeid and self.entityid == entitytocompare.entityid and self.property == entitytocompare.property):
-            if strict:
-                if self.value == entitytocompare.value:
-                    return True
-            else:
-                return True
-        return False
+        self.child_entities.append(entity)
 
     def merge(self, entitytomerge):
         """
@@ -275,14 +261,7 @@ class Entity(object):
 
         """        
 
-        # if the nodes are equal attempt a merge otherwise don't bother
-        if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property):
-            # if the value of each node is not blank then the nodes can't be merged
-            # and we simply append entitytomerge node to self's parent node
-            if self.value != '' and entitytomerge.value != '':
-                self.get_parent().append_child(entitytomerge)
-                return self
-
+        if self.can_merge(entitytomerge):
             # update self.entityid if it makes sense to do so  
             if self.entityid == '' and entitytomerge.entityid != '':
                 self.entityid = entitytomerge.entityid
@@ -291,20 +270,38 @@ class Entity(object):
             if self.value == '' and entitytomerge.value != '':
                 self.value = entitytomerge.value
 
-            child_entitiesmerged = []
-            # try to merge any child_entities of self and entitytomerge 
+            entities_to_merge = []
+            entities_to_append = []
+            # gather lists of entities that can be merged and ones that will be appended
             for child_entitytomerge in entitytomerge.child_entities:
+                entities_to_append.append(child_entitytomerge)
                 for child_entity in self.child_entities:
-                    if (child_entity.entitytypeid == child_entitytomerge.entitytypeid and child_entity.property == child_entitytomerge.property):   
-                        child_entity.merge(child_entitytomerge)
-                        child_entitiesmerged.append(child_entitytomerge)
+                    if child_entity.can_merge(child_entitytomerge):
+                        entities_to_merge.append(entities_to_append.pop())
+                        break
 
-            # append all entitytomerge.child_entities that weren't merged above
-            for child_entity in list(set(entitytomerge.child_entities)-set(child_entitiesmerged)):
-                self.append_child(child_entity)
+            for entity in entities_to_append:
+                self.append_child(entity)   
+
+            for child_entity in self.child_entities:
+                for entity_to_merge in entities_to_merge:
+                    if child_entity.can_merge(entity_to_merge):
+                        child_entity.merge(entity_to_merge) 
+                        break 
         else:
             self.get_parent().append_child(entitytomerge)
-        return self
+
+    def can_merge(self, entitytomerge):
+        # if the nodes are equal attempt a merge otherwise don't bother
+        if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property):
+            # if the value of each node is not blank then the nodes can't be merged
+            # and we simply append entitytomerge node to self's parent node
+            if self.value != '' and entitytomerge.value != '':
+                return False
+
+            return True
+        else:
+            return False
 
     def merge_at(self, entitytomerge, entitytypeid):
         """
