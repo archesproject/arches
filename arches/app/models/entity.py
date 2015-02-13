@@ -700,8 +700,11 @@ class Entity(object):
             if child_entity.businesstablename != '':
                 data[child_entity.undotify()] = self.get_nodes(child_entity.entitytypeid, keys=keys)
             else:
-                data[child_entity.undotify()] = child_entity.dictify(keys=keys)
-        return [data]
+                if child_entity.undotify() not in data:
+                    data[child_entity.undotify()] = []
+                data[child_entity.undotify()].append(child_entity.dictify(keys=keys))
+
+        return data
 
     def get_nodes(self, entitytypeid, keys=[]):
         """
