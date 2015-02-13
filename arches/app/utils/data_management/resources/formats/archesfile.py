@@ -49,13 +49,11 @@ class Resource(object):
             self.resource_id = ''
             self.entitytypeid = ''
             self.groups = []
-            self.nongroups = []
 
         elif isinstance(args[0], dict):
             details = args[0]
             self.entitytypeid = details['RESOURCETYPE'].strip()
             self.resource_id = details['RESOURCEID'].strip()
-            self.nongroups = []  
             self.groups = []
 
     def appendrow(self, row, group_id=None):
@@ -63,8 +61,6 @@ class Resource(object):
             for group in self.groups:
                 if group.group_id == group_id:
                     group.rows.append(row)
-        else:
-           self.nongroups.append(row)
 
     def __str__(self):
         return '{0},{1}'.format(self.resource_id, self.entitytypeid)
@@ -335,15 +331,12 @@ class ArchesReader():
                     resource_id = resource_id_val
                     group_id = ''
                 
-                if group_val != '-1' and group_val != group_id:  #create a new group of resouces
+                if group_val != group_id:  #create a new group of resouces
                     resource.groups.append(Group(row))
                     group_id = group_val
 
                 if group_val == group_id:
                     resource.appendrow(Row(row), group_id=group_id)
-
-                if group_val == '-1':
-                    resource.appendrow(Row(row))
 
         validation_module.validate_resource(resource)
 

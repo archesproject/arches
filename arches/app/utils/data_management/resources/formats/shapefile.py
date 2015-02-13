@@ -51,12 +51,10 @@ class Resource(object):
             self.resource_id = ''
             self.entitytypeid = ''
             self.groups = []
-            self.nongroups = []
 
         elif isinstance(args[0], list):
             self.entitytypeid = args[0][1].strip()
             self.resource_id = args[0][0].strip()
-            self.nongroups = []  
             self.groups = []
 
 
@@ -65,8 +63,6 @@ class Resource(object):
             for group in self.groups:
                 if group.group_id == group_id:
                     group.rows.append(row)
-        else:
-           self.nongroups.append(row)
 
     def __str__(self):
         return '{0},{1}'.format(self.resource_id, self.entitytypeid)
