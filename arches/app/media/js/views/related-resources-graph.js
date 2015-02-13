@@ -198,6 +198,20 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                 .call(drag);
             node.exit()
                 .remove();
+            
+            if (self.texts){
+                self.texts.remove();
+            }
+
+            self.texts = self.vis.selectAll("text.nodeLabels")
+                .data(self.data.nodes);
+
+            self.texts.enter().append("text")
+                .attr("class", 'root-node-label')
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d.isRoot ? d.name : '';
+                });
 
             self.force.on("tick", function() {
                 link.attr("x1", function(d) { return d.source.x; })
@@ -207,6 +221,10 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
          
                 node.attr("cx", function(d) { return d.x; })
                     .attr("cy", function(d) { return d.y; });
+
+                self.texts
+                    .attr("x", function(d) { return d.x; })
+                    .attr("y", function(d) { return d.y; });
          
             });
 

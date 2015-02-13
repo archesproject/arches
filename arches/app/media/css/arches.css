@@ -1265,3 +1265,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background-color: #E67373;
     border: 1px solid #BE4343;
 }
+
+.root-node-label {
+    stroke: #999; /*#3275b1;*/
+    font-size: 32px;
+    font-weight: 900;
+    fill: #fcfcfc; /*#fdfdfd; */
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
