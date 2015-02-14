@@ -230,7 +230,7 @@ def geocode(request):
     return JSONResponse({ 'results': geocoder.find_candidates(search_string) })
 
 def export_results(request):
-    dsl = build_search_results_dsl(request, limit=None)
+    dsl = build_search_results_dsl(request)
     search_results = dsl.search(index='entity', doc_type='') 
     response = None
     format = request.GET.get('export', 'csv')
