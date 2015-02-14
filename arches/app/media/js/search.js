@@ -25,7 +25,8 @@ require(['jquery',
                 'click #view-saved-searches': 'showSavedSearches',
                 'click #clear-search': 'clear',
                 'click #map-filter-button': 'toggleMapFilter',
-                'click #time-filter-button': 'toggleTimeFilter'
+                'click #time-filter-button': 'toggleTimeFilter',
+                'click a.dataexport': 'exportSearch'
             },
 
             initialize: function(options) { 
@@ -248,8 +249,17 @@ require(['jquery',
                 this.mapFilter.clear();
                 this.timeFilter.clear();
                 this.termFilter.clear();
-            }
+            },
 
+            exportSearch: function(e) {
+                var export_format = e.currentTarget.id,
+                    _href = $("a.dataexport").attr("href"),
+                    format = 'export=' + export_format,
+                    params_with_page = this.searchQuery.queryString(),
+                    page_number_regex = /page=[0-9]+/;
+                    params = params_with_page.replace(page_number_regex, format);
+                $("a.dataexport").attr("href", arches.urls.search_results_export + '?' + params);
+            }
         });
         new SearchView();
     });
