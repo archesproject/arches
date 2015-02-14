@@ -13,6 +13,7 @@ define(['jquery',
     function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel, utils, resourceTypes) {
         var geoJSON = new ol.format.GeoJSON();
         return Backbone.View.extend({
+            previousEntityIdArray: [],
 
             events: {
                 'click .layer-zoom': 'layerZoom',
@@ -83,9 +84,8 @@ define(['jquery',
 
 
                 this.vectorLayer = new ResourceLayerModel({}, function(features){
-                    self.vectorLayerLoaded = true;
+                    self.resourceFeatures = features;
                     if (self.highlightOnLoad) {
-                        self.highlightOnLoad = false;
                         _.defer(function () { self.highlightFeatures(self.highlightOnLoad.resultsarray, self.highlightOnLoad.entityIdArray) });
                     }
                     self.trigger('vectorlayerloaded', features);
@@ -474,30 +474,62 @@ define(['jquery',
             highlightFeatures: function(resultsarray, entityIdArray){
                 var resultFeatures = [];
                 var currentPageFeatures = [];
+                var nonResultFeatures = [];
                 var self = this;
+                var sameResultSet = (entityIdArray[0] === '_none');
 
-                if (this.vectorLayerLoaded) {
-                    var previousSelections = this.resultLayer.vectorSource.getFeatures().concat(this.currentPageLayer.getSource().getFeatures());
-                    this.resultLayer.vectorSource.clear();
-                    this.currentPageLayer.getSource().clear();
-                    self.vectorLayer.vectorSource.addFeatures(previousSelections);
-
-                    _.each(entityIdArray, function(entityid) {
-                        var feature = self.vectorLayer.vectorSource.getFeatureById(entityid);
-                        if (feature) {
-                            self.vectorLayer.vectorSource.removeFeature(feature);
-                            if (!feature.get('arches_marker')) {
-                                feature.set('arches_marker', true);
-                            }
-                            if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                if (this.resourceFeatures) {
+                    if (sameResultSet) {
+                        currentPageFeatures = this.currentPageLayer.getSource().getFeatures();
+                        self.currentPageLayer.getSource().clear();
+                        self.resultLayer.vectorSource.addFeatures(currentPageFeatures);
+                        currentPageFeatures = [];
+                        _.each(resultsarray.results.hits.hits, function(pageResult) {
+                            var feature = self.resultLayer.vectorSource.getFeatureById(pageResult['_id']);
+                            if (feature) {
+                                self.resultLayer.vectorSource.removeFeature(feature);
+                                if (!feature.get('arches_marker')) {
+                                    feature.set('arches_marker', true);
+                                }
                                 currentPageFeatures.push(feature);
-                            } else {
-                                resultFeatures.push(feature);
                             }
+                        });
+                        self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
+                    } else {
+                        self.vectorLayer.vectorSource.clear();
+                        this.resultLayer.vectorSource.clear();
+                        this.currentPageLayer.getSource().clear();
+
+                        if (entityIdArray[0] === '_all') {
+                             _.each(this.resourceFeatures, function (feature) {
+                                if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                                    if (!feature.get('arches_marker')) {
+                                        feature.set('arches_marker', true);
+                                    }
+                                    currentPageFeatures.push(feature);
+                                } else {
+                                    resultFeatures.push(feature);
+                                }
+                            });
+                        } else {
+                            _.each(this.resourceFeatures, function (feature) {
+                                if (_.find(resultsarray.results.hits.hits, function(hit){ return hit['_id'] === feature.getId() })) {
+                                    if (!feature.get('arches_marker')) {
+                                        feature.set('arches_marker', true);
+                                    }
+                                    currentPageFeatures.push(feature);
+                                } else if (entityIdArray.indexOf(feature.getId()) > 0) {
+                                    resultFeatures.push(feature);
+                                } else {
+                                    nonResultFeatures.push(feature);
+                                }
+                            });
                         }
-                    });
-                    self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
-                    self.resultLayer.vectorSource.addFeatures(resultFeatures);
+                        self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
+                        self.resultLayer.vectorSource.addFeatures(resultFeatures);
+                        self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
+                    }
+                    self.previousEntityIdArray = entityIdArray;
                 } else {
                     this.highlightOnLoad = {
                         resultsarray: resultsarray,
@@ -650,7 +682,6 @@ define(['jquery',
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
                             self.bufferFeatureOverlay.getFeatures().clear();  
                             self.bufferFeatureOverlay.addFeature(feature);
-                            self.zoomToExtent(feature.getGeometry().getExtent());
                         },
                         error: function(){}
                     });                    

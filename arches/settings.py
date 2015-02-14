@@ -17,10 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-#import version
 import inspect
 # Django settings for Arches project.
 
+MODE = 'PROD' #options are either "PROD" or "DEV" (installing with Dev mode set, get's you extra dependencies)
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 INTERNAL_IPS = ('127.0.0.1',)
@@ -102,7 +102,9 @@ RESOURCE_TYPE_CONFIGS = {
     #     'categories': [_('Resource')],
     #     'has_layer': True,
     #     'on_map': True,
-    #     'vector_color': '#3366FF',
+    #     'marker_color': '#3366FF',
+    #     'stroke_color': '#3366FF',
+    #     'fill_color': '#3366FF',
     #     'primary_name_lookups': {
     #         'entity_type': 'NAME.E41',
     #         'lookup_value': 'Primary'
@@ -121,9 +123,6 @@ APP_NAME = 'Arches v3.0'
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
 
-
-# ARCHES_VERSION = version.__VERSION__
-# BUILD = version.__BUILD__
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 ADMINS = (

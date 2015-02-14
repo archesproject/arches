@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'plugins/d3-tip', 'utils'], function($, Backbone, _, arches, resourceTypes, d3, d3Tip, utils) {
+define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'plugins/d3-tip'], function($, Backbone, _, arches, resourceTypes, d3, d3Tip) {
     return Backbone.View.extend({
         resourceId: null,
         resourceName: '',
@@ -143,6 +143,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
             var drag = self.force.drag()
                 .on("dragstart", function(d) {
                     d3.event.sourceEvent.stopPropagation();
+                    d3.event.sourceEvent.preventDefault();
                 });
 
             var node = self.vis.selectAll("circle")
@@ -156,7 +157,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                     return 'node-' + (d.isRoot ? 'current' : 'ancestor');
                 })
                 .attr("style", function(d){
-                    return "fill:" + resourceTypes[d.entitytypeid].color + ";stroke:" + utils.colorLuminance(resourceTypes[d.entitytypeid].color, -0.3);
+                    return "fill:" + resourceTypes[d.entitytypeid].fillColor + ";stroke:" + resourceTypes[d.entitytypeid].strokeColor;
                 })
                 .on("mouseover", function(d){
                     self.vis.selectAll("circle")
@@ -170,7 +171,7 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                             return className;
                         })
                         .attr("style", function(d1){
-                            return "fill:" + resourceTypes[d1.entitytypeid].color + ";stroke:" + utils.colorLuminance(resourceTypes[d1.entitytypeid].color, -0.3);
+                            return "fill:" + resourceTypes[d1.entitytypeid].fillColor + ";stroke:" + resourceTypes[d1.entitytypeid].strokeColor;
                         });
                     self.vis.selectAll("line")
                         .attr('class', function(l) {
@@ -193,11 +194,27 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
                     self.nodeTip.hide();
                 })
                 .on("click", function (d) {
-                    self.getResourceDataForNode(d);
+                    if (!d3.event.defaultPrevented){
+                        self.getResourceDataForNode(d);
+                    }
                 })
                 .call(drag);
             node.exit()
                 .remove();
+            
+            if (self.texts){
+                self.texts.remove();
+            }
+
+            self.texts = self.vis.selectAll("text.nodeLabels")
+                .data(self.data.nodes);
+
+            self.texts.enter().append("text")
+                .attr("class", 'root-node-label')
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d.isRoot ? d.name : '';
+                });
 
             self.force.on("tick", function() {
                 link.attr("x1", function(d) { return d.source.x; })
@@ -207,6 +224,10 @@ define(['jquery', 'backbone', 'underscore', 'arches', 'resource-types', 'd3', 'p
          
                 node.attr("cx", function(d) { return d.x; })
                     .attr("cy", function(d) { return d.y; });
+
+                self.texts
+                    .attr("x", function(d) { return d.x; })
+                    .attr("y", function(d) { return d.y; });
          
             });
 

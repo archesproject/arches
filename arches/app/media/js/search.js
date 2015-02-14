@@ -12,10 +12,12 @@ require(['jquery',
     'plugins/bootstrap-slider/bootstrap-slider.min',
     'views/forms/sections/branch-list',
     'resource-types',
+    'openlayers',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, TermFilter, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, TermFilter, MapFilter, TimeFilter, SearchResults, ko, Slider, BranchList, resourceTypes, ol) {
     $(document).ready(function() {
+        var wkt = new ol.format.WKT();
 
         var SearchView = Backbone.View.extend({
             el: $('body'),
@@ -92,14 +94,23 @@ require(['jquery',
                 this.searchResults.on('mouseout', function(){
                     this.mapFilter.unselectAllFeatures();
                 }, this);
-                this.searchResults.on('find_on_map', function(resourceid){
-                    this.mapFilter.zoomToResource(resourceid);
+                this.searchResults.on('find_on_map', function(resourceid, data){
+                    var extent;
+                    _.each(data.geometries, function (geometryData) {
+                        var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
+                        geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
+                        extent = extent ? ol.extent.extend(extent, geomExtent) : geomExtent;
+                    });
+                    if (extent) {
+                        self.mapFilter.zoomToExtent(extent);
+                    }
                 }, this);
 
 
                 mapFilterText = this.mapFilter.$el.data().filtertext;
                 timeFilterText = this.timeFilter.$el.data().filtertext;
 
+                self.isNewQuery = true;
                 this.searchQuery = {
                     queryString: function(){
                         var params = {
@@ -113,7 +124,15 @@ require(['jquery',
                             spatialFilter: ko.toJSON(self.mapFilter.query.filter),
                             mapExpanded: self.mapFilter.expanded(),
                             timeExpanded: self.timeFilter.expanded()
-                        }; 
+                        };
+                        if (self.termFilter.query.filter.terms().length === 0 &&
+                            self.timeFilter.query.filter.year_min_max().length === 0 &&
+                            self.timeFilter.query.filter.filters().length === 0 &&
+                            self.mapFilter.query.filter.geometry.coordinates().length === 0) {
+                            params.no_filters = true;
+                        }
+
+                        params.include_ids = self.isNewQuery;
                         return $.param(params).split('+').join('%20');
                     },
                     changed: ko.pureComputed(function(){
@@ -131,6 +150,7 @@ require(['jquery',
                 });
 
                 this.searchQuery.changed.subscribe(function(){
+                    self.isNewQuery = true;
                     self.searchResults.page(1);
                     self.doQuery();
                 });
@@ -143,6 +163,7 @@ require(['jquery',
                     this.updateRequest.abort();
                 }
 
+                $('.loading-mask').show();
                 window.history.pushState({}, '', '?'+queryString);
 
                 this.updateRequest = $.ajax({
@@ -153,6 +174,8 @@ require(['jquery',
                         var data = self.searchResults.updateResults(results);
                         self.mapFilter.highlightFeatures(data, $('.search-result-all-ids').data('results'));
                         self.mapFilter.applyBuffer();
+                        self.isNewQuery = false;
+                        $('.loading-mask').hide();
                     },
                     error: function(){}
                 });

@@ -49,6 +49,7 @@ class Query(Dsl):
         self.se = se
         self._filtered = False
         self.filter_operator = None
+        self.fields = kwargs.pop('fields', None)
         self.start = kwargs.pop('start', 0)
         self.limit = kwargs.pop('limit', 10)
 
@@ -95,9 +96,13 @@ class Query(Dsl):
                 else:
                     self.dsl['query'] = dsl
 
-    def search(self, index='', doc_type=''):
+    def search(self, index='', doc_type='', **kwargs):
+        self.fields = kwargs.pop('fields', self.fields)
+        self.start = kwargs.pop('start', self.start)
+        self.limit = kwargs.pop('limit', self.limit)
+
         self.prepare()
-        print self
+        #print self
         return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
     def delete(self, index=''):
@@ -108,9 +113,13 @@ class Query(Dsl):
         self.dsl['size'] = self.limit
 
         if self._filtered:
-            self.dsl['query']['filtered']['filter'] = {   
-                self.filter_operator: self.dsl['query']['filtered']['filter']
-            }
+            if not ('or' in self.dsl['query']['filtered']['filter'] or 'and' in self.dsl['query']['filtered']['filter']):
+                self.dsl['query']['filtered']['filter'] = {   
+                    self.filter_operator: self.dsl['query']['filtered']['filter']
+                }
+
+        if self.fields != None:
+            self.dsl['fields'] = self.fields
 
 
 class Bool(Dsl):

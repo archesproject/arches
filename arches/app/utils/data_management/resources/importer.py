@@ -119,16 +119,12 @@ class ResourceLoader(object):
             print 'average time per entity = %s' % (elapsed/len(resource_list))
             print 'Load Identifier =', load_id
             print '***You can reverse this load with the following command:'
-            print 'python hip remove_resources --load_id', load_id
+            print 'python manage.py packages -o remove_resources --load_id', load_id
         return ret
 
     def build_master_graph(self, resource, schema):
         master_graph = None
         entity_data = []
-        for row in resource.nongroups:
-            entity = Resource()
-            entity.create_from_mapping(row.resourcetype, schema[row.attributename]['steps'], row.attributename, row.attributevalue)
-            entity_data.append(entity)
 
         if len(entity_data) > 0:
             master_graph = entity_data[0]

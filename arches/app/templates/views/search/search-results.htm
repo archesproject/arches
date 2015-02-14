@@ -1,6 +1,15 @@
+{% load staticfiles %}
 {% load i18n %}
 <!-- Content -->              
 <div style="padding-top: 0px;">
+    <div class="row" style="">
+        <div class="col-xs-11 col-xs-offset-1 col-sm-4 col-sm-offset-7 col-md-3 map-loading loading-mask" style="display: none;">
+                                
+            <img src="{% static 'img/spinner.gif' %}" height="28" width="28" style="margin-top: 2px;">
+            <p class="map-loading-text">Loading results...</p>
+           
+        </div>
+    </div>
 
     <!-- Begin Search Results -->
     <div class="col-xs-12">
@@ -40,7 +49,7 @@
 
                         <li data-bind="visible: geometries().length > 0" >
                             <i class="arches-search-link fa fa-map-marker"></i>&nbsp;
-                            <a href="javascript:void(0);" data-bind="attr: { 'data-resourceid': resourceid }" class="info-link navigate-map"><span class="arches-search-link">{% trans "Map" %}</span></a>
+                            <a href="javascript:void(0);" data-bind="attr: { 'data-resourceid': resourceid, 'data-geometries': JSON.stringify(geometries()) }" class="info-link navigate-map"><span class="arches-search-link">{% trans "Map" %}</span></a>
                         </li>
 
                     </ul>

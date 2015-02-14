@@ -65,33 +65,33 @@ def build_search_terms_dsl(request):
 
     return query
 
-def search_results(request, as_text=False):
+def search_results(request):
     dsl = build_search_results_dsl(request)
     results = dsl.search(index='entity', doc_type='') 
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
-    full_dsl = build_search_results_dsl(request, limit=1000000, page=1)
-    full_results = full_dsl.search(index='entity', doc_type='')
-    all_entity_ids = []
-    for hit in full_results['hits']['hits']:
-        all_entity_ids.append(hit['_id'])
+    all_entity_ids = ['_all']
+    if request.GET.get('include_ids', 'false') == 'false':
+        all_entity_ids = ['_none']
+    elif request.GET.get('no_filters', '') == '':
+        full_results = dsl.search(index='entity', doc_type='', start=0, limit=1000000, fields=[])
+        all_entity_ids = [hit['_id'] for hit in full_results['hits']['hits']]
 
-    return _get_pagination(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
+    return get_paginator(results, total, page, settings.SEARCH_ITEMS_PER_PAGE, all_entity_ids)
 
-def build_search_results_dsl(request, limit=None, page=None):
+def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
     spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
     export = request.GET.get('export', None)
-    if page == None:
-        page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
+    page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
 
     se = SearchEngineFactory().create()
-    if limit == None:
-        if export != None:
-            limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
-        else:
-            limit = settings.SEARCH_ITEMS_PER_PAGE
+
+    if export != None:
+        limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
+    else:
+        limit = settings.SEARCH_ITEMS_PER_PAGE
     
     query = Query(se, start=limit*int(page-1), limit=limit)
     boolquery = Bool()
@@ -151,9 +151,9 @@ def build_search_results_dsl(request, limit=None, page=None):
         start_date = date(temporal_filter['year_min_max'][0], 1, 1)
         end_date = date(temporal_filter['year_min_max'][1], 12, 31)
         if start_date:
-            start_date = start_date.strftime('%Y-%m-%d')
+            start_date = start_date.isoformat()
         if end_date:
-            end_date = end_date.strftime('%Y-%m-%d')
+            end_date = end_date.isoformat()
         range = Range(field='dates.value', gte=start_date, lte=end_date)
         nested = Nested(path='dates', query=range)
         
@@ -209,7 +209,7 @@ def _get_child_concepts(conceptid):
         ret.add(row[1])
     return list(ret)
 
-def _get_pagination(results, total_count, page, count_per_page, all_ids):
+def get_paginator(results, total_count, page, count_per_page, all_ids):
     paginator = Paginator(range(total_count), count_per_page)
     pages = [page]
     if paginator.num_pages > 1:
