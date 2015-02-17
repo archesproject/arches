@@ -183,6 +183,7 @@ require([
                 });
                 $(".knob").css("font-size", 11);
                 $(".knob").css("font-weight", 200);
+                $('[data-toggle="popover"]').popover();
             });
 
             map.on('viewChanged', function (zoom, extent) {
@@ -533,7 +534,7 @@ require([
                 self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
                 self.viewModel.selectedAddress(e.object.text);
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
-                overlay.setPositioning('bottom-center');
+                overlay.setPositioning('center-center');
                 $('#popup').show();
             });
 
@@ -546,6 +547,8 @@ require([
             });
 
             map.map.addOverlay(overlay);
+
+            $('[data-toggle="popover"]').popover();
         },
         getLayerById: function(layerId) {
             return ko.utils.arrayFirst(this.viewModel.layers(), function(item) {
