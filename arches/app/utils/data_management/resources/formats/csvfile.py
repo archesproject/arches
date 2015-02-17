@@ -9,7 +9,6 @@ class CsvWriter:
 
     def __init__(self):
         self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
-        self.legacy_concept_id_mapping = {}
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -39,7 +38,7 @@ class CsvWriter:
         schema = resource_export_configs['SCHEMA']
         resource_types = resource_export_configs['RESOURCE_TYPES']
         csv_name_prefix = resource_export_configs['NAME']
-        csv_header = self.get_column_header(schema)
+        csv_header = [column['field_name'] for column in schema]
         csvs_for_export = []
 
         csv_records = []
@@ -58,22 +57,13 @@ class CsvWriter:
 
         iso_date = datetime.datetime.now().isoformat().replace('T', '_')[0:-7].replace(':','-')
         csv_name = os.path.join(settings.PACKAGE_ROOT, export_temp_directory, '{0} {1}'.format(csv_name_prefix, iso_date))
-        with open(csv_name + '.csv', 'w') as dest:
+        with open(csv_name + '.csv', 'wb') as dest:
             csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(csv_name)
             for csv_record in csv_records:
                 csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
         return csvs_for_export
-
-    def get_column_header(self, schema):
-        """
-        Create the column header from the export mapping schema
-        """
-        header = []
-        for column in schema:
-            header.append(column['field_name'])
-        return header
 
     def create_template_record(self, schema, resource, resource_type):
         """
@@ -110,11 +100,7 @@ class CsvWriter:
             mapping = mapping[0]
             conceptid = ''
             if 'value_type' in mapping:
-                if mapping['value_type'] in self.legacy_concept_id_mapping:
-                    conceptid = self.legacy_concept_id_mapping[mapping['value_type']]
-                else:
-                    conceptid = Concept().get(legacyoid=mapping['value_type']).id
-                    self.legacy_concept_id_mapping[mapping['value_type']] = conceptid
+                conceptid = mapping['value_type']
             entitytypeid = mapping['entitytypeid']
             for entity in resource['_source']['child_entities']:
                 if entitytypeid == entity['entitytypeid'] and conceptid == '':
