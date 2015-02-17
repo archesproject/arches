@@ -155,7 +155,8 @@ define([
 
         return new LayerModel(_.extend({
                 layer: layer,
-                onMap: true
+                onMap: true,
+                isArchesLayer: true
             }, config)
         );
     };

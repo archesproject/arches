@@ -217,7 +217,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <input class="knob" style="font-weight: normal;" data-width="32" data-height="60" data-fgColor="#65a5da" data-angleOffset=-145 data-angleArc=290 value="100" data-thickness=.3 data-bind="attr: {'data-layerid': id}">
 
                                                             <div style="margin-top: -63px; margin-left: 47px;">
-                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
+                                                                <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="if: isArchesLayer, attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
 
                                                                 <a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-bind="if: infoContent, attr: {'data-content': infoContent}" data-html="true" title="Layer info" ><i class="fa fa-2x fa-info-circle" style="color: #65a5da;"></i></a>
 
