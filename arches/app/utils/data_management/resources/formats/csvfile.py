@@ -55,7 +55,7 @@ class CsvWriter:
                 csv_record = self.concatenate_value_lists(complete_record)
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().isoformat().replace('T', ' ')[0:-7]
+        iso_date = datetime.datetime.now().isoformat().replace('T', '_')[0:-7].replace(':','-')
         csv_name = os.path.join(settings.PACKAGE_ROOT, export_temp_directory, '{0} {1}'.format(csv_name_prefix, iso_date))
         with open(csv_name + '.csv', 'w') as dest:
             csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
