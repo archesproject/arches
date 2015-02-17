@@ -534,7 +534,7 @@ require([
                 self.map.map.getView().fitExtent(geom.getExtent(), self.map.map.getSize());
                 self.viewModel.selectedAddress(e.object.text);
                 overlay.setPosition(ol.extent.getCenter(geom.getExtent()));
-                overlay.setPositioning('bottom-center');
+                overlay.setPositioning('center-center');
                 $('#popup').show();
             });
 
