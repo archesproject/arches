@@ -31,7 +31,7 @@ class CsvWriter:
             using_default_mapping = True
         for resource in resources:
             if resource['_type'] in resource_export_configs['RESOURCE_TYPES']:
-                resource_export_configs['RESOURCE_TYPES'][resource['_type']]['records'].append(resource) 
+                resource_export_configs['RESOURCE_TYPES'][resource['_type']]['records'].append(resource)
             if using_default_mapping:
                 resource_export_configs['RECORDS'].append(resource)
 
@@ -96,42 +96,44 @@ class CsvWriter:
         collects values that correspond each entitytypeid in the field map.  Inserts those
         values into the template record's corresponding list of values.
         """
+        domains = resource['_source']['domains']
+        child_entities = resource['_source']['child_entities']
         for mapping in field_map:
             mapping = mapping[0]
             conceptid = ''
             if 'value_type' in mapping:
                 conceptid = mapping['value_type']
             entitytypeid = mapping['entitytypeid']
+            alternates = False
+            alternate_entitytypeid = None
+            alternate_values = None
+
             if 'alternate_entitytypeid' in mapping:
                 alternates = True
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
-            else:
-                alternates = False
-            for entity in resource['_source']['child_entities']:
+
+            for entity in child_entities:
+                if alternate_entitytypeid == entity['entitytypeid']:
+                    alternate_values.append(entity['value'])
                 if entitytypeid == entity['entitytypeid'] and conceptid == '':
                     template_record[mapping['field_name']].append(entity['value'])
-                if alternates == True and alternate_entitytypeid == entity['entitytypeid']:
-                    alternate_values.append(entity['value'])
                 elif entitytypeid == entity['entitytypeid'] and conceptid != '':
-                    for domain in resource['_source']['domains']:
-                        if entity['entityid'] == domain['parentid'] and conceptid == domain['conceptid']:
-                            template_record[mapping['field_name']].append(entity['value'])
-                elif alternates == True and conceptid != '':
-                    if alternate_entitytypeid == entity['entitytypeid']:
-                        for domain in resource['_source']['domains']:
-                            if entity['entityid'] == domain['parentid'] and conceptid == domain['conceptid']:
-                                alternate_values.append(entity['value'])
+                    for domain in domains:
+                        if conceptid == domain['conceptid']:
+                            if entity['entityid'] == domain['parentid']:
+                                template_record[mapping['field_name']].append(entity['value'])
+
             if len(template_record[mapping['field_name']]) == 0:
-                for domain in resource['_source']['domains']:
-                    if domain['entitytypeid'] == entitytypeid:
+                for domain in domains:
+                    if entitytypeid == domain['entitytypeid']:
                         template_record[mapping['field_name']].append(domain['label'])
-                    if alternates == True:
-                        if alternate_entitytypeid == domain['entitytypeid']:
-                            alternate_values.append(entity['value'])
+                    if alternate_entitytypeid == domain['entitytypeid']:
+                        alternate_values.append(entity['value'])
+
             if alternates == True and len(template_record[mapping['field_name']]) == 0:
                 if len(alternate_values) > 0:
-                    template_reccord[mapping['field_name']] = alternate_values
+                    template_record[mapping['field_name']] = alternate_values
 
         return template_record
 
