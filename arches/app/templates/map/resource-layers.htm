@@ -12,7 +12,8 @@
                 ],
                 onMap: true,
                 vectorColor: "#C4171D",
-                iconColor: "#C4171D"
+                iconColor: "#C4171D",
+                infoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: all' %}</div>"
             },
             {% for type, type_data in resource_types %}
             {% if type_data.has_layer %}
@@ -32,7 +33,8 @@
                 onMap: false,
                 {% endif %}
                 vectorColor: "{{type_data.marker_color}}",
-                iconColor: "{{type_data.marker_color}}"
+                iconColor: "{{type_data.marker_color}}",
+                infoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: all' %}</div>"
             },
             {% endif %}
             {% endfor %}

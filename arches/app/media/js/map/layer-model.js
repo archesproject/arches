@@ -11,7 +11,7 @@ define([
                 categories: [],
                 onMap: false,
                 iconColor: "#FFFFFF",
-                layerInfo: null
+                infoContent: null
             };
         _.extend(layerModel, config);
         return layerModel;
