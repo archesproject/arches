@@ -102,17 +102,36 @@ class CsvWriter:
             if 'value_type' in mapping:
                 conceptid = mapping['value_type']
             entitytypeid = mapping['entitytypeid']
+            if 'alternate_entitytypeid' in mapping:
+                alternates = True
+                alternate_entitytypeid = mapping['alternate_entitytypeid']
+                alternate_values = []
+            else:
+                alternates = False
             for entity in resource['_source']['child_entities']:
                 if entitytypeid == entity['entitytypeid'] and conceptid == '':
                     template_record[mapping['field_name']].append(entity['value'])
+                if alternates == True and alternate_entitytypeid == entity['entitytypeid']:
+                    alternate_values.append(entity['value'])
                 elif entitytypeid == entity['entitytypeid'] and conceptid != '':
                     for domain in resource['_source']['domains']:
                         if entity['entityid'] == domain['parentid'] and conceptid == domain['conceptid']:
                             template_record[mapping['field_name']].append(entity['value'])
-                if len(template_record[mapping['field_name']]) == 0:
-                    for domain in resource['_source']['domains']:
-                        if domain['entitytypeid'] == entitytypeid:
-                            template_record[mapping['field_name']].append(domain['label'])
+                elif alternates == True and conceptid != '':
+                    if alternate_entitytypeid == entity['entitytypeid']:
+                        for domain in resource['_source']['domains']:
+                            if entity['entityid'] == domain['parentid'] and conceptid == domain['conceptid']:
+                                alternate_values.append(entity['value'])
+            if len(template_record[mapping['field_name']]) == 0:
+                for domain in resource['_source']['domains']:
+                    if domain['entitytypeid'] == entitytypeid:
+                        template_record[mapping['field_name']].append(domain['label'])
+                    if alternates == True:
+                        if alternate_entitytypeid == domain['entitytypeid']:
+                            alternate_values.append(entity['value'])
+            if alternates == True and len(template_record[mapping['field_name']]) == 0:
+                if len(alternate_values) > 0:
+                    template_reccord[mapping['field_name']] = alternate_values
 
         return template_record
 
