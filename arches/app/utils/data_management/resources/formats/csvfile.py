@@ -9,6 +9,7 @@ class CsvWriter:
 
     def __init__(self):
         self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
+        self.legacy_concept_id_mapping = {}
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
@@ -109,7 +110,11 @@ class CsvWriter:
             mapping = mapping[0]
             conceptid = ''
             if 'value_type' in mapping:
-                conceptid = Concept().get(legacyoid=mapping['value_type']).id
+                if mapping['value_type'] in self.legacy_concept_id_mapping:
+                    conceptid = self.legacy_concept_id_mapping[mapping['value_type']]
+                else:
+                    conceptid = Concept().get(legacyoid=mapping['value_type']).id
+                    self.legacy_concept_id_mapping[mapping['value_type']] = conceptid
             entitytypeid = mapping['entitytypeid']
             for entity in resource['_source']['child_entities']:
                 if entitytypeid == entity['entitytypeid'] and conceptid == '':
