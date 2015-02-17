@@ -218,12 +218,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <div style="margin-top: -63px; margin-left: 47px;">
                                                                 <a href="javascript:void(0);" class="zoom layer-zoom" title="zoom to overlay" data-bind="attr: {'data-layerid': id}"><i class="fa fa-2x fa-search" style="color: #65a5da;"></i></a> &nbsp;
-                                                                
-                                                                <span class="hidden" style="color: #808080;font-size: 11px;">{% trans 'visible zoom range' %}: 
-                                                                    <span data-bind="text: visibleZoomRange"></span>
-                                                                </span>
 
-                                                                <a href="javascript:void(0);" class="" rel="popover-hover" data-placement="right" title="Layer info" data-content="Visible zoom range:"><i class="fa fa-2x fa-info-circle" style="color: #65a5da;"></i></a>
+                                                                <a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-bind="if: layerInfo, attr: {'data-content': layerInfo}" data-html="true" title="Layer info" ><i class="fa fa-2x fa-info-circle" style="color: #65a5da;"></i></a>
 
                                                             </div>
 

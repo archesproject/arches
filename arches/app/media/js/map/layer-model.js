@@ -11,7 +11,7 @@ define([
                 categories: [],
                 onMap: false,
                 iconColor: "#FFFFFF",
-                visibleZoomRange: 'all'
+                layerInfo: null
             };
         _.extend(layerModel, config);
         return layerModel;

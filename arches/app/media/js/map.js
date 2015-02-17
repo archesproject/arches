@@ -183,6 +183,7 @@ require([
                 });
                 $(".knob").css("font-size", 11);
                 $(".knob").css("font-weight", 200);
+                $('[data-toggle="popover"]').popover();
             });
 
             map.on('viewChanged', function (zoom, extent) {
@@ -546,6 +547,8 @@ require([
             });
 
             map.map.addOverlay(overlay);
+
+            $('[data-toggle="popover"]').popover();
         },
         getLayerById: function(layerId) {
             return ko.utils.arrayFirst(this.viewModel.layers(), function(item) {
