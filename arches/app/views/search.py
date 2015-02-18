@@ -23,6 +23,7 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator
 from django.utils.importlib import import_module
 from django.contrib.gis.geos import GEOSGeometry
+from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -49,7 +50,7 @@ def search_terms(request):
 
     for result in results['hits']['hits']:
         prefLabel = get_preflabel_from_conceptid(result['_source']['context'], lang)
-        result['_source']['context'] = prefLabel['value']
+        result['_source']['options']['context_label'] = prefLabel['value']
 
     return JSONResponse(results)
 
@@ -100,10 +101,11 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                boolfilter_folded = Bool()
-                boolfilter_folded.should(Match(field='child_entities.value', query=term['value'], type='phrase'))
-                boolfilter_folded.should(Match(field='child_entities.value.folded', query=term['value'], type='phrase'))
-                nested = Nested(path='child_entities', query=boolfilter_folded)
+                entitytype = EntityTypes.objects.get(conceptid_id=term['context'])
+                boolfilter_nested = Bool()
+                boolfilter_nested.must(Terms(field='child_entities.entitytypeid', terms=[entitytype.pk]))
+                boolfilter_nested.must(Match(field='child_entities.value', query=term['value'], type='phrase'))
+                nested = Nested(path='child_entities', query=boolfilter_nested)
                 if term['inverted']:
                     boolfilter.must_not(nested)
                 else:    
@@ -120,7 +122,6 @@ def build_search_results_dsl(request):
                 boolfilter_folded = Bool()
                 boolfilter_folded.should(Match(field='child_entities.value', query=term['value'], type='phrase_prefix'))
                 boolfilter_folded.should(Match(field='child_entities.value.folded', query=term['value'], type='phrase_prefix'))
-                #phrase = Match(field='child_entities.value', query=term['value'], type='phrase_prefix')
                 nested = Nested(path='child_entities', query=boolfilter_folded)
                 if term['inverted']:
                     boolquery.must_not(nested)

@@ -56,6 +56,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                             inverted: false,
                             type: 'string',
                             context: '',
+                            context_label: '',
                             id: value,
                             text: value,
                             value: value
@@ -65,6 +66,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                                 inverted: false,
                                 type: this._source.options.conceptid ? 'concept' : 'term',
                                 context: this._source.context,
+                                context_label: this._source.options.context_label,
                                 id: this._source.term + this._source.context,
                                 text: this._source.term,
                                 value: this._source.options.conceptid ? this._source.options.conceptid : this._source.term
@@ -76,12 +78,12 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 formatResult:function(result, container, query, escapeMarkup){
                     var markup=[];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
-                    var context = result.context != '' ? '<i class="concept_result_schemaname">(' + result.context + ')</i>' : '';
+                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
                     var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span>' + context;
                     return formatedresult;
                 },
                 formatSelection: function(result){
-                    var context = result.context != '' ? '<i class="concept_result_schemaname">(' + result.context + ')</i>' : '';
+                    var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + result.context_label + ')</i>' : '';
                     var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
                     if(result.inverted){
                         markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
@@ -105,7 +107,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                         self.trigger('filter-removed', e.removed);
                     }else{
                         self.query.filter.terms.remove(function(item){
-                            return item.id === e.removed.id && item.context === e.removed.context;
+                            return item.id === e.removed.id && item.context_label === e.removed.context_label;
                         });                   
                     }
                 }
@@ -146,6 +148,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                 inverted: inverted,
                 type: 'filter-flag',
                 context: '',
+                context_label: '',
                 id: term,
                 text: term,
                 value: term
@@ -190,6 +193,7 @@ define(['jquery', 'backbone', 'arches', 'select2', 'knockout'], function ($, Bac
                         inverted: this.inverted,
                         type: this.type,
                         context: this.context,
+                        context_label: this.context_label,
                         id: this.id,
                         text: this.text,
                         value: this.value
