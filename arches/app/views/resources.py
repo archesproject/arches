@@ -110,9 +110,7 @@ def get_related_resources(resourceid, lang, limit=1000, start=0):
 def map_layers(request, entitytypeid='all', get_centroids=False):
     data = []
 
-    geom = request.GET.get('geom', '')
-    if geom == 'centroid':
-        get_centroids = True
+    geom_param = request.GET.get('geom', None)
 
     bbox = request.GET.get('bbox', '')
     limit = request.GET.get('limit', settings.MAP_LAYER_FEATURE_LIMIT)
@@ -139,6 +137,10 @@ def map_layers(request, entitytypeid='all', get_centroids=False):
         if get_centroids:
             item['_source']['geometry'] = item['_source']['properties']['centroid']
             item['_source'].pop('properties', None)
+        elif geom_param != None:
+            item['_source']['geometry'] = item['_source']['properties'][geom_param]
+            item['_source']['properties'].pop('extent', None)
+            item['_source']['properties'].pop(geom_param, None)
         else:
             item['_source']['properties'].pop('extent', None)
             item['_source']['properties'].pop('centroid', None)
