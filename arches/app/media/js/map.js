@@ -389,9 +389,9 @@ require([
 
             ko.applyBindings(self.viewModel, $('body')[0]);
 
-            $(".basemap").click(function (){ 
+            $(".basemap").click(function (){
                 var basemap = $(this).attr('id');
-                _.each(map.baseLayers, function(baseLayer){ 
+                _.each(map.baseLayers, function(baseLayer){
                     baseLayer.layer.setVisible(baseLayer.id == basemap);
                 });
                 hideAllPanels();
@@ -437,7 +437,7 @@ require([
             });
 
             //Close Button
-            $(".close").click(function (){ 
+            $(".close").click(function (){
                 hideAllPanels();
             });
 
@@ -458,7 +458,7 @@ require([
                     var layer = ko.utils.arrayFirst(self.viewModel.layers(), function(item) {
                         return layerId === item.id;
                     });
-                    layer.layer.setOpacity(value/100)
+                    layer.layer.setOpacity(value/100);
                 }
             });
             $(".knob").css("font-size", 11);
@@ -466,7 +466,7 @@ require([
 
             $(".ol-zoom").css("top", "10px");
             $(".ol-zoom").css("z-index", "500");
-            $(".ol-attribution").css("margin-bottom", "70px")
+            $(".ol-attribution").css("margin-bottom", "70px");
 
             //Select2 Simple Search initialize
             $('.layerfilter').select2({
@@ -477,11 +477,11 @@ require([
                     });
 
                     return {
-                        results: _.map(terms, function(term) { 
+                        results: _.map(terms, function(term) {
                             return {
                                 id: _.uniqueId('term'),
                                 text: term
-                            }
+                            };
                         })
                     };
                 },
