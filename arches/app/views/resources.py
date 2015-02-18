@@ -109,6 +109,11 @@ def get_related_resources(resourceid, lang, limit=1000, start=0):
 
 def map_layers(request, entitytypeid='all', get_centroids=False):
     data = []
+
+    geom = request.GET.get('geom', '')
+    if geom == 'centroid':
+        get_centroids = True
+
     bbox = request.GET.get('bbox', '')
     limit = request.GET.get('limit', settings.MAP_LAYER_FEATURE_LIMIT)
     entityids = request.GET.get('entityid', '')
