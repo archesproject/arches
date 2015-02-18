@@ -51,6 +51,7 @@ define(['jquery',
                     });
                 }
                 nodeInfoPanel.hide();
+                $(e.target).closest('li').toggleClass('graph-active');
                 graphPanel.slideToggle(500);
             },
 

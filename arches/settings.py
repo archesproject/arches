@@ -172,7 +172,7 @@ MEDIA_ROOT =  os.path.join(ROOT_DIR, 'uploadedfiles')
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files. 
 # It must end in a slash if set to a non-empty value.
-MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = ''
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files

@@ -324,7 +324,7 @@ class FileValues(models.Model):
 
     def getname(self):
         if self.value != None:
-            return self.value.name[6:]
+            return self.value.name
         return ''
 
 class AuthGroupPermissions(models.Model):
@@ -421,7 +421,7 @@ class Files(models.Model):
 
     def getname(self):
         if self.val != None:
-            return self.val.name[6:]
+            return self.val.name
         return ''
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
