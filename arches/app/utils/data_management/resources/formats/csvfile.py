@@ -5,6 +5,11 @@ import datetime
 from arches.app.models.concept import Concept
 import codecs
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 class CsvWriter:
 
     def __init__(self):
@@ -55,14 +60,14 @@ class CsvWriter:
                 csv_record = self.concatenate_value_lists(complete_record)
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().isoformat().replace('T', '_')[0:-7].replace(':','-')
-        csv_name = os.path.join(settings.PACKAGE_ROOT, export_temp_directory, '{0} {1}'.format(csv_name_prefix, iso_date))
-        with open(csv_name + '.csv', 'wb') as dest:
-            csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
-            csvwriter.writeheader()
-            csvs_for_export.append(csv_name)
-            for csv_record in csv_records:
-                csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
+        iso_date = datetime.datetime.now().isoformat().replace('T', '_')[0:-7]
+        csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
+        dest = StringIO()
+        csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
+        csvwriter.writeheader()
+        csvs_for_export.append({'name':csv_name, 'outputfile': dest})
+        for csv_record in csv_records:
+            csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
         return csvs_for_export
 
     def create_template_record(self, schema, resource, resource_type):

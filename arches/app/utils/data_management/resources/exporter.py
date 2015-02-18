@@ -22,7 +22,6 @@ class ResourceExporter(object):
         self.export_temp_directory = os.path.join(settings.PACKAGE_ROOT, 'source_data', 'business_data', 'tmp_export_files')
 
     def export(self, resources, zip=False):
-        self.clean_up_old_export_files()
         configs = self.read_export_configs()
         result = self.writer.write_resources(resources, configs, self.export_temp_directory)
         return result
@@ -45,15 +44,11 @@ class ResourceExporter(object):
         Given a list of export file names, zips up all the files with those names and returns and http response.
         '''
         buffer = StringIO()
-        zip = zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED)
 
-        for filename in files_for_export:
-            if file_type:
-                for f in glob.glob(filename + '*' + file_type):
-                    zip.write(f, os.path.basename(f))
-            else:
-                for f in glob.glob(filename + '*'):
-                    zip.write(f, os.path.basename(f))
+        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip:
+            for f in files_for_export:
+                f['outputfile'].seek(0)
+                zip.writestr(f['name'], f['outputfile'].read())
 
         zip.close()
         buffer.flush()
