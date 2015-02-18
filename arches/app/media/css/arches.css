@@ -1279,3 +1279,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     text-anchor: middle;
     pointer-events: none;
 }
+
+a:hover {
+ cursor:pointer;
+}
