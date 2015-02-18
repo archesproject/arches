@@ -19,7 +19,7 @@ require([
         $('#layerslider').layerSlider({
             skinsPath: arches.urls.media + 'plugins/layer_slider/skins/',
             skin: 'fullwidth',
-            thumbnailNavigation: 'hover',
+            thumbnailNavigation: false,
             hoverPrevNext: true,
             responsive: true,
             responsiveUnder: 960,
