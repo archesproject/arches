@@ -961,7 +961,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     color: #999;
 }
 
-.arches-search-link.active {
+.active .arches-search-link {
     color: #4765a0;
 }
 
