@@ -62,15 +62,6 @@ class ResourceExporter(object):
         response.write(zip_stream)
         return response
 
-    def clean_up_old_export_files(self):
-        files = glob.glob(os.path.join(self.export_temp_directory,"*"))
-        for f in files:
-            if os.path.basename(f) != '__init__.py':
-                last_modified = os.path.getmtime(f)
-                last_modified_time = datetime.datetime.fromtimestamp(last_modified)
-                current_time = datetime.datetime.now()
-                if (current_time - last_modified_time).seconds > 3600:
-                    os.remove(f)
 
 
 
