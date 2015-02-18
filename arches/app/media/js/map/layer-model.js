@@ -1,5 +1,5 @@
 define([
-    'underscore'
+    'underscore',
 ], function(_) {
     return function(config) {
         var layerModel = {
@@ -11,7 +11,8 @@ define([
                 categories: [],
                 onMap: false,
                 iconColor: "#FFFFFF",
-                infoContent: null
+                infoContent: null,
+                isArchesLayer: false
             };
         _.extend(layerModel, config);
         return layerModel;
