@@ -60,7 +60,7 @@ class CsvWriter:
                 csv_record = self.concatenate_value_lists(complete_record)
                 csv_records.append(csv_record)
 
-        iso_date = datetime.datetime.now().isoformat().replace('T', '_')[0:-7]
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         csv_name = os.path.join('{0}_{1}.{2}'.format(csv_name_prefix, iso_date, 'csv'))
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=csv_header)
