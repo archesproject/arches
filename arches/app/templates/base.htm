@@ -206,6 +206,8 @@
                     // main page script require
                     require(["{{ main_script }}"]);
                 {% endif %}
+
+                $('[data-toggle="popover"]').popover();
             });
         });
     </script>
