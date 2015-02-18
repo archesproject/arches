@@ -118,18 +118,18 @@ class CsvWriter:
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
 
-            for entity in child_entities:
-                if alternate_entitytypeid == entity['entitytypeid']:
-                    alternate_values.append(entity['value'])
-                if entitytypeid == entity['entitytypeid'] and conceptid == '':
-                    template_record[mapping['field_name']].append(entity['value'])
-                elif entitytypeid == entity['entitytypeid'] and conceptid != '':
-                    for domain in domains:
-                        if conceptid == domain['conceptid']:
-                            if entity['entityid'] == domain['parentid']:
-                                template_record[mapping['field_name']].append(entity['value'])
-
-            if len(template_record[mapping['field_name']]) == 0:
+            if entitytypeid.endswith('E55') != True:
+                for entity in child_entities:
+                    if alternate_entitytypeid == entity['entitytypeid']:
+                        alternate_values.append(entity['value'])
+                    if entitytypeid == entity['entitytypeid'] and conceptid == '':
+                        template_record[mapping['field_name']].append(entity['value'])
+                    elif entitytypeid == entity['entitytypeid'] and conceptid != '':
+                        for domain in domains:
+                            if conceptid == domain['conceptid']:
+                                if entity['entityid'] == domain['parentid']:
+                                    template_record[mapping['field_name']].append(entity['value'])
+            else:
                 for domain in domains:
                     if entitytypeid == domain['entitytypeid']:
                         template_record[mapping['field_name']].append(domain['label'])
