@@ -151,6 +151,12 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 
+/* index slider */
+.ls-bottom-slidebuttons {
+    display: none;
+}
+
+
 
 /*D3 Concept Graph Classes*/
 .node {
@@ -959,10 +965,19 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .arches-search-link {
     color: #999;
+    padding-left: 3px;
 }
 
+.graph-active {
+    background: #428bca;
+    border: 1px solid #357ebd;
+    border-radius: 2px;
+}
+
+
 .graph-active .arches-search-link {
-    color: #4765a0;
+    color: #fff;
+    font-weight: 200;
 }
 
 .arches-search-subtitle {
