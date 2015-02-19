@@ -69,13 +69,14 @@ define(['jquery',
                 self.results.removeAll();
                 
                 $.each(data.results.hits.hits, function(){
-                    var description,
+                    var description = 'No description available',
                         descriptionnode = resourceTypes[this._source.entitytypeid].description;
                     $.each(this._source.child_entities, function(i, entity){
                         if (entity.entitytypeid === descriptionnode){
                             description = entity.value;
                         }
                     })
+
                     self.results.push({
                         primaryname: this._source.primaryname,
                         resourceid: this._source.entityid,
