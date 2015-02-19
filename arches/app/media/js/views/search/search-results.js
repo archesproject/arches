@@ -69,11 +69,18 @@ define(['jquery',
                 self.results.removeAll();
                 
                 $.each(data.results.hits.hits, function(){
+                    var description,
+                        descriptionnode = resourceTypes[this._source.entitytypeid].description;
+                    $.each(this._source.child_entities, function(i, entity){
+                        if (entity.entitytypeid === descriptionnode){
+                            description = entity.value;
+                        }
+                    })
                     self.results.push({
                         primaryname: this._source.primaryname,
                         resourceid: this._source.entityid,
                         entitytypeid: this._source.entitytypeid,
-                        descritption: '',
+                        description: description,
                         geometries: ko.observableArray(this._source.geometries),
                         typeIcon: resourceTypes[this._source.entitytypeid].icon,
                         typeName: resourceTypes[this._source.entitytypeid].name

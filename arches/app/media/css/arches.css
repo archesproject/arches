@@ -995,6 +995,15 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     border: 1px solid #943434 !important;
 }
 
+.arches-search-item-description {
+    margin-bottom: 5px;
+    color: #999;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 200;
+    margin-top: -3px;
+}
+
 /* Map Filter*/
 
 /*element.style {
