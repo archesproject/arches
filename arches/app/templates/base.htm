@@ -169,7 +169,8 @@
                         id: "{{type_data.resourcetypeid}}",
                         icon: "{{type_data.icon_class}}",
                         name: "{{type_data.name}}",
-                        description: "{{type_data.description}}",
+                        defaultDescription: "{{type_data.default_description}}",
+                        descriptionNode: "{{type_data.description_node}}",
                         categories: [
                             {% for category in type_data.categories %}
                             "{{category}}"

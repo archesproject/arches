@@ -69,10 +69,10 @@ define(['jquery',
                 self.results.removeAll();
                 
                 $.each(data.results.hits.hits, function(){
-                    var description = 'No description available',
-                        descriptionnode = resourceTypes[this._source.entitytypeid].description;
+                    var description = resourceTypes[this._source.entitytypeid].defaultDescription;
+                    var descriptionNode = resourceTypes[this._source.entitytypeid].descriptionNode;
                     $.each(this._source.child_entities, function(i, entity){
-                        if (entity.entitytypeid === descriptionnode){
+                        if (entity.entitytypeid === descriptionNode){
                             description = entity.value;
                         }
                     })
