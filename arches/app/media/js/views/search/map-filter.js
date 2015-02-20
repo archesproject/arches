@@ -25,13 +25,7 @@ define(['jquery',
 
                 //  Handle show/hide toggle ourselves
                 $('#map-tools-btn').on('click', function(evt) {
-                    if($(evt.currentTarget).hasClass('open')){
-                        self.disableDrawingTools();
-                    }
-                    else {
-                        self.enableDrawingTools();
-                    }
-                    $(evt.currentTarget).toggleClass('open');
+                    self.toggleMapTools();
                     return false;
                 });
                 $('#map-tools-dropdown').on('click', 'a', function(evt) {
@@ -690,9 +684,22 @@ define(['jquery',
                 }
             },
 
+            toggleMapTools: function() {
+                if($('#map-tools-btn').hasClass('open')){
+                    this.disableDrawingTools();
+                }
+                else {
+                    this.enableDrawingTools();
+                }
+                $('#map-tools-btn').toggleClass('open');
+            },
+
             toggleFilterSection: function(ele, expand){
                 if(expand){
                     this.slideToggle(ele, 'show');
+                    if(!$('#map-tools-btn').hasClass('open')){
+                        this.toggleMapTools();
+                    }
                 }else{
                     this.slideToggle(ele, 'hide');               
                 }
