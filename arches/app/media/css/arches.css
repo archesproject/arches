@@ -1285,7 +1285,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 .loading-mask {
     z-index: 10000;
     position: absolute;
-    width: 200px;
     margin-left: auto;
     margin-right: auto;
     left: 0;
