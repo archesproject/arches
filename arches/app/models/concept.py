@@ -538,7 +538,7 @@ class Concept(object):
     def get_context(self):
         if self.nodetype == 'Concept' or self.nodetype == 'Collection' or self.nodetype == 'EntityType':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
-            print JSONSerializer().serializeToPython(concept)
+            #print JSONSerializer().serializeToPython(concept)
             def get_scheme_id(concept):
                 if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
                     return concept

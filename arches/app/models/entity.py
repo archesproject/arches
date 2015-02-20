@@ -26,7 +26,7 @@ from django.contrib.gis.geos import fromstr
 from django.db import connection
 from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -130,6 +130,19 @@ class Entity(object):
             themodelinstance = themodel()
             themodelinstance.entityid = entity
 
+            # if we need to populate the E32 nodes then this is the code to do it, 
+            # but it really slows down the save so i'm leaving it commented for now
+            # if (isinstance(themodelinstance, archesmodels.Domains)):
+            #     setattr(themodelinstance, columnname, self.value)
+            #     themodelinstance.save()
+            #     concept = Concept(themodelinstance.val.conceptid).get_context()
+            #     if concept:
+            #         if len(self.child_entities) == 0:
+            #             rule = archesmodels.Rules.objects.filter(entitytypedomain_id=self.entitytypeid)
+            #             if len(rule) == 1:
+            #                 self.add_child_entity(rule[0].entitytyperange_id, rule[0].propertyid_id, concept.id, '')
+            #         elif len(self.child_entities) == 1:
+            #             self.child_entities[0].value = concept.id
             if (isinstance(themodelinstance, archesmodels.Files)): 
                 # Saving of files must be handled specially
                 # Because on subsequent saves of a file resource, we post back the file path url (instead of posting the file like we originally did),
@@ -291,7 +304,7 @@ class Entity(object):
     def can_merge(self, entitytomerge):
         """
         A test to see whether 2 nodes can merge or not
-        
+
         """  
 
         # if the nodes are equal attempt a merge otherwise don't bother
