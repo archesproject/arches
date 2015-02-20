@@ -89,6 +89,7 @@ MAP_MAX_ZOOM = 156543.03392804097
 MAP_LAYER_FEATURE_LIMIT = 100000
 
 BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
+GOOGLE_ANALYTICS_TRACKING_ID = None
 
 RESOURCE_TYPE_CONFIGS = {
     # override this setting in your packages settings.py file
@@ -272,7 +273,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'arches.app.utils.context_processors.livereload',
     'arches.app.utils.context_processors.resource_types',
     'arches.app.utils.context_processors.map_info',
-    'arches.app.utils.context_processors.app_name',
+    'arches.app.utils.context_processors.app_settings',
     'arches.app.utils.context_processors.user_can_edit',
 )
 

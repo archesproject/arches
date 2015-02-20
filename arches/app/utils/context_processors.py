@@ -42,9 +42,10 @@ def resource_types(request):
         'resource_types': sorted_resource_types
     }
 
-def app_name(request):
+def app_settings(request):
     return {
-        'APP_NAME': settings.APP_NAME
+        'APP_NAME': settings.APP_NAME,
+        'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID
     }
 
 def user_can_edit(request):
