@@ -1284,14 +1284,16 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 .loading-mask {
     z-index: 10000;
-    top: 0;
+    position: absolute;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
     left: 0;
-    width: 94%;
-    margin-top: -5px;
-    margin-left: 35px;
-    margin-bottom: 10px;
-    background-color: #E67373;
-    border: 1px solid #BE4343;
+    right: 0;
+    top: 45%;
+    width: 200px;
+    background-color: #619462;
+    border: 1px solid #154103;
 }
 
 .root-node-label {
