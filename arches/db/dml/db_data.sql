@@ -21,7 +21,7 @@ SET search_path = concepts, pg_catalog;
 -- Data for Name: d_languages; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_languages VALUES ('en-us', 'ENGLISH', true);
+INSERT INTO d_languages VALUES ('en-US', 'ENGLISH', true);
 
 
 --
@@ -106,12 +106,12 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-us');
---INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'Entity Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'Dropdown Lists', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'Entity Nodes', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-us');
-INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-us');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
+--INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000002', 'prefLabel', 'Entity Types', 'en-US');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000003', 'prefLabel', 'Dropdown Lists', 'en-US');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000004', 'prefLabel', 'Entity Nodes', 'en-US');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
+INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-US');
 
 
 SET search_path = ontology, pg_catalog;

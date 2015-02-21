@@ -34,7 +34,7 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
-    lang = request.GET.get('lang', 'en-us')
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
 
     return render_to_response('search.htm', {
             'main_script': 'search',
@@ -43,7 +43,7 @@ def home_page(request):
         context_instance=RequestContext(request))
 
 def search_terms(request):
-    lang = request.GET.get('lang', 'en-us')
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     
     query = build_search_terms_dsl(request)
     results = query.search(index='term', doc_type='value')

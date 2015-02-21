@@ -22,6 +22,7 @@ from operator import itemgetter
 from operator import methodcaller
 from django.db import transaction, connection
 from django.db.models import Q
+from django.conf import settings
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
@@ -84,7 +85,7 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang='en-us', **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
         if id != '':
             self.load(models.Concepts.objects.get(pk=id))
         elif legacyoid != '':
@@ -227,7 +228,7 @@ class Concept(object):
         return
 
     @staticmethod
-    def gather_concepts_to_delete(concept, lang='en-us'):
+    def gather_concepts_to_delete(concept, lang=settings.LANGUAGE_CODE):
         """
         Gets a dictionary of all the concepts ids to delete
         The values of the dictionary keys differ somewhat depending on the node type being deleted
@@ -322,14 +323,14 @@ class Concept(object):
                 if ret != None: 
                     return ret        
 
-    def get_sortkey(self, lang='en-us'):
+    def get_sortkey(self, lang=settings.LANGUAGE_CODE):
         for value in self.values:
             if value.type == 'sortorder':
                 return value.value
                 
         return self.get_preflabel(lang=lang).value
 
-    def get_preflabel(self, lang='en-us'):
+    def get_preflabel(self, lang=settings.LANGUAGE_CODE):
         ret = []
         if self.values == []: 
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
@@ -421,7 +422,7 @@ class Concept(object):
         for value in self.values:
             value.delete_index()
 
-    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang='en-us'):
+    def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
         class concept(object):
             def __init__(self, *args, **kwargs):
                 self.label = ''
@@ -486,7 +487,7 @@ class Concept(object):
 
         return graph
 
-    def get_paths(self, lang='en-us'):
+    def get_paths(self, lang=settings.LANGUAGE_CODE):
         def graph_to_paths(current_concept, path=[], path_list=[]):
             if len(path) == 0:
                 current_path = []
@@ -505,7 +506,7 @@ class Concept(object):
 
         return graph_to_paths(self)
 
-    def get_node_and_links(self, lang='en-us'):
+    def get_node_and_links(self, lang=settings.LANGUAGE_CODE):
         nodes = [{'concept_id': self.id, 'name': self.get_preflabel(lang=lang).value,'type': 'Current'}]
         links = []
 

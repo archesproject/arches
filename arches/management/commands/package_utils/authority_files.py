@@ -86,7 +86,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         concept.id = str(uuid.uuid4())
         concept.nodetype = 'ConceptScheme'       
         concept.legacyoid = auth_doc_file_name
-        concept.addvalue({'value':display_file_name, 'language': 'en-us', 'type': 'prefLabel', 'category': 'label'})
+        concept.addvalue({'value':display_file_name, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
         scheme_id = concept
         lookups.add_relationship(source='00000000-0000-0000-0000-000000000001', type='narrower', target=concept.id)
 
@@ -111,13 +111,13 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                         concept.id = str(uuid.uuid4())
                         concept.nodetype = 'Concept'# if row[u'CONCEPTTYPE'].upper() == 'INDEX' else 'Collection'
                         concept.legacyoid = row[u'CONCEPTID']
-                        concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'prefLabel', 'category': 'label'})
+                        concept.addvalue({'value':row[u'PREFLABEL'], 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
                         if row['CONCEPTTYPE'].lower() == 'collector':
-                            concept.addvalue({'value':row[u'PREFLABEL'], 'language': 'en-us', 'type': 'collector', 'category': 'label'})
+                            concept.addvalue({'value':row[u'PREFLABEL'], 'language': settings.LANGUAGE_CODE, 'type': 'collector', 'category': 'label'})
                         if row[u'ALTLABELS'] != '':
                             altlabel_list = row[u'ALTLABELS'].split(';')
                             for altlabel in altlabel_list:
-                                concept.addvalue({'value':altlabel, 'language': 'en-us', 'type': 'altLabel', 'category': 'label'})    
+                                concept.addvalue({'value':altlabel, 'language': settings.LANGUAGE_CODE, 'type': 'altLabel', 'category': 'label'})    
                         if lookups.get_lookup(row[u'PARENTCONCEPTID']).values[0].type == 'collector':
                             lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
 

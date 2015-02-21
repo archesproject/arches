@@ -250,7 +250,7 @@ class ShapeReader():
         return conceptid_map  
 
 
-    def get_e55_concept_legacyoids(self, e55_type, lang=u'en-us'):
+    def get_e55_concept_legacyoids(self, e55_type, lang=settings.LANGUAGE_CODE):
         concept = EntityTypes.objects.get(pk=e55_type).conceptid
         concept_graph = Concept().get(id=concept.pk, include_relatedconcepts=True, include=['label'])
         values_to_legacy = []

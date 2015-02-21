@@ -35,7 +35,7 @@ from arches.app.utils.skos import SKOSWriter, SKOSReader
 
 @login_required
 def rdm(request, conceptid):
-    lang = request.GET.get('lang', 'en-us')    
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
     
     languages = models.DLanguages.objects.all()
 
@@ -65,7 +65,7 @@ def rdm(request, conceptid):
 @csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
-    lang = request.GET.get('lang', 'en-us')
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     pretty = request.GET.get('pretty', False)
 
     if request.method == 'GET':
@@ -177,7 +177,7 @@ def concept(request, conceptid):
             imagefile = request.FILES.get('file', None)
 
             if imagefile:
-                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = 'en-us')
+                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = settings.LANGUAGE_CODE)
                 value.save()
                 return JSONResponse(value)
 
@@ -252,7 +252,7 @@ def manage_parents(request, conceptid):
 
 @csrf_exempt
 def confirm_delete(request, conceptid):
-    lang = request.GET.get('lang', 'en-us') 
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE) 
     concept = Concept().get(id=conceptid)
     concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
@@ -303,7 +303,7 @@ def search(request):
     return JSONResponse(results)
 
 def concept_tree(request):
-    lang = request.GET.get('lang', 'en-us') 
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE) 
     conceptid = request.GET.get('node', None)
     concepts = Concept({'id': conceptid}).concept_tree(lang=lang)
     return JSONResponse(concepts, indent=4)

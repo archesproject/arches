@@ -157,7 +157,7 @@ USE_TZ = False
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
 LOCALE_PATHS = (

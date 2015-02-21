@@ -870,8 +870,8 @@ BEGIN
     v_entitytypeto = btrim(v_steps[array_upper(v_steps, 1)-1]);
     v_businesstablename_from = btrim(v_steps[2]);
     v_businesstablename_to = btrim(v_steps[array_upper(v_steps, 1)]);
-    PERFORM data.insert_entitytype(v_entitytypefrom, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-    PERFORM data.insert_entitytype(v_entitytypeto, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+    PERFORM data.insert_entitytype(v_entitytypefrom, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-US', 'en-US', 'UNK', '');
+    PERFORM data.insert_entitytype(v_entitytypeto, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-US', 'en-US', 'UNK', '');
     v_mappingid = (SELECT ontology.insert_mapping(v_entitytypefrom, v_entitytypeto, p_mergenodeid));
 
     --WHILE v_index < ((array_length(v_steps,1)-1)/2)
@@ -883,8 +883,8 @@ BEGIN
         v_range = btrim(v_steps[v_index+3]);
         v_businesstablename_to = btrim(v_steps[v_index+4]);
 
-        PERFORM data.insert_entitytype(v_domain, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
-        PERFORM data.insert_entitytype(v_range, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-us', 'en-us', 'UNK', '');
+        PERFORM data.insert_entitytype(v_domain, v_businesstablename_from, 'True', '', '', v_entitytypefrom, '', 'en-US', 'en-US', 'UNK', '');
+        PERFORM data.insert_entitytype(v_range, v_businesstablename_to, 'True', '', '', v_entitytypefrom, '', 'en-US', 'en-US', 'UNK', '');
         PERFORM ontology.insert_rule(v_domain, v_property, v_range);
         PERFORM ontology.insert_mapping_step(v_mappingid, v_domain, v_property, v_range, v_entitytypefrom, v_entitytypeto, ((v_index+2)/3));  
 
