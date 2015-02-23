@@ -459,14 +459,14 @@ input.resource_search_widget::-webkit-input-placeholder {
     font-weight: 200;
 }
 
-input.resource_search_widget:-moz-placeholder { /* Firefox 18- */
+input.resource_search_widget:-moz-placeholder {
     color: #999;
     font-family: sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
-input.resource_search_widget::-moz-placeholder {  /* Firefox 19+ */
+input.resource_search_widget::-moz-placeholder {
     color: #999; 
     font-family: sans-serif;
     font-size: 15px;
