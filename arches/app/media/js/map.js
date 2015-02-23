@@ -504,8 +504,6 @@ require([
             });
 
             //Select2 Simple Search initialize
-            var placeholder = $('.geocodewidget').val();
-            $('.geocodewidget').val('');
             $('.geocodewidget').select2({
                 ajax: {
                     url: "geocoder",
@@ -521,8 +519,6 @@ require([
                     },
                     cache: true
                 },
-
-                placeholder: placeholder,
                 minimumInputLength: 4,
                 multiple: true,
                 maximumSelectionSize: 1

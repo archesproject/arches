@@ -452,28 +452,34 @@ input.resource_search_widget {
     padding: 6px 5px 10px 5px;
 }
 
-input.resource_search_widget::-webkit-input-placeholder {
+input.arches-select2 {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 6px 5px 10px 5px;
+}
+
+input.arches-select2::-webkit-input-placeholder {
     color: #999;
     font-family: sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
-input.resource_search_widget:-moz-placeholder {
+input.arches-select2:-moz-placeholder {
     color: #999;
     font-family: sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
-input.resource_search_widget::-moz-placeholder {
+input.arches-select2::-moz-placeholder {
     color: #999; 
     font-family: sans-serif;
     font-size: 15px;
     font-weight: 200;
 }
 
-input.resource_search_widget:-ms-input-placeholder {  
+input.arches-select2:-ms-input-placeholder {  
     color: #999;  
     font-family: sans-serif;
     font-size: 15px;
