@@ -17,7 +17,8 @@ define(['jquery',
                 'click .page-button': 'newPage',
                 'click .related-resources-graph': 'showRelatedResouresGraph',
                 'click .navigate-map': 'zoomToFeature',
-                'mouseover .arches-search-item': 'itemMouseover'
+                'mouseover .arches-search-item': 'itemMouseover',
+                'mouseout .arches-search-item': 'itemMouseout'
             },
 
             initialize: function(options) { 
@@ -32,7 +33,6 @@ define(['jquery',
                 ko.applyBindings(this, $('#search-results-count')[0]);
                 ko.applyBindings(this, $('#paginator')[0]);
 
-                this.$el.on('mouseover', this, this.itemMouseout);
             },
 
             showRelatedResouresGraph: function (e) {
@@ -107,8 +107,8 @@ define(['jquery',
             },
 
             itemMouseout: function(evt){
-                evt.data.trigger('mouseout');    
-                delete evt.data.currentTarget;              
+                this.trigger('mouseout');
+                delete this.currentTarget;
                 return false;
             },
 
