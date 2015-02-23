@@ -522,6 +522,7 @@ define(['jquery',
                         self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                         self.resultLayer.vectorSource.addFeatures(resultFeatures);
                         self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
+                        self.zoomToResults();
                     }
                     self.previousEntityIdArray = entityIdArray;
                 } else {
@@ -530,6 +531,11 @@ define(['jquery',
                         entityIdArray: entityIdArray
                     };
                 }
+            },
+
+            zoomToResults: function () {
+                var extent = ol.extent.extend(this.currentPageLayer.getSource().getExtent(), this.resultLayer.vectorSource.getExtent());
+                this.map.map.getView().fitExtent(extent, this.map.map.getSize());
             },
 
             selectFeatureById: function(resourceid){
@@ -715,6 +721,7 @@ define(['jquery',
                 if (!($(ele).is(":visible")) && showOrHide === 'show'){
                     ele.slideToggle('slow', function(){
                         self.map.map.updateSize();
+                        self.zoomToResults();
                     });
                     return;
                 }
