@@ -522,7 +522,9 @@ define(['jquery',
                         self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                         self.resultLayer.vectorSource.addFeatures(resultFeatures);
                         self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
-                        self.zoomToResults();
+                        if (self.drawingFeatureOverlay.getFeatures().getLength() === 0) {
+                            self.zoomToResults();
+                        }
                     }
                     self.previousEntityIdArray = entityIdArray;
                 } else {
