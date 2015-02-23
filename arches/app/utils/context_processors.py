@@ -32,7 +32,8 @@ def map_info(request):
             'zoom': settings.DEFAULT_MAP_ZOOM,
             'bing_key': settings.BING_KEY,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
-            'map_max_zoom': settings.MAP_MAX_ZOOM
+            'map_max_zoom': settings.MAP_MAX_ZOOM,
+            'extent': settings.MAP_EXTENT
         }
     }
 

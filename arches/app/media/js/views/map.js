@@ -72,6 +72,7 @@ define([
                 }).extend([new ol.interaction.DragPan({kinetic: null})]).extend([dragAndDropInteraction]),
                 target: this.el,
                 view: new ol.View({
+                    extent: arches.mapDefaults.extent ? arches.mapDefaults.extent.split(',') : undefined,
                     center: [arches.mapDefaults.x, arches.mapDefaults.y],
                     zoom: arches.mapDefaults.zoom,
                     minZoom: arches.mapDefaults.minZoom,
