@@ -1283,14 +1283,29 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 }
 
 .loading-mask {
-      z-index: 10000;
-      position: absolute;
-      left: 250px;
-      right: 0;
-      top: 184px;
-      width: 200px;
-      background-color: #4C85A1;
-      border: 1px solid #31708f;
+    z-index: 10000;
+    position: absolute;
+    margin-left: 35%;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 184px;
+    width: 200px;
+    background-color: #4C85A1;
+    border: 1px solid #31708f;
+}
+
+@media (max-width: 1800px) {
+  .loading-mask {
+    margin-left: 28%;
+  }
+}
+
+@media (max-width: 992px) {
+  .loading-mask {
+    top: 216px;
+    margin-left: auto;
+  }
 }
 
 .root-node-label {
