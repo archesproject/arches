@@ -446,6 +446,56 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     display:none;
 } 
 
+input.resource_search_widget {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 6px 5px 10px 5px;
+}
+
+input.resource_search_widget::-webkit-input-placeholder {
+    color: #999;
+    font-size: 14px;
+    font-family: sans-serif;
+    font-size: 15px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 200;
+}
+
+input.resource_search_widget:-moz-placeholder { /* Firefox 18- */
+    color: #999;  
+    font-size: 14px;
+    font-family: sans-serif;
+    font-size: 15px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 200;
+}
+
+input.resource_search_widget::-moz-placeholder {  /* Firefox 19+ */
+    color: #999;  
+    font-size: 14px;
+    font-family: sans-serif;
+    font-size: 15px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 200;
+}
+
+input.resource_search_widget:-ms-input-placeholder {  
+    color: #999;  
+    font-size: 14px;
+    font-family: sans-serif;
+    font-size: 15px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 200;
+}
+
 .filter-flag{
     background-color: #5CB85C !important; 
     border: 1px solid #4CAE4C !important;
@@ -1289,7 +1339,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     margin-right: auto;
     left: 0;
     right: 0;
-    top: 184px;
+    top: 180px;
     width: 200px;
     background-color: #4C85A1;
     border: 1px solid #31708f;
@@ -1303,7 +1353,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
 
 @media (max-width: 992px) {
   .loading-mask {
-    top: 216px;
+    top: 218px;
     margin-left: auto;
   }
 }
