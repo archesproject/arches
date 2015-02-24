@@ -522,7 +522,7 @@ define(['jquery',
                         self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                         self.resultLayer.vectorSource.addFeatures(resultFeatures);
                         self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
-                        if (self.drawingFeatureOverlay.getFeatures().getLength() === 0) {
+                        if (self.drawingFeatureOverlay.getFeatures().getLength() === 0 && this.query.filter.geometry.type() !== 'bbox') {
                             self.zoomToResults();
                         }
                     }
