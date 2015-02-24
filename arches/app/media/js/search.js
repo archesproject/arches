@@ -109,7 +109,7 @@ require(['jquery',
                     if (extent) {
                         _.delay(function() {
                             self.mapFilter.zoomToExtent(extent);
-                        }, expand ? 600 : 0);
+                        }, expand ? 700 : 0);
                     }
                 }, this);
 
