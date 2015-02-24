@@ -705,9 +705,6 @@ define(['jquery',
             toggleFilterSection: function(ele, expand){
                 if(expand){
                     this.slideToggle(ele, 'show');
-                    if(!$('#map-tools-btn').hasClass('open')){
-                        this.toggleMapTools();
-                    }
                 }else{
                     this.slideToggle(ele, 'hide');               
                 }

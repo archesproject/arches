@@ -96,13 +96,16 @@ require(['jquery',
                 }, this);
                 this.searchResults.on('find_on_map', function(resourceid, data){
                     var extent;
+                    this.mapFilter.expanded(true);
                     _.each(data.geometries, function (geometryData) {
                         var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
                         geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
                         extent = extent ? ol.extent.extend(extent, geomExtent) : geomExtent;
                     });
                     if (extent) {
-                        self.mapFilter.zoomToExtent(extent);
+                        _.delay(function() {
+                            self.mapFilter.zoomToExtent(extent);
+                        }, 600);
                     }
                 }, this);
 
