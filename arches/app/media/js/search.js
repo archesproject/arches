@@ -95,8 +95,12 @@ require(['jquery',
                     this.mapFilter.unselectAllFeatures();
                 }, this);
                 this.searchResults.on('find_on_map', function(resourceid, data){
-                    var extent;
-                    this.mapFilter.expanded(true);
+                    var extent,
+                        expand = !this.mapFilter.expanded();
+                    if (expand) {
+                        this.mapFilter.expanded(true);
+                    }
+                    
                     _.each(data.geometries, function (geometryData) {
                         var geomExtent = wkt.readGeometry(geometryData.label).getExtent();
                         geomExtent = ol.extent.applyTransform(geomExtent, ol.proj.getTransform('EPSG:4326', 'EPSG:3857'));
@@ -105,7 +109,7 @@ require(['jquery',
                     if (extent) {
                         _.delay(function() {
                             self.mapFilter.zoomToExtent(extent);
-                        }, 600);
+                        }, expand ? 600 : 0);
                     }
                 }, this);
 
