@@ -26,16 +26,19 @@ class ResourceForm(object):
         self.name = info['name']
         self.icon = info['icon']
         self.resource = resource
-        if self.resource == None:
-            self.schema = None
-        else:
-            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
         
         self.data = {
             "domains": {},
             "defaults": {}
         }
-        self.load()
+
+    @property
+    def schema(self):
+        try:
+            return self._schema
+        except AttributeError:
+            self._schema = Entity.get_mapping_schema(self.resource.entitytypeid)
+            return self._schema
     
     @staticmethod
     def get_info():
@@ -55,16 +58,7 @@ class ResourceForm(object):
         return 
 
     def get_nodes(self, entitytypeid):
-        ret = []
-        entities = self.resource.find_entities_by_type_id(entitytypeid)
-        for entity in entities:
-            data = {}
-
-            for entity in entity.flatten():
-                #data[entity.entitytypeid] = self.encode_entity(entity)
-                data = dict(data.items() + self.encode_entity(entity).items())
-            ret.append(data)
-        return ret
+        return self.resource.get_nodes(entitytypeid, keys=['label', 'value', 'entityid'])
 
     def update_nodes(self, entitytypeid, data):
         for entity in self.resource.find_entities_by_type_id(entitytypeid):
@@ -97,16 +91,6 @@ class ResourceForm(object):
             self.resource.merge_at(entity, self.resource.entitytypeid)
         else:
             nodes[0].value = node_data['value']
-
-    def encode_entity(self, entity):
-        def enc(entity, attr):
-            return '%s__%s' % (entity.entitytypeid.replace('.', '_'), attr)
-
-        ret = {}
-        for key, value in entity.__dict__.items():
-            if not key.startswith("__"):
-                ret[enc(entity, key)] = value
-        return ret
 
     def decode_data_item(self, entity):
         def dec(item):

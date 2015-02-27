@@ -56,21 +56,23 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
-    return render_to_response('resource-manager.htm', {
-            'form': form,
-            'formdata': JSONSerializer().serialize(form.data),
-            'form_template': 'views/forms/' + form_id + '.htm',
-            'form_id': form_id,
-            'resourcetypeid': resourcetypeid,
-            'resourceid': resourceid,
-            'main_script': 'resource-manager',
-            'active_page': 'ResourceManger',
-            'resource': resource,
-            'resource_name': resource.get_primary_name(),
-            'resource_type_name': resource.get_type_name(),
-            'form_groups': resource.form_groups
-        },
-        context_instance=RequestContext(request))
+    if request.method == 'GET':
+        form.load()
+        return render_to_response('resource-manager.htm', {
+                'form': form,
+                'formdata': JSONSerializer().serialize(form.data),
+                'form_template': 'views/forms/' + form_id + '.htm',
+                'form_id': form_id,
+                'resourcetypeid': resourcetypeid,
+                'resourceid': resourceid,
+                'main_script': 'resource-manager',
+                'active_page': 'ResourceManger',
+                'resource': resource,
+                'resource_name': resource.get_primary_name(),
+                'resource_type_name': resource.get_type_name(),
+                'form_groups': resource.form_groups
+            },
+            context_instance=RequestContext(request))
     
 def related_resources(request, resourceid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
