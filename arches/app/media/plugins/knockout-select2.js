@@ -1,26 +1,37 @@
-define(['jquery', 'knockout', 'select2'], function ($, ko) {
+
+define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewModel) {
-          ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
-            $(el).select2('destroy');
-          });
+            ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
+                $(el).select2('destroy');
+            });
 
-          var allBindings = allBindingsAccessor(),
-              select2Config = ko.utils.unwrapObservable(allBindings.select2);
+            var allBindings = allBindingsAccessor(),
+                select2Config = ko.utils.unwrapObservable(allBindings.select2);
 
-          if (select2Config.viewModel && select2Config.conceptKey) {
-            select2Config.formatResult = function (item) {
-                return item.value;
-            };
+            if (select2Config.viewModel && select2Config.conceptKey) {
+                select2Config.formatResult = function (item) {
+                    return item.value;
+                };
 
-            select2Config.formatSelection = function (item) {
-                select2Config.viewModel[select2Config.conceptKey + '__label'](item.value)
-                select2Config.viewModel[select2Config.conceptKey + '__value'](item.id)
-                return item.value;
-            };
-          }
+                select2Config.formatSelection = function (item) {
+                    select2Config.viewModel[select2Config.conceptKey + '__label'](item.value)
+                    select2Config.viewModel[select2Config.conceptKey + '__value'](item.id)
+                    return item.value;
+                };
+            }
 
-          $(el).select2(select2Config);
+            select2Config.data = _.filter(select2Config.data, function (item) {
+                return (item.valuetype === "collector") ? (item.children.length > 0) : true;
+            });
+
+            _.each(select2Config.data, function (item) {
+                if (item.valuetype === "collector") {
+                    delete item.id;
+                }
+            });
+
+            $(el).select2(select2Config);
         },
         update: function (el, valueAccessor, allBindingsAccessor, viewModel) {
             var allBindings = allBindingsAccessor(),

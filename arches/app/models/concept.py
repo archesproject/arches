@@ -27,6 +27,8 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+import logging
+logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
@@ -564,7 +566,7 @@ class Concept(object):
             if domain['valuetype'] == 'collector':
                 conceptids_in_nested.append(domain['conceptid'])
                 children = [] #(conceptid, relationtype, child_valuetype, parent_valuetype)
-                collector_children = Concept().get_child_concepts(domain['conceptid'], 'member', ['prefLabel','collector'], 'collector')
+                collector_children = Concept().get_child_concepts(domain['conceptid'], 'narrower', ['prefLabel','collector'], 'collector')
                 for child in collector_children:
                     for d in domains_copy:
                         if child[1] == d['conceptid']:
