@@ -177,7 +177,7 @@ def concept(request, conceptid):
             imagefile = request.FILES.get('file', None)
 
             if imagefile:
-                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image', datatype = 'text', languageid_id = settings.LANGUAGE_CODE)
+                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = settings.LANGUAGE_CODE)
                 value.save()
                 return JSONResponse(value)
 
