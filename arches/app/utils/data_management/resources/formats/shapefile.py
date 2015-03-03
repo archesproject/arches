@@ -11,7 +11,6 @@ from arches.app.models.concept import Concept
 from django.db import connection
 import arches.management.commands.utils as utils
 
-
 class Row(object):
     def __init__(self, *args):
         if len(args) == 0:
@@ -37,9 +36,10 @@ class Group(object):
             self.resource_id = ''
             self.group_id = ''
             self.rows = []
-        elif isinstance(args[0], list):
-            self.resource_id = args[0][0].strip()
-            self.group_id = args[0][4].strip()
+        elif isinstance(args[0], dict):
+            details = args[0]
+            self.resource_id = details['resource_id'].strip()
+            self.group_id = details['group_id'].strip()
             self.rows = []   
 
 
@@ -56,7 +56,6 @@ class Resource(object):
             self.entitytypeid = args[0][1].strip()
             self.resource_id = args[0][0].strip()
             self.groups = []
-
 
     def appendrow(self, row, group_id=None):
         if group_id != None:
@@ -100,8 +99,8 @@ class ShapeReader():
             resource_id = ''
             group_id = ''
                 
-            for shp_dictionary in shp_resource_info:
-                
+            for count, shp_dictionary in enumerate(shp_resource_info):
+                print count, 'count'
                 if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
                     resource = Resource()
                     for key in shp_dictionary.keys():
@@ -111,7 +110,10 @@ class ShapeReader():
                             row.resourcetype = self.entitytypeid
                             row.attributename = key
                             row.attributevalue = shp_dictionary[key]
-                            resource.appendrow(row)
+                            row.group_id = str(count) + " " + key
+                            group = Group({'group_id':row.group_id, 'resource_id':row.group_id})
+                            resource.groups.append(group)
+                            resource.appendrow(row, group_id=row.group_id)
                     resource.entitytypeid = self.entitytypeid
                     resources.append(resource)
 
