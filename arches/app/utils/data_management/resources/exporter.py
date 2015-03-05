@@ -6,6 +6,7 @@ import json
 import glob
 from django.conf import settings
 from formats.csvfile import CsvWriter 
+from formats.kmlfile import KmlWriter 
 from django.http import HttpResponse
 
 try:
@@ -16,14 +17,13 @@ except ImportError:
 class ResourceExporter(object):
 
     def __init__(self, file_format):
-        self.filetypes = {'csv': CsvWriter}
+        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format]()
-        self.export_temp_directory = os.path.join(settings.PACKAGE_ROOT, 'source_data', 'business_data', 'tmp_export_files')
 
     def export(self, resources, zip=False):
         configs = self.read_export_configs()
-        result = self.writer.write_resources(resources, configs, self.export_temp_directory)
+        result = self.writer.write_resources(resources, configs)
         return result
 
     def read_export_configs(self):
@@ -33,9 +33,12 @@ class ResourceExporter(object):
         configs = settings.EXPORT_CONFIG
         if configs != '':
             resource_export_configs = json.load(open(settings.EXPORT_CONFIG, 'r'))
-            configs = resource_export_configs[self.format]
-            for key, val in configs['RESOURCE_TYPES'].iteritems():
-                configs['RESOURCE_TYPES'][key]['records'] = []
+            if self.format in resource_export_configs:
+                configs = resource_export_configs[self.format]
+                for key, val in configs['RESOURCE_TYPES'].iteritems():
+                    configs['RESOURCE_TYPES'][key]['records'] = []
+            else:
+                configs = ''
         
         return configs
 
