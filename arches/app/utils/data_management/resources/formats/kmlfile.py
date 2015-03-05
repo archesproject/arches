@@ -3,9 +3,6 @@ import os
 import datetime
 from arches.app.models.concept import Concept
 import xml.etree.ElementTree as ET
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.geos import GeometryCollection
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from format import Writer
 
 try:
