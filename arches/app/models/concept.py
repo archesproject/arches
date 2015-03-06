@@ -295,7 +295,7 @@ class Concept(object):
             ) 
             SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
-        print sql
+        #print sql
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -620,15 +620,16 @@ class ConceptValue(object):
         return self
 
     def save(self):
-        self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-        value = models.Values()
-        value.pk = self.id
-        value.value = self.value
-        value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
-        value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
-        if self.language != '':
-            value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
-        value.save()
+        if self.value.strip() != '':
+            self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
+            value = models.Values()
+            value.pk = self.id
+            value.value = self.value
+            value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
+            value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
+            if self.language != '':
+                value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
+            value.save()
 
     def delete(self):
         if self.id != '':
