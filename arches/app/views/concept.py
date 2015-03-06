@@ -39,26 +39,16 @@ def rdm(request, conceptid):
     
     languages = models.DLanguages.objects.all()
 
-    concept_scheme_groups = []
-    for concept in models.Concepts.objects.filter(nodetype = 'ConceptSchemeGroup'):
-        concept_scheme_groups.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
-
     concept_schemes = []
     for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
-        scheme = Concept().get(id=concept.pk, include_parentconcepts=True, up_depth_limit=1, include=['label'])
-        group = []
-        for parent in scheme.parentconcepts:
-            if parent.nodetype == 'ConceptSchemeGroup':
-                group.append(parent.get_preflabel(lang=lang).value)
-        concept_schemes.append({'scheme': scheme.get_preflabel(lang=lang), 'group': ','.join(group)})
+        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
     return render_to_response('rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
-            'concept_schemes': concept_schemes,
-            'concept_scheme_groups': concept_scheme_groups
+            'concept_schemes': concept_schemes
         }, context_instance=RequestContext(request))
 
 @login_required
@@ -170,7 +160,7 @@ def concept(request, conceptid):
 
         return JSONResponse(ret, indent=4 if pretty else None)   
 
-    if request.method == 'POST': 
+    if request.method == 'POST':
 
         if len(request.FILES) > 0:
             skosfile = request.FILES.get('skosfile', None)
@@ -182,14 +172,14 @@ def concept(request, conceptid):
                 return JSONResponse(value)
 
             elif skosfile:
-                data = JSONDeserializer().deserialize(request.POST.get('data', None))
-                if data:
-                    concept = Concept(data)
-                    concept.save()
-                    skos = SKOSReader()
-                    rdf = skos.read_file(skosfile)
-                    ret = skos.save_concepts_from_skos(rdf, concept_scheme_group=concept.id)
-                    return JSONResponse(ret)
+                # data = JSONDeserializer().deserialize(request.POST.get('data', None))
+                # if data:
+                # concept = Concept(data)
+                # concept.save()
+                skos = SKOSReader()
+                rdf = skos.read_file(skosfile)
+                ret = skos.save_concepts_from_skos(rdf)
+                return JSONResponse(ret)
             
         else:
             data = JSONDeserializer().deserialize(request.body) 
@@ -211,9 +201,13 @@ def concept(request, conceptid):
             with transaction.atomic():
                 concept = Concept(data)
 
-                if concept.id not in CORE_CONCEPTS:
-                    concept.delete_index()                
-                concept.delete()
+                if concept.id not in CORE_CONCEPTS: 
+                    if concept.nodetype == 'ConceptScheme':
+                        concept.delete_index(delete_self=True)
+                        concept.delete(delete_self=True)
+                    else:
+                        concept.delete_index(delete_self=False)
+                        concept.delete(delete_self=False)
 
                 return JSONResponse(concept)
 
@@ -296,8 +290,40 @@ def search(request):
                         result['in_scheme_name'] = label['_source']['value']
 
             newresults.append(result)
-        else:
-            print result['_source']['value']
+
+    # Use the db to get the concept context but this is SLOW
+    # for result in results['hits']['hits']:
+    #     if result['_source']['conceptid'] not in ids:
+    #         concept = Concept().get(id=result['_source']['conceptid'], include_parentconcepts=True)
+    #         pathlist = concept.get_paths()
+    #         result['in_scheme_name'] = pathlist[0][0]['label']
+    #         newresults.append(result)
+
+
+    # def crawl(conceptid, path=[]):
+    #     query = Query(se, start=0, limit=100)
+    #     bool = Bool()
+    #     bool.must(Match(field='conceptidto', query=conceptid, type='phrase'))
+    #     bool.must(Match(field='relationtype', query='narrower', type='phrase'))
+    #     query.add_query(bool)
+    #     relations = query.search(index='concept_relations')
+    #     for relation in relations['hits']['hits']:
+    #         path.insert(0, relation)
+    #         crawl(relation['_source']['conceptidfrom'], path=path)
+    #     return path
+
+    # for result in results['hits']['hits']:
+    #     if result['_source']['conceptid'] not in ids:
+    #         concept_relations = crawl(result['_source']['conceptid'], path=[])
+    #         if len(concept_relations) > 0:
+    #             conceptid = concept_relations[0]['_source']['conceptidfrom']
+    #             if conceptid in cached_scheme_names:
+    #                 result['in_scheme_name'] = cached_scheme_names[conceptid]
+    #             else:
+    #                 result['in_scheme_name'] = get_preflabel_from_conceptid(conceptid, lang=settings.LANGUAGE_CODE)['value']             
+    #                 cached_scheme_names[conceptid] = result['in_scheme_name'] 
+
+    #         newresults.append(result)
 
     results['hits']['hits'] = newresults
     return JSONResponse(results)

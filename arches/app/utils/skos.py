@@ -45,7 +45,7 @@ class SKOSReader(object):
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
     
-    def save_concepts_from_skos(self, graph, concept_scheme_group='00000000-0000-0000-0000-000000000006'):
+    def save_concepts_from_skos(self, graph):
         """
         given an RDF graph, tries to save the concpets to the system
 
@@ -67,18 +67,15 @@ class SKOSReader(object):
         if isinstance(graph, Graph):
 
             # Search for ConceptSchemes first
-            for s, v, o in graph.triples((None, RDF.type , SKOS.ConceptScheme)):
-                scheme_id = self.generate_uuid_from_subject(baseuuid, s)
-                concept = Concept({
+            for scheme, v, o in graph.triples((None, RDF.type , SKOS.ConceptScheme)):
+                scheme_id = self.generate_uuid_from_subject(baseuuid, scheme)
+                concept_scheme = Concept({
                     'id': scheme_id,
-                    'legacyoid': str(s),
+                    'legacyoid': str(scheme),
                     'nodetype': 'ConceptScheme'
                 })
 
-                # associate the ConceptScheme with the provided ConceptSchemeGroup 
-                self.relations.append({'source': concept_scheme_group, 'type': 'narrower', 'target': scheme_id})
-                
-                for predicate, object in graph.predicate_objects(subject = s):
+                for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
                         if hasattr(object, 'language') and object.language not in allowed_languages: 
                             newlang = models.DLanguages()
@@ -89,65 +86,66 @@ class SKOSReader(object):
                             allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
 
                         try:
-                            # first try and get any values associated with the concept
+                            # first try and get any values associated with the concept_scheme
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, '')) # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             if predicate == DCTERMS.title:
-                                concept.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'category': value_type.category}) 
+                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'category': value_type.category}) 
                                 print 'Casting dcterms:title to skos:prefLabel'
                             if predicate == DCTERMS.description:
-                                concept.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'category': value_type.category}) 
+                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'category': value_type.category}) 
                                 print 'Casting dcterms:description to skos:scopeNote'
                         except:
                             pass
 
                     if str(SKOS) in predicate:
                         if predicate == SKOS.hasTopConcept:
-                            self.relations.append({'source': scheme_id, 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, object)})
+                            self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
-                self.nodes.append(concept)   
+                self.nodes.append(concept_scheme)   
 
-            if len(self.nodes) == 0:
-                raise Exception('No ConceptScheme found in file.')         
+                if len(self.nodes) == 0:
+                    raise Exception('No ConceptScheme found in file.')         
 
-            # Search for Concepts
-            for s, v, o in graph.triples((None, RDF.type , SKOS.Concept)):
-                concept = Concept({
-                    'id': self.generate_uuid_from_subject(baseuuid, s),
-                    'legacyoid': str(s),
-                    'nodetype': 'Concept'
-                })
+                # Search for Concepts
+                for s, v, o in graph.triples((None, SKOS.inScheme , scheme)):
+                    concept = Concept({
+                        'id': self.generate_uuid_from_subject(baseuuid, s),
+                        'legacyoid': str(s),
+                        'nodetype': 'Concept'
+                    })
 
-                # loop through all the elements within a <skos:Concept> element
-                for predicate, object in graph.predicate_objects(subject = s):
-                    if str(SKOS) in predicate:
-                        if hasattr(object, 'language') and object.language not in allowed_languages: 
-                            newlang = models.DLanguages()
-                            newlang.pk = object.language
-                            newlang.languagename = object.language
-                            newlang.isdefault = False
-                            newlang.save()
-                            allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
+                    # loop through all the elements within a <skos:Concept> element
+                    for predicate, object in graph.predicate_objects(subject = s):
+                        if str(SKOS) in predicate:
+                            if hasattr(object, 'language') and object.language not in allowed_languages: 
+                                newlang = models.DLanguages()
+                                newlang.pk = object.language
+                                newlang.languagename = object.language
+                                newlang.isdefault = False
+                                newlang.save()
+                                allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
 
-                        relation_or_value_type = predicate.replace(SKOS, '') # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
+                            relation_or_value_type = predicate.replace(SKOS, '') # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
 
-                        if relation_or_value_type in skos_value_types_list:
-                            value_type = skos_value_types.get(valuetype=relation_or_value_type)
-                            concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category}) 
-                        elif predicate == SKOS.broader:
-                            self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
-                        elif predicate == SKOS.narrower:
-                            self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
-                        elif predicate == SKOS.related:
-                            self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
+                            if relation_or_value_type in skos_value_types_list:
+                                value_type = skos_value_types.get(valuetype=relation_or_value_type)
+                                concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category}) 
+                            elif predicate == SKOS.broader:
+                                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
+                            elif predicate == SKOS.narrower:
+                                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
+                            elif predicate == SKOS.related:
+                                self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
-                self.nodes.append(concept)
+                    self.nodes.append(concept)
 
 
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
                     node.save()
-                    node.index(scheme=scheme_id)            
+                    temp = Concept({'id':scheme_id})
+                    node.index(scheme=temp)            
 
                 # insert the concept relations
                 for relation in self.relations:

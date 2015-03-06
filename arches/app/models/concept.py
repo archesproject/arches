@@ -226,7 +226,9 @@ class Concept(object):
             value.delete()
 
         if delete_self:
-            models.Concepts.objects.get(pk=self.id).delete()
+            concepts_to_delete = Concept.gather_concepts_to_delete(self)
+            for key, concept in concepts_to_delete.iteritems():
+                models.Concepts.objects.get(pk=key).delete()
         return
 
     @staticmethod
@@ -235,7 +237,7 @@ class Concept(object):
         Gets a dictionary of all the concepts ids to delete
         The values of the dictionary keys differ somewhat depending on the node type being deleted
         If the nodetype == 'Concept' then return ConceptValue objects keyed to the concept id
-        If the nodetype == 'ConceptScheme' or 'ConceptSchemeGroup' then return a ConceptValue object with the value set to any ONE prefLabel keyed to the concept id
+        If the nodetype == 'ConceptScheme' then return a ConceptValue object with the value set to any ONE prefLabel keyed to the concept id
         We do this because it takes so long to gather the ids of the concepts when deleting a Scheme or Group
 
         """
@@ -256,21 +258,22 @@ class Concept(object):
             return concepts_to_delete
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
-        if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'ConceptSchemeGroup':
-            rows = Concept().get_child_concepts(concept.id, 'narrower', ['prefLabel'], 'prefLabel')
+        if concept.nodetype == 'ConceptScheme':
+            rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
             for row in rows:
                 concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
                 concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
 
         return concepts_to_delete
 
-    def get_child_concepts(self, conceptid, relationtype, child_valuetypes, parent_valuetype):
+    def get_child_concepts(self, conceptid, relationtypes, child_valuetypes, parent_valuetype):
         """
         Recursively builds a list of child concepts for a given concept based on its relationship type and valuetypes. 
 
         """
 
         cursor = connection.cursor()
+        relationtypes = ' or '.join(["d.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         sql = """WITH RECURSIVE children AS (
                 SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c.valuetype, 1 AS depth       ---|NonRecursive Part
                     FROM concepts.relations d
@@ -279,18 +282,18 @@ class Concept(object):
                     WHERE d.conceptidfrom = '{0}'
                     and c2.valuetype = '{3}'
                     and c.valuetype in ('{2}')
-                    and d.relationtype = '{1}'
+                    and ({1})
                 UNION
-                    SELECT a.conceptidfrom, a.conceptidto, v2.value, v.value as valueto, v.valuetype, depth+1      ---|RecursivePart
-                    FROM concepts.relations  a
-                    JOIN children b ON(b.conceptidto = a.conceptidfrom) 
-                    JOIN concepts.values v ON(v.conceptid = a.conceptidto) 
-                    JOIN concepts.values v2 ON(v2.conceptid = a.conceptidfrom) 
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v.valuetype, depth+1      ---|RecursivePart
+                    FROM concepts.relations  d
+                    JOIN children b ON(b.conceptidto = d.conceptidfrom) 
+                    JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
+                    JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom) 
                     WHERE  v2.valuetype = '{3}'
                     and v.valuetype in ('{2}')
-                    and a.relationtype = '{1}'
+                    and ({1})
             ) 
-            SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtype, ("','").join(child_valuetypes), parent_valuetype)
+            SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
         cursor.execute(sql)
         rows = cursor.fetchall()
@@ -412,17 +415,26 @@ class Concept(object):
     def delete_index(self, delete_self=False):
         se = SearchEngineFactory().create()
 
-        for subconcept in self.subconcepts:
-            concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
-
+        def deleteconcepts(concepts_to_delete):
             for key, concept in concepts_to_delete.iteritems():
                 query = Query(se, start=0, limit=10000)
                 phrase = Match(field='conceptid', query=key, type='phrase')
                 query.add_query(phrase)
-                query.delete(index='concept_labels')
+                query.delete(index='concept_labels')            
 
-        for value in self.values:
-            value.delete_index()
+        if delete_self:
+            concepts_to_delete = Concept.gather_concepts_to_delete(self)
+            deleteconcepts(concepts_to_delete)
+            
+            for value in self.values:
+                value.delete_index()
+        else:
+            for subconcept in self.subconcepts:
+                concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
+                deleteconcepts(concepts_to_delete)
+
+                for value in subconcept.values:
+                    value.delete_index()
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
         class concept(object):
@@ -479,7 +491,7 @@ class Concept(object):
 
         graph = []
         #if self.id == None or self.id == '' or self.id == top_concept:
-        concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptSchemeGroup') | Q(nodetype = 'GroupingNode'))
+        concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
         for conceptmodel in concepts:
             graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
         #else:
@@ -542,12 +554,13 @@ class Concept(object):
         if self.nodetype == 'Concept' or self.nodetype == 'Collection' or self.nodetype == 'EntityType':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             def get_scheme_id(concept):
-                if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
+                #if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
+                if len(concept.parentconcepts) == 0:
                     return concept
 
             return concept.traverse(get_scheme_id, direction='up')
 
-        if self.nodetype == 'ConceptScheme' or self.nodetype == 'ConceptSchemeGroup':
+        if self.nodetype == 'ConceptScheme':
             return self
 
     def get_e55_domain(self, entitytypeid):
@@ -566,7 +579,7 @@ class Concept(object):
             if domain['valuetype'] == 'collector':
                 conceptids_in_nested.append(domain['conceptid'])
                 children = [] #(conceptid, relationtype, child_valuetype, parent_valuetype)
-                collector_children = Concept().get_child_concepts(domain['conceptid'], 'narrower', ['prefLabel','collector'], 'collector')
+                collector_children = Concept().get_child_concepts(domain['conceptid'], ['narrower'], ['prefLabel','collector'], 'collector')
                 for child in collector_children:
                     for d in domains_copy:
                         if child[1] == d['conceptid']:

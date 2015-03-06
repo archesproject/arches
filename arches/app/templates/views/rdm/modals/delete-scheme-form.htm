@@ -15,7 +15,7 @@
                             <select style="width:100%" class="select2" name="scheme_dd" required>
                                 <option value=""></option>
                                 {% for scheme in concept_schemes %}
-                                    <option value="{{scheme.scheme.conceptid}}">{{scheme.scheme.value}} ({{scheme.group}})</option>
+                                    <option value="{{scheme.conceptid}}">{{scheme.value}}</option>
                                 {% endfor %}
                             </select>
                         </p>

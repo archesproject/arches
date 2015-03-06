@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-scheme-group-dd'], function ($, Backbone, ConceptModel, ValueModel, ConceptSchemeGroupDD) {
+define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(e){
@@ -11,10 +11,6 @@ define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-s
             this.select2 = this.$el.find('[name=language_dd]').select2({
                 minimumResultsForSearch: -1
             });                
-
-            this.conceptschemegroupdd = new ConceptSchemeGroupDD({
-                el: this.$el
-            });
 
             this.modal.validate({
                 ignore: null,
@@ -42,11 +38,8 @@ define(['jquery', 'backbone', 'models/concept', 'models/value', 'views/concept-s
                         relationshiptype: 'narrower',
                         nodetype: 'ConceptScheme'
                     });
-                    
-                    var conceptschemegroup = self.conceptschemegroupdd.getSchemeGroupModelFromSelection($(form).find('[name=language_dd]').val());
-                    conceptschemegroup.set('subconcepts',[conceptscheme]);
 
-                    conceptschemegroup.save(function() {
+                    conceptscheme.save(function() {
                         self.modal.modal('hide');
                         $('.modal-backdrop.fade.in').remove();  // a hack for now
                         self.trigger('conceptSchemeAdded');
