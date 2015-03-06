@@ -7,6 +7,7 @@ import glob
 from django.conf import settings
 from formats.csvfile import CsvWriter 
 from formats.kmlfile import KmlWriter 
+from formats.shpfile import ShpWriter 
 from django.http import HttpResponse
 
 try:
@@ -17,7 +18,7 @@ except ImportError:
 class ResourceExporter(object):
 
     def __init__(self, file_format):
-        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter}
+        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'shp': ShpWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 

@@ -17,7 +17,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from optparse import make_option
 from formats.archesfile import ArchesReader
-from formats.shapefile import ShapeReader
+from formats.shpfile import ShapeReader
 
 
 class ResourceLoader(object):

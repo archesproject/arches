@@ -2,6 +2,9 @@ from django.conf import settings
 from arches.app.models.concept import Concept
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
+from django.contrib.gis.geos import MultiPoint
+from django.contrib.gis.geos import MultiPolygon
+from django.contrib.gis.geos import MultiLineString
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Writer(object):
@@ -100,11 +103,30 @@ class Writer(object):
                 template_record[k] = ("; ").join(v)
         return template_record
 
-    def process_feature_geoms(self, properties, resource):
+    def process_feature_geoms(self, properties, resource, geo_process='collection'):
         geoms = []
+        result = None
         for g in resource['_source']['geometries']:
             geom = GEOSGeometry(JSONSerializer().serialize(g['value'], ensure_ascii=False))
             geoms.append(geom)
-        geometry = GeometryCollection(geoms)
-        feature = {'type':'Feature','geometry': geometry,'properties': properties}
-        return feature
+        if geo_process=='collection':
+            geometry = GeometryCollection(geoms)
+            result = {'type':'Feature','geometry': geometry,'properties': properties}
+        elif geo_process == 'sorted':
+            result = []
+            sorted_geoms = {'points':[], 'lines':[], 'polys':[]}
+            for geom in geoms:
+                if geom.geom_typeid == 0:
+                    sorted_geoms['points'].append(geom)
+                if geom.geom_typeid == 1:
+                    sorted_geoms['lines'].append(geom)
+                if geom.geom_typeid == 3:
+                    sorted_geoms['polys'].append(geom)
+            if len(sorted_geoms['points']) > 0:
+                result.append({'type':'Feature','geometry': MultiPoint(sorted_geoms['points']),'properties': properties})
+            if len(sorted_geoms['lines']) > 0:
+                result.append({'type':'Feature','geometry': MultiLineString(sorted_geoms['lines']),'properties': properties})
+            if len(sorted_geoms['polys']) > 0:
+                result.append({'type':'Feature','geometry': MultiPolygon(sorted_geoms['polys']),'properties': properties})
+
+        return result

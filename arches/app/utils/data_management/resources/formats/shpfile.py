@@ -1,15 +1,26 @@
 import sys
-import json
-# from .. import utils
-from django.contrib.gis.gdal import DataSource
-from django.conf import settings
 import os
+import json
+from django.conf import settings
+from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.geos import MultiPoint
+from django.contrib.gis.geos import MultiLineString
+from django.contrib.gis.geos import MultiPolygon
 from arches.app.models.models import Concepts
 from arches.app.models.models import VwConcepts
 from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
+from format import Writer
+import datetime
+import shapefile
 from django.db import connection
 import arches.management.commands.utils as utils
+import codecs
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 class Row(object):
     def __init__(self, *args):
@@ -334,3 +345,145 @@ class ShapeReader():
         field_values_and_geom_wkt.append(geom_wkt_values) #the last item of field_values is a list containing wkt geom values
         
         return (field_names, field_values_and_geom_wkt)
+
+
+class ShpWriter(Writer):
+
+    def __init__(self):
+        self.resource_type_configs = settings.RESOURCE_TYPE_CONFIGS()
+        self.default_mapping = {
+            "NAME": "ArchesResourceExport",
+            "SCHEMA": [
+                {"field_name":"prime_name", "source":"primaryname", "data_type":"str"},
+                {"field_name":"arches_id", "source":"entityid", "data_type":"str"},
+                {"field_name":"type", "source":"resource_name", "data_type":"str"},
+            ],
+            "RESOURCE_TYPES" : {},
+            "RECORDS":[]
+        }
+
+    def convert_geom(self, geos_geom):
+      if geos_geom.geom_type == 'Point':
+          multi_geom = MultiPoint(geos_geom)
+          shp_geom = [[c for c in multi_geom.coords]]
+      if geos_geom.geom_type == 'LineString':
+          multi_geom = MultiLineString(geos_geom)
+          shp_geom = [c for c in multi_geom.coords]
+      if geos_geom.geom_type == 'Polygon':
+          multi_geom = MultiPolygon(geos_geom)
+          shp_geom = [c[0] for c in multi_geom.coords]
+      if geos_geom.geom_type == 'MultiPoint':
+          shp_geom = [[c for c in geos_geom.coords]]
+      if geos_geom.geom_type == 'MultiLineString':
+          shp_geom = [c for c in geos_geom.coords]
+      if geos_geom.geom_type == 'MultiPolygon':
+          shp_geom = [c[0] for c in geos_geom.coords]
+
+      return shp_geom
+
+    def create_shapefiles(self, feature_collection, shp_name, resource_export_configs):
+        '''
+        Takes a geojson-like (geojson-like because it has a geos geometry rather than a geojson geometry, allowing us to modify the 
+        geometry to be a centroid or hull if necessary.) feature collection, groups the data by resource type and creates a shapefile
+        for each resource. Returns a .zip file with each of the shapefiles. An arches export configuration file is needed to map shapefile
+        fields to resorce entitytypeids and specify the shapefile column datatypes (fiona schema). 
+        '''
+
+        features_by_geom_type = {'point':[], 'line':[], 'poly':[]}
+        for feature in feature_collection['features']:
+            if feature['geometry'].geom_typeid == 4:
+                features_by_geom_type['point'].append(feature)
+
+            elif feature['geometry'].geom_typeid == 5:
+                features_by_geom_type['line'].append(feature)
+
+            elif feature['geometry'].geom_typeid == 6:
+                features_by_geom_type['poly'].append(feature)    
+
+        shapefiles_for_export = []
+        geos_datatypes_to_pyshp_types = {'str':'C', 'datetime':'D', 'float':'F'}
+        
+        for geom_type, features in features_by_geom_type.iteritems():
+             if len(features) > 0:
+
+                if geom_type == 'point':
+                    writer = shapefile.Writer(shapeType=shapefile.MULTIPOINT)
+                elif geom_type == 'line':
+                    writer = shapefile.Writer(shapeType=shapefile.POLYLINE)
+                elif geom_type == 'poly':
+                    writer = shapefile.Writer(shapeType=shapefile.POLYGON)
+
+                for field in resource_export_configs["SCHEMA"]:
+                    writer.field(codecs.encode(field['field_name']), geos_datatypes_to_pyshp_types[field['data_type']])
+
+                for r in features:
+                    print 'converting geom'
+                    shp_geom = self.convert_geom(r['geometry'])
+                    print shp_geom
+                    if geom_type in ['point','line']:
+                        print 'line or point'
+                        writer.line(parts=shp_geom)
+                    elif geom_type == 'poly':
+                        print 'polygons'
+                        writer.poly(parts=shp_geom)
+                    writer.record(**r['properties'])
+
+                shp = StringIO()
+                shx = StringIO()
+                dbf = StringIO()
+                prj = StringIO()
+                prj.write('GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]')
+                writer.saveShp(shp)
+                writer.saveShx(shx)
+                writer.saveDbf(dbf)
+                shapefiles_for_export += [
+                    {'name':shp_name + geom_type + '.shp', 'outputfile': shp},
+                    {'name':shp_name + geom_type + '.dbf', 'outputfile': dbf},
+                    {'name':shp_name + geom_type + '.shx', 'outputfile': shx},
+                    {'name':shp_name + geom_type + '.prj', 'outputfile': prj}
+                    ]
+        
+        return shapefiles_for_export
+
+    def write_resources(self, resources, resource_export_configs):
+        """Using resource_export_configs from either a resource_export_mappings.json
+        or the default mapping (which includes only resource type, primaryname and entityid).
+        """
+        using_default_mapping = False
+        if resource_export_configs == '':
+            resource_export_configs = self.default_mapping
+            using_default_mapping = True
+        for resource in resources:
+            if resource['_type'] in resource_export_configs['RESOURCE_TYPES']:
+                resource_export_configs['RESOURCE_TYPES'][resource['_type']]['records'].append(resource)
+            if using_default_mapping:
+                resource_export_configs['RECORDS'].append(resource)
+
+        schema = resource_export_configs['SCHEMA']
+        resource_types = resource_export_configs['RESOURCE_TYPES']
+        name_prefix = resource_export_configs['NAME']
+
+        features = []
+
+        for resource_type, data in resource_types.iteritems():
+            field_map = data['FIELD_MAP']
+            for resource in data['records']:
+                if len(resource['_source']['geometries']) > 0:
+                    template_properties = self.create_template_record(schema, resource, resource_type)
+                    complete_properties = self.get_field_map_values(resource, template_properties, field_map)
+                    properties = self.concatenate_value_lists(complete_properties)
+                    feature = self.process_feature_geoms(properties, resource)
+                    features.append(feature)
+
+        if using_default_mapping:
+            for resource in resource_export_configs['RECORDS']:
+                if len(resource['_source']['geometries']) > 0:
+                    properties = self.create_template_record(schema, resource, resource_type=None)
+                    feature = self.process_feature_geoms(properties, resource, 'sorted')
+                    features += feature
+
+        feature_collection = {'type':'FeatureCollection', 'features': features}
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = os.path.join('{0}_{1}_'.format(name_prefix, iso_date))
+        
+        return self.create_shapefiles(feature_collection, file_name, resource_export_configs)
