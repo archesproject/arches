@@ -121,7 +121,7 @@ require([
             var self = this;
             var form = new DeleteSchemeForm({
                 el: $('#delete-scheme-form'),
-                model: concept
+                model: null
             });
             form.modal.modal('show');
             form.on({

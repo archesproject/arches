@@ -14,25 +14,6 @@
             <!-- Form -->
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-6">
-                        <h5 class="arches-modal-section">{% trans "Select an existing group, or add your own" %}</h5>
-                        <p> 
-                            {% include 'views/concept-scheme-group-dd.htm' %}  
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <h5 class="arches-modal-section">{% trans "Language" %}</h5>
-                        <p> 
-                            <select style="width:100%" class="select2" name="language_dd" required>
-                                {% for language in languages %}
-                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
-                                {% endfor %}
-                            </select>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-xs-12">
                         
                         <form class="form-inline" role="form">

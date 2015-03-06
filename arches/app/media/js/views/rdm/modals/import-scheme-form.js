@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-scheme-group-dd'], function ($, Backbone, arches, ConceptSchemeGroupDD) {
+define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
     return Backbone.View.extend({
 
         initialize: function(e){
@@ -9,10 +9,6 @@ define(['jquery', 'backbone', 'arches', 'views/concept-scheme-group-dd'], functi
                 minimumResultsForSearch: -1
             });                
 
-            this.conceptschemegroupdd = new ConceptSchemeGroupDD({
-                el: this.$el
-            });
-
             this.modal.validate({
                 ignore: null,
                 rules: {
@@ -20,10 +16,8 @@ define(['jquery', 'backbone', 'arches', 'views/concept-scheme-group-dd'], functi
                 },
                 submitHandler: function(form) {
                     $(form).submit(function(e) {
-                        var conceptschemegroup = self.conceptschemegroupdd.getSchemeGroupModelFromSelection($(form).find('[name=language_dd]').val());
-
+                        
                         var data = new FormData(this);
-                        data.append('data', JSON.stringify(conceptschemegroup.toJSON()));
 
                         $.ajax({
                             url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),

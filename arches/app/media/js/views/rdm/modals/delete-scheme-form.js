@@ -18,16 +18,16 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                 });              
             }
 
-            //this.schemedropdown.on('changed')
-
             this.modal.validate({
                 ignore: null,
                 rules: {
                     scheme_dd: "required"
                 },
                 submitHandler: function(form) {
-                    model = new ConceptModel({'id':self.schemedropdown.val()})
-                    self.model.set('subconcepts', [model]);
+                    self.model = new ConceptModel({
+                        'id':self.schemedropdown.val(),
+                        'nodetype': 'ConceptScheme'
+                    });
 
                     self.model.delete(function(){
                         self.modal.modal('hide');

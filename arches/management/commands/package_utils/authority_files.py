@@ -82,20 +82,18 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
     auth_doc_file_name = str(filename)
     display_file_name = string.capwords(auth_doc_file_name.replace('_',' ').replace('AUTHORITY DOCUMENT.csv', '').strip())
     if auth_doc_file_name.upper() != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.CSV':
-        concept = Concept()
-        concept.id = str(uuid.uuid4())
-        concept.nodetype = 'ConceptScheme'       
-        concept.legacyoid = auth_doc_file_name
-        concept.addvalue({'value':display_file_name, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
-        scheme_id = concept
-        lookups.add_relationship(source='00000000-0000-0000-0000-000000000001', type='narrower', target=concept.id)
+        top_concept = Concept()
+        top_concept.id = str(uuid.uuid4())
+        top_concept.nodetype = 'Concept'       
+        top_concept.legacyoid = auth_doc_file_name
+        top_concept.addvalue({'value':display_file_name, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
+        lookups.add_relationship(source='00000000-0000-0000-0000-000000000001', type='hasTopConcept', target=top_concept.id)
 
     else:
-        concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
-        concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
-        scheme_id = concept
+        top_concept = Concept().get(id = '00000000-0000-0000-0000-000000000005')
+        top_concept.legacyoid = 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv'
 
-    lookups.add_lookup(concept=concept, rownum=0)
+    lookups.add_lookup(concept=top_concept, rownum=0)
     
     try:
         with open(filepath, 'rU') as f:
@@ -188,7 +186,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         except Exception as e:
             errors.append('ERROR in row %s (%s):\n%s\n' % (lookups.lookup[key]['rownum'], str(e), traceback.format_exc()))
         
-        lookups.lookup[key]['concept'].index(scheme=scheme_id)            
+        lookups.lookup[key]['concept'].index(scheme=top_concept)            
 
     # insert the concept relations
     for relation in lookups.concept_relationships:

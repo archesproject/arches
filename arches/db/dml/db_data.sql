@@ -76,7 +76,6 @@ INSERT INTO d_relationtypes VALUES ('narrower', 'Semantic Relations', 'skos');
 INSERT INTO d_relationtypes VALUES ('narrowerTransitive', 'Semantic Relations', 'skos');
 INSERT INTO d_relationtypes VALUES ('related', 'Semantic Relations', 'skos');
 INSERT INTO d_relationtypes VALUES ('member', 'Concept Collections', 'skos');
-
 INSERT INTO d_relationtypes VALUES ('hasTopConcept', 'Properties', 'skos');
 
 --Arches entityttype relations to concepts
@@ -85,7 +84,6 @@ INSERT INTO d_relationtypes VALUES ('hasEntity', 'Entitynode Relations', 'arches
 
 --OWL Class types and Arches specific types
 INSERT INTO d_nodetypes VALUES ('GroupingNode', 'arches');
-INSERT INTO d_nodetypes VALUES ('ConceptSchemeGroup', 'arches');
 INSERT INTO d_nodetypes VALUES ('ConceptScheme', 'skos');
 INSERT INTO d_nodetypes VALUES ('Concept', 'skos');
 INSERT INTO d_nodetypes VALUES ('Collection', 'skos');
@@ -93,17 +91,17 @@ INSERT INTO d_nodetypes VALUES ('EntityType', 'arches');
 
 
 
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptSchemeGroup', 'ARCHES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 -- INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'GroupingNode', 'ENTITY TYPES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'GroupingNode', 'ENTITY NODES');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'ConceptScheme', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptSchemeGroup', 'CANDIDATES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'Concept', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000006', 'ConceptScheme', 'CANDIDATES');
 
 -- INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003', 'narrower');
 -- INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000004', 'narrower');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000004', 'narrower');
-INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'narrower');
+INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'hasTopConcept');
 --INSERT INTO relations(conceptidfrom, conceptidto, relationtype) VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'narrower');
 
 INSERT INTO values(conceptid, valuetype, value, languageid) VALUES ('00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
