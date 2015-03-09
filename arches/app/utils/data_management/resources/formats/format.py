@@ -91,7 +91,6 @@ class Writer(object):
             if alternates == True and len(template_record[mapping['field_name']]) == 0:
                 if len(alternate_values) > 0:
                     template_record[mapping['field_name']] = alternate_values
-
         return template_record
 
     def concatenate_value_lists(self, template_record):
@@ -100,7 +99,12 @@ class Writer(object):
         """
         for k, v in template_record.iteritems():
             if type(v) == list:
-                template_record[k] = ("; ").join(v)
+                v.sort()
+                try:
+                    template_record[k] = ("; ").join(v)
+                except:
+                    unicode_vals = [unicode(x) for x in v]
+                    template_record[k] = ("; ").join(vals)
         return template_record
 
     def process_feature_geoms(self, properties, resource, geo_process='collection'):
