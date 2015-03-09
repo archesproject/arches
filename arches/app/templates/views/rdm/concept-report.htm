@@ -27,11 +27,13 @@
                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>                            
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    {% if concept.nodetype == 'Concept' or concept.nodetype == 'ConceptScheme'%}
-                    <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
-                    <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
+                    {% if concept.nodetype == 'ConceptScheme'%}
+                    <li><a href="javascript:void(0);" data-toggle="#add-top-concept-form">{% trans "Add Top Concept" %}</a></li>
+                    <li><a href="javascript:void(0);">{% trans "Import Top Concept from AAT" %}</a></li>
                     {% endif %}
                     {% if concept.nodetype == 'Concept'%}
+                    <li><a href="javascript:void(0);" data-toggle="#add-concept-form">{% trans "Add Child" %}</a></li>
+                    <li><a href="javascript:void(0);">{% trans "Import Child from AAT" %}</a></li>
                     <li><a href="javascript:void(0);" data-toggle="#manage-parent-form">{% trans "Manage Parents" %}</a></li>
                     {% endif %}
                     <li class="divider"></li>

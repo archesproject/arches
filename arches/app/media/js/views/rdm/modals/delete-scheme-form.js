@@ -26,7 +26,8 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
                 submitHandler: function(form) {
                     self.model = new ConceptModel({
                         'id':self.schemedropdown.val(),
-                        'nodetype': 'ConceptScheme'
+                        'nodetype': 'ConceptScheme', 
+                        'delete_self': true
                     });
 
                     self.model.delete(function(){

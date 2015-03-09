@@ -91,7 +91,7 @@ def concept(request, conceptid):
             depth_limit=depth_limit, up_depth_limit=None, lang=lang)
 
         if f == 'html':
-            if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptSchemeGroup' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType':
+            if concept_graph.nodetype == 'Concept' or concept_graph.nodetype == 'ConceptScheme' or concept_graph.nodetype == 'EntityType':
                 languages = models.DLanguages.objects.all()
                 valuetypes = models.ValueTypes.objects.all()
                 relationtypes = models.DRelationtypes.objects.all()
@@ -104,6 +104,10 @@ def concept(request, conceptid):
                     if value.category == 'label':
                         labels.append(value)
                 direct_parents = [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
+                if concept_graph.nodetype == 'ConceptScheme':
+                    parent_relations = relationtypes.filter(category='Properties')
+                else:
+                    parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
                 return render_to_response('views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
@@ -113,7 +117,7 @@ def concept(request, conceptid):
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category='undefined'),
-                    'parent_relations': relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive'),
+                    'parent_relations': parent_relations,
                     'related_relations': relationtypes.filter(Q(category='Mapping Properties') | Q(relationtype = 'related')),
                     'concept_paths': concept_graph.get_paths(lang=lang),
                     'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
@@ -202,12 +206,9 @@ def concept(request, conceptid):
                 concept = Concept(data)
 
                 if concept.id not in CORE_CONCEPTS: 
-                    if concept.nodetype == 'ConceptScheme':
-                        concept.delete_index(delete_self=True)
-                        concept.delete(delete_self=True)
-                    else:
-                        concept.delete_index(delete_self=False)
-                        concept.delete(delete_self=False)
+                    delete_self = data['delete_self'] if 'delete_self' in data else False                    
+                    concept.delete_index(delete_self=delete_self)
+                    concept.delete(delete_self=delete_self)
 
                 return JSONResponse(concept)
 

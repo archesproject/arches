@@ -113,11 +113,11 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))[0:1]
+            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
                 self.hassubconcepts = True
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -133,7 +133,7 @@ class Concept(object):
                 if nodetype == 'EntityType':
                     conceptrealations = models.ConceptRelations.objects.filter(conceptidto = self.id, relationtype = 'member')
                 else:
-                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations'), ~Q(relationtype = 'related'))
+                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -295,6 +295,7 @@ class Concept(object):
             ) 
             SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
+        #print sql
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -425,7 +426,7 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             deleteconcepts(concepts_to_delete)
-            
+
             for value in self.values:
                 value.delete_index()
         else:
@@ -619,15 +620,16 @@ class ConceptValue(object):
         return self
 
     def save(self):
-        self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-        value = models.Values()
-        value.pk = self.id
-        value.value = self.value
-        value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
-        value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
-        if self.language != '':
-            value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
-        value.save()
+        if self.value.strip() != '':
+            self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
+            value = models.Values()
+            value.pk = self.id
+            value.value = self.value
+            value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
+            value.valuetype_id = self.type # models.ValueTypes.objects.get(pk=self.type)
+            if self.language != '':
+                value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
+            value.save()
 
     def delete(self):
         if self.id != '':

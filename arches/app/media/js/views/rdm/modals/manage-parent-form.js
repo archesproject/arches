@@ -20,7 +20,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                 minimumResultsForSearch: 10,
                 maximumSelectionSize: 1
             });
-            this.numberOfParents = this.$el.find('a').length;
+            this.numberOfParents = this.$el.find('#number_of_parents').val();
             this.deletedrelationships = [];
         },
         
@@ -61,7 +61,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             this.$el.find('[data-id="'+ data.id +'"]').toggle(300);
 
             if (this.deletedrelationships.length == this.numberOfParents - 1){
-                this.$el.find('a').hide(300);
+                this.$el.find('.fa-times-circle').hide(300);
             }
         },
 

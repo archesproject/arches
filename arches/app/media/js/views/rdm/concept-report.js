@@ -25,6 +25,7 @@ define([
             'click a[data-toggle="#related-concept-form"]': 'addRelatedConceptClicked',
             'click a[data-toggle="#related-member-form"]': 'addRelatedMemberClicked',
             'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
+            'click a[data-toggle="#add-top-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
         },
 
