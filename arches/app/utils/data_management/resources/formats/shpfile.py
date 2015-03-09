@@ -111,7 +111,6 @@ class ShapeReader():
             group_id = ''
                 
             for count, shp_dictionary in enumerate(shp_resource_info):
-                print count, 'count'
                 if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
                     resource = Resource()
                     for key in shp_dictionary.keys():
@@ -354,9 +353,9 @@ class ShpWriter(Writer):
         self.default_mapping = {
             "NAME": "ArchesResourceExport",
             "SCHEMA": [
-                {"field_name":"prime_name", "source":"primaryname", "data_type":"str"},
-                {"field_name":"arches_id", "source":"entityid", "data_type":"str"},
-                {"field_name":"type", "source":"resource_name", "data_type":"str"},
+                {"field_name":"prime_name", "source":"primaryname", "data_type":"str", "data_length":"128"},
+                {"field_name":"arches_id", "source":"entityid", "data_type":"str", "data_length":"128"},
+                {"field_name":"type", "source":"resource_name", "data_type":"str", "data_length":"128"},
             ],
             "RESOURCE_TYPES" : {},
             "RECORDS":[]
@@ -380,6 +379,20 @@ class ShpWriter(Writer):
           shp_geom = [c[0] for c in geos_geom.coords]
 
       return shp_geom
+
+    def concatenate_value_lists(self, template_record):
+        """
+        If multiple values are found for a column, joins them into a semi-colon concatenated string.
+        """
+        for k, v in template_record.iteritems():
+            if type(v) == list:
+                v.sort()
+                try:
+                    template_record[k] = ("; ").join(v).encode("utf-8")
+                except:
+                    unicode_vals = [unicode(x) for x in v]
+                    template_record[k] = unicode(("; ").join(vals)).encode("utf-8")
+        return template_record
 
     def create_shapefiles(self, feature_collection, shp_name, resource_export_configs):
         '''
@@ -414,17 +427,13 @@ class ShpWriter(Writer):
                     writer = shapefile.Writer(shapeType=shapefile.POLYGON)
 
                 for field in resource_export_configs["SCHEMA"]:
-                    writer.field(codecs.encode(field['field_name']), geos_datatypes_to_pyshp_types[field['data_type']])
+                    writer.field(codecs.encode(field['field_name']), geos_datatypes_to_pyshp_types[field['data_type']], field['data_length'])
 
                 for r in features:
-                    print 'converting geom'
                     shp_geom = self.convert_geom(r['geometry'])
-                    print shp_geom
                     if geom_type in ['point','line']:
-                        print 'line or point'
                         writer.line(parts=shp_geom)
                     elif geom_type == 'poly':
-                        print 'polygons'
                         writer.poly(parts=shp_geom)
                     writer.record(**r['properties'])
 
@@ -472,8 +481,8 @@ class ShpWriter(Writer):
                     template_properties = self.create_template_record(schema, resource, resource_type)
                     complete_properties = self.get_field_map_values(resource, template_properties, field_map)
                     properties = self.concatenate_value_lists(complete_properties)
-                    feature = self.process_feature_geoms(properties, resource)
-                    features.append(feature)
+                    feature = self.process_feature_geoms(properties, resource, 'sorted')
+                    features += feature
 
         if using_default_mapping:
             for resource in resource_export_configs['RECORDS']:
