@@ -56,7 +56,6 @@ class Writer(object):
         domains = resource['_source']['domains']
         child_entities = resource['_source']['child_entities']
         for mapping in field_map:
-            mapping = mapping[0]
             conceptid = ''
             if 'value_type' in mapping:
                 conceptid = mapping['value_type']
