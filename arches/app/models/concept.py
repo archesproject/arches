@@ -166,36 +166,31 @@ class Concept(object):
 
         for parentconcept in self.parentconcepts:
             parentconcept.save()
-            conceptrelation = models.ConceptRelations()
-            conceptrelation.pk = str(uuid.uuid4())
-            conceptrelation.conceptidfrom_id = parentconcept.id 
-            conceptrelation.conceptidto_id = self.id
-            conceptrelation.relationtype_id = parentconcept.relationshiptype
-            conceptrelation.save()
+            parentconcept.add_relation(self, parentconcept.relationshiptype)
 
         for subconcept in self.subconcepts:
             subconcept.save()
-            conceptrelation = models.ConceptRelations()
-            conceptrelation.pk = str(uuid.uuid4())
-            conceptrelation.conceptidfrom_id = self.id
-            conceptrelation.conceptidto_id = subconcept.id
-            conceptrelation.relationtype_id = subconcept.relationshiptype
-            conceptrelation.save()
+            self.add_relation(subconcept, subconcept.relationshiptype)
 
         for relatedconcept in self.relatedconcepts:
-            relation = models.ConceptRelations()
-            relation.pk = str(uuid.uuid4())
-            relation.conceptidfrom_id = self.id
-            relation.conceptidto_id = relatedconcept.id
-            relation.relationtype_id = relatedconcept.relationshiptype
-            relation.save()
+            self.add_relation(relatedconcept, relatedconcept.relationshiptype)
 
         return concept
 
     def delete(self, delete_self=False):
+        """
+        Deletes any subconcepts associated with this concept and additionally this concept if 'delete_self' is True
+        If any parentconcepts or relatedconcepts are included then it will only delete the relationship to those concepts but not the concepts themselves
+        If any values are passed, then those values as well as the relationship to those values will be deleted
+
+        Note, django will automatically take care of deleting any db models that have a foreign key relationship to the model being deleted 
+        (eg: deleting a concept model will also delete all values and relationships), but because we need to manage deleting 
+        parent concepts and related concepts and values we have to do that here too
+
+        """
+
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
-
             for key, concept in concepts_to_delete.iteritems():
                 models.Concepts.objects.get(pk=key).delete()
 
@@ -230,6 +225,20 @@ class Concept(object):
             for key, concept in concepts_to_delete.iteritems():
                 models.Concepts.objects.get(pk=key).delete()
         return
+
+    def add_relation(self, concepttorelate, relationtype):
+        """
+        Relates this concept to 'concepttorelate' via the relationtype
+
+        """
+
+        relation = models.ConceptRelations()
+        relation.pk = str(uuid.uuid4())
+        relation.conceptidfrom_id = self.id
+        relation.conceptidto_id = concepttorelate.id
+        relation.relationtype_id = relationtype
+        relation.save()
+        return relation
 
     @staticmethod
     def gather_concepts_to_delete(concept, lang=settings.LANGUAGE_CODE):
@@ -630,6 +639,7 @@ class ConceptValue(object):
             if self.language != '':
                 value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
             value.save()
+            self.category = value.valuetype.category
 
     def delete(self):
         if self.id != '':
