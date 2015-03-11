@@ -571,6 +571,7 @@ class Concept(object):
             def get_scheme_id(concept):
                 for parentconcept in concept.parentconcepts:
                     if parentconcept.relationshiptype == 'hasTopConcept':
+                        return concept
 
             return concept.traverse(get_scheme_id, direction='up')
 
