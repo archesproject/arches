@@ -63,7 +63,7 @@ def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     pretty = request.GET.get('pretty', False)
-    
+
     if conceptid == '00000000-0000-0000-0000-000000000000':
         conceptid = ''
 
@@ -196,6 +196,8 @@ def concept(request, conceptid):
             if data:
                 with transaction.atomic():
                     concept = Concept(data)
+                    if concept.id == '00000000-0000-0000-0000-000000000000':
+                        concept.id = ''
                     concept.save()
                     concept.index()
 
