@@ -35,6 +35,7 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                     var conceptscheme = new ConceptModel({
                         legacyoid: $(form).find('[name=label]').val(),
                         values: [label, note],
+                        id: '00000000-0000-0000-0000-000000000000',
                         nodetype: 'ConceptScheme'
                     });
 

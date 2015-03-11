@@ -63,6 +63,9 @@ def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     pretty = request.GET.get('pretty', False)
+    
+    if conceptid == '00000000-0000-0000-0000-000000000000':
+        conceptid = ''
 
     if request.method == 'GET':
 
