@@ -90,6 +90,9 @@ class DLanguages(models.Model):
     class Meta:
         db_table = u'd_languages'
 
+    def __unicode__(self):
+        return self.languageid
+        
 class DRelationtypes(models.Model):
     relationtype = models.TextField(primary_key=True)
     category = models.TextField()
