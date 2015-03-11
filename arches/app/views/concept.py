@@ -32,7 +32,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
-# from SPARQLWrapper import SPARQLWrapper, JSON
 from django.utils.module_loading import import_by_path
 
 sparql_providers = {}
@@ -43,7 +42,6 @@ for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
 @login_required
 def rdm(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
-    
     languages = models.DLanguages.objects.all()
 
     concept_schemes = []
@@ -55,7 +53,8 @@ def rdm(request, conceptid):
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
-            'concept_schemes': concept_schemes
+            'concept_schemes': concept_schemes,
+            'CORE_CONCEPTS': CORE_CONCEPTS
         }, context_instance=RequestContext(request))
 
 @login_required
@@ -195,9 +194,7 @@ def concept(request, conceptid):
                 with transaction.atomic():
                     concept = Concept(data)
                     concept.save()
-
-                    if conceptid not in CORE_CONCEPTS:
-                        concept.index()
+                    concept.index()
 
                     return JSONResponse(concept)
 
@@ -209,8 +206,8 @@ def concept(request, conceptid):
             with transaction.atomic():
                 concept = Concept(data)
 
-                if concept.id not in CORE_CONCEPTS: 
-                    delete_self = data['delete_self'] if 'delete_self' in data else False                    
+                delete_self = data['delete_self'] if 'delete_self' in data else False  
+                if not (delete_self and concept.id in CORE_CONCEPTS):
                     concept.delete_index(delete_self=delete_self)
                     concept.delete(delete_self=delete_self)
 
@@ -270,7 +267,6 @@ def search(request):
     ids = []
     if removechildren != None:
         concepts = Concept().get(id=removechildren, include_subconcepts=True, include=None)
-        print concepts
         def get_children(concept):
             ids.append(concept.id)
 

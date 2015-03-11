@@ -108,7 +108,7 @@ require([
             form.modal.modal('show');
             form.on({
                 'conceptSchemeAdded': function(){
-                    conceptTree.render();
+                    window.location.reload();
                 }
             })
         });

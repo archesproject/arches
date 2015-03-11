@@ -33,7 +33,9 @@ logger = logging.getLogger(__name__)
 CORE_CONCEPTS = (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000002',
-    '00000000-0000-0000-0000-000000000003'
+    '00000000-0000-0000-0000-000000000003',
+    '00000000-0000-0000-0000-000000000004',
+    '00000000-0000-0000-0000-000000000006'
 )
 
 class Concept(object):
@@ -122,10 +124,11 @@ class Concept(object):
                     if depth_limit != None:
                         downlevel = downlevel + 1                
                     for relation in conceptrealations:
-                        self.relationshiptype = relation.relationtype.pk
-                        self.subconcepts.append(Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
+                        subconcept = Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
                             include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype))
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype)
+                        subconcept.relationshiptype = relation.relationtype.pk
+                        self.subconcepts.append(subconcept)
 
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
@@ -138,10 +141,12 @@ class Concept(object):
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
                     for relation in conceptrealations:
-                        self.parentconcepts.append(Concept().get(id=relation.conceptidfrom_id, include_subconcepts=False, 
+                        parentconcept = Concept().get(id=relation.conceptidfrom_id, include_subconcepts=False, 
                             include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, 
                             exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype))
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype)
+                        parentconcept.relationshiptype = relation.relationtype.pk
+                        self.parentconcepts.append(parentconcept)
 
             if include_relatedconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
@@ -564,9 +569,8 @@ class Concept(object):
         if self.nodetype == 'Concept' or self.nodetype == 'Collection' or self.nodetype == 'EntityType':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             def get_scheme_id(concept):
-                #if concept.nodetype == 'ConceptScheme' or concept.nodetype == 'GroupingNode':
-                if len(concept.parentconcepts) == 0:
-                    return concept
+                for parentconcept in concept.parentconcepts:
+                    if parentconcept.relationshiptype == 'hasTopConcept':
 
             return concept.traverse(get_scheme_id, direction='up')
 
