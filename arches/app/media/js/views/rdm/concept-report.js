@@ -9,10 +9,11 @@ define([
     'views/rdm/modals/related-concept-form',
     'views/rdm/modals/related-member-form',
     'views/rdm/modals/manage-parent-form',
+    'views/rdm/modals/import-concept-form',
     'views/rdm/modals/add-child-form',
     'views/rdm/modals/add-image-form',
     'views/concept-graph'
-], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, AddChildForm, AddImageForm, ConceptGraph) {
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor, RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm, AddImageForm, ConceptGraph) {
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -26,7 +27,8 @@ define([
             'click a[data-toggle="#related-member-form"]': 'addRelatedMemberClicked',
             'click a[data-toggle="#add-concept-form"]': 'addChildConcept',
             'click a[data-toggle="#add-top-concept-form"]': 'addChildConcept',
-            'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts'
+            'click a[data-toggle="#manage-parent-form"]': 'manageParentConcepts',
+            'click a[data-toggle="#import-concept-form"]': 'importConcept',
         },
 
         initialize: function(options) {
@@ -150,15 +152,32 @@ define([
                     self.trigger('parentsChanged');
                 }
             });
-        },        
+        },    
+
+        importConcept: function(e){
+            var self = this;
+            this.model.reset();
+            var modal = new ImportConcept({
+                el: $('#import-concept-form')[0],
+                model: this.model
+            });
+            modal.modal.modal('show');
+
+            modal.on({
+                'conceptsImported': function(){
+                    self.trigger('conceptsImported');
+                }
+            });
+        },    
 
         addImageClicked: function (e) {
             this.model.reset();
-            var self = this,
-                form = new AddImageForm({
-                    el: this.$el.find('#add-image-form')[0],
-                    model: this.model
-                });
+            var self = this;
+            var form = new AddImageForm({
+                el: this.$el.find('#add-image-form')[0],
+                model: this.model
+            });
+
             form.on('dataChanged', function () {
                 self.render();
             });

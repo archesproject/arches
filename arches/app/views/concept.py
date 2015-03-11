@@ -20,7 +20,7 @@ import uuid
 from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -32,6 +32,13 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
+# from SPARQLWrapper import SPARQLWrapper, JSON
+from django.utils.module_loading import import_by_path
+
+sparql_providers = {}
+for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
+    Provider = import_by_path(provider)()
+    sparql_providers[Provider.endpoint] = Provider
 
 @login_required
 def rdm(request, conceptid):
@@ -114,6 +121,7 @@ def concept(request, conceptid):
                     'labels': labels,
                     'concept': concept_graph,
                     'languages': languages,
+                    'sparql_providers': sparql_providers,
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category='undefined'),
@@ -176,10 +184,6 @@ def concept(request, conceptid):
                 return JSONResponse(value)
 
             elif skosfile:
-                # data = JSONDeserializer().deserialize(request.POST.get('data', None))
-                # if data:
-                # concept = Concept(data)
-                # concept.save()
                 skos = SKOSReader()
                 rdf = skos.read_file(skosfile)
                 ret = skos.save_concepts_from_skos(rdf)
@@ -241,7 +245,7 @@ def manage_parents(request, conceptid):
                 return JSONResponse(data)
 
     else:
-        HttpResponseNotAllowed(['POST'])
+        return HttpResponseNotAllowed(['POST'])
 
     return HttpResponseNotFound()
 
@@ -327,6 +331,47 @@ def search(request):
     #         newresults.append(result)
 
     results['hits']['hits'] = newresults
+    return JSONResponse(results)
+
+@csrf_exempt
+def add_concepts_from_sparql_endpoint(request, conceptid):
+    if request.method == 'POST':
+        json = request.body
+        if json != None:
+            data = JSONDeserializer().deserialize(json)
+
+            parentconcept = Concept({
+                'id': conceptid,
+                'nodetype': data['model']['nodetype']
+            }) 
+
+            if parentconcept.nodetype == 'Concept':
+                relationshiptype = 'narrower'
+            elif parentconcept.nodetype == 'ConceptScheme':
+                relationshiptype = 'hasTopConcept' 
+
+            provider = sparql_providers[data['endpoint']]
+            try:
+                parentconcept.subconcepts = provider.get_concepts(data['ids'])
+            except Exception as e:
+                return HttpResponseServerError(e.message)
+
+            for subconcept in parentconcept.subconcepts:
+                subconcept.relationshiptype = relationshiptype
+        
+            parentconcept.save()
+            parentconcept.index()
+
+            return JSONResponse(parentconcept, indent=4)
+
+    else:
+        return HttpResponseNotAllowed(['POST'])
+
+    return HttpResponseNotFound()
+
+def search_sparql_endpoint_for_concepts(request):
+    provider = sparql_providers[request.GET.get('endpoint')]
+    results = provider.search_for_concepts(request.GET.get('terms'))
     return JSONResponse(results)
 
 def concept_tree(request):

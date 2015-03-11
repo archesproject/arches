@@ -83,10 +83,10 @@ require([
             'parentsChanged': function() {
                 //conceptTree.render();
                 conceptReport.render();
-            }//,
-            // 'conceptAdded': function() {
-            //     conceptTree.render();
-            // }
+            },
+            'conceptsImported': function() {
+                conceptReport.render();
+            }
         });
 
         conceptsearch.on("select2-selecting", function(e, el) {
