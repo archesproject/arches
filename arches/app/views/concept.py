@@ -64,9 +64,6 @@ def concept(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     pretty = request.GET.get('pretty', False)
 
-    if conceptid == '00000000-0000-0000-0000-000000000000':
-        conceptid = ''
-
     if request.method == 'GET':
 
         include_subconcepts = request.GET.get('include_subconcepts', 'true') == 'true'
@@ -196,8 +193,6 @@ def concept(request, conceptid):
             if data:
                 with transaction.atomic():
                     concept = Concept(data)
-                    if concept.id == '00000000-0000-0000-0000-000000000000':
-                        concept.id = ''
                     concept.save()
                     concept.index()
 
