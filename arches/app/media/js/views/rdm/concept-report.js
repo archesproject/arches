@@ -80,7 +80,7 @@ define([
 
             this.confirm_delete_modal = this.$el.find('.confirm-delete-modal');
             this.confirm_delete_modal_yes = this.confirm_delete_modal.find('.confirm-delete-yes');
-
+            this.confirm_delete_modal_yes.removeAttr('disabled');
             this.confirm_delete_modal_yes.data('id', data.id);
             this.confirm_delete_modal_yes.data('nodetype', data.nodetype);
             this.confirm_delete_modal_yes.data('action', data.action);
@@ -92,9 +92,11 @@ define([
             this.confirm_delete_modal.modal('show');
 
             if (data.action === 'delete-concept'){
+                this.confirm_delete_modal_yes.attr('disabled', 'disabled');
                 $.ajax({
                     url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', data.id),
                     success: function(response) {
+                        self.confirm_delete_modal_yes.removeAttr('disabled');
                         self.confirm_delete_modal.find('.modal-body [name="additional-info"]').html(response);
                     }
                 });                
@@ -201,27 +203,39 @@ define([
             var self = this;
             var data = $(e.target).data();
             var modal = self.$el.find('.confirm-delete-modal');
+            var title = modal.find('.modal-title').text();
             this.model.reset();
 
-            modal.on('hidden.bs.modal', function () {
-                var model, eventName;
+            if (data.action === 'delete-concept') {
+                modal.find('h4').text(' ' + title);
+                modal.find('.modal-title').addClass('loading');    
+                            
+                model = new ConceptModel(data)
+                self.model.set('subconcepts', [model]);
 
-                if (data.action === 'delete-value') {
-                    model = new ValueModel(data);
-                    self.model.set('values', [model]);
-                }
-                if (data.action === 'delete-relationship') {
-                    model = new ConceptModel(data);
-                    self.model.set('relatedconcepts', [model]);
-                }
-                if (data.action === 'delete-concept') {
-                    model = new ConceptModel(data)
-                    self.model.set('subconcepts', [model]);
-                }
+                self.model.delete(function(){
+                    modal.find('h4').text(title);
+                    modal.find('.modal-title').removeClass('loading');
+                    modal.modal('hide');
+                    $('.modal-backdrop.fade.in').remove();  // a hack for now
+                }, self);
+            }else{
+                modal.on('hidden.bs.modal', function () {
+                    var model;
 
-                self.model.delete();
-            });
-            modal.modal('hide');
+                    if (data.action === 'delete-value') {
+                        model = new ValueModel(data);
+                        self.model.set('values', [model]);
+                    }
+                    if (data.action === 'delete-relationship') {
+                        model = new ConceptModel(data);
+                        self.model.set('relatedconcepts', [model]);
+                    }
+
+                    self.model.delete();
+                });
+                modal.modal('hide');                
+            }            
         }
     });
 });

@@ -33,12 +33,12 @@ define(['backbone', 'jquery'], function (Backbone, $) {
             }
             $.ajax($.extend({
                 complete: function (request, status) {
+                    if (typeof callback === 'function') {
+                        callback.call(scope, request, status, self);
+                    }                    
                     if (status === 'success' &&  request.responseJSON) {
                         self.set(request.responseJSON);
                         self.trigger(eventname, self);
-                    }
-                    if (typeof callback === 'function') {
-                        callback.call(scope, request, status, self);
                     }
                 }
             }, config));

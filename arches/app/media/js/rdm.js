@@ -50,12 +50,16 @@ require([
                 window.history.pushState({}, "conceptid", concept.get('id'));
             },
             'save': function(){
-                //conceptTree.render();
+                if(concept.get('nodetype') === 'ConceptScheme'){
+                    conceptTree.render();
+                }
                 conceptReport.render();
                 concept.reset()
             },
             'delete': function(){
-                //conceptTree.render();
+                if(concept.get('nodetype') === 'ConceptScheme'){
+                    conceptTree.render();
+                }
                 conceptReport.render();
                 concept.reset()
             }
@@ -104,7 +108,7 @@ require([
             form.modal.modal('show');
             form.on({
                 'conceptSchemeAdded': function(){
-                    window.location.reload();
+                    conceptTree.render();
                 }
             })
         });

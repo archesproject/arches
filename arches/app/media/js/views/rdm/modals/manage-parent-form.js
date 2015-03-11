@@ -43,12 +43,12 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             })
             self.model.set('deleted', concepts)
 
-            this.model.save(function() {
-                this.modal.modal('hide');
-                $('.modal-backdrop.fade.in').remove();  // a hack for now
-                this.cleanup();
-            }, this);
-
+            this.modal.on('hidden.bs.modal', function (e) {
+                this.model.save(function() {
+                    this.cleanup();
+                }, this);
+            })
+            this.modal.modal('hide');
         },
 
         cancel: function(){

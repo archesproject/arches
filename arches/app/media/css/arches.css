@@ -1,6 +1,12 @@
-/* Tree Panel
+/* Modal Panels
 ------------------------------------*/
 
+.modal-title.loading:before {
+   content: url(../img/select2-spinner.gif);
+}
+
+/* Tree Panel
+------------------------------------*/
 
 .concept_tree{
     padding: 13px;

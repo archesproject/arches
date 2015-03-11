@@ -22,10 +22,11 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                     relationshiptype: this.relationshiptype.val()
                 });
                 this.model.set('relatedconcepts', [relatedConcept]);
-                this.model.save(function() {
-                    self.modal.modal('hide');
-                    $('.modal-backdrop.fade.in').remove();  // a hack for now
-                });
+
+                this.modal.on('hidden.bs.modal', function (e) {
+                    self.model.save();
+                })
+                this.modal.modal('hide');
             }
         }
     });

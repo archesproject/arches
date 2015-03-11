@@ -1,12 +1,6 @@
 define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone, arches, ConceptModel) {
     return Backbone.View.extend({
 
-        events: {
-            'click .modal-footer .savebtn': 'save',
-            'click .modal-footer .btn-u-default': 'cancel',
-            'click a': 'removeRelationship'
-        },
-
         initialize: function(){
             var self = this;
             self.$el.find("#error_text").closest('.row').addClass('hidden');
@@ -48,56 +42,38 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone
             });      
 
             this.modal = this.$el.find('form');
-        },
+            this.modal.validate({
+                ignore: null,
+                rules: {
+                    concept_identifiers: "required"
+                },
+                submitHandler: function(form) {
+                    var data = {
+                        'ids': self.$el.find("[name=concept_identifiers]").val(),
+                        'endpoint': self.endpoint.val(),
+                        'model': self.model.toJSON()
+                    };
+                    self.$el.find("#error_text").closest('.row').addClass('hidden');
+                    $.ajax({
+                        type: "POST",
+                        url: arches.urls.from_sparql_endpoint.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', self.model.get('id')),
+                        data: JSON.stringify(data),
+                        success: function(){
+                            self.modal.on('hidden.bs.modal', function (e) {
+                                self.trigger('conceptsImported');
+                            })
+                            self.modal.modal('hide');
+                        }, 
+                        error: function(response){
+                            var el = self.$el.find("#error_text");
+                            el.closest('.row').removeClass('hidden');
+                            el.html(response.responseText);
+                        }
+                    });
 
-        save: function(){
-            var self = this;
-            var data = {
-                'ids': this.$el.find("[name=concept_identifiers]").val(),
-                'endpoint': this.endpoint.val(),
-                'model': this.model.toJSON()
-            };
-            self.$el.find("#error_text").closest('.row').addClass('hidden');
-            $.ajax({
-                type: "POST",
-                url: arches.urls.from_sparql_endpoint.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-                data: JSON.stringify(data),
-                success: function(){
-                    self.modal.on('hidden.bs.modal', function (e) {
-                        self.trigger('conceptsImported');
-                    })
-                    self.modal.modal('hide');
-                }, 
-                error: function(response){
-                    var el = self.$el.find("#error_text");
-                    el.closest('.row').removeClass('hidden');
-                    el.html(response.responseText);
+                    return false;
                 }
             });
-            // this.modal.validate({
-            //     ignore: null,
-            //     rules: {
-            //         concept_identifiers: "required"
-            //     },
-            //     submitHandler: function(form) {
-            //         $.ajax({
-            //             type: "POST",
-            //             url: arches.urls.from_sparql_endpoint.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.model.get('id')),
-            //             data: JSON.stringify(data),
-            //             success: function(){
-            //                 self.modal.on('hidden.bs.modal', function (e) {
-            //                     self.trigger('conceptsImported');
-            //                 })
-            //                 self.modal.modal('hide');
-            //             }, 
-            //             error: function(response){
-            //                 var el = self.$el.find("#error_text");
-            //                 el.closest('.row').removeClass('hidden');
-            //                 el.html(response.responseText);
-            //             }
-            //         });
-            //     }
-            // });
         }
     });
 });

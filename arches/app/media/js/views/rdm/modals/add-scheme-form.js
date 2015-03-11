@@ -39,11 +39,12 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                         nodetype: 'ConceptScheme'
                     });
 
-                    conceptscheme.save(function() {
-                        self.modal.modal('hide');
-                        $('.modal-backdrop.fade.in').remove();  // a hack for now
-                        self.trigger('conceptSchemeAdded');
-                    }, self);
+                    self.modal.on('hidden.bs.modal', function (e) {
+                        conceptscheme.save(function() {
+                            self.trigger('conceptSchemeAdded');
+                        }, self);
+                    })
+                    self.modal.modal('hide');
 
                     return false;
                 }
