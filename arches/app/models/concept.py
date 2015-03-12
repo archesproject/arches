@@ -486,7 +486,7 @@ class Concept(object):
                     level = level + 1                
                 for relation in conceptrealations:
                     ret.children.append(_findNarrowerConcept(relation.conceptidto_id, depth_limit=depth_limit, level=level))   
-
+                ret.children = sorted(ret.children, key=lambda concept: concept.label)
             return ret 
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
