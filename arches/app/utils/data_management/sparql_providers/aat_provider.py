@@ -94,7 +94,7 @@ class AAT_Provider(Abstract_Provider):
     def perform_sparql_query(self, query):
         self.setQuery(query)
 
-        print query
+        #print query
         #return HttpResponse(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
 
         req = urllib2.Request(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
