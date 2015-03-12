@@ -138,8 +138,7 @@ class SKOSReader(object):
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
                     self.nodes.append(concept)
-
-
+                
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
@@ -178,6 +177,7 @@ class SKOSWriter(object):
         #bind the namespaces
         rdf_graph.bind('arches',ARCHES)
         rdf_graph.bind('skos',SKOS)
+        rdf_graph.bind('dcterms',DCTERMS)
         
         """
         #add main concept to the graph
@@ -186,25 +186,36 @@ class SKOSWriter(object):
         rdf_graph.add((Arches guid, SKOS.prefLabel, Literal('Stone',lang=en)))
         """
 
-        def build_skos(node):
-            conceptid = node.id
-            rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
+        if concept_graph.nodetype == 'ConceptScheme':
+            scheme_id = concept_graph.id
 
-            for value in node.values:
-                if value.category == 'label' or value.category == 'note':
-                    rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(value.value, lang = value.language)))
-                else:
-                    rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(value.value, lang = value.language)))
+            def build_skos(node):
 
-            for subconcept in node.subconcepts:
-                if node.nodetype == 'ConceptScheme':
-                    rdf_graph.add((ARCHES[node.id], SKOS.hasTopConcept, ARCHES[subconcept.id]))
-                elif node.nodetype == 'Concept':
-                    rdf_graph.add((ARCHES[node.id], SKOS.narrower, ARCHES[subconcept.id]))
+                if node.nodetype == 'Concept':
+                    rdf_graph.add((ARCHES[node.id], SKOS.inScheme, ARCHES[scheme_id]))
 
-            for relatedconcept in node.relatedconcepts:
-                rdf_graph.add((ARCHES[node.id], SKOS.related, ARCHES[relatedconcept.id]))
+                for subconcept in node.subconcepts:
+                    rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
+
+                for relatedconcept in node.relatedconcepts:
+                    rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))                
+                
+                for value in node.values:
+                    if value.category == 'label' or value.category == 'note':
+                        if node.nodetype == 'ConceptScheme':
+                            if value.type == 'prefLabel':
+                                rdf_graph.add((ARCHES[node.id], DCTERMS.title, Literal(value.value, lang = value.language)))
+                            elif value.type == 'scopeNote':
+                                rdf_graph.add((ARCHES[node.id], DCTERMS.description, Literal(value.value, lang = value.language)))
+                        else:
+                            rdf_graph.add((ARCHES[node.id], SKOS[value.type], Literal(value.value, lang = value.language)))
+                    else:
+                        rdf_graph.add((ARCHES[node.id], ARCHES[value.type.replace(' ', '_')], Literal(value.value, lang = value.language)))
+
+                rdf_graph.add((ARCHES[node.id], RDF.type, SKOS[node.nodetype]))
 
 
-        concept_graph.traverse(build_skos)
-        return rdf_graph.serialize(format=format)
+            concept_graph.traverse(build_skos)
+            return rdf_graph.serialize(format=format)
+        else:
+            raise Exception('Only ConceptSchemes can be written to SKOS RDF files.')
