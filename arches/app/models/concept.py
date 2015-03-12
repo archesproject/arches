@@ -151,11 +151,14 @@ class Concept(object):
             if include_relatedconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
-                    self.relationshiptype = relation.relationtype.pk
                     if relation.conceptidto_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidto_id, include=['label']))
+                        relatedconcept = Concept().get(relation.conceptidto_id, include=['label'])
+                        relatedconcept.relationshiptype = relation.relationtype.pk
+                        self.relatedconcepts.append(relatedconcept)
                     if relation.conceptidfrom_id != self.id:
-                        self.relatedconcepts.append(Concept().get(relation.conceptidfrom_id, include=['label']))
+                        relatedconcept = Concept().get(relation.conceptidfrom_id, include=['label'])
+                        relatedconcept.relationshiptype = relation.relationtype.pk
+                        self.relatedconcepts.append(relatedconcept)
 
         return self
             
