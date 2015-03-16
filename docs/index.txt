@@ -11,14 +11,9 @@ testing push hook....
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   getting-started
+   arches-data
+   arches-core
+   hip
