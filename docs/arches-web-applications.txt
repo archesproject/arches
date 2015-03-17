@@ -1,0 +1,43 @@
+#######################
+Arches Web Applications
+#######################
+
+
+Architecture
+============
+
+
+Home Page
+=========
+
+
+Search
+======
+
+
+Map
+===
+
+
+Resource Data Management
+========================
+
+
+Forms
+-----
+
+
+Reports
+-------
+
+
+Elasticsearch
+=============
+
+Indexing Arches Data
+--------------------
+
+
+Arches Search Services
+----------------------
+
