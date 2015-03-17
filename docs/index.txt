@@ -6,14 +6,12 @@
 Welcome to Arches3's documentation!
 ===================================
 
-overview here...
 
 Contents:
 
 .. toctree::
    :maxdepth: 3
 
+   overview
    getting-started
-   arches-data
-   arches-core
-   hip
+   understanding-arches

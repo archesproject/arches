@@ -1,0 +1,72 @@
+############
+Understanding Arches
+############
+
+Arches Data
+===========
+
+Physical Data model
+-------------------
+
+
+Reference data graph
+--------------------
+
+
+Resource Graph
+--------------
+
+
+Ontology graph
+--------------
+
+
+Search Indexes
+--------------
+
+
+Exporting Data
+--------------
+
+
+Arches Web Framework
+====================
+
+Architecture
+------------
+
+
+Home Page
+---------
+
+
+Search
+------
+
+
+Map
+---
+
+
+Resource Data Management
+------------------------
+
+
+Forms
+^^^^^
+
+
+Reports
+^^^^^^^
+
+
+Elasticsearch
+-------------
+
+Indexing Arches Data
+^^^^^^^^^^^^^^^^^^^^
+
+
+Arches Search Services
+^^^^^^^^^^^^^^^^^^^^^^
+

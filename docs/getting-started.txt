@@ -2,28 +2,22 @@
 Getting Started
 ############
 
+Installation
+============
+
+
 Dependencies
-============  
-
-foo...
-
-System Install
-==============
-
-foo...
-
-Running Arches
-==============
-
-foo...
+------------
 
 
-Development/Evalution
----------------------
+Installing Arches
+-----------------
 
-foo...
 
-Production
+Arches Applications
+===================
+
+
+Arches-HIP
 ----------
 
-foo...
