@@ -3,7 +3,6 @@ define(['jquery', 'knockout'], function ($, ko) {
         init: function(el, valueAccessor, allBindings, viewModel, bindingContext) {
             var defaults = {};
             var settings = ko.unwrap(valueAccessor());
-            //var viewModel = bindingContext.$data;
             
             defaults.toolbar = [
                 ['style', ['bold', 'italic', 'underline', 'clear']], 
