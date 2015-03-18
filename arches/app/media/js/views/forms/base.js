@@ -3,7 +3,8 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         
         events: function(){
             return {
-                'click #saveedits': 'submit'  
+                'click #saveedits': 'submit',
+                'click #canceledits': 'cancel'
             }
         },
 
@@ -34,10 +35,10 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
             this.data = JSON.parse(this._rawdata);
 
-            $('input,select').change(function() {
-                var isDirty = self.isDirty();
-                self.trigger('change', isDirty);
-            });
+            // $('input,select').change(function() {
+            //     var isDirty = self.isDirty();
+            //     self.trigger('change', isDirty);
+            // });
 
             this.on('change', function(eventtype, item){
                 $('#saveedits').removeClass('disabled');
@@ -90,6 +91,12 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }
+        },
+
+        cancel: function(){
+            _.each(this.branchLists, function(branchList){
+                branchList.undoEdits();
+            }, this);  
         }
     });
 });

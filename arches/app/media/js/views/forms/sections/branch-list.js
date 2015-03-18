@@ -1,10 +1,5 @@
 define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
-        viewModel: null,
-        dataKey: '',
-        pkField: '',
-        originalItem: null,
-        alwaysEdit: false,
 
         events: {
             'click .add-button': 'addItem',
@@ -22,8 +17,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             // if this is a function then it's assumed to be an observableArray already
             if(typeof this.viewModel !== 'function'){
                 _.each(this.viewModel.defaults, function(value, key){
-                    var node = this.addDefaultNode(key, value);
-                    this.editedItem.push(koMapping.fromJS(node));
+                    this.addDefaultNode(key, value);
                 }, this);   
 
                 this.branch_lists = koMapping.fromJS(this.viewModel.branch_lists)
@@ -178,6 +172,25 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 return koMapping.toJS(this.branch_lists);
             }else{
                 return koMapping.toJS(this.branch_lists);
+            }
+        },
+
+        undoEdits: function(){
+            if(this.alwaysEdit && this.data[this.dataKey].branch_lists.length === 1){
+                this.editedItem.removeAll();
+                _.each(this.data[this.dataKey].branch_lists[0].nodes, function(node){
+                    this.editedItem.push(koMapping.fromJS(node));
+                }, this);   
+            }else{
+                this.branch_lists.removeAll();
+                _.each(this.data[this.dataKey].branch_lists, function(node){
+                    this.branch_lists.push(koMapping.fromJS(node));
+                }, this);
+
+                this.editedItem.removeAll();
+                _.each(this.defaults, function(node){
+                    this.editedItem.push(koMapping.fromJS(node));
+                }, this);
             }
         }
     });
