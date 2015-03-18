@@ -1,9 +1,10 @@
 define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
         viewModel: null,
-        key: '',
+        dataKey: '',
         pkField: '',
-        editeditem: '',
+        originalItem: null,
+        alwaysEdit: false,
 
         events: {
             'click .add-button': 'addItem',
@@ -13,32 +14,125 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'viewModel', 'key', 'pkField', 'validateBranch'));
-            if (this.pkField === ''){
-                this.pkField = this.key + '__entityid';                
-            }
+            _.extend(this, options);
+            this.editedItem = ko.observableArray();
+            this.defaults = [];
+            this.viewModel = this.data[this.dataKey];
 
             // if this is a function then it's assumed to be an observableArray already
-            if(typeof this.viewModel[this.key] !== 'function'){
-                this.viewModel[this.key] = ko.observableArray(ko.utils.unwrapObservable(this.viewModel[this.key]));                
+            if(typeof this.viewModel !== 'function'){
+                _.each(this.viewModel.defaults, function(value, key){
+                    var node = this.addDefaultNode(key, value);
+                    this.editedItem.push(koMapping.fromJS(node));
+                }, this);   
+
+                this.branch_lists = koMapping.fromJS(this.viewModel.branch_lists)
+
+                if(this.alwaysEdit && this.branch_lists().length === 1){
+                    this.editedItem.removeAll();
+                    _.each(this.branch_lists()[0].nodes(), function(node){
+                        this.editedItem.push(node);
+                    }, this);   
+                }             
             }
-            this.viewModel.editing[this.key] = koMapping.fromJS(this.viewModel.defaults[this.key]);
+
+            ko.applyBindings(this, this.el);
         },
 
         validateBranch: function (data) {
             return true;
         },
 
+        validateHasValues: function(nodes){
+            var valid = true;
+            _.each(nodes, function (node) {
+                if (node.entityid === '' && node.value === ''){
+                    valid = false;
+                }
+            }, this);
+            return valid;
+        },
+
+        getEdited: function(entitytypeid, key){
+            if(!this.alwaysEdit){
+                this.addDefaultNode(entitytypeid, '');
+            }
+            return ko.pureComputed({
+                read: function() {
+                    //var x = this.editedItem();
+                    //var defaultNode = null;
+                    var ret = null;
+                    this.entitytypeid = entitytypeid;
+                    _.each(this.editedItem(), function(node){
+                        if (entitytypeid.search(node.entitytypeid()) > -1){
+                            ret = node[key]();
+                        }
+                    }, this);
+                    return ret
+                },
+                write: function(value){
+                    _.each(this.editedItem(), function(node){
+                        if (entitytypeid.search(node.entitytypeid()) > -1){
+                            node[key](value);
+                        }
+                    }, this);
+                },
+                entitytypeid: entitytypeid,
+                owner: this
+            });
+        },
+
+        addDefaultNode: function(entitytypeid, value){
+            var alreadyHasDefault = false;
+            var def = {
+                property: '',
+                entitytypeid: entitytypeid,
+                entityid: '',
+                value: value,
+                label: '',
+                businesstablename: '',
+                child_entities: []
+            };
+            _.each(this.defaults, function(node){
+                if (node.entitytypeid === entitytypeid){
+                    alreadyHasDefault = true;
+                }
+            }, this);
+
+            if (!alreadyHasDefault){
+                this.defaults.push(def);  
+                this.editedItem.push(koMapping.fromJS(def));            
+            }
+
+            return def
+        },
+
+        onSelect2Selecting: function(item, select2Config){
+            _.each(this.editedItem(), function(node){
+                if (node.entitytypeid() === select2Config.dataKey){
+                    node.label(item.value);
+                    //node.value(item.id);
+                    node.entitytypeid(item.entitytypeid);
+                }
+            }, this);
+        },
+
         addItem: function() {
-            this.editeditem = ''
-            var data = ko.toJS(this.viewModel.editing[this.key]);
+            var data = ko.toJS(this.editedItem);
             var validationAlert = this.$el.find('.branch-invalid-alert');
             
             if (this.validateBranch(data)) {
-                delete data.__ko_mapping__;
-				this.trigger('change', 'add', data);
-                this.viewModel[this.key].push(data);
-                koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
+                var all = this.editedItem.removeAll();
+                this.branch_lists.push({
+                    'nodes': koMapping.fromJS(all)
+                });
+                _.each(this.defaults, function(node){
+                    this.editedItem.push(koMapping.fromJS(node));
+                }, this);
+
+                this.originalItem = null;
+
+                this.trigger('change', 'add', data);
             } else {
                 validationAlert.show(300);
                 setTimeout(function() {
@@ -48,27 +142,42 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         deleteItem: function(e) {
-            var data = $(e.target).data();
-            var item = this.viewModel[this.key]()[data.index];
-
-            this.trigger('change', 'delete', item);   
-            this.viewModel[this.key].remove(this.viewModel[this.key]()[data.index]);
+            var item = $(e.target).data();
+            var branch = this.branch_lists()[item.index];
+            this.trigger('change', 'delete', branch);   
+            this.branch_lists.remove(this.branch_lists()[item.index]);
         },
 
         editItem: function(e) {
-            var data = $(e.target).closest('.arches-CRUD-edit').data();
-            this.editeditem = this.viewModel[this.key]()[data.index];
-
-            this.trigger('change', 'edit', this.editeditem);
-            koMapping.fromJS(ko.toJS(this.editeditem), this.viewModel.editing[this.key]);
-            this.viewModel[this.key].remove(this.editeditem);
+            var item = $(e.target).closest('.arches-CRUD-edit').data();
+            var branch = this.branch_lists.splice(item.index, 1)[0];
+            this.editedItem.removeAll()
+            this.originalItem = koMapping.toJS(branch);
+            _.each(branch.nodes(), function(node){
+                this.editedItem.push(node);
+            }, this);   
+            
+            this.trigger('change', 'edit', this.editedItem);
         },
 
         discardEdit: function(e) {
-            if(this.editeditem !== ''){
-                this.viewModel[this.key].push(this.editeditem);
-                koMapping.fromJS(this.viewModel.defaults[this.key], this.viewModel.editing[this.key]);
-                this.editeditem = '';           
+            if(this.originalItem !== null){
+                this.branch_lists.push({
+                    'nodes': koMapping.fromJS(this.originalItem.nodes)
+                });
+                _.each(this.defaults, function(node){
+                    this.editedItem.push(koMapping.fromJS(node));
+                }, this);
+
+                this.originalItem = null;           
+            }
+        },
+
+        getBranchListData: function(){
+            if(this.alwaysEdit){
+                return koMapping.toJS(this.branch_lists);
+            }else{
+                return koMapping.toJS(this.branch_lists);
             }
         }
     });

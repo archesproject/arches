@@ -58,63 +58,35 @@ class ResourceForm(object):
         return 
 
     def get_nodes(self, entitytypeid):
-        return self.resource.get_nodes(entitytypeid, keys=['label', 'value', 'entityid'])
+        #return self.resource.get_nodes(entitytypeid, keys=['label', 'value', 'entityid', 'entitytypeid'])
+        ret = []
+        entities = self.resource.find_entities_by_type_id(entitytypeid)
+        for entity in entities:
+            ret.append({'nodes': entity.flatten()})
 
-    def update_nodes(self, entitytypeid, data):
+        return ret
+
+    def update_nodes(self, entitytypeid, data, dataKey=None):
+        if dataKey == None:
+            dataKey = entitytypeid
+
         for entity in self.resource.find_entities_by_type_id(entitytypeid):
             self.resource.child_entities.remove(entity)
 
         if self.schema == None:
             self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
-        for value in data[entitytypeid.replace('.', '_')]:
+        for value in data[entitytypeid]:
             baseentity = None
-            for newentity in self.decode_data_item(value):
-                entity = Entity()
-                entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+            for newentity in value['nodes']:
+                try:
+                    entity = Entity()
+                    entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
 
-                if baseentity == None:
-                    baseentity = entity
-                else:
-                    baseentity.merge(entity)
+                    if baseentity == None:
+                        baseentity = entity
+                    else:
+                        baseentity.merge(entity)
+                except:
+                    pass
             
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
-
-    def update_node(self, entitytypeid, data):
-        if self.schema == None:
-            self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
-        nodes = self.resource.find_entities_by_type_id(entitytypeid)
-        node_data = self.decode_data_item(data[entitytypeid.replace('.', '_')])[0]
-
-        if len(nodes) == 0:
-            entity = Entity()
-            entity.create_from_mapping(self.resource.entitytypeid, self.schema[entitytypeid]['steps'], entitytypeid, node_data['value'], node_data['entityid'])
-            self.resource.merge_at(entity, self.resource.entitytypeid)
-        else:
-            nodes[0].value = node_data['value']
-
-    def decode_data_item(self, entity):
-        def dec(item):
-            # item = "NAME_E41__entitytypeid"
-            val = item.split('__')
-            if len(val) != 2:
-                return False
-            entitytypeid = val[0]
-            propertyname = val[1]
-            
-            v = entitytypeid.split('_')
-            entitytypeid = '%s.%s' % ('_'.join(v[:-1]), v[-1])
-            return (entitytypeid, propertyname)
-
-        ret = {}
-        for key, value in entity.iteritems():
-            r = dec(key)
-            if r:
-                if r[0] not in ret:
-                    ret[r[0]] = {}
-                ret[r[0]][r[1]] = value
-
-        ret2 = []
-        for key, value in ret.iteritems():
-            value['entitytypeid'] = key
-            ret2.append(value)
-        return ret2

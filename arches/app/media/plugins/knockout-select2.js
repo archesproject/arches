@@ -1,27 +1,26 @@
 
 define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
     ko.bindingHandlers.select2 = {
-        init: function(el, valueAccessor, allBindingsAccessor, viewModel) {
+        init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
+            var self = this;
+            var allBindings = allBindingsAccessor();
+            var branchList = bindingContext.$data;
+            var select2Config = ko.utils.unwrapObservable(allBindings.select2);            
+
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).select2('destroy');
             });
 
-            var allBindings = allBindingsAccessor(),
-                select2Config = ko.utils.unwrapObservable(allBindings.select2);
+            select2Config.formatResult = function (item) {
+                return item.value;
+            };
 
-            if (select2Config.viewModel && select2Config.conceptKey) {
-                select2Config.formatResult = function (item) {
-                    return item.value;
-                };
+            select2Config.formatSelection = function (item) {
+                branchList.onSelect2Selecting(item, select2Config);
+                return item.value;
+            };
 
-                select2Config.formatSelection = function (item) {
-                    select2Config.viewModel[select2Config.conceptKey + '__label'](item.value)
-                    select2Config.viewModel[select2Config.conceptKey + '__value'](item.id)
-                    return item.value;
-                };
-            }
-
-            select2Config.data = _.filter(select2Config.data, function (item) {
+            select2Config.data = _.filter(branchList.viewModel.domains[select2Config.dataKey], function (item) {
                 return (item.valuetype === "collector") ? (item.children.length > 0) : true;
             });
 
@@ -33,37 +32,18 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
             $(el).select2(select2Config);
         },
-        update: function (el, valueAccessor, allBindingsAccessor, viewModel) {
-            var allBindings = allBindingsAccessor(),
-                select2Config = ko.utils.unwrapObservable(allBindings.select2);
+        update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
+            var allBindings = allBindingsAccessor();
+            var select2Config = ko.utils.unwrapObservable(allBindings.select2);
 
             if ("value" in allBindings) {
-                $(el).select2("val", allBindings.value());
-            } else if (select2Config.viewModel && select2Config.conceptKey) {
-                if ($(el).select2("val") != select2Config.viewModel[select2Config.conceptKey + '__value']()) {
-                    $(el).select2("val", select2Config.viewModel[select2Config.conceptKey + '__value']());
+                if (allBindings.select2.multiple && allBindings.value().constructor != Array) {                
+                    $(el).select2("val", allBindings.value().split(","));
                 }
-            } else if ("selectedOptions" in allBindings) {
-                var converted = [];
-                var textAccessor = function(value) { return value; };
-                if ("optionsText" in allBindings) {
-                    textAccessor = function(value) {
-                        var valueAccessor = function (item) { return item; }
-                        if ("optionsValue" in allBindings) {
-                            valueAccessor = function (item) { return item[allBindings.optionsValue]; }
-                        }
-                        var items = $.grep(allBindings.options(), function (e) { return valueAccessor(e) == value});
-                        if (items.length == 0 || items.length > 1) {
-                            return "UNKNOWN";
-                        }
-                        return items[0][allBindings.optionsText];
-                    }
+                else {
+                    $(el).select2("val", allBindings.value());
                 }
-                $.each(allBindings.selectedOptions(), function (key, value) {
-                    converted.push({id: value, text: textAccessor(value)});
-                });
-                $(el).select2("data", converted);
-            }
+            } 
         }
     };
 
