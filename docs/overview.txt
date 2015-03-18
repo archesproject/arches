@@ -33,6 +33,14 @@ To promote consistent data creation, update, and indexing workflows, Arches impl
 http://archesproject.org/forum/
 
 
+**Version History**
+
+v3.0  April, 2015: Updated architecture, inclusion of the Reference Data Manager, updated dependencies (ElasticSearch, OpenLayers, Knockout)
+
+v2.0  March, 2014: Improved upload of digital files, assorted bug fixes
+
+v1.0 October, 2013: Initial Release
+
 
 **License**
 
