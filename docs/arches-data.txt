@@ -4,30 +4,73 @@ Arches Data
 
 Physical Data model
 ===================
+The Arches physical data model consists of tables and referential integrity constraints implmented within a Postgres database.  The design of the physical data model is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  To accomplish this, Arches seperates the physical data model from the set of "resources" (things that Arches keeps track of) and "attributes of resources" into which business data can be loaded.  Therefore, within the physical data model, Arches stores both metadata - "data about data" defining the set of resources and attributes available to store - and business data  - inventorying and describing the cultural heritage resources themselves. We refer to the metadata portion of this as "Resource Graphs", and those are covered in more detail in the next section.
+
+The physical data model itself is shown below in the following entity relationship diagram.
 
 
-Reference data graph
+The core of the physical data model are the entity_types and entities tables.  One entity within an Arches database means one of three things:
+1> the existence of a cultural heritage resource
+2> an attribute of a cultural heritage resource, or
+3> an in-between point between the resource and one or more given attributes
+
+Entity types, in turn, classify entities into one of a series of entity types which can be defined by an Arches implmentor in the course of defining a resource graph for an Arches application.  
+**For the purpose of this document, we are assuming that you will implement the Arches HIP application, and we do not go into depth on how to modify entity types.
+
+There is a whole lot of metadata attached to the entity type records in order to define things like:
+- what is the semantic classification of a given entity type?
+- what are the allowed relationships between this entities of this type and entities of other types?
+- does the existence of an entity of this type mean the existence of a resource, or does it mean the existence of an attribute of a resource?
+- if this an entity exists with this entity type, does it contain attributive information, and in what table does it store it.
+
+Dont worry too much about these semaantic nodes for the moment.  They are not technically required 
+
+
+
+Resource Data Graphs
+===============
+
+Ontologies
+----------
+
+
+Reference Data Graph
 ====================
 
 
-Resource Graph
-==============
+Ontology Graph
+=======================
 
 
-Ontology graph
-==============
+Loading Reference Data
+======================
+
+from .csv
+------------
 
 
-Loading Data
-============
+from .skos
+---------
+
+
+Loading Business Data
+======================
 
 
 from .arches
 ------------
+-syntax
+-arches-level validation
+ validate_row_syntax - validates format of archesfile row
+validate_entitytype - checks that entitytype listed exists in the resource graph for that resource type
+valdiate_attribute_value - checks that the attributevalue is valid within the context of the businesstablename (e.g. a date is actually formatted correclty, a number is really a number and not a string)
+validate_contiguousness - checks that resource attributes are on contiguous lines in the .arches file
+validate_relations_file - checks that all resourceids listed in the .relations file exist in the .arches file
 
 
 from .shp
 ---------
+
 
 
 Exporting Data
