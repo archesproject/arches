@@ -8,7 +8,6 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         },
 
         constructor: function (options) {
-            console.log('in base.js constructor');
             var self = this;
             this.branchLists = [];
 
