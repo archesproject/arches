@@ -390,15 +390,14 @@ define(['jquery',
                     }
                 });
 
-                var iconUnicode = '\uf060';
-                this.resultLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: '#C4171D'}).layer();
+                this.resultLayer = new ResourceLayerModel({entitytypeid: null, vectorColor: arches.resourceMarker.defaultColor}).layer();
                 this.map.map.addLayer(this.resultLayer);
                 var styleFactory = function (color, zIndex) {
                     var rgb = utils.hexToRgb(color);
                     return [new ol.style.Style({
                         text: new ol.style.Text({
-                            text: iconUnicode,
-                            font: 'normal 42px octicons',
+                            text: arches.resourceMarker.icon,
+                            font: 'normal 42px ' + arches.resourceMarker.font,
                             offsetX: 5,
                             offsetY: ((42/2)*-1)-5,
                             fill: new ol.style.Fill({
@@ -408,8 +407,8 @@ define(['jquery',
                         zIndex: zIndex
                     }), new ol.style.Style({
                         text: new ol.style.Text({
-                            text: iconUnicode,
-                            font: 'normal 42px octicons',
+                            text: arches.resourceMarker.icon,
+                            font: 'normal 42px ' + arches.resourceMarker.font,
                             offsetY: (42/2)*-1,
                             stroke: new ol.style.Stroke({
                                 color: 'white',
@@ -422,7 +421,7 @@ define(['jquery',
                         zIndex: zIndex
                     })];
                 };
-                var normalStyle = styleFactory('#C4171D', 1000000);
+                var normalStyle = styleFactory(arches.resourceMarker.defaultColor, 1000000);
                 var highlightStyle = styleFactory('#4CAE4C', 9999999);
 
                 this.currentPageLayer = new ol.layer.Vector({
