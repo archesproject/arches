@@ -16,7 +16,6 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             };
 
             select2Config.formatSelection = function (item) {
-                branchList.onSelect2Selecting(item, select2Config);
                 return item.value;
             };
 
@@ -31,19 +30,17 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             });
 
             $(el).select2(select2Config);
+
+            $(el).on("change", function(val) {
+                console.log(val);
+                if(val.added){
+                    return select2Config.value({'value':val.added.id, 'label':val.added.value, 'entitytypeid': val.added.entitytypeid});
+                }
+                return select2Config.value(val.val);
+            });
         },
         update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var allBindings = allBindingsAccessor();
-            var select2Config = ko.utils.unwrapObservable(allBindings.select2);
-
-            if ("value" in allBindings) {
-                if (allBindings.select2.multiple && allBindings.value().constructor != Array) {                
-                    $(el).select2("val", allBindings.value().split(","));
-                }
-                else {
-                    $(el).select2("val", allBindings.value());
-                }
-            } 
+            return $(el).select2("val", ko.utils.unwrapObservable(valueAccessor().value()), true);
         }
     };
 
