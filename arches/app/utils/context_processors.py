@@ -33,7 +33,10 @@ def map_info(request):
             'bing_key': settings.BING_KEY,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
-            'extent': settings.MAP_EXTENT
+            'extent': settings.MAP_EXTENT,
+            'resource_marker_icon': settings.RESOURCE_MARKER_ICON_UNICODE,
+            'resource_marker_font': settings.RESOURCE_MARKER_ICON_FONT,
+            'resource_marker_color': settings.RESOURCE_MARKER_DEFAULT_COLOR
         }
     }
 

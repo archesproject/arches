@@ -11,8 +11,8 @@
                     "{% trans 'resource' %}"
                 ],
                 onMap: true,
-                vectorColor: "#C4171D",
-                iconColor: "#C4171D",
+                vectorColor: "{{ map_info.resource_marker_color }}",
+                iconColor: "{{ map_info.resource_marker_color }}",
                 infoContent: "<div style=\"width:200px;\">{% trans 'visible zoom range: all' %}</div>"
             },
             {% for type, type_data in resource_types %}
