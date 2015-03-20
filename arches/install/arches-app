@@ -1,0 +1,223 @@
+#!/usr/bin/env python
+import arches
+import argparse
+import codecs
+import os
+import sys
+
+from django.core.management.templates import TemplateCommand
+from django.core.management.base import BaseCommand, CommandError
+from django.utils.importlib import import_module
+from os import path
+from django.core.management.utils import handle_extensions
+import errno
+import django
+from django.template import Template, Context
+import shutil
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
+here = os.path.abspath(os.path.dirname(__file__))
+COMMANDS = {}
+
+from arches.management.commands import utils
+
+parent_parser = argparse.ArgumentParser(add_help=False)
+
+parser = argparse.ArgumentParser(
+    prog='arches', 
+    description='Manage Arches-based Applications',
+    parents=[parent_parser], 
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+subparsers = parser.add_subparsers(title='available commands', dest='command')
+subparsers.required = True
+
+class ArchesTemplateCommand(TemplateCommand):
+
+    def handle(self, name, args, target=None):
+        self.app_or_project = 'app'
+        self.paths_to_remove = []
+        self.validate_name(name, 'app')
+
+        # if some directory is given, make sure it's nicely expanded
+        if target is None:
+            top_dir = path.join(os.getcwd(), name)
+            try:
+                os.makedirs(top_dir)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    message = "'%s' already exists" % top_dir
+                else:
+                    message = e
+                raise CommandError(message)
+        else:
+            top_dir = os.path.abspath(path.expanduser(target))
+            if not os.path.exists(top_dir):
+                raise CommandError("Destination directory '%s' does not "
+                                   "exist, please create it first." % top_dir)
+
+        extensions = tuple(
+            handle_extensions(args.extensions))
+        extra_files = []
+
+        for file in args.files:
+            extra_files.extend(map(lambda x: x.strip(), file.split(',')))
+
+        base_name = '%s_name' % self.app_or_project
+        base_subdir = '%s_template' % self.app_or_project
+        base_directory = '%s_directory' % self.app_or_project
+
+        if django.VERSION[-2] != 'final':
+            docs_version = 'dev'
+        else:
+            docs_version = '%d.%d' % django.VERSION[:2]
+
+        context = Context({
+            base_name: name,
+            base_directory: top_dir,
+            'docs_version': docs_version,
+            'source_app': args.source_app #gets the basename directory that contains this __main__.py script
+        }, autoescape=False)
+
+        # Setup a stub settings environment for template rendering
+        from django.conf import settings
+        if not settings.configured:
+            settings.configure()
+
+        template_dir = self.handle_template(args.template, base_subdir)
+        prefix_length = len(template_dir) + 1
+
+        for root, dirs, files in os.walk(template_dir):
+
+            path_rest = root[prefix_length:]
+            relative_dir = path_rest.replace(base_name, name)
+            if relative_dir:
+                target_dir = path.join(top_dir, relative_dir)
+                if not path.exists(target_dir):
+                    os.mkdir(target_dir)
+
+            for dirname in dirs[:]:
+                if dirname.startswith('.') or dirname == '__pycache__':
+                    dirs.remove(dirname)
+
+            for filename in files:
+                if filename.endswith(('.pyo', '.pyc', '.py.class')):
+                    # Ignore some files as they cause various breakages.
+                    continue
+                old_path = path.join(root, filename)
+                new_path = path.join(top_dir, relative_dir,
+                                     filename.replace(base_name, name))
+                if path.exists(new_path):
+                    raise CommandError("%s already exists, overlaying a "
+                                       "project or app into an existing "
+                                       "directory won't replace conflicting "
+                                       "files" % new_path)
+
+                # Only render the Python files, as we don't want to
+                # accidentally render Django templates files
+                with open(old_path, 'rb') as template_file:
+                    content = template_file.read()
+                if filename.endswith(extensions) or filename in extra_files or filename.endswith('.py'):
+                    content = content.decode('utf-8')
+                    template = Template(content)
+                    content = template.render(context)
+                    content = content.encode('utf-8')
+                with open(new_path, 'wb') as new_file:
+                    new_file.write(content)
+                try:
+                    shutil.copymode(old_path, new_path)
+                    self.make_writeable(new_path)
+                except OSError:
+                    self.stderr.write(
+                        "Notice: Couldn't set permission bits on %s. You're "
+                        "probably using an uncommon filesystem setup. No "
+                        "problem." % new_path, self.style.NOTICE)
+
+        for root, dirs, files in os.walk(os.path.join(top_dir)):
+            for dirname in dirs:
+                if dirname == 'arches-template-content':
+                    os.rename(os.path.join(root, dirname), os.path.join(root, name))
+
+        if self.paths_to_remove:
+            for path_to_remove in self.paths_to_remove:
+                if path.isfile(path_to_remove):
+                    os.remove(path_to_remove)
+                else:
+                    shutil.rmtree(path_to_remove,
+                                  onerror=rmtree_errorhandler)
+
+def command_create_app(args):
+    cmd = ArchesTemplateCommand()
+    cmd.handle(args.name, args)
+
+parser_start = subparsers.add_parser(
+    'create',
+    help="Create the scaffolding for a new Arches application",
+)
+parser_start.add_argument(
+    'name', 
+    type=str,
+    help='name of your new app'
+    )
+parser_start.add_argument(
+    '-d', '--directory',
+    help='destination directory of your new project',
+    dest='directory',
+    type=str, 
+    default='',
+)
+parser_start.add_argument(
+    '-t', '--template',
+    help="The path or URL to load the template from.",
+    type=str, 
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-template') 
+)
+parser_start.add_argument(
+    '-e', '--extension',
+    dest='extensions',
+    help='The file extension(s) to render (default: py).',
+    type=str, 
+    default=['py','txt','html','js','css']
+)
+parser_start.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='name of your new arches application',
+    type=str, 
+    default='',
+)
+parser_start.add_argument(
+    '-a', '--app',
+    dest='source_app',
+    help='An application upon which your new app runs',
+    type=str, 
+    default='arches',
+)
+
+try:
+    # Python 3
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
+except AttributeError:
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr)
+
+class CommandError(Exception):
+    pass
+
+COMMANDS['create'] = command_create_app
+
+def main(argv=None):
+    if argv is not None:
+        args = parser.parse_args(argv)
+    else:
+        args = parser.parse_args()
+
+    try:
+        COMMANDS[args.command](args)
+    except CommandError as e:
+        print str(e)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()

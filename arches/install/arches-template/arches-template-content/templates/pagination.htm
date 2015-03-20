@@ -1,0 +1,19 @@
+<div class="text-center">
+    <ul class="pagination">
+        <li><a class="{% if not page_obj.has_previous %}disabled"{% else %}page-button" data-page="{{ page_obj.previous_page_number }}"{% endif %} href="#">«</a></li>
+    {% for page in pages %}
+        {% if page %}
+            {% ifequal page page_obj.number %}
+                <li class="current page active"><a href="#" data-page="{{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="page"><a href="#" data-page="{{ page }}" class="page-button">{{ page }}</a></li>
+            {% endifequal %}
+        {% else %}
+            <li class="disabled"><a href="#">...</a></li>
+        {% endif %}
+    {% endfor %}
+        <li><a class="{% if not page_obj.has_next %}disabled"{% else %}page-button" data-page="{{ page_obj.next_page_number }}"{% endif %} href="#">»</a></li>
+    </ul>
+</div>  
+<div name="search-result-data" data-results="{{results}}"></div>
+<div class="search-result-all-ids" data-results="{{all_ids}}"></div>

@@ -1,0 +1,72 @@
+{% load i18n %}
+<!-- Add Related Concept Modal Data Entry Form -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="" class="modal-title">{% trans "Select Concept Values for Dropdowns" %}</h4>
+            </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        
+                        <form class="form-inline" role="form">
+                            
+                            <div class="form-group arches-modal-form-group">
+
+                                <div class="row">
+                                    <div class="col-xs-9">
+                                        <!-- Concept Search Widget -->
+                                        <h5 id="" class="arches-modal-section">{% trans "Select a concept" %}</h5>
+                                        <div class="">  
+                                            {% include 'views/concept-search.htm' %}  
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
+                                        <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}">
+                                            {% for relation in related_relations %}
+                                              <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+                                
+                                <div class="row">
+
+                                    <!-- Explanation -->
+                                    <div class="col-xs-12">
+                                        <p class="explanation">
+                                            {% trans "Selecting a concept will select that concept and all it's children." %}
+                                        </p>
+                                    </div>
+                                    <!-- End Explanation -->
+
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="savebtn btn-u" type="button">{% trans "Save" %}</button>
+            </div>
+          </div>
+    </div>
+</div>
+<!-- End Related Concept Modal Data Entry Form -->

@@ -1,0 +1,133 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="header">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="container">
+            
+            <!-- Topbar Message -->
+            <div class="arches-loginbar pull-left">
+                
+                <a href="http://www.archesproject.org" class="">{% trans "Arches" %} </a> 
+                <span class="hidden-xs">{% trans "Cultural Heritage Inventory" %}</span>
+
+            </div>
+
+            <!-- Topbar Navigation -->
+            <ul class="loginbar pull-right">
+                <li>
+                    <i class="fa fa-globe"></i>
+                    <a>{% trans "Languages" %}</a>
+                    <ul class="lenguages">
+                        <li class="active">
+                            <a href="javascript:void(0);">{% trans "English" %} <i class="fa fa-check"></i></a> 
+                        </li>
+                    </ul>
+                </li>
+                <li class="topbar-devider"></li>   
+                <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{% trans 'Documentation coming soon.' %}">{% trans "Help" %}</a></li>
+                <li class="topbar-devider"></li>   
+                <li>
+                    <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">{% trans "Login" %}{% else %}&logout=true">Welcome {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
+                </li>
+                
+            </ul>
+            <!-- End Topbar Navigation -->
+        </div>
+    </div>
+    <!-- End Topbar -->
+
+    <!-- Navbar -->
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                    <span class="fa fa-bars"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img id="logo-header" class="arches-logo" src="{{ STATIC_URL }}img/arches_logo.png" alt="Logo">
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    
+                    <!-- Home -->
+                    <li class="{% if active_page = 'Home' %}active{% endif %}">
+                        <a href="{% url 'home' %}">
+                            {% trans "Home" %}
+                        </a>
+                    </li>
+                    <!-- End Home -->
+
+                    <!-- New Search-->
+                    <li class="{% if active_page = 'Search' %}active{% endif %}">
+                        <a href="{% url 'search_home' %}">
+                            {% trans "Search" %}
+                        </a>
+                    </li>
+                    <!-- End Search-->
+
+                    <!-- Map-->
+                    <li class="{% if active_page = 'Map' %}active{% endif %}">
+                        <a href="{% url 'map' %}">
+                            {% trans "Map View" %}
+                        </a>
+                    </li>
+                    <!-- End Map-->
+
+                    {% if user_can_edit %}
+                    <!-- Resource Editor-->
+                    <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                            {% trans "Resource Manager" %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for type, type_data in resource_types %}
+                                <li><a href="{% url 'resource_manager' type type_data.default_page '' %}"><i class="{{type_data.icon_class}}"></i>{{type_data.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <!-- End Resource Editor -->
+
+                     <!-- RDM-->
+                    <li class="{% if user.is_anonymous %}{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
+                        <a href="{% url 'rdm' '' %}">
+                            {% trans "RDM" %}
+                        </a>
+                    </li>
+                    <!-- End RDM-->
+                    {% endif %}
+
+                    <!-- Search Block -->
+                    <li>
+                        <i class="search fa fa-search search-btn"></i>
+                        <div class="search-open arches-search">
+
+                            <div class="input-group animated fadeInDown">
+                                <!-- Project Dropdown -->
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="input-group" id="simple-search">
+                                            <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
+                                            {% include "views/simple-search.htm" %}
+                                        </div>
+                                    </div>
+                                </div>  
+                                <!-- End Project Dropdown -->
+                            </div>
+                        </div>    
+                    </li>
+                    <!-- End Search Block -->
+                </ul>
+            </div><!--/navbar-collapse-->
+        </div>    
+    </div>            
+    <!-- End Navbar -->
+
+</div>
