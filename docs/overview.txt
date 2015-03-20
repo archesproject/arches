@@ -53,7 +53,7 @@ Who is Arches for?
 
 Arches is primarily intended for software developers who need to build flexible and responsive web applications, and who wish to hide the complexities of ontologies, thesauri, and geospatial data management from their users.
 
-The Arches framework is largely invisbile to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows.  
+The Arches framework is largely invisible to end users; Arches applications are responsible for defining resource graphs and implementing data entry, data presentation, and data reporting workflows.  
 
 One major exception to this rule is the Reference Data Manager (RDM).  The RDM is a core component of the Arches framework and can support the creation and curation of thesauri without the need to implement an Arches application. 
 

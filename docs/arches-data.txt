@@ -23,19 +23,19 @@ The physical data model is best understood when broken into three distinct parts
 **Ontology Data**
 
 
-The ontology portion of the data model stores the metadata sourced from the resource graphs.  These tables therefore contain infomation about what is the valid set of semantic "types" of data (by default, Arches uses CIDOC CRM [http://www.cidoc-crm.org/] to define these things), and what are the valid types of relationships between them.
+The ontology portion of the data model stores the metadata sourced from the resource graphs.  These tables therefore contain information about what is the valid set of semantic "types" of data (by default, Arches uses CIDOC CRM [http://www.cidoc-crm.org/] to define these things), and what are the valid types of relationships between them.
 
 
 **Reference Data**
 
 
-This is where Arches stores the heriarchical controlled vocabularies that power drop down lists in Arches applications.  Items in dropdown lists are called "concepts".  Metadata about concpets, such as their labels and scope notes are stored in the related ``values`` table, and relationships between concepts are managed in the ``relations`` table.
+This is where Arches stores the hierarchical controlled vocabularies that power drop down lists in Arches applications.  Items in drop-down lists are called "concepts".  Metadata about concepts, such as their labels and scope notes are stored in the related ``values`` table, and relationships between concepts are managed in the ``relations`` table.
 
 
 **Resources Data**
 
 
-The Resources Data section is where Arches stores the actual cultural heritage resource information - the business data. The key concpets to understand in this portion of the database are entities, relations, and "business tables".  
+The Resources Data section is where Arches stores the actual cultural heritage resource information - the business data. The key concepts to understand in this portion of the database are entities, relations, and "business tables".  
 
 Entities within an Arches database represent one of three things:
 
@@ -43,7 +43,7 @@ Entities within an Arches database represent one of three things:
 #. an attribute of a cultural heritage resource, or
 #. a record required to maintain ontological consistency between attributes
 
-Relations represent realtionships between entities within an Arches database.  Records in this table indicate a relationship between two distinct entities.
+Relations represent relationships between entities within an Arches database.  Records in this table indicate a relationship between two distinct entities.
 
 Business tables contain strings, numbers, dates, or geometries that capture actual attributes of resources.  These work by linking entities (by ``entityid``) to respective values.
 
@@ -55,7 +55,7 @@ The ``entity_types`` table really belongs in all three categories because:
 
 * they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
 * they link the attribute to one of a series of ontological categories that, by default, is based on CRM
-* they specify which attributes must be powered by dropdown lists from the Reference data section.
+* they specify which attributes must be powered by drop-down lists from the Reference data section.
 
 In the simplest potential case, a resource that happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
 
@@ -74,12 +74,12 @@ One example of a resource graph from the Arches HIP application is ``HERITAGE_ R
 [image]
 
 
-While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named [resourcetype name]_nodes.csv and [resourcetype name]_edges.csv.  Regardless of how these csv files are created, they must include the columns defined below.
+While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  Regardless of how these csv files are created, they must include the columns defined below.
 
 **Nodes:**
 
-* ``Id``: a unqiue and arbitrary ID for each record within the file
-* ``Label``: the name of the entitytype that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entitytype
+* ``Id``: a unique and arbitrary ID for each record within the file
+* ``Label``: the name of the entity type that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entity type
 * ``mergenode``: defines the upstream node that occurs one time (and only one time) within a given resource instance.  In most cases, that node is the one that represents the resource itself.
 * ``businesstable``: identifies the respective business table (strings, numbers, dates, geometries, domains) that will store values associated to instances of the node. This value should be left null for nodes that never store a business data. 
 
@@ -119,9 +119,9 @@ Do we even have a way to point to folder full of skos files and say load them?
 
 Loading Business Data
 ======================
-Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extention.  
+Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extension.  
 
-Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entitytype. 
+Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entity type. 
 
 Dot Arches files, on the other hand, take a key-value pair approach populating resource graphs with resources with attributes.  Therefore, they are able to add as many of a given attribute as exists in the data.  The downside of the dot arches format is that it can take a significant data processing or reformatting effort to get a significant amount of source data ready for loading to Arches from this format.
 
@@ -129,7 +129,7 @@ Dot Arches files, on the other hand, take a key-value pair approach populating r
 
 from .arches
 ------------
-The dot arches file is a pipe "|" delimitted text file containing the following column headers:
+The dot arches file is a pipe "|" delimited text file containing the following column headers:
 RESOURCEID|
 RESOURCETYPE|
 ATTRIBUTENAME|
