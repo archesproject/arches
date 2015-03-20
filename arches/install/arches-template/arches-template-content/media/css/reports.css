@@ -1,0 +1,83 @@
+/* Arches Reports CSS */
+
+
+
+
+.arches-report-section-header {
+	text-align: center;
+	margin-bottom: 10px;
+	font-size: 26px;
+	font-weight: 200;
+}
+
+
+.arches-report-subsection {
+	margin-bottom: 5px;
+	margin-top: 5px;
+	font-size: 21px;
+	font-weight: 200;
+}
+
+
+.arches-report-resource-name {
+	margin-bottom: 0px;
+	margin-top: 5px;
+	font-size: 21px;
+	font-weight: 400;
+	color: #4765a0;
+}
+
+
+.arches-report-subsection-content {
+	margin-top: 5px;
+	padding-left: 10px;
+}
+
+
+.arches-report-subsection-title {
+	font-size: 18px;
+	font-weight: 200;
+	color: #777;
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+.arches-report-subsection-item {
+	font-size: 16px;
+	font-weight: 200;
+	color: #4765a0;
+	margin-left: 10px;
+	line-height: 1.175;
+}
+
+
+.arches-report-subsection-item-type {
+	font-size: 14px;
+	font-weight: 200;
+	color: #888;
+}
+
+.arches-report-image-thumbnail {
+	margin-bottom: 20px;
+}
+
+.arches-report-group-spacer {
+	margin-bottom: 9px;
+}
+
+.arches-report-spacer {
+	margin-bottom: 10px;
+}
+
+.arches-report-list-spacer {
+	margin-bottom: 5px;
+}
+
+.report-breadcrumb {
+	width: 100%;
+	z-index: 1;
+}
+
+.report-body {
+	overflow-y: scroll; 
+}
