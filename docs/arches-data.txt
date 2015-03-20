@@ -6,13 +6,14 @@ Physical Data model
 ===================
 Note: An Arches implmentor does not need to know anything about the physical data model in order to successfully deploy an Arches Application.  This section is most useful for those who wish to write database views or otherwise issue sql queries directly against an Arches database instance.
 
-The Arches physical data model consists of tables and referential integrity constraints implmented within a Postgres database.  It's is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
 
-To accomplish this, Arches stores both metadata - "data about data" that define the set of resource types and attributes available to store - and business data  - inventorying and describing the cultural heritage resources themselves. A "Resource Graph" is the logical framework that is used to populate Arches with the metadata it needs to know what is the set of resource types and attributes to be managed in a given Arches implementation. 
-
+The Arches physical data model consists of tables and referential integrity constraints implmented within a Postgres database.  It is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
 
 
-The physical data model is best understood when broken into three distinct parts: Ontology Data,  Reference Data, and Resources Data.  The entity_types table plays a role in all three of these parts of the data model.  More on that later.
+To accomplish this, Arches stores both metadata - "data about data" that define the set of resource types and attributes available to store - and business data  - inventorying and describing the cultural heritage resources themselves.
+
+
+The physical data model is best understood when broken into three distinct parts: Ontology Data,  Reference Data, and Resources Data.  The entity_types table plays a role in all three of these parts of the data model. 
 
 
 [image]
@@ -20,24 +21,31 @@ The physical data model is best understood when broken into three distinct parts
 
 **Ontology Data**
 
+
 The ontology portion of the data model stores the metadata sourced from the resource graphs.  These tables therefore contain infomation about what is the valid set of semantic "types" of data (by default, Arches uses CIDOC CRM to define these things), and what are the valid types of relationships between them.
+
 
 **Reference Data**
 
+
 This is where Arches stores the heriarchical controlled vocabularies that power drop down lists in Arches Applications.  Items in dropdown lists are called "concepts".  Metadata about concpets, such as their labels and scope notes are stored in the related "values" table, and relationships between concepts are managed in the "relations" table.
 
+
 **Resources Data**
+
 
 The Resources Data section is where Arches stores the actual cultural heritage resource information - the business data. The key concpets to understand in this portion of the database are entities, relations, and "business tables".  
 
 Entities within an Arches database represent one of three things:
-* 1> the existence of a cultural heritage resource
-* 2> an attribute of a cultural heritage resource, or
-* 3> a record required to maintain ontological consistency between attributes
+#. the existence of a cultural heritage resource
+#. an attribute of a cultural heritage resource, or
+#. a record required to maintain ontological consistency between attributes
 
 Relations represent realtionships between entities within an Arches database.  Records in this table indicate a relationship between two distinct entities.
 
 Business tables contain strings, numbers, dates, or geometries that capture actual attributes of resources.  These work by linking entities (by entityid) to respective values. One special business table is the domains table.  It is unique in that it only stores valueid's (as a foreign key from the values table within the Reference Data) in order to relate entities that are constrained by a controlled vocabulary to its appropriate Reference Data records.
+
+**ENTITY_TYPES**
 
 The **entity_types** table really belongs in all three categories becuase:
 * they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
@@ -48,15 +56,43 @@ In the simplest potential case, a resource that happens to be a person with a na
 
 
 
-
-Resource Data Graphs
+Resource Graphs
 ===============
 
+A "Resource Graph" is the logical framework that is used to populate Arches with the metadata it needs to know what is the set of resource types and attributes to be managed in a given Arches Application.
+
+
+Each resource type that an Arches Application implements has its own resource graph.  One example of a resource graph from the Arches HIP Application is HERITAGE_ RESOURCE.E18.  This example resource graph is visualized below:
+
+
+[image]
+
+
+While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named [resourcetype name]_nodes.csv and [resourcetype name]_edges.csv.  Regardless of how these csv files are created, they must include the columns define below.
+
+Nodes
+---------
+
+Id: a unqiue and arbitrary ID for each record within the file
+Label: the name of the entitytype that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entitytype
+mergenode: defines the upstream node that occurs one time (and only one time) within a given resource instance.  In most cases, that node is the one that represents the resource itself.
+businesstable: identifies the respective business table (strings, numbers, dates, geometries, domains) that will store values associated to instances of the node. This value should be left null for nodes that never store a business data.
+ 
+
+Edges
+---------
+Source: the ID of the source node
+Target: the ID of the target node
+Label: the semantic CRM "property" that allows them to connect to each other.
+
+**NOTE:** Arches comes loaded with the semantic properties defined in the CIDOC CRM.  Look to the CRM documenation to learn about the list of available properties.
 
 
 Ontologies
 ----------
+The fundamental role of resource graphs is define a suite of resource types, their attributes, and relationships between them.  However, the graph also supports associating nodes and edges within the resource graph to semantic classes and properties defined in CIDOC CRM.  This document purposely avoids any detailed explanation of CRM, so suffice it to say that one should refer to CRM documentation to make an informed decision about what class or property to assign to nodes and edges respectively.
 
+For those who do not care about CRM, ontologies or semantic interoperability, the simplest way to make a valid graph is to assign all nodes as "E1" and all edges as "P1".  
 
 Reference Data Graph
 ====================
