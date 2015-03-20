@@ -47,7 +47,7 @@ Business tables contain strings, numbers, dates, or geometries that capture actu
 
 **ENTITY_TYPES**
 
-The **entity_types** table really belongs in all three categories becuase:
+The **entity_types** table really belongs in all three categories because:
 * they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
 * they link the attribute to one of a series of ontological categories that, by default, is based on CRM
 * they specify which attributes must be powered by dropdown lists from the Reference data section.
@@ -96,11 +96,7 @@ For those who do not care about CRM, ontologies or semantic interoperability, th
 
 Reference Data Graph
 ====================
-
-
-Ontology Graph
-=======================
-
+Explain the fixed parts of the graph, and where individual thesauri slot in.
 
 Loading Reference Data
 ======================
@@ -111,14 +107,28 @@ from .csv
 
 from .skos
 ---------
-
+Do we even have a way to point to folder full of skos files and say load them?
 
 Loading Business Data
 ======================
+Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extention.  
+
+Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entitytype. 
+
+Dot Arches files, on the other hand, take a key-value pair approach populating resource graphs with resources with attributes.  Therefore, they are able to add as many of a given attribute as exists in the data.  The downside of the dot arches format is that it can take a significant data processing or reformatting effort to get a significant amount of source data ready for loading to Arches from this format.
+
 
 
 from .arches
 ------------
+The dot arches file is a pipe "|" delimitted text file containing the following column headers:
+RESOURCEID|
+RESOURCETYPE|
+ATTRIBUTENAME|
+ATTRIBUTEVALUE|
+GROUPID
+
+
 -syntax
 -arches-level validation
  validate_row_syntax - validates format of archesfile row
