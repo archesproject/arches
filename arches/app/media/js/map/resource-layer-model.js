@@ -14,7 +14,6 @@ define([
 
         var layer = function () {
             var rgb = utils.hexToRgb(config.vectorColor);
-            var iconUnicode = '\uf060';
             var zIndex = 0;
             var styleCache = {};
 
@@ -34,8 +33,8 @@ define([
 
                 var styles = [new ol.style.Style({
                     text: new ol.style.Text({
-                        text: iconUnicode,
-                        font: 'normal ' + iconSize + 'px octicons',
+                        text: arches.resourceMarker.icon,
+                        font: 'normal ' + iconSize + 'px ' + arches.resourceMarker.font,
                         offsetX: 5,
                         offsetY: ((iconSize/2)*-1)-5,
                         fill: new ol.style.Fill({
@@ -45,8 +44,8 @@ define([
                     zIndex: mouseOver ? zIndex*1000000000: zIndex
                 }), new ol.style.Style({
                     text: new ol.style.Text({
-                        text: iconUnicode,
-                        font: 'normal ' + iconSize + 'px octicons',
+                        text: arches.resourceMarker.icon,
+                        font: 'normal ' + iconSize + 'px ' + arches.resourceMarker.font,
                         offsetY: (iconSize/2)*-1,
                         stroke: new ol.style.Stroke({
                             color: 'white',

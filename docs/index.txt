@@ -1,19 +1,14 @@
-.. Arches3 documentation master file, created by
-   sphinx-quickstart on Mon Mar 16 12:07:46 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+====================
+Arches Documentation
+====================
 
-Welcome to Arches3's documentation!
-===================================
-
-overview here...
 
 Contents:
 
 .. toctree::
    :maxdepth: 3
 
+   overview
    getting-started
    arches-data
-   arches-core
-   hip
+   arches-web-applications

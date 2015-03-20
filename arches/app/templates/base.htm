@@ -146,6 +146,11 @@
                         maxZoom: {{ map_info.map_max_zoom }},
                         extent: '{{ map_info.extent }}'
                     },
+                    resourceMarker: {
+                        font: '{{ map_info.resource_marker_font }}',
+                        icon: '{{ map_info.resource_marker_icon }}',
+                        defaultColor: '{{ map_info.resource_marker_color }}'
+                    },
                     bingKey: "{{ map_info.bing_key }}",
                     bingLayers: [{
                         id: 'Road',

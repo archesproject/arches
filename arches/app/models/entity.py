@@ -311,9 +311,8 @@ class Entity(object):
 
         # if the nodes are equal attempt a merge otherwise don't bother
         if (self.entitytypeid == entitytomerge.entitytypeid and self.property == entitytomerge.property):
-            # if the value of each node is not blank then the nodes can't be merged
-            # and we simply append entitytomerge node to self's parent node
-            if self.value != '' and entitytomerge.value != '':
+            # if the value of each node is not blank and they are not equal, then the nodes can't be merged
+            if self.value != '' and entitytomerge.value != '' and self.value != entitytomerge.value:
                 return False
 
             return True

@@ -1,9 +1,8 @@
 define(['jquery', 'knockout'], function ($, ko) {
     ko.bindingHandlers.summernote = {
-        init: function(el, valueAccessor, allBindings, bindingContext) {
+        init: function(el, valueAccessor, allBindings, viewModel, bindingContext) {
             var defaults = {};
             var settings = ko.unwrap(valueAccessor());
-            //var viewModel = bindingContext.$data;
             
             defaults.toolbar = [
                 ['style', ['bold', 'italic', 'underline', 'clear']], 

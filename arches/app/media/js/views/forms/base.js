@@ -3,22 +3,28 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         
         events: function(){
             return {
-                'click #saveedits': 'submit'  
+                'click #saveedits': 'submit',
+                'click #canceledits': 'cancel'
             }
         },
 
         constructor: function (options) {
             var self = this;
+            this.branchLists = [];
+
+            ko.observableArray.fn.get = function(entitytypeid, key) {
+                var allItems = this();
+                var ret = '';
+                _.each(allItems, function(node){
+                    if (entitytypeid.search(node.entitytypeid()) > -1){
+                        ret = node[key]();
+                    }
+                }, this);
+                return ret
+            }
 
             Backbone.View.apply(this, arguments);
             
-            _.each(this.branchLists, function(branchList) {
-                self.listenTo(branchList, 'change', function(eventtype, item){
-                    self.trigger('change', eventtype, item);                 
-                });
-            });
-
-            ko.applyBindings(this.viewModel, this.el);
             return this;
         },
 
@@ -27,20 +33,26 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this.form = this.$el;
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
-            this.viewModel = JSON.parse(this._rawdata);
-            this.viewModel.editing = {};
+            this.data = JSON.parse(this._rawdata);
 
-            $('input,select').change(function() {
-                var isDirty = self.isDirty();
-                self.trigger('change', isDirty);
-            });
+            // $('input,select').change(function() {
+            //     var isDirty = self.isDirty();
+            //     self.trigger('change', isDirty);
+            // });
 
             this.on('change', function(eventtype, item){
                 $('#saveedits').removeClass('disabled');
                 $('#canceledits').removeClass('disabled');                    
             });
 
-            this.branchLists = [];
+        },
+
+        addBranchList: function(branchList){
+            var self = this;
+            this.branchLists.push(branchList);
+            this.listenTo(branchList, 'change', function(eventtype, item){
+                self.trigger('change', eventtype, item);                 
+            });
         },
 
         isDirty: function () {
@@ -63,11 +75,10 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         },
 
         getData: function(includeDomains){
-            var data = ko.toJS(this.viewModel)
-            if (!includeDomains) {
-                delete data.domains;
-            }
-            delete data.editing;
+            var data = {};
+            _.each(this.branchLists, function(branchList){
+                data[branchList.dataKey] = branchList.getData();
+            }, this);  
             return ko.toJSON(data);
         },
 
@@ -80,6 +91,12 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }
+        },
+
+        cancel: function(){
+            _.each(this.branchLists, function(branchList){
+                branchList.undoAllEdits();
+            }, this);  
         }
     });
 });
