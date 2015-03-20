@@ -3,8 +3,6 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         events: {
             'click .add-button': 'addItem',
-            'click .arches-CRUD-delete ': 'deleteItem',
-            'click .arches-CRUD-edit ': 'editItem',
             'click [name="discard-edit-link"]': 'undoCurrentEdit'
         },
 
@@ -110,8 +108,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             }, this);
 
             if (!alreadyHasDefault){
-                this.defaults.push(def);  
-                //this.editedItem.push(koMapping.fromJS(def));  
+                this.defaults.push(def); 
                 var editedBranch = this.getEditedBranch();
                 if(editedBranch){
                     editedBranch.nodes.push(koMapping.fromJS(def));
@@ -142,18 +139,13 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             }
         },
 
-        deleteItem: function(e) {
-            var item = $(e.target).data();
-            var branch = this.branch_lists()[item.index];
+        deleteItem: function(branch, e) {
             this.trigger('change', 'delete', branch);   
-            this.branch_lists.remove(this.branch_lists()[item.index]);
+            this.branch_lists.remove(branch);
         },
 
-        editItem: function(e) {
-            var item = $(e.target).closest('.arches-CRUD-edit').data();
-            var branch = this.branch_lists()[item.index];            
+        editItem: function(branch, e) {        
             this.originalItem = koMapping.toJS(branch);
-
             this.removeEditedBranch();
             branch.editing(true);
             
