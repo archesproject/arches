@@ -77,7 +77,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         getData: function(includeDomains){
             var data = {};
             _.each(this.branchLists, function(branchList){
-                data[branchList.dataKey] = branchList.getBranchListData();
+                data[branchList.dataKey] = branchList.getData();
             }, this);  
             return ko.toJSON(data);
         },
@@ -95,7 +95,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
 
         cancel: function(){
             _.each(this.branchLists, function(branchList){
-                branchList.undoEdits();
+                branchList.undoAllEdits();
             }, this);  
         }
     });
