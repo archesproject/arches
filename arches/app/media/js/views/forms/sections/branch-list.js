@@ -16,16 +16,16 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
             // if this is a function then it's assumed to be an observableArray already
             if(typeof this.viewModel !== 'function'){
-                _.each(this.viewModel.defaults, function(value, key){
-                    this.addDefaultNode(key, value);
-                }, this);   
-
                 _.each(this.viewModel.branch_lists, function(item){
                     this.branch_lists.push({
                         'editing': ko.observable(false),
                         'nodes': koMapping.fromJS(item.nodes)
                     })
-                }, this);         
+                }, this);      
+
+                _.each(this.viewModel.defaults, function(value, key){
+                    this.addDefaultNode(key, value);
+                }, this);   
             }
 
             ko.applyBindings(this, this.el);
@@ -83,15 +83,13 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         getBranchLists: function() {
-            return ko.pureComputed(function() {
-                var branch_lists = [];
-                _.each(this.branch_lists(), function(list){
-                    if(!list.editing()){
-                        branch_lists.push(list);
-                    }
-                }, this);
-                return branch_lists;
+            var branch_lists = [];
+            _.each(this.branch_lists(), function(list){
+                if(!list.editing()){
+                    branch_lists.push(list);
+                }
             }, this);
+            return branch_lists;
         },
 
         addDefaultNode: function(entitytypeid, value){
@@ -126,7 +124,6 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         addItem: function() {
-            //var data = ko.toJS(this.editedItem);
             var branch = this.getEditedBranch();
             var validationAlert = this.$el.find('.branch-invalid-alert');
             
@@ -155,10 +152,10 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         editItem: function(e) {
             var item = $(e.target).closest('.arches-CRUD-edit').data();
             var branch = this.branch_lists()[item.index];            
+            this.originalItem = koMapping.toJS(branch);
 
             this.removeEditedBranch();
             branch.editing(true);
-            this.originalItem = koMapping.toJS(branch);
             
             this.trigger('change', 'edit', branch);
         },
