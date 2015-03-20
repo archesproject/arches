@@ -53,10 +53,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             }
             return ko.pureComputed({
                 read: function() {
-                    //var x = this.editedItem();
-                    //var defaultNode = null;
                     var ret = null;
-                    this.entitytypeid = entitytypeid;
                     _.each(this.editedItem(), function(node){
                         if (entitytypeid.search(node.entitytypeid()) > -1){
                             ret = node[key]();
@@ -67,11 +64,16 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 write: function(value){
                     _.each(this.editedItem(), function(node){
                         if (entitytypeid.search(node.entitytypeid()) > -1){
-                            node[key](value);
+                            if(typeof value === 'string'){
+                                node[key](value);
+                            }else{
+                                _.each(value, function(val, k, list){
+                                    node[k](val);
+                                }, this);
+                            }
                         }
                     }, this);
                 },
-                entitytypeid: entitytypeid,
                 owner: this
             });
         },
@@ -101,15 +103,15 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             return def
         },
 
-        onSelect2Selecting: function(item, select2Config){
-            _.each(this.editedItem(), function(node){
-                if (node.entitytypeid() === select2Config.dataKey){
-                    node.label(item.value);
-                    //node.value(item.id);
-                    node.entitytypeid(item.entitytypeid);
-                }
-            }, this);
-        },
+        // onSelect2Selecting: function(item, select2Config){
+        //     _.each(this.editedItem(), function(node){
+        //         if (node.entitytypeid() === select2Config.dataKey){
+        //             node.label(item.value);
+        //             node.value(item.id);
+        //             node.entitytypeid(item.entitytypeid);
+        //         }
+        //     }, this);
+        // },
 
         addItem: function() {
             var data = ko.toJS(this.editedItem);
