@@ -38,7 +38,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -82,6 +82,9 @@ class Command(BaseCommand):
             
         if options['operation'] == 'remove_resources':     
             self.remove_resources(options['load_id'])
+
+        if options['operation'] == 'load_concept_scheme':
+            self.load_concept_scheme(package_name, options['source'])
 
 
     def setup(self, package_name):
@@ -262,6 +265,16 @@ class Command(BaseCommand):
 
         """
         resource_remover.delete_resources(load_id)
+
+    def load_concept_scheme(self, package_name, data_source=None):
+        """
+        Runs the setup.py file found in the package root
+
+        """
+        data_source = None if data_source == '' else data_source
+        module = import_module('%s.setup' % package_name)
+        load = getattr(module, 'load_authority_files')
+        load(data_source) 
 
 
     def start_livereload(self):

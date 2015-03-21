@@ -31,12 +31,16 @@ class Lookups(object):
     def add_relationship(self, source=None, type=None, target=None, rownum=None):
         self.concept_relationships.append({'source': source, 'type': type, 'target': target, 'rownum': rownum})
 
-def load_authority_files(break_on_error=True):
+def load_authority_files(source=None, break_on_error=True):
     cursor = connection.cursor()
     file_list = []
     errors = []
+    authority_files_path = list(settings.CONCEPT_SCHEME_LOCATIONS)
+
+    if source != None:
+        authority_files_path.append(source)
     
-    for path in settings.CONCEPT_SCHEME_LOCATIONS:
+    for path in authority_files_path:
         if os.path.exists(path):
             print '\nLOADING AUTHORITY FILES (%s)' % (path)
             print '-----------------------'            
