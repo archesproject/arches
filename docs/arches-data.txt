@@ -5,7 +5,7 @@ Arches Data
 Physical Data model
 ===================
 
-.. note:: This section is most useful for those who wish to issue queries directly against the Arches backend PostgreSQL database.
+.. note:: This section is most useful for those who wish to issue sql queries directly against the Arches backend PostgreSQL database.
 
 
 The Arches physical data model consists of tables and referential integrity constraints implmented within a PostgreSQL database.  It is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
@@ -17,7 +17,7 @@ To accomplish this, Arches stores both metadata - defining the set of resource t
 The physical data model is best understood when broken into three distinct parts: Ontology Data,  Reference Data, and Resources Data.  The ``entity_types`` table plays a role in all three of these parts of the data model. 
 
 
-[image]
+[Arches ERD.jpg]
 
 
 **Ontology Data**
@@ -74,7 +74,11 @@ One example of a resource graph from the Arches HIP application is ``HERITAGE_ R
 [image]
 
 
-While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  Regardless of how these csv files are created, they must include the columns defined below.
+While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
+
+.. note:: As of the writing of this document, the Arches developers' primary tool to develop and visualize the resource graphs is Gephi (http://www.gephi.org/).  However, it is possible that a future version of Arches may include tools that support resource graph development and visualization.
+
+Regardless of how the nodes and edges csv files are created, they must include the columns defined below.
 
 **Nodes:**
 
@@ -129,12 +133,30 @@ Dot Arches files, on the other hand, take a key-value pair approach populating r
 
 from .arches
 ------------
-The dot arches file is a pipe "|" delimited text file containing the following column headers:
-RESOURCEID|
-RESOURCETYPE|
-ATTRIBUTENAME|
-ATTRIBUTEVALUE|
+The .arches format is intended to support upload of Arches data containing rich content and complex relationships while also being acheivable to format properly using common software like MS Excel or OpenOffice.
+
+The dot arches file is a pipe ("|") delimited text file containing the following column headers:
+
+RESOURCEID
+RESOURCETYPE
+ATTRIBUTENAME
+ATTRIBUTEVALUE
 GROUPID
+
+The file is really just a list of business entities to be loaded to Arches.  By "business entities", we mean it only requires those entities that actually store a business value.  In this way, the .arches format is obfuscated from the details of the resource graph that it is being loaded to.  The only real requirement is that the entity types referenced in the ATTRIBUTENAME field exist within the resource graph that the data is being loaded into.
+
+The format fundamentally takes a key-value pair approach to storage where the ATTRIBUTENAME defines the key (actually the entity type as defined in the resource graph) and the ATTRIBUTEVALUE defines the business value of the entity.
+
+RESOURCEID is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat many times.  When building resource data in .arches format, a user should also know that Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
+
+RESOURCETYPE specifies which resource type graph a given attribute is being loaded to.  In the Arches HIP Application, the available resource types include: ACTIVITY.E7, ACTOR.E39, HERITAGE_RESOURCE.E18, HERITAGE_RESOURCE_GROUP.E27, HISTORICAL_EVENT.E5, and INFORMATION_RESOURCE.E73.
+
+ATTRIBUTENAME specifies the node from the appropriate resource graph that the supplied value (in the ATTRIBUTEVALUE column) will load to.  Note that ATTRIBUTENAME is synonymous with entitytypeid.  Essentially, you are specifying the enitytypeid of the (business) entity that you are loading to the system.
+
+ATTRIBUTEVALUE stores the the actual business value of the enitit.  ATTRIBUTEVALUE values must conform to the datatype specified by the businesstable associated to the ATTRIBUTENAME.  One special case here is values assocaited to ATTRIBUTENAME(s) that link to the "domains" businesstable.  In those cases, the value store in ATTRIBUTEVALUE must be the conceptid fed in from csv-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
+
+GROUPID is inteded to support cases where business values stored in seperate nodes within the resource graph must be assocaited to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both FIRST_NAME.E1 and LAST_NAME.E1 as seperate nodes.  In that case, a an ACTOR that has two seperate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common GROUPID value and the two rows containing "Samuel" and Clemens" should have the same.  
+
 
 
 -syntax
