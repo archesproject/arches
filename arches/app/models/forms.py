@@ -26,11 +26,7 @@ class ResourceForm(object):
         self.name = info['name']
         self.icon = info['icon']
         self.resource = resource
-        
-        self.data = {
-            "domains": {},
-            "defaults": {}
-        }
+        self.data = {}
 
     @property
     def schema(self):
