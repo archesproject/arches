@@ -59,7 +59,7 @@ class Entity(object):
                 self.load(args[0])  
 
     def __repr__(self):
-        return ('%s: %s of type %s with value "%s"') % (self.__class__, self.entityid, self.entitytypeid, JSONSerializer().serialize(self.value))
+        return ('%s: %s of type %s with value %s') % (self.__class__, self.entityid, self.entitytypeid, JSONSerializer().serialize(self.value))
 
     def __hash__(self): 
         return hash(frozenset((self.entitytypeid, self.entityid, self.value, self.property)))
@@ -409,19 +409,20 @@ class Entity(object):
 
         """
 
+        for child_entity in self.child_entities:
+            ret = child_entity.traverse(func, scope) 
+            if ret != None: 
+                # break???
+                return ret   
+
         if scope == None:
             ret = func(self)
         else:
             ret = func(self, scope) 
 
-        # break out of the traversal if the function returns a value
+        #break out of the traversal if the function returns a value
         if ret != None:
-            return ret   
-
-        for child_entity in self.child_entities:
-            ret = child_entity.traverse(func, scope) 
-            if ret != None: 
-                return ret   
+            return ret               
 
     def get_rank(self, rank=0):
         """
@@ -566,6 +567,12 @@ class Entity(object):
 
         """
 
+        if action == 'disallow':
+            self.filter(lambda entity: entity.entitytypeid not in entitytypes)
+        else:
+            self.filter(lambda entity: entity.entitytypeid in entitytypes)
+        return
+
         parent_entitytypes = set()
         flattened_graph = self.flatten()
         entities_to_prune = set()        
@@ -618,14 +625,44 @@ class Entity(object):
         these nodes are assumed to be of no material value to the graph
 
         """
+        #somelist[:] = [tup for tup in somelist if determine(tup)]
+
+        # def func(entity):
+        #     try:
+        #         parent = entity.get_parent()
+        #         print '-'*10
+        #         print entity
+        #         print len(parent.child_entities)
+        #         if len(entity.child_entities) == 0 and entity.value == '':
+        #             print JSONSerializer().serialize(entity, indent=4)
+        #             parent.child_entities.remove(entity)
+        #             print len(parent.child_entities)
+        #     except:
+        #         pass
+
+        # def func(entity):
+        #     try:
+        #         # http://stackoverflow.com/questions/1207406/remove-items-from-a-list-while-iterating-in-python
+        #         parent = entity.get_parent()
+        #         parent.child_entities[:] = [child_entity for child_entity in parent.child_entities if (len(child_entity.child_entities) != 0 or child_entity.value != '')]
+        #     except:
+        #         pass
+
+        #self.traverse(func)
+
+        self.filter((lambda entity: len(entity.child_entities) != 0 or entity.value != ''))
+
+
+
+    def filter(self, lambda_expression):
 
         def func(entity):
-            try:
+            if hasattr(entity, 'get_parent'):
                 parent = entity.get_parent()
-                if len(entity.child_entities) == 0 and entity.value == '':
-                    parent.child_entities.remove(entity)
-            except:
-                pass
+                parent.child_entities[:] = filter(lambda_expression, parent.child_entities)
+            # else:
+            #     entity.child_entities[:] = filter(lambda_expression, entity.child_entities)
+
         self.traverse(func)
 
     def clear(self):
