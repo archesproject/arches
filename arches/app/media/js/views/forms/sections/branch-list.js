@@ -55,6 +55,13 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                                     ret = node[key]();
                                 }
                             }, this);
+                            if(ret === null){
+                                _.each(this.defaults, function(node){
+                                    if (node.entitytypeid === entitytypeid){
+                                        list.nodes.push(koMapping.fromJS(node)); 
+                                    }
+                                }, this);
+                            }
                         }
                     }, this);
                     return ret
