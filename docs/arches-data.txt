@@ -59,22 +59,23 @@ The ``entity_types`` table really belongs in all three categories because:
 
 In the simplest potential case, a resource that happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
 
+.. Hint:: Each of these three sections within Arches database are contained in seperate namespaces that Postgres calls "schemas."  Each schema, in turn, has wthin in it two predefined views called vw_nodes and vw_edges.  The Arches application does not use these views, but they could be useful in developing graph-based outputs of resource instances, resource graphs, and RDM graphs.
 
 
 Resource Graphs
 ===============
 
-A "Resource Graph" is the logical framework that is used by Arches to define the set of resource types and attributes to be managed.  
+A "Resource Graph" is the logical framework that is used by Arches to define the set of resources and attributes of resources to be managed.  
 
 Arches applications must provide a resource graph for each resource type being inventoried.
 
-One example of a fully featured resource graph from the Arches HIP application is ``HERITAGE_ RESOURCE.E18``.
+One example of a fully featured resource graph from the Arches HIP application is ``HERITAGE_RESOURCE.E18``.
 
 
 [image]
 
 
-While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two csv formatted files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
+While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two specially formatted csv files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
 
 .. note:: As of the writing of this document, the Arches developers' primary tool to develop and visualize the resource graphs is Gephi (http://www.gephi.org/).  However, it is possible that a future version of Arches may include tools that support resource graph development and visualization.
 
@@ -99,7 +100,7 @@ Regardless of how the nodes and edges csv files are created, they must include t
 Ontologies
 ----------
 
-The fundamental role of resource graphs is to define a suite of resource types, their attributes, and relationships between them.  However, the graph also supports associating nodes and edges within the resource graph to semantic classes and properties defined in CIDOC CRM.  
+The fundamental role of resource graphs is to define a suite of resource types, their attributes, and relationships between them.  However, the graph also supports associating nodes and edges within the it to semantic classes and properties defined in CIDOC CRM.  
 
 .. note:: One should refer to CIDOC CRM (http://www.cidoc-crm.org/) to make an informed decision about what class or property to assign to nodes and edges respectively.
 
@@ -108,14 +109,103 @@ For those who do not care about CRM, ontologies or semantic interoperability, th
 Reference Data Graph
 ====================
 
-Explain the fixed parts of the graph, and where individual thesauri slot in.
+The reference data graph stores information necesary to use robustly managed thesauri as picklists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
 
-Loading Reference Data
-======================
+* Ability to associate sets of reference data entries as valid selections in dropdown lists for "domain" nodes in the resource graph
+* Ability to associate arbitrary attributes (such as preferred labels, alternate labels, scope notes, sort order) to entries within the reference data
+* Ability to store words associated to given reference data entries in multiple languages (to support internationalization)
+* Ability to relate entries to each other in semanticly rich heirarchies
+
+Like the resource data graph, reference data is also stored in a graph structure.  But instead of entities and relations, the reference data includes ``concepts`` and ``relations``.  The types of avaialble relations are best categorized as ``semantic relations`` and ``collections``.  The meaning behind concepts is not only derived from its own individual description (or scope note), but also from its context from its position within a heirarchy of concepts.  Semantic relations are the connective tissue of heirarchical relationships that infuse meaning into concepts.  Collections, on the other hand, are used primarily for the purpose defining which concpets belong in a given Entity Types' dropdown list regardless of its position within a semantic heirarchy.  In short, semantic relationships infuse meaning and collections define the content of dropdown lists.  This infers that the Arches RDM is in itself a sophisticated thesaurus management system.
+
+
+Loading Authority Files
+-----------------------
+Arches supports two formats for loading controlled vocabularies to its Reference Data graph.  The first approach, using csv files, is designed to support loading of legacy data to Arches.  As such, data are prepared and formatted and then uploaded as part of the installation of a specific Arches Application.  The second approach uses SKOS files. With SKOS files the assumption is that a given Arches application is already up and running, and that a person will use commands in the RDM's user interface to pull in new thesauri from SKOS-formatted files.
+
+If you chose to create your own authority files those can be loaded using the following command from inside ||this directory||::
+	
+	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'
+
 
 from .csv
 ------------
+The following steps outline how to create your own csv-formatted authority documents for use in a system implmenation. These steps can be followed using excel as your text editor but the final file must be saved as a utf-8 formatted csv file.
 
+Data is required for all columns in the authority file with the exception of 'AltLables'.
+
+	1.) Create a text file and paste the following text to the first line::
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+
+	2.) On the second line we will begin creating our concept. Start by creating a conceptid that will be unique both within this file and across all authority document files. A good pattern to follow is to use the name of the authority document itself (with '_' instead of spaces and minus the AUTHORITY_DOCUMENT.csv) with the number of the particular concept within the authority document appended. As an example, if your authority document is name 'EXAMPLE_AUTHORITY_DOCUMENT.csv' the first concept within the authority document would have the conceptid 'EXAMPLE_1'::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,
+		EXAMPLE_2,
+
+	3.) Next, add your preferred label for the concept. In most cases this will be the value you have in mind or from your data that you would like to use for the domain list this authority document will be related to::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,Example concept label,
+		EXAMPLE_2,Second example concept,
+
+	4.) Now add an alternate label for your concept. This may be left blank if you have no alternate label for your concept::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,Example concept label,Alternate concept label,
+		EXAMPLE_2,Second example concept,Second alternate concept label,
+
+	5.) Then add a Parent ConceptID. If the concept is not heirarchically related to any other concept in the authority document then the Parent ConceptID will be the full name of the authority document itself. If the concept is heirarchically related to another concept in the authority file, ensure the parent concept is defined above the child concept and input the parent concepts' conceptid here. In our example I have added a second concept that references the first concept as its parent::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,
+		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,
+
+	6.) Next, add a Concept Type. The only two valid values for ConceptType are: Index, and Collector. For more information on what the difference between these two concept types refer to the the general Arches documentation (http://arches3.readthedocs.org/en/latest/arches-data/#loading-reference-data)::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,Collector,
+		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,Index,
+
+	7.) Optionally, you can add a Provider for your concept. This value provides context for where the concept came from::
+
+		//EXAMPLE_AUTHORITY_DOCUMENT.csv
+
+		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,Collector,Organization_1
+		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,Index,Organization_2
+
+	8.) Save your document.
+
+	9.) IMPORTANT: Finally, we have to make sure our authority file maps to a 'domain node' in a resource graph. To do this either create or open the existing 'ENTITY_TYPE_X_ADOC.csv' file that should reside in the same directory as your authority files (this file must be named ENTITY_TYPE_X_ADOC.csv).
+
+		If you are modifying an existing ENTITY_TYPE_X_ADOC.csv file skip to step b below.
+
+		a.) Copy and past the following text into the file on the first line::
+
+			entitytype,authoritydoc,authoritydocconceptschemename
+
+		b.) Add a comma separated entry with the following information: the entity type to which you would like your authority documented associated (exactly how it is spelled in the resource graph including the .E## suffix), the name of the exact name of the authority document, and the concept scheme into which you would like to load this authority document::
+
+			//ENTITY_TYPE_X_ADOC.csv
+
+			entitytype,authoritydoc,authoritydocconceptschemename
+			EXAMPLE_NODE.E55,EXAMPLE_AUTHORITY_DOCUMENT.csv,Example Concept Scheme Name
+
+Properly structured Authority files can be loaded into Arches using the following command from inside ||this directory||::
+	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'			
+			
 
 from .skos
 ---------
@@ -179,13 +269,14 @@ from .shp
 An Example Data Load
 --------------------
 
-Below is a very simple and internally consistent resource graph, set of authority documents, and .arches file. The intent is to illustrate how a logical model is defined and how data can be migrated into it.
+Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate how a logical model is defined and how data can be migrated into it.
 
 [image of resource graph]
 
 As with all resource graphs, the RDM must be populated with the data necesary to populate data into those nodes whose store data in the businesstable "domains".  Below are images of a set of csv format "authority files" that would necesarily go with this hypothetical resource graph.
 
-[image of auth docs for heritage resource type and name type]
+[image of auth docs for heritage]
+[ resource type and name type]
 
 Finally, the .arches file below shows how to structure data for two distinct resources and their attributes:
 
