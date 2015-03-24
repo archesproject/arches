@@ -141,7 +141,6 @@ Your application should now have a structure similar to the structure below. If 
             settings.py
             setup.py
             urls.py
-            /elasticsearch
             /logs
             /media
             /models
@@ -150,14 +149,19 @@ Your application should now have a structure similar to the structure below. If 
             /tests
             /views
 
+5. Install ElasticSearch
+Navigate to the directory containing manage.py 
+::
+  (ENV)$ python manage.py packages -o setup_elasticsearch
 
 5. Start ElasticSearch
 Open a new command terminal and run the following command
 ::
-    $ /myarchesapp/mynewarchesapp/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
-
+    $ /myarchesapp/myarchesapp/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
+You can minimize this terminal and let it run in the background
 
 6. Create your database
+Using your first terminal
 ::
     (ENV)$ python manage.py packages -o install
 
@@ -192,15 +196,7 @@ Common Issues
 If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_myarchesapp" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
 
 DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
-
-Arches Applications
-===================
-
-
-Arches-HIP
-----------
-
-
+    
 
 
 
