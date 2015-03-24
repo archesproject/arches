@@ -176,3 +176,41 @@ from .shp
 Exporting Data
 ==============
 
+By default arches will export the id, primary name and type to kml, shapefile and csv formats.  However, if you need to export more information for a resource, or customize the column names of your export file an export mapping file is required.
+
+Resource export mappings
+------------------------
+
+The resource export mappings is a json file that maps resources in your search results, to the schema of an export format; kml, csv or shp.   If you need to create this file it’s path needs to be assigned to the EXPORT_CONFIGS variable in your applications settings.py file.  For example:
+
+EXPORT_CONFIG = os.path.normpath(os.path.join(PACKAGE_ROOT, 'source_data', 'business_data', 'resource_export_mappings.json'))
+
+The top level members of the json object are the format extensions (e.g. “csv”, “shp”, “kml”). Each format extension has the following properties:
+
+“NAME” = base name of the export file
+“SCHEMA” = array of objects defining each field to be added to your exported file.  Each 
+    object should have the following properties:
+    “field_name” = name of the exported field (required)
+    “source” = The location of the data in the search results. If the value is “field_map” the 
+        application will lookup the value using the field map for the resource. If the value is
+        “alternatename” every name for the resource that is not primary will be concatenated
+        into a list of alternate names. A value of “resource_name” will lookup the resource name
+        from the ‘RESOURCE_TYPE_CONFIGS’ in the application’s settings.py file.  
+    “data_type” = “str”, “datetype”, or “float” (required only for shapefiles)
+    “data_length” = an integer in quotes (e.g. “128” required only for shapefiles)
+“RESOURCE_TYPES” = an object containing an object for each resource type that will be 
+    exported. The key for each resource type object is the resource entitytypeid. The value for
+    each type contains the following properties:
+    “FIELD_MAP” = a list of objects each containing information needed to map
+        child entity data to an export file field. Properties for the field map include:
+        “field_name” = The field_name value - match a field in the ‘SCHEMA’ (required)
+        “entitytypeid” = The entitytypeid of the child entity (required)
+        “value_type” = A conceptid of the value used to define the value’s type. For example, 
+            an address may have different types such as primary or postal. If you want to export 
+            only the primary address for this column, you can add the concept type for ‘primary 
+            address’ here. Concept ids can be found in your application’s Reference Data
+            Manager (RDM). (optional)
+        "alternate_entitytypeid" = Alternate entity type to use if no value is available for the 
+            the “entitytypeid” (optional)
+
+There is an example of an export mapping file in the appendix of this document. 

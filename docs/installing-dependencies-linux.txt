@@ -1,0 +1,73 @@
+Installing Arches on Linux (Ubuntu 14.04)
+===========================================
+
+The following instructions were written with Ubuntu 14.04 LTS in mind.
+Other versions of Ubuntu or other Linux distributions might have some
+different steps, but the general outline should be similar. All
+instructions assume that they are entered through the terminal and that
+the user has root privileges. Installing on alternate flavors of Linux
+will follow a similar pattern.
+
+Of course, you may use the same instructions to install Arches either an
+in-house or remote server. And, while this guide does not cover it,
+Arches can be installed across multiple machines for deployments that
+demand high fault tolerance.
+
+Step 1: Install Required Dependencies
+-------------------------------------
+
+This step installs PostgreSQL, PostGIS, GEOS and the latest JDK by
+running a single script.
+
+.. note::
+
+    If you would rather install the components seperately, simply open the
+    script file and run only the portions of the script you want.
+
+Download following shell script using wget:
+
+::
+
+    wget https://bitbucket.org/arches/arches3/raw/b295633aec4d5b3bb7cba10d439a43648ce75701/arches/install/ubuntu_trusty_setup.sh
+
+Run the following script to build install PostgreSql, PostGIS, GEOS and
+the latest JDK:
+
+::
+
+    ./ubuntu_trusty_setup.sh
+
+.. warning::
+
+    **PostgreSQL Warnings** 
+
+    If you experience errors during the
+    installation, please check that the setting
+    'standard\_conforming\_strings' in 'postgresql.conf' is uncommented and
+    set to 'off'. 
+
+    See `this question on stackoverflow`__ for more information.
+
+    .. _stackoverflow: http://stackoverflow.com/questions/7667724/error-saving-geodjango-pointfield
+
+    __ stackoverflow_
+
+
+.. warning::
+
+    If you get an error similar to this, "Could not import user-defined
+    GEOMETRY\_BACKEND "geos"", you might try adding the path to the GDAL dll
+    to your archesproject/settings.py file (for more information see `the
+    django docs <https://docs.djangoproject.com/en/1.6/ref/contrib/gis/install/geolibs/#gdal-library-path>`__):
+
+::
+
+      GDAL_LIBRARY_PATH = '/path/to/libgdal.so'  #<-- make sure this path is correct and points to the actual .so file, note the forward slashess
+
+.. note::
+
+    We use the Django development server to make it easy for you to
+    confirm that Arches has installed properly. You WILL NEED to configure
+    Arches to use a production quality web server such as Apache if you want
+    to use Arches in production. See the chapter on Arches configuration for
+    guidance on how to complete this step.
