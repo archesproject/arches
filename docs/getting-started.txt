@@ -78,8 +78,6 @@ Arches.
 Installing Arches Dependencies
 -------------------------------
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
@@ -89,11 +87,11 @@ Contents:
 
 Installing Arches
 -----------------
-When you are done with your installation, your folder structure will look something like this:
+TODO: When you are done with your installation, your folder structure will look something like this:
 ::
     /Projects
       /ENV (virtual environment where arches gets installed)
-      /myarchesproject
+      /myarchesapp
 
 With your Arches dependencies installed, you are now ready to install Arches. 
 
@@ -109,6 +107,7 @@ navigate to your Projects directory (or wherever you want to create your virtual
 ::
     $ virtualenv ENV
 Now activate your virtual environment with the following command:
+
 On Linux (and other POSIX systems):
 ::
     $ source bin/activate
@@ -117,7 +116,7 @@ On Windows:
     > \path\to\env\Scripts\activate
 
 .. note::
-    If you are creating an Arches applicaiton based on HIP, you should skip to HERE.
+    If you are creating an Arches applicaiton based on HIP, you should continue here: http://example.com/.
 
 2. Install arches
 For this step your virtual environment must be activated. You will know that's the case if you see the name of your virutal environment in parentheses proceeding your command prompt like so ``(ENV)`` .
@@ -127,38 +126,72 @@ For this step your virtual environment must be activated. You will know that's t
 3. Create the Arches application scaffolding:
 In your Projects directory run the following command replacing 'myarchesapp' with the name of your arches application:
 :: 
-(ENV)$ arches-app create myarchesapp
+    (ENV)$ arches-app create myarchesapp
 
 4. Configure your application settings
-Your application should now have a folder structure similar to this:
+Your application should now have a structure similar to the structure below. If that's the case, you can configure your application here (recommended) or continue to the next installation step:
 ::
     /Projects
       /ENV (virtual environment where arches gets installed)
       /myarchesapp
-        /
+        manage.py
+        wsgi.py
+        README.txt
+        /myarchesapp
+            settings.py
+            setup.py
+            urls.py
+            /elasticsearch
+            /logs
+            /media
+            /models
+            /source_data
+            /templates
+            /tests
+            /views
+
 
 5. Start ElasticSearch
+Open a new command terminal and run the following command
+::
+    $ /myarchesapp/mynewarchesapp/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
+
 
 6. Create your database
 ::
-(ENV)$ python manage.py packages -o install
+    (ENV)$ python manage.py packages -o install
 
-7. Verify that arches is running
+.. note::
+
+    This step will drop and recreate a database with your with the following name: arches_myarchesapp as well as load any concept schemes or business data that you may have defined in your settings during configuration.
+
+7. Run arches
+Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
+Navigate to your application's manage.py file and run:
+::
+    (ENV)$ python manage.py runserver
+Now you can open a browser window and see your application running at:
+::
+    http://localhost:8000/
+
+.. note::
+
+    We use the Django development server to make it easy for you to
+    confirm that Arches has installed properly. You WILL NEED to configure
+    Arches to use a production quality web server such as Apache if you want
+    to use Arches in production. See the chapter on Arches configuration for
+    guidance on how to complete this step.
 
 Next steps:
 
-Now that Arches is running, you will need to load your concept scheme and resource data
+Now that Arches is running, you will need to load your concept scheme and resource data.  
 
 Common Issues
 -------------
 
-By default, Arches will look for a template called 'template_postgis_20'.  If you have named your template something else,
-you will need to remember to update the template name in your application's settings.py file with that name.  
+If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_myarchesapp" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
 
-DATABASES['default']['POSTGIS_TEMPLATE'] = 'template_postgis_20'  #If you used the ubuntu trusty installation script, this value should be 'template_postgis_21'
-
-If you get the following error 'django.db.utils.OperationalError: FATAL:  database "arches_myarchesapp" does not exist' It is probably due to Django 
-using the incorrect postgis database template to create your new application's database. To correct this issue, open your new applications settings.py file and make sure django is using the correct postgis template:
+DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
 
 Arches Applications
 ===================

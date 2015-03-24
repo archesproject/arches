@@ -63,11 +63,3 @@ the latest JDK:
 ::
 
       GDAL_LIBRARY_PATH = '/path/to/libgdal.so'  #<-- make sure this path is correct and points to the actual .so file, note the forward slashess
-
-.. note::
-
-    We use the Django development server to make it easy for you to
-    confirm that Arches has installed properly. You WILL NEED to configure
-    Arches to use a production quality web server such as Apache if you want
-    to use Arches in production. See the chapter on Arches configuration for
-    guidance on how to complete this step.
