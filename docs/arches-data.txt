@@ -68,7 +68,7 @@ A "Resource Graph" is the logical framework that is used by Arches to define the
 
 Arches applications must provide a resource graph for each resource type being inventoried.
 
-One example of a resource graph from the Arches HIP application is ``HERITAGE_ RESOURCE.E18``, visualized below:
+One example of a fully featured resource graph from the Arches HIP application is ``HERITAGE_ RESOURCE.E18``.
 
 
 [image]
@@ -147,13 +147,17 @@ The file is really just a list of business entities to be loaded to Arches.  By 
 
 The format fundamentally takes a key-value pair approach to storage where the ATTRIBUTENAME defines the key (actually the entity type as defined in the resource graph) and the ATTRIBUTEVALUE defines the business value of the entity.
 
-RESOURCEID is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat many times.  When building resource data in .arches format, a user should also know that Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
+RESOURCEID is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat on many lines.  As a point of reference, Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
 
 RESOURCETYPE specifies which resource type graph a given attribute is being loaded to.  In the Arches HIP Application, the available resource types include: ACTIVITY.E7, ACTOR.E39, HERITAGE_RESOURCE.E18, HERITAGE_RESOURCE_GROUP.E27, HISTORICAL_EVENT.E5, and INFORMATION_RESOURCE.E73.
 
 ATTRIBUTENAME specifies the node from the appropriate resource graph that the supplied value (in the ATTRIBUTEVALUE column) will load to.  Note that ATTRIBUTENAME is synonymous with entitytypeid.  Essentially, you are specifying the enitytypeid of the (business) entity that you are loading to the system.
 
-ATTRIBUTEVALUE stores the the actual business value of the enitit.  ATTRIBUTEVALUE values must conform to the datatype specified by the businesstable associated to the ATTRIBUTENAME.  One special case here is values assocaited to ATTRIBUTENAME(s) that link to the "domains" businesstable.  In those cases, the value store in ATTRIBUTEVALUE must be the conceptid fed in from csv-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
+ATTRIBUTEVALUE stores the the actual business value of the enitit.  ATTRIBUTEVALUE values must conform to the datatype specified by the businesstable associated to the ATTRIBUTENAME. See the Postgres documentation for appropriate formatting for strings, numbers, and dates.  See the notes below for formatting details on Geometries and Domains.
+
+.. note:: Geometry: Any value that is to be loaded as a geometry must be formatted using Well Known Text (or "WKT" for short) with coordinates set to ESPG 4326 or latitude/longitude WGS84 (http://spatialreference.org/ref/epsg/4326/).  WKT is a standard format for storing vector geometry as human-readable text.  Details of the standard can be found here: https://portal.opengeospatial.org/files/?artifact_id=54797, and wikipedia has a much more readable aggregation of the relevant information here: http://en.wikipedia.org/wiki/Well-known_text.
+
+.. note:: Domains: Another special case here is values assocaited to ATTRIBUTENAME(s) that link to the "domains" businesstable.  In those cases, the value store in ATTRIBUTEVALUE must be the conceptid fed in from csv-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
 
 GROUPID is inteded to support cases where business values stored in seperate nodes within the resource graph must be assocaited to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both FIRST_NAME.E1 and LAST_NAME.E1 as seperate nodes.  In that case, a an ACTOR that has two seperate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common GROUPID value and the two rows containing "Samuel" and Clemens" should have the same.  
 
@@ -171,6 +175,23 @@ validate_relations_file - checks that all resourceids listed in the .relations f
 from .shp
 ---------
 
+
+An Example Data Load
+--------------------
+
+Below is a very simple and internally consistent resource graph, set of authority documents, and .arches file. The intent is to illustrate how a logical model is defined and how data can be migrated into it.
+
+[image of resource graph]
+
+As with all resource graphs, the RDM must be populated with the data necesary to populate data into those nodes whose store data in the businesstable "domains".  Below are images of a set of csv format "authority files" that would necesarily go with this hypothetical resource graph.
+
+[image of auth docs for heritage resource type and name type]
+
+Finally, the .arches file below shows how to structure data for two distinct resources and their attributes:
+
+
+
+- use a very simple example of a resource graph.  Graph should contain a mergenode, grouping node, and an E55 entitytype, and a geometry.  Show an example auth doc and .arches file for loading data to the graph.
 
 
 Exporting Data
