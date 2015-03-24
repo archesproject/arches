@@ -1,4 +1,8 @@
-define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], function ($, Backbone, ko, koMapping, _) {
+define(['jquery', 
+    'backbone', 
+    'knockout', 
+    'knockout-mapping', 
+    'underscore',], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
 
         events: {
@@ -10,15 +14,12 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             _.extend(this, options);
             this.defaults = [];
             this.viewModel = this.data[this.dataKey];
-            this.branch_lists = ko.observableArray();
+            this.viewModel.branch_lists = koMapping.fromJS(this.data[this.dataKey].branch_lists);
 
             // if this is a function then it's assumed to be an observableArray already
             if(typeof this.viewModel !== 'function'){
-                _.each(this.viewModel.branch_lists, function(item){
-                    this.branch_lists.push({
-                        'editing': ko.observable(false),
-                        'nodes': koMapping.fromJS(item.nodes)
-                    })
+                _.each(this.viewModel.branch_lists(), function(item){
+                    item.editing = ko.observable(false);
                 }, this);      
 
                 _.each(this.viewModel.defaults, function(value, key){
@@ -27,6 +28,11 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             }
 
             ko.applyBindings(this, this.el);
+        },
+
+        createSubBranch: function(BranchList, options){
+            options.data = this.data[this.dataKey][options.dataKey];
+            return new BranchList(options);
         },
 
         validateBranch: function (data) {
@@ -48,7 +54,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             return ko.pureComputed({
                 read: function() {
                     var ret = null;
-                    _.each(this.branch_lists(), function(list){
+                    _.each(this.viewModel.branch_lists(), function(list){
                         if(list.editing()){
                             _.each(list.nodes(), function(node){
                                 if (entitytypeid.search(node.entitytypeid()) > -1){
@@ -67,7 +73,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                     return ret
                 },
                 write: function(value){
-                    _.each(this.branch_lists(), function(list){
+                    _.each(this.viewModel.branch_lists(), function(list){
                         if(list.editing()){
                             _.each(list.nodes(), function(node){
                                 if (entitytypeid.search(node.entitytypeid()) > -1){
@@ -89,7 +95,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         getBranchLists: function() {
             var branch_lists = [];
-            _.each(this.branch_lists(), function(list){
+            _.each(this.viewModel.branch_lists(), function(list){
                 if(!list.editing()){
                     branch_lists.push(list);
                 }
@@ -120,7 +126,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 if(editedBranch){
                     editedBranch.nodes.push(koMapping.fromJS(def));
                 }else{
-                    this.branch_lists.push(koMapping.fromJS({'editing':ko.observable(true), 'nodes': ko.observableArray([koMapping.fromJS(def)])})); 
+                    this.viewModel.branch_lists.push(koMapping.fromJS({'editing':ko.observable(true), 'nodes': ko.observableArray([koMapping.fromJS(def)])})); 
                 }     
             }
 
@@ -148,7 +154,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         deleteItem: function(branch, e) {
             this.trigger('change', 'delete', branch);   
-            this.branch_lists.remove(branch);
+            this.viewModel.branch_lists.remove(branch);
         },
 
         editItem: function(branch, e) {        
@@ -161,7 +167,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
 
         getEditedBranch: function(){
             var branch = null;
-            _.each(this.branch_lists(), function(list){
+            _.each(this.viewModel.branch_lists(), function(list){
                 if(list.editing()){
                     branch = list;
                 }
@@ -174,13 +180,13 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
                 'editing':ko.observable(true), 
                 'nodes': ko.observableArray(this.defaults)
             });
-            this.branch_lists.push(branch); 
+            this.viewModel.branch_lists.push(branch); 
             return branch;
         },
 
         removeEditedBranch: function(){
             var branch = this.getEditedBranch();
-            this.branch_lists.remove(branch); 
+            this.viewModel.branch_lists.remove(branch); 
             return branch;
         },
 
@@ -188,7 +194,7 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
             this.removeEditedBranch();
             this.addBlankEditBranch();
             if(this.originalItem !== null){
-                this.branch_lists.push({
+                this.viewModel.branch_lists.push({
                     'editing': ko.observable(false),
                     'nodes': koMapping.fromJS(this.originalItem.nodes)
                 });
@@ -207,9 +213,9 @@ define(['jquery', 'backbone', 'knockout', 'knockout-mapping', 'underscore'], fun
         },
 
         undoAllEdits: function(){
-            this.branch_lists.removeAll();
-            _.each(this.viewModel.branch_lists, function(item){
-                this.branch_lists.push({
+            this.viewModel.branch_lists.removeAll();
+            _.each(this.data[this.dataKey], function(item){
+                this.viewModel.branch_lists.push({
                     'editing': ko.observable(false),
                     'nodes': koMapping.fromJS(item.nodes)
                 })
