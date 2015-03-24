@@ -26,11 +26,7 @@ class ResourceForm(object):
         self.name = info['name']
         self.icon = info['icon']
         self.resource = resource
-        
-        self.data = {
-            "domains": {},
-            "defaults": {}
-        }
+        self.data = {}
 
     @property
     def schema(self):
@@ -70,8 +66,7 @@ class ResourceForm(object):
         if dataKey == None:
             dataKey = entitytypeid
 
-        for entity in self.resource.find_entities_by_type_id(entitytypeid):
-            self.resource.child_entities.remove(entity)
+        self.resource.prune(entitytypes=[entitytypeid])
 
         if self.schema == None:
             self.schema = Entity.get_mapping_schema(self.resource.entitytypeid)
@@ -90,3 +85,5 @@ class ResourceForm(object):
                     pass
             
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
+
+        self.resource.trim()

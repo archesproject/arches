@@ -28,9 +28,7 @@ To promote consistent data creation, update, and indexing workflows, Arches impl
 
 
 
-**Arches' User and Developer forum is:**
-
-http://archesproject.org/forum/
+**Arches' User and Developer forum:**  http://archesproject.org/forum/
 
 
 **Version History**
