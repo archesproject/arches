@@ -87,7 +87,7 @@ Installing Arches Dependencies
 
 Installing Arches
 -----------------
-TODO: When you are done with your installation, your folder structure will look something like this:
+Generally arches applications (in the case below 'myarchesapp') are installed in a project directory (in the case below 'Projects'). A virtual environment ('ENV') is created at the same directory as your arches application, so if you have multiple arches applications, they can share the same virtual environment.:
 ::
     /Projects
       /ENV (virtual environment where arches gets installed)
@@ -102,18 +102,17 @@ With your Arches dependencies installed, you are now ready to install Arches.
 .. note::
     Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
 
-virtualenv creates a directory with it's own installation of Python and Python executables. Arches will be installed within this virtual environment. To do so,  
-navigate to your Projects directory (or wherever you want to create your virtual environment) and create your environment with the follwing command: 
+virtualenv creates a directory with it's own installation of Python and Python executables. Arches will be installed within this virtual environment. To do so, navigate to your Projects directory (or wherever you want to create your arches applications) and create your virtual environment with the follwing command: 
 ::
     $ virtualenv ENV
 Now activate your virtual environment with the following command:
 
 On Linux (and other POSIX systems):
 ::
-    $ source bin/activate
+    $ source ENV/bin/activate
 On Windows:
 ::
-    > \path\to\env\Scripts\activate
+    > \path\to\ENV\Scripts\activate
 
 .. note::
     If you are creating an Arches applicaiton based on HIP, you should continue here: http://example.com/.
@@ -154,13 +153,13 @@ Navigate to the directory containing manage.py
 ::
   (ENV)$ python manage.py packages -o setup_elasticsearch
 
-5. Start ElasticSearch
+6. Start ElasticSearch
 Open a new command terminal and run the following command
 ::
     $ /myarchesapp/myarchesapp/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
 You can minimize this terminal and let it run in the background
 
-6. Create your database
+7. Create your database
 Using your first terminal
 ::
     (ENV)$ python manage.py packages -o install
@@ -169,7 +168,13 @@ Using your first terminal
 
     This step will drop and recreate a database with your with the following name: arches_myarchesapp as well as load any concept schemes or business data that you may have defined in your settings during configuration.
 
-7. Run arches
+.. note::
+
+    If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_hip_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
+
+    DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
+
+8. Run arches
 Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
 Navigate to your application's manage.py file and run:
 ::
@@ -189,15 +194,6 @@ Now you can open a browser window and see your application running at:
 Next steps:
 
 Now that Arches is running, you will need to load your concept scheme and resource data.  
-
-Common Issues
--------------
-
-If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_myarchesapp" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
-
-DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
-    
-
 
 
    

@@ -1,8 +1,8 @@
 Installing Arches Dependencies on Windows
-============================
+=========================================
 
-This chapter presents the steps necessary to acquire and install the
-Arches core software on your server.
+This chapter describes what software you'll need to run Arches and
+where you can find find it.
 
 Of course, you may use the same instructions to install Arches on either
 an in-house or remote server. And, while this guide does not cover it,
@@ -10,8 +10,8 @@ Arches can be installed across multiple machines for deployments that
 demand high fault tolerance.
 
   
-Step 1: Install PostgreSQL 9.3, PostGIS 2.x
--------------------------------------------
+Install PostgreSQL 9.3 and PostGIS 2.x
+---------------------------------------
 
 Download and install PostgreSQL 9.3 for Windows from:
 
@@ -19,67 +19,19 @@ http://www.postgresql.org/download/.
 
 **Notes:**
 
-1.  Select all the default options when installing and take special note
-    of the password you supply for the superuser (you’ll need this
-    later, by default we assume the password ‘postgis’)
-2.  At the end of the install leave the checkbox checked to run Stack
-    Builder (which you’ll use to install PostGIS) then click the
-    “Finish” button
-3.  In the Stack Builder drop-down menu, select the local Postgres
-    database (something like PostgreSQL 9.3 on port 5432) then click
-    “Next”
-4.  Expand the Spatial Extensions link and check the box for PostGIS.
-    Click “Next”
-5.  Select your download directory and click “Next” again
-6.  Click “Next” to start the installation of PostGIS
-7.  Select all the defaults until you get to the screen where it asks
-    for your password. Type in the password that you created earlier.
-8.  Select “Yes” to register the GDAL\_DATA environment variable ,unless
-    you have it currently set to something else and you don’t want to
-    override it.
-9.  Click “Close” and then “Finish” to complete the setup of Postgres
-    with PostGIS
-10. Assuming that your Postgres installation is in C:Files.3, add this
-    to your system PATH (If you are unsure how to do this, look `here`_
-    ):
+- Be sure to add PostgreSQL/9.3/bin directory to your system path.
+
+- After installing PostgreSQL you’ll need to run 2 commands from a
+  command window (this only applies to PostgreSQL 9.2 and above).
+  Open a command window and at the command prompt type the following:
 
     ::
 
-        C:\Program Files\PostgreSQL\9.3\bin        
+        createdb -U postgres -E UTF8 -T template0 template_postgis_20
+        psql -U postgres -d template_postgis_20 -c "CREATE EXTENSION postgis;"
 
-After installing PostgreSQL you’ll need to run 2 commands from a
-command window (this only applies to PostgreSQL 9.2 and above).
-Open a command window and at the command prompt type the following:
-
-::
-
-    createdb -U postgres -E UTF8 -T template0 template_postgis_20  
-    psql -U postgres -d template_postgis_20 -c "CREATE EXTENSION postgis;"
-
-.. note::
-
-    To confirm that you have installed PostgreSQL, open a command window
-    and type: psql. You should be prompted for a password. If so, then
-    PostgreSQL is installed and you may close the command prompt. If you
-    received an error like “psql is not recognized as an internal or
-    external command, operable program or batch file” then you probably need
-    to add an entry to your path.
-
-.. warning::
-        
-    **PostgreSQL Warnings**
-
-    If you experience errors during the
-    installation, please check that the setting
-    ‘standard\_conforming\_strings’ in ‘postgresql.conf’ is uncommented and
-    set to ‘off’. See `this`_ question on stackoverflow for more
-    information.
-
-.. _here: http://java.com/en/download/help/path.xml
-.. _this: http://stackoverflow.com/questions/7667724/error-saving-geodjango-pointfield  
-
-Step 2: Install GEOS
---------------------
+Install GEOS
+-------------
 
 Download and install GEOS from http://trac.osgeo.org/osgeo4w/
 
@@ -87,15 +39,10 @@ Download and install GEOS from http://trac.osgeo.org/osgeo4w/
 
 -  Make sure to select the x86 version for 32bit machines, or x86-64 for
    64bit machines
--  Assuming that your OSGeo4W installation is in ``C:\OSGeo4W\``
-   directory, add this to your system PATH:
+-  Once you have OSGeo4W installed, be sure to add the OSGeo4W\bin directory to your path.
 
-    ::
-
-        C:\OSGeo4W\bin
-
-Step 3: Install Python 2.7.6
-----------------------------
+Install Python 2.7.6
+-----------------------
 
 Download Python at http://www.python.org/download
 
@@ -125,33 +72,11 @@ Download Python at http://www.python.org/download
     trouble with 2.7.7 and 2.7.8
     If you want a guaranteed good result stick with version **2.7.6**
 
-Step 4: Install the latest Java Development Kit (JDK)
------------------------------------------------------
+Install the latest Java Development Kit (JDK)
+---------------------------------------------------
 
 Download and install the JDK from
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 **Notes:**
-
-1.  Select all the default options, except at the very end, uncheck the
-    box that asks to install the Ask.com toolbar.
-2.  Right-click the “My Computer” icon on your desktop and select
-    “Properties” to set the JAVA\_HOME environment variable.
-3.  Click the “Advanced” tab.
-4.  Click the “Environment Variables” button.
-5.  Under “System Variables”, click “New”.
-6.  Enter the variable name as JAVA\_HOME.
-7.  Enter the variable value as the installation path for the Java
-    Development Kit. (For example, if you used the default path for the
-    Java Development Kit during installation, use
-    ‘C:\Files\Java1.7.0_25’. This string should be your variable
-    value.)
-8.  Click “OK”.
-9.  Click “Apply Changes”.
-10. Close any command window which was open before you made these
-    changes, and open a new command window. There is no way to reload
-    environment variables from an active command prompt. If the changes
-    do not take effect even after reopening the command window, restart
-    Windows.
-
-.. _the djagno docs: https://docs.djangoproject.com/en/1.6/ref/contrib/gis/install/geolibs/#gdal-library-path
+    Once the JDK is installed, be sure to set the JAVA\_HOME environment variable.
