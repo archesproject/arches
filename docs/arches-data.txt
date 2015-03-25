@@ -65,7 +65,7 @@ In the simplest potential case, a resource that happens to be a person with a na
 Resource Graphs
 ===============
 
-A "Resource Graph" is the logical framework that is used by Arches to define the set of resources and attributes of resources to be managed.  
+Resource graphs are the logical framework that is used by Arches to define the set of resources and attributes of resources to be managed in an Arches Application.  
 
 Arches applications must provide a resource graph for each resource type being inventoried.
 
@@ -109,36 +109,38 @@ For those who do not care about CRM, ontologies or semantic interoperability, th
 Reference Data Graph
 ====================
 
-The reference data graph stores information necesary to use robustly managed thesauri as picklists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
+The reference data graph stores information necesary to use thesauri as input to picklists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
 
 * Ability to associate sets of reference data entries as valid selections in dropdown lists for "domain" nodes in the resource graph
 * Ability to associate arbitrary attributes (such as preferred labels, alternate labels, scope notes, sort order) to entries within the reference data
 * Ability to store words associated to given reference data entries in multiple languages (to support internationalization)
 * Ability to relate entries to each other in semanticly rich heirarchies
 
-Like the resource data graph, reference data is also stored in a graph structure.  But instead of entities and relations, the reference data includes ``concepts`` and ``relations``.  The types of avaialble relations are best categorized as ``semantic relations`` and ``collections``.  The meaning behind concepts is not only derived from its own individual description (or scope note), but also from its context from its position within a heirarchy of concepts.  Semantic relations are the connective tissue of heirarchical relationships that infuse meaning into concepts.  Collections, on the other hand, are used primarily for the purpose defining which concpets belong in a given Entity Types' dropdown list regardless of its position within a semantic heirarchy.  In short, semantic relationships infuse meaning and collections define the content of dropdown lists.  This infers that the Arches RDM is in itself a sophisticated thesaurus management system.
+Like the resource data graph, reference data is also stored in a graph structure.  Reference data includes ``concepts`` and ``relations``.  
+
+``Concepts`` are the core component of the reference data graph.  It indicates an idea that must be wrapped in metadata (such as a primary label) to communicate meaning.  Concepts, in turn, are related to each other using relations.
+
+The "types" of avaialble relations are categorized as ``semantic relations`` and ``collections``.  The meaning of a given concept is not only derived from its own individual description (or scope note), but also from the context from its position within a heirarchy of concepts.  Semantic relations are the connective tissue of heirarchical relationships that infuse meaning into concepts.  Collections, on the other hand, are used for the purpose of defining which concpets belong in a given Entity Types' dropdown list.  Collections group concepts independently of their semantic heirarchy.  In short, semantic relationships infuse meaning and collections define the content of dropdown lists.
 
 
-Loading Authority Files
+Loading Reference Data
 -----------------------
-Arches supports two formats for loading controlled vocabularies to its Reference Data graph.  The first approach, using csv files, is designed to support loading of legacy data to Arches.  As such, data are prepared and formatted and then uploaded as part of the installation of a specific Arches Application.  The second approach uses SKOS files. With SKOS files the assumption is that a given Arches application is already up and running, and that a person will use commands in the RDM's user interface to pull in new thesauri from SKOS-formatted files.
+Arches supports two formats for migrating concepts into the Reference Data graph.  The first approach, using csv files (also called ``Authority Files``), is designed to support loading of legacy reference data to Arches.  As such, source data are formatted and then uploaded as part of the installation of a specific Arches Application.  
 
-If you chose to create your own authority files those can be loaded using the following command from inside ||this directory||::
-	
-	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'
+The second approach uses SKOS files. With SKOS files, the assumption is that an Arches application is already up and running, and that a person will use commands in the RDM's user interface to pull in new thesauri from SKOS-formatted files.
 
 
 from .csv
 ------------
-The following steps outline how to create your own csv-formatted authority documents for use in a system implmenation. These steps can be followed using excel as your text editor but the final file must be saved as a utf-8 formatted csv file.
+The following steps outline how to create your own csv-formatted authority documents for use in a system implmenation. They can be followed using Excel as your text editor but the final file must be saved as a utf-8 formatted csv file.
 
 Data is required for all columns in the authority file with the exception of 'AltLables'.
 
-	1.) Create a text file and paste the following text to the first line::
+	1.) Create a text file and paste the following text to the first line.  These are the column headings for each required field of data::
 
 		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
 
-	2.) On the second line we will begin creating our concept. Start by creating a conceptid that will be unique both within this file and across all authority document files. A good pattern to follow is to use the name of the authority document itself (with '_' instead of spaces and minus the AUTHORITY_DOCUMENT.csv) with the number of the particular concept within the authority document appended. As an example, if your authority document is name 'EXAMPLE_AUTHORITY_DOCUMENT.csv' the first concept within the authority document would have the conceptid 'EXAMPLE_1'::
+	2.) On the second line we will begin creating our concept. Start by creating a conceptid that will be unique both within this file and across all authority document files to be loaded. A good pattern to follow is to use the name of the authority document itself (with '_' instead of spaces and minus the AUTHORITY_DOCUMENT.csv) with the number of the particular concept within the authority document appended. As an example, if your authority document is name 'EXAMPLE_AUTHORITY_DOCUMENT.csv' the first concept within the authority document would have the conceptid 'EXAMPLE_1'::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -205,7 +207,8 @@ Data is required for all columns in the authority file with the exception of 'Al
 
 Properly structured Authority files can be loaded into Arches using the following command from inside ||this directory||::
 	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'			
-			
+
+	
 
 from .skos
 ---------
