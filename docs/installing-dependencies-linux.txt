@@ -56,10 +56,10 @@ the latest JDK:
 .. warning::
 
     If you get an error similar to this, "Could not import user-defined
-    GEOMETRY\_BACKEND "geos"", you might try adding the path to the GDAL dll
+    GEOMETRY\_BACKEND "geos"", you might try adding the path to the GDAL .so
     to your archesproject/settings.py file (for more information see `the
     django docs <https://docs.djangoproject.com/en/1.6/ref/contrib/gis/install/geolibs/#gdal-library-path>`__):
 
 ::
 
-      GDAL_LIBRARY_PATH = '/path/to/libgdal.so'  #<-- make sure this path is correct and points to the actual .so file, note the forward slashess
+      GDAL_LIBRARY_PATH = '/path/to/libgdal.so'  #<-- make sure this path is correct and points to the actual .so file, note the forward slashes
