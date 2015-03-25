@@ -22,6 +22,17 @@ define(['jquery',
                     $('#date').trigger('change'); 
                 });
 
+                ko.observableArray.fn.get = function(entitytypeid, key) {
+                    var allItems = this();
+                    var ret = '';
+                    _.each(allItems, function(node){
+                        if (entitytypeid.search(node.entitytypeid()) > -1){
+                            ret = node[key]();
+                        }
+                    }, this);
+                    return ret
+                }
+
                 this.slider = new Slider('input.slider', {});
                 this.slider.on('slideStop', function(evt){
                     // if ther user has the slider at it's min and max, then essentially they don't want to filter by year
@@ -82,20 +93,16 @@ define(['jquery',
                     this.trigger('enabled', filtersenabled || sliderenabled, this.query.filter.inverted());
                 }, this);
 
-
                 new BranchList({
                     el: $('#time-filter')[0],
-                    viewModel: this.query.filter,
-                    key: 'filters',
-                    validateBranch: function (data) {
-                        if (data.date_types__value !== '' && data.date_operators__value !== '' && data.date !== '') {
-                            return true;
-                        }
-                        return false;
+                    data: this.viewModel,
+                    dataKey: 'important_dates',
+                    validateBranch: function (nodes) {
+                        return this.validateHasValues(nodes);;
                     }
                 });
 
-                ko.applyBindings(this.query.filter, $('#time-filter')[0]);
+                //ko.applyBindings(this.query.filter, $('#time-filter')[0]);
             },
 
             toggleFilterSection: function(ele, expand){
