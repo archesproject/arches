@@ -34,16 +34,6 @@ System Requirements
 
 There are a few things to know about Arches before we get started.
 
-Arches has the following software dependencies:
-
-* PostgreSQL relational database (version 9.3)
-* PostGIS (version 2.x) spatial module for PostgreSQL
-* Python (version 2.7.6 - there seem to be issues with later versions of python) 
-* GEOS
-
-These instructions will walk you through the necessary steps to load all
-the required dependencies and get Arches up and running quickly.
-
 Please note that Arches has been developed for modern browsers. It supports:
 
 * Firefox
@@ -52,17 +42,10 @@ Please note that Arches has been developed for modern browsers. It supports:
 * Opera
 * Internet Explorer 10 or higher.
 
-Requirements
-~~~~~~~~~~~~
-
 -  At least 4GB of RAM for evaulation and testing, or 8 to 16GB for
    production.
 -  10GB minimum to install the codebase and test dataset, but diskspace
    requirements will vary greatly depending on the size of your dataset
-
-
-Installation
-============
 
 It's important to recognize that Arches is designed to manage large,
 enterprise-scale Cultural Heritage inventories. The software is
@@ -75,8 +58,17 @@ installation instructions provide step-by-step guidelines for installing
 Arches.
 
 
-Installing Arches Dependencies
--------------------------------
+Dependencies
+============
+
+* PostgreSQL relational database (version 9.3)
+* PostGIS (version 2.x) spatial module for PostgreSQL
+* Python (version 2.7.6 - there seem to be issues with later versions of python) 
+* GEOS
+
+These instructions will provide some guidance on installing 
+the required dependencies and getting Arches up and running quickly.
+
 
 .. toctree::
    :maxdepth: 2
@@ -85,13 +77,16 @@ Installing Arches Dependencies
    installing-dependencies-windows
 
 
-Installing Arches
------------------
-Generally arches applications (in the case below 'myarchesapp') are installed in a project directory (in the case below 'Projects'). A virtual environment ('ENV') is created at the same directory as your arches application, so if you have multiple arches applications, they can share the same virtual environment.:
+Installation
+============
+
+For the installation process you will need **pip** installed on your system. If you don't already have it, you can find instructions to install it here: https://pip.pypa.io/en/latest/installing.html
+
+Generally arches applications (in the case below 'my_arches_app') are installed in a project directory (in the case below 'Projects'). A virtual environment ('ENV') is created at the same directory as your arches application, so if you have multiple arches applications, they can share the same virtual environment.:
 ::
     /Projects
       /ENV (virtual environment where arches gets installed)
-      /myarchesapp
+      /my_arches_app
 
 With your Arches dependencies installed, you are now ready to install Arches. 
 
@@ -115,31 +110,37 @@ On Windows:
     > \path\to\ENV\Scripts\activate
 
 .. note::
-    If you are creating an Arches applicaiton based on HIP, you should continue here: http://example.com/.
+    If you are creating an Arches applicaiton based on HIP, you should stop here and go to : http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
 
-2. Install arches
+2. Install the arches module
 For this step your virtual environment must be activated. You will know that's the case if you see the name of your virutal environment in parentheses proceeding your command prompt like so ``(ENV)`` .
 ::
     (ENV)$ pip install arches
 
 3. Create the Arches application scaffolding:
-In your Projects directory run the following command replacing 'myarchesapp' with the name of your arches application:
+In your Projects directory run the following command replacing 'my_arches_app' with the name of your arches application:
 :: 
-    (ENV)$ arches-app create myarchesapp
+    (ENV)$ arches-app create my_arches_app
 
-4. Configure your application settings
-Your application should now have a structure similar to the structure below. If that's the case, you can configure your application here (recommended) or continue to the next installation step:
+4. Install ElasticSearch
+Navigate to the directory containing manage.py 
+::
+  (ENV)$ cd my_arches_app/
+  (ENV)$ python manage.py packages -o setup_elasticsearch
+
+Your project directory should now look something like this:
 ::
     /Projects
       /ENV (virtual environment where arches gets installed)
-      /myarchesapp
+      /my_arches_app
         manage.py
         wsgi.py
         README.txt
-        /myarchesapp
+        /my_hip_app
             settings.py
             setup.py
             urls.py
+            /elasticsearch
             /logs
             /media
             /models
@@ -148,33 +149,49 @@ Your application should now have a structure similar to the structure below. If 
             /tests
             /views
 
-5. Install ElasticSearch
-Navigate to the directory containing manage.py 
-::
-  (ENV)$ python manage.py packages -o setup_elasticsearch
 
-6. Start ElasticSearch
+Settings
+========
+
+Open the settings.py file in my_arches_app/my_arches_app
+
+There are a few changes that you may need to make in order for your application to install and run properly.
+
+Be sure that the name of your postgis template in your settings matches your postgis template in postgresf. If it doesn't, uncomment the line (remove the ``#`` at the start of each line) below and replace 'template_postgis_20' with the name of your template.
+::
+
+  #DATABASES['default']['POSTGIS_TEMPLATE'] = 'template_postgis_20' 
+The default database password used in Arches is 'postgis'. You may have already set your Postgres password to something more secure. If so, uncomment the line below and replace 'postgis' with your Postgres connection password. 
+::
+
+  #DATABASES['default']['PASSWORD'] = 'postgis'
+
+
+Running Arches
+==============
+
+1. Start ElasticSearch
 Open a new command terminal and run the following command
 ::
-    $ /myarchesapp/myarchesapp/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
+    $ /my_arches_app/my_arches_app/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
 You can minimize this terminal and let it run in the background
 
-7. Create your database
+2. Create your database
 Using your first terminal
 ::
     (ENV)$ python manage.py packages -o install
 
 .. note::
 
-    This step will drop and recreate a database with your with the following name: arches_myarchesapp as well as load any concept schemes or business data that you may have defined in your settings during configuration.
+    This step will drop and recreate a database with your with the following name: arches_my_arches_app as well as load any concept schemes or business data that you may have defined in your settings.
 
 .. note::
 
-    If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_hip_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
+    If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_arches_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
 
     DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
 
-8. Run arches
+3. Run arches
 Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
 Navigate to your application's manage.py file and run:
 ::
