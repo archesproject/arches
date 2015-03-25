@@ -20,17 +20,17 @@ define([
     //set default map style to Roads
     baseLayers[0].layer.setVisible(true);
 
-    baseLayers.push({
-        id: 'labasemap',
-        name: 'LA County Basemap',
-        icon: arches.urls.media + 'img/map/la_county.png',
-        layer: new ol.layer.Tile({
-            visible: false,
-            source: new ol.source.XYZ({
-                url: 'http://egis3.lacounty.gov/arcgis/rest/services/LACounty_Cache/LACounty_Base/MapServer/tile/{z}/{y}/{x}'
-            })
-        })
-    });
+    // baseLayers.push({
+    //     id: 'examplemap',
+    //     name: 'Example Basemap',
+    //     icon: arches.urls.media + 'img/map/an_example.png',
+    //     layer: new ol.layer.Tile({
+    //         visible: false,
+    //         source: new ol.source.XYZ({
+    //             url: 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png'
+    //         })
+    //     })
+    // });
 
     return baseLayers;
 });

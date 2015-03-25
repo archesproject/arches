@@ -112,13 +112,22 @@ def RESOURCE_TYPE_CONFIGS():
 {% endif %}
 
 #GEOCODING_PROVIDER = ''
-
+{% if source_app == 'arches' %}
 RESOURCE_GRAPH_LOCATIONS = (
     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PACKAGE_ROOT, 'source_data', 'resource_graphs'),
 )
+{% else %}
+# RESOURCE_GRAPH_LOCATIONS = (
+#     # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
+#     # Always use forward slashes, even on Windows.
+#     # Don't forget to use absolute paths, not relative paths.
+#     os.path.join(PACKAGE_ROOT, 'source_data', 'resource_graphs'),
+# )
+{% endif %}
+
 
 CONCEPT_SCHEME_LOCATIONS = (
     # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
