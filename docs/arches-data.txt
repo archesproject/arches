@@ -5,7 +5,7 @@ Arches Data
 Physical Data model
 ===================
 
-.. note:: This section is most useful for those who wish to issue sql queries directly against the Arches backend PostgreSQL database.
+.. note:: The physical data model section is most useful for those who wish to issue sql queries directly against the Arches backend PostgreSQL database.
 
 
 The Arches physical data model consists of tables and referential integrity constraints implmented within a PostgreSQL database.  It is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
@@ -100,11 +100,11 @@ Regardless of how the nodes and edges csv files are created, they must include t
 Ontologies
 ----------
 
-The fundamental role of resource graphs is to define a suite of resource types, their attributes, and relationships between them.  However, the graph also supports associating nodes and edges within the it to semantic classes and properties defined in CIDOC CRM.  
+In addition to defining resources and their attributes, resource graphs also support associating assocaiting those resources and attributes to semantic classes and properties defined in CIDOC CRM.  Details on how this is done are provided in the section above on Resource Graphs.
 
 .. note:: One should refer to CIDOC CRM (http://www.cidoc-crm.org/) to make an informed decision about what class or property to assign to nodes and edges respectively.
 
-For those who do not care about CRM, ontologies or semantic interoperability, the simplest way to make a valid graph is to assign all nodes as "E1" and all edges as "P1".  
+For those who do not care about CRM, ontologies or semantic interoperability, the simplest way to make a valid graph is to assign all nodes with class "E1" and all edges with property "P1".  
 
 Reference Data Graph
 ====================
@@ -180,7 +180,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,Collector,
 		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,Index,
 
-	7.) Optionally, you can add a Provider for your concept. This value provides context for where the concept came from::
+	7.) The Provider identifies where a given concept came from::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -205,6 +205,25 @@ Data is required for all columns in the authority file with the exception of 'Al
 			entitytype,authoritydoc,authoritydocconceptschemename
 			EXAMPLE_NODE.E55,EXAMPLE_AUTHORITY_DOCUMENT.csv,Example Concept Scheme Name
 
+	10.) You can optionally define a seperate but related ``[EXAMPLE_AUTHORITY_DOCUMENT].values.csv`` file to add additional information about concepts in your initial concepts file.  This file uses a key-value pair approach to associating additional attributes to a given concept.  The structure of the values file is as follows:
+	
+		//EXAMPLE_AUTHORITY_DOCUMENT.values.csv
+
+		conceptid,Value,ValueType,Provider 
+		EXAMPLE_1,This an example scope note,scopeNote,GCI
+		EXAMPLE_1,2[filepath to an image],imgae,GCI
+
+		The conceptid is the linking key to the initial concept within the inital concept file.
+		
+		
+		Arches comes loaded with a set of Valuetype's necesary to maintain compliance with SKOS and Dublin Core standards. The set of preloaded value types are nicely documented in the dml file located in the code repository here: arches\db\dml\db_data.sql.  However, an implementor has the freedom to add additional ValueType's by simply adding them within *.values.csv file.  To be clear, these additional valuetypes will not fall into the fold of SKOS standards, but they could be useful for your individual implementation.
+		
+		One example where this is particularly relevant is the use "sortorder" as a valuetype.  By default, Arches orders dropdown lists alphabetically.  Sometimes, as in the cases of time periods, users prefer that their dropdown lists are presented in specific order. In the case of time periods, users prefer it be based on some semblance of chronological order.  
+		
+		When the sortorder valuetype is specifcied, corresponding numeric values can be used to ensure that the concept labels appear in the dropdown in a specific order.
+	
+	
+			
 Properly structured Authority files can be loaded into Arches using the following command from inside ||this directory||::
 	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'			
 
@@ -221,6 +240,7 @@ Resources and their attributes can be loaded to Arches resource graphs using one
 Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entity type. 
 
 Dot Arches files, on the other hand, take a key-value pair approach populating resource graphs with resources with attributes.  Therefore, they are able to add as many of a given attribute as exists in the data.  The downside of the dot arches format is that it can take a significant data processing or reformatting effort to get a significant amount of source data ready for loading to Arches from this format.
+
 
 
 
@@ -250,11 +270,19 @@ ATTRIBUTEVALUE stores the the actual business value of the enitit.  ATTRIBUTEVAL
 
 .. note:: Geometry: Any value that is to be loaded as a geometry must be formatted using Well Known Text (or "WKT" for short) with coordinates set to ESPG 4326 or latitude/longitude WGS84 (http://spatialreference.org/ref/epsg/4326/).  WKT is a standard format for storing vector geometry as human-readable text.  Details of the standard can be found here: https://portal.opengeospatial.org/files/?artifact_id=54797, and wikipedia has a much more readable aggregation of the relevant information here: http://en.wikipedia.org/wiki/Well-known_text.
 
-.. note:: Domains: Another special case here is values assocaited to ATTRIBUTENAME(s) that link to the "domains" businesstable.  In those cases, the value store in ATTRIBUTEVALUE must be the conceptid fed in from csv-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
+.. note:: Domains: Another special case here is values assocaited to ATTRIBUTENAME(s) that link to the "domains" businesstable.  In those cases, the value stored in ATTRIBUTEVALUE must be the conceptid fed in from csv-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
 
-GROUPID is inteded to support cases where business values stored in seperate nodes within the resource graph must be assocaited to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both FIRST_NAME.E1 and LAST_NAME.E1 as seperate nodes.  In that case, a an ACTOR that has two seperate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common GROUPID value and the two rows containing "Samuel" and Clemens" should have the same.  
+GROUPID is inteded to support cases where business values stored in seperate nodes within the resource graph must be assocaited to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both FIRST_NAME.E1 and LAST_NAME.E1 as seperate nodes.  In that case, a an ACTOR that has two seperate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common GROUPID value and the two rows containing "Samuel" and Clemens" should have their own GROUPID value.  
 
+Below is a sample of what a validly populated .arches could look like.
 
+RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
+CRA-01|ACTIVITY.E7|EXTERNAL_XREF.E42|CRA-01|EXTERNAL_RESOURCE.E1-0
+CRA-01|ACTIVITY.E7|EXTERNAL_XREF_TYPE.E55|XREF_TYPE:2|EXTERNAL_RESOURCE.E1-0
+CRA-01|ACTIVITY.E7|NAME.E41|Adelante Eastside Redevelopment Project|NAME.E41-0
+CRA-01|ACTIVITY.E7|NAME_TYPE.E55|NAME_TYPE:1|NAME.E41-0
+CRA-01|ACTIVITY.E7|ACTIVITY_TYPE.E55|ACTIVITY_TYPE:5|PHASE_TYPE_ASSIGNMENT.E17-0
+CRA-01|ACTIVITY.E7|SPATIAL_COORDINATES_GEOMETRY.E47|POINT(-118.17909 34.06413)|PLACE.E53-0
 
 -syntax
 -arches-level validation
@@ -271,21 +299,79 @@ from .shp
 
 An Example Data Load
 --------------------
+Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate the construction of a logical model and a simple set of source data that can be loaded in to the model.
 
-Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate how a logical model is defined and how data can be migrated into it.
+
+--Resource Graph--
 
 [image of resource graph]
 
-As with all resource graphs, the RDM must be populated with the data necesary to populate data into those nodes whose store data in the businesstable "domains".  Below are images of a set of csv format "authority files" that would necesarily go with this hypothetical resource graph.
+Id,Label,mergenode,businesstable
+69,EXAMPLE_RESOURCE.E1,EXAMPLE_RESOURCE.E1,[null]
+66,PERIOD.E1,EXAMPLE_RESOURCE.E1,strings
+8,DESCRIPTION_OF_LOCATION.E1,PLACE.E1,strings
+4,PHASE_TYPE_ASSIGNMENT.E1,EXAMPLE_RESOURCE.E1,[null]
+42,HERITAGE_RESOURCE_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
+172,RESOURCE_DESCRIPTION.E1,EXAMPLE_RESOURCE.E1,strings
+16,NAME_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
+71,PLACE.E1,EXAMPLE_RESOURCE.E1,[null]
+5,GEOMETRY.E1,PLACE.E1,geometries
+17,NAME.E1,EXAMPLE_RESOURCE.E1,strings
 
-[image of auth docs for heritage]
-[ resource type and name type]
+Source,Target,Id,Label
+69,4,1,P1
+69,17,2,P1
+69,71,3,P1
+69,172,4,P1
+4,42,5,P1
+4,66,6,P1
+71,5,7,P1
+71,8,8,P1
+17,16,9,P1
 
-Finally, the .arches file below shows how to structure data for two distinct resources and their attributes:
+
+--Reference Data--
+File = NAME_TYPE.E1.csv
+conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+NAME_TYPE_1,Primary Name,,NAME_TYPE.E1.csv,Index,Organization_1
+NAME_TYPE_2,Alias Name,,NAME_TYPE.E1.csv,Index,Organization_1
+
+File = HERITAGE_RESOURCE_TYPE.E1.csv
+conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+HERITAGE_RESOURCE_TYPE_1,Architecture,,HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
+HERITAGE_RESOURCE_TYPE_2,Spanish Colonial,,HERITAGE_RESOURCE_TYPE_1,index,Organization_1
+HERITAGE_RESOURCE_TYPE_3,Postmodern,,HERITAGE_RESOURCE_TYPE_1,index,Organization_1
+HERITAGE_RESOURCE_TYPE_4,Archealogy,,HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
+HERITAGE_RESOURCE_TYPE_5,Pottery Sherd,,HERITAGE_RESOURCE_TYPE_4,index,Organization_1
+HERITAGE_RESOURCE_TYPE_6,Arrowhead,,HERITAGE_RESOURCE_TYPE_4,index,Organization_1
+
+--Business Data--
+File = resource.arches
+RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION.E1|long description of the resource|DESCRIPTION.E1-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME.E1|The Taj Mahal|NAME.E41-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(0 0)|GEOMETRY.E1-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION_OF_LOCATION.E1|In the Atlantic Ocean off the coast of Africa|DESCRIPTION_OF_LOCATION.E1
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_3|PHASE_TYPE_ASSIGNMENT.E1-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|1950 to 1980|PHASE_TYPE_ASSIGNMENT.E1-0
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_5|PHASE_TYPE_ASSIGNMENT.E1-1
+EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|Prehistoric|PHASE_TYPE_ASSIGNMENT.E1-1
+
+Note:: There are two distinct "groups" of phase-type assignements.  That means that the resource was different things at different times.
+
+Note:: In the case of NAME_TYPE.E1 and HERITAGE_RESOURCE_TYPE.E1, the attributevalue is actually the ID of the concept as defined in the authority file.
+
+RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
+EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME.E1|The Little Taj Mahal|NAME.E41-0
+EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
+EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(1 1)|GEOMETRY.E1-0
 
 
+File = resource.relations
+RESOURCEID_FROM|RESOURCEID_TO|START_DATE|END_DATE|RELATION_TYPE|NOTES
+EXAMPLE RESOURCE_1|EXAMPLE RESOURCE_2|||RELATIONSHIP_TYPE:1|
 
-- use a very simple example of a resource graph.  Graph should contain a mergenode, grouping node, and an E55 entitytype, and a geometry.  Show an example auth doc and .arches file for loading data to the graph.
 
 
 Exporting Data
