@@ -30,6 +30,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
+from django.http import HttpResponseNotFound
 
 @login_required
 @csrf_exempt
@@ -57,22 +58,25 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
     if request.method == 'GET':
-        form.load()
-        return render_to_response('resource-manager.htm', {
-                'form': form,
-                'formdata': JSONSerializer().serialize(form.data),
-                'form_template': 'views/forms/' + form_id + '.htm',
-                'form_id': form_id,
-                'resourcetypeid': resourcetypeid,
-                'resourceid': resourceid,
-                'main_script': 'resource-manager',
-                'active_page': 'ResourceManger',
-                'resource': resource,
-                'resource_name': resource.get_primary_name(),
-                'resource_type_name': resource.get_type_name(),
-                'form_groups': resource.form_groups
-            },
-            context_instance=RequestContext(request))
+        if form != None:
+            form.load()
+            return render_to_response('resource-manager.htm', {
+                    'form': form,
+                    'formdata': JSONSerializer().serialize(form.data),
+                    'form_template': 'views/forms/' + form_id + '.htm',
+                    'form_id': form_id,
+                    'resourcetypeid': resourcetypeid,
+                    'resourceid': resourceid,
+                    'main_script': 'resource-manager',
+                    'active_page': 'ResourceManger',
+                    'resource': resource,
+                    'resource_name': resource.get_primary_name(),
+                    'resource_type_name': resource.get_type_name(),
+                    'form_groups': resource.form_groups
+                },
+                context_instance=RequestContext(request))
+        else:
+            return HttpResponseNotFound('<h1>Arches form not found.</h1>')
     
 def related_resources(request, resourceid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
