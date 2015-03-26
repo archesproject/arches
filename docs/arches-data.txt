@@ -233,6 +233,7 @@ from .skos
 ---------
 Do we even have a way to point to folder full of skos files and say load them?
 
+
 Loading Business Data
 ======================
 Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extension.  
