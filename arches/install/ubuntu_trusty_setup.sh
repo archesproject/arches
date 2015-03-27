@@ -33,7 +33,7 @@ sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/9.3/mai
 sudo service postgresql restart
 
 sudo wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
-tar xvfj geos-3.3.8.tar.bz2
+sudo tar xvfj geos-3.3.8.tar.bz2
 cd geos-3.3.8
 ./configure
 make
@@ -41,7 +41,7 @@ sudo make install
 cd ..
 
 sudo wget http://download.osgeo.org/postgis/source/postgis-2.1.3.tar.gz
-tar xfvz postgis-2.1.3.tar.gz
+sudo tar xfvz postgis-2.1.3.tar.gz
 cd postgis-2.1.3
 ./configure
 make
@@ -54,7 +54,7 @@ sudo ln -sf /usr/share/postgresql-common/pg_wrapper /usr/local/bin/raster2pgsql
 cd ..
 
 sudo -u postgres psql -d postgres -c "CREATE EXTENSION postgis;"
-sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis_21
+sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis_20
 sudo -u postgres createlang -d template_postgis_21 plpgsql
 sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_21'"
 sudo -u postgres psql -d template_postgis_21 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/postgis.sql
