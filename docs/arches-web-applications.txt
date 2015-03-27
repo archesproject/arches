@@ -8,7 +8,7 @@ Think of Arches as a strong foundation onto which you can build your own Arches 
 
 Out of the box, Arches provides the functionality to store, index, and search (temporally, spatially, and free text) any data entered into the system and to present it on a map or in tabular search results.  If you only need to read data out of the system then you're ready to go.  
 
-Arches ends at the point of data entry and reporting.  If you need that level of functionality then you'll need to build that in your application.  See the `Arches-Hip <http://arches-hip.readthedocs.org/en/latest/>`_ application for an example of an application built on top of Arches.
+Arches ends at the point of data entry and reporting.  If you need that level of functionality then you'll need to build that into your own application.  See the `Arches-Hip <http://arches-hip.readthedocs.org/en/latest/>`_ application for an example of an application built on top of Arches.
 
 
 
