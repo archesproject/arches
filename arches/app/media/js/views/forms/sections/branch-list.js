@@ -11,7 +11,11 @@ define(['jquery',
         },
 
         initialize: function(options) {
+            var self = this;
+            this.singleEdit = false;
+
             _.extend(this, options);
+
             this.defaults = [];
             this.viewModel = this.data[this.dataKey];
             this.viewModel.branch_lists = koMapping.fromJS(this.data[this.dataKey].branch_lists);
@@ -28,6 +32,26 @@ define(['jquery',
             }
 
             ko.applyBindings(this, this.el);
+
+            if (this.singleEdit) {
+                _.each(this.viewModel.branch_lists(), function (branch) {
+                    if (branch) {
+                        _.each(branch.nodes(), function (node) {
+                            var value = node.value();
+                            if (value) {
+                                this.editItem(branch);
+                            }
+                        }, this);
+                    }
+                }, this);
+
+                var editingBranch = this.getEditedBranch();
+                _.each(editingBranch.nodes(), function (node) {
+                    node.value.subscribe(function () {
+                        self.trigger('change', 'edit', editingBranch);
+                    });
+                });
+            }
         },
 
         createSubBranch: function(BranchList, options){
@@ -96,7 +120,7 @@ define(['jquery',
         getBranchLists: function() {
             var branch_lists = [];
             _.each(this.viewModel.branch_lists(), function(list){
-                if(!list.editing()){
+                if(!list.editing() || (this.singleEdit && list.editing())){
                     branch_lists.push(list);
                 }
             }, this);
