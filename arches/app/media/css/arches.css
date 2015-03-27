@@ -1371,3 +1371,16 @@ input.arches-select2:-ms-input-placeholder {
 a:hover {
  cursor:pointer;
 }
+
+.geom-file-instructions {
+    font-size: 17px;
+    font-weight: 200;
+    color: #555;
+    margin-left: 5px;
+    margin-right: 5px;
+    display: block;
+    padding-left: 8px;
+    padding-right: 5px;
+    padding-top: 12px;
+    padding-bottom: 4px;
+}
