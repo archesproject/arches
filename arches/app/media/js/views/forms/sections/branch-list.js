@@ -235,11 +235,14 @@ define(['jquery',
             this.viewModel.branch_lists.removeAll();
             _.each(this.data[this.dataKey].branch_lists, function(item){
                 this.viewModel.branch_lists.push({
-                    'editing': ko.observable(false),
+                    'editing': ko.observable(this.singleEdit),
                     'nodes': koMapping.fromJS(item.nodes)
                 })
             }, this); 
-            this.addBlankEditBranch();
+
+            if(!this.singleEdit || this.viewModel.branch_lists().length === 0){
+                this.addBlankEditBranch();
+            }
         }
     });
 });
