@@ -12,7 +12,7 @@ STATICFILES_DIRS = (os.path.join(PACKAGE_ROOT, 'media'),) + STATICFILES_DIRS
 TEMPLATE_DIRS = (os.path.join(PACKAGE_ROOT, 'templates'),os.path.join(PACKAGE_ROOT, 'templatetags')) + TEMPLATE_DIRS
 
 {% if source_app == 'arches' %}
-RESOURCE_MODEL = {'default': '{{ app_name }}.models.resource.Resource'}
+RESOURCE_MODEL = {'default': 'arches.app.models.resource.Resource'}
 {% else %}
 #RESOURCE_MODEL = {'default': '{{ app_name }}.models.resource.Resource'}
 {% endif %}
