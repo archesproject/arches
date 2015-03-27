@@ -298,11 +298,18 @@ Before any data are loaded from the .arches format into the Arches database, our
 from .shp
 ---------
 
+Shapefile upload is one of the nice, new features of Arches 3. Though a little configuration is needed to load your shapefiles into Arches, the process is very simple. There are just a couple of limitations to loading data using shapefiles.
+
+    Your shapefile can contain only one resource type per shapefile. For example, you would need one shapefile to load Heritage Resources and a second shapefile for Activities.
+
+    Your shapefile projection must be defined as WGS84 Lat/Lon (EPSG:4326).
+
+    Currently the shapefile loader does not load the .relations file. If you need to add relationships between resources, you should use the .arches format with a .relations file rather than a shapefile, or create relationships between resources using the web application after loading your shapefile.
+
 
 An Example Data Load
 --------------------
-Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate the construction of a logical model and a simple set of source data that can be loaded in to the model. 
-
+Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate the construction of a logical model and a simple set of source data that can be loaded into the model. 
 
 --Resource Graph--
 
@@ -311,78 +318,160 @@ Below is a very simple resource graph, set of authority documents, and .arches f
 
 .. Note:: that in the examples below, the character string of "[null]" is used as a substitute for no value.
 
-Id,Label,mergenode,businesstable
-69,EXAMPLE_RESOURCE.E1,EXAMPLE_RESOURCE.E1,[null]
-66,PERIOD.E1,EXAMPLE_RESOURCE.E1,strings
-8,DESCRIPTION_OF_LOCATION.E1,PLACE.E1,strings
-4,PHASE_TYPE_ASSIGNMENT.E1,EXAMPLE_RESOURCE.E1,[null]
-42,HERITAGE_RESOURCE_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
-172,RESOURCE_DESCRIPTION.E1,EXAMPLE_RESOURCE.E1,strings
-16,NAME_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
-71,PLACE.E1,EXAMPLE_RESOURCE.E1,[null]
-5,GEOMETRY.E1,PLACE.E1,geometries
-17,NAME.E1,EXAMPLE_RESOURCE.E1,strings
+::
 
-Source,Target,Id,Label
-69,4,1,P1
-69,17,2,P1
-69,71,3,P1
-69,172,4,P1
-4,42,5,P1
-4,66,6,P1
-71,5,7,P1
-71,8,8,P1
-17,16,9,P1
+	Id,Label,mergenode,businesstable
+	69,EXAMPLE_RESOURCE.E1,EXAMPLE_RESOURCE.E1,[null]
+	66,PERIOD.E1,EXAMPLE_RESOURCE.E1,strings
+	8,DESCRIPTION_OF_LOCATION.E1,PLACE.E1,strings
+	4,PHASE_TYPE_ASSIGNMENT.E1,EXAMPLE_RESOURCE.E1,[null]
+	42,HERITAGE_RESOURCE_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
+	172,RESOURCE_DESCRIPTION.E1,EXAMPLE_RESOURCE.E1,strings
+	16,NAME_TYPE.E1,EXAMPLE_RESOURCE.E1,domains
+	71,PLACE.E1,EXAMPLE_RESOURCE.E1,[null]
+	5,GEOMETRY.E1,PLACE.E1,geometries
+	17,NAME.E1,EXAMPLE_RESOURCE.E1,strings
+
+::
+
+	Source,Target,Id,Label
+	69,4,1,P1
+	69,17,2,P1
+	69,71,3,P1
+	69,172,4,P1
+	4,42,5,P1
+	4,66,6,P1
+	71,5,7,P1
+	71,8,8,P1
+	17,16,9,P1
 
 
 --Reference Data--
 File = NAME_TYPE.E1.csv
-conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
-NAME_TYPE_1,Primary Name,,NAME_TYPE.E1.csv,Index,Organization_1
-NAME_TYPE_2,Alias Name,,NAME_TYPE.E1.csv,Index,Organization_1
+::
+
+	conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+	NAME_TYPE_1,Primary Name,,NAME_TYPE.E1.csv,Index,Organization_1
+	NAME_TYPE_2,Alias Name,,NAME_TYPE.E1.csv,Index,Organization_1
 
 File = HERITAGE_RESOURCE_TYPE.E1.csv
-conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
-HERITAGE_RESOURCE_TYPE_1,Architecture,[null],HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
-HERITAGE_RESOURCE_TYPE_2,Spanish Colonial,[null],HERITAGE_RESOURCE_TYPE_1,index,Organization_1
-HERITAGE_RESOURCE_TYPE_3,Postmodern,[null],HERITAGE_RESOURCE_TYPE_1,index,Organization_1
-HERITAGE_RESOURCE_TYPE_4,Archealogy,[null],HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
-HERITAGE_RESOURCE_TYPE_5,Pottery Sherd,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
-HERITAGE_RESOURCE_TYPE_6,Arrowhead,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
+::
+
+	conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
+	HERITAGE_RESOURCE_TYPE_1,Architecture,[null],HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
+	HERITAGE_RESOURCE_TYPE_2,Spanish Colonial,[null],HERITAGE_RESOURCE_TYPE_1,index,Organization_1
+	HERITAGE_RESOURCE_TYPE_3,Postmodern,[null],HERITAGE_RESOURCE_TYPE_1,index,Organization_1
+	HERITAGE_RESOURCE_TYPE_4,Archealogy,[null],HERITAGE_RESOURCE_TYPE.E1.csv,Collector,Organization_1
+	HERITAGE_RESOURCE_TYPE_5,Pottery Sherd,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
+	HERITAGE_RESOURCE_TYPE_6,Arrowhead,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
 
 --Business Data--
 File = resource.arches
-RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION.E1|long description of the resource|DESCRIPTION.E1-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME.E1|The Taj Mahal|NAME.E41-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(0 0)|GEOMETRY.E1-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION_OF_LOCATION.E1|In the Atlantic Ocean off the coast of Africa|DESCRIPTION_OF_LOCATION.E1
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_3|PHASE_TYPE_ASSIGNMENT.E1-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|1950 to 1980|PHASE_TYPE_ASSIGNMENT.E1-0
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_5|PHASE_TYPE_ASSIGNMENT.E1-1
-EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|Prehistoric|PHASE_TYPE_ASSIGNMENT.E1-1
+::
 
-Note:: There are two distinct "groups" of phase-type assignements.  That means that the resource was different things at different times.
+	RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION.E1|long description of the resource|DESCRIPTION.E1-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME.E1|The Taj Mahal|NAME.E41-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(0 0)|GEOMETRY.E1-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|DESCRIPTION_OF_LOCATION.E1|In the Atlantic Ocean off the coast of Africa|DESCRIPTION_OF_LOCATION.E1
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_3|PHASE_TYPE_ASSIGNMENT.E1-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|1950 to 1980|PHASE_TYPE_ASSIGNMENT.E1-0
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_5|PHASE_TYPE_ASSIGNMENT.E1-1
+	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|Prehistoric|PHASE_TYPE_ASSIGNMENT.E1-1
 
-Note:: In the case of NAME_TYPE.E1 and HERITAGE_RESOURCE_TYPE.E1, the attributevalue is actually the ID of the concept as defined in the authority file.
+.. note:: There are two distinct "groups" of phase-type assignements.  That means that the resource was different things at different times.
 
-RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
-EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME.E1|The Little Taj Mahal|NAME.E41-0
-EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
-EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(1 1)|GEOMETRY.E1-0
+.. note:: In the case of NAME_TYPE.E1 and HERITAGE_RESOURCE_TYPE.E1, the attributevalue is actually the ID of the concept as defined in the authority file.
+::
+
+	RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
+	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME.E1|The Little Taj Mahal|NAME.E41-0
+	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
+	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(1 1)|GEOMETRY.E1-0
 
 
 File = resource.relations
-RESOURCEID_FROM|RESOURCEID_TO|START_DATE|END_DATE|RELATION_TYPE|NOTES
-EXAMPLE RESOURCE_1|EXAMPLE RESOURCE_2|[null]|[null]|RELATIONSHIP_TYPE:1|[null]
+::
+	RESOURCEID_FROM|RESOURCEID_TO|START_DATE|END_DATE|RELATION_TYPE|NOTES
+	EXAMPLE RESOURCE_1|EXAMPLE RESOURCE_2|[null]|[null]|RELATIONSHIP_TYPE:1|[null]
+
+Before you can load data, you must have ElasticSearch running so that your data is indexed during the load. 
+To start ElasticSearch open a console and run
+::
+	$ path\to\my_hip_app\my_hip_app\elasticsearch\elasticsearch-1.4.1\bin\elasticsearch
+
+To load your resource graphs, make sure that your virtual envrionment is activated. If it's not, in a new terminal run:
+On Linux and Unix systems:
+::
+	$ source path\to\ENV\bin\activate
+
+On Windows:
+::
+	> path\to\ENV\Scripts\activate
+
+With your virtual envrionment activated, navigate to directory manage.py file in your project and load your authority files with the following command where -s is a directory containing your authority files:
+::
+	$ python manage.py packages -o load_concept_scheme -s /path/to/authority_files/directory
+
+Now you can load your .arches file with the following command. 
+::
+	$ python manage.py packages -o load_resources -s /path/to/my/mydata.arches
+
+.. note::
+
+		When loading with a .arches file, relationships defined in your .relations file will be automatically loaded if they are in the same directory as your .arches file.
 
 
+
+If you choose to load your data from a shapefile rather than a .arches file there are 3 simple steps
+
+Step 1. Create your configuration file.
+
+You’ll need to create configuration file to tell Arches how the fields in your shapefile correspond to nodes in a resource graph.The configuration file should have the same base name as your shapefile with the extension ‘.config’. For example, if your shapefile is called ‘heritage_resources.shp’, you will will need a ‘heritage_resources.config’ file along with your ‘heritage_resources.dbf’, etc.
+
+The .config file is formatted in JSON as you can see in this example which corresponds to the example graph above:
+::
+
+	{
+		“RESOURCE_TYPE”: “EXAMPLE_RESOURCE.E11″,
+		“GEOM_TYPE”: “GEOMETRY.E1″,
+		“FIELD_MAP”: [
+			[“place”,”PLACE.E1″],
+			[“location”,”DESCRIPTION_OF_LOCATION.E1″],
+			[“name”,”NAME.E1″],
+			[“period”,”PERIOD.E1″],
+			[“descrip”,”RESOURCE_DESCRIPTION.E1″],
+			[“heri_type”,”HERITAGE_RESOURCE_TYPE.E1″]
+		]
+	}
+
+ 
+“RESOURCE_TYPE” is the resource type of your shapefile.
+“GEOM_TYPE” is simply the name of the entitytype that Arches HIP uses to manage geometry.
+“FIELD_MAP” is where you list your shapefile fields and their corresponding entitytypes. Each field must be enclosed in brackets, with the shapefile column name in the first position and the entitytypeid (e.g.: node name) in the second.
+
+Note also that the curly braces at the beginning and end of the file are important!
+
+Step 2. Confirm Your Shapefile Data
+
+There are just a couple of details to keep in mind when creating your shapefile.
+
+    Remember that the projection of your data must be EPSG:4326 (WGS84 Lat/Lon).
+    The data type of your shapefile columns need to match the datatype of the nodes (entitytypes) to which they are mapped. For example, if you want to load a “name” column in your shapefile to “NAME.E41” (which the HIP defines as a “string” data type), you must ensure that your shapefile treats “name” as a string.
+    
+    If you want to load a field in your shapefile to an Arches controlled vocabulary, you’ll need to make sure that the values in the shapefile match a preferred label in Arches’ Reference Data Manager (RDM). For example, if you want to load values from your shapefile into the “HERITAGE_RESOURCE_TYPE.E55″ node, the values in your shapefile column must match a preferred label in the RDM scheme (by default Arches uses the “HERITAGE_RESOURCE_TYPE_AUTHORITY_DOCUMENT.csv” scheme)
+
+Now you can run the load_resources command. The console commands for loading a shapefile are the same as they are for loading a .arches file (see above). Once your authority files are loaded and your virtual envionment is activated just navigate to the directory with your projects manage.py file and run:
+::
+	
+	$ python manage.py packages -o load_resources -s /path/to/my/mydata.shp
+	
 
 Exporting Data
 ==============
 
-By default arches will export the id, primary name and resource type to kml, shapefile and csv formats.  However, if you need to export more information for a resource, or customize the column names of your export file an export mapping file is required.
+By default arches will export the id, primary name and resource type to kml, shapefile and csv formats.  However, if you need to export more information for a resource, or customize the column names of your export file, an export mapping file is required.
 
 Resource export mappings
 ------------------------
