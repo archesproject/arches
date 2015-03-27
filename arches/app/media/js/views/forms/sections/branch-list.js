@@ -17,7 +17,7 @@ define(['jquery',
             _.extend(this, options);
 
             this.defaults = [];
-            this.viewModel = this.data[this.dataKey];
+            this.viewModel = JSON.parse(JSON.stringify(this.data[this.dataKey]));
             this.viewModel.branch_lists = koMapping.fromJS(this.data[this.dataKey].branch_lists);
 
             // if this is a function then it's assumed to be an observableArray already
@@ -52,11 +52,6 @@ define(['jquery',
                     });
                 });
             }
-        },
-
-        createSubBranch: function(BranchList, options){
-            options.data = this.data[this.dataKey][options.dataKey];
-            return new BranchList(options);
         },
 
         validateBranch: function (data) {
@@ -238,14 +233,13 @@ define(['jquery',
 
         undoAllEdits: function(){
             this.viewModel.branch_lists.removeAll();
-            _.each(this.data[this.dataKey], function(item){
+            _.each(this.data[this.dataKey].branch_lists, function(item){
                 this.viewModel.branch_lists.push({
                     'editing': ko.observable(false),
                     'nodes': koMapping.fromJS(item.nodes)
                 })
             }, this); 
-
-            this.addBlankEditBranch()
+            this.addBlankEditBranch();
         }
     });
 });
