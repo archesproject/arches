@@ -1,12 +1,12 @@
 define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2', 'plugins/knockout-summernote'], function ($, Backbone, ko, _) {
     return Backbone.View.extend({
         
-        events: function(){
-            return {
-                'click #saveedits': 'submit',
-                'click #canceledits': 'cancel'
-            }
-        },
+        // events: function(){
+        //     return {
+        //         'click #saveedits': 'submit',
+        //         'click #canceledits': 'cancel'
+        //     }
+        // },
 
         constructor: function (options) {
             var self = this;
@@ -35,16 +35,32 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#formdata').val()));
             this.data = JSON.parse(this._rawdata);
 
-            // $('input,select').change(function() {
-            //     var isDirty = self.isDirty();
-            //     self.trigger('change', isDirty);
-            // });
-
-            this.on('change', function(eventtype, item){
-                $('#saveedits').removeClass('disabled');
-                $('#canceledits').removeClass('disabled');                    
+            //Show and hide Upload Wizard.  
+            $("#start-workflow").click(function(){ 
+                self.startWorkflow(); 
+                return false; 
+            });
+            $("#end-workflow").click(function(){
+                self.startWorkflow();
+                self.saveWizard(); 
+                return false; 
+            });
+            $("#cancel-workflow").click(function(){ 
+                self.startWorkflow(); 
+                return false; 
             });
 
+        },
+
+        startWorkflow: function() {    
+            $( ["#workflow-container", "#current-items"].join(",") ).toggle(300);
+            $( ["#cancel-workflow","#end-workflow","#start-workflow"].join(",")  ).toggle();
+        },
+
+        saveWizard: function() {    
+            $( ["#completed-evaluations"].join(",")  ).toggle(300);
+            $( ["#related-files"].join(",")  ).css("display", "block");
+            $( ["#no-evaluations", "#no-files"].join(",")  ).css("display", "none");
         },
 
         addBranchList: function(branchList){
@@ -54,25 +70,6 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 self.trigger('change', eventtype, item);                 
             });
             return branchList;
-        },
-
-        isDirty: function () {
-            // var viewModel = JSON.parse(ko.toJSON(this.viewModel));
-            // for(branch in ko.toJS(this.viewModel)){
-            //     if(branch !== 'domains' && branch !== 'defaults' && branch !== 'editing'){
-            //         for(index in viewModel[branch]){
-            //             for(item in viewModel[branch][index]){
-            //                 if(item.indexOf('entityid') > 0){
-            //                     if(viewModel[branch][index][item] === ''){
-            //                         return true;
-            //                         break;
-            //                     }
-            //                 }                            
-            //             }
-            //         }                    
-            //     }
-            // }
-            return this.getData(true) !== this._rawdata;
         },
 
         getData: function(includeDomains){

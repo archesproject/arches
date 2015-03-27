@@ -3,6 +3,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
+            var data;
             var allBindings = allBindingsAccessor();
             var branchList = bindingContext.$data;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2);            
@@ -19,7 +20,13 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 return item.value;
             };
 
-            select2Config.data = _.filter(branchList.viewModel.domains[select2Config.dataKey], function (item) {
+            if (branchList.viewModel !== undefined) {
+                data = branchList.viewModel.domains[select2Config.dataKey];
+            }else{
+                data = bindingContext.$root.domains[select2Config.dataKey];
+            }
+
+            select2Config.data = _.filter(data, function (item) {
                 return (item.valuetype === "collector") ? (item.children.length > 0) : true;
             });
 
