@@ -2867,7 +2867,7 @@ ul.labels-demo li {
 .arches-report-map {
     height: 500px;
     margin-top: 150px;
-    border-width: 0px 1px 1px 1px; 
+    border-width: 1px 1px 1px 1px; 
     border-color: #cfcfcf; 
     border-style: solid;
 }
