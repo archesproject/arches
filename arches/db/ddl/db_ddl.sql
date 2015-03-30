@@ -1563,7 +1563,8 @@ CREATE TABLE mappings (
     mappingid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     entitytypeidfrom text,
     entitytypeidto text,
-    mergenodeid text
+    mergenodeid text,
+	cardinality text
 );
 
 
