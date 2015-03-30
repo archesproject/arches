@@ -379,16 +379,13 @@ File = resource.arches
 	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|1950 to 1980|PHASE_TYPE_ASSIGNMENT.E1-0
 	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|HERITAGE_RESOURCE_TYPE.E1|HERITAGE_RESOURCE_TYPE_5|PHASE_TYPE_ASSIGNMENT.E1-1
 	EXAMPLE RESOURCE_1|EXAMPLE_RESOURCE.E1|PERIOD.E1|Prehistoric|PHASE_TYPE_ASSIGNMENT.E1-1
-
-.. note:: There are two distinct "groups" of phase-type assignements.  That means that the resource was different things at different times.
-
-.. note:: In the case of NAME_TYPE.E1 and HERITAGE_RESOURCE_TYPE.E1, the attributevalue is actually the ID of the concept as defined in the authority file.
-::
-
-	RESOURCEID|RESOURCETYPE|ATTRIBUTENAME|ATTRIBUTEVALUE|GROUPID
 	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME.E1|The Little Taj Mahal|NAME.E41-0
 	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|NAME_TYPE.E1|NAME_TYPE_1|NAME.E41-0
 	EXAMPLE RESOURCE_2|EXAMPLE_RESOURCE.E1|GEOMETRY.E1|POINT(1 1)|GEOMETRY.E1-0
+	
+.. note:: "EXAMPLE RESOURCE_1" has two distinct "groups" of phase-type assignements.  That means that the resource was different things at different times.
+
+.. note:: In the case of NAME_TYPE.E1 and HERITAGE_RESOURCE_TYPE.E1, the attributevalue is actually the ID of the concept as defined in the authority file.
 
 
 File = resource.relations
