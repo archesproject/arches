@@ -185,9 +185,9 @@ Using your first terminal
 
 .. note::
 
-    If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_arches_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template:
+    If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_arches_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template::
 
-    DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
+      DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
 
 3. Run arches
 Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
