@@ -5,10 +5,10 @@ Arches Data
 Physical Data model
 ===================
 
-.. note:: The physical data model section is most useful for those who wish to issue sql queries directly against the Arches backend PostgreSQL database.
+.. note:: The physical data model section is most useful for those who wish to issue SQL queries directly against the Arches back end PostgreSQL database.
 
 
-The Arches physical data model consists of tables and referential integrity constraints implmented within a PostgreSQL database.  It is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
+The Arches physical data model consists of tables and referential integrity constraints implemented within a PostgreSQL database.  It is driven by a requirement that Arches be able to support data management for most any cultural heritage application in the world without the need to modify the underlying table structure.  
 
 
 To accomplish this, Arches stores both metadata - defining the set of resource types and attributes available to store - and business data - inventorying and describing the cultural heritage resources themselves.
@@ -59,7 +59,7 @@ The ``entity_types`` table really belongs in all three categories because:
 
 In the simplest potential case, a resource that happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
 
-.. Hint:: Each of these three sections within Arches database are contained in seperate namespaces that Postgres calls "schemas."  Each schema, in turn, has wthin in it two predefined views called vw_nodes and vw_edges.  The Arches application does not use these views, but they could be useful in developing graph-based outputs of resource instances, resource graphs, and RDM graphs.
+.. Hint:: Each of these three sections within Arches database are contained in a separate Postgres schema. Each schema, in turn, has within in it two predefined views called ``vw_nodes`` and ``vw_edges``.  The Arches application does not use these views, but they could be useful in developing graph-based outputs of resource instances, resource graphs, and RDM graphs.
 
 
 Resource Graphs
@@ -75,11 +75,11 @@ One example of a fully featured resource graph from the Arches HIP application i
 [image]
 
 
-While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two specially formatted csv files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
+While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two specially formatted CSV files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
 
 .. note:: As of the writing of this document, the Arches developers' primary tool to develop and visualize the resource graphs is Gephi (http://www.gephi.org/).  However, it is possible that a future version of Arches may include tools that support resource graph development and visualization.
 
-Regardless of how the nodes and edges csv files are created, they must include the columns defined below.
+Regardless of how the nodes and edges CSV files are created, they must include the columns defined below.
 
 **Nodes:**
 
@@ -100,7 +100,7 @@ Regardless of how the nodes and edges csv files are created, they must include t
 Ontologies
 ----------
 
-In addition to defining resources and their attributes, resource graphs also support associating assocaiting those resources and attributes to semantic classes and properties defined in CIDOC CRM.  Details on how this is done are provided in the section above on Resource Graphs.
+In addition to defining resources and their attributes, resource graphs also support associating those resources and attributes to semantic classes and properties defined in CIDOC CRM.  Details on how this is done are provided in the section above on Resource Graphs.
 
 .. note:: One should refer to CIDOC CRM (http://www.cidoc-crm.org/) to make an informed decision about what class or property to assign to nodes and edges respectively.
 
@@ -109,38 +109,38 @@ For those who do not care about CRM, ontologies or semantic interoperability, th
 Reference Data Graph
 ====================
 
-The reference data graph stores information necesary to use thesauri as input to picklists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
+The reference data graph stores information necessary to use thesauri as input to pick lists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
 
-* Ability to associate sets of reference data entries as valid selections in dropdown lists for "domain" nodes in the resource graph
+* Ability to associate sets of reference data entries as valid selections in drop-down lists for "domain" nodes in the resource graph
 * Ability to associate arbitrary attributes (such as preferred labels, alternate labels, scope notes, sort order) to entries within the reference data
 * Ability to store words associated to given reference data entries in multiple languages (to support internationalization)
-* Ability to relate entries to each other in semanticly rich heirarchies
+* Ability to relate entries to each other in semantically rich hierarchies
 
 Like the resource data graph, reference data is also stored in a graph structure.  Reference data includes ``concepts`` and ``relations``.  
 
 ``Concepts`` are the core component of the reference data graph.  It indicates an idea that must be wrapped in metadata (such as a primary label) to communicate meaning.  Concepts, in turn, are related to each other using relations.
 
-The "types" of avaialble relations are categorized as ``semantic relations`` and ``collections``.  The meaning of a given concept is not only derived from its own individual description (or scope note), but also from the context from its position within a heirarchy of concepts.  Semantic relations are the connective tissue of heirarchical relationships that infuse meaning into concepts.  Collections, on the other hand, are used for the purpose of defining which concpets belong in a given Entity Types' dropdown list.  Collections group concepts independently of their semantic heirarchy.  In short, semantic relationships infuse meaning and collections define the content of dropdown lists.
+The "types" of available relations are categorized as ``semantic relations`` and ``collections``.  The meaning of a given concept is not only derived from its own individual description (or scope note), but also from the context from its position within a hierarchy of concepts.  Semantic relations are the connective tissue of hierarchical relationships that infuse meaning into concepts.  Collections, on the other hand, are used for the purpose of defining which concepts belong in a given Entity Types' drop-down list.  Collections group concepts independently of their semantic hierarchy.  In short, semantic relationships infuse meaning and collections define the content of drop-down lists.
 
 
 Loading Reference Data
 -----------------------
-Arches supports two formats for migrating concepts into the Reference Data graph.  The first approach, using csv files (also called ``Authority Files``), is designed to support loading of legacy reference data to Arches.  As such, source data are formatted and then uploaded as part of the installation of a specific Arches Application.  
+Arches supports two formats for migrating concepts into the Reference Data graph.  The first approach, using CSV files (also called ``Authority Files``), is designed to support loading of legacy reference data to Arches.  As such, source data are formatted and then uploaded as part of the installation of a specific Arches Application.  
 
 The second approach uses SKOS files. With SKOS files, the assumption is that an Arches application is already up and running, and that a person will use commands in the RDM's user interface to pull in new thesauri from SKOS-formatted files.
 
 
 from .csv
 ------------
-The following steps outline how to create your own csv-formatted authority documents for use in a system implmenation. They can be followed using Excel as your text editor but the final file must be saved as a utf-8 formatted csv file.
+The following steps outline how to create your own CSV-formatted authority documents for use in a system implementation. They can be followed using Excel as your text editor but the final file must be saved as a UTF-8 formatted CSV file.
 
-Data is required for all columns in the authority file with the exception of 'AltLables'.
+Data is required for all columns in the authority file with the exception of ``AltLabels``.
 
-	1.) Create a text file and paste the following text to the first line.  These are the column headings for each required field of data::
+	#. Create a text file and paste the following text to the first line.  These are the column headings for each required field of data::
 
 		conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider
 
-	2.) On the second line we will begin creating our concept. Start by creating a conceptid that will be unique both within this file and across all authority document files to be loaded. A good pattern to follow is to use the name of the authority document itself (with '_' instead of spaces and minus the AUTHORITY_DOCUMENT.csv) with the number of the particular concept within the authority document appended. As an example, if your authority document is name 'EXAMPLE_AUTHORITY_DOCUMENT.csv' the first concept within the authority document would have the conceptid 'EXAMPLE_1'::
+	#. On the second line we will begin creating our concept. Start by creating a conceptid that will be unique both within this file and across all authority document files to be loaded. A good pattern to follow is to use the name of the authority document itself (with '_' instead of spaces and minus the AUTHORITY_DOCUMENT.csv) with the number of the particular concept within the authority document appended. As an example, if your authority document is name 'EXAMPLE_AUTHORITY_DOCUMENT.csv' the first concept within the authority document would have the conceptid 'EXAMPLE_1'::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -148,7 +148,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,
 		EXAMPLE_2,
 
-	3.) Next, add your preferred label for the concept. In most cases this will be the value you have in mind or from your data that you would like to use for the domain list this authority document will be related to::
+	#. Next, add your preferred label for the concept. In most cases this will be the value you have in mind or from your data that you would like to use for the domain list this authority document will be related to::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -156,7 +156,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,
 		EXAMPLE_2,Second example concept,
 
-	4.) Now add an alternate label for your concept. This may be left blank if you have no alternate label for your concept::
+	#. Now add an alternate label for your concept. This may be left blank if you have no alternate label for your concept::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -164,7 +164,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,Alternate concept label,
 		EXAMPLE_2,Second example concept,Second alternate concept label,
 
-	5.) Then add a Parent ConceptID. If the concept is not heirarchically related to any other concept in the authority document then the Parent ConceptID will be the full name of the authority document itself. If the concept is heirarchically related to another concept in the authority file, ensure the parent concept is defined above the child concept and input the parent concepts' conceptid here. In our example I have added a second concept that references the first concept as its parent::
+	#. Then add a Parent ConceptID. If the concept is not hierarchically related to any other concept in the authority document then the Parent ConceptID will be the full name of the authority document itself. If the concept is hierarchically related to another concept in the authority file, ensure the parent concept is defined above the child concept and input the parent concepts' conceptid here. In our example I have added a second concept that references the first concept as its parent::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -172,7 +172,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,
 		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,
 
-	6.) Next, add a Concept Type. The only two valid values for ConceptType are: Index, and Collector. For more information on what the difference between these two concept types refer to the the general Arches documentation (http://arches3.readthedocs.org/en/latest/arches-data/#loading-reference-data)::
+	#. Next, add a Concept Type. The only two valid values for ConceptType are: Index, and Collector. For more information on what the difference between these two concept types refer to the the general Arches documentation (http://arches3.readthedocs.org/en/latest/arches-data/#loading-reference-data)::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -180,7 +180,7 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,Collector,
 		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,Index,
 
-	7.) The Provider identifies where a given concept came from::
+	#. The Provider identifies where a given concept came from::
 
 		//EXAMPLE_AUTHORITY_DOCUMENT.csv
 
@@ -188,54 +188,44 @@ Data is required for all columns in the authority file with the exception of 'Al
 		EXAMPLE_1,Example concept label,Alternate concept label,EXAMPLE_AUTHORITY_DOCUMENT.csv,Collector,Organization_1
 		EXAMPLE_2,Second example concept,Second alternate concept label,EXAMPLE_1,Index,Organization_2
 
-	8.) Save your document.
+	#. Save your document.
 
-	9.) IMPORTANT: Finally, we have to make sure our authority file maps to a 'domain node' in a resource graph. To do this either create or open the existing 'ENTITY_TYPE_X_ADOC.csv' file that should reside in the same directory as your authority files (this file must be named ENTITY_TYPE_X_ADOC.csv).
+	#. **IMPORTANT**: Finally, we have to make sure our authority file maps to a 'domain node' in a resource graph. To do this either create or open the existing ``ENTITY_TYPE_X_ADOC.csv`` file that should reside in the same directory as your authority files (this file must be named ``ENTITY_TYPE_X_ADOC.csv``).  If you are modifying an existing ``ENTITY_TYPE_X_ADOC.csv`` file skip to step b below.
 
-		If you are modifying an existing ENTITY_TYPE_X_ADOC.csv file skip to step b below.
-
-		a.) Copy and past the following text into the file on the first line::
+		a. Copy and past the following text into the file on the first line::
 
 			entitytype,authoritydoc,authoritydocconceptschemename
 
-		b.) Add a comma separated entry with the following information: the entity type to which you would like your authority documented associated (exactly how it is spelled in the resource graph including the .E## suffix), the name of the exact name of the authority document, and the concept scheme into which you would like to load this authority document::
+		b. Add a comma separated entry with the following information: the entity type to which you would like your authority documented associated (exactly how it is spelled in the resource graph including the .E## suffix), the name of the exact name of the authority document, and the concept scheme into which you would like to load this authority document::
 
 			//ENTITY_TYPE_X_ADOC.csv
 
 			entitytype,authoritydoc,authoritydocconceptschemename
 			EXAMPLE_NODE.E55,EXAMPLE_AUTHORITY_DOCUMENT.csv,Example Concept Scheme Name
 
-	10.) You can optionally define a seperate but related ``[EXAMPLE_AUTHORITY_DOCUMENT].values.csv`` file to add additional information about concepts in your initial concepts file.  This file uses a key-value pair approach to associating additional attributes to a given concept.  The structure of the values file is as follows:
+	#. You can optionally define a seperate but related ``[EXAMPLE_AUTHORITY_DOCUMENT].values.csv`` file to add additional information about concepts in your initial concepts file.  This file uses a key-value pair approach to associating additional attributes to a given concept.  The structure of the values file is as follows::
 	
 		//EXAMPLE_AUTHORITY_DOCUMENT.values.csv
 
 		conceptid,Value,ValueType,Provider 
 		EXAMPLE_1,This an example scope note,scopeNote,GCI
-		EXAMPLE_1,2[filepath to an image],imgae,GCI
+		EXAMPLE_1,2[filepath to an image],image,GCI
 
-		The conceptid is the linking key to the initial concept within the inital concept file.
-		
-		
-		Arches comes loaded with a set of Valuetype's necesary to maintain compliance with SKOS and Dublin Core standards. The set of preloaded value types are nicely documented in the dml file located in the code repository here: arches\db\dml\db_data.sql.  However, an implementor has the freedom to add additional ValueType's by simply adding them within *.values.csv file.  To be clear, these additional valuetypes will not fall into the fold of SKOS standards, but they could be useful for your individual implementation.
-		
-		One example where this is particularly relevant is the use "sortorder" as a valuetype.  By default, Arches orders dropdown lists alphabetically.  Sometimes, as in the cases of time periods, users prefer that their dropdown lists are presented in specific order. In the case of time periods, users prefer it be based on some semblance of chronological order.  
-		
-		When the sortorder valuetype is specifcied, corresponding numeric values can be used to ensure that the concept labels appear in the dropdown in a specific order.
+	The conceptid is the linking key to the initial concept within the initial concept file.
 	
 	
+	Arches comes loaded with a set of ValueTypes necessary to maintain compliance with SKOS and Dublin Core standards. The set of preloaded value types are nicely documented in the DML file located in the code repository here: arches\db\dml\db_data.sql.  However, an implementor has the freedom to add additional ValueType's by simply adding them within ``*.values.csv`` file.  To be clear, these additional ValueTypes will not fall into the fold of SKOS standards, but they could be useful for your individual implementation.
+	
+	One example where this is particularly relevant is the use ``sortorder`` as a ValueType.  By default, Arches orders drop-down lists alphabetically.  Sometimes, as in the cases of time periods, users prefer that their drop-down lists are presented in specific order. In the case of time periods, users prefer it be based on some semblance of chronological order.  
+	
+	When the sortorder valuetype is specifcied, corresponding numeric values can be used to ensure that the concept labels appear in the drop-down in a specific order.
 			
-Properly structured Authority files can be loaded into Arches using the following command from inside ||this directory||::
-	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'			
+Properly structured Authority files can be loaded into Arches using the following command from inside the application root directory::
 
-	
-
-from .skos
----------
-Do we even have a way to point to folder full of skos files and say load them?
-
+	python manage.py packages -o load_concept_scheme --source '{PATH TO AUTHORITY FILES}'
 
 Loading Business Data
-======================
+=====================
 Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extension.  
 
 Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entity type. 
@@ -253,15 +243,13 @@ The format fundamentally takes a key-value pair approach to storage where the AT
 
 The dot arches file is a pipe ("|") delimited text file containing the following column headers:
 
+	``RESOURCEID`` is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat on many lines.  As a point of reference, Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
 
+	``RESOURCETYPE`` specifies which resource type graph a given attribute is being loaded to.  In the Arches HIP Application, the available resource types include: ACTIVITY.E7, ACTOR.E39, HERITAGE_RESOURCE.E18, HERITAGE_RESOURCE_GROUP.E27, HISTORICAL_EVENT.E5, and INFORMATION_RESOURCE.E73.
 
-``RESOURCEID`` is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat on many lines.  As a point of reference, Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
+	``ATTRIBUTENAME`` specifies the node from the appropriate resource graph that the supplied value (in the ATTRIBUTEVALUE column) will load to.  Note that ATTRIBUTENAME is synonymous with entitytypeid.  Essentially, you are specifying the enitytypeid of the (business) entity that you are loading to the system.
 
-``RESOURCETYPE`` specifies which resource type graph a given attribute is being loaded to.  In the Arches HIP Application, the available resource types include: ACTIVITY.E7, ACTOR.E39, HERITAGE_RESOURCE.E18, HERITAGE_RESOURCE_GROUP.E27, HISTORICAL_EVENT.E5, and INFORMATION_RESOURCE.E73.
-
-``ATTRIBUTENAME`` specifies the node from the appropriate resource graph that the supplied value (in the ATTRIBUTEVALUE column) will load to.  Note that ATTRIBUTENAME is synonymous with entitytypeid.  Essentially, you are specifying the enitytypeid of the (business) entity that you are loading to the system.
-
-``ATTRIBUTEVALUE`` stores the the actual business value of the enitit.  ATTRIBUTEVALUE values must conform to the datatype specified by the businesstable associated to the ATTRIBUTENAME. See the Postgres documentation for appropriate formatting for strings, numbers, and dates.  See the notes below for formatting details on Geometries and Domains.
+	``ATTRIBUTEVALUE`` stores the the actual business value of the enitit.  ATTRIBUTEVALUE values must conform to the datatype specified by the businesstable associated to the ATTRIBUTENAME. See the Postgres documentation for appropriate formatting for strings, numbers, and dates.  See the notes below for formatting details on Geometries and Domains.
 
 .. note:: Geometry: Any value that is to be loaded as a geometry must be formatted using Well Known Text (or "WKT" for short) with coordinates set to ESPG 4326 or latitude/longitude WGS84 (http://spatialreference.org/ref/epsg/4326/).  WKT is a standard format for storing vector geometry as human-readable text.  Details of the standard can be found here: https://portal.opengeospatial.org/files/?artifact_id=54797, and wikipedia has a much more readable aggregation of the relevant information here: http://en.wikipedia.org/wiki/Well-known_text.
 
@@ -282,7 +270,7 @@ The dot relation file is a pipe ("|") delimited text file containing the followi
 ``NOTES`` is a non-required field into which additional text about the relationship can be captured.
 
 
-.. example:: You may want to relate a house to a person (both of which can be resources) using RELATION_TYPE "lived in" and specify the date at which the person moved into the house as the START_DATE, and the date the person moved out as the END_DATE.
+For example, you may want to relate a house to a person (both of which can be resources) using RELATION_TYPE "lived in" and specify the date at which the person moved into the house as the START_DATE, and the date the person moved out as the END_DATE.
 
 
 --.arches file validations--
@@ -513,144 +501,147 @@ The top level members of the json object are the format extensions (e.g. â€œcsvâ
 
 Example Resource Export Mappings
 --------------------------------
-{
-    "csv": {
-        "NAME": "HistoricPlacesLA_Search_Results_Export",
-        "SCHEMA": [
-            {"field_name": "PRIMARY NAME","source": "primaryname"},
-            {"field_name": "OTHER NAMES","source": "alternatename"},
-            {"field_name": "ARCHES ID","source": "entityid"},
-            {"field_name": "ARCHES RESOURCE TYPE","source": "resource_name"},
-            {"field_name": "TYPE","source": "field_map"},
-            {"field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION","source": "field_map"},
-            {"field_name": "DESIGNATIONS","source": "field_map"}
-        ],
-        "RESOURCE_TYPES": {
-            "ACTOR.E39": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "TYPE",
-                        "entitytypeid": "ACTOR_TYPE.E55"
-                    },
-                    {
-                        "field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    }
-                ]
-            },
-            "HERITAGE_RESOURCE.E18": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "TYPE",
-                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
-                    },
-                    {
-                        "field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    },
-                    {
-                        "field_name": "DESIGNATIONS",
-                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
-                    }
-                ]
-            }
-        }
-    },
-    "kml": {
-        "NAME": "HistoricPlacesLA_Search_Results_Export",
-        "SCHEMA": [
-            {"field_name": "primary_name","source": "primaryname"},
-            {"field_name": "other_names","source": "alternatename"},
-            {"field_name": "arches_id","source": "entityid"},
-            {"field_name": "arches_resource_type","source": "resource_name"},
-            {"field_name": "geometry","source": "geometries"},
-            {"field_name": "type","source": "field_map"},
-            {"field_name": "primary_address_or_description","source": "field_map"},
-            {"field_name": "designations","source": "field_map"}
-        ],
-        "RESOURCE_TYPES": {
-            "ACTOR.E39": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "type",
-                        "entitytypeid": "ACTOR_TYPE.E55"
-                    },
-                    {
-                        "field_name": "primary_address_or_description",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    }
-                ]
-            },
-            "HERITAGE_RESOURCE.E18": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "type",
-                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
-                    },
-                    {
-                        "field_name": "primary_address_or_description",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    },
-                    {
-                        "field_name": "designations",
-                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
-                    }
-                ]
-            }
-        }
-    },
-    "shp": {
-        "NAME": "HistoricPlacesLA_Search_Results_Export",
-        "SCHEMA": [
-            {"field_name": "prime_name","source": "primaryname","data_type": "str","data_length": "128"},
-            {"field_name": "arches_id","source": "entityid","data_type": "str","data_length": "128"},
-            {"field_name": "resource","source": "resource_name","data_type": "str","data_length": "128"},
-            {"field_name": "othernames","source": "alternatename","data_type": "str","data_length": "128"},
-            {"field_name": "type","source": "field_map","data_type": "str","data_length": "128"},
-            {"field_name": "address","source": "field_map","data_type": "str","data_length": "128"},
-            {"field_name": "designatns","source": "field_map","data_type": "str","data_length": "128"}
-        ],
-        "RESOURCE_TYPES": {
-            "ACTOR.E39": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "type",
-                        "entitytypeid": "ACTOR_TYPE.E55"
-                    },
-                    {
-                        "field_name": "address",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    }
-                ]
-            },
-            "HERITAGE_RESOURCE.E18": {
-                "FIELD_MAP": [
-                    {
-                        "field_name": "type",
-                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
-                    },
-                    {
-                        "field_name": "address",
-                        "entitytypeid": "PLACE_ADDRESS.E45",
-                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
-                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
-                    },
-                    {
-                        "field_name": "designatns",
-                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
-                    }
-                ]
-            }
-        }
-    }
-}
+
+::
+
+	{
+	    "csv": {
+	        "NAME": "HistoricPlacesLA_Search_Results_Export",
+	        "SCHEMA": [
+	            {"field_name": "PRIMARY NAME","source": "primaryname"},
+	            {"field_name": "OTHER NAMES","source": "alternatename"},
+	            {"field_name": "ARCHES ID","source": "entityid"},
+	            {"field_name": "ARCHES RESOURCE TYPE","source": "resource_name"},
+	            {"field_name": "TYPE","source": "field_map"},
+	            {"field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION","source": "field_map"},
+	            {"field_name": "DESIGNATIONS","source": "field_map"}
+	        ],
+	        "RESOURCE_TYPES": {
+	            "ACTOR.E39": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "TYPE",
+	                        "entitytypeid": "ACTOR_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    }
+	                ]
+	            },
+	            "HERITAGE_RESOURCE.E18": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "TYPE",
+	                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "PRIMARY ADDRESS/LOCATION DESCRIPTION",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    },
+	                    {
+	                        "field_name": "DESIGNATIONS",
+	                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
+	                    }
+	                ]
+	            }
+	        }
+	    },
+	    "kml": {
+	        "NAME": "HistoricPlacesLA_Search_Results_Export",
+	        "SCHEMA": [
+	            {"field_name": "primary_name","source": "primaryname"},
+	            {"field_name": "other_names","source": "alternatename"},
+	            {"field_name": "arches_id","source": "entityid"},
+	            {"field_name": "arches_resource_type","source": "resource_name"},
+	            {"field_name": "geometry","source": "geometries"},
+	            {"field_name": "type","source": "field_map"},
+	            {"field_name": "primary_address_or_description","source": "field_map"},
+	            {"field_name": "designations","source": "field_map"}
+	        ],
+	        "RESOURCE_TYPES": {
+	            "ACTOR.E39": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "type",
+	                        "entitytypeid": "ACTOR_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "primary_address_or_description",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    }
+	                ]
+	            },
+	            "HERITAGE_RESOURCE.E18": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "type",
+	                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "primary_address_or_description",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    },
+	                    {
+	                        "field_name": "designations",
+	                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
+	                    }
+	                ]
+	            }
+	        }
+	    },
+	    "shp": {
+	        "NAME": "HistoricPlacesLA_Search_Results_Export",
+	        "SCHEMA": [
+	            {"field_name": "prime_name","source": "primaryname","data_type": "str","data_length": "128"},
+	            {"field_name": "arches_id","source": "entityid","data_type": "str","data_length": "128"},
+	            {"field_name": "resource","source": "resource_name","data_type": "str","data_length": "128"},
+	            {"field_name": "othernames","source": "alternatename","data_type": "str","data_length": "128"},
+	            {"field_name": "type","source": "field_map","data_type": "str","data_length": "128"},
+	            {"field_name": "address","source": "field_map","data_type": "str","data_length": "128"},
+	            {"field_name": "designatns","source": "field_map","data_type": "str","data_length": "128"}
+	        ],
+	        "RESOURCE_TYPES": {
+	            "ACTOR.E39": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "type",
+	                        "entitytypeid": "ACTOR_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "address",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    }
+	                ]
+	            },
+	            "HERITAGE_RESOURCE.E18": {
+	                "FIELD_MAP": [
+	                    {
+	                        "field_name": "type",
+	                        "entitytypeid": "HERITAGE_RESOURCE_TYPE.E55"
+	                    },
+	                    {
+	                        "field_name": "address",
+	                        "entitytypeid": "PLACE_ADDRESS.E45",
+	                        "value_type": "e4f5bd2f-56b7-4b8d-ac48-7e6d90e530ae",
+	                        "alternate_entitytypeid": "DESCRIPTION_OF_LOCATION.E62"
+	                    },
+	                    {
+	                        "field_name": "designatns",
+	                        "entitytypeid": "TYPE_OF_DESIGNATION_OR_PROTECTION.E55"
+	                    }
+	                ]
+	            }
+	        }
+	    }
+	}
