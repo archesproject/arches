@@ -26,8 +26,7 @@ ease.
 
 That's it! Feel free to tap a colleague on the shoulder if you need a
 little help along the way, or check out the resources at
-[www.archesproject.org](http://www.archesproject.org) for more support.
-
+http://www.archesproject.org for more support.
 
 System Requirements
 ===================
@@ -110,16 +109,15 @@ On Windows:
     > \path\to\ENV\Scripts\activate
 
 .. note::
-    If you are creating an Arches application based on HIP, you should stop here and go to : http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
+    If you are creating an Arches application based on HIP, you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
 
 2. Install the arches module
 For this step your virtual environment must be activated. You will know that's the case if you see the name of your virtual environment in parentheses proceeding your command prompt like so ``(ENV)`` .
 ::
     (ENV)$ pip install arches
 
-3. Create the Arches application scaffolding:
-In your Projects directory run the following command replacing 'my_arches_app' with the name of your arches application:
-:: 
+3. Create the Arches application scaffolding - in your Projects directory run the following command replacing ``my_arches_app`` with the name of your arches application::
+
     (ENV)$ arches-app create my_arches_app
 
 4. Install ElasticSearch
@@ -157,11 +155,11 @@ Open the settings.py file in my_arches_app/my_arches_app
 
 There are a few changes that you may need to make in order for your application to install and run properly.
 
-Be sure that the name of your postgis template in your settings matches your postgis template in postgres. If it doesn't, uncomment the line (remove the ``#`` at the start of each line) below and replace 'template_postgis_20' with the name of your template.
+Be sure that the name of your postgis template in your settings matches your postgis template in PostgreSQL. If it doesn't, uncomment the line (remove the ``#`` at the start of each line) below and replace 'template_postgis_20' with the name of your template.
 ::
 
   #DATABASES['default']['POSTGIS_TEMPLATE'] = 'template_postgis_20' 
-The default database password used in Arches is 'postgis'. You may have already set your Postgres password to something more secure. If so, uncomment the line below and replace 'postgis' with your Postgres connection password. 
+The default database password used in Arches is 'postgis'. You may have already set your PostgreSQL password to something more secure. If so, uncomment the line below and replace 'postgis' with your PostgreSQL connection password. 
 ::
 
   #DATABASES['default']['PASSWORD'] = 'postgis'
@@ -205,15 +203,8 @@ Now you can open a browser window and see your application running at:
     We use the Django development server to make it easy for you to
     confirm that Arches has installed properly. You WILL NEED to configure
     Arches to use a production quality web server such as Apache if you want
-    to use Arches in production. See the chapter on Arches configuration for
-    guidance on how to complete this step.
+    to use Arches in production.
 
 Next steps:
 
 Now that Arches is running, you will need to load your concept scheme and resource data.  
-
-
-   
-
-
-
