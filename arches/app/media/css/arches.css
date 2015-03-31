@@ -413,17 +413,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     top: 0px;
 }
 
-.tools-panel {
-    margin-top: -518px;
-    height: 400px; 
-    width: 349px; 
-    margin-left: -1px;
-    background: #ffffff; 
-    border: 1px solid rgba(0,0,0,.15); 
-    opacity: 1.0; 
-    border-top-left-radius: 3px; 
-    border-top-right-radius: 3px;
-}
+
 
 .overlay-entry {
     color: #555;
@@ -942,17 +932,17 @@ input.arches-select2:-ms-input-placeholder {
     top: 0px;
 }
 
+
 .tools-panel {
-    margin-top: -580px;
-    height: 500px; 
+    margin-top: -518px;
+    height: 400px; 
     width: 349px; 
     margin-left: -1px;
     background: #ffffff; 
-    border: 1px solid rgba(0,0,0,.2); 
+    border: 1px solid rgba(0,0,0,.15); 
     opacity: 1.0; 
-    border-top-left-radius: 3px; 
-    border-top-right-radius: 3px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-top-left-radius: 1px; 
+    border-top-right-radius: 1px;
 }
 
 .overlay-entry {
@@ -1373,15 +1363,16 @@ a:hover {
 }
 
 .geom-file-instructions {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 200;
-    color: #555;
+    color: #888;
+    margin-top: -5px;
     margin-left: 5px;
     margin-right: 5px;
     display: block;
-    padding-left: 8px;
+    padding-left: 28px;
     padding-right: 5px;
-    padding-top: 12px;
+    padding-top: 0px;
     padding-bottom: 4px;
 }
 
