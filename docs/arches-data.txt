@@ -17,7 +17,7 @@ To accomplish this, Arches stores both metadata - defining the set of resource t
 The physical data model is best understood when broken into three distinct parts: Ontology Data,  Reference Data, and Resources Data.  The ``entity_types`` table plays a role in all three of these parts of the data model. 
 
 
-[Arches ERD.jpg]
+.. image:: images/Arches_ERD.jpg
 
 
 **Ontology Data**
@@ -72,7 +72,7 @@ Arches applications must provide a resource graph for each resource type being i
 One example of a fully featured resource graph from the Arches HIP application is ``HERITAGE_RESOURCE.E18``.
 
 
-[image]
+.. image:: images/HERITAGE_RESOURCE_graph.png
 
 
 While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two specially formatted CSV files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
@@ -214,11 +214,11 @@ Data is required for all columns in the authority file with the exception of ``A
 	The conceptid is the linking key to the initial concept within the initial concept file.
 	
 	
-	Arches comes loaded with a set of ValueTypes necessary to maintain compliance with SKOS and Dublin Core standards. The set of preloaded value types are nicely documented in the DML file located in the code repository here: arches\db\dml\db_data.sql.  However, an implementor has the freedom to add additional ValueType's by simply adding them within ``*.values.csv`` file.  To be clear, these additional ValueTypes will not fall into the fold of SKOS standards, but they could be useful for your individual implementation.
+	Arches comes loaded with a set of ValueTypes necessary to maintain compliance with SKOS and Dublin Core standards. The set of preloaded value types are nicely documented in the DML file located in the code repository here: ``arches\db\dml\db_data.sql``.  However, an implementor has the freedom to add additional ValueType's by simply adding them within ``*.values.csv`` file.  To be clear, these additional ValueTypes will not fall into the fold of SKOS standards, but they could be useful for your individual implementation.
 	
 	One example where this is particularly relevant is the use ``sortorder`` as a ValueType.  By default, Arches orders drop-down lists alphabetically.  Sometimes, as in the cases of time periods, users prefer that their drop-down lists are presented in specific order. In the case of time periods, users prefer it be based on some semblance of chronological order.  
 	
-	When the sortorder valuetype is specifcied, corresponding numeric values can be used to ensure that the concept labels appear in the drop-down in a specific order.
+	When the 'sortorder' ValueType is specified, corresponding numeric values can be used to ensure that the concept labels appear in the drop-down in a specific order.
 			
 Properly structured Authority files can be loaded into Arches using the following command from inside the application root directory::
 
@@ -226,11 +226,11 @@ Properly structured Authority files can be loaded into Arches using the followin
 
 Loading Business Data
 =====================
-Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ".arches" extension.  
+Resources and their attributes can be loaded to Arches resource graphs using one of two formats: shapefiles or a specially formatted text file with a ``.arches`` extension.  
 
 Shapefiles have the significant limitation that they cannot define explicit relationships between resources and they can only hold one attribute value per entity type. 
 
-Dot Arches files, on the other hand, take a key-value pair approach populating resource graphs with resources with attributes.  Therefore, they are able to add as many of a given attribute as exists in the data.  The downside of the dot arches format is that it can take a significant data processing or reformatting effort to get a significant amount of source data ready for loading to Arches from this format.
+``.arches`` files, on the other hand, take a key-value pair approach populating resource graphs with resources with attributes.  Therefore, they are able to add as many of a given attribute as exists in the data.  The downside of the dot arches format is that it can take a significant data processing or reformatting effort to get a significant amount of source data ready for loading to Arches from this format.
 
 
 from .arches
@@ -299,9 +299,9 @@ An Example Data Load
 --------------------
 Below is a very simple resource graph, set of authority documents, and .arches file. The intent is to quickly illustrate the construction of a logical model and a simple set of source data that can be loaded into the model. 
 
---Resource Graph--
+**Resource Graph**
 
-[example resource graph2.jpg]
+.. image:: images/example_resource_graph2.jpg
 
 
 .. Note:: that in the examples below, the character string of "[null]" is used as a substitute for no value.
@@ -334,7 +334,7 @@ Below is a very simple resource graph, set of authority documents, and .arches f
 	17,16,9,P1
 
 
---Reference Data--
+**Reference Data**
 File = NAME_TYPE.E1.csv
 ::
 
@@ -353,7 +353,7 @@ File = HERITAGE_RESOURCE_TYPE.E1.csv
 	HERITAGE_RESOURCE_TYPE_5,Pottery Sherd,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
 	HERITAGE_RESOURCE_TYPE_6,Arrowhead,[null],HERITAGE_RESOURCE_TYPE_4,index,Organization_1
 
---Business Data--
+**Business Data**
 File = resource.arches
 ::
 
