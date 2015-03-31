@@ -73,16 +73,13 @@ class ResourceForm(object):
         for value in data[entitytypeid]:
             baseentity = None
             for newentity in value['nodes']:
-                try:
-                    entity = Entity()
-                    entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
+                entity = Entity()
+                entity.create_from_mapping(self.resource.entitytypeid, self.schema[newentity['entitytypeid']]['steps'], newentity['entitytypeid'], newentity['value'], newentity['entityid'])
 
-                    if baseentity == None:
-                        baseentity = entity
-                    else:
-                        baseentity.merge(entity)
-                except:
-                    pass
+                if baseentity == None:
+                    baseentity = entity
+                else:
+                    baseentity.merge(entity)
             
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
 

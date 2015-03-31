@@ -1,12 +1,9 @@
 define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2', 'plugins/knockout-summernote'], function ($, Backbone, ko, _) {
     return Backbone.View.extend({
         
-        // events: function(){
-        //     return {
-        //         'click #saveedits': 'submit',
-        //         'click #canceledits': 'cancel'
-        //     }
-        // },
+        events: {
+            'click .confirm-delete-yes': 'delete'
+        },
 
         constructor: function (options) {
             var self = this;
@@ -40,9 +37,9 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 self.startWorkflow(); 
                 return false; 
             });
-            $("#end-workflow").click(function(){
+            $("#end-workflow").click(function(evt){
                 self.startWorkflow();
-                self.saveWizard(); 
+                self.submit(evt); 
                 return false; 
             });
             $("#cancel-workflow").click(function(){ 
@@ -81,20 +78,56 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         },
 
         validate: function(){
-            return true;
+            var isValid = true
+            _.each(this.branchLists, function(branchList){
+                _.each(branchList.viewModel.branch_lists(), function(list){
+                    isValid = isValid && branchList.validateBranch(ko.toJS(list.nodes));
+                }, this); 
+            }, this); 
+            return isValid;
         },
 
-        submit: function(){
+        submit: function(evt){
+            var validationAlert = this.$el.find('.branch-invalid-alert');;
+            evt.preventDefault();
+
             if (this.validate()){
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
+            }else {
+                validationAlert.show(300);
+                setTimeout(function() {
+                    validationAlert.fadeOut();
+                }, 5000);
             }
+        },
+
+        delete: function(){
+            var nodes = [];
+            var data = {};
+            _.each(this.deleted_assessment, function(value, key, list){
+                data[key] = [];
+                _.each(value.branch_lists, function(branch_list){
+                    nodes = []
+                    _.each(branch_list.nodes, function(node){
+                           node.value = '';
+                           nodes.push(node);
+                        }, this);
+                    data[key].push({'nodes': nodes});
+                }, this);
+            }, this);
+            this.form.find('#formdata').val(ko.toJSON(data));
+            this.form.submit(); 
         },
 
         cancel: function(){
             _.each(this.branchLists, function(branchList){
                 branchList.undoAllEdits();
             }, this);  
+        },
+
+        isDirty: function () {
+            return false;
         }
     });
 });

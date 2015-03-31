@@ -59,7 +59,7 @@ define(['jquery',
         },
 
         validateHasValues: function(nodes){
-            var valid = true;
+            var valid = nodes != undefined && nodes.length > 0;
             _.each(nodes, function (node) {
                 if (node.entityid === '' && node.value === ''){
                     valid = false;

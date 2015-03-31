@@ -170,15 +170,16 @@ class Entity(object):
 
         for child_entity in self.child_entities:
             child = child_entity._save()
-            try:
-                rule = archesmodels.Rules.objects.get(entitytypedomain = entity.entitytypeid, entitytyperange = child.entitytypeid, propertyid = child_entity.property)
-                newrelationship = archesmodels.Relations()
-                newrelationship.entityiddomain = entity
-                newrelationship.entityidrange = child
-                newrelationship.ruleid = rule
-                newrelationship.save()
-            except:
-                print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(entity.entitytypeid, child.entitytypeid, entity.property)
+            #try:
+            rule = archesmodels.Rules.objects.get(entitytypedomain = entity.entitytypeid, entitytyperange = child.entitytypeid, propertyid = child_entity.property)
+            archesmodels.Relations.objects.get_or_create(entityiddomain = entity, entityidrange = child, ruleid = rule)
+            # newrelationship.entityiddomain = entity
+            # newrelationship.entityidrange = child
+            # newrelationship.ruleid = rule
+            # newrelationship.save()
+            # except:
+            #     print JSONSerializer().serialize(child_entity)
+            #     print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(entity.entitytypeid, child.entitytypeid, child_entity.property)
 
         return entity
 
@@ -573,49 +574,49 @@ class Entity(object):
             self.filter(lambda entity: entity.entitytypeid in entitytypes)
         return
 
-        parent_entitytypes = set()
-        flattened_graph = self.flatten()
-        entities_to_prune = set()        
+        # parent_entitytypes = set()
+        # flattened_graph = self.flatten()
+        # entities_to_prune = set()        
 
-        def gather_parent_entitytypes(entity):
-            if entity.get_rank() == 0:
-                return
-            parent_entity = entity.get_parent()
-            parent_entitytypes.add(parent_entity.entitytypeid)
-            gather_parent_entitytypes(parent_entity)
+        # def gather_parent_entitytypes(entity):
+        #     if entity.get_rank() == 0:
+        #         return
+        #     parent_entity = entity.get_parent()
+        #     parent_entitytypes.add(parent_entity.entitytypeid)
+        #     gather_parent_entitytypes(parent_entity)
 
-        if action == 'disallow':
-            for entity in flattened_graph:
-                if entity.entitytypeid in entitytypes:
-                    entities_to_prune.add(entity)
+        # if action == 'disallow':
+        #     for entity in flattened_graph:
+        #         if entity.entitytypeid in entitytypes:
+        #             entities_to_prune.add(entity)
 
-        else:
-            # if you passed in no entitytypes then you're basically saying remove all information from the graph
-            if len(entitytypes) == 0:
-                self.clear()
-                return
+        # else:
+        #     # if you passed in no entitytypes then you're basically saying remove all information from the graph
+        #     if len(entitytypes) == 0:
+        #         self.clear()
+        #         return
 
-            # first we need to loop through the graph to all the parents of entity to the list of allowed entitytypes
-            for entity in flattened_graph:
-                if entity.entitytypeid in entitytypes:
-                    gather_parent_entitytypes(entity)
+        #     # first we need to loop through the graph to all the parents of entity to the list of allowed entitytypes
+        #     for entity in flattened_graph:
+        #         if entity.entitytypeid in entitytypes:
+        #             gather_parent_entitytypes(entity)
 
-            entitytypes = entitytypes + list(parent_entitytypes)
-            for entity in flattened_graph:
-                if entity.entitytypeid not in entitytypes:
-                    entities_to_prune.add(entity)
+        #     entitytypes = entitytypes + list(parent_entitytypes)
+        #     for entity in flattened_graph:
+        #         if entity.entitytypeid not in entitytypes:
+        #             entities_to_prune.add(entity)
     
-        # prune the remaining entities
-        print 'entities to prune: %s' % entities_to_prune
-        for entity in entities_to_prune:
-            try:
-                parent = entity.get_parent()   
-                print '\nremoving: %s' % entity         
-                parent.child_entities.remove(entity) 
-            except:
-                if entity.get_rank() == 0:
-                    self.clear()
-                    return
+        # # prune the remaining entities
+        # print 'entities to prune: %s' % entities_to_prune
+        # for entity in entities_to_prune:
+        #     try:
+        #         parent = entity.get_parent()   
+        #         print '\nremoving: %s' % entity         
+        #         parent.child_entities.remove(entity) 
+        #     except:
+        #         if entity.get_rank() == 0:
+        #             self.clear()
+        #             return
 
         self.trim()
 
@@ -655,6 +656,11 @@ class Entity(object):
 
 
     def filter(self, lambda_expression):
+        """
+        Only allows the nodes defined in the lambda_expression to populate the entity graph
+        (eg: filters out of the entity graph any entity that doesn't return true from the lambda_expression)
+
+        """
 
         def func(entity):
             if hasattr(entity, 'get_parent'):
@@ -805,3 +811,6 @@ class Entity(object):
 
     def undotify_entitytypeid(self):
         return self.entitytypeid.replace('.', '_').replace('-', '___');
+
+    def to_json(self):
+        return JSONSerializer().serialize(self)
