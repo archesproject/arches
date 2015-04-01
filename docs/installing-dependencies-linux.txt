@@ -13,8 +13,8 @@ in-house or remote server. And, while this guide does not cover it,
 Arches can be installed across multiple machines for deployments that
 demand high fault tolerance.
 
-Step 1: Install Required Dependencies
--------------------------------------
+Install Required Dependencies
+-----------------------------
 
 This step installs PostgreSQL, PostGIS, GEOS and the latest JDK by
 running a single script.
