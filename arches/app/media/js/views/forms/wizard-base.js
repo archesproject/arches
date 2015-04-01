@@ -34,30 +34,31 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
 
             //Show and hide Upload Wizard.  
             $("#start-workflow").click(function(){ 
-                self.startWorkflow(); 
+                self.startWorkflow();
                 return false; 
             });
             $("#end-workflow").click(function(evt){
-                self.startWorkflow();
                 self.submit(evt); 
                 return false; 
             });
             $("#cancel-workflow").click(function(){ 
-                self.startWorkflow(); 
+                self.cancleWorkflow();
                 return false; 
             });
 
         },
 
-        startWorkflow: function() {    
+        toggleEditor: function() {    
             $( ["#workflow-container", "#current-items"].join(",") ).toggle(300);
             $( ["#cancel-workflow","#end-workflow","#start-workflow"].join(",")  ).toggle();
         },
 
-        saveWizard: function() {    
-            $( ["#completed-evaluations"].join(",")  ).toggle(300);
-            $( ["#related-files"].join(",")  ).css("display", "block");
-            $( ["#no-evaluations", "#no-files"].join(",")  ).css("display", "none");
+        startWorkflow: function() { 
+            this.toggleEditor(); 
+        },
+
+        cancleWorkflow: function() { 
+            this.toggleEditor(); 
         },
 
         addBranchList: function(branchList){
@@ -92,6 +93,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             evt.preventDefault();
 
             if (this.validate()){
+                this.toggleEditor();
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }else {
