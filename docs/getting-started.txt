@@ -175,6 +175,7 @@ Running Arches
 
     You can minimize this terminal and let it run in the background
 
+
 #.  **Create your database**:
 
     Using your first terminal::
