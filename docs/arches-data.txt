@@ -39,9 +39,9 @@ The Resources Data section is where Arches stores the actual cultural heritage r
 
 Entities within an Arches database represent one of three things:
 
-#. the existence of a cultural heritage resource
-#. an attribute of a cultural heritage resource, or
-#. a record required to maintain ontological consistency between attributes
+	#. the existence of a cultural heritage resource
+	#. an attribute of a cultural heritage resource, or
+	#. a record required to maintain ontological consistency between attributes
 
 Relations represent relationships between entities within an Arches database.  Records in this table indicate a relationship between two distinct entities.
 
@@ -53,9 +53,9 @@ One special business table is the domains table.  It is unique in that it only s
 
 The ``entity_types`` table really belongs in all three categories because:
 
-* they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
-* they link the attribute to one of a series of ontological categories that, by default, is based on CRM
-* they specify which attributes must be powered by drop-down lists from the Reference data section.
+	* they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
+	* they link the attribute to one of a series of ontological categories that, by default, is based on CRM
+	* they specify which attributes must be powered by drop-down lists from the Reference data section.
 
 In the simplest potential case, a resource that happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
 
@@ -83,16 +83,16 @@ Regardless of how the nodes and edges CSV files are created, they must include t
 
 **Nodes:**
 
-* ``Id``: a unique and arbitrary ID for each record within the file
-* ``Label``: the name of the entity type that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entity type
-* ``mergenode``: defines the upstream node that occurs one time (and only one time) within a given resource instance.  In most cases, that node is the one that represents the resource itself.
-* ``businesstable``: identifies the respective business table (strings, numbers, dates, geometries, domains) that will store values associated to instances of the node. This value should be left null for nodes that never store a business data. 
+	* ``Id``: a unique and arbitrary ID for each record within the file
+	* ``Label``: the name of the entity type that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entity type
+	* ``mergenode``: defines the upstream node that occurs one time (and only one time) within a given resource instance.  In most cases, that node is the one that represents the resource itself.
+	* ``businesstable``: identifies the respective business table (strings, numbers, dates, geometries, domains) that will store values associated to instances of the node. This value should be left null for nodes that never store a business data. 
 
 **Edges:**
 
-* ``Source``: the ID of the source node
-* ``Target``: the ID of the target node
-* ``Label``: the semantic CRM "property" that allows them to connect to each other.
+	* ``Source``: the ID of the source node
+	* ``Target``: the ID of the target node
+	* ``Label``: the semantic CRM "property" that allows them to connect to each other.
 
 .. note:: Arches comes loaded with the semantic properties defined in the CIDOC CRM (http://www.cidoc-crm.org/).  Look to the CRM documentation to learn about the list of available properties.
 
@@ -111,10 +111,10 @@ Reference Data Graph
 
 The reference data graph stores information necessary to use thesauri as input to pick lists (sometimes called "controlled vocabularies") within resource data entry forms.  The functional requirements for reference data in the cultural heritage field are quite robust, and best defined in SKOS documentation (http://www.w3.org/2004/02/skos/).  For the purpose of this document, we will outline a few of the most important and visible requirements:
 
-* Ability to associate sets of reference data entries as valid selections in drop-down lists for "domain" nodes in the resource graph
-* Ability to associate arbitrary attributes (such as preferred labels, alternate labels, scope notes, sort order) to entries within the reference data
-* Ability to store words associated to given reference data entries in multiple languages (to support internationalization)
-* Ability to relate entries to each other in semantically rich hierarchies
+	* Ability to associate sets of reference data entries as valid selections in drop-down lists for "domain" nodes in the resource graph
+	* Ability to associate arbitrary attributes (such as preferred labels, alternate labels, scope notes, sort order) to entries within the reference data
+	* Ability to store words associated to given reference data entries in multiple languages (to support internationalization)
+	* Ability to relate entries to each other in semantically rich hierarchies
 
 Like the resource data graph, reference data is also stored in a graph structure.  Reference data includes ``concepts`` and ``relations``.  
 
@@ -271,11 +271,11 @@ For example, you may want to relate a house to a person (both of which can be re
 
 Before any data are loaded from the ``.arches`` format into the Arches database, our data loading code runs a series of validations to ensure adherence to the rules outlines above.  Below is a quick enumeration of the validity checks that are executed:
 
-#. syntax of the ``.arches`` and ``.relation`` files (including proper headings and column delimiters)
-#. verifies that the ``ATTRIBUTENAME`` listed  in the .arches files exists in the resource graph for the specified resource type
-#. checks that the ``ATTRIBUTEVALUE`` is valid for the ``businesstablename`` of its related entity type
-#. checks that rows are ordered by ``RESOURCEID`` then ``GROUPID``
-#. checks that all ``RESOURCEID`` values listed in the ``.relations`` file exist in the ``.arches`` file
+	#. syntax of the ``.arches`` and ``.relation`` files (including proper headings and column delimiters)
+	#. verifies that the ``ATTRIBUTENAME`` listed  in the .arches files exists in the resource graph for the specified resource type
+	#. checks that the ``ATTRIBUTEVALUE`` is valid for the ``businesstablename`` of its related entity type
+	#. checks that rows are ordered by ``RESOURCEID`` then ``GROUPID``
+	#. checks that all ``RESOURCEID`` values listed in the ``.relations`` file exist in the ``.arches`` file
 
 From Shapefile
 --------------
@@ -303,9 +303,11 @@ The ``.config`` file is formatted in JSON as you can see in this example::
 		]
 	}
 
-* ``RESOURCE_TYPE`` is the resource type of your shapefile.
-* ``GEOM_TYPE`` is simply the name of the entity type that Arches HIP uses to manage geometry.
-* ``FIELD_MAP`` is where you list your shapefile fields and their corresponding entity types. Each field must be enclosed in brackets, with the shapefile column name in the first position and the ``entitytypeid`` in the second.
+Notice that it contains the following properties:
+
+	* ``RESOURCE_TYPE`` is the resource type of your shapefile.
+	* ``GEOM_TYPE`` is simply the name of the entity type that Arches HIP uses to manage geometry.
+	* ``FIELD_MAP`` is where you list your shapefile fields and their corresponding entity types. Each field must be enclosed in brackets, with the shapefile column name in the first position and the ``entitytypeid`` in the second.
 
 ..note:: The curly braces at the beginning and end of the file are important! Also, remember that the projection of your data must be EPSG:4326 (WGS84 Lat/Lon).
 
@@ -441,24 +443,19 @@ The resource export mappings is a JSON file that maps resources in your search r
 
 The top level members of the JSON object are the format extensions (e.g. “csv”, “shp”, “kml”). Each format extension has the following properties:
 
-* ``NAME``:  base name of the export file
-* ``SCHEMA``:  array of objects defining each field to be added to your exported file.  Each object should have the following properties:
-    * ``field_name``:  name of the exported field (required)
-    * ``source``:  The location of the data in the search results. If the value is “field_map” the 
-      application will lookup the value using the field map for the resource. If the value is
-    * ``alternatename`` :  every name for the resource that is not primary will be concatenated
-      into a list of alternate names. A value of “resource_name” will lookup the resource name
-      from the ``RESOURCE_TYPE_CONFIGS`` in the application’s ``settings.py`` file.  
-    * ``data_type``:  “str”, “datetype”, or “float” (required only for shapefiles)
-    * ``data_length``:  an integer in quotes (e.g. “128” required only for shapefiles)
-* ``RESOURCE_TYPES``:  an object containing an object for each resource type that will be 
-  exported. The key for each resource type object is the resource's ``entitytypeid``. The value for
-  each type contains the following properties:
-	* ``FIELD_MAP``:  a list of objects each containing information needed to map child entity data to an export file field. Properties for the field map include:
-		* ``field_name``:  The field_name value - match a field in the ``SCHEMA`` (required)
-		* ``entitytypeid``:  The ``entitytypeid`` of the child entity (required)
-		* ``value_type``:  A ``conceptid`` of the value used to define the value’s type. For example, an address may have different types such as primary or postal. If you want to export only the primary address for this column, you can add the concept type for ‘primary address’ here. Concept ids can be found in your application’s Reference Data Manager (RDM). (optional)
-		* ``alternate_entitytypeid``:  Alternate entity type to use if no value is available for the ``entitytypeid`` (optional)
+	* ``NAME``:  base name of the export file
+	* ``SCHEMA``:  array of objects defining each field to be added to your exported file.  Each object should have the following properties:
+	    * ``field_name``:  name of the exported field (required)
+	    * ``source``:  The location of the data in the search results. If the value is “field_map” the application will lookup the value using the field map for the resource.
+	    * ``alternatename`` :  every name for the resource that is not primary will be concatenated into a list of alternate names. A value of “resource_name” will lookup the resource name from the ``RESOURCE_TYPE_CONFIGS`` in the application’s ``settings.py`` file.  
+	    * ``data_type``:  “str”, “datetype”, or “float” (required only for shapefiles)
+	    * ``data_length``:  an integer in quotes (e.g. “128” required only for shapefiles)
+	* ``RESOURCE_TYPES``:  an object containing an object for each resource type that will be exported. The key for each resource type object is the resource's ``entitytypeid``. The value for each type contains the following properties:
+		* ``FIELD_MAP``:  a list of objects each containing information needed to map child entity data to an export file field. Properties for the field map include:
+			* ``field_name``:  The field_name value - match a field in the ``SCHEMA`` (required)
+			* ``entitytypeid``:  The ``entitytypeid`` of the child entity (required)
+			* ``value_type``:  A ``conceptid`` of the value used to define the value’s type. For example, an address may have different types such as primary or postal. If you want to export only the primary address for this column, you can add the concept type for ‘primary address’ here. Concept ids can be found in your application’s Reference Data Manager (RDM). (optional)
+			* ``alternate_entitytypeid``:  Alternate entity type to use if no value is available for the ``entitytypeid`` (optional)
 
 Example Resource Export Mappings
 --------------------------------
