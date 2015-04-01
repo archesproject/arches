@@ -102,13 +102,13 @@ With your Arches dependencies installed, you are now ready to install Arches.
 
     Now activate your virtual environment with the following command:
 
-    On Linux (and other POSIX systems)::
+        On Linux (and other POSIX systems)::
 
-        $ source ENV/bin/activate
+            $ source ENV/bin/activate
 
-    On Windows::
+        On Windows::
 
-        > \path\to\ENV\Scripts\activate
+            > \path\to\ENV\Scripts\activate
 
     .. note::
         If you are creating an Arches application based on HIP, you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
