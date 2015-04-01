@@ -167,13 +167,17 @@ The default database password used in Arches is 'postgis'. You may have already 
 Running Arches
 ==============
 
-#.  **Start ElasticSearch**: Open a new command terminal and run the following command::
+#.  **Start ElasticSearch**:
+
+    Open a new command terminal and run the following command::
 
         $ /my_arches_app/my_arches_app/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
 
     You can minimize this terminal and let it run in the background
 
-#.  **Create your database**: Using your first terminal::
+#.  **Create your database**:
+
+    Using your first terminal::
 
         (ENV)$ python manage.py packages -o install
 
@@ -187,7 +191,9 @@ Running Arches
 
           DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
 
-#.  **Run arches**: Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
+#.  **Run arches**:
+
+    Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
 
     Navigate to your application's ``manage.py`` file and run::
 
