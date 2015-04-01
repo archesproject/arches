@@ -45,7 +45,7 @@ class ResourceForm(object):
             'class': ResourceForm
         }
 
-    def update(self, data):
+    def update(self, data, files):
         # update resource w/ post data
         return 
 

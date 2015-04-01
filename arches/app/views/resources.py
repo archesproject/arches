@@ -44,9 +44,8 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
     form = resource.get_form(form_id)
 
     if request.method == 'POST':
-        # get the values from the form and pass to the resource
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
-        form.update(data)
+        form.update(data, request.FILES)
 
         with transaction.atomic():
             if resourceid != '':

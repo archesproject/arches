@@ -1391,3 +1391,20 @@ a:hover {
     opacity: 0;
     filter: alpha(opacity=0);
 }
+
+/* Evaluation Form & Wizard */
+.arches-evaluation-header {
+    font-size: 15px;
+    font-weight: 400;
+    margin-top: -5px;
+    margin-left: 19px;
+    margin-bottom: -2px;
+    color: #585f69;
+}
+
+.arches-evaluation-content {
+    font-size: 15px;
+    color: #57889c;
+    margin-left: 19px;
+    line-height: 17px;
+}
