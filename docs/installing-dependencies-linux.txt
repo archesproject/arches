@@ -1,5 +1,5 @@
-Installing Arches on Linux (Ubuntu 14.04)
-===========================================
+Installing Arches Dependencies on Linux (Ubuntu 14.04)
+======================================================
 
 The following instructions were written with Ubuntu 14.04 LTS in mind.
 Other versions of Ubuntu or other Linux distributions might have some
@@ -13,10 +13,7 @@ in-house or remote server. And, while this guide does not cover it,
 Arches can be installed across multiple machines for deployments that
 demand high fault tolerance.
 
-Install Required Dependencies
------------------------------
-
-This step installs PostgreSQL, PostGIS, GEOS and the latest JDK by
+The following instructions install PostgreSQL, PostGIS, GEOS and the latest JDK by
 running a single script.
 
 .. note::
