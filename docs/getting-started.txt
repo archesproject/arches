@@ -35,16 +35,16 @@ There are a few things to know about Arches before we get started.
 
 Please note that Arches has been developed for modern browsers. It supports:
 
-* Firefox
-* Chrome
-* Safari
-* Opera
-* Internet Explorer 10 or higher.
+    * Firefox
+    * Chrome
+    * Safari
+    * Opera
+    * Internet Explorer 10 or higher.
 
--  At least 4GB of RAM for evaluation and testing, or 8 to 16GB for
-   production.
--  10GB minimum to install the code base and test dataset, but disk space
-   requirements will vary greatly depending on the size of your dataset
+Minimum system requirements:
+
+    * At least 4GB of RAM for evaluation and testing, or 8 to 16GB for production.
+    * 10GB minimum to install the code base and test dataset, but disk space requirements will vary greatly depending on the size of your dataset
 
 It's important to recognize that Arches is designed to manage large,
 enterprise-scale Cultural Heritage inventories. The software is
