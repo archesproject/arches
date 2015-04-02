@@ -4,6 +4,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
             var data;
+            var domains = {};
             var allBindings = allBindingsAccessor();
             var branchList = bindingContext.$data;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2);            
@@ -20,11 +21,9 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 return item.value;
             };
 
-            if (branchList.viewModel !== undefined) {
-                data = branchList.viewModel.domains[select2Config.dataKey];
-            }else{
-                data = bindingContext.$root.domains[select2Config.dataKey];
-            }
+            domains[select2Config.dataKey] = [];
+            domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
+            data = domains[select2Config.dataKey];
 
             select2Config.data = _.filter(data, function (item) {
                 return (item.valuetype === "collector") ? (item.children.length > 0) : true;
@@ -46,7 +45,14 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             });
         },
         update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            return $(el).select2("val", ko.utils.unwrapObservable(valueAccessor().value()), true);
+            var val = ko.utils.unwrapObservable(valueAccessor().value());
+            if (typeof val === 'string' || val === null){
+                return $(el).select2("val", val, true);
+            }
+            if (typeof val === 'object'){
+                return $(el).select2("val", val.value, true);
+            }
+            
         }
     };
 
