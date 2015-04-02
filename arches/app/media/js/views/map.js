@@ -129,14 +129,23 @@ define([
 
         handleMouseMove: function(e) {
             var self = this;
-            var pixels = [e.offsetX, e.offsetY];
+            if(e.offsetX === undefined) {
+                // this works in Firefox
+                var xpos = e.pageX-$('#map').offset().left;
+                var ypos = e.pageY-$('#map').offset().top;
+            } else { 
+                // works in Chrome, IE and Safari
+                var xpos = e.offsetX;
+                var ypos = e.offsetY;
+            }
+            var pixels = [xpos, ypos];
             var coords = this.map.getCoordinateFromPixel(pixels);
             var point = new ol.geom.Point(coords);
             var format = ol.coordinate.createStringXY(4);
             var overFeature = this.map.forEachFeatureAtPixel(pixels, function (feature, layer) {
                 return feature;
             });
-
+            
             coords = point.transform("EPSG:3857", "EPSG:4326").getCoordinates();
             if (coords.length > 0) {
                 this.trigger('mousePositionChanged', format(coords), pixels, overFeature);
@@ -144,6 +153,7 @@ define([
                 this.trigger('mousePositionChanged', '');
             }
         },
+
 
         handleMouseOut: function () {
             this.trigger('mousePositionChanged', '');
