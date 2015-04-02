@@ -3015,7 +3015,7 @@ ul.labels-demo li {
 }
 
 .arches-crud-record:hover {
-    background: #f5f5f5;
+    background: aliceblue /*#f5f5f5*/;
 }
 
 

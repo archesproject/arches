@@ -1,5 +1,5 @@
 {% load i18n %}
-<form method="POST" id="resource_data_management_form" class="form-inline arches-form" role="form">
+<form method="POST" id="resource_data_management_form" class="form-inline arches-form" role="form" enctype="multipart/form-data">
     <div class="right-inner arches-box-grey-border padding-10" id="crud" style="">
                 
         <!-- Theme Title -->
@@ -7,7 +7,7 @@
             <div class="col-xs-12">
                 
                 <div class="headline margin-bottom-10 padding-left-10">
-                    <h3 class="headline text-primary"><i class="fa fa-tag text-primary"></i>{{form.name}}</h3>
+                    <h3 class="headline text-primary"><i class="fa {{form.icon}} text-primary"></i>{{form.name}}</h3>
 
                     <!-- Save/Discard Buttons for small, medium and large screens -->
                     <span class="pull-right margin-top-minus-10">

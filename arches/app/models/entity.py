@@ -131,6 +131,7 @@ class Entity(object):
             themodel = self._get_model(entity.entitytypeid.businesstablename)
             themodelinstance = themodel()
             themodelinstance.entityid = entity
+            self.businesstablename = entity.entitytypeid.businesstablename
 
             # if we need to populate the E32 nodes then this is the code to do it, 
             # but it really slows down the save so i'm leaving it commented for now
@@ -145,41 +146,29 @@ class Entity(object):
             #                 self.add_child_entity(rule[0].entitytyperange_id, rule[0].propertyid_id, concept.id, '')
             #         elif len(self.child_entities) == 1:
             #             self.child_entities[0].value = concept.id
-            if (isinstance(themodelinstance, archesmodels.Files)): 
+            if not (isinstance(themodelinstance, archesmodels.Files)): 
+                setattr(themodelinstance, columnname, self.value)
+                themodelinstance.save()
+                self.label = self.value
+                
+                if (isinstance(themodelinstance, archesmodels.Domains)): 
+                    self.value = themodelinstance.getlabelid()
+                    self.label = themodelinstance.getlabelvalue()
+            else:
                 # Saving of files must be handled specially
                 # Because on subsequent saves of a file resource, we post back the file path url (instead of posting the file like we originally did),
                 # we want to prevent the path from being saved back to the database thus screwing up the file save process 
                 if isinstance(self.value, (InMemoryUploadedFile, TemporaryUploadedFile)):
                     setattr(themodelinstance, columnname, self.value)
                     themodelinstance.save()
-                elif isinstance(self.value, str):
-                    setattr(themodelinstance, columnname, self.value)
-                    themodelinstance.save()
-            else:
-                setattr(themodelinstance, columnname, self.value)
-                themodelinstance.save()
+                    self.value = themodelinstance.geturl()
+                    self.label = themodelinstance.getname()
 
-            self.businesstablename = entity.entitytypeid.businesstablename
-            self.label = self.value
-            if (isinstance(themodelinstance, archesmodels.Domains)): 
-                self.value = themodelinstance.getlabelid()
-                self.label = themodelinstance.getlabelvalue()
-            elif (isinstance(themodelinstance, archesmodels.Files)): 
-                self.value = themodelinstance.geturl()
-                self.label = themodelinstance.getname()
 
         for child_entity in self.child_entities:
             child = child_entity._save()
-            #try:
             rule = archesmodels.Rules.objects.get(entitytypedomain = entity.entitytypeid, entitytyperange = child.entitytypeid, propertyid = child_entity.property)
             archesmodels.Relations.objects.get_or_create(entityiddomain = entity, entityidrange = child, ruleid = rule)
-            # newrelationship.entityiddomain = entity
-            # newrelationship.entityidrange = child
-            # newrelationship.ruleid = rule
-            # newrelationship.save()
-            # except:
-            #     print JSONSerializer().serialize(child_entity)
-            #     print 'ERROR in query for the following rule: Domain={0}, Range={1}, Property={2}. Relationship could not be saved'.format(entity.entitytypeid, child.entitytypeid, child_entity.property)
 
         return entity
 
