@@ -1408,3 +1408,36 @@ a:hover {
     margin-left: 19px;
     line-height: 17px;
 }
+
+
+/* File Upload Form & Wizard */
+
+.arches-file-upload-record {
+    font-size: 15px;
+    display: block;
+    padding-left: 8px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 25px;
+    background: #fcfcfc;
+    /*border-bottom: solid 1px #ddd;*/
+}
+
+
+.arches-file-upload-record:hover {
+    background: #f5f5f5;
+}
+
+.arches-file-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+}
+
+.arches-file-description {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-top: -10px;
+    color: #777;
+}

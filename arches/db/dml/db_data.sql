@@ -12,8 +12,8 @@ SET client_encoding = 'UTF8';
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
-SET search_path = concepts, pg_catalog;
 
+SET search_path = concepts, pg_catalog;
 
 --
 -- TOC entry 3327 (class 0 OID 11000953)
@@ -483,3 +483,8 @@ INSERT INTO properties VALUES ('P14.1', 'E7', 'E39','in the role of');
 --
 -- PostgreSQL database dump complete
 --
+
+SET search_path = data, pg_catalog;
+
+INSERT INTO entity_types(classid, conceptid, businesstablename, publishbydefault, entitytypeid, isresource)
+    VALUES ('E55', '00000000-0000-0000-0000-000000000005', 'domains', false, 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55', false);

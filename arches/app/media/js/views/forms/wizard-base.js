@@ -12,9 +12,10 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             ko.observableArray.fn.get = function(entitytypeid, key) {
                 var allItems = this();
                 var ret = '';
-                _.each(allItems, function(node){
-                    if (entitytypeid.search(node.entitytypeid()) > -1){
+                _.filter(allItems, function(node){
+                    if ('entitytypeid' in node && entitytypeid.search(node.entitytypeid()) > -1){
                         ret = node[key]();
+                        return true;
                     }
                 }, this);
                 return ret
@@ -81,9 +82,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         validate: function(){
             var isValid = true
             _.each(this.branchLists, function(branchList){
-                _.each(branchList.viewModel.branch_lists(), function(list){
-                    isValid = isValid && branchList.validateBranch(ko.toJS(list.nodes));
-                }, this); 
+                isValid = isValid && branchList.validate();
             }, this); 
             return isValid;
         },
