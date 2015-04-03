@@ -18,6 +18,7 @@ define(['jquery',
 
             this.defaults = [];
             this.viewModel = JSON.parse(JSON.stringify(this.data[this.dataKey]));
+            //this.viewModel.domains = this.data[this.dataKey].domains;
             this.viewModel.branch_lists = koMapping.fromJS(this.data[this.dataKey].branch_lists);
 
             // if this is a function then it's assumed to be an observableArray already
@@ -57,7 +58,9 @@ define(['jquery',
         validate: function(){
             var valid = true;
             _.each(this.viewModel.branch_lists(), function(list){
-                valid = valid && this.validateBranch(ko.toJS(list.nodes));
+                if (this.singleEdit || !list.editing()){
+                    valid = valid && this.validateBranch(ko.toJS(list.nodes));
+                }
             }, this); 
             return valid;
         },

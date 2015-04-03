@@ -92,14 +92,16 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             return isValid;
         },
 
-        submit: function(){
+        submit: function(evt){
+            evt.preventDefault();
+            
             if (this.validate()){
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }
         },
 
-        cancel: function(){
+        cancel: function(evt){
             _.each(this.branchLists, function(branchList){
                 branchList.undoAllEdits();
             }, this);  
