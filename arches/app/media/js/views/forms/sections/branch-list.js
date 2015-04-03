@@ -54,6 +54,14 @@ define(['jquery',
             }
         },
 
+        validate: function(){
+            var valid = true;
+            _.each(this.viewModel.branch_lists(), function(list){
+                valid = valid && this.validateBranch(ko.toJS(list.nodes));
+            }, this); 
+            return valid;
+        },
+
         validateBranch: function (data) {
             return true;
         },
