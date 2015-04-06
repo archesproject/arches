@@ -22,6 +22,5 @@ from django.conf.urls import patterns, url, include
 uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
 urlpatterns = patterns('',
-    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , '{{ app_name }}.views.resources.report', name='report'),
     url(r'', include({{ source_app }}_urls)),
 )
