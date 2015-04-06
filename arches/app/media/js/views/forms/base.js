@@ -3,8 +3,8 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         
         events: function(){
             return {
-                'click #saveedits': 'submit',
-                'click #canceledits': 'cancel'
+                'click .save-edits': 'submit',
+                'click .cancel-edits': 'cancel'
             }
         },
 
@@ -42,8 +42,8 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             // });
 
             this.on('change', function(eventtype, item){
-                $('#saveedits').removeClass('disabled');
-                $('#canceledits').removeClass('disabled');                    
+                $('.save-edits').removeClass('disabled');
+                $('.cancel-edits').removeClass('disabled');                    
             });
 
         },
