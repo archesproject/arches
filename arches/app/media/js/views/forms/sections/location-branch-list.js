@@ -13,7 +13,7 @@ define([
         initialize: function(options) {
             var self = this;
             var map = new MapView({
-                el: $('#map')
+                el: this.$el.find('.map')
             });
 
             var addFeature = function (feature, editing) {
@@ -154,7 +154,7 @@ define([
 
             var draw = null;
 
-            $(".geometry-btn").click(function (){ 
+            self.$el.find(".geometry-btn").click(function (){ 
                 var geometryType = $(this).data('geometrytype');
                 if (draw) {
                     map.map.removeInteraction(draw);
@@ -169,58 +169,58 @@ define([
                 });
                 map.map.addInteraction(draw);
 
-                $("#inventory-home").click();
+                self.$el.find("#inventory-home").click();
             });
 
-            $("#inventory-home").click(function (){ 
-                $("#overlay-panel").addClass("hidden");
-                $("#basemaps-panel").addClass("hidden");
+            self.$el.find("#inventory-home").click(function (){ 
+                self.$el.find("#overlay-panel").addClass("hidden");
+                self.$el.find("#basemaps-panel").addClass("hidden");
 
-                $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").addClass("arches-map-tools");
+                self.$el.find("#inventory-basemaps").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-basemaps").addClass("arches-map-tools");
 
-                $("#inventory-overlays").removeClass("arches-map-tools-pressed");
-                $("#inventory-overlays").addClass("arches-map-tools");
+                self.$el.find("#inventory-overlays").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-overlays").addClass("arches-map-tools");
 
 
-                $("#inventory-home").addClass("arches-map-tools-pressed");
-                $("#inventory-home").removeClass("arches-map-tools");
+                self.$el.find("#inventory-home").addClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-home").removeClass("arches-map-tools");
                 
                 return false;
             });
-            $("#inventory-basemaps").click(function (){ 
-                $("#overlay-panel").addClass("hidden");
-                $("#basemaps-panel").removeClass("hidden");
+            self.$el.find("#inventory-basemaps").click(function (){ 
+                self.$el.find("#overlay-panel").addClass("hidden");
+                self.$el.find("#basemaps-panel").removeClass("hidden");
 
-                $("#inventory-home").removeClass("arches-map-tools-pressed");
-                $("#inventory-home").addClass("arches-map-tools");
+                self.$el.find("#inventory-home").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-home").addClass("arches-map-tools");
 
-                $("#inventory-overlays").removeClass("arches-map-tools-pressed");
-                $("#inventory-overlays").addClass("arches-map-tools");
+                self.$el.find("#inventory-overlays").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-overlays").addClass("arches-map-tools");
 
-                $("#inventory-basemaps").addClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").removeClass("arches-map-tools");
+                self.$el.find("#inventory-basemaps").addClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-basemaps").removeClass("arches-map-tools");
                 
                 return false;
             });
 
-            $("#inventory-overlays").click(function (){ 
-                $("#overlay-panel").removeClass("hidden");
-                $("#basemaps-panel").addClass("hidden");
+            self.$el.find("#inventory-overlays").click(function (){ 
+                self.$el.find("#overlay-panel").removeClass("hidden");
+                self.$el.find("#basemaps-panel").addClass("hidden");
 
-                $("#inventory-home").removeClass("arches-map-tools-pressed");
-                $("#inventory-home").addClass("arches-map-tools");
+                self.$el.find("#inventory-home").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-home").addClass("arches-map-tools");
 
-                $("#inventory-basemaps").removeClass("arches-map-tools-pressed");
-                $("#inventory-basemaps").addClass("arches-map-tools");
+                self.$el.find("#inventory-basemaps").removeClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-basemaps").addClass("arches-map-tools");
 
-                $("#inventory-overlays").addClass("arches-map-tools-pressed");
-                $("#inventory-overlays").removeClass("arches-map-tools");
+                self.$el.find("#inventory-overlays").addClass("arches-map-tools-pressed");
+                self.$el.find("#inventory-overlays").removeClass("arches-map-tools");
 
                 return false;
             });
 
-            $(".close").click(function (){ 
+            this.$el.find(".close").click(function (){ 
                 $("#inventory-home").click()
             });
 
@@ -230,7 +230,7 @@ define([
                 ol.format.KML
             ];
 
-            $('.geom-upload').on('change', function() {
+            this.$el.find('.geom-upload').on('change', function() {
                 if (this.files.length > 0) {
                     var file = this.files[0];
                     var reader = new FileReader();
