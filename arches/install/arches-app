@@ -4,6 +4,7 @@ import argparse
 import codecs
 import os
 import sys
+import imp
 
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import BaseCommand, CommandError
@@ -35,6 +36,12 @@ subparsers.required = True
 class ArchesTemplateCommand(TemplateCommand):
 
     def handle(self, name, args, target=None):
+
+        try:
+            imp.find_module(args.source_app)
+        except ImportError as e:
+            raise CommandError(e)
+
         self.app_or_project = 'app'
         self.paths_to_remove = []
         self.validate_name(name, 'app')
@@ -56,6 +63,8 @@ class ArchesTemplateCommand(TemplateCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
+
+
         extensions = tuple(
             handle_extensions(args.extensions))
         extra_files = []
@@ -71,6 +80,7 @@ class ArchesTemplateCommand(TemplateCommand):
             docs_version = 'dev'
         else:
             docs_version = '%d.%d' % django.VERSION[:2]
+
 
         context = Context({
             base_name: name,
