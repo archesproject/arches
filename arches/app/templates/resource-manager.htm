@@ -75,8 +75,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <select style="width:100%; height: 36px; padding-top: 2px;" class="select2 arches-select2-crud-form" id="crud_menu" placeholder="type">
                             {% for form_group in form_groups %}
                             <optgroup label="{{form_group.name}}">
-                                {% for form in form_group.forms %}
-                                    <option value="{{form.id}}">{{form.name}}</option>
+                                {% for form in form_group.forms %} 
+                                    <option value="<a href="javascript:void(0); data-formid="{{form.id}}" {% if form.id == form_id %} selected {% endif %} data-formurl="{% url 'resource_manager' resourcetypeid form.id resourceid%}">{{form.name}}</option>
                                 {% endfor %}
                             </optgroup>
                             {% endfor %}

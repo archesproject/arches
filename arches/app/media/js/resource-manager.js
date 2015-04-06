@@ -108,5 +108,14 @@ require([
             }
         });
 
+        $('#crud_menu').on("change", function(e) {
+            if (dirty) {
+                // make sure they are cool with losing edits before switching...
+            } else {
+                $(this).select2("val", $('option:selected', this).text())
+                document.location.href = $('option:selected', this).attr('data-formurl');
+            }
+        });
+
     });
 });
