@@ -179,6 +179,8 @@ class Resource(Entity):
             edit.newvalue = None
             edit.save()
 
+        self.delete_all_resource_relationships()
+
         self._delete(delete_root=True)
 
     def get_form(self, form_id):
