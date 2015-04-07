@@ -43,6 +43,11 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
     form = resource.get_form(form_id)
 
+    if request.method == 'DELETE':
+        resource.delete_index()
+        resource.delete()
+        return JSONResponse({ 'success': True })
+
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.POST.get('formdata', {}))
         form.update(data, request.FILES)

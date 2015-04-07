@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from arches.app.models.entity import Entity
+from django.utils.translation import ugettext as _
 
 class ResourceForm(object):
     def __init__(self, resource):
@@ -85,3 +86,14 @@ class ResourceForm(object):
             self.resource.merge_at(baseentity, self.resource.entitytypeid)
 
         self.resource.trim()
+
+
+class DeleteResourceForm(ResourceForm):
+    @staticmethod
+    def get_info():
+        return {
+            'id': 'delete-resource',
+            'icon': 'fa-times-circle',
+            'name': _('Delete Resource'),
+            'class': DeleteResourceForm
+        }

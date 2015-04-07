@@ -128,6 +128,7 @@
             define('arches', [], function () {
                 return {
                     urls: {
+                        home: "{% url 'home' %}",
                         media: "{{ STATIC_URL }}",
                         uploadedfiles: "{{ MEDIA_URL }}",
                         concept_tree: "{% url 'concept_tree' %}",
