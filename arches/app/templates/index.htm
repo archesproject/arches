@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base.htm" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'plugins/layer_slider/css/layerslider.css' %}" type="text/css">
@@ -37,17 +38,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:22px; font-weight: 200; color:#fff; top:100px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Arches Includes
+                {% trans 'Arches Includes' %}
                 </span>
 
                 <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:140px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Activities and </br>
-                Important Historic Events
+                {% trans 'Activities and' %} </br>
+                {% trans 'Important Historic Events' %}
                 </span>
 
                 <!-- Photo Credit -->
                 <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:470px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Photo: Image Caption, <a href="javascript:void(0);">Photographer Name</a>
+                {% trans 'Photo: Image Caption, ' %}<a href="javascript:void(0);">{% trans 'Photographer Name' %}</a>
                 </span>
 
              </div>
@@ -61,17 +62,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:22px; font-weight: 200; color:#fff; top:100px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Arches Includes
+                {% trans 'Arches Includes' %}
                 </span>
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:140px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Historic Districts and Monuments
+                {% trans 'Historic Districts and Monuments' %}
                 </span>
 
                 <!-- Photo Credit -->
                 <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:470px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Photo: Image Caption, <a href="javascript:void(0);">Photographer Name</a>
+                {% trans 'Photo: Image Caption, ' %}<a href="javascript:void(0);">{% trans 'Photographer Name' %}</a>
                 </span>
 
              </div>
@@ -85,17 +86,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:22px; font-weight: 200; color:#fff; top:100px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Arches Includes
+                {% trans 'Arches Includes' %}
                 </span>
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:140px; left: 10px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                People and Organizations
+                {% trans 'People and Organizations' %}
                 </span>
 
                 <!-- Photo Credit -->
                 <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:470px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Photo: Image Caption, <a href="javascript:void(0);">Photographer Name</a>
+                {% trans 'Photo: Image Caption, ' %}<a href="javascript:void(0);">{% trans 'Photographer Name' %}</a>
                 </span>
 
              </div>
@@ -109,17 +110,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:22px; font-weight: 200; color:#fff; top:100px; left: 120px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Arches Includes
+                {% trans 'Arches Includes' %}
                 </span>
 
                 <!-- Text -->
                 <span class="ls-s-1" style="line-height: 42px; font-size:42px; font-weight: 200; color:#fff; top:140px; left: 120px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Images </br>and  other Digital Files
+                {% trans 'Images </br>and  other Digital Files' %}
                 </span>
 
                 <!-- Photo Credit -->
                 <span class="ls-s-1" style="line-height: 16px; font-size:12px; color:#fff; top:470px; left: 750px; slidedirection: top; slideoutdirection: bottom; durationin: 0; durationout: 3500;">
-                Photo: Image Caption, <a href="javascript:void(0);">Photographer Name</a>
+                {% trans 'Photo: Image Caption, ' %}<a href="javascript:void(0);">{% trans 'Photographer Name' %}</a>
                 </span>
 
              </div>
@@ -136,11 +137,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="container">
         <div class="row">
             <div class="col-md-9 animated fadeInLeft">
-                <span>Survey Los Angeles</span>
-                <p>Los Angeles is taking a significant step to protect its rich heritage by embarking on SurveyLA - a citywide survey to identify and document historic resources representing significant themes in the city's history. While Los Angeles has over 1,000 Historic-Cultural Monuments (local landmarks) and 29 Historic Preservation Overlay Zones (historic districts), before SurveyLA only about 15% of the city had been surveyed.</p>
+                <span>{% trans 'Survey Los Angeles' %}</span>
+                <p>{% trans 'Los Angeles is taking a significant step to protect its rich heritage by embarking on SurveyLA - a citywide survey to identify and document historic resources representing significant themes in the city's history. While Los Angeles has over 1,000 Historic-Cultural Monuments (local landmarks) and 29 Historic Preservation Overlay Zones (historic districts), before SurveyLA only about 15% of the city had been surveyed.' %}</p>
             </div>            
             <div class="col-md-3 btn-buy animated fadeInRight">
-                <a href="javascript:void(0);" class="btn-u btn-u-lg"><i class="fa fa-plus-square"></i> Learn More</a>
+                <a href="javascript:void(0);" class="btn-u btn-u-lg"><i class="fa fa-plus-square"></i> {% trans 'Learn More' %}</a>
             </div>
         </div>
     </div>
@@ -154,8 +155,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!--Title Box-->        
         <div class="title-box no-border margin-top-minus-10" style="border-bottom-color: #dcdcdc;">
-            <div class="title-box-text"><span class="color-green">Featured Heritage</span></div>
-            <p>These are some of the interesting cultural heritage stories in Los Angeles</p>
+            <div class="title-box-text"><span class="color-green">{% trans 'Featured Heritage' %}</span></div>
+            <p>{% trans 'These are some of the interesting cultural heritage stories in Los Angeles' %}</p>
         </div>
         <!-- End Title Box -->    
 
@@ -164,7 +165,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="col-sm-4">
                 <div class="servive-block servive-block-default" style="background: #ffffff;">
                     <i class="icon-custom rounded-x icon-bg-dark fa fa-trophy"></i>
-                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">Street Cars and Suburbanization</h2></a>
+                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">{% trans 'Street Cars and Suburbanization' %}</h2></a>
                     <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium qui officia deserunt mollitia anim</p>                        
                 </div>
             </div>
@@ -172,7 +173,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="col-sm-4">
                 <div class="servive-block servive-block-default" style="background: #ffffff;">
                     <i class="icon-custom rounded-x icon-bg-dark fa fa-trophy"></i>
-                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">The Entertainment Industry 1908-1928</h2></a>
+                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">{% trans 'The Entertainment Industry 1908-1928' %}</h2></a>
                     <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium qui officia deserunt mollitia anim</p>                        
                 </div>
             </div>
@@ -180,7 +181,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="col-sm-4">
                 <div class="servive-block servive-block-default" style="background: #ffffff;">
                     <i class="icon-custom rounded-x icon-bg-dark fa fa-camera"></i>
-                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">A Visual History of West LA 1900-1945</h2></a>
+                    <a class="" href="javascript:void(0);"><h2 class="txt-color-blue">{% trans 'A Visual History of West LA 1900-1945' %}</h2></a>
                     <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium qui officia deserunt mollitia anim</p>                        
                 </div>
             </div>

@@ -10,4 +10,5 @@ Contents:
    overview
    getting-started
    arches-data
+   rdm
    arches-web-applications
