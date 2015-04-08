@@ -487,6 +487,10 @@ input.arches-select2:-ms-input-placeholder {
     border: 1px solid #4CAE4C !important;
 }
 
+.select2-results .select2-disabled {
+    background: #fff;
+}
+
 /*
 .sidebar-nav-v1 > li.active > a {
   color: #333;
