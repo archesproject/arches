@@ -237,7 +237,7 @@ class Resource(Entity):
         
         """        
 
-        if relationship_type:
+        if relationship_type_id:
             relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id), Q(relationshiptype=relationship_type_id))
         else:
             relationships = archesmodels.RelatedResource.objects.filter( Q(entityid2=self.entityid)|Q(entityid1=self.entityid), Q(entityid2=related_resource_id)|Q(entityid1=related_resource_id) )
@@ -247,9 +247,9 @@ class Resource(Entity):
 
     def get_related_resources(self, entitytypeid=None, relationship_type_id=None, return_entities=True):
         """
-        Gets a list of entities related to this entity, optionaly filters on entitytypeid and/or relationship type. 
-        Setting return_entities to False will return the relationship records 
-        rather than the related entities. 
+        Gets a list of related entities and their relationshiptype, optionaly filters on entitytypeid and/or relationship type. 
+        Setting return_entities to False will return the relationship record only
+
         """
 
         ret = []
@@ -266,7 +266,7 @@ class Resource(Entity):
                 if (entitytypeid == None or entity_obj.entitytypeid_id == entitytypeid) and (relationship_type_id == None or relationship_type_id == relationship.relationshiptype):
                     if return_entities == True:
                         related_entity = Resource().get(related_resource_id)
-                        ret.append(related_entity)
+                        ret.append({'related_entity': related_entity, 'relationship': relationship})
                     else:
                         ret.append(relationship)
         return ret   

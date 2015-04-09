@@ -11,6 +11,7 @@ from django.utils.encoding import smart_unicode
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.json import DjangoJSONEncoder
+from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
 
@@ -77,10 +78,14 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             #return super(JSONSerializer,self).serialize([object], **self.options.copy())[0]
-            return PythonSerializer().serialize([object],**self.options.copy())
+            return self.handle_object(model_to_dict(object))
+            return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             #return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
-            return PythonSerializer().serialize(object,**self.options.copy())
+            ret = []
+            for item in object:
+                ret.append(self.handle_object(item))
+            return ret
         elif (isinstance(object, int) or
               isinstance(object, float) or 
               isinstance(object, long) or 
