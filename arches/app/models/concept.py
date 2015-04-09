@@ -589,7 +589,7 @@ class Concept(object):
 
         """
 
-        domains = list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).exclude(valuetype='altLabel').order_by('sortorder', 'value').values())
+        domains = list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).filter(languageid=settings.LANGUAGE_CODE).exclude(valuetype='altLabel').order_by('sortorder', 'value').values())
         domains_copy = copy.deepcopy(domains) #Prevents 'recursive dictionary' type from getting created in nested for loop 
         nested_domains = []
         conceptids_in_nested = []
