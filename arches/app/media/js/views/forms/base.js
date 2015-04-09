@@ -46,6 +46,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 $('.cancel-edits').removeClass('disabled');                    
             });
 
+            this.$el.find('.form-load-mask').hide();
         },
 
         addBranchList: function(branchList){

@@ -50,7 +50,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 self.cancleWorkflow();
                 return false; 
             });
-
+            this.$el.find('.form-load-mask').hide();
         },
 
         toggleEditor: function() {    
