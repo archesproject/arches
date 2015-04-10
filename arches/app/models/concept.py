@@ -606,14 +606,14 @@ class Concept(object):
 
             for value in concept.values:
                 if value.type == 'prefLabel':
-                    ret['value'] = concept.values[0].value
+                    ret['value'] = value.value
                     ret['entitytypeid'] = entitytypeid
-                    id = concept.id
+                    value_id = value.id
                 if value.type == 'collector':
                     collector = True
 
             if collector != True:
-                ret['id'] = id
+                ret['id'] = value_id
 
             if len(concept.subconcepts) > 0:
                 ret['children'] = []
