@@ -14,7 +14,11 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 var ret = '';
                 _.filter(allItems, function(node){
                     if ('entitytypeid' in node && entitytypeid.search(node.entitytypeid()) > -1){
-                        ret = node[key]();
+                        if(key){
+                            ret = node[key]();
+                        }else{
+                            ret = node;
+                        }
                         return true;
                     }
                 }, this);
@@ -46,7 +50,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
                 self.cancleWorkflow();
                 return false; 
             });
-
+            this.$el.find('.form-load-mask').hide();
         },
 
         toggleEditor: function() {    

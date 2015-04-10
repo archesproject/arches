@@ -1445,3 +1445,19 @@ a:hover {
     margin-top: -10px;
     color: #777;
 }
+
+.form-load-mask {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+    margin: -10px 0 0 -10px;
+    z-index: 10;
+    text-align: center;
+}
+
+.form-load-mask i {
+    color: white;
+    font-size: 80px;
+    margin-top: 50px;
+}

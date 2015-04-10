@@ -149,6 +149,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 <!--=== End Content Part ===-->
 
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="nav-confirm-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="" class="modal-title">{% trans 'Unsaved edits...' %}</h4>
+            </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
+            <div class="modal-body">
+                <div class="alert alert-warning" role="alert">
+                    <strong>{% trans 'Warning!' %}</strong>
+                    {% trans 'You have unsaved edits in your form that will be lost if you leave this form.  Would you like to continue and discard your current edits?' %}
+                </div>
+                
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="nav-confirm-btn btn-u" type="button">{% trans "OK" %}</button>
+            </div>
+          </div>
+    </div>
+</div>
+
 <div style="display:none;" id="form-data">
     <input type="hidden" id="form-id" value="{{form_id}}">
     <input type="hidden" id="resourcetypeid" value="{{resourcetypeid}}">

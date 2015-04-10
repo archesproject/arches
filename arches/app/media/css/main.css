@@ -2811,6 +2811,7 @@ ul.labels-demo li {
 }
 
 .arches-box-grey-border {
+    position: relative;
     border-color: #dcdcdc; 
     border: 1px solid rgba(0,0,0,.1);
     padding-left: 20px;

@@ -63,7 +63,8 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
     if request.method == 'GET':
         if form != None:
-            form.load()
+            lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+            form.load(lang)
             return render_to_response('resource-manager.htm', {
                     'form': form,
                     'formdata': JSONSerializer().serialize(form.data),
@@ -81,11 +82,24 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
                 context_instance=RequestContext(request))
         else:
             return HttpResponseNotFound('<h1>Arches form not found.</h1>')
-    
+
+@login_required
+@csrf_exempt
 def related_resources(request, resourceid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    start = request.GET.get('start', 0)
-    return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
+    if request.method == 'GET':
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        start = request.GET.get('start', 0)
+        return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
+    
+    if request.method == 'DELETE':
+        data = JSONDeserializer().deserialize(request.body) 
+        entityid1 = data.get('entityid1')
+        entityid2 = data.get('entityid2')
+        realtionshiptype = data.get('realtionshiptype')
+        resource = Resource(entityid1)
+        resource.delete_resource_relationship(entityid2, realtionshiptype)
+        #resource.delete()
+        return JSONResponse({ 'success': True })
 
 def get_related_resources(resourceid, lang, limit=1000, start=0):
     ret = {

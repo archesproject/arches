@@ -94,18 +94,24 @@ require([
                     el: $('#resource_data_management_form')[0]
                 });
                 formView.on('change', function () {
-                    dirty = formView.isDirty();
+                    dirty = true;
                 });
             }
         });
 
+        var formurl = '';
+
         $('.form-link').click(function (e) {
-            var formurl = $(e.target).data().formurl;
+            formurl = $(e.target).data().formurl;
             if (dirty) {
-                // make sure they are cool with losing edits before switching...
+                $('#nav-confirm-modal').modal('show');
             } else {
                 document.location.href = formurl;
             }
+        });
+
+        $('.nav-confirm-btn').click(function () {
+            document.location.href = formurl;
         });
 
         $('#crud_menu').on("change", function(e) {

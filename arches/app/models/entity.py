@@ -434,6 +434,9 @@ class Entity(object):
 
     def set_entity_value(self, entitytypeid, value, append=False):
         """
+        Directly sets the value of a node in the graph
+        Will only set the value if the node exists and there is only one instance of that node or if the node doesn't exist it will be created
+        If append is set to True, the node will simply be appended next to other nodes of the same type
 
         """
 
