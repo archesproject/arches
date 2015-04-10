@@ -100,18 +100,23 @@ require([
         });
 
         var formurl = '';
+        var navigateForm = function () {
+            $('#nav-confirm-modal').modal('hide');
+            $('.form-load-mask').show();
+            document.location.href = formurl;
+        }
 
         $('.form-link').click(function (e) {
             formurl = $(e.target).data().formurl;
             if (dirty) {
                 $('#nav-confirm-modal').modal('show');
             } else {
-                document.location.href = formurl;
+                navigateForm();
             }
         });
 
         $('.nav-confirm-btn').click(function () {
-            document.location.href = formurl;
+            navigateForm();
         });
 
         $('#crud_menu').on("change", function(e) {
