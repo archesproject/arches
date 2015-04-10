@@ -89,7 +89,7 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, pathway='Semantic Relations', **kwargs):
         if id != '':
             self.load(models.Concepts.objects.get(pk=id))
         elif legacyoid != '':
@@ -115,18 +115,21 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
+            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = pathway) | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
+
                 self.hassubconcepts = True
+
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype = pathway) | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
                     for relation in conceptrealations:
                         subconcept = Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
                             include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype)
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, pathway=pathway)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
 
@@ -588,29 +591,48 @@ class Concept(object):
         neither collectors nor children of collectors
 
         """
+        entitytype_values = models.Values.objects.filter(value__iexact=entitytypeid).filter(languageid=settings.LANGUAGE_CODE).values()
+        try:
+            entitytype_concept = self.get(id=entitytype_values[0]['conceptid_id'], legacyoid='', include_subconcepts=True, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, pathway='member')
+        except IndexError:
+            entitytype_concept = Concept()
 
-        domains = list(models.VwEntitytypeDomains.objects.filter(entitytypeid=entitytypeid).filter(languageid=settings.LANGUAGE_CODE).exclude(valuetype='altLabel').order_by('sortorder', 'value').values())
-        domains_copy = copy.deepcopy(domains) #Prevents 'recursive dictionary' type from getting created in nested for loop 
-        nested_domains = []
-        conceptids_in_nested = []
+        result = []
 
-        for domain in domains:
-            if domain['valuetype'] == 'collector':
-                conceptids_in_nested.append(domain['conceptid'])
-                children = [] #(conceptid, relationtype, child_valuetype, parent_valuetype)
-                collector_children = Concept().get_child_concepts(domain['conceptid'], ['narrower'], ['prefLabel','collector'], 'collector')
-                for child in collector_children:
-                    for d in domains_copy:
-                        if child[1] == d['conceptid']:
-                            children.append(d)
-                            conceptids_in_nested.append(d['conceptid'])
-                nested_domain = domain
-                nested_domain['children'] = sorted(children, key=itemgetter('sortorder'))
-                nested_domain['disabled'] = True
-                nested_domains.append(nested_domain)
-        collectorless_domains = [a for a in domains_copy if a['conceptid'] not in conceptids_in_nested]
-        result = sorted(nested_domains + collectorless_domains, key=itemgetter('sortorder')) 
-        return result
+        def get_vals(concept, depth_limit=None, level=0):
+
+            ret = {} 
+            collector = False
+
+            for value in concept.values:
+                if value.type == 'prefLabel':
+                    ret['value'] = concept.values[0].value
+                    ret['entitytypeid'] = entitytypeid
+                    id = concept.id
+                if value.type == 'collector':
+                    collector = True
+
+            if collector != True:
+                ret['id'] = id
+
+            if len(concept.subconcepts) > 0:
+                ret['children'] = []
+
+            if depth_limit != None:
+                level = level + 1  
+
+            for subconcept in concept.subconcepts:
+                ret['children'].append(get_vals(subconcept, depth_limit=depth_limit, level=level)) 
+
+            return ret 
+
+        result.append(get_vals(entitytype_concept))
+
+        if 'children' in result[0]:
+            return result[0]['children']
+        else:
+            return []
+
 
 
 class ConceptValue(object):

@@ -120,12 +120,12 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                             altlabel_list = row[u'ALTLABELS'].split(';')
                             for altlabel in altlabel_list:
                                 concept.addvalue({'value':altlabel, 'language': settings.LANGUAGE_CODE, 'type': 'altLabel', 'category': 'label'})    
-                        if lookups.get_lookup(row[u'PARENTCONCEPTID']).values[0].type == 'collector':
-                            lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
-
+                        # if lookups.get_lookup(row[u'PARENTCONCEPTID']).values[0].type == 'collector':
+                        lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
                         lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='narrower', target=concept.id, rownum=rows.line_num)
                         
-                        if auth_doc_file_name in auth_file_to_entity_concept_mapping:
+                        if auth_doc_file_name in auth_file_to_entity_concept_mapping and row[u'PARENTCONCEPTID'] == auth_doc_file_name:
+ 
                             lookups.add_relationship(source=auth_file_to_entity_concept_mapping[auth_doc_file_name]['ENTITYTYPE_CONCEPTID'], type='member', target=concept.id, rownum=rows.line_num)
 
                         if row[u'PARENTCONCEPTID'] == '' or (row[u'CONCEPTTYPE'].upper() != 'INDEX' and row[u'CONCEPTTYPE'].upper() != 'COLLECTOR'):

@@ -23,18 +23,8 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
             domains[select2Config.dataKey] = [];
             domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
-            data = domains[select2Config.dataKey];
-
-            select2Config.data = _.filter(data, function (item) {
-                return (item.valuetype === "collector") ? (item.children.length > 0) : true;
-            });
-
-            _.each(select2Config.data, function (item) {
-                if (item.valuetype === "collector") {
-                    delete item.id;
-                }
-            });
-
+            select2Config.data = domains[select2Config.dataKey];
+            
             $(el).select2(select2Config);
 
             $(el).on("change", function(val) {
@@ -44,6 +34,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 return select2Config.value(val.val);
             });
         },
+
         update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var val = ko.utils.unwrapObservable(valueAccessor().value());
             if (typeof val === 'string' || val === null){
