@@ -53,6 +53,7 @@ urlpatterns = patterns('',
     url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.edit_history', name="edit_history"),
     url(r'^resources/layers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', name="map_layers"),
     url(r'^resources/markers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', {'get_centroids':True}, name="map_markers"),
+    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , 'arches.app.views.resources.report', name='report'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -62,3 +63,7 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += staticfiles_urlpatterns()
+
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
