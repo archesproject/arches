@@ -32,6 +32,9 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from django.http import HttpResponseNotFound
 
+def report(request, resourceid):
+    raise NotImplementedError('Reports are not yet implemented.')
+
 @login_required
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
