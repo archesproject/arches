@@ -14,18 +14,26 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             });
 
             select2Config.formatResult = function (item) {
-                return item.value;
+                return item.text;
             };
 
             select2Config.formatSelection = function (item) {
-                return item.value;
+                return item.text;
             };
 
             domains[select2Config.dataKey] = [];
             domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
             select2Config.data = domains[select2Config.dataKey];
             
+            select2Config.createSearchChoice = function(term, data) { 
+                if ($(data).filter(function() 
+                    { return this.text.localeCompare(term)===0; }).length===0) {
+                        return {id:term, text:term};
+                    }
+                }
+
             $(el).select2(select2Config);
+
 
             $(el).on("change", function(val) {
                 if(val.added){

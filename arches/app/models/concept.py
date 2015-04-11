@@ -606,7 +606,7 @@ class Concept(object):
 
             for value in concept.values:
                 if value.type == 'prefLabel':
-                    ret['value'] = value.value
+                    ret['text'] = value.value
                     ret['entitytypeid'] = entitytypeid
                     value_id = value.id
                 if value.type == 'collector':
