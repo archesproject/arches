@@ -614,7 +614,7 @@ class Entity(object):
 
     def trim(self):
         """
-        recusrsively removes all nodes starting from the leaf that have no child_entities and no value
+        recursively removes all nodes starting from the leaf that have no child_entities and no value
         these nodes are assumed to be of no material value to the graph
 
         """

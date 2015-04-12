@@ -37,7 +37,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
             $(el).on("change", function(val) {
                 if(val.added){
-                    return select2Config.value({'value':val.added.id, 'label':val.added.value, 'entitytypeid': val.added.entitytypeid});
+                    return select2Config.value({'value':val.added.id, 'label':val.added.text, 'entitytypeid': val.added.entitytypeid});
                 }
                 return select2Config.value(val.val);
             });

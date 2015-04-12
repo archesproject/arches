@@ -586,9 +586,8 @@ class Concept(object):
 
     def get_e55_domain(self, entitytypeid):
         """
-        For a given entitytypeid creates a dictionary for each collector node. Each collector dictionary includes
-        an array of its child nodes. Returns a list of these collector dictionaries added to a list of nodes that are
-        neither collectors nor children of collectors
+        For a given entitytypeid creates a dictionary representing that entitytypeid's concept graph (member pathway) formatted to support
+        select2 dropdowns
 
         """
         entitytype_values = models.Values.objects.filter(value__iexact=entitytypeid).filter(languageid=settings.LANGUAGE_CODE).values()
