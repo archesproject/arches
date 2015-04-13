@@ -31,6 +31,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
 from django.http import HttpResponseNotFound
+from django.contrib.gis.geos import GEOSGeometry
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -196,3 +197,9 @@ def edit_history(request, resourceid=''):
             ret[index]['log'].append(log)
             
     return JSONResponse(ret, indent=4)
+
+def get_admin_areas(request):
+    geomString = request.GET.get('geom', '')
+    geom = GEOSGeometry(geomString)
+    intersection = models.Overlays.objects.filter(geometry__intersects=geom)
+    return JSONResponse({'results': intersection}, indent=4)

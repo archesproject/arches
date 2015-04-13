@@ -54,6 +54,7 @@ urlpatterns = patterns('',
     url(r'^resources/layers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', name="map_layers"),
     url(r'^resources/markers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', {'get_centroids':True}, name="map_markers"),
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , 'arches.app.views.resources.report', name='report'),
+    url(r'^get_admin_areas','arches.app.views.resources.get_admin_areas', name='get_admin_areas'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
