@@ -1461,3 +1461,8 @@ a:hover {
     font-size: 80px;
     margin-top: 50px;
 }
+
+.report-header-link {
+    display: inline-block;
+    margin: 20px 20px 0;
+}
