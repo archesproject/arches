@@ -226,6 +226,14 @@ define([
                 $("#inventory-home").click()
             });
 
+            $(".basemap").click(function (){
+                var basemap = $(this).attr('id');
+                _.each(map.baseLayers, function(baseLayer){
+                    baseLayer.layer.setVisible(baseLayer.id == basemap);
+                });
+                $("#inventory-home").click()
+            });
+
             var formatConstructors = [
                 ol.format.GPX,
                 ol.format.GeoJSON,
