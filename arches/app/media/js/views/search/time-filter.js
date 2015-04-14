@@ -43,7 +43,7 @@ define(['jquery',
                     }
                 });                
 
-                this._rawdata = ko.toJSON(JSON.parse($('#formdata').val()));
+                this._rawdata = ko.toJSON(JSON.parse($('#timefilterdata').val()));
                 this.viewModel = JSON.parse(this._rawdata);
 
                 this.expanded = ko.observable(false);
