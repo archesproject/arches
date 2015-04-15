@@ -1466,3 +1466,8 @@ a:hover {
     display: inline-block;
     margin: 20px 20px 0;
 }
+
+.related-resource-details {
+    padding-left: 25px;
+    color: #808080;
+}

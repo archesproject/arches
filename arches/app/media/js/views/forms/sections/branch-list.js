@@ -224,10 +224,7 @@ define(['jquery',
             this.removeEditedBranch();
             this.addBlankEditBranch();
             if(this.originalItem !== null){
-                this.viewModel.branch_lists.push({
-                    'editing': ko.observable(false),
-                    'nodes': koMapping.fromJS(this.originalItem.nodes)
-                });
+                this.viewModel.branch_lists.push(koMapping.fromJS(_.extend({editing: false}, this.originalItem)));
 
                 this.originalItem = null;  
             }         
@@ -245,10 +242,7 @@ define(['jquery',
         undoAllEdits: function(){
             this.viewModel.branch_lists.removeAll();
             _.each(this.data[this.dataKey].branch_lists, function(item){
-                this.viewModel.branch_lists.push({
-                    'editing': ko.observable(this.singleEdit),
-                    'nodes': koMapping.fromJS(item.nodes)
-                })
+                this.viewModel.branch_lists.push(koMapping.fromJS(_.extend({editing: this.singleEdit}, item)));
             }, this); 
 
             if(!this.singleEdit || this.viewModel.branch_lists().length === 0){
