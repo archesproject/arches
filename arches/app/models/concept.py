@@ -322,7 +322,6 @@ class Concept(object):
             ) 
             SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
-        #print sql
         cursor.execute(sql)
         rows = cursor.fetchall()
         return rows
@@ -603,7 +602,7 @@ class Concept(object):
 
         sql = """
         WITH RECURSIVE children AS (
-            SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[c.valueid] AS idpath        ---|NonRecursive Part
+            SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
                 FROM concepts.relations d
                 JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
                 JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
@@ -612,7 +611,7 @@ class Concept(object):
                 and c.valuetype in ('prefLabel', 'sortorder')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                 UNION
-                SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (idpath || v.valueid)   ---|RecursivePart
+                SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
                 FROM concepts.relations  d
                 JOIN children b ON(b.conceptidto = d.conceptidfrom) 
                 JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
@@ -620,27 +619,30 @@ class Concept(object):
                 WHERE  v2.valuetype = 'prefLabel'
                 and v.valuetype in ('prefLabel','sortorder')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, vtype FROM children ORDER BY depth DESC, idpath DESC;
+            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY conceptidto, depth DESC, idpath DESC;
         """.format(entitytype.conceptid_id)
 
-        column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'vtype']
+
+        column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
         cursor.execute(sql)
         rows = cursor.fetchall()
+        from operator import itemgetter
 
         def get_vals(stats):
-            ret = {}
-            if stats.type == 'prefLabel':            
-                ret['text'] = stats.text
-                ret['type'] = stats.type
-            if stats.type != 'collector':
-                ret['id'] = stats.id
-            if stats.type == 'sortorder':
-                ret['sort'] = stats.text
+            ret = None
+            ret= {}          
+            ret['text'] = stats.text
+            ret['id'] = stats.id
+            ret['concept'] = stats.concept
+            if stats.sortorder == '':
+                stats.sortorder = stats.text
+            ret['sortorder'] = stats.sortorder
+            ret['entitytypeid'] = entitytypeid
             if len(stats.subdirs) > 0:
                 ret['children'] = []
             for valid, value in stats.subdirs.items():
-                ret['children'].append(get_vals(value))
-
+                if ret != {}:
+                    ret['children'].append(get_vals(value))
             return ret
 
         class Vals(object):
@@ -648,25 +650,51 @@ class Concept(object):
                 self.count = 0
                 self.text = ''
                 self.id = ''
-                self.depth = ''
-                self.type = ''
+                self.concept = ''
+                self.sortorder = ''
                 self.subdirs = {}
 
             def __str__(self):
                 return str(self.count) + str(self.subdirs) 
 
         counts = Vals()
-        for p in rows:
-            rec = dict(zip(column_names, p)) 
-            parts = rec['idpath'][1:-1].split(',')
-            branch = counts
-            for part in parts:
-                branch = branch.subdirs.setdefault(part, Vals())
-                branch.text = rec['valueto']
-                branch.id = rec['valueidto']
-                branch.type = rec['vtype'] 
-                branch.depth = rec['depth']
-                branch.count += 1
+
+        current_concept = {'conceptid': '', 'sortorder':'', 'text':'', 'collector':'', 'valueid':''}
+
+        for i, row in enumerate(rows[0:-1]):
+            nextrec = dict(zip(column_names, rows[i + 1]))
+            rec = dict(zip(column_names, row)) 
+            if rec['conceptidto'] != nextrec['conceptidto']:
+                parts = rec['conceptpath'][1:-1].split(',')
+                if rec['vtype'] == 'sortorder':
+                    current_concept['sortorder'] = rec['valueto']
+                elif rec['vtype'] == 'prefLabel':
+                    current_concept['prefLabel'] = rec['valueto']
+                    current_concept['valueid'] = rec['valueidto']
+                elif rec['vtype'] == 'collector':
+                    current_concept['collector'] = 'collector'
+                
+                branch = counts
+
+                for part in parts:
+                    branch = branch.subdirs.setdefault(part, Vals())
+                    branch.text = current_concept['prefLabel']
+                    branch.id = current_concept['valueid']
+                    branch.concept = current_concept['conceptid']
+                    branch.sortorder = current_concept['sortorder']
+                    branch.count += 1
+
+            else:
+                new_concept = {'conceptid': rec['conceptidto'], 'sortorder':'', 'prefLabel':''}
+                if rec['vtype'] == 'sortorder':
+                    new_concept['sortorder'] = rec['valueto']
+                elif rec['vtype'] == 'prefLabel':
+                    new_concept['prefLabel'] = rec['valueto']
+                    new_concept['valueid'] = rec['valueidto']
+                elif rec['vtype'] == 'collector':
+                    new_concept['collector'] = 'collector'
+
+                current_concept = new_concept
 
         result = get_vals(counts)
 
