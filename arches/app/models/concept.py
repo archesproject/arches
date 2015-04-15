@@ -28,6 +28,8 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
@@ -89,11 +91,16 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, pathway='Semantic Relations', **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
         if id != '':
             self.load(models.Concepts.objects.get(pk=id))
         elif legacyoid != '':
             self.load(models.Concepts.objects.get(legacyoid=legacyoid))
+
+        if semantic == True:
+            pathway_filter = Q(relationtype__category = 'Semantic Relations')
+        else:
+            pathway_filter = Q(relationtype = 'member')
 
         if self.id != '':
             nodetype = kwargs.pop('nodetype', self.nodetype)
@@ -115,13 +122,13 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype__category = pathway) | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
+            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
 
                 self.hassubconcepts = True
 
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), Q(relationtype = pathway) | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
 
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
@@ -129,7 +136,7 @@ class Concept(object):
                     for relation in conceptrealations:
                         subconcept = Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
                             include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, pathway=pathway)
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
 
@@ -139,7 +146,7 @@ class Concept(object):
                 if nodetype == 'EntityType':
                     conceptrealations = models.ConceptRelations.objects.filter(conceptidto = self.id, relationtype = 'member')
                 else:
-                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -147,7 +154,7 @@ class Concept(object):
                         parentconcept = Concept().get(id=relation.conceptidfrom_id, include_subconcepts=False, 
                             include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, 
                             exclude=exclude, include=include, depth_limit=depth_limit, 
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype)
+                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic)
                         parentconcept.relationshiptype = relation.relationtype.pk
                         self.parentconcepts.append(parentconcept)
 
@@ -590,49 +597,83 @@ class Concept(object):
         select2 dropdowns
 
         """
-        entitytype_values = models.Values.objects.filter(value__iexact=entitytypeid).filter(languageid=settings.LANGUAGE_CODE).values()
-        try:
-            entitytype_concept = self.get(id=entitytype_values[0]['conceptid_id'], legacyoid='', include_subconcepts=True, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, pathway='member')
-        except IndexError:
-            entitytype_concept = Concept()
+        cursor = connection.cursor()
 
-        result = []
+        entitytype = models.EntityTypes.objects.get(pk=entitytypeid)
 
-        def get_vals(concept, depth_limit=None, level=0):
+        sql = """
+        WITH RECURSIVE children AS (
+            SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[c.valueid] AS idpath        ---|NonRecursive Part
+                FROM concepts.relations d
+                JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
+                JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
+                WHERE d.conceptidfrom = '{0}'
+                and c2.valuetype = 'prefLabel'
+                and c.valuetype in ('prefLabel', 'sortorder')
+                and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
+                UNION
+                SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (idpath || v.valueid)   ---|RecursivePart
+                FROM concepts.relations  d
+                JOIN children b ON(b.conceptidto = d.conceptidfrom) 
+                JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
+                JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom) 
+                WHERE  v2.valuetype = 'prefLabel'
+                and v.valuetype in ('prefLabel','sortorder')
+                and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
+            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, vtype FROM children ORDER BY depth DESC, idpath DESC;
+        """.format(entitytype.conceptid_id)
 
-            ret = {} 
-            collector = False
+        column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'vtype']
+        cursor.execute(sql)
+        rows = cursor.fetchall()
 
-            for value in concept.values:
-                if value.type == 'prefLabel':
-                    ret['text'] = value.value
-                    ret['entitytypeid'] = entitytypeid
-                    value_id = value.id
-                if value.type == 'collector':
-                    collector = True
-
-            if collector != True:
-                ret['id'] = value_id
-
-            if len(concept.subconcepts) > 0:
+        def get_vals(stats):
+            ret = {}
+            if stats.type == 'prefLabel':            
+                ret['text'] = stats.text
+                ret['type'] = stats.type
+            if stats.type != 'collector':
+                ret['id'] = stats.id
+            if stats.type == 'sortorder':
+                ret['sort'] = stats.text
+            if len(stats.subdirs) > 0:
                 ret['children'] = []
+            for valid, value in stats.subdirs.items():
+                ret['children'].append(get_vals(value))
 
-            if depth_limit != None:
-                level = level + 1  
+            return ret
 
-            for subconcept in concept.subconcepts:
-                ret['children'].append(get_vals(subconcept, depth_limit=depth_limit, level=level)) 
+        class Vals(object):
+            def __init__(self):
+                self.count = 0
+                self.text = ''
+                self.id = ''
+                self.depth = ''
+                self.type = ''
+                self.subdirs = {}
 
-            return ret 
+            def __str__(self):
+                return str(self.count) + str(self.subdirs) 
 
-        result.append(get_vals(entitytype_concept))
+        counts = Vals()
+        for p in rows:
+            rec = dict(zip(column_names, p)) 
+            parts = rec['idpath'][1:-1].split(',')
+            branch = counts
+            for part in parts:
+                branch = branch.subdirs.setdefault(part, Vals())
+                branch.text = rec['valueto']
+                branch.id = rec['valueidto']
+                branch.type = rec['vtype'] 
+                branch.depth = rec['depth']
+                branch.count += 1
 
-        if 'children' in result[0]:
-            return result[0]['children']
+        result = get_vals(counts)
+
+        if 'children' in result:
+            return result['children']
         else:
             return []
-
-
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):
