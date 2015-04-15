@@ -597,3 +597,12 @@ class UserProfile(models.Model):
             super(UserProfile, self).save(*args, **kwargs) # Call the "real" save() method.
         except:
             return #'json invalid'
+
+class Overlays(models.Model):
+    overlayid = models.AutoField(primary_key=True)
+    overlaytype = models.TextField()
+    overlayvalue = models.TextField()
+    geometry = models.GeometryField()
+    objects = models.GeoManager()
+    class Meta:
+        db_table = u'aux"."overlays'

@@ -309,6 +309,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans 'View Report' %}
                                 </button>
                             </a>
+                            {% if user_can_edit == True %}
+                            <a href="javascript:void(0);" class="text-primary" target="_blank" data-bind="attr:{ href: selectedResource() ? 'resources/' +  selectedResource().entitytypeid + '/summary/' + selectedResource().id : 'javascript:void(0);'}">
+                                <button type="button" class="btn btn-primary">
+                                    {% trans 'Edit' %}
+                                </button>
+                            </a>
+                            {% endif %}
                         </div>
                     </div><!-- /.modal-content -->
 

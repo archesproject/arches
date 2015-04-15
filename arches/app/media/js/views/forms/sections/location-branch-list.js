@@ -33,6 +33,7 @@ define([
                 });
                 self.viewModel.branch_lists.push(branch);
                 self.trigger('change', 'geometrychange', branch);
+                self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
             };
 
             var bulkAddFeatures = function (features) {
@@ -142,6 +143,7 @@ define([
                         self.removeEditedBranch();
                         branch.editing(true);
                         self.trigger('change', 'geometrychange', branch);
+                        self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
                     });
 
                     featureOverlay.addFeature(feature);
@@ -221,6 +223,14 @@ define([
             });
 
             this.$el.find(".close").click(function (){ 
+                $("#inventory-home").click()
+            });
+
+            $(".basemap").click(function (){
+                var basemap = $(this).attr('id');
+                _.each(map.baseLayers, function(baseLayer){
+                    baseLayer.layer.setVisible(baseLayer.id == basemap);
+                });
                 $("#inventory-home").click()
             });
 

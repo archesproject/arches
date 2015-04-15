@@ -11,22 +11,18 @@ to help you quickly get Arches running on your server.
 What do I need to know to use this guide?
 -----------------------------------------
 
-Arches is designed to let you manage many types of cultural heritage
-data. And while we've tried to make it easy to install Arches, you'll
-need to make some decisions on how you wish to describe and manage the
-information that goes into Arches. But don't worry, we've also included
-lots of examples and well-thought-out defaults for setting up the
-software.
+Arches is designed to let you build semantically rich, geospatial applications.  If you are a software developer, this document will help you understand how to use Arches to create your own custom applications.  We expect that you are comfortable with python and javascript.
 
-So, installing Arches means loading software and deciding how you want
-to describe the cultural heritage information that's important to you.
-We've written this guide assuming that you are comfortable working with
-your computer's command line, and that you can edit text files with
-ease.
+If you're not a software developer, you'll find useful information in this document such as how to install Arches and how to understand the graph model Arches uses to manage data.
 
-That's it! Feel free to tap a colleague on the shoulder if you need a
-little help along the way, or check out the resources at
-http://www.archesproject.org for more support.
+Please note that you will need to install an Arches application to do any real work with Arches.  You can visit http://www.archesproject.org to get a list of open source Arches applications.  
+
+
+It's important to recognize that Arches is designed to manage large, enterprise-scale datasets. The software is sophisticated and is designed to support extensive customization.  This means that there are many ways to deploy Arches.
+
+We've written this guide to streamline the installation of Arches Server in the most straight-forward manner possible. However, you can access the Arches source code at https://bitbucket.org/arches/arches3 if you wish to extend or contribute to the Arches project.
+
+
 
 System Requirements
 ===================
@@ -46,15 +42,6 @@ Minimum system requirements:
     * At least 4GB of RAM for evaluation and testing, or 8 to 16GB for production.
     * 10GB minimum to install the code base and test dataset, but disk space requirements will vary greatly depending on the size of your dataset
 
-It's important to recognize that Arches is designed to manage large,
-enterprise-scale Cultural Heritage inventories. The software is
-sophisticated and is designed to be support extensive customization.
-This means that there are many ways to deploy Arches.
-
-We've written this guide to streamline the installation of Arches Server
-and the in the more straight-forward manner possible. These
-installation instructions provide step-by-step guidelines for installing
-Arches.
 
 
 Dependencies
@@ -76,31 +63,38 @@ the required dependencies and getting Arches up and running quickly.
    installing-dependencies-windows
 
 
-Installation
-============
+Installing Arches
+=================
 
 For the installation process you will need **pip** installed on your system. If you don't already have it, you can find instructions to install it here: https://pip.pypa.io/en/latest/installing.html
 
-Generally arches applications (in the case below 'my_arches_app') are installed in a project directory (in the case below 'Projects'). A virtual environment ('ENV') is created at the same directory as your arches application, so if you have multiple arches applications, they can share the same virtual environment.::
+If you have installed the dependencies, you're ready to install Arches.
 
-    /Projects
-      /ENV (virtual environment where arches gets installed)
-      /my_arches_app
+#1. Create the Arches Project folder:
 
-With your Arches dependencies installed, you are now ready to install Arches. 
+    Create a folder called 'Projects' (or some other meaningful name) on your system.    
 
-#.  Install virtualenv and create your Python virtual environment::
+
+#2. Install virtualenv::
 
         $ pip install virtualenv
 
-    .. note::
-        Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
 
-    virtualenv creates a directory with it's own installation of Python and Python executables. Arches will be installed within this virtual environment. To do so, navigate to your Projects directory (or wherever you want to create your arches applications) and create your virtual environment with the following command::
+
+**Note**
+    Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
+
+
+#3. Create the ENV folder:
+
+    Navigate to your Projects directory (or wherever you named the root Arches folder) and create your virtual environment with the following command::
 
         $ virtualenv ENV
 
-    Now activate your virtual environment with the following command:
+    
+#4. Install Arches:
+
+    Activate your virtual environment with the following command:
 
         On Linux (and other POSIX systems)::
 
@@ -108,109 +102,40 @@ With your Arches dependencies installed, you are now ready to install Arches.
 
         On Windows::
 
-            > \path\to\ENV\Scripts\activate
+            \path to 'Projects'\ENV\Scripts\activate
 
-    .. note::
-        If you are creating an Arches application based on HIP, you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
 
-#.  Install the arches module
-    For this step your virtual environment must be activated. You will know that's the case if you see the name of your virtual environment in parentheses proceeding your command prompt like so ``(ENV)``::
+        You should see the name of your virtual environment in parentheses proceeding your command prompt like so ``(ENV)``::
+
+        (ENV)$ 
+
+
+        Install Arches (your virtual environment must be activated)::
 
         (ENV)$ pip install arches
 
-#.  Create the Arches application scaffolding - in your Projects directory run the following command replacing ``my_arches_app`` with the name of your arches application::
-
-        (ENV)$ arches-app create my_arches_app
-
-#.  Install ElasticSearch
-    Navigate to the directory containing manage.py::
-
-      (ENV)$ cd my_arches_app/
-      (ENV)$ python manage.py packages -o setup_elasticsearch
-
-    Your project directory should now look something like this::
-
-        /Projects
-          /ENV (virtual environment where arches gets installed)
-          /my_arches_app
-            manage.py
-            wsgi.py
-            README.txt
-            /my_hip_app
-                settings.py
-                setup.py
-                urls.py
-                /elasticsearch
-                /logs
-                /media
-                /models
-                /source_data
-                /templates
-                /tests
-                /views
-
-Settings
-========
-
-Open the settings.py file in my_arches_app/my_arches_app
-
-There are a few changes that you may need to make in order for your application to install and run properly.
-
-Be sure that the name of your postgis template in your settings matches your postgis template in PostgreSQL. If it doesn't, uncomment the line (remove the ``#`` at the start of each line) below and replace 'template_postgis_20' with the name of your template::
-
-  #DATABASES['default']['POSTGIS_TEMPLATE'] = 'template_postgis_20' 
-
-The default database password used in Arches is 'postgis'. You may have already set your PostgreSQL password to something more secure. If so, uncomment the line below and replace 'postgis' with your PostgreSQL connection password::
-
-  #DATABASES['default']['PASSWORD'] = 'postgis'
-
-Running Arches
-==============
-
-#.  **Start ElasticSearch**:
-
-    Open a new command terminal and run the following command::
-
-        $ /my_arches_app/my_arches_app/elasticsearch/elasticsearch-1.4.1/bin/elasticsearch
-
-    You can minimize this terminal and let it run in the background
 
 
-#.  **Create your database**:
+That's it, you're done.  You should now have a folder structure that looks like this::
 
-    Using your first terminal::
+    /Projects
+        /ENV
 
-        (ENV)$ python manage.py packages -o install
 
-    .. note::
 
-        This step will drop and recreate a database with your with the following name: arches_my_arches_app as well as load any concept schemes or business data that you may have defined in your settings.
+Arches Applications
+==============================
 
-    .. note::
+Generally arches applications are installed in a folder directly under the Arches root folder.  You can install as many Arches applications as you like, and they'll all use the same Arches framework and virtual environment.  A typical Arches application installation will therefore look something like this:: 
 
-        If you get the following error *'django.db.utils.OperationalError: FATAL:  database "arches_my_arches_app" does not exist'* It is probably because Arches is unable to find your postgis database template to create your new application's database. By default, Arches will look for a template called 'template_postgis_20'. If this does not match the name of your postgis template database, open your new applications settings.py file and define the name of your postgis template::
+    /Projects
+        /ENV (virtual environment where the Arches frameowrk is installed)
+        /my_arches_app
+        /another_arches_app
 
-          DATABASES['default']['POSTGIS_TEMPLATE'] = 'the name of your postgis template' 
 
-#.  **Run arches**:
+**Note**
+    If you want to install an existing Arches application, such as the Heritage Inventory Package (HIP), you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
 
-    Open a new terminal. **Be sure to activate your virtual environment for this terminal as well**.
 
-    Navigate to your application's ``manage.py`` file and run::
 
-        (ENV)$ python manage.py runserver
-
-    Now you can open a browser window and see your application running at::
-
-        http://localhost:8000/
-
-    .. note::
-
-        We use the Django development server to make it easy for you to
-        confirm that Arches has installed properly. You WILL NEED to configure
-        Arches to use a production quality web server such as Apache if you want
-        to use Arches in production.
-
-Next steps:
-
-Now that Arches is running, you will need to load your concept scheme and resource data.  

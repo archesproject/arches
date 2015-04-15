@@ -30,7 +30,10 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.views.concept import get_preflabel_from_valueid
+from arches.app.models.concept import Concept
 from django.http import HttpResponseNotFound
+from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import Max, Min
 
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
@@ -64,6 +67,38 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
 
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
+    min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
+    timefilterdata = {
+        'important_dates': {
+            'branch_lists': [],
+            'domains': {
+                'important_dates' : Concept().get_e55_domain('BEGINNING_OF_EXISTENCE_TYPE.E55') + Concept().get_e55_domain('END_OF_EXISTENCE_TYPE.E55'),
+                'date_operators' : [{
+                    "conceptid": "0",
+                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                    "id": "0",
+                    "language,id": settings.LANGUAGE_CODE,
+                    "value": "Before",
+                    "valuetype": "prefLabel"
+                },{
+                    "conceptid": "1",
+                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                    "id": "1",
+                    "language,id": settings.LANGUAGE_CODE,
+                    "value": "On",
+                    "valuetype": "prefLabel"
+                },{
+                    "conceptid": "2",
+                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                    "id": "2",
+                    "language,id": settings.LANGUAGE_CODE,
+                    "value": "After",
+                    "valuetype": "prefLabel"
+                }]
+            }
+        }
+    }
+
     if request.method == 'GET':
         if form != None:
             lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -80,7 +115,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
                     'resource': resource,
                     'resource_name': resource.get_primary_name(),
                     'resource_type_name': resource.get_type_name(),
-                    'form_groups': resource.form_groups
+                    'form_groups': resource.form_groups,
+                    'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
+                    'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
+                    'timefilterdata': JSONSerializer().serialize(timefilterdata),
                 },
                 context_instance=RequestContext(request))
         else:
@@ -196,3 +234,9 @@ def edit_history(request, resourceid=''):
             ret[index]['log'].append(log)
             
     return JSONResponse(ret, indent=4)
+
+def get_admin_areas(request):
+    geomString = request.GET.get('geom', '')
+    geom = GEOSGeometry(geomString)
+    intersection = models.Overlays.objects.filter(geometry__intersects=geom)
+    return JSONResponse({'results': intersection}, indent=4)
