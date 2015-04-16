@@ -220,7 +220,7 @@ define(['jquery',
             return branch;
         },
 
-        undoCurrentEdit: function(e) {
+        undoCurrentEdit: function() {
             this.removeEditedBranch();
             this.addBlankEditBranch();
             if(this.originalItem !== null){
