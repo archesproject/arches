@@ -13,11 +13,6 @@ require([
     'jquery-validate',
 ], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm) {
     $(document).ready(function() {
-        var mode = 'scheme';
-        if (window.location.search.search('mode=dropdown') === 1){
-            mode = 'dropdown';
-        }
-
         window.onpopstate = function(event) {
           //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
           //window.location = document.location;

@@ -72,7 +72,6 @@ def concept(request, conceptid):
         include_relatedconcepts = request.GET.get('include_relatedconcepts', 'true') == 'true'
         emulate_elastic_search = request.GET.get('emulate_elastic_search', 'false') == 'true'
         depth_limit = request.GET.get('depth_limit', None)
-        mode = request.GET.get('mode', 'scheme')
 
         if f == 'html':
             depth_limit = 1
@@ -95,7 +94,6 @@ def concept(request, conceptid):
         labels = []
         this_concept = Concept().get(id=conceptid)
 
-        print this_concept.nodetype
         if f == 'html':
             if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
                 concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
