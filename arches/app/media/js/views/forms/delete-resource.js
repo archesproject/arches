@@ -4,6 +4,10 @@ define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
             'click .delete-resource-btn': 'deleteResource'
         },
 
+        initialize: function() {
+            this.$el.find('.form-load-mask').hide();
+        },
+
         deleteResource: function() {
             $.ajax({
                 method: 'DELETE',

@@ -50,7 +50,7 @@ class ResourceForm(object):
         # update resource w/ post data
         return 
 
-    def load(self):
+    def load(self, lang):
         # retrieves the data from the server
         return 
 

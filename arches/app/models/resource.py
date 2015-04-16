@@ -220,6 +220,8 @@ class Resource(Entity):
 
         relationship.save()
 
+        return relationship
+
     def delete_all_resource_relationships(self):
         """
         Deletes all relationships to other resources. 
