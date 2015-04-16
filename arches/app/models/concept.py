@@ -619,89 +619,60 @@ class Concept(object):
                 WHERE  v2.valuetype = 'prefLabel'
                 and v.valuetype in ('prefLabel','sortorder')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY conceptidto, depth DESC, idpath DESC;
+            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;;
         """.format(entitytype.conceptid_id)
 
 
         column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
         cursor.execute(sql)
         rows = cursor.fetchall()
-        from operator import itemgetter
 
-        def get_vals(stats):
-            ret = None
-            ret= {}          
-            ret['text'] = stats.text
-            ret['id'] = stats.id
-            ret['concept'] = stats.concept
-            if stats.sortorder == '':
-                stats.sortorder = stats.text
-            ret['sortorder'] = stats.sortorder
-            ret['entitytypeid'] = entitytypeid
-            if len(stats.subdirs) > 0:
-                ret['children'] = []
-            for valid, value in stats.subdirs.items():
-                if ret != {}:
-                    ret['children'].append(get_vals(value))
-            return ret
-
-        class Vals(object):
-            def __init__(self):
-                self.count = 0
+        class Val(object):
+            def __init__(self, conceptid):
                 self.text = ''
+                self.conceptid = conceptid
                 self.id = ''
-                self.concept = ''
                 self.sortorder = ''
-                self.subdirs = {}
+                self.collector = ''
+                self.children = []
+                self.entitytypeid = entitytypeid
 
-            def __str__(self):
-                return str(self.count) + str(self.subdirs) 
+        result = Val(entitytype.conceptid_id)
 
-        counts = Vals()
+        def _findNarrower(val, path, rec):
+            for conceptid in path:
+                childids = [child.conceptid for child in val.children]
+                if conceptid not in childids:
+                    new_val = Val(rec['conceptidto'])
+                    if rec['vtype'] == 'sortorder':
+                        new_val.sortorder = rec['valueto']
+                    elif rec['vtype'] == 'prefLabel':
+                        new_val.text = rec['valueto']
+                        new_val.id = rec['valueidto']
+                    elif rec['vtype'] == 'collector':
+                        new_val.collector == 'collector'
+                    val.children.append(new_val)
+                else:
+                    for child in val.children:
+                        if conceptid == child.conceptid:
+                            if conceptid == path[-1]:
+                                if rec['vtype'] == 'sortorder':
+                                    child.sortorder = rec['valueto']
+                                elif rec['vtype'] == 'prefLabel':
+                                    child.text = rec['valueto']
+                                    child.id = rec['valueidto']
+                                elif rec['vtype'] == 'collector':
+                                    child.collector == 'collector'
+                            path.pop(0)
+                            _findNarrower(child, path, rec)
+                val.children.sort(key=lambda x: (x.sortorder, x.text))
 
-        current_concept = {'conceptid': '', 'sortorder':'', 'text':'', 'collector':'', 'valueid':''}
+        for row in rows:
+            rec = dict(zip(column_names, row))
+            path = rec['conceptpath'][1:-1].split(',')
+            _findNarrower(result, path, rec)
 
-        for i, row in enumerate(rows[0:-1]):
-            nextrec = dict(zip(column_names, rows[i + 1]))
-            rec = dict(zip(column_names, row)) 
-            if rec['conceptidto'] != nextrec['conceptidto']:
-                parts = rec['conceptpath'][1:-1].split(',')
-                if rec['vtype'] == 'sortorder':
-                    current_concept['sortorder'] = rec['valueto']
-                elif rec['vtype'] == 'prefLabel':
-                    current_concept['prefLabel'] = rec['valueto']
-                    current_concept['valueid'] = rec['valueidto']
-                elif rec['vtype'] == 'collector':
-                    current_concept['collector'] = 'collector'
-                
-                branch = counts
-
-                for part in parts:
-                    branch = branch.subdirs.setdefault(part, Vals())
-                    branch.text = current_concept['prefLabel']
-                    branch.id = current_concept['valueid']
-                    branch.concept = current_concept['conceptid']
-                    branch.sortorder = current_concept['sortorder']
-                    branch.count += 1
-
-            else:
-                new_concept = {'conceptid': rec['conceptidto'], 'sortorder':'', 'prefLabel':''}
-                if rec['vtype'] == 'sortorder':
-                    new_concept['sortorder'] = rec['valueto']
-                elif rec['vtype'] == 'prefLabel':
-                    new_concept['prefLabel'] = rec['valueto']
-                    new_concept['valueid'] = rec['valueidto']
-                elif rec['vtype'] == 'collector':
-                    new_concept['collector'] = 'collector'
-
-                current_concept = new_concept
-
-        result = get_vals(counts)
-
-        if 'children' in result:
-            return result['children']
-        else:
-            return []
+        return JSONSerializer().serializeToPython(result)['children']
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):
