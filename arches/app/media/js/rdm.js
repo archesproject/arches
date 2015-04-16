@@ -38,7 +38,8 @@ require([
         });
         var conceptReport = new ConceptReport({
             el: $('#concept_report')[0],
-            model: concept
+            model: concept,
+            mode: ''
         });
         var conceptsearch = new ConceptSearch({ 
             el: $('#rdm-concept-search-container')[0],
@@ -71,7 +72,8 @@ require([
             },
             'conceptSelected': function(conceptid){
                 concept.clear();
-                concept.set('id', conceptid);                   
+                concept.set('id', conceptid);   
+                conceptReport.mode = '';                
                 conceptReport.render();
             }
         });
@@ -83,6 +85,12 @@ require([
 
                 //conceptTree.render();
                 conceptReport.render();
+            },
+            'dropdownConceptSelected': function(conceptid) {
+                concept.clear();
+                concept.set('id', conceptid);
+
+                conceptReport.render('dropdown');
             },
             'parentsChanged': function() {
                 //conceptTree.render();

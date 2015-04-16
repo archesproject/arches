@@ -17,6 +17,7 @@ define([
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
+            'click .concept-report-content *[data-action="viewddconcept"]': 'dropdownConceptSelected',
             'click .concept-report-content *[data-action="delete-relationship"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-value"]': 'deleteClicked',
             'click .concept-report-content *[data-action="delete-concept"]': 'deleteClicked',
@@ -43,8 +44,16 @@ define([
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
-            $.ajax({
-                url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid) + '?f=html',
+            if (this.xhr){
+                this.xhr.abort();
+            }
+
+            this.xhr = $.ajax({
+                url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid),
+                data: {
+                    'f': 'html',
+                    'mode': this.mode
+                },
                 success: function(response) {
                     self.$el.find('.concept-report-loading').addClass('hidden');
                     self.$el.html(response);
@@ -106,6 +115,14 @@ define([
 
         conceptSelected: function(e) {
             var data = $(e.target).data();
+            this.mode = '';
+
+            this.trigger('conceptSelected', data.conceptid);
+        },
+
+        dropdownConceptSelected: function(e) {
+            var data = $(e.target).data();
+            this.mode = 'dropdown';
 
             this.trigger('conceptSelected', data.conceptid);
         },

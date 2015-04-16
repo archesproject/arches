@@ -124,12 +124,10 @@ class Concept(object):
 
             hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
-
                 self.hassubconcepts = True
 
             if include_subconcepts:
                 conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
-
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -143,10 +141,7 @@ class Concept(object):
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
             if include_parentconcepts:
-                if nodetype == 'EntityType':
-                    conceptrealations = models.ConceptRelations.objects.filter(conceptidto = self.id, relationtype = 'member')
-                else:
-                    conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -159,7 +154,7 @@ class Concept(object):
                         self.parentconcepts.append(parentconcept)
 
             if include_relatedconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptidto_id != self.id:
                         relatedconcept = Concept().get(relation.conceptidto_id, include=['label'])
