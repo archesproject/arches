@@ -120,9 +120,12 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                             altlabel_list = row[u'ALTLABELS'].split(';')
                             for altlabel in altlabel_list:
                                 concept.addvalue({'value':altlabel, 'language': settings.LANGUAGE_CODE, 'type': 'altLabel', 'category': 'label'})    
-                        # if lookups.get_lookup(row[u'PARENTCONCEPTID']).values[0].type == 'collector':
-                        lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
-                        lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='narrower', target=concept.id, rownum=rows.line_num)
+                        
+                        parent_concept_id = lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id
+                        lookups.add_relationship(source=parent_concept_id, type='narrower', target=concept.id, rownum=rows.line_num)
+                        # don't add a member relationship between a top concept and it's children
+                        if parent_concept_id != top_concept.id: 
+                            lookups.add_relationship(source=parent_concept_id, type='member', target=concept.id, rownum=rows.line_num)
                         
                         # add the member relationship from the E55 type (typically) to their top members
                         if auth_doc_file_name in auth_file_to_entity_concept_mapping and row[u'PARENTCONCEPTID'] == auth_doc_file_name:
