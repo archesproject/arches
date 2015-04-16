@@ -23,6 +23,7 @@ define(['jquery',
 
             initialize: function(options) { 
                 var self = this;
+                _.extend(this, options);
 
                 this.total = ko.observable();
                 this.results = ko.observableArray();
