@@ -124,9 +124,10 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                         lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='member', target=concept.id, rownum=rows.line_num)
                         lookups.add_relationship(source=lookups.get_lookup(legacyoid=row[u'PARENTCONCEPTID']).id, type='narrower', target=concept.id, rownum=rows.line_num)
                         
+                        # add the member relationship from the E55 type (typically) to their top members
                         if auth_doc_file_name in auth_file_to_entity_concept_mapping and row[u'PARENTCONCEPTID'] == auth_doc_file_name:
- 
-                            lookups.add_relationship(source=auth_file_to_entity_concept_mapping[auth_doc_file_name]['ENTITYTYPE_CONCEPTID'], type='member', target=concept.id, rownum=rows.line_num)
+                            for entitytype_info in auth_file_to_entity_concept_mapping[auth_doc_file_name]:
+                                lookups.add_relationship(source=entitytype_info['ENTITYTYPE_CONCEPTID'], type='member', target=concept.id, rownum=rows.line_num)
 
                         if row[u'PARENTCONCEPTID'] == '' or (row[u'CONCEPTTYPE'].upper() != 'INDEX' and row[u'CONCEPTTYPE'].upper() != 'COLLECTOR'):
                             raise Exception('The row has invalid values.')
@@ -226,11 +227,14 @@ def entitytype_to_auth_doc_mapping(cursor, path_to_authority_files):
                     SELECT conceptid FROM data.entity_types WHERE entitytypeid = '%s'
                 """%(row[u'ENTITYTYPE'])
                 #print sql
-
             try:
                 cursor.execute(sql)
                 entity_type_conceptid = str(cursor.fetchone()[0])
-                ret[str(row['AUTHORITYDOC'])] = {'ENTITYTYPE' : row[u'ENTITYTYPE'], 'ENTITYTYPE_CONCEPTID': entity_type_conceptid}
+                auth_doc_file_name = str(row['AUTHORITYDOC'])
+                if auth_doc_file_name in ret:
+                    ret[auth_doc_file_name].append({'ENTITYTYPE' : row[u'ENTITYTYPE'], 'ENTITYTYPE_CONCEPTID': entity_type_conceptid})
+                else:
+                    ret[auth_doc_file_name] = [{'ENTITYTYPE' : row[u'ENTITYTYPE'], 'ENTITYTYPE_CONCEPTID': entity_type_conceptid}]
             except Exception as e:
                 errors.append('ERROR in row %s (%s):\n%s\n%s' % (rows.line_num, str(e), sql, traceback.format_exc()))
 
