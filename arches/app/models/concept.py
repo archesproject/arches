@@ -608,7 +608,7 @@ class Concept(object):
                 JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
                 WHERE d.conceptidfrom = '{0}'
                 and c2.valuetype = 'prefLabel'
-                and c.valuetype in ('prefLabel', 'sortorder')
+                and c.valuetype in ('prefLabel', 'sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                 UNION
                 SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
@@ -617,9 +617,9 @@ class Concept(object):
                 JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
                 JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom) 
                 WHERE  v2.valuetype = 'prefLabel'
-                and v.valuetype in ('prefLabel','sortorder')
+                and v.valuetype in ('prefLabel','sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;;
+            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;
         """.format(entitytype.conceptid_id)
 
 
@@ -662,7 +662,7 @@ class Concept(object):
                                     child.text = rec['valueto']
                                     child.id = rec['valueidto']
                                 elif rec['vtype'] == 'collector':
-                                    child.collector == 'collector'
+                                    child.collector = 'collector'
                             path.pop(0)
                             _findNarrower(child, path, rec)
                 val.children.sort(key=lambda x: (x.sortorder, x.text))

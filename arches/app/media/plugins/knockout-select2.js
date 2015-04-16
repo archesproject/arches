@@ -24,7 +24,13 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             domains[select2Config.dataKey] = [];
             domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
             select2Config.data = domains[select2Config.dataKey];
-            
+
+            _.each(select2Config.data, function (item) {
+                if (item.collector === 'collector') {
+                    delete item.id;
+                }
+            });
+
             select2Config.createSearchChoice = function(term, data) { 
                 if ($(data).filter(function() 
                     { return this.text.localeCompare(term)===0; }).length===0) {
