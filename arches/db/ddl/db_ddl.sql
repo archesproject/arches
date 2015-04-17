@@ -2247,7 +2247,7 @@ CREATE TABLE overlays (
     overlayty text,
     overlayval text,
     geometry public.geometry(Geometry,4326),
-    overlayid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
+    overlayid uuid NOT NULL DEFAULT public.uuid_generate_v1mc()
 );
 
 
@@ -2278,7 +2278,7 @@ CREATE INDEX overlays_sidx ON overlays USING gist (geometry);
 -- Name: overlaytype_idx; Type: INDEX; Schema: aux; Owner: postgres; Tablespace: 
 --
 
-CREATE INDEX overlaytype_idx ON overlays USING btree (overlaytype);
+CREATE INDEX overlaytype_idx ON overlays USING btree (overlayty);
 
 
 -- Completed on 2014-09-10 15:56:11
