@@ -50,14 +50,18 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
         },
 
         update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            var val = ko.utils.unwrapObservable(valueAccessor().value());
-            if (typeof val === 'string' || val === null){
+            var val = '';
+            if(valueAccessor().value){
+                val = ko.utils.unwrapObservable(valueAccessor().value());
+                if (typeof val === 'string' || val === null){
+                    return $(el).select2("val", val, true);
+                }
+                if (typeof val === 'object'){
+                    return $(el).select2("val", val.value, true);
+                }
+            }else{
                 return $(el).select2("val", val, true);
             }
-            if (typeof val === 'object'){
-                return $(el).select2("val", val.value, true);
-            }
-            
         }
     };
 
