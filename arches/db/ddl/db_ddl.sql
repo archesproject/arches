@@ -2244,8 +2244,8 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE overlays (
-    overlaytype text,
-    overlayvalue text,
+    overlayty text,
+    overlayval text,
     geometry public.geometry(Geometry,4326),
     overlayid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
 );
