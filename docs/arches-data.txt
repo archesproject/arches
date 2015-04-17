@@ -54,10 +54,10 @@ One special business table is the domains table.  It is unique in that it only s
 The ``entity_types`` table really belongs in all three categories because:
 
 	* they classify entities into an "attribute" that an implementor defines in the course of creating resource graphs. 
-	* they link the attribute to one of a series of ontological categories that, by default, is based on CRM
-	* they specify which attributes must be powered by drop-down lists from the Reference data section.
+	* they specify the ontological category that (CRM classification) that an entity falls into
+	* they identify which attributes must be powered by drop-down lists from the reference data manager.
 
-In the simplest potential case, a resource that happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
+A very simple example is this: a resource happens to be a person with a name will, at a minimum, contain two entities and one relation.  That is, an entity that represents the existence of the resource, another entity that contains the person's name, and a relation that links the two together.
 
 .. Hint:: Each of these three sections within Arches database are contained in a separate Postgres schema. Each schema, in turn, has within in it two predefined views called ``vw_nodes`` and ``vw_edges``.  The Arches application does not use these views, but they could be useful in developing graph-based outputs of resource instances, resource graphs, and RDM graphs.
 
@@ -69,13 +69,13 @@ Resource graphs are the logical framework that is used by Arches to define the s
 
 Arches applications must provide a resource graph for each resource type being inventoried.
 
-One example of a fully featured resource graph from the Arches HIP application is ``HERITAGE_RESOURCE.E18``.
+One example of a fully featured resource graph from the Arches HIP application is HERITAGE_RESOURCE.E18.
 
 
 .. image:: images/HERITAGE_RESOURCE_graph.png
 
 
-While this visualization is useful for creating, editing, and analyzing the resource and its available attributes, the graph's data is populated into Arches from two specially formatted CSV files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
+The graph's data is populated into Arches from two specially formatted CSV files named ``{resource type name}_nodes.csv`` and ``{resourcetype name}_edges.csv``.  
 
 .. note:: As of the writing of this document, the Arches developers' primary tool to develop and visualize the resource graphs is Gephi (http://www.gephi.org/).  However, it is possible that a future version of Arches may include tools that support resource graph development and visualization.
 
@@ -93,9 +93,6 @@ Regardless of how the nodes and edges CSV files are created, they must include t
 	* ``Source``: the ID of the source node
 	* ``Target``: the ID of the target node
 	* ``Label``: the semantic CRM "property" that allows them to connect to each other.
-
-.. note:: Arches comes loaded with the semantic properties defined in the CIDOC CRM (http://www.cidoc-crm.org/).  Look to the CRM documentation to learn about the list of available properties.
-
 
 Ontologies
 ----------
