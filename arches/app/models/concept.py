@@ -169,7 +169,7 @@ class Concept(object):
             
     def save(self):
         self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-        concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid, 'nodetype_id': self.nodetype})
+        concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid if self.legacyoid != '' else self.id, 'nodetype_id': self.nodetype})
 
         for value in self.values:
             if not isinstance(value, ConceptValue): 
