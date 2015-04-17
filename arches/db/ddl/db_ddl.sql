@@ -2247,7 +2247,7 @@ CREATE TABLE overlays (
     overlaytype text,
     overlayvalue text,
     geometry public.geometry(Geometry,4326),
-    overlayid uuid NOT NULL
+    overlayid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
 );
 
 
