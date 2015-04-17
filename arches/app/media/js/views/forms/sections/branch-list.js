@@ -27,8 +27,8 @@ define(['jquery',
                     item.editing = ko.observable(false);
                 }, this);      
 
-                _.each(this.viewModel.defaults, function(value, key){
-                    this.addDefaultNode(key, value);
+                _.each(this.viewModel.defaults, function(value, entitytypeid){
+                    this.addDefaultNode(entitytypeid, 'value', value);
                 }, this);   
             }
 
@@ -80,7 +80,7 @@ define(['jquery',
         },
 
         getEditedNode: function(entitytypeid, key){
-            this.addDefaultNode(entitytypeid, '');
+            this.addDefaultNode(entitytypeid, key, '');
             return ko.pureComputed({
                 read: function() {
                     var ret = null;
@@ -133,17 +133,18 @@ define(['jquery',
             return branch_lists;
         },
 
-        addDefaultNode: function(entitytypeid, value){
+        addDefaultNode: function(entitytypeid, key, value){
             var alreadyHasDefault = false;
             var def = {
                 property: '',
                 entitytypeid: entitytypeid,
                 entityid: '',
-                value: value,
+                value: '',
                 label: '',
                 businesstablename: '',
                 child_entities: []
             };
+            def[key] = value;
             _.each(this.defaults, function(node){
                 if (node.entitytypeid === entitytypeid){
                     alreadyHasDefault = true;
