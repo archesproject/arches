@@ -310,6 +310,24 @@
     </div>
 
 
+    <div action="" class="modal fade cannot-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+        <div class="modal-dialog cannot-delete">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans "Unable to Delete" %}</h4>
+                </div>
+                <div class="modal-body">
+                    <h4 class="modal-title">{% trans "Concept is is already in use by an existing project." %}</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Ok" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- End Modal window for adding a new concept -->
     <div id="value-form">
         {% include "views/rdm/modals/value-form.htm" %}

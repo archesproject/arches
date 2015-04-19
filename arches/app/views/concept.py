@@ -198,13 +198,22 @@ def concept(request, conceptid):
 
         if data:
             with transaction.atomic():
+
                 concept = Concept(data)
 
                 delete_self = data['delete_self'] if 'delete_self' in data else False  
                 if not (delete_self and concept.id in CORE_CONCEPTS):
-                    concept.delete_index(delete_self=delete_self)
-                    concept.delete(delete_self=delete_self)
-
+                    in_use = False
+                    for subconcept in data['subconcepts']:
+                        if in_use == False:
+                            check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
+                            in_use = check_concept.check_if_concept_in_use()
+                    if in_use == False:
+                        concept.delete_index(delete_self=delete_self)
+                        concept.delete(delete_self=delete_self)
+                    else:
+                        return JSONResponse({"in_use": in_use})
+                        
                 return JSONResponse(concept)
 
     return HttpResponseNotFound()

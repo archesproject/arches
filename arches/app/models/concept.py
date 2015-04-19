@@ -585,6 +585,26 @@ class Concept(object):
         if self.nodetype == 'ConceptScheme':
             return self
 
+    def check_if_concept_in_use(self):
+        """Checks  if a concept or any of its subconcepts is in use by a resource"""
+        in_use = False
+        for value in self.values:
+            try:
+                recs = models.Domains.objects.filter(val=value.id)
+                if len(recs) > 0:
+                    in_use = True
+                    break
+                else:
+                    pass
+            except Exception, e:
+                print e
+        if in_use != True:
+            for subconcept in self.subconcepts:
+                in_use = subconcept.check_if_concept_in_use() 
+                if in_use == True:
+                    return in_use
+        return in_use
+
     def get_e55_domain(self, entitytypeid):
         """
         For a given entitytypeid creates a dictionary representing that entitytypeid's concept graph (member pathway) formatted to support
