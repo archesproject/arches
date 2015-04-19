@@ -17,10 +17,6 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 return item.text;
             };
 
-            select2Config.formatSelection = function (item) {
-                return item.text;
-            };
-
             domains[select2Config.dataKey] = [];
             domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
             select2Config.data = domains[select2Config.dataKey];
@@ -38,10 +34,52 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                     }
                 }
 
+            select2Config.getConceptPath = function(root_conceptid) {
+                var root = {'children': select2Config.data}
+                var result = [];
+                var isParent = false;
+  
+                function lookForChild(obj, conceptid) {
+                    isParent = false;
+                    _.each(obj.children, function (item) {
+                        if (item.conceptid === conceptid) {
+                            isParent = true;
+                            result.push(obj)
+                        } 
+                    });
+
+                    if (isParent === false) {
+                        for (var i=0; i<obj.children.length;i+=1){
+                            lookForChild(obj.children[i], conceptid);
+                        }
+                    } else {
+                        lookForChild(root, obj.conceptid);
+                    }
+                };
+
+                lookForChild(root, root_conceptid)
+
+                return result;
+            }
+
+            select2Config.formatSelection = function (item) {
+                var path = [];
+                var result = item.text;
+                if (select2Config.showParents === true) {
+                    path = this.getConceptPath(item.conceptid);
+                    if (path.length > 1) {
+                        result = path[0].text + ": " + item.text;
+                    }
+                }
+                return result
+            };
+
+
             $(el).select2(select2Config);
 
 
             $(el).on("change", function(val) {
+                // $(".select2-container .select2-choice").css({ "height": "200px;" }); Trying to change height of select2 result container to show more parents
                 if(val.added){
                     return select2Config.value({'value':val.added.id, 'label':val.added.text, 'entitytypeid': val.added.entitytypeid});
                 }
