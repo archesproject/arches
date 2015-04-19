@@ -1,82 +1,77 @@
 {% load staticfiles %}
 {% load i18n %}
-<div class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 md-margin-bottom-40">
-                <!-- About -->
-                <div class="headline"><h2>About</h2></div>  
-                <p class="margin-bottom-25 md-margin-bottom-40">
-                    Arches is built to create and manage rich inventories of culturally signficant resources.
-                </p>  
 
-                <!-- End About -->
-
-                <!-- Monthly Newsletter -->
-                <div class="headline"><h2>Monthly Newsletter</h2></div> 
-                <p>Subscribe to our newsletter and stay up to date with the latest news and deals!</p>
-                <form class="footer-subsribe">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Email Address">                            
-                        <span class="input-group-btn">
-                            <button class="btn-u" type="button">Subscribe</button>
-                        </span>
-                    </div>                  
-                </form>                         
-                <!-- End Monthly Newsletter -->
-            </div><!--/col-md-4-->  
-            
-            <div class="col-md-4 md-margin-bottom-40">
-                <!-- Recent Blogs -->
-                <div class="posts">
-                    <div class="headline"><h2>Recent Blog Entries</h2></div>
-                    <dl class="dl-horizontal">
-                        <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/6.jpg" alt="" /></a></dt>
-                        <dd>
-                            <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
-                        </dd>
-                    </dl>
-                    <dl class="dl-horizontal">
-                        <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/10.jpg" alt="" /></a></dt>
-                        <dd>
-                            <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
-                        </dd>
-                    </dl>
-                    <dl class="dl-horizontal">
-                        <dt><a href="javascript:void(0);"><img src="{{ STATIC_URL }}img/sliders/elastislide/11.jpg" alt="" /></a></dt>
-                        <dd>
-                            <p><a href="javascript:void(0);">Anim moon officia Unify is an incredibly beautiful responsive Bootstrap Template</a></p> 
-                        </dd>
-                    </dl>
+<!--=== Footer v6 ===-->
+<div id="footer-v6" class="footer-v6">
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                
+                <!-- Default About Us.  Edit the <p> text below for your own message -->
+                <div class="col-md-3 sm-margin-bottom-40">
+                    <div class="heading-footer">
+                        <h2>About Arches</h2>
+                    </div>
+                    <p>Arches is built to create and manage rich inventories of culturally significant resources.</p>
                 </div>
-                <!-- End Recent Blogs -->                    
-            </div><!--/col-md-4-->
+                <!-- End About Us -->
 
-            <div class="col-md-4">
-                <!-- Contact Us -->
-                <div class="headline"><h2>Contact Us</h2></div> 
-                <address class="md-margin-bottom-40">
-                    25, Lorem Lis Street, Orange <br />
-                    California, US <br />
-                    Phone: 800 123 3456 <br />
-                    Fax: 800 123 3456 <br />
-                    Email: <a href="mailto:info@anybiz.com" class="">info@anybiz.com</a>
-                </address>
-                <!-- End Contact Us -->
+                <!-- Recent News -->
+                <div class="col-md-3 sm-margin-bottom-40">
+                    <div class="heading-footer"><h2>Recent News</h2></div>
+                    <ul class="list-unstyled link-news">
+                        <li>
+                            <a href="http://www.wmf.org/">WMF Introduces Arches v3.0</a>
+                            <small>5 May, 2015</small>
+                        </li>
+                        <li>
+                            <a href="#">Getty Announces HistoricPlacesLA</a>
+                            <small>23 February, 2015</small>
+                        </li>
+                        <li>
+                            <a href="http://www.archesproject.org">Arches-HIP Launched</a>
+                            <small>20 April, 2015</small>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Recent News -->
 
-                <!-- Social Links -->
-                <div class="headline"><h2>Stay Connected</h2></div> 
-                <ul class="social-icons">
-                    <li><a href="javascript:void(0);" data-original-title="Feed" class="social_rss"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Facebook" class="social_facebook"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Twitter" class="social_twitter"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Goole Plus" class="social_googleplus"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Pinterest" class="social_pintrest"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Linkedin" class="social_linkedin"></a></li>
-                    <li><a href="javascript:void(0);" data-original-title="Vimeo" class="social_vimeo"></a></li>
-                </ul>
-                <!-- End Social Links -->
-            </div><!--/col-md-4-->
-        </div>
-    </div> 
-</div> 
+                <!-- Useful Links -->
+                <div class="col-md-3 sm-margin-bottom-40">
+                    <div class="heading-footer"><h2>Useful Links</h2></div>
+                    <ul class="list-unstyled footer-link-list">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="">Search</a></li>
+                        <li><a href="{% url 'map' %}">Maps</a></li>
+                        <li><a href="#">Help</a></li>
+                    </ul>
+                </div>
+                <!-- End Useful Links -->
+
+                <!-- Contacts -->
+                <div class="col-md-3">
+                    <div class="heading-footer"><h2>Contacts</h2></div>
+                    <ul class="list-unstyled contacts">
+                        <li>
+                            <i class="radius-3x fa fa-map-marker"></i>
+                            601 Montgomery St, Suite 1095,<br>
+                            San Francisco, CA 94111
+                        </li>
+                        <li>
+                            <i class="radius-3x fa fa-phone"></i>
+                            (+123) 456 7890 (main)<br>
+                            (+123) 456 7891 (mobile)
+                        </li>
+                        <li>
+                            <i class="radius-3x fa fa-globe"></i>
+                            <a href="#">info@arches.org</a><br>                           
+                            <a href="#">www.archesproject.org</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Contacts -->
+            </div>
+        </div><!--/container -->
+    </div>
+</div>
+<!--=== End Footer v6 ===-->

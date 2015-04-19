@@ -14,6 +14,16 @@
 @import url(plugins/animate.css);
 @import url(plugins/box-shadows.css);
 
+
+/*Arches Topbar
+------------------------------------*/
+.powered-by-arches { 
+    left: 0px; 
+    height: 15px; 
+    margin-top: -8px; 
+    padding-right: 5px;
+}
+
 /*Boxed Layout
 ------------------------------------*/
 .wrapper {
@@ -1043,30 +1053,6 @@
     border-color: #888 !important;
 }
 
-/*Copyright*/
-.copyright {
-    font-size: 12px;
-    padding: 11px 0 7px;
-    background: #3e4753;
-    border-top: solid 1px #777; 
-}
-
-.copyright p {
-    color: #dadada;
-    margin-top: 12px;
-}
-
-.copyright a {
-    margin: 0 5px;
-    color: #72c02c;
-}
-.copyright a:hover {
-    color: #a8f85f;
-}
-
-.copyright a img {
-    margin-top: 5px;
-}
 
 /*Breadcrumbs
 ------------------------------------*/ 

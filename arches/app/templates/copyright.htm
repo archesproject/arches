@@ -1,19 +1,49 @@
 {% load staticfiles %}
 {% load i18n %}
+
 <div class="copyright">
     <div class="container">
         <div class="row">
-            <div class="col-md-6">                     
-                <p>
-                    Arches v3.0  |  HIP (Heritage Inventory Package) v1.0
-                    <a href="http://www.archesproject.org">Arches Community</a>
-                </p>
+            <div class="col-md-8 sm-margon-bottom-10">
+                <ul class="list-inline terms-menu">
+                    <li class="silver">Arches v3.0  |  HIP (Heritage Inventory Package) v1.0</li>
+                    <li><a href="http://www.archesproject.org">Arches Community</a></li>
+                </ul>
             </div>
-            <div class="col-md-6">  
-                <a href="{% url 'home' %}">
-                    <img class="pull-right arches-logo" id="logo-footer" src="{{ STATIC_URL }}img/arches_logo.png" alt="">
-                </a>
+            <div class="col-md-4">
+                <ul class="list-inline dark-social pull-right space-bottom-0">
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Facebook" href="#">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Twitter" href="#">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Google plus" href="#">
+                            <i class="fa fa-google-plus"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Instagram" href="#">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Youtube" href="#">
+                            <i class="fa fa-youtube"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-placement="top" data-toggle="tooltip" class="tooltips" data-original-title="Soundcloud" href="#">
+                            <i class="fa fa-soundcloud"></i>
+                        </a>
+                    </li>
+                </ul>       
             </div>
         </div>
-    </div> 
+    </div>
 </div>
