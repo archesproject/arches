@@ -8,14 +8,16 @@
             
             <!-- Topbar Message -->
             <div class="arches-loginbar pull-left">
-                
-                <a href="http://www.archesproject.org" class="">{% trans "Arches" %} </a> 
-                <span class="hidden-xs">{% trans "Cultural Heritage Inventory" %}</span>
+
+                <a href="http://www.archesproject.org" class="">
+                    <img src="{% static 'img/PoweredByArches.png' %}" class="powered-by-arches">
+                </a>
 
             </div>
 
             <!-- Topbar Navigation -->
             <ul class="loginbar pull-right">
+                
                 <li>
                     <i class="fa fa-globe"></i>
                     <a>{% trans "Languages" %}</a>
@@ -48,9 +50,12 @@
                     <span class="sr-only">{% trans "Toggle navigation" %}</span>
                     <span class="fa fa-bars"></span>
                 </button>
+
+                <!-- Default Logo, Replace with your own -->
                 <a class="navbar-brand" href="{% url 'home' %}">
                     <img id="logo-header" class="arches-logo" src="{{ STATIC_URL }}img/arches_logo.png" alt="Logo">
                 </a>
+                
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
