@@ -645,7 +645,7 @@ class Concept(object):
                         new_val.text = rec['valueto']
                         new_val.id = rec['valueidto']
                     elif rec['vtype'] == 'collector':
-                        new_val.collector == 'collector'
+                        new_val.collector = 'collector'
                     val.children.append(new_val)
                 else:
                     for child in val.children:
