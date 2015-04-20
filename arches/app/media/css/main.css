@@ -3861,6 +3861,61 @@ blockquote:hover {
     color:#4765a0 !important;
 }
 
+
+/*copyright*/
+.copyright {
+    padding: 15px 0;
+    background: #222;
+}
+
+/*Social Icons*/
+.dark-social {
+    margin: 5px 0 0;
+}
+
+.dark-social li {
+    margin-left: 5px;
+}
+
+ .dark-social li i {
+    color: #777;
+}
+
+
+.copyright .terms-menu {
+    margin: 7px 0 0;
+}
+
+.copyright .terms-menu li {
+    color: #777;
+    font-size: 13px;
+    line-height: 10px;
+    margin-right: 2px;
+    border-color: #777;
+    padding-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #bbb;
+}
+
+.copyright .terms-menu li:first-child {
+    border-left: none;
+    padding: 0 7px 0 0;
+}
+
+.copyright .terms-menu li a {
+    color: #777;
+}
+
+.copyright .terms-menu li a:hover {
+    color: #bbb;
+}
+
+
+
+
+
+
+
 /*Blog Posts
 ------------------------------------*/
 .posts .dl-horizontal a:hover { 
