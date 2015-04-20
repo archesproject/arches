@@ -52,10 +52,10 @@ def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
     if request.method == 'DELETE':
         resource.delete_index()
         se = SearchEngineFactory().create()
-        related_resources = resource.get_related_resources()
-        for related_resource in related_resources:
-            se.delete(index='resource_relations', doc_type='all', id=related_resource['relationship'].resourcexid)
-            related_resource['relationship'].delete()
+        realtionships = resource.get_related_resources(return_entities=False)
+        for realtionship in realtionships:
+            se.delete(index='resource_relations', doc_type='all', id=realtionship.resourcexid)
+            realtionship.delete()
         resource.delete()
         return JSONResponse({ 'success': True })
 
