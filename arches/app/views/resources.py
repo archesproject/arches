@@ -40,12 +40,15 @@ def report(request, resourceid):
 
 @login_required
 @csrf_exempt
-def resource_manager(request, resourcetypeid='', form_id='', resourceid=''):
+def resource_manager(request, resourcetypeid='', form_id='default', resourceid=''):
 
     if resourceid != '':
         resource = Resource(resourceid)
     elif resourcetypeid != '':
         resource = Resource({'entitytypeid': resourcetypeid})
+
+    if form_id == 'default':
+        form_id = resource.form_groups[0]['forms'][0]['id']
 
     form = resource.get_form(form_id)
 
