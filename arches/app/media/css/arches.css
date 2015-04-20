@@ -1471,3 +1471,7 @@ a:hover {
     padding-left: 25px;
     color: #808080;
 }
+
+.empty-message {
+    display: none;
+}
