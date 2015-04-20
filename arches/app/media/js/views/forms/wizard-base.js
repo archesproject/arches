@@ -96,7 +96,7 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             evt.preventDefault();
 
             if (this.validate()){
-                this.toggleEditor();
+                this.$el.find('.form-load-mask').show();
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }else {
