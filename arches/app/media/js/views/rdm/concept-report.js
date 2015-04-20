@@ -40,7 +40,12 @@ define([
             var self = this;
             var conceptid = this.model.get('id');
             var showGraph = self.$el.find(".concept-graph").is(":visible");
+            
+            if (this.model.get('in_use')) {
+                self.in_use = true;
+            }
 
+            self.inuse = false;
             self.$el.find('.concept-report-loading').removeClass('hidden');
             self.$el.find('.concept-report-content').addClass('hidden');
 
@@ -48,7 +53,16 @@ define([
                 this.xhr.abort();
             }
 
+            self.displayInUse = function() {
+                if (self.in_use === true) {
+                    self.cannot_delete_modal = self.$el.find('.cannot-delete-modal');
+                    self.cannot_delete_modal.modal('show');
+                    self.in_use = false;
+                }
+            }
+
             this.xhr = $.ajax({
+                in_use: self.inuse,
                 url: arches.urls.concept.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', conceptid),
                 data: {
                     'f': 'html',
@@ -79,7 +93,8 @@ define([
                             }
                         }
                     }
-                }
+                },
+                complete: self.displayInUse
             });
         },
 
