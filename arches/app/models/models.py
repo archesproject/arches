@@ -600,8 +600,8 @@ class UserProfile(models.Model):
 
 class Overlays(models.Model):
     overlayid = models.AutoField(primary_key=True)
-    overlaytype = models.TextField()
-    overlayvalue = models.TextField()
+    overlayty = models.TextField()
+    overlayval = models.TextField()
     geometry = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
