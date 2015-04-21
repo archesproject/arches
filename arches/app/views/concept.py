@@ -204,10 +204,12 @@ def concept(request, conceptid):
                 delete_self = data['delete_self'] if 'delete_self' in data else False  
                 if not (delete_self and concept.id in CORE_CONCEPTS):
                     in_use = False
-                    for subconcept in data['subconcepts']:
-                        if in_use == False:
-                            check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
-                            in_use = check_concept.check_if_concept_in_use()
+                    if 'subconcepts' in data:
+                        for subconcept in data['subconcepts']:
+                            if in_use == False:
+                                check_concept = Concept().get(subconcept['id'], include_subconcepts=True)
+                                in_use = check_concept.check_if_concept_in_use()
+
                     if in_use == False:
                         concept.delete_index(delete_self=delete_self)
                         concept.delete(delete_self=delete_self)
@@ -216,7 +218,7 @@ def concept(request, conceptid):
                         
                 return JSONResponse(concept)
 
-    return HttpResponseNotFound()
+    return HttpResponseNotFound
 
 @csrf_exempt
 def manage_parents(request, conceptid):
