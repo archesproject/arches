@@ -1462,9 +1462,11 @@ a:hover {
     margin-top: 50px;
 }
 
-.report-header-link {
+.header-btn-wrapper { 
     display: inline-block;
-    margin: 20px 20px 0;
+    margin: 10px;
+    position:absolute;
+    right:0px;
 }
 
 .related-resource-details {
