@@ -488,3 +488,5 @@ SET search_path = data, pg_catalog;
 
 INSERT INTO entity_types(classid, conceptid, businesstablename, publishbydefault, entitytypeid, isresource)
     VALUES ('E55', '00000000-0000-0000-0000-000000000005', 'domains', false, 'ARCHES_RESOURCE_CROSS-REFERENCE_RELATIONSHIP_TYPES.E55', false);
+
+INSERT INTO concepts.relations VALUES ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000005', 'hasCollection', public.uuid_generate_v1mc());
