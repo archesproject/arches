@@ -141,13 +141,15 @@ def related_resources(request, resourceid):
         return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
     
     if request.method == 'DELETE':
+        se = SearchEngineFactory().create()
         data = JSONDeserializer().deserialize(request.body) 
         entityid1 = data.get('entityid1')
         entityid2 = data.get('entityid2')
+        resourcexid = data.get('resourcexid')
         realtionshiptype = data.get('realtionshiptype')
         resource = Resource(entityid1)
         resource.delete_resource_relationship(entityid2, realtionshiptype)
-        #resource.delete()
+        se.delete(index='resource_relations', doc_type='all', id=resourcexid)
         return JSONResponse({ 'success': True })
 
 def get_related_resources(resourceid, lang, limit=1000, start=0):
