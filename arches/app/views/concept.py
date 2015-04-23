@@ -85,11 +85,6 @@ def concept(request, conceptid):
                     'default_report': True
                 }, context_instance=RequestContext(request))
 
-        if f == 'skos':
-            include_parentconcepts = False
-            include_subconcepts = True
-            depth_limit = None
-
         ret = []
         labels = []
         this_concept = Concept().get(id=conceptid)
@@ -152,7 +147,13 @@ def concept(request, conceptid):
                 }, context_instance=RequestContext(request))
 
         if f == 'skos':
+            include_parentconcepts = False
+            include_subconcepts = True
+            depth_limit = None
             skos = SKOSWriter()
+            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
+                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
             return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
 
         if emulate_elastic_search:
