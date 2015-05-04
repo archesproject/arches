@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Arches'
-copyright = u'2015, Farallon Geographics, Inc.'
+copyright = u'2015, Getty Conservation Institute and World Monuments Fund'
 author = u'Farallon Geographics, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
