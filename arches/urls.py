@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
@@ -65,3 +66,6 @@ urlpatterns = patterns('',
 
 urlpatterns += staticfiles_urlpatterns()
 
+if settings.DEBUG:
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
