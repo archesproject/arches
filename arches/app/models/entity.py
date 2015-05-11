@@ -22,6 +22,7 @@ import copy
 import arches.app.models.models as archesmodels
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import fromstr
+from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
 from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
@@ -62,7 +63,10 @@ class Entity(object):
         return ('%s: %s of type %s with value %s') % (self.__class__, self.entityid, self.entitytypeid, JSONSerializer().serialize(self.value))
 
     def __hash__(self): 
-        return hash(frozenset((self.entitytypeid, self.entityid, self.value, self.property)))
+        if isinstance(self.value, GEOSGeometry):
+            return hash(tuple((self.entitytypeid, self.entityid, self.value.wkt, self.property)))
+        else:
+            return hash(tuple((self.entitytypeid, self.entityid, self.value, self.property)))
     def __eq__(self, x): 
         return hash(self) == hash(x)
     def __ne__(self, x): 
