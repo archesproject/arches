@@ -11,6 +11,9 @@ INSTALLED_APPS = INSTALLED_APPS + (PACKAGE_NAME,)
 STATICFILES_DIRS = (os.path.join(PACKAGE_ROOT, 'media'),) + STATICFILES_DIRS
 TEMPLATE_DIRS = (os.path.join(PACKAGE_ROOT, 'templates'),os.path.join(PACKAGE_ROOT, 'templatetags')) + TEMPLATE_DIRS
 
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT =  os.path.join(PACKAGE_ROOT, 'uploadedfiles')
+
 {% if source_app == 'arches' %}
 RESOURCE_MODEL = {'default': 'arches.app.models.resource.Resource'}
 {% else %}
