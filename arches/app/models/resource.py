@@ -76,6 +76,7 @@ class Resource(Entity):
         else:
             newentity = True
 
+        self.trim()
         self._save() 
 
         if not newentity:
