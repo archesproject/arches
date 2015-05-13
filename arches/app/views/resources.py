@@ -76,37 +76,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
             return redirect('resource_manager', resourcetypeid=resourcetypeid, form_id=form_id, resourceid=resourceid)
 
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-    timefilterdata = {
-        'important_dates': {
-            'branch_lists': [],
-            'domains': {
-                'important_dates' : Concept().get_e55_domain('BEGINNING_OF_EXISTENCE_TYPE.E55') + Concept().get_e55_domain('END_OF_EXISTENCE_TYPE.E55'),
-                'date_operators' : [{
-                    "conceptid": "0",
-                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-                    "id": "0",
-                    "language,id": settings.LANGUAGE_CODE,
-                    "value": "Before",
-                    "valuetype": "prefLabel"
-                },{
-                    "conceptid": "1",
-                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-                    "id": "1",
-                    "language,id": settings.LANGUAGE_CODE,
-                    "value": "On",
-                    "valuetype": "prefLabel"
-                },{
-                    "conceptid": "2",
-                    "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
-                    "id": "2",
-                    "language,id": settings.LANGUAGE_CODE,
-                    "value": "After",
-                    "valuetype": "prefLabel"
-                }]
-            }
-        }
-    }
-
+    
     if request.method == 'GET':
         if form != None:
             lang = request.GET.get('lang', settings.LANGUAGE_CODE)
@@ -126,7 +96,7 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
                     'form_groups': resource.form_groups,
                     'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
                     'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
-                    'timefilterdata': JSONSerializer().serialize(timefilterdata),
+                    'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
                 },
                 context_instance=RequestContext(request))
         else:

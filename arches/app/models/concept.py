@@ -27,6 +27,7 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.utils.translation import ugettext as _
 import logging
 
 
@@ -688,6 +689,52 @@ class Concept(object):
             _findNarrower(result, path, rec)
 
         return JSONSerializer().serializeToPython(result)['children']
+
+    @staticmethod
+    def get_time_filter_data():
+        important_dates = []
+        for date_search_entity_type in settings.DATE_SEARCH_ENTITY_TYPES:
+            important_dates = important_dates + Concept().get_e55_domain(date_search_entity_type)
+
+        return {
+            'important_dates': {
+                'branch_lists': [],
+                'domains': {
+                    'important_dates' : important_dates,
+                    'date_operators' : [{
+                        "conceptid": "0",
+                        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                        "id": "0",
+                        "languageid": settings.LANGUAGE_CODE,
+                        "text": _("Before"),
+                        "valuetype": "prefLabel",  
+                        "sortorder": "",
+                        "collector": "",
+                        "children": []
+                    },{
+                        "conceptid": "1",
+                        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                        "id": "1",
+                        "languageid": settings.LANGUAGE_CODE,
+                        "text": _("On"),
+                        "valuetype": "prefLabel",  
+                        "sortorder": "",
+                        "collector": "",
+                        "children": []
+                    },{
+                        "conceptid": "2",
+                        "entitytypeid": "DATE_COMPARISON_OPERATOR.E55",
+                        "id": "2",
+                        "languageid": settings.LANGUAGE_CODE,
+                        "text": _("After"),
+                        "valuetype": "prefLabel",  
+                        "sortorder": "",
+                        "collector": "",
+                        "children": []
+                    }]
+                }
+            }
+        }
 
 class ConceptValue(object):
     def __init__(self, *args, **kwargs):

@@ -123,6 +123,8 @@ GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
 EXPORT_CONFIG = ''
 
+DATE_SEARCH_ENTITY_TYPES = []
+
 SPARQL_ENDPOINT_PROVIDERS = (
     'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
 )
