@@ -23,6 +23,8 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator
 from django.utils.importlib import import_module
 from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import Max, Min
+from arches.app.models import models
 from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
@@ -35,10 +37,14 @@ geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
 
     return render_to_response('search.htm', {
             'main_script': 'search',
-            'active_page': 'Search'
+            'active_page': 'Search',
+            'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
+            'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
+            'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
         }, 
         context_instance=RequestContext(request))
 
@@ -101,7 +107,7 @@ def build_search_results_dsl(request):
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
-                entitytype = EntityTypes.objects.get(conceptid_id=term['context'])
+                entitytype = models.EntityTypes.objects.get(conceptid_id=term['context'])
                 boolfilter_nested = Bool()
                 boolfilter_nested.must(Terms(field='child_entities.entitytypeid', terms=[entitytype.pk]))
                 boolfilter_nested.must(Match(field='child_entities.value', query=term['value'], type='phrase'))
