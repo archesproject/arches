@@ -273,7 +273,7 @@ class Concept(object):
             
             def find_concepts(concept):
                 if len(concept.parentconcepts) <= 1:
-                    concepts_to_delete[concept.id] = concept.get_preflabel(lang=lang)
+                    concepts_to_delete[concept.id] = concept
                     for subconcept in concept.subconcepts:
                         find_concepts(subconcept)
 
@@ -284,8 +284,8 @@ class Concept(object):
         if concept.nodetype == 'ConceptScheme':
             rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
             for row in rows:
-                concepts_to_delete[row[0]] = ConceptValue({'value':row[2]})
-                concepts_to_delete[row[1]] = ConceptValue({'value':row[3]})
+                concepts_to_delete[row[0]] = Concept({'values':[ConceptValue({'id':row[4], 'conceptid':row[0], 'value':row[2]})]})
+                concepts_to_delete[row[1]] = Concept({'values':[ConceptValue({'id':row[5], 'conceptid':row[1], 'value':row[3]})]})
 
         return concepts_to_delete
 
@@ -298,7 +298,7 @@ class Concept(object):
         cursor = connection.cursor()
         relationtypes = ' or '.join(["d.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         sql = """WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c.valuetype, 1 AS depth       ---|NonRecursive Part
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c2.valueid, c.valueid as valueidto, c.valuetype, 1 AS depth       ---|NonRecursive Part
                     FROM concepts.relations d
                     JOIN concepts.values c ON(c.conceptid = d.conceptidto) 
                     JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom) 
@@ -307,7 +307,7 @@ class Concept(object):
                     and c.valuetype in ('{2}')
                     and ({1})
                 UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v.valuetype, depth+1      ---|RecursivePart
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v2.valueid, v.valueid as valueidto, v.valuetype, depth+1      ---|RecursivePart
                     FROM concepts.relations  d
                     JOIN children b ON(b.conceptidto = d.conceptidfrom) 
                     JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
@@ -316,7 +316,7 @@ class Concept(object):
                     and v.valuetype in ('{2}')
                     and ({1})
             ) 
-            SELECT conceptidfrom, conceptidto, value, valueto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
+            SELECT conceptidfrom, conceptidto, value, valueto, valueid, valueidto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
         cursor.execute(sql)
         rows = cursor.fetchall()
@@ -436,28 +436,20 @@ class Concept(object):
             subconcept.index(scheme=subconcept.get_context())
 
     def delete_index(self, delete_self=False):
-        se = SearchEngineFactory().create()
-
+        
         def deleteconcepts(concepts_to_delete):
             for key, concept in concepts_to_delete.iteritems():
-                query = Query(se, start=0, limit=10000)
-                phrase = Match(field='conceptid', query=key, type='phrase')
-                query.add_query(phrase)
-                query.delete(index='concept_labels')            
+                for conceptvalue in concept.values:
+                    conceptvalue.delete_index()        
 
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             deleteconcepts(concepts_to_delete)
 
-            for value in self.values:
-                value.delete_index()
         else:
             for subconcept in self.subconcepts:
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 deleteconcepts(concepts_to_delete)
-
-                for value in subconcept.values:
-                    value.delete_index()
 
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
         class concept(object):
@@ -588,6 +580,7 @@ class Concept(object):
 
     def check_if_concept_in_use(self):
         """Checks  if a concept or any of its subconcepts is in use by a resource"""
+        
         in_use = False
         for value in self.values:
             try:
@@ -812,15 +805,13 @@ class ConceptValue(object):
             if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
                 se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
     
-    def delete_index(self):      
-        if self.category == 'label':
-            se = SearchEngineFactory().create()
-            if self.category == '':
-                raise Exception('Delete index failed.  Remember to specify a category for your value. %s' % JSONSerializer().serialize(self))
-            scheme = self.get_scheme_id()
-            if scheme == None:
-                raise Exception('Delete label index failed.  Index type (scheme id) could not be derived from the label.')
-            se.delete(index='concept_labels', doc_type=scheme, id=self.id)
+    def delete_index(self):   
+        se = SearchEngineFactory().create() 
+        query = Query(se, start=0, limit=10000)
+        phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
+        query.add_query(phrase)
+        query.delete(index='concept_labels')   
+        se.delete_terms(self.id)
 
     def get_scheme_id(self):
         se = SearchEngineFactory().create()

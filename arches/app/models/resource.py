@@ -447,7 +447,7 @@ class Resource(Entity):
 
         def delete_indexes(entity):
             if entity.businesstablename == 'strings' or entity.businesstablename == 'domains':
-                se.delete_terms(entity)
+                se.delete_terms(entity.entityid)
 
         entity = Entity().get(self.entityid)
         entity.traverse(delete_indexes)

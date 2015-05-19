@@ -95,8 +95,12 @@ class SearchEngine(object):
 
     def index_term(self, term, id, context='', options={}):
         """
-        If the term is already indexed, then simply increment the count and add the entity id of the term to the existing index.
+        If the term is already indexed, then simply increment the count and add the id of the term to the existing index.
         If the term isn't indexed then add the index.
+
+        id: a unique id associated with the term
+        context: a uuid of a concept to associate with the term to render in the ui
+        options: any additional information to associate with the term
 
         """
 
@@ -124,25 +128,25 @@ class SearchEngine(object):
                 self.logger.warning('%s: WARNING: search failed to index term: %s \nException detail: %s\n' % (datetime.now(), term, detail))
                 raise detail   
                   
-    def delete_terms(self, entities):
+    def delete_terms(self, ids):
         """
         If the term is referenced more then once simply decrement the 
-        count and remove the entity id of the deleted term from the from the existing index.
+        count and remove the id of the deleted term from the from the existing index.
 
         If the term is only referenced once then delete the index  
 
         """
 
-        if not isinstance(entities, list):
-            entities = [entities]
+        if not isinstance(ids, list):
+            ids = [ids]
 
-        for entity in entities:
+        for id in ids:
             result = self.es.search(index='term', doc_type='value', body={
                 "query": {
                     "filtered": {
                         "filter":{
                             "terms": {
-                                "ids": [entity.entityid]
+                                "ids": [id]
                             }
                         }, 
                         "query": {
@@ -156,7 +160,7 @@ class SearchEngine(object):
 
             if 'hits' in result:
                 for document in result['hits']['hits']:
-                    document['_source']['ids'].remove(entity.entityid)
+                    document['_source']['ids'].remove(id)
                     count = len(document['_source']['ids'])
                     if count > 0:
                         document['_source']['count'] = count

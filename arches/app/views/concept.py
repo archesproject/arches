@@ -205,6 +205,9 @@ def concept(request, conceptid):
                 delete_self = data['delete_self'] if 'delete_self' in data else False  
                 if not (delete_self and concept.id in CORE_CONCEPTS):
                     in_use = False
+                    if delete_self:
+                        check_concept = Concept().get(data['id'], include_subconcepts=True)
+                        in_use = check_concept.check_if_concept_in_use()
                     if 'subconcepts' in data:
                         for subconcept in data['subconcepts']:
                             if in_use == False:
@@ -256,7 +259,7 @@ def manage_parents(request, conceptid):
 def confirm_delete(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE) 
     concept = Concept().get(id=conceptid)
-    concepts_to_delete = [concept.value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
+    concepts_to_delete = [concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).iteritems()]
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
