@@ -165,6 +165,7 @@ class SearchEngine(object):
                     if count > 0:
                         document['_source']['count'] = count
                         self.index_data('term', 'value', document['_source'], id=document['_id'])
+                        self.es.indices.refresh(index='term')
                     else:
                         self.delete(index='term', doc_type='value', id=document['_id'])
 
