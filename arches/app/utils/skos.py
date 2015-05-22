@@ -142,9 +142,7 @@ class SKOSReader(object):
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
-                    node.save()
-                    temp = Concept({'id':scheme_id})
-                    node.index(scheme=temp)            
+                    node.save()        
 
                 # insert the concept relations
                 for relation in self.relations:
@@ -154,6 +152,11 @@ class SKOSReader(object):
                     newrelation.conceptidto_id = relation['target']
                     newrelation.relationtype_id = relation['type']
                     newrelation.save()
+
+                # need to index after the concepts and relations have been entered into the db 
+                # so that the proper context gets indexed with the concept
+                for node in self.nodes:
+                    node.index()  
 
             return self
         else:
