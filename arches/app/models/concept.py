@@ -282,10 +282,16 @@ class Concept(object):
 
         # here we can just delete everything and so use a recursive CTE to get the concept ids much more quickly 
         if concept.nodetype == 'ConceptScheme':
-            rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel'], 'prefLabel')
+            rows = Concept().get_child_concepts(concept.id, ['narrower', 'hasTopConcept'], ['prefLabel', 'altLabel', 'hiddenLabel'], 'prefLabel')
             for row in rows:
-                concepts_to_delete[row[0]] = Concept({'values':[ConceptValue({'id':row[4], 'conceptid':row[0], 'value':row[2]})]})
-                concepts_to_delete[row[1]] = Concept({'values':[ConceptValue({'id':row[5], 'conceptid':row[1], 'value':row[3]})]})
+                if row[0] not in concepts_to_delete:
+                    concepts_to_delete[row[0]] = Concept({'id': row[0]})
+                
+                if row[1] not in concepts_to_delete:
+                    concepts_to_delete[row[1]] = Concept({'id': row[1]})
+
+                concepts_to_delete[row[0]].addvalue({'id':row[4], 'conceptid':row[0], 'value':row[2]})
+                concepts_to_delete[row[1]].addvalue({'id':row[5], 'conceptid':row[1], 'value':row[3]})
 
         return concepts_to_delete
 
@@ -312,7 +318,7 @@ class Concept(object):
                     JOIN children b ON(b.conceptidto = d.conceptidfrom) 
                     JOIN concepts.values v ON(v.conceptid = d.conceptidto) 
                     JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom) 
-                    WHERE  v2.valuetype = '{3}'
+                    WHERE v2.valuetype = '{3}'
                     and v.valuetype in ('{2}')
                     and ({1})
             ) 
@@ -810,7 +816,7 @@ class ConceptValue(object):
         query = Query(se, start=0, limit=10000)
         phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
         query.add_query(phrase)
-        query.delete(index='concept_labels')   
+        query.delete(index='concept_labels')  
         se.delete_terms(self.id)
 
     def get_scheme_id(self):
