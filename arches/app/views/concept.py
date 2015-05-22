@@ -398,7 +398,14 @@ def get_concept_label_from_valueid(valueid):
         return concept_label['_source']
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    ret = None
+    ret = {
+        "category": "",
+        "conceptid": "",
+        "language": "",
+        "value": "",
+        "type": "",
+        "id": ""
+    }
     se = SearchEngineFactory().create()
     query = Query(se)
     terms = Terms(field='conceptid', terms=[conceptid])
