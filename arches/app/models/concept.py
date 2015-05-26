@@ -99,7 +99,7 @@ class Concept(object):
             self.load(models.Concepts.objects.get(legacyoid=legacyoid))
 
         if semantic == True:
-            pathway_filter = Q(relationtype__category = 'Semantic Relations')
+            pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
         else:
             pathway_filter = Q(relationtype = 'member')
 
@@ -123,12 +123,12 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))[0:1]
+            hassubconcepts = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
                 self.hassubconcepts = True
 
             if include_subconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -142,7 +142,7 @@ class Concept(object):
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
             if include_parentconcepts:
-                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), pathway_filter | Q(relationtype__category = 'Properties'), ~Q(relationtype = 'related'))
+                conceptrealations = models.ConceptRelations.objects.filter(Q(conceptidto = self.id), pathway_filter, ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -188,6 +188,14 @@ class Concept(object):
 
         for relatedconcept in self.relatedconcepts:
             self.add_relation(relatedconcept, relatedconcept.relationshiptype)
+            
+            if relatedconcept.relationshiptype == 'member':
+                child_concepts = relatedconcept.get(include_subconcepts=True)
+                def applyRelationship(concept):
+                    for subconcept in concept.subconcepts:
+                        concept.add_relation(subconcept, relatedconcept.relationshiptype)
+                child_concepts.traverse(applyRelationship)
+                
 
         return concept
 
