@@ -134,7 +134,7 @@ class Concept(object):
                         downlevel = downlevel + 1                
                     for relation in conceptrealations:
                         subconcept = Concept().get(id=relation.conceptidto_id, include_subconcepts=include_subconcepts, 
-                            include_parentconcepts=False, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
+                            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit, 
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
