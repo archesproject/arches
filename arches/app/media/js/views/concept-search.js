@@ -37,7 +37,8 @@ define(['jquery', 'backbone', 'arches', 'select2'], function ($, Backbone, arche
                 formatResult:function(result, container, query, escapeMarkup){
                     var markup=[];
                     window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
-                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span><i class="concept_result_schemaname">(' + result.scheme + ')</i>';
+                    result.scheme = result.scheme ? '(' + result.scheme + ')' : '';
+                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span><i class="concept_result_schemaname">' + result.scheme + '</i>';
                     return formatedresult;
                 },
                 escapeMarkup: function(m) { return m; }
