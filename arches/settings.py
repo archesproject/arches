@@ -79,7 +79,7 @@ DATA_CONCEPT_SCHEME = ''
 
 ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
 
-LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for livereload browser extensions
+LIVERELOAD_PORT = 35728 # usually only used in development, 35729 is default for livereload browser extensions
 
 DEFAULT_MAP_X = 0
 DEFAULT_MAP_Y = 0
@@ -168,7 +168,7 @@ USE_TZ = False
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored
 LOCALE_PATHS = (
