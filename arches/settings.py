@@ -84,8 +84,8 @@ LIVERELOAD_PORT = 35729 # usually only used in development, 35729 is default for
 DEFAULT_MAP_X = 0
 DEFAULT_MAP_Y = 0
 DEFAULT_MAP_ZOOM = 0
-MAP_MIN_ZOOM = 0.0005831682455839253
-MAP_MAX_ZOOM = 156543.03392804097
+MAP_MIN_ZOOM = 0
+MAP_MAX_ZOOM = 19
 MAP_LAYER_FEATURE_LIMIT = 100000
 MAP_EXTENT = ''
 
@@ -168,7 +168,7 @@ USE_TZ = False
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
-LANGUAGE_CODE = 'en-US'
+LANGUAGE_CODE = 'en'
 
 # the path where your translation strings are stored
 LOCALE_PATHS = (
