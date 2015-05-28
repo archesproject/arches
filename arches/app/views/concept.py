@@ -102,7 +102,7 @@ def concept(request, conceptid):
             languages = models.DLanguages.objects.all()
             valuetypes = models.ValueTypes.objects.all()
             relationtypes = models.DRelationtypes.objects.all()
-            prefLabel = concept_graph.get_preflabel(lang=lang).value
+            prefLabel = concept_graph.get_preflabel(lang=lang)
             for subconcept in concept_graph.subconcepts:
                 subconcept.prefLabel = subconcept.get_preflabel(lang=lang) 
             for relatedconcept in concept_graph.relatedconcepts:
