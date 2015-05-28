@@ -1366,7 +1366,7 @@ ALTER TABLE data.geometries OWNER TO postgres;
 
 CREATE TABLE numbers (
     entityid uuid NOT NULL,
-    val numeric
+    val double precision
 );
 
 

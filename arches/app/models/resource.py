@@ -335,6 +335,7 @@ class Resource(Entity):
         document.dates = []
         document.domains = []
         document.geometries = []
+        document.numbers = []
 
         for entity in self.flatten():
             if entity.entityid != self.entityid:
@@ -345,6 +346,8 @@ class Resource(Entity):
                     document.domains.append(entity_copy)
                 elif entity.businesstablename == 'dates':
                     document.dates.append(entity)
+                elif entity.businesstablename == 'numbers':
+                    document.numbers.append(entity)
                 elif entity.businesstablename == 'geometries':
                     entity.value = JSONDeserializer().deserialize(fromstr(entity.value).json)
                     document.geometries.append(entity)

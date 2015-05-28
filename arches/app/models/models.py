@@ -407,7 +407,7 @@ class Dates(models.Model):
 
 class Numbers(models.Model):
     entityid = models.ForeignKey('Entities', primary_key=True, db_column='entityid')
-    val = models.DecimalField(max_digits=65535, decimal_places=65534)
+    val = models.FloatField()
     class Meta:
         db_table = u'numbers'
         
