@@ -1,6 +1,6 @@
 {% load i18n %}
 <!-- Add Related Concept Modal Data Entry Form -->
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content no-corners">
             
@@ -32,7 +32,7 @@
 
                                     <div class="col-xs-3">
                                         <h5 id="" class="arches-modal-section">{% trans "Relation type" %}</h5>
-                                        <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}">
+                                        <select style="width:100%;" class="select2" id="related-relation-type" placeholder="{% trans "Relation to Concept" %}" name="relationtype_dd">
                                             <option value=""></option>
                                             {% for relation in related_relations %}
                                               <option value="{{relation.relationtype}}">{{relation.relationtype}}</option>
@@ -65,9 +65,9 @@
 
             <div class="modal-footer">
                 <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
-                <button class="savebtn btn-u" type="button">{% trans "Save" %}</button>
+                <button class="savebtn btn-u" type="submit">{% trans "Save" %}</button>
             </div>
           </div>
     </div>
-</div>
+</form>
 <!-- End Related Concept Modal Data Entry Form -->

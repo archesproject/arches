@@ -1,33 +1,34 @@
 define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
     return ConceptSearch.extend({
 
-        events: {
-            'click .modal-footer .savebtn': 'save'
-        },
-
         initialize: function(){
             ConceptSearch.prototype.initialize.apply(this, arguments);
-            this.modal = this.$el.find('.modal');
+            var self = this;
+            this.modal = this.$el.find('form');
             this.relationshiptype = this.modal.find('#related-relation-type').select2({
                 minimumResultsForSearch: 10,
                 maximumSelectionSize: 1
             });
-        },
-        
-		save: function(){
-            var self = this;
-            if (this.searchbox.val() !== ''){
-                var relatedConcept = new ConceptModel({
-                    id: this.searchbox.val(),
-                    relationshiptype: this.relationshiptype.val()
-                });
-                this.model.set('relatedconcepts', [relatedConcept]);
 
-                this.modal.on('hidden.bs.modal', function (e) {
-                    self.model.save();
-                })
-                this.modal.modal('hide');
-            }
+            this.modal.validate({
+                ignore: null,
+                rules: {
+                    concept_search_box: 'required',
+                    relationtype_dd: 'required'
+                },
+                submitHandler: function(form) {
+                    var relatedConcept = new ConceptModel({
+                        id: self.searchbox.val(),
+                        relationshiptype: self.relationshiptype.val()
+                    });
+                    self.model.set('relatedconcepts', [relatedConcept]);
+
+                    self.modal.on('hidden.bs.modal', function (e) {
+                        self.model.save();
+                    })
+                    self.modal.modal('hide');
+                }
+            });
         }
     });
 });
