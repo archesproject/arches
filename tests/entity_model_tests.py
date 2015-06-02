@@ -33,11 +33,16 @@ import arches.app.utils.data_management.resources.remover as resource_remover
 from arches.management.commands.package_utils import resource_graphs
 from arches.management.commands.package_utils import authority_files
 from arches.app.models.entity import Entity
+from arches.app.models.concept import Concept
+from arches.app.models.concept import ConceptValue
+
+# these tests can be run from the command line via
+# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
 class BasicEntityTests(SimpleTestCase):
-    def setUp(self):
-        self.entity = TestEntityFactory.create(1)
-        install()
+    # def setUp(self):
+    #     self.entity = TestEntityFactory.create(1)
+    #     install()
 
 
     def test_init_entity_from_json(self):
@@ -80,6 +85,165 @@ class BasicEntityTests(SimpleTestCase):
         self.assertEqual(entity.child_entities, [])
 
 
+class ConceptModelTests(SimpleTestCase):
+
+    def test_create_concept(self):
+        """
+        Test of basic CRUD on a Concept model
+
+        """
+
+        concept_in = Concept()
+        concept_in.nodetype = 'Concept'
+        concept_in.values = [ConceptValue({
+            #id: '',
+            #conceptid: '',
+            'type': 'prefLabel',
+            'category': 'label',
+            'value': 'test pref label',
+            'language': 'en-US'
+        })]
+        concept_in.save()
+
+        concept_out = Concept().get(id=concept_in.id)
+
+        self.assertEqual(concept_out.id, concept_in.id)
+        self.assertEqual(concept_out.values[0].value, 'test pref label')
+
+        label = concept_in.values[0] 
+        label.value = 'updated pref label'
+        concept_in.values[0] = label
+        concept_in.save()
+        concept_out = Concept().get(id=concept_in.id)
+
+        self.assertEqual(concept_out.values[0].value, 'updated pref label')
+
+        concept_out.delete()
+        deleted_concept = Concept().get(id=concept_in.id)
+        self.assertEqual(deleted_concept, None)
+
+
+    def test_prefLabel(self):
+        """
+        Test to confirm the proper retrieval of the prefLabel based on different language requirements
+
+        """
+
+        concept = Concept()
+        concept.nodetype = 'Concept'
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label en-US',
+                'language': 'en-US'
+            }),
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label en',
+                'language': 'en'
+            }),
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label es-SP',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en-US',
+                'language': 'en-US'
+            })
+        ]
+
+        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en-US')
+        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en')
+        self.assertEqual(concept.get_preflabel().value, 'test pref label %s' % (test_settings.LANGUAGE_CODE))
+
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label en',
+                'language': 'en'
+            }),
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label es',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en-US',
+                'language': 'en-US'
+            })
+        ]
+
+        # should pick the base language if it can't find the more specific version
+        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en')
+        
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label es',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en-US',
+                'language': 'en-US'
+            })
+        ]
+
+        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en-US')
+                
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label es',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en',
+                'language': 'en'
+            })
+        ]
+
+        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en')
+        
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label en-US',
+                'language': 'en-US'
+            }),
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'test pref label es',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en-US',
+                'language': 'en-US'
+            })
+        ]
+
+        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en-US')
+
+
 class TestEntityFactory(object):
     @staticmethod
     def create(id='', value=''):
@@ -94,10 +258,11 @@ class TestEntityFactory(object):
 
 
 def install(path_to_source_data_dir=None):
-    #truncate_db()
+    pass
+    # truncate_db()
     # delete_index(index='concept_labels')
     # delete_index(index='entity')
-    load_resource_graphs()
+    #load_resource_graphs()
     #load_authority_files(path_to_source_data_dir)
     #resource_remover.truncate_resources()
     #load_resources()

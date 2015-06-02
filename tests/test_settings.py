@@ -16,13 +16,19 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
+
+from arches.settings import *
 import os
-#import version
 import inspect
 
+
+PACKAGE_NAME = 'arches'
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, '..', 'arches'))
 PACKAGE_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
+
+LANGUAGE_CODE = 'en-US'
 
 RESOURCE_GRAPH_LOCATIONS = os.path.join(PACKAGE_ROOT, 'fixtures'),
 
@@ -42,30 +48,3 @@ DATABASES = {
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
 }
-
-ENTITY_MODEL = {
-    # override this setting in your packages settings.py file
-    # to set the default model for the system to use
-    # Your model needs to inherit from 'arches.app.models.entity.Entity' to work
-    'default': 'arches.app.models.entity.Entity'
-}
-
-
-ELASTICSEARCH_HTTP_PORT = 9200 # this should be in increments of 200, eg: 9400, 9600, 9800
-SEARCH_BACKEND = 'arches.app.search.search.SearchEngine'
-
-DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
-
-# override this setting in your packages settings.py file
-# entity type that holds the spatial coordinates of resources
-ENTITY_TYPE_FOR_MAP_DISPLAY = ''
-
-LIMIT_ENTITY_TYPES_TO_LOAD = None #(
-    # override this setting in your packages settings.py file
-#    'ARCHAEOLOGICAL HERITAGE (ARTIFACT).E18',
-#)
-
-DATA_CONCEPT_SCHEME = ''
-
-ETL_USERNAME = 'ETL' # override this setting in your packages settings.py file
-
