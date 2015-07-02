@@ -75,15 +75,16 @@ If you have installed the dependencies, you're ready to install Arches.
     Create a folder called 'Projects' (or some other meaningful name) on your system.    
 
 
-#2. Install virtualenv::
+#2.  Install virtualenv:
+    
+    Open a command prompt and type::
 
         $ pip install virtualenv
 
+    .. note::
+        For Linux users: Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
 
-
-**Note**
-    Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
-
+    virtualenv creates a directory with it's own installation of Python and Python executables. 
 
 #3. Create the ENV folder:
 
