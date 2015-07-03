@@ -19,7 +19,13 @@ http://www.postgresql.org/download/.
 
 **Notes:**
 
-- Be sure to add PostgreSQL/9.3/bin directory to your system path.
+- Assuming that your PostgreSQL installation is in ``C:\Program Files``, add
+  this to your system PATH:
+
+    ::
+
+        C:\Program Files\PostgreSQL\9.3\bin;
+
 
 - After installing PostgreSQL you’ll need to run 2 commands from a
   command window (this only applies to PostgreSQL 9.2 and above).
@@ -30,6 +36,7 @@ http://www.postgresql.org/download/.
         createdb -U postgres -E UTF8 -T template0 template_postgis_20
         psql -U postgres -d template_postgis_20 -c "CREATE EXTENSION postgis;"
 
+
 Install GEOS
 -------------
 
@@ -39,7 +46,16 @@ Download and install GEOS from http://trac.osgeo.org/osgeo4w/
 
 -  Make sure to select the x86 version for 32bit machines, or x86-64 for
    64bit machines
--  Once you have OSGeo4W installed, be sure to add the OSGeo4W\bin directory to your path.
+-  Assuming that your OSGeo4W installation is in ``C:\``, add
+   this to your PATH:
+
+    ::
+
+        C:\OSGeo4W\bin;
+
+        OR (for 64 bit Windows)
+
+        C:\OSGeo4W64\bin;
 
 Install Python 2.7.6
 -----------------------
@@ -79,4 +95,11 @@ Download and install the JDK from
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 **Notes:**
-    Once the JDK is installed, be sure to set the JAVA\_HOME environment variable.
+
+-  Once the JDK is installed, be sure to set the JAVA\_HOME environment variable.
+-  Make sure the JAVA\_HOME variable points to the parent of the bin directory
+-  For example, assuming that you installed version 1.8.0_45 of the JDK then your JAVA\_HOME variable might look like this:
+
+    :: 
+
+        C:\Program Files\Java\jdk1.8.0_45
