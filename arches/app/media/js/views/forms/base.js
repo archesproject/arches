@@ -1,6 +1,15 @@
 define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select2', 'plugins/knockout-summernote'], function ($, Backbone, ko, _) {
-    return Backbone.View.extend({
-        
+    return Backbone.View.extend(
+    /** @lends Base.prototype */
+    {
+          /**
+           * @class Base class description
+           *
+           * @augments Backbone.View
+           * @constructs
+           *
+           */
+           
         events: function(){
             return {
                 'click .save-edits': 'submit',
@@ -93,10 +102,79 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             return isValid;
         },
 
+
+        /**
+         * Displays alert message in a specified branchlist section of a form
+         * @param {Object} 
+         * @return {Boolean} 
+         */ 
+        showAlert: function(branchList) {
+            var validationAlert = branchList.$el.find('.branch-invalid-alert');
+            validationAlert.show(300);
+            setTimeout(function() {
+                validationAlert.fadeOut();
+                }, 5000);
+        },
+
+        /**
+         * Checks whether all branchlists where the required rule is true, have form data to submit.
+         * @return {Boolean} 
+         */ 
+        checkForRequiredBranchlists: function() {
+            var isValid = true
+            _.each(this.branchLists, function(branchList){
+                if (branchList.rules.required === true && branchList.getData().length === 0 && branchList.singleEdit === false) {
+                    isValid = false;
+                    this.showAlert(branchList);
+                } else if (branchList.rules.required === true && branchList.singleEdit === true) {
+                    if (branchList.getData().length === 0) {
+                        isValid = false;
+                    } else {
+                        _.each(branchList.getData(), function(nodes) {
+                            _.each(nodes, function(node) {
+                                _.each(node, function(n) {
+                                    if (n.value === '') {
+                                        isValid = false;
+                                        this.showAlert(branchList);
+                                    }
+                                }, this)
+                            }, this)
+                        }, this)
+                    }
+                }
+            }, this); 
+            return isValid;
+        },
+           
+        /**
+         * Performs form validation by calling methods that evaluate branchlist rules.
+         * @return {Boolean} 
+         */ 
+        validateForm: function(){
+            var isValid = true
+            isValid = this.checkForRequiredBranchlists();
+            return isValid;
+        },
+
+        /**
+         * Ensures all of the branch lists in the form have rule properties so that rule based validation can be run on the entire form
+         * @return {Boolean} 
+         */
+        checkForRules: function(){
+            var hasRules = true;
+            _.each(this.branchLists, function(branchList){
+                if (!branchList.rules) {
+                    hasRules = false;
+                }
+            }, this); 
+            return hasRules;
+        },
+
         submit: function(evt){
             evt.preventDefault();
-            
-            if (this.validate()){
+            var rules = this.checkForRules();
+            this.validationMethod = rules ? this.validateForm : this.validate; //the branchlists of some forms may not have rules. In those cases we use the default validate method
+            if (this.validationMethod()){
                 this.form.find('#formdata').val(this.getData());
                 this.form.submit(); 
             }
