@@ -90,6 +90,8 @@ class Query(Dsl):
             if self._filtered:
                 if 'bool' in dsl and 'bool' in self.dsl['query']['filtered']['query']:
                     self.dsl['query']['filtered']['query'] = Bool(self.dsl['query']['filtered']['query']).merge(dsl).dsl
+                else:
+                    self.dsl['query']['filtered']['query'] = dsl
             else:
                 if 'bool' in dsl and 'bool' in self.dsl['query']:
                     self.dsl['query'] = Bool(self.dsl['query']).merge(dsl).dsl
