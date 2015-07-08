@@ -398,7 +398,8 @@ def get_concept_label_from_valueid(valueid):
         return concept_label['_source']
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    ret = {
+    ret = None
+    default = {
         "category": "",
         "conceptid": "",
         "language": "",
@@ -414,9 +415,12 @@ def get_preflabel_from_conceptid(conceptid, lang):
     query.add_query(match)
     preflabels = query.search(index='concept_labels')['hits']['hits'] 
     for preflabel in preflabels:
+        default = preflabel['_source']
         # get the label in the preferred language, otherwise get the label in the default language
         if preflabel['_source']['language'] == lang:
             return preflabel['_source']
-        if preflabel['_source']['language'] == settings.LANGUAGE_CODE:
+        if preflabel['_source']['language'].split('-')[0] == lang.split('-')[0]:
             ret = preflabel['_source']
-    return ret
+        if preflabel['_source']['language'] == settings.LANGUAGE_CODE and ret == None:
+            ret = preflabel['_source']
+    return default if ret == None else ret
