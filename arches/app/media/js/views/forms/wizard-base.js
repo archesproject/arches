@@ -53,12 +53,14 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
             this.$el.find('.form-load-mask').hide();
         },
 
-        toggleEditor: function() {    
-            $( ["#workflow-container", "#current-items"].join(",") ).toggle(300, 
-                function(){
-                    //fire resize so that map gets loaded in wizard forms
-                    $(window).trigger('resize');
-            });
+        toggleEditor: function() { 
+            var branchLists = this.branchLists;   
+            var formLoaded = function() {
+                _.each(branchLists, function(branchList) {
+                    branchList.trigger('formloaded');
+                })
+            }
+            $( ["#workflow-container", "#current-items"].join(",") ).toggle(300, formLoaded);
             $( ["#cancel-workflow","#end-workflow","#start-workflow"].join(",")  ).toggle();
         },
 

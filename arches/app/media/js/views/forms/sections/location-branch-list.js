@@ -16,11 +16,6 @@ define([
                 el: this.$el.find('.map')
             });
 
-            $(window).on('resize',function(){
-                //load map after 'Add' button is clicked in wizard forms
-                map.map.updateSize()
-            });
-
             var addFeature = function (feature, editing) {
                 var branch = koMapping.fromJS({
                     'editing': ko.observable(editing), 
@@ -150,13 +145,22 @@ define([
                         self.trigger('change', 'geometrychange', branch);
                         self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
                     });
-                    featureOverlay.addFeature(feature);
+                    try { 
+                        featureOverlay.addFeature(feature);
+                        }
+                    catch(err) {
+                        console.log(err.message);
+                        }
                 });
             }
 
             self.viewModel.branch_lists.subscribe(refreshFreatureOverlay);
             refreshFreatureOverlay();
             zoomToFeatureOverlay();
+
+            this.on('formloaded', function(){
+                map.map.updateSize()
+            });
 
             var draw = null;
 
