@@ -16,6 +16,11 @@ define([
                 el: this.$el.find('.map')
             });
 
+            $(window).on('resize',function(){
+                //load map after 'Add' button is clicked in wizard forms
+                map.map.updateSize()
+            });
+
             var addFeature = function (feature, editing) {
                 var branch = koMapping.fromJS({
                     'editing': ko.observable(editing), 
@@ -145,7 +150,6 @@ define([
                         self.trigger('change', 'geometrychange', branch);
                         self.trigger('geometrychange', feature, wkt.writeGeometry(geom));
                     });
-
                     featureOverlay.addFeature(feature);
                 });
             }

@@ -54,7 +54,11 @@ define(['jquery', 'backbone', 'knockout', 'underscore', 'plugins/knockout-select
         },
 
         toggleEditor: function() {    
-            $( ["#workflow-container", "#current-items"].join(",") ).toggle(300);
+            $( ["#workflow-container", "#current-items"].join(",") ).toggle(300, 
+                function(){
+                    //fire resize so that map gets loaded in wizard forms
+                    $(window).trigger('resize');
+            });
             $( ["#cancel-workflow","#end-workflow","#start-workflow"].join(",")  ).toggle();
         },
 
