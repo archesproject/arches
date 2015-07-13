@@ -72,6 +72,13 @@ def load_authority_files(source=None, break_on_error=True):
             sys.exit(101)
 
 
+def is_uuid(uuid):
+    result = False
+    if len(uuid) == 36 and len(uuid.split('-')) == 5:
+        result = True
+    return result
+
+
 def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_entity_concept_mapping):
     print filename.upper()    
 
@@ -109,8 +116,9 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
                     if 'MISSING' in row:
                         raise Exception('The row wasn\'t parsed properly. Missing %s' % (row['MISSING']))
                     else:
+                        legacyoid = row[u'CONCEPTID']
                         concept = Concept()
-                        concept.id = str(uuid.uuid4())
+                        concept.id = legacyoid if is_uuid(legacyoid) == True else str(uuid.uuid4())
                         concept.nodetype = 'Concept'# if row[u'CONCEPTTYPE'].upper() == 'INDEX' else 'Collection'
                         concept.legacyoid = row[u'CONCEPTID']
                         concept.addvalue({'value':row[u'PREFLABEL'], 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
