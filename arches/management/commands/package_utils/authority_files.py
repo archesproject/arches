@@ -71,13 +71,11 @@ def load_authority_files(source=None, break_on_error=True):
         if break_on_error:
             sys.exit(101)
 
-
 def is_uuid(uuid):
-    result = False
-    if len(uuid) == 36 and len(uuid.split('-')) == 5:
-        result = True
+    uuid_pattern = [8,4,4,4,12]
+    uuid_split = uuid.split('-')
+    result =  [len(x) for x in uuid_split] == uuid_pattern
     return result
-
 
 def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_entity_concept_mapping):
     print filename.upper()    
