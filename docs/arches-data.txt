@@ -86,8 +86,11 @@ Regardless of how the nodes and edges CSV files are created, they must include t
 	* ``Id``: a unique and arbitrary ID for each record within the file
 	* ``Label``: the name of the entity type that is stored in a given node.  This name must be concatenated with a dot (".") and the CRM class associated to that entity type
 	* ``mergenode``: defines the upstream node that occurs one time (and only one time) within a given resource instance.  In most cases, that node is the one that represents the resource itself.
-	* ``businesstable``: identifies the respective business table (strings, numbers, dates, geometries, domains) that will store values associated to instances of the node. This value should be left null for nodes that never store a business data. 
+	* ``businesstable``: identifies the respective data type (strings, numbers, dates, geometries, domains) that values associated to instances of the node will be stored as. This value should be left null for nodes that never store a business data. 
 
+.. note:: There is an excellent thread on the Arches forum discussing the purpose and implementation of mergenode here: https://groups.google.com/forum/?hl=en#!topic/archesproject/xRt1FPQXrLg
+
+	
 **Edges:**
 
 	* ``Source``: the ID of the source node
