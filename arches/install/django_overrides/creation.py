@@ -97,6 +97,17 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         self._create_test_db(verbosity, autoclobber)
 
+        # Create the base arches database and connect to it.
+        install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
+        
+        db_settings = settings.DATABASES['default']
+        db_settings['NAME'] = test_database_name
+        db_settings['install_path'] = install_path   
+        
+        install_db.create_sqlfile(db_settings, install_path)
+        
+        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
+
         self.connection.close()
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
@@ -149,15 +160,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             # Create the base arches database and connect to it.
             db_settings = settings.DATABASES['default']
             db_settings['NAME'] = test_database_name
-            install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
-            db_settings['install_path'] = install_path   
-            install_db.create_sqlfile(db_settings, install_path)
-            
+
             os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -c "DROP DATABASE IF EXISTS %(NAME)s;"' % db_settings)
             os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -c "CREATE DATABASE %(NAME)s WITH ENCODING=\'UTF8\' OWNER=%(USER)s CONNECTION LIMIT=-1;"' % db_settings)
             
-            os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
-
         except Exception as e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
