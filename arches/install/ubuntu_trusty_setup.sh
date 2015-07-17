@@ -55,17 +55,17 @@ cd ..
 
 sudo -u postgres psql -d postgres -c "CREATE EXTENSION postgis;"
 sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis_20
-sudo -u postgres createlang -d template_postgis_21 plpgsql
-sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_21'"
-sudo -u postgres psql -d template_postgis_21 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/postgis.sql
-sudo -u postgres psql -d template_postgis_21 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/spatial_ref_sys.sql
-sudo -u postgres psql -d template_postgis_21 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/rtpostgis.sql
-sudo -u postgres psql -d template_postgis_21 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
-sudo -u postgres psql -d template_postgis_21 -c "GRANT ALL ON geography_columns TO PUBLIC;"
-sudo -u postgres psql -d template_postgis_21 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-sudo -u postgres createdb training -T template_postgis_21
+sudo -u postgres createlang -d template_postgis_20 plpgsql
+sudo -u postgres psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_20'"
+sudo -u postgres psql -d template_postgis_20 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/postgis.sql
+sudo -u postgres psql -d template_postgis_20 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/spatial_ref_sys.sql
+sudo -u postgres psql -d template_postgis_20 -f /usr/share/postgresql/9.3/contrib/postgis-2.1/rtpostgis.sql
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geometry_columns TO PUBLIC;"
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns TO PUBLIC;"
+sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+sudo -u postgres createdb training -T template_postgis_20
 
 sudo apt-get install -y openjdk-7-jdk python-setuptools python-dev
 
-sudo -u postgres createdb -E UTF8 -T template_postgis_21 --locale=en_US.utf8 arches
+sudo -u postgres createdb -E UTF8 -T template_postgis_20 --locale=en_US.utf8 arches
 
