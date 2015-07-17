@@ -168,14 +168,15 @@ def insert_mappings(nodes, edges):
 
     cursor = connection.cursor()
 
+    root_node_id = get_root_node_id(edges)
+
     for node in nodes:
-        entitytypeid = get_node(node["ID"], nodes)["LABEL"]
-        if node['BUSINESSTABLE'] != '' and node['BUSINESSTABLE'] != 'entities':
+        if node['ID'] != root_node_id:
             mapping = get_mapping_steps_from_node_id(node["ID"], nodes, edges) 
             sql = """
                 SELECT ontology.insert_mappings('%s','%s');
                 """ % (", ".join(mapping), node["MERGENODE"])
-            # print sql
+            #print sql
             cursor.execute(sql)
             cursor.fetchone()
 

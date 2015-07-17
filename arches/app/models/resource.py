@@ -35,7 +35,7 @@ class Resource(Entity):
     Used for managing Resource type entities
 
     This class will return an instance of the class defined in settings.RESOURCE_MODEL
-    The class defined in settings.ENTITY_MODEL must be a subclass of this class (arches.app.models.resource.Resource)
+    The class defined in settings.RESOURCE_MODEL must be a subclass of this class (arches.app.models.resource.Resource)
 
     """
     def __new__(cls, *args, **kwargs):

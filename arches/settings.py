@@ -42,11 +42,11 @@ DATABASES = {
     }
 }
 
-ENTITY_MODEL = {
+RESOURCE_MODEL = {
     # override this setting in your packages settings.py file
     # to set the default model for the system to use
-    # Your model needs to inherit from 'arches.app.models.entity.Entity' to work
-    'default': 'arches.app.models.entity.Entity'
+    # Your model needs to inherit from 'arches.app.models.resource.Resource' to work
+    'default': 'arches.app.models.resource.Resource'
 }
 
 
@@ -227,6 +227,9 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_DIRS = (
+    'arches.app.templates',
+)
 
 # Application definition
 
