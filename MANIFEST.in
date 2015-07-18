@@ -3,6 +3,7 @@ exclude arches/logs/*.txt
 recursive-exclude tests *
 recursive-exclude virtualenv *
 recursive-exclude arches/elasticsearch *
+recursive-exclude arches/uploadedfiles *
 global-exclude *.log
 global-exclude *.pyc
 global-exclude *.zip

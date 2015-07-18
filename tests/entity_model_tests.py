@@ -32,17 +32,26 @@ from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 from arches.management.commands.package_utils import resource_graphs
 from arches.management.commands.package_utils import authority_files
+from arches.app.models import models
 from arches.app.models.entity import Entity
+from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
 from arches.app.models.concept import ConceptValue
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
+run_install = True
 class BasicEntityTests(SimpleTestCase):
-    # def setUp(self):
-    #     self.entity = TestEntityFactory.create(1)
-    #     install()
+
+    def setUp(self):
+        global run_install
+        #self.entity = TestEntityFactory.create(1)
+        if run_install:
+            install()
+            run_install = False
+        pass
 
 
     def test_init_entity_from_json(self):
@@ -83,6 +92,98 @@ class BasicEntityTests(SimpleTestCase):
         self.assertEqual(entity.property, 'P1')
         self.assertEqual(entity.value, '123')
         self.assertEqual(entity.child_entities, [])
+
+    def test_save(self):
+        python_object = {
+            "entityid":"",
+            "entitytypeid":"CAR.E1",
+            "value":"",
+            "property":"P1",
+            "child_entities":[{
+                "entityid":"",
+                "entitytypeid":"MAKE.E1",
+                "value":"Porsche",
+                "property":"P1",
+                "child_entities":[{
+                    "entityid":"",
+                    "entitytypeid":"MODEL.E1",
+                    "value":"911",
+                    "property":"P1",
+                    "child_entities":[]
+                }]
+            }]
+        }
+        entity = Entity(python_object)
+        entity._save()
+        self.assertNotEqual(python_object['entityid'], entity.entityid)
+
+        entity = Entity().get(entity.entityid)
+        self.assertEqual(entity.child_entities[0].value, 'Porsche')
+        self.assertEqual(entity.child_entities[0].child_entities[0].value, '911')
+
+    def test_post_save_data_integrity(self):
+        python_object = {
+            "entityid":"",
+            "entitytypeid":"CAR.E1",
+            "value":"",
+            "property":"P1",
+            "child_entities":[{
+                "entityid":"",
+                "entitytypeid":"PROPULSION_SYSTEM.E1",
+                "value":"",
+                "property":"P1",
+                "child_entities":[{
+                    "entityid":"",
+                    "entitytypeid":"ENGINE.E1",
+                    "value":"",
+                    "property":"P1",
+                    "child_entities":[{
+                        "entityid":"",
+                        "entitytypeid":"HORSEPOWER.E1",
+                        "value":"300",
+                        "property":"P1",
+                        "child_entities":[]
+                    }]
+                }]
+            }]
+        }
+        entity = Resource(python_object)
+        entity.save()
+        self.assertNotEqual(python_object['entityid'], entity.entityid)
+
+        entity = Resource().get(entity.entityid)
+        self.assertEqual(int(entity.child_entities[0].child_entities[0].child_entities[0].value), 300)
+        
+        entity.child_entities[0].child_entities[0].entityid = ''
+        entity.child_entities[0].child_entities[0].child_entities[0].entityid = ''
+        entity.save()
+
+        #entity = Resource().get(entity.entityid)
+        #print JSONSerializer().serialize(entity)
+        #self.assertEqual(int(entity.child_entities[0].child_entities[0].child_entities[0].value), 300)
+
+        # test for database integrity
+        self.assertEqual(models.Entities.objects.count(), 4)
+        self.assertEqual(models.Relations.objects.count(), 3)
+
+    def test_set_entity_value(self):
+        python_object = {
+            "entityid":"",
+            "entitytypeid":"CAR.E1",
+            "value":"",
+            "property":"P1",
+            "child_entities":[]
+        }
+        entity1 = Resource(python_object)
+        entity1.save()
+        self.assertNotEqual(python_object['entityid'], entity1.entityid)
+
+        entity2 = Resource().get(entity1.entityid)
+        entity2.set_entity_value('HORSEPOWER.E1', '300')
+        entity2.save()
+
+        entity3 = Resource().get(entity2.entityid)
+        self.assertEqual(int(entity3.child_entities[0].child_entities[0].child_entities[0].value), 300)
 
 
 class ConceptModelTests(SimpleTestCase):
@@ -258,11 +359,10 @@ class TestEntityFactory(object):
 
 
 def install(path_to_source_data_dir=None):
-    pass
     # truncate_db()
     # delete_index(index='concept_labels')
     # delete_index(index='entity')
-    #load_resource_graphs()
+    load_resource_graphs()
     #load_authority_files(path_to_source_data_dir)
     #resource_remover.truncate_resources()
     #load_resources()
@@ -290,3 +390,6 @@ def load_resources(external_file=None):
     else:
         for f in settings.BUSISNESS_DATA_FILES:
             rl.load(f)
+
+
+#install()
