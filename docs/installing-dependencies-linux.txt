@@ -33,6 +33,7 @@ the latest JDK:
 
 ::
 
+    chmod +x ubuntu_trusty_setup.sh
     ./ubuntu_trusty_setup.sh
 
 .. warning::
