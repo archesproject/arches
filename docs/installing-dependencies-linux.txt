@@ -25,7 +25,8 @@ Download following shell script using wget:
 
 ::
 
-    wget https://bitbucket.org/arches/arches3/raw/b295633aec4d5b3bb7cba10d439a43648ce75701/arches/install/ubuntu_trusty_setup.sh
+    wget https://bitbucket.org/arches/arches3/raw/4f8ffdafb043cf2f6ad009d4738e94202eb529dd/arches/install/ubuntu_trusty_setup.sh
+
 
 Run the following script to build install PostgreSql, PostGIS, GEOS and
 the latest JDK:
