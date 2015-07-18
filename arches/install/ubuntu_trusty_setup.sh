@@ -33,8 +33,8 @@ sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/9.3/mai
 sudo service postgresql restart
 
 sudo wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2
-sudo tar xvfj geos-3.3.8.tar.bz2
-cd geos-3.3.8
+sudo tar xvfj geos-3.4.2.tar.bz2
+cd geos-3.4.2
 ./configure
 make
 sudo make install
