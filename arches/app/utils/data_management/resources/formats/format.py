@@ -53,8 +53,10 @@ class Writer(object):
         collects values that correspond each entitytypeid in the field map.  Inserts those
         values into the template record's corresponding list of values.
         """
+
         domains = resource['_source']['domains']
         child_entities = resource['_source']['child_entities']
+        child_entities += resource['_source']['dates']
         for mapping in field_map:
             conceptid = ''
             if 'value_type' in mapping:
@@ -68,7 +70,6 @@ class Writer(object):
                 alternates = True
                 alternate_entitytypeid = mapping['alternate_entitytypeid']
                 alternate_values = []
-
             if entitytypeid.endswith('E55') != True:
                 for entity in child_entities:
                     if alternate_entitytypeid == entity['entitytypeid']:
@@ -125,6 +126,15 @@ class Writer(object):
                     sorted_geoms['lines'].append(geom)
                 if geom.geom_typeid == 3:
                     sorted_geoms['polys'].append(geom)
+                if geom.geom_typeid == 4:
+                    for feat in geom:
+                        sorted_geoms['points'].append(feat)
+                if geom.geom_typeid == 5:
+                    for feat in geom:
+                        sorted_geoms['lines'].append(feat)
+                if geom.geom_typeid == 6:
+                    for feat in geom:
+                        sorted_geoms['polys'].append(feat)
             if len(sorted_geoms['points']) > 0:
                 result.append({'type':'Feature','geometry': MultiPoint(sorted_geoms['points']),'properties': properties})
             if len(sorted_geoms['lines']) > 0:
