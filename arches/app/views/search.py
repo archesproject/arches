@@ -33,6 +33,14 @@ from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+
+import csv
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 geocoder = import_module(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
@@ -243,5 +251,14 @@ def export_results(request):
     format = request.GET.get('export', 'csv')
     exporter = ResourceExporter(format)
     results = exporter.export(search_results['hits']['hits'])
+
+    related_resources = [{'id1':rr.entityid1, 'id2':rr.entityid2, 'type':rr.relationshiptype} for rr in models.RelatedResource.objects.all()] 
+    csv_name = 'resource_relationships.csv'
+    dest = StringIO()
+    csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=['id1','id2','type'])
+    csvwriter.writeheader()
+    for csv_record in related_resources:
+        csvwriter.writerow({k:v.encode('utf8') for k,v in csv_record.items()})
+    results.append({'name':csv_name, 'outputfile': dest})
     zipped_results = exporter.zip_response(results, '{0}_{1}_export.zip'.format(settings.PACKAGE_NAME, format))
     return zipped_results
