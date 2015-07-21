@@ -79,10 +79,7 @@ If you have installed the dependencies, you're ready to install Arches.
     
     Open a command prompt and type::
 
-        $ pip install virtualenv
-
-    .. note::
-        For Linux users: Using apt-get to install virtualenv will install an older version that will result in errors in your Arches installation. Be sure to use pip for your virtualenv installation.
+        $ pip install virtualenv==1.11.4
 
     virtualenv creates a directory with it's own installation of Python and Python executables. 
 
