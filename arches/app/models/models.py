@@ -36,6 +36,7 @@ import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 # from django.contrib.auth.models import User
 
@@ -514,7 +515,7 @@ class Domains(models.Model):
                 try:
                     uuid.UUID(value)
                     value = Values.objects.get(valueid = value)
-                except(ValueError, TypeError):
+                except(ValueError, TypeError, ObjectDoesNotExist):
                     # print value, 'attr value'
                     concepts = Concepts.objects.filter(legacyoid = value)
                     if len(concepts) == 1:
