@@ -83,8 +83,13 @@ class Writer(object):
                                     template_record[mapping['field_name']].append(entity['value'])
             else:
                 for domain in domains:
-                    if entitytypeid == domain['entitytypeid']:
+                    if entitytypeid == domain['entitytypeid'] and conceptid == '':
                         template_record[mapping['field_name']].append(domain['label'])
+                    elif entitytypeid == domain['entitytypeid'] and conceptid != '':
+                        for domain_type in domains:
+                            if conceptid == domain_type['conceptid']:
+                                if domain['entityid'] == domain_type['parentid']:
+                                    template_record[mapping['field_name']].append(domain['label'])
                     if alternate_entitytypeid == domain['entitytypeid']:
                         alternate_values.append(entity['value'])
 
