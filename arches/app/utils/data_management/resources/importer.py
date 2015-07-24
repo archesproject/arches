@@ -1,4 +1,5 @@
 import os
+import uuid
 import csv
 import datetime
 from time import time
@@ -95,9 +96,15 @@ class ResourceLoader(object):
                 schema = Resource.get_mapping_schema(resource.entitytypeid)
 
             master_graph = self.build_master_graph(resource, schema)
-
             self.pre_save(master_graph)
-            master_graph.save(user=self.user, note=load_id)
+
+            try:
+                uuid.UUID(resource.resource_id)
+                entityid = resource.resource_id
+            except(ValueError):
+                entityid = ''
+                
+            master_graph.save(user=self.user, note=load_id, resource_uuid=entityid)
             master_graph.index()
             resource.entityid = master_graph.entityid
             legacyid_to_entityid[resource.resource_id] = master_graph.entityid

@@ -62,7 +62,7 @@ class Resource(Entity):
 
         self.form_groups = []
 
-    def save(self, user={}, note=''):
+    def save(self, user={}, note='', resource_uuid=''):
         """
         Saves a resource back to the db 
 
@@ -75,6 +75,7 @@ class Resource(Entity):
             entity_pre_save = Entity().get(self.entityid)
         else:
             newentity = True
+            self.entityid = resource_uuid
 
         self.trim()
         self._save() 
