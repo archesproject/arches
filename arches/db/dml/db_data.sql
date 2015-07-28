@@ -55,6 +55,9 @@ INSERT INTO d_valuetypes VALUES ('title', 'label', null, 'dcterms', 'text');
 INSERT INTO d_valuetypes VALUES ('description', 'note', null, 'dcterms', 'text');
 INSERT INTO d_valuetypes VALUES ('collector', 'undefined', null, 'arches', 'text');
 
+--ARCHES PROPERTIES
+INSERT INTO d_valuetypes VALUES ('sortorder', 'undefined', null, 'arches', 'text');
+
 --
 -- TOC entry 3329 (class 0 OID 11000965)
 -- Dependencies: 226
