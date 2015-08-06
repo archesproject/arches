@@ -27,6 +27,7 @@ from arches.setup import get_elasticsearch_download_url, download_elasticsearch,
 from arches.db.install import truncate_db, install_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
+import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -39,7 +40,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -53,6 +54,8 @@ class Command(BaseCommand):
             help='Format: shp or arches'),
         make_option('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.'),
+        make_option('-d', '--dest_dir', action='store', dest='dest_dir',
+            help='Directory where you want to save exported files.'),
     )
 
     def handle(self, *args, **options):
@@ -92,6 +95,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'index_database':
             self.index_database(package_name)
+
+        if options['operation'] == 'export_resource_graphs':
+            self.export_resource_graphs(package_name, options['dest_dir'])
 
     def setup(self, package_name):
         """
@@ -288,6 +294,12 @@ class Command(BaseCommand):
         """
         # self.setup_indexes(package_name)
         index_database.index_db()
+
+    def export_resource_graphs(self, package_name, data_dest=None):
+        """
+        Exports resource graphs to csv files
+        """
+        graph_exporter.export(data_dest)
 
     def start_livereload(self):
         from livereload import Server

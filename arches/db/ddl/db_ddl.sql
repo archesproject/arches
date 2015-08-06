@@ -1553,6 +1553,10 @@ CREATE TABLE mapping_steps (
 
 ALTER TABLE ontology.mapping_steps OWNER TO postgres;
 
+
+
+--SET search_path = ontology, pg_catalog;
+
 --
 -- TOC entry 252 (class 1259 OID 15704462)
 -- Dependencies: 3350 3351 11
@@ -1564,12 +1568,59 @@ CREATE TABLE mappings (
     entitytypeidfrom text,
     entitytypeidto text,
     mergenodeid text,
-	cardinality text
+  cardinality text
 );
+
 
 
 ALTER TABLE ontology.mappings OWNER TO postgres;
 
+CREATE OR REPLACE VIEW ontology.vw_export_nodes AS 
+ SELECT foo.assettype,
+    foo.node AS label,
+    (foo.assettype || ':'::text) || foo.node AS id,
+    foo.mergenodeid AS mergenode,
+    foo.businesstable AS businesstablename
+   FROM ( SELECT m.entitytypeidfrom AS assettype,
+            r.entitytypedomain AS node,
+            m.mergenodeid,
+            ( SELECT entity_types.businesstablename
+                   FROM data.entity_types
+                  WHERE entity_types.entitytypeid = r.entitytypedomain) AS businesstable
+           FROM ontology.mapping_steps ms
+             JOIN ontology.mappings m ON m.mappingid = ms.mappingid
+             JOIN ontology.rules r ON r.ruleid = ms.ruleid
+        UNION
+         SELECT m.entitytypeidfrom,
+            r.entitytyperange AS node,
+            m.mergenodeid,
+            ( SELECT entity_types.businesstablename
+                   FROM data.entity_types
+                  WHERE entity_types.entitytypeid = r.entitytyperange) AS businesstable
+           FROM ontology.mapping_steps ms
+             JOIN ontology.mappings m ON m.mappingid = ms.mappingid
+             JOIN ontology.rules r ON r.ruleid = ms.ruleid) foo
+  WHERE (foo.node <> ALL (ARRAY['ARCHES_RECORD.E31'::text, 'CREATION_EVENT.E65'::text, 'UPDATE_EVENT.E65'::text, 'COMPILER.E82'::text, 'COMPILER_PERSON.E21'::text, 'REFERENCE_NUMBER_(INTERNAL).E42'::text, 'TIME-SPAN_UPDATE_EVENT.E52'::text, 'TIME-SPAN_CREATION_EVENT.E52'::text, 'DATE_OF_COMPILATION.E50'::text, 'DATE_OF_LAST_UPDATE.E50'::text])) AND foo.node <> foo.assettype
+  ORDER BY foo.assettype, foo.node;
+
+ALTER TABLE ontology.vw_export_nodes
+  OWNER TO postgres;
+
+--SET search_path = ontology, pg_catalog;
+
+CREATE OR REPLACE VIEW ontology.vw_export_edges AS 
+ SELECT m.entitytypeidfrom AS assettype,
+    (m.entitytypeidfrom || ':'::text) || r.entitytypedomain AS source,
+    (m.entitytypeidfrom || ':'::text) || r.entitytyperange AS target,
+    r.propertyid AS label
+   FROM ontology.mapping_steps ms
+     JOIN ontology.mappings m ON m.mappingid = ms.mappingid
+     JOIN ontology.rules r ON r.ruleid = ms.ruleid
+  WHERE (m.entitytypeidfrom <> ALL (ARRAY['ARCHES_RECORD.E31'::text, 'CREATION_EVENT.E65'::text, 'UPDATE_EVENT.E65'::text, 'COMPILER.E82'::text, 'COMPILER_PERSON.E21'::text, 'REFERENCE_NUMBER_(INTERNAL).E42'::text, 'TIME-SPAN_UPDATE_EVENT.E52'::text, 'TIME-SPAN_CREATION_EVENT.E52'::text, 'DATE_OF_COMPILATION.E50'::text, 'DATE_OF_LAST_UPDATE.E50'::text])) AND (r.entitytypedomain <> ALL (ARRAY['ARCHES_RECORD.E31'::text, 'CREATION_EVENT.E65'::text, 'UPDATE_EVENT.E65'::text, 'COMPILER.E82'::text, 'COMPILER_PERSON.E21'::text, 'REFERENCE_NUMBER_(INTERNAL).E42'::text, 'TIME-SPAN_UPDATE_EVENT.E52'::text, 'TIME-SPAN_CREATION_EVENT.E52'::text, 'DATE_OF_COMPILATION.E50'::text, 'DATE_OF_LAST_UPDATE.E50'::text])) AND (r.entitytyperange <> ALL (ARRAY['ARCHES_RECORD.E31'::text, 'CREATION_EVENT.E65'::text, 'UPDATE_EVENT.E65'::text, 'COMPILER.E82'::text, 'COMPILER_PERSON.E21'::text, 'REFERENCE_NUMBER_(INTERNAL).E42'::text, 'TIME-SPAN_UPDATE_EVENT.E52'::text, 'TIME-SPAN_CREATION_EVENT.E52'::text, 'DATE_OF_COMPILATION.E50'::text, 'DATE_OF_LAST_UPDATE.E50'::text])) AND m.entitytypeidto = r.entitytyperange
+  ORDER BY m.entitytypeidfrom;
+
+ALTER TABLE ontology.vw_export_edges
+  OWNER TO postgres;
 --
 -- TOC entry 253 (class 1259 OID 15704470)
 -- Dependencies: 11

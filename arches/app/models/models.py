@@ -233,6 +233,23 @@ class VwNodes(models.Model):
     class Meta:
         db_table = u'vw_nodes'
 
+class VwExportNodes(models.Model):
+    id = models.TextField(primary_key=True) # This field type is a guess.
+    label = models.TextField()
+    assettype = models.TextField()
+    mergenode = models.TextField()
+    businesstablename = models.TextField()
+    class Meta:
+        db_table = u'ontology"."vw_export_nodes'
+
+class VwExportEdges(models.Model):
+    source = models.TextField() # This field type is a guess.
+    label = models.TextField()
+    target = models.TextField(primary_key=True) # This field type is a guess.
+    assettype = models.TextField()
+    class Meta:
+        db_table = u'ontology"."vw_export_edges'
+
 class VwEntitytypeDomains(models.Model):
     id = models.TextField(primary_key=True) # This field type is a guess.
     entitytypeid = models.TextField(blank=True)
