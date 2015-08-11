@@ -8,6 +8,7 @@ from django.conf import settings
 from formats.csvfile import CsvWriter 
 from formats.kmlfile import KmlWriter 
 from formats.shpfile import ShpWriter 
+from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
 
 try:
@@ -18,13 +19,17 @@ except ImportError:
 class ResourceExporter(object):
 
     def __init__(self, file_format):
-        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'shp': ShpWriter}
+        self.filetypes = {'csv': CsvWriter, 'kml': KmlWriter, 'shp': ShpWriter, 'json': JsonWriter}
         self.format = file_format
         self.writer = self.filetypes[file_format]()
 
-    def export(self, resources, zip=False):
-        configs = self.read_export_configs()
-        result = self.writer.write_resources(resources, configs)
+    def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
+        result=None
+        if search_results == True:
+            configs = self.read_export_configs()
+            result = self.writer.write_resources(resources, configs)
+        else:
+            self.writer.write_resources(dest_dir)
         return result
 
     def read_export_configs(self):

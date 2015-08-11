@@ -3,7 +3,6 @@ from arches.app.models.models import VwExportEdges as Edges
 import csv
 from pprint import pprint as pp
 import os
-import ipdb
 
 def export(export_dir):
     """

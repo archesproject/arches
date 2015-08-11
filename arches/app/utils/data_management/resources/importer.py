@@ -18,6 +18,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands import utils
 from optparse import make_option
 from formats.archesfile import ArchesReader
+from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
 
 
@@ -43,36 +44,38 @@ class ResourceLoader(object):
 
     def load(self, source):
         file_name, file_format = os.path.splitext(source)
+        archesjson = False
         if file_format == '.shp':
             reader = ShapeReader()
         elif file_format == '.arches':
             reader = ArchesReader()
             print '\nVALIDATING ARCHES FILE ({0})'.format(source)
-            print '-----------------------'
             reader.validate_file(source)
+        elif file_format == '.json':
+            archesjson = True
+            reader = JsonReader()
 
         start = time()
         resources = reader.load_file(source)
 
         print '\nLOADING RESOURCES ({0})'.format(source)
-        print '-----------------------'
         relationships = None
         related_resource_records = []
         relationships_file = file_name + '.relations'
         elapsed = (time() - start)
         print 'time to parse {0} resources = {1}'.format(file_name, elapsed)
-        results = self.resource_list_to_entities(resources)
+        results = self.resource_list_to_entities(resources, archesjson)
         if os.path.exists(relationships_file):
             relationships = csv.DictReader(open(relationships_file, 'r'), delimiter='|')
             for relationship in relationships:
-                related_resource_records.append(self.relate_resources(relationship, results['legacyid_to_entityid']))
+                related_resource_records.append(self.relate_resources(relationship, results['legacyid_to_entityid'], archesjson))
         else:
             print 'No relationship file'
 
         #self.se.bulk_index(self.resources)
 
 
-    def resource_list_to_entities(self, resource_list):
+    def resource_list_to_entities(self, resource_list, archesjson=False):
         '''Takes a collection of imported resource records and saves them as arches entities'''
 
         start = time()
@@ -90,33 +93,37 @@ class ResourceLoader(object):
             if count >= progress_interval and count % progress_interval == 0:
                 print count, 'of', len(resource_list), 'loaded'
 
-            masterGraph = None
-            entityData = []
-            if current_entitiy_type != resource.entitytypeid:
-                schema = Resource.get_mapping_schema(resource.entitytypeid)
 
-            master_graph = self.build_master_graph(resource, schema)
-            self.pre_save(master_graph)
+            if archesjson == False:
+                masterGraph = None
+                if current_entitiy_type != resource.entitytypeid:
+                    schema = Resource.get_mapping_schema(resource.entitytypeid)
 
-            try:
-                uuid.UUID(resource.resource_id)
-                entityid = resource.resource_id
-            except(ValueError):
-                entityid = ''
-                
-            master_graph.save(user=self.user, note=load_id, resource_uuid=entityid)
-            master_graph.index()
-            resource.entityid = master_graph.entityid
-            legacyid_to_entityid[resource.resource_id] = master_graph.entityid
+                master_graph = self.build_master_graph(resource, schema)
+                self.pre_save(master_graph)
+
+                try:
+                    uuid.UUID(resource.resource_id)
+                    entityid = resource.resource_id
+                except(ValueError):
+                    entityid = ''
+                    
+                master_graph.save(user=self.user, note=load_id, resource_uuid=entityid)
+                master_graph.index()
+                resource.entityid = master_graph.entityid
+                legacyid_to_entityid[resource.resource_id] = master_graph.entityid
             
+            else:
+                new_resource = Resource(resource)
+                new_resource.save(user=self.user, note=load_id, resource_uuid=new_resource.entityid)
+                try:
+                    new_resource.index()
+                except:
+                    print 'Could not index resource. This may be because the valueid of a concept is not in the database.'
+                legacyid_to_entityid[new_resource.entityid] = new_resource.entityid
+
             ret['successfully_saved'] += 1
-            # self.resources.append({
-            #     '_index': 'entity',
-            #     '_type': master_graph.entitytypeid,
-            #     '_id': master_graph.entityid,
-            #     '_source': master_graph.prepare_documents_for_search_index()[0]
-            # })
-            
+
 
         ret['legacyid_to_entityid'] = legacyid_to_entityid
         elapsed = (time() - start)
@@ -160,18 +167,29 @@ class ResourceLoader(object):
     def pre_save(self, master_graph):
         pass
 
-    def relate_resources(self, relationship, legacyid_to_entityid):
-        relationshiptype_concept = Concepts.objects.get(legacyoid = relationship['RELATION_TYPE'])
-        concept_value = Values.objects.filter(conceptid = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
-        start_date = None if relationship['START_DATE'] == '' else relationship['START_DATE']
-        end_date = None if relationship['END_DATE'] == '' else relationship['END_DATE']
+    def relate_resources(self, relationship, legacyid_to_entityid, archesjson):
+        start_date = None if relationship['START_DATE'] in ('', 'None') else relationship['START_DATE']
+        end_date = None if relationship['END_DATE'] in ('', 'None') else relationship['END_DATE']
+
+        if archesjson == False:
+            relationshiptype_concept = Concepts.objects.get(legacyoid = relationship['RELATION_TYPE'])
+            concept_value = Values.objects.filter(conceptid = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
+            entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']]
+            entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']]
+
+        else:
+            concept_value = Values.objects.filter(valueid = relationship['RELATION_TYPE'])
+            entityid1 = relationship['RESOURCEID_FROM']
+            entityid2 = relationship['RESOURCEID_TO']
+
         related_resource_record = RelatedResource(
-            entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']],
-            entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']],
+            entityid1 = entityid1,
+            entityid2 = entityid2,
             notes = relationship['NOTES'],
             relationshiptype = concept_value[0].valueid,
             datestarted = start_date,
             dateended = end_date,
             )
+
         related_resource_record.save()
         self.se.index_data(index='resource_relations', doc_type='all', body=model_to_dict(related_resource_record), idfield='resourcexid')

@@ -71,7 +71,7 @@ class Resource(Entity):
         newentity = False
         timestamp = datetime.now()
 
-        if self.entityid != '':
+        if self.entityid != '' and resource_uuid == '':
             entity_pre_save = Entity().get(self.entityid)
         else:
             newentity = True
@@ -154,7 +154,6 @@ class Resource(Entity):
                     edit.oldvalue = None
                     edit.newvalue = entity.label if entity.label != '' else entity.value
                     edit.save()
-
         return self
 
     def delete(self, user={}, note=''):

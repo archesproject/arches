@@ -28,9 +28,12 @@ from arches.db.install import truncate_db, install_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
+from arches.app.utils.data_management.resources.exporter import ResourceExporter
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.models import models
+import csv
 
 class Command(BaseCommand):
     """
@@ -40,7 +43,7 @@ class Command(BaseCommand):
     
     option_list = BaseCommand.option_list + (
         make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs'],
+            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
@@ -98,6 +101,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'export_resource_graphs':
             self.export_resource_graphs(package_name, options['dest_dir'])
+
+        if options['operation'] == 'export_resources':
+            self.export_resources(package_name, options['dest_dir'])
 
     def setup(self, package_name):
         """
@@ -300,6 +306,20 @@ class Command(BaseCommand):
         Exports resource graphs to csv files
         """
         graph_exporter.export(data_dest)
+
+    def export_resources(self, package_name, data_dest=None):
+        """
+        Exports resources to archesjson
+        """
+        resource_exporter = ResourceExporter('json')
+        resource_exporter.export(search_results=False, dest_dir=data_dest)
+        related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()] 
+        relations_file = os.path.splitext(data_dest)[0] + '.relations'
+        with open(relations_file, 'w') as f:
+            csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
+            csvwriter.writeheader()
+            for csv_record in related_resources:
+                csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
 
     def start_livereload(self):
         from livereload import Server
