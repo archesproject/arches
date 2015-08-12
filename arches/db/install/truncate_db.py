@@ -17,6 +17,7 @@ def create_sqlfile(database_settings, path_to_file):
 
 	t = Template(
 	"SELECT pg_terminate_backend({{ PID }}) from pg_stat_activity where datname='{{ NAME }}';\n"
+	"SELECT pg_terminate_backend({{ PID }}) from pg_stat_activity where datname='{{ POSTGIS_TEMPLATE }}';\n"
 	"\n"
 
 	"DROP DATABASE IF EXISTS {{ NAME }};\n"
