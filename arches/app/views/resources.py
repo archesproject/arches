@@ -102,7 +102,6 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         else:
             return HttpResponseNotFound('<h1>Arches form not found.</h1>')
 
-@login_required
 @csrf_exempt
 def related_resources(request, resourceid):
     if request.method == 'GET':
@@ -110,7 +109,7 @@ def related_resources(request, resourceid):
         start = request.GET.get('start', 0)
         return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
     
-    if request.method == 'DELETE':
+    if request.user.is_authenticated() and request.method == 'DELETE':
         se = SearchEngineFactory().create()
         data = JSONDeserializer().deserialize(request.body) 
         entityid1 = data.get('entityid1')
