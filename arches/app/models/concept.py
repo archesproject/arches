@@ -580,16 +580,19 @@ class Concept(object):
         return {'nodes': nodes, 'links': links}
 
     def get_context(self):
-        if self.nodetype == 'Concept' or self.nodetype == 'Collection' or self.nodetype == 'EntityType':
+        if self.nodetype == 'Concept' or self.nodetype == 'Collection':
             concept = Concept().get(id = self.id, include_parentconcepts = True, include = None)
             def get_scheme_id(concept):
                 for parentconcept in concept.parentconcepts:
                     if parentconcept.relationshiptype == 'hasTopConcept':
                         return concept
 
-            return concept.traverse(get_scheme_id, direction='up')
+            if len(concept.parentconcepts) > 0:
+                return concept.traverse(get_scheme_id, direction='up')
+            else:
+                return self
 
-        if self.nodetype == 'ConceptScheme':
+        else: # like ConceptScheme or EntityType
             return self
 
     def check_if_concept_in_use(self):
