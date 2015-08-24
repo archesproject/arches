@@ -146,14 +146,16 @@ def concept(request, conceptid):
                     'concept_paths': concept_graph.get_paths(lang=lang)
                 }, context_instance=RequestContext(request))
 
+
+        concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
+                include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
+                depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+
         if f == 'skos':
             include_parentconcepts = False
             include_subconcepts = True
             depth_limit = None
             skos = SKOSWriter()
-            concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 
-                    include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
             return HttpResponse(skos.write(concept_graph, format="pretty-xml"), content_type="application/xml")
 
         if emulate_elastic_search:
