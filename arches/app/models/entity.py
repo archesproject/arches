@@ -117,18 +117,19 @@ class Entity(object):
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
+
+        is_new_entity = False
         entitytype = archesmodels.EntityTypes.objects.get(pk = self.entitytypeid)
         try:
             uuid.UUID(self.entityid)
         except(ValueError):
+            is_new_entity = True
             self.entityid = str(uuid.uuid4())
-
 
         entity = archesmodels.Entities()
         entity.entitytypeid = entitytype
         entity.entityid = self.entityid
         entity.save()
-
 
         columnname = entity.entitytypeid.getcolumnname()
         if columnname != None:
@@ -162,12 +163,12 @@ class Entity(object):
                 # Saving of files must be handled specially
                 # Because on subsequent saves of a file resource, we post back the file path url (instead of posting the file like we originally did),
                 # we want to prevent the path from being saved back to the database thus screwing up the file save process 
-                if isinstance(self.value, (InMemoryUploadedFile, TemporaryUploadedFile)):
+                # This block should only be entered when initally uploading a file via the application, or when inserting records via a .arches file
+                if isinstance(self.value, (InMemoryUploadedFile, TemporaryUploadedFile)) or is_new_entity:
                     setattr(themodelinstance, columnname, self.value)
                     themodelinstance.save()
                     self.value = themodelinstance.geturl()
                     self.label = themodelinstance.getname()
-
 
         for child_entity in self.child_entities:
             child = child_entity._save()
