@@ -5,12 +5,13 @@ define(['jquery',
     'arches', 
     'select2',
     'knockout',
+    'knockout-mapping', 
     'plugins/bootstrap-slider/bootstrap-slider.min',
     'views/forms/sections/branch-list',
     'resource-types',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'], 
-    function($, _, Backbone, bootstrap, arches, select2, ko, Slider, BranchList, resourceTypes) {
+    function($, _, Backbone, bootstrap, arches, select2, ko, koMapping, Slider, BranchList, resourceTypes) {
 
         return Backbone.View.extend({
 
@@ -93,7 +94,7 @@ define(['jquery',
                     this.trigger('enabled', filtersenabled || sliderenabled, this.query.filter.inverted());
                 }, this);
 
-                new BranchList({
+                this.time_filter_branchlist = new BranchList({
                     el: $('#time-filter')[0],
                     data: this.viewModel,
                     dataKey: 'important_dates',
@@ -101,6 +102,13 @@ define(['jquery',
                         return this.validateHasValues(nodes);;
                     }
                 });
+
+                this.time_filter_branchlist.on('change', function(){
+                    self.query.filter.filters.removeAll();
+                    _.each(this.getData(), function(item){
+                        self.query.filter.filters.push(item);
+                    })                
+                })
 
                 //ko.applyBindings(this.query.filter, $('#time-filter')[0]);
             },
@@ -138,6 +146,11 @@ define(['jquery',
                     if('filters' in filter && filter.filters.length > 0){
                         _.each(filter.filters, function(filter){
                             this.query.filter.filters.push(filter);
+                            var branch = koMapping.fromJS({
+                                'editing':ko.observable(false), 
+                                'nodes': ko.observableArray(filter.nodes)
+                            });
+                            this.time_filter_branchlist.viewModel.branch_lists.push(branch);
                         }, this);
                     }
                     if('year_min_max' in filter && filter.year_min_max.length === 2){
