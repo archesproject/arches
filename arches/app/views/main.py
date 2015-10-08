@@ -23,6 +23,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib.auth.models import User
 
 def index(request):
     return render_to_response('index.htm', {
@@ -54,6 +55,7 @@ def auth(request):
     else:
         if request.GET.get('logout', None) is not None:
             logout(request)
+            request.user = User.objects.get(username='anonymous')
 
         return render_to_response('login.htm', {
                 'main_script': 'login',
