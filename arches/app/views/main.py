@@ -55,14 +55,15 @@ def auth(request):
     else:
         if request.GET.get('logout', None) is not None:
             logout(request)
-            request.user = User.objects.get(username='anonymous')
-
-        return render_to_response('login.htm', {
-                'main_script': 'login',
-                'auth_failed': (auth_attempt_success is not None),
-                'next': next
-            },
-            context_instance=RequestContext(request))
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect('auth')
+        else:
+            return render_to_response('login.htm', {
+                    'main_script': 'login',
+                    'auth_failed': (auth_attempt_success is not None),
+                    'next': next
+                },
+                context_instance=RequestContext(request))
 
 
 def search(request):
