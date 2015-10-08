@@ -247,8 +247,7 @@ class Command(BaseCommand):
         Creates anonymous user and group for read only access.
         """
 
-        from django.contrib.auth.models import User
-        from django.contrib.auth.models import Group
+        from django.contrib.auth.models import User, Group
 
         read_group = Group.objects.create(name='read')
         anonymous_user = User.objects.create_user('anonymous', '', '')
@@ -260,13 +259,14 @@ class Command(BaseCommand):
         Creates edit group and adds admin to it by default.
         """
 
-        from django.contrib.auth.models import User
-        from django.contrib.auth.models import Group
+        from django.contrib.auth.models import User, Group
 
         edit_group = Group.objects.create(name='edit')
         edit_group = Group.objects.get(name='edit')
+        read_group = Group.objects.get(name='read')
         admin_user = User.objects.get(username='admin')
         admin_user.groups.add(edit_group)
+        admin_user.groups.add(read_group)
 
     def build_permissions(self):
         """
