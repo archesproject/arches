@@ -208,8 +208,8 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
 
-        self.create_anonymous_user()
-        self.create_edit_group()
+        self.create_groups()
+        self.create_users()
 
     def generate_procfile(self, package_name):
         """
@@ -242,28 +242,28 @@ class Command(BaseCommand):
         package_root = settings.PACKAGE_ROOT
         return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
 
-    def create_anonymous_user(self):
+    def create_groups(self):
         """
-        Creates anonymous user and group for read only access.
-        """
-
-        from django.contrib.auth.models import User, Group
-
-        read_group = Group.objects.create(name='read')
-        anonymous_user = User.objects.create_user('anonymous', '', '')
-        read_group = Group.objects.get(name='read')
-        anonymous_user.groups.add(read_group)
-
-    def create_edit_group(self):
-        """
-        Creates edit group and adds admin to it by default.
+        Creates read and edit groups.
         """
 
         from django.contrib.auth.models import User, Group
 
         edit_group = Group.objects.create(name='edit')
-        edit_group = Group.objects.get(name='edit')
+        read_group = Group.objects.create(name='read')
+
+    def create_users(self):
+        """
+        Creates anonymous user and adds anonymous and admin user to appropriate groups.
+        """
+
+        from django.contrib.auth.models import User, Group
+
+        anonymous_user = User.objects.create_user('anonymous', '', '')
         read_group = Group.objects.get(name='read')
+        anonymous_user.groups.add(read_group)
+
+        edit_group = Group.objects.get(name='edit')
         admin_user = User.objects.get(username='admin')
         admin_user.groups.add(edit_group)
         admin_user.groups.add(read_group)
