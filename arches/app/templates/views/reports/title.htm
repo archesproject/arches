@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Project Name (screens small and bigger)-->
             <div class="hidden-sm hidden-xs col-sm-12">
                 <h1 class="pull-left arches-breadcrumb-title"><i class="fa {{RESOURCE_TYPE_CONFIGS.icon_class}}"></i>{{ report_info.source.primaryname }}<small style="padding-left: 8px;">{{RESOURCE_TYPE_CONFIGS.name}}</small></h1>
-                {% if user_can_edit == True %}
+                {% if 'edit' in user.user_groups %}
                 <div class="header-btn-wrapper">
                     <a href="{% url 'resource_manager' report_info.source.entitytypeid 'default' report_info.source.entityid %}" class="info-link edit-link report-header-link btn btn-primary">
                         <i class="fa fa-edit"></i><span> {% trans 'Edit' %}</span>
@@ -51,7 +51,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <a href="#map" class="info-link navigate-map"><span class="arches-search-link">{% trans 'Map' %}</span></a>
                     </li>
 
-                    {% if user_can_edit == True %}
+                    {% if 'edit' in user.user_groups %}
                     <li>
                         <i class="arches-search-link fa fa-edit"></i>
                         <a href="{% url 'resource_manager' report_info.source.entitytypeid 'default' report_info.source.entityid %}" class="info-link edit-link"><span class="arches-search-link">{% trans 'Edit' %}</span></a>

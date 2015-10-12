@@ -208,6 +208,9 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
 
+        self.create_groups()
+        self.create_users()
+
     def generate_procfile(self, package_name):
         """
         Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
@@ -238,6 +241,32 @@ class Command(BaseCommand):
         file_name_wo_extention = file_name[:-4]
         package_root = settings.PACKAGE_ROOT
         return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
+
+    def create_groups(self):
+        """
+        Creates read and edit groups.
+        """
+
+        from django.contrib.auth.models import User, Group
+
+        edit_group = Group.objects.create(name='edit')
+        read_group = Group.objects.create(name='read')
+
+    def create_users(self):
+        """
+        Creates anonymous user and adds anonymous and admin user to appropriate groups.
+        """
+
+        from django.contrib.auth.models import User, Group
+
+        anonymous_user = User.objects.create_user('anonymous', '', '')
+        read_group = Group.objects.get(name='read')
+        anonymous_user.groups.add(read_group)
+
+        edit_group = Group.objects.get(name='edit')
+        admin_user = User.objects.get(username='admin')
+        admin_user.groups.add(edit_group)
+        admin_user.groups.add(read_group)
 
     def build_permissions(self):
         """
