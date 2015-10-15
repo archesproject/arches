@@ -1046,7 +1046,8 @@ SET search_path = concepts, pg_catalog;
 CREATE TABLE concepts (
     conceptid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     nodetype text NOT NULL,
-    legacyoid text
+    legacyoid text,
+    CONSTRAINT unique_legacyoid UNIQUE (legacyoid)
 );
 
 
