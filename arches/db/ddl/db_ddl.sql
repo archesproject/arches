@@ -1044,14 +1044,17 @@ SET search_path = concepts, pg_catalog;
 --
 
 CREATE TABLE concepts (
-    conceptid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
+    conceptid uuid NOT NULL,
     nodetype text NOT NULL,
-    legacyoid text,
+    legacyoid text NOT NULL,
     CONSTRAINT unique_legacyoid UNIQUE (legacyoid)
+
 );
 
 
 ALTER TABLE concepts.concepts OWNER TO postgres;
+
+
 
 --
 -- TOC entry 222 (class 1259 OID 15704302)
@@ -2391,3 +2394,50 @@ CREATE INDEX parcels_sidx
   (geometry );
 
 
+CREATE OR REPLACE FUNCTION concepts.concpets_ins()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+ v_uuid uuid = public.uuid_generate_v1mc();
+
+BEGIN
+--Provides CONCEPTID for RDM inserts and cases where ETL conceptid is not a UUID
+  IF NEW.CONCEPTID IS NULL THEN
+     NEW.CONCEPTID := v_uuid;
+  END IF;
+
+ -- Supports RDM where no concpetid or legacyoid is fed in
+  IF NEW.CONCEPTID IS NULL AND (NEW.LEGACYOID IS NULL OR NEW.LEGACYOID = '') THEN
+     NEW.LEGACYOID = v_uuid::text;
+  END IF;   
+
+
+-- I would assume that two cases below are handled in python code by being explicit about insert values for both columns... just coding defensively here. ABL.
+-- Supports where ETL provided conceptid is a UUID and will be kept, but no LEGACYOID provided.
+  IF NEW.CONCEPTID IS NOT NULL and (NEW.LEGACYOID is null or NEW.LEGACYOID = '') THEN
+     NEW.LEGACYOID = NEW.CONCEPTID::text;     
+  END IF;   
+
+-- Supports where ETL'ed conceptid is not a UUID.  Populates original "concpetid" as LEGACYOID.
+  IF NEW.LEGACYOID IS NOT NULL OR NEW.LEGACYOID != '' then
+     NEW.LEGACYOID = NEW.LEGACYOID;     
+  END IF;   
+
+RETURN NEW;
+END$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION concepts.concpets_ins()
+  OWNER TO postgres;
+
+  
+  
+-- Trigger: concepts_ins_tgr on concepts.concepts
+
+-- DROP TRIGGER concepts_ins_tgr ON concepts.concepts;
+
+CREATE TRIGGER concepts_ins_tgr
+  BEFORE INSERT
+  ON concepts.concepts
+  FOR EACH ROW
+  EXECUTE PROCEDURE concepts.concpets_ins();
