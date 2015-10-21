@@ -177,8 +177,8 @@ define(['jquery',
         },
 
         deleteItem: function(branch, e) {
-            this.trigger('change', 'delete', branch);   
             this.viewModel.branch_lists.remove(branch);
+            this.trigger('change', 'delete', branch);   
         },
 
         editItem: function(branch, e) {        
