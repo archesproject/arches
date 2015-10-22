@@ -57,6 +57,7 @@ class Writer(object):
         domains = resource['_source']['domains']
         child_entities = resource['_source']['child_entities']
         child_entities += resource['_source']['dates']
+        child_entities += resource['_source']['numbers']
         for mapping in field_map:
             conceptid = ''
             if 'value_type' in mapping:
@@ -109,7 +110,7 @@ class Writer(object):
                     template_record[k] = ("; ").join(v)
                 except:
                     unicode_vals = [unicode(x) for x in v]
-                    template_record[k] = ("; ").join(vals)
+                    template_record[k] = ("; ").join(unicode_vals)
         return template_record
 
     def process_feature_geoms(self, properties, resource, geo_process='collection'):
