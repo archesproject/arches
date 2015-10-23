@@ -391,7 +391,7 @@ class ShpWriter(Writer):
                     template_record[k] = ("; ").join(v).encode("utf-8")
                 except:
                     unicode_vals = [unicode(x) for x in v]
-                    template_record[k] = unicode(("; ").join(vals)).encode("utf-8")
+                    template_record[k] = unicode(("; ").join(unicode_vals)).encode("utf-8")
         return template_record
 
     def create_shapefiles(self, feature_collection, shp_name, resource_export_configs):
