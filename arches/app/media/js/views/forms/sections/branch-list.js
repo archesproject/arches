@@ -163,8 +163,8 @@ define(['jquery',
             
             if (this.validateBranch(ko.toJS(branch.nodes))) {
                 var branch = this.getEditedBranch();
-                this.addBlankEditBranch();
                 branch.editing(false);
+                this.addBlankEditBranch();
                 this.originalItem = null;
 
                 this.trigger('change', 'add', branch);
