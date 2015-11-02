@@ -232,7 +232,7 @@ Shapefiles have the significant limitation that they cannot define explicit rela
 
 From ``.arches``
 ----------------
-The ``.arches`` format is intended to support upload of Arches data containing rich content and complex relationships while also being achievable to format properly using common software like MS Excel or OpenOffice.  The ``.arches`` format actually requires two files: one for loading resources (with a ``.arches`` extension) and another for loading relationships between resources (with a ``.relation`` extension).
+The ``.arches`` format is intended to support upload of Arches data containing rich content and complex relationships while also being achievable to format properly using common software like MS Excel or OpenOffice.  The ``.arches`` format actually requires two files: one for loading resources (with a ``.arches`` extension) and another for loading relationships between resources (with a ``.relations`` extension).
 
 The file is really just a list of business entities to be loaded to Arches.  "Business entities" are those entities that actually store a business value.  In this way, the ``.arches`` format is obfuscated from the details of the resource graph that it is being loaded to.  The only real requirement is that the entity types referenced in the ``ATTRIBUTENAME`` field exist within the resource graph that the data are being loaded into.
 
@@ -240,7 +240,7 @@ The format takes a key-value pair approach to storage, where the ``ATTRIBUTENAME
 
 The ``.arches`` file is a pipe (``|``) delimited text file containing the following column headers:
 
-	* ``RESOURCEID`` is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat on many lines.  As a point of reference, Arches will create a seperate unique ID for any resource that is laoded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
+	* ``RESOURCEID`` is a user-generated unique ID for each individual resource.  Since any given resource will likely have many attributes, it is expected that a given RESOURCEID value will repeat on many lines.  As a point of reference, Arches will create a separate unique ID for any resource that is loaded and will save the RESOURCEID provided within the .arches file as an external reference of type "Legacy ID".
 	* ``RESOURCETYPE`` specifies which resource type graph a given attribute is being loaded to.  In the Arches HIP Application, the available resource types include: ACTIVITY.E7, ACTOR.E39, HERITAGE_RESOURCE.E18, HERITAGE_RESOURCE_GROUP.E27, HISTORICAL_EVENT.E5, and INFORMATION_RESOURCE.E73.
 	* ``ATTRIBUTENAME`` specifies the node from the appropriate resource graph that the supplied value (in the ATTRIBUTEVALUE column) will load to.  Note that ATTRIBUTENAME is synonymous with entitytypeid.  Essentially, you are specifying the enitytypeid of the (business) entity that you are loading to the system.
 	* ``ATTRIBUTEVALUE`` stores the the actual business value of the entity.  ``ATTRIBUTEVALUE`` values must conform to the data type specified by the business table associated to the entity type referenced by the ``ATTRIBUTENAME``. See the PostgreSQL documentation for appropriate formatting for strings, numbers, and dates.  See the notes below for formatting details on Geometries and Domains.
@@ -249,12 +249,12 @@ The ``.arches`` file is a pipe (``|``) delimited text file containing the follow
 
 .. note:: Domains: Another special case here is values associated to ``ATTRIBUTENAME``(s) that link to the ``domains`` businesstable.  In those cases, the value stored in ``ATTRIBUTEVALUE`` must be the ``conceptid`` fed in from CSV-formatted "authority files."   More on authority files is available in the "Loading Reference Data" section.
 
-``GROUPID`` is intended to support cases where business values stored in separate nodes within the resource graph must be associated to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both ``FIRST_NAME.E1`` and ``LAST_NAME.E1`` as seperate nodes.  In that case, an ACTOR that has two separate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common ``GROUPID`` value and the two rows containing "Samuel" and Clemens" should have their own ``GROUPID`` value.  
+``GROUPID`` is intended to support cases where business values stored in separate nodes within the resource graph must be associated to each other. To illustrate the need, the classic example is an ACTOR resource graph that contains both ``FIRST_NAME.E1`` and ``LAST_NAME.E1`` as separate nodes.  In that case, an ACTOR that has two separate names would need to know which first name and which last name go together.  (An example might be Mark Twain and Samuel Clemens.)  To group these appropriately, the two rows containing "Mark" and "Twain" should share a common ``GROUPID`` value and the two rows containing "Samuel" and Clemens" should have their own ``GROUPID`` value.  
 
 .. hint:: The code that loads data from ``.arches`` files assumes that the records within the file are sorted first on ``RESOURCEID`` and then on ``GROUPID``.  If the rows are sorted incorrectly, it could cause the load to fail, or (worse) load the data into the database incorrectly.  Luckily, the data loading code has built into it a number of validations which search for conditions that could cause problems.  Those validations are outlined in the next section.
 
 
-The ``.relation`` file is a pipe (``|``) delimited text file containing the following column headers:
+The ``.relations`` file is a pipe (``|``) delimited text file containing the following column headers:
 
 	* ``RESOURCEID_FROM`` indicates one of the two resources to be related.  The value here must also be present as a ``RESOURCEID`` in the ``.arches`` file.
 	* ``RESOURCEID_TO`` indicates the other of the two resources to be related.  The value here must also be present as a ``RESOURCEID`` in the ``.arches`` file.
