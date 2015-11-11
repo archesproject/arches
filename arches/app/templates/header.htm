@@ -101,7 +101,7 @@
                     <!-- End Resource Editor -->
 
                      <!-- RDM-->
-                    <li class="{% if user.is_anonymous %}{% endif %} {% if active_page = 'RDM' %}active{% endif %}">
+                    <li class="{% if active_page = 'RDM' %}active{% endif %}">
                         <a href="{% url 'rdm' '' %}">
                             {% trans "RDM" %}
                         </a>
