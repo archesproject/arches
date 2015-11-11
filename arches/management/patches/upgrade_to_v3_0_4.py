@@ -10,8 +10,7 @@ from arches.management.commands import utils
 
 def load_graphs(break_on_error=True, settings=None):
     """
-    Iterates through the resource node and edge files to load entitytypes and mappings into the database.
-    Generates node level permissions for each resourcetype/entitytype combination
+    Iterates through the resource node and edge files to add mappings in the database for nodes that don't collect data
 
     """
 
@@ -63,7 +62,7 @@ def load_graphs(break_on_error=True, settings=None):
             sys.exit(101)
 
     else:
-        print '\nArches was successfully updated !'
+        print "\npatch '%s' successfully applied." % __name__
 
 
 def append_branch(path_to_branch, node_list, edge_list):
@@ -210,4 +209,5 @@ def get_root_node_id(edge_list):
         if edge['SOURCE'] not in target_nodes:
             return edge['SOURCE']
 
-load_graphs(break_on_error=True)
+if __name__ == "arches.management.patches.upgrade_to_v3_0_4":
+    load_graphs(break_on_error=True)
