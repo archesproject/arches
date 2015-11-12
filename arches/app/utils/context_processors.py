@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
 from arches.app.models.resource import Resource
+from arches.app.utils.decorators import deprecated
 
 def livereload(request):
     return {
@@ -50,4 +51,12 @@ def app_settings(request):
     return {
         'APP_NAME': settings.APP_NAME,
         'GOOGLE_ANALYTICS_TRACKING_ID': settings.GOOGLE_ANALYTICS_TRACKING_ID
+    }
+
+@deprecated
+def user_can_edit(request):
+    # need to implement proper permissions check here...
+    # for now allowing all logged in users to be 'editors'
+    return {
+        'user_can_edit': request.user.is_authenticated()
     }
