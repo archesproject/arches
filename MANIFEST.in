@@ -8,3 +8,4 @@ global-exclude *.log
 global-exclude *.pyc
 global-exclude *.zip
 global-exclude *.DS_Store
+global-exclude *.orig
