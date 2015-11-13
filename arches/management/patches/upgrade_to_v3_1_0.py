@@ -141,9 +141,13 @@ def main():
         admin_user.groups.add(edit_group)
         admin_user.groups.add(read_group)
 
-
-        # Install shapefile library
+        print '\nINSTALLING PYSHP MODULE'
+        print '-----------------------'
         pip.main(['install', 'pyshp'])
+
+
+        print '\nUPDATING ENTITY INDEX'
+        print '---------------------'
 
         # Add numbers array to resources that do not have them. Move numbers data from child_entities to numbers array in index.
         resourceid_sql = "SELECT entityid FROM data.entities WHERE entitytypeid IN (SELECT distinct(entitytypeid) FROM data.entity_types WHERE isresource =True);"
@@ -173,8 +177,9 @@ def main():
             records+=1
             # if records%500 == 0:
             #     print '%s records processed'%str(records)
-                
-        # print '%s total records processed'%str(records)
+
+        print '%s records updated' % str(records)
+
         # print 'Patch took %s seconds to run.'%str(time.time() - start)
 
         print "\npatch '%s' successfully applied." % __name__
