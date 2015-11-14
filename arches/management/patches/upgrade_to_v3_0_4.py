@@ -209,5 +209,5 @@ def get_root_node_id(edge_list):
         if edge['SOURCE'] not in target_nodes:
             return edge['SOURCE']
 
-if __name__ == "arches.management.patches.upgrade_to_v3_0_4":
-    load_graphs(break_on_error=True)
+
+load_graphs(break_on_error=True)

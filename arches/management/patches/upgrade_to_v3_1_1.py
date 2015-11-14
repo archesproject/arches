@@ -184,6 +184,4 @@ def main():
 
         print "\npatch '%s' successfully applied." % __name__
 
-
-if __name__ == "arches.management.patches.upgrade_to_v3_1_0":
-        main()
+main()
