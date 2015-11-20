@@ -33,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_by_path
+from django.shortcuts import render_to_response, redirect
 
 sparql_providers = {}
 for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
@@ -41,21 +42,25 @@ for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
 
 @login_required
 def rdm(request, conceptid):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
-    languages = models.DLanguages.objects.all()
+    if 'edit' in request.user.user_groups:
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
+        languages = models.DLanguages.objects.all()
 
-    concept_schemes = []
-    for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
-        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+        concept_schemes = []
+        for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
+            concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
-    return render_to_response('rdm.htm', {
-            'main_script': 'rdm',
-            'active_page': 'RDM',
-            'languages': languages,
-            'conceptid': conceptid,
-            'concept_schemes': concept_schemes,
-            'CORE_CONCEPTS': CORE_CONCEPTS
-        }, context_instance=RequestContext(request))
+        return render_to_response('rdm.htm', {
+                'main_script': 'rdm',
+                'active_page': 'RDM',
+                'languages': languages,
+                'conceptid': conceptid,
+                'concept_schemes': concept_schemes,
+                'CORE_CONCEPTS': CORE_CONCEPTS
+            }, context_instance=RequestContext(request))
+    else:
+        return redirect('auth')
+
 
 @login_required
 @csrf_exempt
