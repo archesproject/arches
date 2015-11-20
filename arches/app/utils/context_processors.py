@@ -58,5 +58,5 @@ def user_can_edit(request):
     # need to implement proper permissions check here...
     # for now allowing all logged in users to be 'editors'
     return {
-        'user_can_edit': request.user.is_authenticated()
+        'user_can_edit': 'edit' in request.user.user_groups
     }

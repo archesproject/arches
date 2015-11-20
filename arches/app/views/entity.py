@@ -34,7 +34,7 @@ def Entities(request, entityid):
         else:
             entity = Entity().get(entityid)
     else:
-        if not request.user.is_authenticated():
+        if 'edit' not in request.user.user_groups:
             raise Exception('User must be logged in to insert, update, or delete entities')
         if request.method == 'POST':
             if len(request.FILES) > 0:

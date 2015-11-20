@@ -24,7 +24,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -33,36 +33,34 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_by_path
-from django.shortcuts import render_to_response, redirect
+
 
 sparql_providers = {}
 for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
     Provider = import_by_path(provider)()
     sparql_providers[Provider.endpoint] = Provider
 
-@login_required
+@permission_required('edit')
 def rdm(request, conceptid):
-    if 'edit' in request.user.user_groups:
-        lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
-        languages = models.DLanguages.objects.all()
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
+    languages = models.DLanguages.objects.all()
 
-        concept_schemes = []
-        for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
-            concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+    concept_schemes = []
+    for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
+        concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
-        return render_to_response('rdm.htm', {
-                'main_script': 'rdm',
-                'active_page': 'RDM',
-                'languages': languages,
-                'conceptid': conceptid,
-                'concept_schemes': concept_schemes,
-                'CORE_CONCEPTS': CORE_CONCEPTS
-            }, context_instance=RequestContext(request))
-    else:
-        return redirect('auth')
+    return render_to_response('rdm.htm', {
+            'main_script': 'rdm',
+            'active_page': 'RDM',
+            'languages': languages,
+            'conceptid': conceptid,
+            'concept_schemes': concept_schemes,
+            'CORE_CONCEPTS': CORE_CONCEPTS
+        }, context_instance=RequestContext(request))
 
 
-@login_required
+
+@permission_required('edit')
 @csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')

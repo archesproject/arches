@@ -27,9 +27,9 @@
                 </li>
                 <li class="topbar-devider"></li>   
                 <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="{% trans 'Documentation coming soon.' %}">{% trans "Help" %}</a></li>
-                <li class="topbar-devider"></li>   
+                <li class="topbar-devider"></li>
                 <li>
-                    <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.is_anonymous %}">{% trans "Login" %}{% else %}&logout=true">Welcome {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
+                    <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
                 </li>
                 
             </ul>

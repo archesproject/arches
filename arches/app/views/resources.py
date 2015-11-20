@@ -20,7 +20,7 @@ import re
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
@@ -38,7 +38,7 @@ from django.db.models import Max, Min
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
 
-@login_required
+@permission_required('edit')
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='default', resourceid=''):
 
@@ -109,7 +109,7 @@ def related_resources(request, resourceid):
         start = request.GET.get('start', 0)
         return JSONResponse(get_related_resources(resourceid, lang, start=start, limit=15), indent=4)
     
-    if request.user.is_authenticated() and request.method == 'DELETE':
+    if 'edit' in request.user.user_groups and request.method == 'DELETE':
         se = SearchEngineFactory().create()
         data = JSONDeserializer().deserialize(request.body) 
         entityid1 = data.get('entityid1')
