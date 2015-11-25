@@ -96,28 +96,29 @@ RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
-RESOURCE_TYPE_CONFIGS = {
-    # override this setting in your packages settings.py file
-    #
-    # 'HERITAGE_RESOURCE.E18': {
-    #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
-    #     'name': _('Heritage Resource'),
-    #     'icon_class': 'fa fa-trophy',
-    #     'default_page': 'summary',
-    #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
-    #     'categories': [_('Resource')],
-    #     'has_layer': True,
-    #     'on_map': True,
-    #     'marker_color': '#3366FF',
-    #     'stroke_color': '#3366FF',
-    #     'fill_color': '#3366FF',
-    #     'primary_name_lookups': {
-    #         'entity_type': 'NAME.E41',
-    #         'lookup_value': 'Primary'
-    #     },
-    #     'sort_order': 1
-    # },
-}
+def RESOURCE_TYPE_CONFIGS():
+    return {
+        # override this setting in your packages settings.py file
+        #
+        # 'HERITAGE_RESOURCE.E18': {
+        #     'resourcetypeid': 'HERITAGE_RESOURCE.E18',
+        #     'name': _('Heritage Resource'),
+        #     'icon_class': 'fa fa-trophy',
+        #     'default_page': 'summary',
+        #     'description': _('INSERT RESOURCE DESCRIPTION HERE'),
+        #     'categories': [_('Resource')],
+        #     'has_layer': True,
+        #     'on_map': True,
+        #     'marker_color': '#3366FF',
+        #     'stroke_color': '#3366FF',
+        #     'fill_color': '#3366FF',
+        #     'primary_name_lookups': {
+        #         'entity_type': 'NAME.E41',
+        #         'lookup_value': 'Primary'
+        #     },
+        #     'sort_order': 1
+        # },
+    }
 
 GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
 
