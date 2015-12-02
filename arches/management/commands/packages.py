@@ -259,7 +259,8 @@ class Command(BaseCommand):
 
         from django.contrib.auth.models import User, Group
 
-        anonymous_user = User.objects.create_user('anonymous', '', '')
+        from datetime import datetime
+        anonymous_user = User.objects.create_user('anonymous', '', '', last_login=datetime.now())
         read_group = Group.objects.get(name='read')
         anonymous_user.groups.add(read_group)
 

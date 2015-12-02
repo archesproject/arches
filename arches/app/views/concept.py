@@ -32,12 +32,12 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nest
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 sparql_providers = {}
 for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-    Provider = import_by_path(provider)()
+    Provider = import_string(provider)()
     sparql_providers[Provider.endpoint] = Provider
 
 @permission_required('edit')
