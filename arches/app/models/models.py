@@ -287,6 +287,17 @@ class Concepts(models.Model):
     def __unicode__(self):
         return ('%s') % (self.conceptid)
 
+    # def __getattr__(self, name):
+    #     print '_'*40
+    #     print name
+    #     if name == 'conceptid':
+    #         print '*'*40
+    #         print str(super(Concepts, self).__getattr__(name))
+    #         return str(super(Concepts, self).__getattr__(name))
+    #     else:
+    #         return super(Concepts, self).__getattr__(name)
+
+
 class ConceptRelations(models.Model):
     relationid = models.TextField(primary_key=True)
     conceptidfrom = models.ForeignKey('Concepts', db_column='conceptidfrom', related_name='concept_relation_from')

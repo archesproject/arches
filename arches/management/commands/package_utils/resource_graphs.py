@@ -180,7 +180,7 @@ def insert_mappings(nodes, edges):
             cursor.execute(sql)
             cursor.fetchone()
 
-    transaction.commit_unless_managed()
+    # transaction.commit_unless_managed()
 
 def get_mapping_steps_from_node_id(node_id, nodes, edges, mapping=None):
     """

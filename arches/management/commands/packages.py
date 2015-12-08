@@ -291,7 +291,7 @@ class Command(BaseCommand):
 
         for resourcetype in resourcetypes:
             for entitytype in resourcetypes[resourcetype]:
-                content_type = ContentType.objects.get_or_create(name='Arches', app_label=resourcetype, model=entitytype)
+                content_type = ContentType.objects.get_or_create(app_label=resourcetype, model=entitytype)
                 Permission.objects.create(codename='add_%s' % entitytype, name='%s - add' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='update_%s' % entitytype, name='%s - update' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])

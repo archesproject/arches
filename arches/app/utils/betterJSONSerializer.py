@@ -3,6 +3,7 @@ import decimal
 import types
 import json
 import inspect
+import uuid
 from io import StringIO
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import Model
@@ -14,6 +15,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+
 
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
@@ -102,6 +104,8 @@ class JSONSerializer(object):
             return getattr(object, self.geom_format)
         elif isinstance(object, File):
             return object.name
+        elif isinstance(object, uuid.UUID):
+            return str(object)
         elif hasattr(object, '__dict__'):
             return self.handle_dictionary(object.__dict__)
         else:
