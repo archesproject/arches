@@ -22,12 +22,18 @@ import logging
 from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class SearchEngine(object):
 
     def __init__(self):
-        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
+        # 
+        serializer = JSONSerializer()
+        serializer.mimetype = 'application/json'
+        serializer.dumps = serializer.serialize
+        serializer.loads = JSONDeserializer().deserialize
+        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
         self.logger = logging.getLogger(__name__)
 
     def delete(self, **kwargs):
