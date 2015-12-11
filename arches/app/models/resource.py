@@ -304,7 +304,6 @@ class Resource(Entity):
 
         search_documents = self.prepare_documents_for_search_index()
         for document in search_documents:
-            print document
             se.index_data('entity', self.entitytypeid, document, id=self.entityid)
 
             report_documents = self.prepare_documents_for_report_index(geom_entities=document['geometries'])
