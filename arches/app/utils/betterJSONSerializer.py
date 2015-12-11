@@ -117,7 +117,7 @@ class JSONSerializer(object):
         for key, value in d.iteritems():
             try:
                 #print key + ': ' + str(type(value))
-                obj[key] = self.handle_object(value)
+                obj[str(key)] = self.handle_object(value)
             except(UnableToSerializeMethodTypesError):
                 pass
 
