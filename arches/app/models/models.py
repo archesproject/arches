@@ -38,34 +38,6 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
-# from django.contrib.auth.models import User
-
-# def _func(self):
-#     return 'you did it'
-
-
-# User.get_mapping = types.MethodType(_func, None, User)
-
-class AuthGroup(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(unique=True, max_length=80)
-    class Meta:
-        db_table = u'auth_group'
-
-class AuthUser(models.Model):
-    id = models.IntegerField(primary_key=True)
-    username = models.CharField(unique=True, max_length=30)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    email = models.CharField(max_length=75)
-    password = models.CharField(max_length=128)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    is_superuser = models.BooleanField()
-    last_login = models.DateTimeField()
-    date_joined = models.DateTimeField()
-    class Meta:
-        db_table = u'auth_user'
 
 class Classes(models.Model):
     classid = models.TextField(primary_key=True)
@@ -100,105 +72,6 @@ class DRelationtypes(models.Model):
     namespace = models.TextField()
     class Meta:
         db_table = u'd_relationtypes'
-
-class DjangoAdminLog(models.Model):
-    id = models.IntegerField(primary_key=True)
-    action_time = models.DateTimeField()
-    user_id = models.IntegerField()
-    content_type_id = models.IntegerField()
-    object_id = models.TextField()
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-    class Meta:
-        db_table = u'django_admin_log'
-
-class DjangoContentType(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-    class Meta:
-        db_table = u'django_content_type'
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(max_length=40, primary_key=True)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-    class Meta:
-        db_table = u'django_session'
-
-class DjangoSite(models.Model):
-    id = models.IntegerField(primary_key=True)
-    domain = models.CharField(max_length=100)
-    name = models.CharField(max_length=50)
-    class Meta:
-        db_table = u'django_site'
-
-class GeographyColumns(models.Model):
-    f_table_catalog = models.TextField() # This field type is a guess.
-    f_table_schema = models.TextField() # This field type is a guess.
-    f_table_name = models.TextField() # This field type is a guess.
-    f_geography_column = models.TextField() # This field type is a guess.
-    coord_dimension = models.IntegerField()
-    srid = models.IntegerField()
-    type = models.TextField()
-    class Meta:
-        db_table = u'geography_columns'
-
-class GeometryColumns(models.Model):
-    f_table_catalog = models.CharField(max_length=256)
-    f_table_schema = models.CharField(max_length=256)
-    f_table_name = models.CharField(max_length=256)
-    f_geometry_column = models.CharField(max_length=256)
-    coord_dimension = models.IntegerField()
-    srid = models.IntegerField()
-    type = models.CharField(max_length=30)
-    class Meta:
-        db_table = u'geometry_columns'
-
-class RasterColumns(models.Model):
-    r_table_catalog = models.TextField() # This field type is a guess.
-    r_table_schema = models.TextField() # This field type is a guess.
-    r_table_name = models.TextField() # This field type is a guess.
-    r_raster_column = models.TextField() # This field type is a guess.
-    srid = models.IntegerField()
-    scale_x = models.FloatField()
-    scale_y = models.FloatField()
-    blocksize_x = models.IntegerField()
-    blocksize_y = models.IntegerField()
-    same_alignment = models.BooleanField()
-    regular_blocking = models.BooleanField()
-    num_bands = models.IntegerField()
-    pixel_types = models.TextField() # This field type is a guess.
-    nodata_values = models.TextField() # This field type is a guess.
-    out_db = models.TextField() # This field type is a guess.
-    extent = models.GeometryField(srid=0)
-    objects = models.GeoManager()
-    class Meta:
-        db_table = u'raster_columns'
-
-class RasterOverviews(models.Model):
-    o_table_catalog = models.TextField() # This field type is a guess.
-    o_table_schema = models.TextField() # This field type is a guess.
-    o_table_name = models.TextField() # This field type is a guess.
-    o_raster_column = models.TextField() # This field type is a guess.
-    r_table_catalog = models.TextField() # This field type is a guess.
-    r_table_schema = models.TextField() # This field type is a guess.
-    r_table_name = models.TextField() # This field type is a guess.
-    r_raster_column = models.TextField() # This field type is a guess.
-    overview_factor = models.IntegerField()
-    class Meta:
-        db_table = u'raster_overviews'
-
-class SpatialRefSys(models.Model):
-    srid = models.IntegerField(primary_key=True)
-    auth_name = models.CharField(max_length=256)
-    auth_srid = models.IntegerField()
-    srtext = models.CharField(max_length=2048)
-    proj4text = models.CharField(max_length=2048)
-    class Meta:
-        db_table = u'spatial_ref_sys'
 
 class VwConcepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
@@ -261,21 +134,6 @@ class VwEntitytypeDomains(models.Model):
     class Meta:
         managed = False
         db_table = 'vw_entitytype_domains'
-
-class AuthMessage(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey('AuthUser')
-    message = models.TextField()
-    class Meta:
-        db_table = u'auth_message'
-
-class AuthPermission(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=50)
-    content_type = models.ForeignKey('DjangoContentType')
-    codename = models.CharField(max_length=100)
-    class Meta:
-        db_table = u'auth_permission'
 
 class Concepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
@@ -358,27 +216,6 @@ class FileValues(models.Model):
         if self.value != None:
             return self.value.name
         return ''
-
-class AuthGroupPermissions(models.Model):
-    id = models.IntegerField(primary_key=True)
-    group = models.ForeignKey('AuthGroup')
-    permission = models.ForeignKey('AuthPermission')
-    class Meta:
-        db_table = u'auth_group_permissions'
-
-class AuthUserGroups(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey('AuthUser')
-    group = models.ForeignKey('AuthGroup')
-    class Meta:
-        db_table = u'auth_user_groups'
-
-class AuthUserUserPermissions(models.Model):
-    id = models.IntegerField(primary_key=True)
-    user = models.ForeignKey('AuthUser')
-    permission = models.ForeignKey('AuthPermission')
-    class Meta:
-        db_table = u'auth_user_user_permissions'
 
 class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
