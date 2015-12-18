@@ -247,12 +247,8 @@ def entitytype_to_auth_doc_mapping(cursor, path_to_authority_files):
             except Exception as e:
                 errors.append('ERROR in row %s (%s):\n%s\n%s' % (rows.line_num, str(e), sql, traceback.format_exc()))
 
-    print "ERRORS:"
     if len(errors) > 0:
         errors.insert(0, 'ERRORS IN FILE: %s\n' % (filepath))
         errors.append('\n\n\n\n')
-        print errors
-    else:
-        print "  none!"
     return ret
 
