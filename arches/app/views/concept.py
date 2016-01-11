@@ -35,10 +35,16 @@ from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_by_path
 
 
-sparql_providers = {}
-for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-    Provider = import_by_path(provider)()
-    sparql_providers[Provider.endpoint] = Provider
+def get_sparql_providers(endpoint=None):
+    sparql_providers = {}
+    for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
+        Provider = import_by_path(provider)()
+        sparql_providers[Provider.endpoint] = Provider
+    
+    if endpoint:
+        return sparql_providers[endpoint]
+    else:
+        return sparql_providers
 
 @permission_required('edit')
 def rdm(request, conceptid):
@@ -125,7 +131,7 @@ def concept(request, conceptid):
                     'labels': labels,
                     'concept': concept_graph,
                     'languages': languages,
-                    'sparql_providers': sparql_providers,
+                    'sparql_providers': get_sparql_providers(),
                     'valuetype_labels': valuetypes.filter(category='label'),
                     'valuetype_notes': valuetypes.filter(category='note'),
                     'valuetype_related_values': valuetypes.filter(category='undefined'),
@@ -360,7 +366,7 @@ def add_concepts_from_sparql_endpoint(request, conceptid):
             elif parentconcept.nodetype == 'ConceptScheme':
                 relationshiptype = 'hasTopConcept' 
 
-            provider = sparql_providers[data['endpoint']]
+            provider = get_sparql_providers(data['endpoint'])
             try:
                 parentconcept.subconcepts = provider.get_concepts(data['ids'])
             except Exception as e:
@@ -380,7 +386,7 @@ def add_concepts_from_sparql_endpoint(request, conceptid):
     return HttpResponseNotFound()
 
 def search_sparql_endpoint_for_concepts(request):
-    provider = sparql_providers[request.GET.get('endpoint')]
+    provider = get_sparql_providers(request.GET.get('endpoint'))
     results = provider.search_for_concepts(request.GET.get('terms'))
     return JSONResponse(results)
 
