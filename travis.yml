@@ -1,0 +1,26 @@
+
+language: python
+
+python:
+  - 2.7
+
+sudo: required
+
+services:
+  - postgresql
+  - elasticsearch
+  
+addons:
+  postgresql: "9.3"
+  
+before_install:
+  - bash arches/install/ubuntu_trusty_setup.sh
+  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.deb && sudo dpkg -i --force-confnew elasticsearch-1.4.1.deb
+
+
+install: 
+  - python setup.py install
+  - sleep 30
+  
+script: python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
+ 
