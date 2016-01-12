@@ -25,6 +25,7 @@ Replace this with more appropriate tests for your application.
 
 import os
 from tests import test_settings
+from tests import test_setup
 from django.core import management
 from django.test import SimpleTestCase, TestCase
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -42,16 +43,18 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
-run_install = True
+def setUpModule():
+    test_setup.install()
+
 class BasicEntityTests(SimpleTestCase):
 
-    def setUp(self):
-        global run_install
-        #self.entity = TestEntityFactory.create(1)
-        if run_install:
-            install()
-            run_install = False
-        pass
+    # def setUp(self):
+    #     global run_install
+    #     if run_install:
+    #         print '-' * 80
+    #         #test_setup.install()
+    #         run_install = False
+    #     pass
 
 
     def test_init_entity_from_json(self):
@@ -94,20 +97,21 @@ class BasicEntityTests(SimpleTestCase):
         self.assertEqual(entity.child_entities, [])
 
     def test_save(self):
+        val = models.Values.objects.get(value='Legal')
         python_object = {
             "entityid":"",
-            "entitytypeid":"CAR.E1",
+            "entitytypeid":"PERSON.E1",
             "value":"",
             "property":"P1",
             "child_entities":[{
                 "entityid":"",
-                "entitytypeid":"MAKE.E1",
-                "value":"Porsche",
+                "entitytypeid":"NAME.E1",
+                "value":"Alexei",
                 "property":"P1",
                 "child_entities":[{
                     "entityid":"",
-                    "entitytypeid":"MODEL.E1",
-                    "value":"911",
+                    "entitytypeid":"NAME_TYPE.E1",
+                    "value":val.pk,
                     "property":"P1",
                     "child_entities":[]
                 }]
@@ -118,29 +122,29 @@ class BasicEntityTests(SimpleTestCase):
         self.assertNotEqual(python_object['entityid'], entity.entityid)
 
         entity = Entity().get(entity.entityid)
-        self.assertEqual(entity.child_entities[0].value, 'Porsche')
-        self.assertEqual(entity.child_entities[0].child_entities[0].value, '911')
-
-    def test_post_save_data_integrity(self):
+        self.assertEqual(entity.child_entities[0].value, 'Alexei')
+        self.assertEqual(entity.child_entities[0].child_entities[0].value, val.pk)
+    
+    def test_post_save_data_integrity2(self):
         python_object = {
             "entityid":"",
-            "entitytypeid":"CAR.E1",
+            "entitytypeid":"PERSON.E1",
             "value":"",
             "property":"P1",
             "child_entities":[{
                 "entityid":"",
-                "entitytypeid":"PROPULSION_SYSTEM.E1",
+                "entitytypeid":"LOCATION.E1",
                 "value":"",
                 "property":"P1",
                 "child_entities":[{
                     "entityid":"",
-                    "entitytypeid":"ENGINE.E1",
+                    "entitytypeid":"PERIOD.E1",
                     "value":"",
                     "property":"P1",
                     "child_entities":[{
                         "entityid":"",
-                        "entitytypeid":"HORSEPOWER.E1",
-                        "value":"300",
+                        "entitytypeid":"ADDRESS.E1",
+                        "value":"859",
                         "property":"P1",
                         "child_entities":[]
                     }]
@@ -152,24 +156,87 @@ class BasicEntityTests(SimpleTestCase):
         self.assertNotEqual(python_object['entityid'], entity.entityid)
 
         entity = Resource().get(entity.entityid)
-        self.assertEqual(int(entity.child_entities[0].child_entities[0].child_entities[0].value), 300)
+        self.assertEqual(int(entity.child_entities[0].child_entities[0].child_entities[0].value), 859)
         
-        entity.child_entities[0].child_entities[0].entityid = ''
-        entity.child_entities[0].child_entities[0].child_entities[0].entityid = ''
-        entity.save()
+        entity.child_entities[0].child_entities = []
 
-        #entity = Resource().get(entity.entityid)
-        #print JSONSerializer().serialize(entity)
-        #self.assertEqual(int(entity.child_entities[0].child_entities[0].child_entities[0].value), 300)
+        count_of_entities_before_save = models.Entities.objects.count()
+        entity.save()
+        count_of_entities_after_save = models.Entities.objects.count()
 
         # test for database integrity
-        self.assertEqual(models.Entities.objects.count(), 4)
-        self.assertEqual(models.Relations.objects.count(), 3)
+        self.assertEqual(count_of_entities_before_save - count_of_entities_after_save, 3)
+        self.assertEqual(models.Relations.objects.count(), 0)
+
+    def test_delete_of_entity(self):
+        val = models.Values.objects.get(value='Legal')
+        python_object = {
+            "entityid":"",
+            "entitytypeid":"PERSON.E1",
+            "value":"",
+            "property":"P1",
+            "child_entities":[{
+                "entityid":"",
+                "entitytypeid":"NAME.E1",
+                "value":"Alexei",
+                "property":"P1",
+                "child_entities":[{
+                    "entityid":"",
+                    "entitytypeid":"NAME_TYPE.E1",
+                    "value":val.pk,
+                    "property":"P1",
+                    "child_entities":[]
+                }]
+            },{
+                "entityid":"",
+                "entitytypeid":"LOCATION.E1",
+                "value":"",
+                "property":"P1",
+                "child_entities":[{
+                    "entityid":"",
+                    "entitytypeid":"PERIOD.E1",
+                    "value":"",
+                    "property":"P1",
+                    "child_entities":[{
+                        "entityid":"",
+                        "entitytypeid":"ADDRESS.E1",
+                        "value":"859",
+                        "property":"P1",
+                        "child_entities":[]
+                    }]
+                }]
+            }]
+        }
+
+        entity = Resource(python_object)
+        entity.save()
+
+        count_of_entities_before_delete = models.Entities.objects.count()
+        count_of_relations_before_delete = models.Relations.objects.count()
+        count_of_strings_before_delete = models.Strings.objects.count()
+        count_of_numbers_before_delete = models.Numbers.objects.count()
+        count_of_domains_before_delete = models.Domains.objects.count()
+        entity.delete()
+        count_of_entities_after_delete = models.Entities.objects.count()
+        count_of_relations_after_delete = models.Relations.objects.count()
+        count_of_strings_after_delete = models.Strings.objects.count()
+        count_of_numbers_after_delete = models.Numbers.objects.count()
+        count_of_domains_after_delete = models.Domains.objects.count()
+
+
+        with self.assertRaises(models.Entities.DoesNotExist):
+            Resource().get(entity.entityid)
+
+        self.assertEqual(count_of_entities_before_delete - count_of_entities_after_delete, 6)
+        self.assertEqual(count_of_relations_before_delete - count_of_relations_after_delete, 5)
+        self.assertEqual(count_of_strings_before_delete - count_of_strings_after_delete, 1)
+        self.assertEqual(count_of_numbers_before_delete - count_of_numbers_after_delete, 1)
+        self.assertEqual(count_of_domains_before_delete - count_of_domains_after_delete, 1)
 
     def test_set_entity_value(self):
         python_object = {
             "entityid":"",
-            "entitytypeid":"CAR.E1",
+            "entitytypeid":"PERSON.E1",
             "value":"",
             "property":"P1",
             "child_entities":[]
@@ -179,217 +246,17 @@ class BasicEntityTests(SimpleTestCase):
         self.assertNotEqual(python_object['entityid'], entity1.entityid)
 
         entity2 = Resource().get(entity1.entityid)
-        entity2.set_entity_value('HORSEPOWER.E1', '300')
+        entity2.set_entity_value('ADDRESS.E1', '5703')
         entity2.save()
 
         entity3 = Resource().get(entity2.entityid)
-        self.assertEqual(int(entity3.child_entities[0].child_entities[0].child_entities[0].value), 300)
+        self.assertEqual(int(entity3.child_entities[0].child_entities[0].child_entities[0].value), 5703)
 
-
-class ConceptModelTests(SimpleTestCase):
-
-    def test_create_concept(self):
-        """
-        Test of basic CRUD on a Concept model
-
-        """
-
-        concept_in = Concept()
-        concept_in.nodetype = 'Concept'
-        concept_in.values = [ConceptValue({
-            #id: '',
-            #conceptid: '',
-            'type': 'prefLabel',
-            'category': 'label',
-            'value': 'test pref label',
-            'language': 'en-US'
-        })]
-        concept_in.save()
-
-        concept_out = Concept().get(id=concept_in.id)
-
-        self.assertEqual(concept_out.id, concept_in.id)
-        self.assertEqual(concept_out.values[0].value, 'test pref label')
-
-        label = concept_in.values[0] 
-        label.value = 'updated pref label'
-        concept_in.values[0] = label
-        concept_in.save()
-        concept_out = Concept().get(id=concept_in.id)
-
-        self.assertEqual(concept_out.values[0].value, 'updated pref label')
-
-        concept_out.delete()
-        deleted_concept = Concept().get(id=concept_in.id)
-        self.assertEqual(deleted_concept, None)
-
-
-    def test_prefLabel(self):
-        """
-        Test to confirm the proper retrieval of the prefLabel based on different language requirements
-
-        """
-
-        concept = Concept()
-        concept.nodetype = 'Concept'
-        concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en-US',
-                'language': 'en-US'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en',
-                'language': 'en'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es-SP',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
-        ]
-
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en-US')
-        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en')
-        self.assertEqual(concept.get_preflabel().value, 'test pref label %s' % (test_settings.LANGUAGE_CODE))
-
-        concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en',
-                'language': 'en'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
-        ]
-
-        # should pick the base language if it can't find the more specific version
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test pref label en')
-        
-        concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
-        ]
-
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en-US')
-                
-        concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en',
-                'language': 'en'
-            })
-        ]
-
-        self.assertEqual(concept.get_preflabel(lang='en-US').value, 'test alt label en')
-        
-        concept.values = [
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label en-US',
-                'language': 'en-US'
-            }),
-            ConceptValue({
-                'type': 'prefLabel',
-                'category': 'label',
-                'value': 'test pref label es',
-                'language': 'es-SP'
-            }),
-            ConceptValue({
-                'type': 'altLabel',
-                'category': 'label',
-                'value': 'test alt label en-US',
-                'language': 'en-US'
-            })
-        ]
-
-        self.assertEqual(concept.get_preflabel(lang='en').value, 'test pref label en-US')
-
-
-class TestEntityFactory(object):
-    @staticmethod
-    def create(id='', value=''):
-        entity = Entity()
-        entity.entityid = id
-        entity.entitytypeid = 'TEST.E1'
-        entity.property = 'P1'
-        entity.value = value
-        entity.child_entities = []
-        return entity
-
-
-
-def install(path_to_source_data_dir=None):
-    # truncate_db()
-    # delete_index(index='concept_labels')
-    # delete_index(index='entity')
-    load_resource_graphs()
-    #load_authority_files(path_to_source_data_dir)
-    #resource_remover.truncate_resources()
-    #load_resources()
-
-def truncate_db():
-    management.call_command('packages', operation='setup') 
-
-def load_resource_graphs():
-    resource_graphs.load_graphs(break_on_error=True, settings=test_settings)
-    pass
-
-def load_authority_files(path_to_files=None):
-    authority_files.load_authority_files(break_on_error=True)
-
-def delete_index(index=None):
-    se = SearchEngineFactory().create()
-    se.delete_index(index=index)
-    pass
-
-def load_resources(external_file=None):
-    rl = ResourceLoader()
-    if external_file != None:
-        print 'loading:', external_file
-        rl.load(external_file)
-    else:
-        for f in settings.BUSISNESS_DATA_FILES:
-            rl.load(f)
-
-
-#install()
+# def get_db_stats():
+#     return {
+#         'entities': models.Entities.objects.count(),
+#         'relations': models.Relations.objects.count(),
+#         'strings': models.Strings.objects.count(),
+#         'numbers': models.Numbers.objects.count(),
+#         'domains': models.Domains.objects.count()
+#     }

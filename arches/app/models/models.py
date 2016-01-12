@@ -301,8 +301,15 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     when corresponding `Files` object is deleted.
     """
     if instance.val:
-        if os.path.isfile(instance.val.path):
-            os.remove(instance.val.path)
+        try:
+            if os.path.isfile(instance.val.path):
+                os.remove(instance.val.path)
+        ## except block added to deal with S3 file deletion
+        ## see comments on 2nd answer below
+        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except:
+            storage, name = instance.val.storage, instance.val.name
+            storage.delete(name)
 
 @receiver(models.signals.pre_save, sender=Files)
 def auto_delete_file_on_change(sender, instance, **kwargs):

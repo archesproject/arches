@@ -260,7 +260,7 @@ The ``.relations`` file is a pipe (``|``) delimited text file containing the fol
 	* ``RESOURCEID_TO`` indicates the other of the two resources to be related.  The value here must also be present as a ``RESOURCEID`` in the ``.arches`` file.
 	* ``START_DATE`` is a non-required field intended to indicate the date at which a given relationship between resources began.  
 	* ``END_DATE`` is a non-required field intended to indicate the date at which a given relationship between resources ended.
-	* ``REALTION_TYPE`` is a domain value driven by an authority document file called ``ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv``. Any value that you put into this column must be a ``conceptid`` from that authority document.  If you wish to customize the set of available relationship types, simply modify the authority document.  
+	* ``RELATION_TYPE`` is a domain value driven by an authority document file called ``ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv``. Any value that you put into this column must be a ``conceptid`` from that authority document.  If you wish to customize the set of available relationship types, simply modify the authority document.  
 	* ``NOTES`` is a non-required field into which additional text about the relationship can be captured.
 
 

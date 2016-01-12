@@ -153,6 +153,7 @@ class Command(BaseCommand):
             f.write('# ----------------- FOR TESTING ONLY -----------------')
             f.write('\n# - THESE SETTINGS SHOULD BE REVIEWED FOR PRODUCTION -')
             f.write('\nnode.max_local_storage_nodes: 1')
+            f.write('\nnode.local: true')
             f.write('\nindex.number_of_shards: 1')
             f.write('\nindex.number_of_replicas: 0')
             f.write('\nhttp.port: %s' % port)

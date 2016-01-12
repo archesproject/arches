@@ -1,0 +1,252 @@
+{
+  "resources": [
+    {
+      "relationship": "P1",
+      "crm_class": "E1",
+      "name": "PERSON",
+      "type": "",
+      "has_children": true,
+      "entity_id": "PERSON.E1",
+      "isResource": true,
+      "mergenode": "CAR.E1",
+      "entities": [
+        {
+          "relationship": "P1",
+          "crm_class": "E1",
+          "name": "NAME",
+          "type": "strings",
+          "has_children": true,
+          "entity_id": "NAME.E1",
+          "isResource": false,
+          "mergenode": "PERSON.E1",
+          "entities": [
+            {
+              "relationship": "P1",
+              "crm_class": "E1",
+              "name": "NAME_TYPE",
+              "type": "domains",
+              "has_children": false,
+              "entity_id": "NAME_TYPE.E1",
+              "isResource": false,
+              "mergenode": "NAME.E1",
+              "entities": [
+                
+              ],
+              "type_class": "domains",
+              "editing": false
+            }
+          ],
+          "type_class": "strings",
+          "editing": true
+        },
+        {
+          "relationship": "P1",
+          "crm_class": "E1",
+          "name": "LIFE_SPAN",
+          "type": "",
+          "has_children": false,
+          "entity_id": "LIFE_SPAN.E1",
+          "isResource": false,
+          "mergenode": "LIFE_SPAN.E1",
+          "entities": [
+            {
+              "relationship": "P1",
+              "crm_class": "E1",
+              "name": "BIRTH_DATE",
+              "type": "dates",
+              "has_children": false,
+              "entity_id": "BIRTH_DATE.E1",
+              "isResource": false,
+              "mergenode": "BIRTH_DATE.E1",
+              "entities": [
+                
+              ],
+              "type_class": "dates",
+              "editing": false
+            },
+            {
+              "relationship": "P1",
+              "crm_class": "E1",
+              "name": "DECEASED_DATE",
+              "type": "dates",
+              "has_children": false,
+              "entity_id": "DECEASED_DATE.E1",
+              "isResource": false,
+              "mergenode": "DECEASED_DATE.E1",
+              "entities": [
+                
+              ],
+              "type_class": "dates",
+              "editing": false
+            }
+          ],
+          "type_class": "",
+          "editing": false
+        },
+        {
+          "relationship": "P1",
+          "crm_class": "E1",
+          "name": "LOCATION",
+          "type": "",
+          "has_children": true,
+          "entity_id": "LOCATION.E1",
+          "isResource": false,
+          "mergenode": "LOCATION.E1",
+          "entities": [
+            {
+              "relationship": "P1",
+              "crm_class": "E1",
+              "name": "PERIOD",
+              "type": "",
+              "has_children": true,
+              "entity_id": "PERIOD.E1",
+              "isResource": false,
+              "mergenode": "LOCATION.E1",
+              "entities": [
+                {
+                  "relationship": "P1",
+                  "crm_class": "E1",
+                  "name": "SPATIAL_LOCATION",
+                  "type": "geometries",
+                  "has_children": false,
+                  "entity_id": "SPATIAL_LOCATION.E1",
+                  "isResource": false,
+                  "mergenode": "PERIOD.E1",
+                  "entities": [
+                    
+                  ],
+                  "type_class": "geometries",
+                  "editing": false
+                },
+                {
+                  "relationship": "P1",
+                  "crm_class": "E1",
+                  "name": "STATE",
+                  "type": "domains",
+                  "has_children": false,
+                  "entity_id": "STATE.E1",
+                  "isResource": false,
+                  "mergenode": "PERIOD.E1",
+                  "entities": [
+                    
+                  ],
+                  "type_class": "domains",
+                  "editing": false
+                },
+                {
+                  "relationship": "P1",
+                  "crm_class": "E1",
+                  "name": "CITY",
+                  "type": "domains",
+                  "has_children": false,
+                  "entity_id": "CITY.E1",
+                  "isResource": false,
+                  "mergenode": "PERIOD.E1",
+                  "entities": [
+                    
+                  ],
+                  "type_class": "domains",
+                  "editing": false
+                },
+                {
+                  "relationship": "P1",
+                  "crm_class": "E1",
+                  "name": "LOCATION_DATES",
+                  "type": "",
+                  "has_children": true,
+                  "entity_id": "LOCATION_DATES.E1",
+                  "isResource": false,
+                  "mergenode": "PERIOD.E1",
+                  "entities": [
+                    {
+                      "relationship": "P1",
+                      "crm_class": "E1",
+                      "name": "FROM",
+                      "type": "dates",
+                      "has_children": false,
+                      "entity_id": "FROM.E1",
+                      "isResource": false,
+                      "mergenode": "LOCATION_DATES.E1",
+                      "entities": [
+                        
+                      ],
+                      "type_class": "dates",
+                      "editing": false
+                    },
+                    {
+                      "relationship": "P1",
+                      "crm_class": "E1",
+                      "name": "TO",
+                      "type": "dates",
+                      "has_children": false,
+                      "entity_id": "TO.E1",
+                      "isResource": false,
+                      "mergenode": "LOCATION_DATES.E1",
+                      "entities": [
+                        
+                      ],
+                      "type_class": "dates",
+                      "editing": false
+                    }
+                  ],
+                  "type_class": "",
+                  "editing": false
+                },
+                {
+                  "relationship": "P1",
+                  "crm_class": "E1",
+                  "name": "ADDRESS",
+                  "type": "numbers",
+                  "has_children": false,
+                  "entity_id": "ADDRESS.E1",
+                  "isResource": false,
+                  "mergenode": "PERIOD.E1",
+                  "entities": [
+                    
+                  ],
+                  "type_class": "numbers",
+                  "editing": false
+                }
+              ],
+              "type_class": "",
+              "editing": false
+            }
+          ],
+          "type_class": "",
+          "editing": false
+        },
+        {
+          "relationship": "P1",
+          "crm_class": "E1",
+          "name": "PHOTO",
+          "type": "files",
+          "has_children": true,
+          "entity_id": "PHOTO.E1",
+          "isResource": false,
+          "mergenode": "PERSON.E1",
+          "entities": [
+            {
+              "relationship": "P1",
+              "crm_class": "E1",
+              "name": "CAPTION",
+              "type": "strings",
+              "has_children": false,
+              "entity_id": "CAPTION.E1",
+              "isResource": false,
+              "mergenode": "PHOTO.E1",
+              "entities": [
+                
+              ],
+              "type_class": "strings",
+              "editing": false
+            }
+          ],
+          "type_class": "files",
+          "editing": false
+        }
+      ],
+      "type_class": "",
+      "editing": false
+    }
+  ]
+}
