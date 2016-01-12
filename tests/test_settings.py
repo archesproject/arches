@@ -30,7 +30,6 @@ PACKAGE_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 
 LANGUAGE_CODE = 'en-US'
 
-RESOURCE_GRAPH_LOCATIONS = os.path.join(PACKAGE_ROOT, 'fixtures'),
 
 #########################################
 ###  START PACKAGE SPECIFIC SETTINGS  ###
@@ -48,3 +47,18 @@ DATABASES = {
         'POSTGIS_TEMPLATE': 'template_postgis_20',
     }
 }
+
+ELASTICSEARCH_HTTP_PORT = 9999 # this should be in increments of 200, eg: 9400, 9600, 9800
+ELASTICSEARCH_HOSTS = [
+    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
+]
+
+RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures'),)
+
+CONCEPT_SCHEME_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'authority_files'),)
+
+BUSISNESS_DATA_FILES = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)

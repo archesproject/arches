@@ -1,0 +1,4 @@
+conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider 
+20000001-0000-0000-0000-000000000000,Portland,,CITY_AUTHORITY_DOCUMENT.csv,Index,GCI
+20000002-0000-0000-0000-000000000000,San Francisco,The Bay Area,CITY_AUTHORITY_DOCUMENT.csv,Index,GCI
+
