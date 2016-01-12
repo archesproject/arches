@@ -1,0 +1,4 @@
+*.pyc
+virtualenv/ENV
+tests/elasticsearch
+tests/logs
