@@ -20,7 +20,6 @@ before_install:
 
 install: 
   - python setup.py install
-  - sleep 30
   
 script: python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
  
