@@ -257,13 +257,13 @@ class Entities(models.Model):
         return ('%s of type %s') % (self.entityid, self.entitytypeid)
 
 class Strings(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.TextField()
     class Meta:
         db_table = u'strings'
 
 class Dates(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.DateTimeField()
     class Meta:
         db_table = u'dates'
@@ -272,13 +272,13 @@ class Dates(models.Model):
         return ('%s') % (self.val)
 
 class Numbers(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.FloatField()
     class Meta:
         db_table = u'numbers'
         
 class Files(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.FileField(upload_to='files')
     class Meta:
         db_table = u'files'
@@ -334,7 +334,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
             return False
 
 class Geometries(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
@@ -358,7 +358,7 @@ class EditLog(models.Model):
         db_table = u'data"."edit_log'
 
 class Domains(models.Model):
-    entityid = models.OneToOneField('Entities', db_column='entityid')
+    entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.ForeignKey('Values', db_column='val', null=True)
     class Meta:
         db_table = u'domains'
@@ -418,7 +418,7 @@ class Rules(models.Model):
         db_table = u'rules'
 
 class MappingSteps(models.Model):
-    mappingid = models.OneToOneField('Mappings', db_column='mappingid')
+    mappingid = models.OneToOneField('Mappings', primary_key=True, db_column='mappingid')
     ruleid = models.ForeignKey('Rules', db_column='ruleid')
     order = models.IntegerField()
     class Meta:
