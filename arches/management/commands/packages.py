@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 from optparse import make_option
+from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -207,7 +208,11 @@ class Command(BaseCommand):
         install_db.create_sqlfile(db_settings, install_path)
         
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
+        
+        management.call_command('migrate') 
+
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
+
 
         self.create_groups()
         self.create_users()
