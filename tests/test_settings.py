@@ -48,10 +48,10 @@ DATABASES = {
     }
 }
 
-ELASTICSEARCH_HTTP_PORT = 9999 # this should be in increments of 200, eg: 9400, 9600, 9800
-ELASTICSEARCH_HOSTS = [
-    {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
-]
+# ELASTICSEARCH_HTTP_PORT = 9999 # this should be in increments of 200, eg: 9400, 9600, 9800
+# ELASTICSEARCH_HOSTS = [
+#     {'host': 'localhost', 'port': ELASTICSEARCH_HTTP_PORT}
+# ]
 
 RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures'),)
 
