@@ -81,7 +81,7 @@ class Entity(object):
 
         entity = archesmodels.Entities.objects.get(pk = pk)
         self.entitytypeid = entity.entitytypeid_id
-        self.entityid = entity.pk
+        self.entityid = str(entity.pk)
         self.businesstablename = entity.entitytypeid.businesstablename if entity.entitytypeid.businesstablename else ''
 
         # get the entity value if any

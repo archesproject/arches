@@ -70,7 +70,7 @@ class Concept(object):
     
     def load(self, value):
         if isinstance(value, dict):
-            self.id = value['id'] if 'id' in value else ''
+            self.id = str(value['id']) if 'id' in value else ''
             self.nodetype = value['nodetype'] if 'nodetype' in value else ''
             self.legacyoid = value['legacyoid'] if 'legacyoid' in value else ''
             self.relationshiptype = value['relationshiptype'] if 'relationshiptype' in value else ''            
@@ -88,7 +88,7 @@ class Concept(object):
                     self.addrelatedconcept(relatedconcept)
 
         if isinstance(value, models.Concepts):
-            self.id = value.pk
+            self.id = str(value.pk)
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
@@ -330,7 +330,7 @@ class Concept(object):
                     and v.valuetype in ('{2}')
                     and ({1})
             ) 
-            SELECT conceptidfrom, conceptidto, value, valueto, valueid, valueidto FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
+            SELECT conceptidfrom::text, conceptidto::text, value, valueto, valueid::text, valueidto::text FROM children;""".format(conceptid, relationtypes, ("','").join(child_valuetypes), parent_valuetype)
 
         cursor.execute(sql)
         rows = cursor.fetchall()
@@ -645,7 +645,7 @@ class Concept(object):
                 WHERE  v2.valuetype = 'prefLabel'
                 and v.valuetype in ('prefLabel','sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom, conceptidto, value, valueid, valueto, valueidto, depth, idpath, conceptpath, vtype FROM children ORDER BY depth, conceptpath;
+            ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
         """.format(entitytype.conceptid_id)
 
 
@@ -792,16 +792,16 @@ class ConceptValue(object):
     
     def load(self, value):
         if isinstance(value, models.Values):
-            self.id = value.pk
-            self.conceptid = value.conceptid.pk
+            self.id = str(value.pk)
+            self.conceptid = str(value.conceptid.pk)
             self.type = value.valuetype.pk
             self.category = value.valuetype.category
             self.value = value.value
             self.language = value.languageid_id
 
         if isinstance(value, dict):
-            self.id = value['id'] if 'id' in value else ''
-            self.conceptid = value['conceptid'] if 'conceptid' in value else ''
+            self.id = str(value['id']) if 'id' in value else ''
+            self.conceptid = str(value['conceptid']) if 'conceptid' in value else ''
             self.type = value['type'] if 'type' in value else ''
             self.category = value['category'] if 'category' in value else ''
             self.value = value['value'] if 'value' in value else ''

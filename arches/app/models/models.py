@@ -365,7 +365,7 @@ class Domains(models.Model):
 
     def getlabelid(self):
         if self.val_id != None:
-            return self.val_id
+            return str(self.val_id)
         return ''
 
     def getlabelvalue(self):
