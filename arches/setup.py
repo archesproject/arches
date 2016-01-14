@@ -31,7 +31,6 @@ def install():
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'creation.py'), os.path.join(django_install_location, 'db', 'backends', 'postgresql_psycopg2'))
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'inspectdb.py'), os.path.join(django_install_location, 'core', 'management', 'commands'))
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'admin.py'), os.path.join(django_install_location, 'contrib', 'auth'))
-        shutil.copy2(os.path.join(install_dir, 'django_overrides', 'models.py'), os.path.join(django_install_location, 'contrib', 'auth'))
         shutil.copy2(os.path.join(install_dir, 'django_overrides', 'widgets.css'), os.path.join(django_install_location, 'contrib', 'admin', 'static', 'admin', 'css'))
 
         # GET ELASTICSEARCH
