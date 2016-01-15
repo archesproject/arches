@@ -45,7 +45,7 @@ class Classes(models.Model):
     isactive = models.BooleanField()
     defaultbusinesstable = models.TextField()
     class Meta:
-        db_table = u'classes'
+        db_table = u'ontology"."classes'
 
     def __unicode__(self):
         return self.classname
@@ -54,14 +54,14 @@ class DNodetypes(models.Model):
     nodetype = models.TextField(primary_key=True)
     namespace = models.TextField()
     class Meta:
-        db_table = u'd_nodetypes'
+        db_table = u'concepts"."d_nodetypes'
 
 class DLanguages(models.Model):
     languageid = models.TextField(primary_key=True)
     languagename = models.TextField()
     isdefault = models.BooleanField()
     class Meta:
-        db_table = u'd_languages'
+        db_table = u'concepts"."d_languages'
 
     def __unicode__(self):
         return self.languageid
@@ -71,13 +71,14 @@ class DRelationtypes(models.Model):
     category = models.TextField()
     namespace = models.TextField()
     class Meta:
-        db_table = u'd_relationtypes'
+        db_table = u'concepts"."d_relationtypes'
 
 class VwConcepts(models.Model):
     conceptid = models.TextField(primary_key=True) # This field type is a guess.
     conceptlabel = models.TextField()
     legacyoid = models.TextField()
     class Meta:
+        managed = False
         db_table = u'vw_concepts'
 
 class VwEdges(models.Model):
@@ -85,6 +86,7 @@ class VwEdges(models.Model):
     label = models.TextField()
     target = models.TextField() # This field type is a guess.
     class Meta:
+        managed = False
         db_table = u'vw_edges'
 
 class VwEntityTypes(models.Model):
@@ -97,6 +99,7 @@ class VwEntityTypes(models.Model):
     isresource = models.BooleanField()
     conceptid = models.TextField() # This field type is a guess.
     class Meta:
+        managed = False
         db_table = u'vw_entity_types'
 
 class VwNodes(models.Model):
@@ -104,6 +107,7 @@ class VwNodes(models.Model):
     id = models.TextField(primary_key=True) # This field type is a guess.
     val = models.TextField()
     class Meta:
+        managed = False
         db_table = u'vw_nodes'
 
 class VwExportNodes(models.Model):
@@ -113,6 +117,7 @@ class VwExportNodes(models.Model):
     mergenode = models.TextField()
     businesstablename = models.TextField()
     class Meta:
+        managed = False
         db_table = u'ontology"."vw_export_nodes'
 
 class VwExportEdges(models.Model):
@@ -121,6 +126,7 @@ class VwExportEdges(models.Model):
     target = models.TextField(primary_key=True) # This field type is a guess.
     assettype = models.TextField()
     class Meta:
+        managed = False
         db_table = u'ontology"."vw_export_edges'
 
 class VwEntitytypeDomains(models.Model):
@@ -140,7 +146,7 @@ class Concepts(models.Model):
     nodetype = models.ForeignKey('DNodetypes', db_column='nodetype')
     legacyoid = models.TextField()
     class Meta:
-        db_table = u'concepts'
+        db_table = u'concepts"."concepts'
 
     def __unicode__(self):
         return ('%s') % (self.conceptid)
@@ -196,7 +202,7 @@ class Values(models.Model):
     value = models.TextField()
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
-        db_table = u'values'
+        db_table = u'concepts"."values'
 
 class FileValues(models.Model):
     valueid = models.TextField(primary_key=True) # This field type is a guess.
@@ -205,7 +211,8 @@ class FileValues(models.Model):
     value = models.FileField(upload_to='concepts')
     languageid = models.ForeignKey('DLanguages', db_column='languageid')
     class Meta:
-        db_table = u'values'
+        managed = False
+        db_table = u'concepts"."values'
 
     def geturl(self):
         if self.value != None:
@@ -223,7 +230,7 @@ class Properties(models.Model):
     classrange = models.ForeignKey('Classes', db_column='classrange', related_name='properties_classrange')
     propertydisplay = models.TextField()
     class Meta:
-        db_table = u'properties'
+        db_table = u'ontology"."properties'
 
 class EntityTypes(models.Model):
     classid = models.ForeignKey('Classes', db_column='classid', related_name='entitytypes_classid')
@@ -260,13 +267,13 @@ class Strings(models.Model):
     entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.TextField()
     class Meta:
-        db_table = u'strings'
+        db_table = u'data"."strings'
 
 class Dates(models.Model):
     entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.DateTimeField()
     class Meta:
-        db_table = u'dates'
+        db_table = u'data"."dates'
 
     def __unicode__(self):
         return ('%s') % (self.val)
@@ -275,13 +282,13 @@ class Numbers(models.Model):
     entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.FloatField()
     class Meta:
-        db_table = u'numbers'
+        db_table = u'data"."numbers'
         
 class Files(models.Model):
     entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.FileField(upload_to='files')
     class Meta:
-        db_table = u'files'
+        db_table = u'data"."files'
 
     def geturl(self):
         if self.val != None:
@@ -338,7 +345,7 @@ class Geometries(models.Model):
     val = models.GeometryField()
     objects = models.GeoManager()
     class Meta:
-        db_table = u'geometries'
+        db_table = u'data"."geometries'
 
 class EditLog(models.Model):
     editlogid = models.TextField(primary_key=True)
@@ -361,7 +368,7 @@ class Domains(models.Model):
     entityid = models.OneToOneField('Entities', primary_key=True, db_column='entityid')
     val = models.ForeignKey('Values', db_column='val', null=True)
     class Meta:
-        db_table = u'domains'
+        db_table = u'data"."domains'
 
     def getlabelid(self):
         if self.val_id != None:
@@ -415,14 +422,14 @@ class Rules(models.Model):
     entitytyperange = models.ForeignKey('EntityTypes', db_column='entitytyperange', related_name='rules_entitytyperange')
     propertyid = models.ForeignKey('Properties', db_column='propertyid')
     class Meta:
-        db_table = u'rules'
+        db_table = u'ontology"."rules'
 
 class MappingSteps(models.Model):
     mappingid = models.OneToOneField('Mappings', primary_key=True, db_column='mappingid')
     ruleid = models.ForeignKey('Rules', db_column='ruleid')
     order = models.IntegerField()
     class Meta:
-        db_table = u'mapping_steps'
+        db_table = u'ontology"."mapping_steps'
 
 class Relations(models.Model):
     relationid = models.AutoField(primary_key=True)
