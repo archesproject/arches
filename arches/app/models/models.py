@@ -43,7 +43,6 @@ class Classes(models.Model):
     classid = models.TextField(primary_key=True)
     classname = models.TextField()
     isactive = models.BooleanField()
-    defaultbusinesstable = models.TextField()
     class Meta:
         db_table = u'ontology"."classes'
 
@@ -115,7 +114,7 @@ class VwExportNodes(models.Model):
     label = models.TextField()
     assettype = models.TextField()
     mergenode = models.TextField()
-    businesstablename = models.TextField()
+    businesstablename = models.TextField(null=True)
     class Meta:
         managed = False
         db_table = u'ontology"."vw_export_nodes'
@@ -142,7 +141,7 @@ class VwEntitytypeDomains(models.Model):
         db_table = 'vw_entitytype_domains'
 
 class Concepts(models.Model):
-    conceptid = models.TextField(primary_key=True) # This field type is a guess.
+    conceptid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     nodetype = models.ForeignKey('DNodetypes', db_column='nodetype')
     legacyoid = models.TextField()
     class Meta:
@@ -163,7 +162,7 @@ class Concepts(models.Model):
 
 
 class ConceptRelations(models.Model):
-    relationid = models.TextField(primary_key=True)
+    relationid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     conceptidfrom = models.ForeignKey('Concepts', db_column='conceptidfrom', related_name='concept_relation_from')
     conceptidto = models.ForeignKey('Concepts', db_column='conceptidto', related_name='concept_relation_to')
     relationtype = models.ForeignKey('DRelationtypes', db_column='relationtype', related_name='concept_relation_type')
@@ -186,9 +185,10 @@ class ConceptRelations(models.Model):
 
 class ValueTypes(models.Model):
     valuetype = models.TextField(primary_key=True)
-    category = models.TextField()
-    description = models.TextField()
+    category = models.TextField(null=True)
+    description = models.TextField(null=True)
     namespace = models.TextField()
+    datatype = models.TextField(null=True)
     class Meta:
         db_table = u'concepts"."d_valuetypes'
 
@@ -196,7 +196,7 @@ class ValueTypes(models.Model):
         return ('valuetype: %s, category: %s') % (self.valuetype, self.category)
 
 class Values(models.Model):
-    valueid = models.TextField(primary_key=True) # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
     value = models.TextField()
@@ -205,7 +205,7 @@ class Values(models.Model):
         db_table = u'concepts"."values'
 
 class FileValues(models.Model):
-    valueid = models.TextField(primary_key=True) # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
     value = models.FileField(upload_to='concepts')
@@ -228,19 +228,19 @@ class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
     classdomain = models.ForeignKey('Classes', db_column='classdomain', related_name='properties_classdomain')
     classrange = models.ForeignKey('Classes', db_column='classrange', related_name='properties_classrange')
-    propertydisplay = models.TextField()
+    propertydisplay = models.TextField(null=True)
     class Meta:
         db_table = u'ontology"."properties'
 
 class EntityTypes(models.Model):
     classid = models.ForeignKey('Classes', db_column='classid', related_name='entitytypes_classid')
     conceptid = models.ForeignKey('Concepts', db_column='conceptid', related_name='entitytypes_conceptid')
-    businesstablename = models.TextField()
+    businesstablename = models.TextField(null=True)
     publishbydefault = models.BooleanField()
-    icon = models.TextField()
-    defaultvectorcolor = models.TextField()
+    icon = models.TextField(null=True)
+    defaultvectorcolor = models.TextField(null=True)
     entitytypeid = models.TextField(primary_key=True)
-    isresource = models.BooleanField()
+    isresource = models.NullBooleanField()
     class Meta:
         db_table = u'data"."entity_types'
 
@@ -255,7 +255,7 @@ class EntityTypes(models.Model):
         return ('%s') % (self.entitytypeid)
 
 class Entities(models.Model):
-    entityid = models.TextField(primary_key=True) # This field type is a guess.
+    entityid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     entitytypeid = models.ForeignKey('EntityTypes', db_column='entitytypeid')
     class Meta:
         db_table = u'data"."entities'
@@ -349,18 +349,18 @@ class Geometries(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.TextField(primary_key=True)
-    resourceentitytypeid = models.TextField()
-    resourceid = models.TextField()
-    attributeentitytypeid = models.TextField()
-    edittype = models.TextField()
-    userid = models.TextField()
-    timestamp = models.DateTimeField()
-    oldvalue = models.TextField()
-    newvalue = models.TextField()
-    user_email = models.TextField()
-    user_firstname = models.TextField()
-    user_lastname = models.TextField()
-    note = models.TextField()
+    resourceentitytypeid = models.TextField(null=True)
+    resourceid = models.TextField(null=True)
+    attributeentitytypeid = models.TextField(null=True)
+    edittype = models.TextField(null=True)
+    userid = models.TextField(null=True)
+    timestamp = models.DateTimeField(null=True)
+    oldvalue = models.TextField(null=True)
+    newvalue = models.TextField(null=True)
+    user_email = models.TextField(null=True)
+    user_firstname = models.TextField(null=True)
+    user_lastname = models.TextField(null=True)
+    note = models.TextField(null=True)
     class Meta:
         db_table = u'data"."edit_log'
 
@@ -392,7 +392,7 @@ class Domains(models.Model):
         if name == 'val':
             if not isinstance(value, Values):
                 try:
-                    uuid.UUID(value)
+                    uuid.UUID(str(value))
                     value = Values.objects.get(valueid = value)
                 except(ValueError, TypeError, ObjectDoesNotExist):
                     # print value, 'attr value'
@@ -406,7 +406,7 @@ class Domains(models.Model):
         super(Domains, self).__setattr__(name, value)
 
 class Mappings(models.Model):
-    mappingid = models.TextField(primary_key=True) # This field type is a guess.
+    mappingid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     entitytypeidfrom = models.ForeignKey('EntityTypes', db_column='entitytypeidfrom', related_name='mappings_entitytypeidfrom')
     entitytypeidto = models.ForeignKey('EntityTypes', db_column='entitytypeidto', related_name='mappings_entitytypeidto')
     mergenodeid = models.TextField()
@@ -417,7 +417,7 @@ class Mappings(models.Model):
         return ('%s -- %s') % (self.entitytypeidfrom, self.entitytypeidto)
 
 class Rules(models.Model):
-    ruleid = models.TextField(primary_key=True) # This field type is a guess.
+    ruleid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
     entitytypedomain = models.ForeignKey('EntityTypes', db_column='entitytypedomain', related_name='rules_entitytypedomain')
     entitytyperange = models.ForeignKey('EntityTypes', db_column='entitytyperange', related_name='rules_entitytyperange')
     propertyid = models.ForeignKey('Properties', db_column='propertyid')
@@ -425,11 +425,13 @@ class Rules(models.Model):
         db_table = u'ontology"."rules'
 
 class MappingSteps(models.Model):
-    mappingid = models.OneToOneField('Mappings', primary_key=True, db_column='mappingid')
+    mappingstepid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    mappingid = models.ForeignKey('Mappings', db_column='mappingid')
     ruleid = models.ForeignKey('Rules', db_column='ruleid')
     order = models.IntegerField()
     class Meta:
         db_table = u'ontology"."mapping_steps'
+        unique_together = (("mappingid", "ruleid", "order",),)
 
 class Relations(models.Model):
     relationid = models.AutoField(primary_key=True)
@@ -479,10 +481,31 @@ class UserProfile(models.Model):
             return #'json invalid'
 
 class Overlays(models.Model):
-    overlayid = models.AutoField(primary_key=True)
+    overlayid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     overlayty = models.TextField()
     overlayval = models.TextField()
-    geometry = models.GeometryField()
+    geometry = models.GeometryField(srid=4326)
     objects = models.GeoManager()
     class Meta:
         db_table = u'aux"."overlays'
+
+class Parcels(models.Model):
+    parcelid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    parcelapn = models.TextField()
+    vintage = models.TextField()
+    geometry = models.MultiPolygonField(srid=4326)
+    objects = models.GeoManager()
+    class Meta:
+        db_table = u'aux"."parcels'
+
+class Addresses(models.Model):
+    addressid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    addressnum = models.TextField()
+    addressstreet = models.TextField()
+    vintage = models.TextField()
+    city = models.TextField()
+    postalcode = models.TextField()
+    geometry = models.MultiPointField(srid=4326)
+    objects = models.GeoManager()
+    class Meta:
+        db_table = u'aux"."addresses'

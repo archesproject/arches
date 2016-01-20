@@ -123,7 +123,7 @@ class BasicEntityTests(SimpleTestCase):
 
         entity = Entity().get(entity.entityid)
         self.assertEqual(entity.child_entities[0].value, 'Alexei')
-        self.assertEqual(entity.child_entities[0].child_entities[0].value, val.pk)
+        self.assertEqual(entity.child_entities[0].child_entities[0].value, str(val.pk))
     
     def test_post_save_data_integrity2(self):
         python_object = {

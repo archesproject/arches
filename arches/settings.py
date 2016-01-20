@@ -137,6 +137,8 @@ APP_NAME = 'Arches v3.0'
 #######################################
 
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PACKAGE_ROOT = ROOT_DIR
+PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

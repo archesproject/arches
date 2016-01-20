@@ -1,4 +1,4 @@
-﻿--
+--
 -- PostgreSQL database dump
 --
 
@@ -918,7 +918,7 @@ BEGIN
     THEN
         RETURN 'Failed';
     ELSE
-      INSERT INTO ontology.mapping_steps(mappingid, ruleid, "order")VALUES(p_mappingid::uuid, v_ruleid, p_order);
+      INSERT INTO ontology.mapping_steps(mappingstepid, mappingid, ruleid, "order")VALUES(public.uuid_generate_v1mc(), p_mappingid::uuid, v_ruleid, p_order);
       RETURN ret;    
     END IF;    
 
@@ -1549,6 +1549,7 @@ ALTER TABLE ontology.classes OWNER TO postgres;
 --
 
 CREATE TABLE mapping_steps (
+    mappingstepid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     mappingid uuid NOT NULL,
     ruleid uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     "order" integer NOT NULL
@@ -1853,7 +1854,7 @@ ALTER TABLE ONLY classes
 --
 
 ALTER TABLE ONLY mapping_steps
-    ADD CONSTRAINT pk_mappings_x_rules PRIMARY KEY (mappingid, ruleid, "order");
+    ADD CONSTRAINT pk_mappings_x_rules PRIMARY KEY (mappingstepid);
 
 
 --
@@ -1904,6 +1905,10 @@ ALTER TABLE ONLY rules
 
 ALTER TABLE ONLY mappings
     ADD CONSTRAINT unique_mappings UNIQUE (entitytypeidfrom, entitytypeidto);
+
+
+ALTER TABLE ONLY mapping_steps
+    ADD CONSTRAINT unique_mappingsteps UNIQUE (mappingid, ruleid, "order");
 
 
 SET search_path = data, pg_catalog;
@@ -2343,6 +2348,7 @@ CREATE INDEX overlaytype_idx ON overlays USING btree (overlayty);
 --
 CREATE TABLE aux.addresses
 (
+  addressid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
   addressnum text,
   addressstreet text,
   vintage text,
@@ -2366,6 +2372,12 @@ CREATE INDEX addresses_sidx
   (geometry );
 
 
+
+ALTER TABLE ONLY aux.addresses
+    ADD CONSTRAINT addresses_pkey PRIMARY KEY (addressid);
+
+
+
 -- Index: aux.addresses_sidx
 
   -- Table: aux.parcels
@@ -2374,6 +2386,7 @@ CREATE INDEX addresses_sidx
 
 CREATE TABLE aux.parcels
 (
+  parcelid uuid NOT NULL DEFAULT public.uuid_generate_v1mc(),
   parcelapn text,
   vintage text,
   geometry public.geometry(MultiPolygon,4326)
@@ -2392,6 +2405,11 @@ CREATE INDEX parcels_sidx
   ON aux.parcels
   USING gist
   (geometry );
+
+
+ALTER TABLE ONLY aux.parcels
+    ADD CONSTRAINT parcels_pkey PRIMARY KEY (parcelid);
+
 
 
 CREATE OR REPLACE FUNCTION concepts.concpets_ins()

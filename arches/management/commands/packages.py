@@ -25,7 +25,7 @@ from django.conf import settings
 from django.utils.importlib import import_module
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.db.install import truncate_db, install_db
+from arches.db.install import truncate_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
@@ -199,23 +199,14 @@ class Command(BaseCommand):
         """
 
         db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
+        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')  
         db_settings['truncate_path'] = truncate_path
-        db_settings['install_path'] = install_path   
         
         truncate_db.create_sqlfile(db_settings, truncate_path)
-        install_db.create_sqlfile(db_settings, install_path)
         
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
         
         management.call_command('migrate') 
-
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
-
-
-        self.create_groups()
-        self.create_users()
 
     def generate_procfile(self, package_name):
         """
@@ -247,33 +238,6 @@ class Command(BaseCommand):
         file_name_wo_extention = file_name[:-4]
         package_root = settings.PACKAGE_ROOT
         return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
-
-    def create_groups(self):
-        """
-        Creates read and edit groups.
-        """
-
-        from django.contrib.auth.models import User, Group
-
-        edit_group = Group.objects.create(name='edit')
-        read_group = Group.objects.create(name='read')
-
-    def create_users(self):
-        """
-        Creates anonymous user and adds anonymous and admin user to appropriate groups.
-        """
-
-        from django.contrib.auth.models import User, Group
-
-        from datetime import datetime
-        anonymous_user = User.objects.create_user('anonymous')
-        read_group = Group.objects.get(name='read')
-        anonymous_user.groups.add(read_group)
-
-        edit_group = Group.objects.get(name='edit')
-        admin_user = User.objects.get(username='admin')
-        admin_user.groups.add(edit_group)
-        admin_user.groups.add(read_group)
 
     def build_permissions(self):
         """
