@@ -140,10 +140,8 @@ class Command(BaseCommand):
         url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
         file_name = url.split('/')[-1]
 
-        try:
-            unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
-        except:
-            download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
+        download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
+        unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
 
         es_config_directory = os.path.join(install_location, 'config')
         try:
@@ -164,11 +162,11 @@ class Command(BaseCommand):
 
         # install plugin
         if sys.platform == 'win32':
-            os.system("call %s --install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
+            os.system("call %s install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
         else:
             os.chdir(os.path.join(install_location, 'bin'))
             os.system("chmod u+x plugin")
-            os.system("./plugin --install mobz/elasticsearch-head")
+            os.system("./plugin install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
     def start_elasticsearch(self, package_name):

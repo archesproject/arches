@@ -484,8 +484,7 @@ class Resource(Entity):
                         'label' : {'type' : 'string', 'index' : 'not_analyzed'},
                         'primaryname': {'type' : 'string', 'index' : 'not_analyzed'},
                         'child_entities' : { 
-                            'type' : 'nested', 
-                            'index' : 'analyzed',
+                            'type' : 'nested',
                             'properties' : {
                                 'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -504,8 +503,7 @@ class Resource(Entity):
                             }
                         },
                         'domains' : { 
-                            'type' : 'nested', 
-                            'index' : 'analyzed',
+                            'type' : 'nested',
                             'properties' : {
                                 'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -524,8 +522,7 @@ class Resource(Entity):
                             }
                         },
                         'geometries' : { 
-                            'type' : 'nested', 
-                            'index' : 'analyzed',
+                            'type' : 'nested',
                             'properties' : {
                                 'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},
@@ -539,8 +536,7 @@ class Resource(Entity):
                             }
                         },
                         'dates' : { 
-                            'type' : 'nested', 
-                            'index' : 'analyzed',
+                            'type' : 'nested',
                             'properties' : {
                                 'entityid' : {'type' : 'string', 'index' : 'not_analyzed'},
                                 'parentid' : {'type' : 'string', 'index' : 'not_analyzed'},

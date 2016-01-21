@@ -1,5 +1,5 @@
 Django==1.8.8
-elasticsearch>=1.0.0,<2.0.0
+elasticsearch>=2.0.0,<3.0.0
 xlrd==0.9.0
 Pillow==2.4.0
 rdflib
@@ -9,4 +9,4 @@ pyshp
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.zip
+# https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.1.1/elasticsearch-2.1.1.zip

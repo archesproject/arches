@@ -175,7 +175,7 @@ class SearchEngine(object):
                     else:
                         self.delete(index='term', doc_type='value', id=document['_id'])
 
-    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex='analyzed', body=None):
+    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
@@ -190,11 +190,14 @@ class SearchEngine(object):
                         }
                     }
                 } 
-            else:           
+            else:
+                fn = { 'type' : fieldtype }
+                if fieldindex:
+                    fn['index'] = fieldindex
                 body =  { 
                     doc_type : {
                         'properties' : {
-                            fieldname : { 'type' : fieldtype, 'index' : fieldindex }
+                            fieldname : fn
                         }
                     }
                 }
