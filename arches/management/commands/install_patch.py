@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.utils.importlib import import_module
+from django.apps import apps
 import os
 
 class Command(BaseCommand):
@@ -46,6 +46,6 @@ class Command(BaseCommand):
         data_source = None if data_source == '' else data_source
         if data_source:
             module_name = os.path.basename(data_source).split('.')[0]
-            import_module('arches.management.patches.%s' % module_name)
+            apps.import_string('arches.management.patches.%s' % module_name)
         else: 
             print 'You need to specify a file with the -s option'

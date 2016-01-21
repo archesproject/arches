@@ -20,6 +20,7 @@ import uuid
 import types
 import copy
 import arches.app.models.models as archesmodels
+from django.apps import apps
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import GEOSGeometry
@@ -688,7 +689,7 @@ class Entity(object):
 
         try:
             model_identifier = str('models.' + tablename)
-            Model = models.get_model(*model_identifier.split("."))
+            Model = apps.get_model(*model_identifier.split("."))
         except TypeError:
             Model = None
         if Model is None:

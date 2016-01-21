@@ -21,7 +21,7 @@ from django.conf import settings
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.paginator import Paginator
-from django.utils.importlib import import_module
+from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from arches.app.models import models
@@ -42,7 +42,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-geocoder = import_module(settings.GEOCODING_PROVIDER)
+geocoder = apps.import_string(settings.GEOCODING_PROVIDER)
 
 def home_page(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)

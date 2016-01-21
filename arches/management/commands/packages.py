@@ -22,7 +22,7 @@ from optparse import make_option
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_string
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
 from arches.db.install import truncate_db
@@ -122,7 +122,7 @@ class Command(BaseCommand):
 
         """
 
-        module = import_module('%s.setup' % package_name)
+        module = import_string('%s.setup' % package_name)
         install = getattr(module, 'install')
         install() 
 
@@ -168,7 +168,7 @@ class Command(BaseCommand):
         else:
             os.chdir(os.path.join(install_location, 'bin'))
             os.system("chmod u+x plugin")
-            os.system("./plugin -install mobz/elasticsearch-head")
+            os.system("./plugin --install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
     def start_elasticsearch(self, package_name):
@@ -273,7 +273,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_module('%s.setup' % package_name)
+        module = import_string('%s.setup' % package_name)
         load = getattr(module, 'load_resources')
         load(data_source) 
 
@@ -290,7 +290,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_module('%s.setup' % package_name)
+        module = import_string('%s.setup' % package_name)
         load = getattr(module, 'load_authority_files')
         load(data_source) 
 
