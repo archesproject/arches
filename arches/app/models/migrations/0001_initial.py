@@ -357,10 +357,10 @@ class Migration(migrations.Migration):
                 ('resourcexid', models.AutoField(serialize=False, primary_key=True)),
                 ('entityid1', models.TextField()),
                 ('entityid2', models.TextField()),
-                ('notes', models.TextField()),
-                ('relationshiptype', models.TextField()),
-                ('datestarted', models.DateField()),
-                ('dateended', models.DateField()),
+                ('notes', models.TextField(null=True)),
+                ('relationshiptype', models.TextField(null=True)),
+                ('datestarted', models.DateField(null=True)),
+                ('dateended', models.DateField(null=True)),
             ],
             options={
                 'db_table': 'data"."resource_x_resource',
@@ -404,7 +404,7 @@ class Migration(migrations.Migration):
                 ('valueid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('value', models.TextField()),
                 ('conceptid', models.ForeignKey(to='models.Concepts', db_column=b'conceptid')),
-                ('languageid', models.ForeignKey(to='models.DLanguages', db_column=b'languageid')),
+                ('languageid', models.ForeignKey(to='models.DLanguages', db_column=b'languageid', null=True)),
             ],
             options={
                 'db_table': 'concepts"."values',

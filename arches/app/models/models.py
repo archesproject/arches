@@ -200,7 +200,7 @@ class Values(models.Model):
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey('ValueTypes', db_column='valuetype')
     value = models.TextField()
-    languageid = models.ForeignKey('DLanguages', db_column='languageid')
+    languageid = models.ForeignKey('DLanguages', db_column='languageid', null=True)
     class Meta:
         db_table = u'concepts"."values'
 
@@ -455,10 +455,10 @@ class RelatedResource(models.Model):
     resourcexid = models.AutoField(primary_key=True)
     entityid1 = models.TextField()
     entityid2 = models.TextField()
-    notes = models.TextField()
-    relationshiptype = models.TextField()
-    datestarted = models.DateField()
-    dateended = models.DateField()
+    notes = models.TextField(null=True)
+    relationshiptype = models.TextField(null=True)
+    datestarted = models.DateField(null=True)
+    dateended = models.DateField(null=True)
     class Meta:
         db_table = u'data"."resource_x_resource'
 
