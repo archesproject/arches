@@ -42,8 +42,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-geocoder = apps.import_string(settings.GEOCODING_PROVIDER)
-
 def home_page(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
@@ -241,7 +239,8 @@ def get_paginator(results, total_count, page, count_per_page, all_ids):
     return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results), 'all_ids': JSONSerializer().serialize(all_ids)})
 
 def geocode(request):
-    search_string = request.GET.get('q', '')    
+    geocoder = apps.import_string(settings.GEOCODING_PROVIDER)  
+    search_string = request.GET.get('q', '')  
     return JSONResponse({ 'results': geocoder.find_candidates(search_string) })
 
 def export_results(request):
