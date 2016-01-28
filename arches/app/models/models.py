@@ -27,81 +27,6 @@ class Addresses(models.Model):
         db_table = 'addresses'
 
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=80)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    group = models.ForeignKey(AuthGroup)
-    permission = models.ForeignKey('AuthPermission')
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthMessage(models.Model):
-    user = models.ForeignKey('AuthUser')
-    message = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_message'
-
-
-class AuthPermission(models.Model):
-    name = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType')
-    codename = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    username = models.CharField(unique=True, max_length=30)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    email = models.CharField(max_length=75)
-    password = models.CharField(max_length=128)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    is_superuser = models.BooleanField()
-    last_login = models.DateTimeField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
-
-
-class AuthUserGroups(models.Model):
-    user = models.ForeignKey(AuthUser)
-    group = models.ForeignKey(AuthGroup)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    user = models.ForeignKey(AuthUser)
-    permission = models.ForeignKey(AuthPermission)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
-
-
 class Branchmetadata(models.Model):
     branchmetadataid = models.TextField(primary_key=True)  # This field type is a guess.
     name = models.BigIntegerField(blank=True, null=True)
@@ -141,7 +66,7 @@ class Cards(models.Model):
 
 class CardsXCardgroups(models.Model):
     cardgroupid = models.ForeignKey(Cardgroups, db_column='cardgroupid')
-    cardid = models.ForeignKey(Cards, db_column='cardid')
+    cardid = models.ForeignKey('Cards', db_column='cardid')
 
     class Meta:
         managed = False
@@ -219,50 +144,6 @@ class DValuetypes(models.Model):
     class Meta:
         managed = False
         db_table = 'd_valuetypes'
-
-
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    user_id = models.IntegerField()
-    content_type_id = models.IntegerField(blank=True, null=True)
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    name = models.CharField(max_length=100)
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_session'
-
-
-class DjangoSite(models.Model):
-    domain = models.CharField(max_length=100)
-    name = models.CharField(max_length=50)
-
-    class Meta:
-        managed = False
-        db_table = 'django_site'
 
 
 class Edges(models.Model):
@@ -445,7 +326,7 @@ class Tileinstances(models.Model):
     tileinstanceid = models.TextField(primary_key=True)  # This field type is a guess.
     resourceinstanceid = models.ForeignKey(Resourceinstances, db_column='resourceinstanceid')
     resourceclassid = models.ForeignKey(Nodes, db_column='resourceclassid')
-    cardid = models.ForeignKey(Cards, db_column='cardid')
+    cardid = models.ForeignKey('Cards', db_column='cardid')
     parenttileinstanceid = models.ForeignKey('self', db_column='parenttileinstanceid', blank=True, null=True)
     tilegroupid = models.TextField()  # This field type is a guess.
     tileinstancedata = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -457,7 +338,7 @@ class Tileinstances(models.Model):
 
 class Values(models.Model):
     valueid = models.TextField(primary_key=True)  # This field type is a guess.
-    conceptid = models.ForeignKey(Concepts, db_column='conceptid')
+    conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey(DValuetypes, db_column='valuetype')
     value = models.TextField()
     languageid = models.ForeignKey(DLanguages, db_column='languageid', blank=True, null=True)
