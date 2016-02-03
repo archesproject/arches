@@ -151,8 +151,8 @@ class Edges(models.Model):
     name = models.TextField()
     description = models.TextField()
     crmproperty = models.TextField()
-    domainnodeid = models.ForeignKey('Nodes', db_column='domainnodeid')
-    rangenodeid = models.ForeignKey('Nodes', db_column='rangenodeid')
+    domainnodeid = models.ForeignKey('Nodes', db_column='domainnodeid', related_name='edge_domains')
+    rangenodeid = models.ForeignKey('Nodes', db_column='rangenodeid', related_name='edge_ranges')
     branchmetadataid = models.ForeignKey(Branchmetadata, db_column='branchmetadataid', blank=True, null=True)
 
     class Meta:
@@ -258,8 +258,8 @@ class Parcels(models.Model):
 
 class Properties(models.Model):
     propertyid = models.TextField(primary_key=True)
-    classdomain = models.ForeignKey(Classes, db_column='classdomain')
-    classrange = models.ForeignKey(Classes, db_column='classrange')
+    classdomain = models.ForeignKey(Classes, db_column='classdomain', related_name='property_classdomains')
+    classrange = models.ForeignKey(Classes, db_column='classrange', related_name='property_classranges')
     propertydisplay = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -268,8 +268,8 @@ class Properties(models.Model):
 
 
 class Relations(models.Model):
-    conceptidfrom = models.ForeignKey(Concepts, db_column='conceptidfrom')
-    conceptidto = models.ForeignKey(Concepts, db_column='conceptidto')
+    conceptidfrom = models.ForeignKey(Concepts, db_column='conceptidfrom', related_name='relation_concepts_from')
+    conceptidto = models.ForeignKey(Concepts, db_column='conceptidto', related_name='relation_concepts_to')
     relationtype = models.ForeignKey(DRelationtypes, db_column='relationtype')
     relationid = models.TextField(primary_key=True)  # This field type is a guess.
 
@@ -280,8 +280,8 @@ class Relations(models.Model):
 
 class Resource2ResourceConstraints(models.Model):
     resource2resourceid = models.TextField(primary_key=True)  # This field type is a guess.
-    resourceclassfrom = models.ForeignKey(Nodes, db_column='resourceclassfrom', blank=True, null=True)
-    resourceclassto = models.ForeignKey(Nodes, db_column='resourceclassto', blank=True, null=True)
+    resourceclassfrom = models.ForeignKey(Nodes, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
+    resourceclassto = models.ForeignKey(Nodes, db_column='resourceclassto', blank=True, null=True, related_name='resxres_contstraint_classes_to')
     cardinality = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -291,8 +291,8 @@ class Resource2ResourceConstraints(models.Model):
 
 class ResourceXResource(models.Model):
     resourcexid = models.AutoField(primary_key=True)
-    resourceinstanceidfrom = models.ForeignKey('Resourceinstances', db_column='resourceinstanceidfrom', blank=True, null=True)
-    resourceinstanceidto = models.ForeignKey('Resourceinstances', db_column='resourceinstanceidto', blank=True, null=True)
+    resourceinstanceidfrom = models.ForeignKey('Resourceinstances', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
+    resourceinstanceidto = models.ForeignKey('Resourceinstances', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.ForeignKey('Values', db_column='relationshiptype')
     datestarted = models.DateField(blank=True, null=True)
