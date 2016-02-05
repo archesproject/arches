@@ -9,12 +9,10 @@ class CreateExtension(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % self.name)
+        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS \"%s\"" % self.name)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("DROP EXTENSION IF EXISTS %s" % self.name)
+        schema_editor.execute("DROP EXTENSION IF EXISTS \"%s\"" % self.name)
 
     def describe(self):
         return "Creates extension %s" % self.name
-
-        
