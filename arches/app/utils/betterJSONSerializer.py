@@ -54,6 +54,11 @@ class JSONSerializer(object):
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
 
+        # prevent raw strings from begin re-encoded
+        # this is especially important when doing bulk operations in elasticsearch
+        if (isinstance(obj, basestring)):
+            return obj
+        
         ret = self.handle_object(obj)
 
         return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())

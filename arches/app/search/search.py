@@ -44,10 +44,16 @@ class SearchEngine(object):
 
         """
 
-        body = kwargs.get('body', None)
+        body = kwargs.pop('body', None)
         if body != None:
             try:
-                return self.es.delete_by_query(ignore=[404], **kwargs)
+                data = []
+                refresh = kwargs.pop('refresh', False)
+                for hit in helpers.scan(self.es, query=body, **kwargs):
+                    hit['_op_type'] = 'delete'
+                    data.append(hit)
+
+                return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
                 raise detail   
