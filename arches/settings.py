@@ -246,7 +246,8 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'arches',
     'arches.app.models',
-    'arches.management'
+    'arches.management',
+    'django_nose',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -260,6 +261,15 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
 )
+
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=arches',
+]
 
 
 ROOT_URLCONF = 'arches.urls'
