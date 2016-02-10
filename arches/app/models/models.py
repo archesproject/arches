@@ -195,12 +195,12 @@ class Forms(models.Model):
 
 class FormsXCardGroups(models.Model):
     formid = models.ForeignKey(Forms, db_column='formid')
-    cardgroupid = models.ForeignKey(Cards, db_column='cardid')
+    cardgroupid = models.ForeignKey(Cardgroups, db_column='cardgroupid')
 
     class Meta:
         managed = True
         db_table = 'forms_x_card_groups'
-        unique_together = (('formid', 'cardid'),)
+        unique_together = (('formid', 'cardgroupid'),)
 
 
 class Nodegroups(models.Model):
