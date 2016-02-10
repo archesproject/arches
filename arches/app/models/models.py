@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.db import models
-
+import uuid
 
 class Addresses(models.Model):
     addressnum = models.TextField(blank=True, null=True)
@@ -23,12 +23,12 @@ class Addresses(models.Model):
     objects = models.GeoManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'addresses'
 
 
 class Branchmetadata(models.Model):
-    branchmetadataid = models.TextField(primary_key=True)  # This field type is a guess.
+    branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)  # This field type is a guess.
     name = models.BigIntegerField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
@@ -36,31 +36,31 @@ class Branchmetadata(models.Model):
     version = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'branchmetadata'
 
 
 class Cardgroups(models.Model):
-    cardgroupid = models.TextField(primary_key=True)  # This field type is a guess.
+    cardgroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     title = models.TextField()
     subtitle = models.TextField(blank=True, null=True)
     nodeid = models.ForeignKey('Nodes', db_column='nodeid', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cardgroups'
 
 
 class Cards(models.Model):
-    cardid = models.TextField(primary_key=True)  # This field type is a guess.
+    cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     htmltemplate = models.TextField()
     title = models.TextField()
     subtitle = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cards'
 
 
@@ -69,7 +69,7 @@ class CardsXCardgroups(models.Model):
     cardid = models.ForeignKey('Cards', db_column='cardid')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cards_x_cardgroups'
         unique_together = (('cardgroupid', 'cardid'),)
 
@@ -80,28 +80,28 @@ class CardsXNodesXWidgets(models.Model):
     widgetid = models.ForeignKey('Widgets', db_column='widgetid')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cards_x_nodes_x_widgets'
         unique_together = (('nodeid', 'cardid', 'widgetid'),)
 
 
 class Classes(models.Model):
-    classid = models.TextField(primary_key=True)
+    classid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     classname = models.TextField()
     isactive = models.BooleanField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'classes'
 
 
 class Concepts(models.Model):
-    conceptid = models.TextField(primary_key=True)  # This field type is a guess.
+    conceptid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     nodetype = models.ForeignKey('DNodetypes', db_column='nodetype')
     legacyoid = models.TextField(unique=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'concepts'
 
 
@@ -111,7 +111,7 @@ class DLanguages(models.Model):
     isdefault = models.BooleanField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'd_languages'
 
 
@@ -120,7 +120,7 @@ class DNodetypes(models.Model):
     namespace = models.TextField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'd_nodetypes'
 
 
@@ -130,7 +130,7 @@ class DRelationtypes(models.Model):
     namespace = models.TextField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'd_relationtypes'
 
 
@@ -142,12 +142,12 @@ class DValuetypes(models.Model):
     datatype = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'd_valuetypes'
 
 
 class Edges(models.Model):
-    edgeid = models.TextField(primary_key=True)  # This field type is a guess.
+    edgeid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     description = models.TextField()
     crmproperty = models.TextField()
@@ -156,13 +156,13 @@ class Edges(models.Model):
     branchmetadataid = models.ForeignKey(Branchmetadata, db_column='branchmetadataid', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'edges'
         unique_together = (('rangenodeid', 'domainnodeid'),)
 
 
 class EditLog(models.Model):
-    editlogid = models.TextField(primary_key=True)  # This field type is a guess.
+    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassid = models.TextField(blank=True, null=True)  # This field type is a guess.
     resourceinstanceid = models.TextField(blank=True, null=True)  # This field type is a guess.
     attributenodeid = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -178,43 +178,43 @@ class EditLog(models.Model):
     note = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'edit_log'
 
 
 class Forms(models.Model):
-    formid = models.TextField(primary_key=True)  # This field type is a guess.
+    formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'forms'
 
 
-class FormsXCards(models.Model):
+class FormsXCardGroups(models.Model):
     formid = models.ForeignKey(Forms, db_column='formid')
-    cardid = models.ForeignKey(Cards, db_column='cardid')
+    cardgroupid = models.ForeignKey(Cards, db_column='cardid')
 
     class Meta:
-        managed = False
-        db_table = 'forms_x_cards'
+        managed = True
+        db_table = 'forms_x_card_groups'
         unique_together = (('formid', 'cardid'),)
 
 
 class Nodegroups(models.Model):
-    nodegroupid = models.TextField(primary_key=True)  # This field type is a guess.
+    nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     cardinality = models.TextField()
     legacygroupid = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'nodegroups'
 
 
 class Nodes(models.Model):
-    nodeid = models.TextField(primary_key=True)  # This field type is a guess.
+    nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     description = models.TextField()
     istopnode = models.BooleanField()
@@ -228,19 +228,19 @@ class Nodes(models.Model):
     branchmetadataid = models.ForeignKey(Branchmetadata, db_column='branchmetadataid', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'nodes'
 
 
 class Overlays(models.Model):
     overlaytyp = models.TextField(blank=True, null=True)
     overlayval = models.TextField(blank=True, null=True)
-    overlayid = models.TextField(primary_key=True)  # This field type is a guess.
+    overlayid = models.AutoField(primary_key=True)  # This field type is a guess.
     geometry = models.PolygonField(blank=True, null=True)
     objects = models.GeoManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'overlays'
 
 
@@ -252,18 +252,18 @@ class Parcels(models.Model):
     objects = models.GeoManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'parcels'
 
 
 class Properties(models.Model):
-    propertyid = models.TextField(primary_key=True)
+    propertyid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     classdomain = models.ForeignKey(Classes, db_column='classdomain', related_name='property_classdomains')
     classrange = models.ForeignKey(Classes, db_column='classrange', related_name='property_classranges')
     propertydisplay = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'properties'
 
 
@@ -271,21 +271,21 @@ class Relations(models.Model):
     conceptidfrom = models.ForeignKey(Concepts, db_column='conceptidfrom', related_name='relation_concepts_from')
     conceptidto = models.ForeignKey(Concepts, db_column='conceptidto', related_name='relation_concepts_to')
     relationtype = models.ForeignKey(DRelationtypes, db_column='relationtype')
-    relationid = models.TextField(primary_key=True)  # This field type is a guess.
+    relationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'relations'
 
 
 class Resource2ResourceConstraints(models.Model):
-    resource2resourceid = models.TextField(primary_key=True)  # This field type is a guess.
+    resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Nodes, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
     resourceclassto = models.ForeignKey(Nodes, db_column='resourceclassto', blank=True, null=True, related_name='resxres_contstraint_classes_to')
     cardinality = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'resource2resource_constraints'
 
 
@@ -299,7 +299,7 @@ class ResourceXResource(models.Model):
     dateended = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'resource_x_resource'
 
 
@@ -308,22 +308,22 @@ class ResourceclassesXForms(models.Model):
     formid = models.ForeignKey(Forms, db_column='formid')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'resourceclasses_x_forms'
         unique_together = (('resourceclassid', 'formid'),)
 
 
 class Resourceinstances(models.Model):
-    resourceinstanceid = models.TextField(primary_key=True)  # This field type is a guess.
+    resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     col1 = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'resourceinstances'
 
 
 class Tileinstances(models.Model):
-    tileinstanceid = models.TextField(primary_key=True)  # This field type is a guess.
+    tileinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceid = models.ForeignKey(Resourceinstances, db_column='resourceinstanceid')
     resourceclassid = models.ForeignKey(Nodes, db_column='resourceclassid')
     cardid = models.ForeignKey('Cards', db_column='cardid')
@@ -332,28 +332,28 @@ class Tileinstances(models.Model):
     tileinstancedata = models.TextField(blank=True, null=True)  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'tileinstances'
 
 
 class Values(models.Model):
-    valueid = models.TextField(primary_key=True)  # This field type is a guess.
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     conceptid = models.ForeignKey('Concepts', db_column='conceptid')
     valuetype = models.ForeignKey(DValuetypes, db_column='valuetype')
     value = models.TextField()
     languageid = models.ForeignKey(DLanguages, db_column='languageid', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'values'
 
 
 class Widgets(models.Model):
-    widgetid = models.TextField(primary_key=True)  # This field type is a guess.
+    widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'widgets'
