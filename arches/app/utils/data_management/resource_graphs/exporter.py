@@ -1,5 +1,5 @@
-from arches.app.models.models import VwExportNodes as Nodes
-from arches.app.models.models import VwExportEdges as Edges
+# from arches.app.models.models import VwExportNodes as Nodes
+# from arches.app.models.models import VwExportEdges as Edges
 import csv
 from pprint import pprint as pp
 import os
