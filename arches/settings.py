@@ -31,7 +31,7 @@ INTERNAL_IPS = ('127.0.0.1',)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'arches.db.backends.arches_postgis', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'arches',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'postgis',                  # Not used with sqlite3.
@@ -270,6 +270,7 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=arches',
 ]
+
 
 
 ROOT_URLCONF = 'arches.urls'
