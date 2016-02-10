@@ -122,8 +122,8 @@ class Command(BaseCommand):
 
         """
 
-        module = import_string('%s.setup' % package_name)
-        install = getattr(module, 'install')
+        install = import_string('%s.setup.install' % package_name)
+        # install = getattr(module, 'install')
         install() 
 
     def setup_elasticsearch(self, package_name, port=9200):
