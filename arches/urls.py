@@ -17,9 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
+from arches.app.views import concept, entity, main, map, resources, search
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -27,42 +28,41 @@ admin.autodiscover()
 
 uuid_regex = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
 
-urlpatterns = patterns('',
-    url(r'^$', 'arches.app.views.main.index'),
-    url(r'^index.htm', 'arches.app.views.main.index', name='home'),
-    url(r'^auth/', 'arches.app.views.main.auth', name='auth'),
-    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.rdm', name='rdm'),
-    url(r'^map', 'arches.app.views.map.get_page', name="map"),
-    url(r'^geocoder', 'arches.app.views.search.geocode', name="geocoder"),
+urlpatterns = [
+    url(r'^$', main.index),
+    url(r'^index.htm', main.index, name='home'),
+    url(r'^auth/', main.auth, name='auth'),
+    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , concept.rdm, name='rdm'),
+    url(r'^map', map.get_page, name="map"),
+    url(r'^geocoder', search.geocode, name="geocoder"),
     
-    url(r'^entities/(?P<entityid>%s)$' % uuid_regex , 'arches.app.views.entity.Entities'),
-    url(r'^entityTypes/(?P<entitytypeid>.*)$', 'arches.app.views.entity.EntityTypes'),
-    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, 'arches.app.views.concept.manage_parents', name="concept_manage_parents"),        
-    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, 'arches.app.views.concept.confirm_delete', name="confirm_delete"),     
-    url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.concept', name="concept"),
-    url(r'^concepts/tree$', 'arches.app.views.concept.concept_tree', name="concept_tree"),      
-    url(r'^concepts/search$', 'arches.app.views.concept.search', name="concept_search"),
-    url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, 'arches.app.views.concept.add_concepts_from_sparql_endpoint', name="from_sparql_endpoint"),
-    url(r'^concepts/search_sparql_endpoint$', 'arches.app.views.concept.search_sparql_endpoint_for_concepts', name="search_sparql_endpoint"),
-    url(r'^search$', 'arches.app.views.search.home_page', name="search_home"),
-    url(r'^search/terms$', 'arches.app.views.search.search_terms', name="search_terms"),
-    url(r'^search/resources$', 'arches.app.views.search.search_results', name="search_results"),
-    url(r'^search/export$', 'arches.app.views.search.export_results', name="search_results_export"),
-    url(r'^buffer/$', 'arches.app.views.search.buffer', name="buffer"),
-    url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.resource_manager', name="resource_manager"),
-    url(r'^resources/related/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.related_resources', name="related_resources"),
-    url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, 'arches.app.views.resources.edit_history', name="edit_history"),
-    url(r'^resources/layers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', name="map_layers"),
-    url(r'^resources/markers/(?P<entitytypeid>.*)$', 'arches.app.views.resources.map_layers', {'get_centroids':True}, name="map_markers"),
-    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , 'arches.app.views.resources.report', name='report'),
-    url(r'^get_admin_areas','arches.app.views.resources.get_admin_areas', name='get_admin_areas'),
+    url(r'^entities/(?P<entityid>%s)$' % uuid_regex , entity.Entities),
+    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),        
+    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),     
+    url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , concept.concept, name="concept"),
+    url(r'^concepts/tree$', concept.concept_tree, name="concept_tree"),      
+    url(r'^concepts/search$', concept.search, name="concept_search"),
+    url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
+    url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
+    url(r'^search$', search.home_page, name="search_home"),
+    url(r'^search/terms$', search.search_terms, name="search_terms"),
+    url(r'^search/resources$', search.search_results, name="search_results"),
+    url(r'^search/export$', search.export_results, name="search_results_export"),
+    url(r'^buffer/$', search.buffer, name="buffer"),
+    url(r'^resources/(?P<resourcetypeid>[0-9a-zA-Z_.]*)/(?P<form_id>[a-zA-Z_-]*)/(?P<resourceid>%s|())$' % uuid_regex, resources.resource_manager, name="resource_manager"),
+    url(r'^resources/related/(?P<resourceid>%s|())$' % uuid_regex, resources.related_resources, name="related_resources"),
+    url(r'^resources/history/(?P<resourceid>%s|())$' % uuid_regex, resources.edit_history, name="edit_history"),
+    url(r'^resources/layers/(?P<entitytypeid>.*)$', resources.map_layers, name="map_layers"),
+    url(r'^resources/markers/(?P<entitytypeid>.*)$', resources.map_layers, {'get_centroids':True}, name="map_markers"),
+    url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
+    url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
-)
+    url(r'^admin/', admin.site.urls),
+]
 
 urlpatterns += staticfiles_urlpatterns()
 
