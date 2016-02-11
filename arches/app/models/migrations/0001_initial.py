@@ -2,12 +2,11 @@
 from __future__ import unicode_literals
 
 import os
-import uuid
-import sqlparse
-from django.db import migrations, models
 from django.conf import settings
+from django.db import migrations, models
+import uuid
 import django.contrib.gis.db.models.fields
-
+from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
 
 def get_sql_string_from_file(pathtofile):
     ret = []
@@ -53,165 +52,116 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL('CREATE SCHEMA ontology; CREATE SCHEMA data; CREATE SCHEMA concepts; CREATE SCHEMA aux;', 'DROP SCHEMA ontology CASCADE; DROP SCHEMA data CASCADE; DROP SCHEMA concepts CASCADE; DROP SCHEMA aux CASCADE;'),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'batch_index.sql')), ''),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'isstring.sql')), ''),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'uuid-ossp.sql')), ''),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'ddl', 'db_ddl_v4.sql')), ''),
+        CreateExtension(name='uuid-ossp'),
 
-        migrations.CreateModel(
-            name='FileValues',
-            fields=[
-                ('valueid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('value', models.FileField(upload_to=b'concepts')),
-            ],
-            options={
-                'db_table': 'concepts"."values',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwConcepts',
-            fields=[
-                ('conceptid', models.TextField(serialize=False, primary_key=True)),
-                ('conceptlabel', models.TextField()),
-                ('legacyoid', models.TextField()),
-            ],
-            options={
-                'db_table': 'vw_concepts',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwEdges',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('source', models.TextField()),
-                ('label', models.TextField()),
-                ('target', models.TextField()),
-            ],
-            options={
-                'db_table': 'vw_edges',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwEntitytypeDomains',
-            fields=[
-                ('id', models.TextField(serialize=False, primary_key=True)),
-                ('entitytypeid', models.TextField(blank=True)),
-                ('conceptid', models.TextField(blank=True)),
-                ('value', models.TextField(blank=True)),
-                ('valuetype', models.TextField(blank=True)),
-                ('languageid', models.TextField(blank=True)),
-                ('sortorder', models.TextField(blank=True)),
-            ],
-            options={
-                'db_table': 'vw_entitytype_domains',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwEntityTypes',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('entitytypeid', models.TextField()),
-                ('entitytypename', models.TextField()),
-                ('description', models.TextField()),
-                ('languageid', models.TextField()),
-                ('reportwidget', models.TextField()),
-                ('icon', models.TextField()),
-                ('isresource', models.BooleanField()),
-                ('conceptid', models.TextField()),
-            ],
-            options={
-                'db_table': 'vw_entity_types',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwExportEdges',
-            fields=[
-                ('source', models.TextField()),
-                ('label', models.TextField()),
-                ('target', models.TextField(serialize=False, primary_key=True)),
-                ('assettype', models.TextField()),
-            ],
-            options={
-                'db_table': 'ontology"."vw_export_edges',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwExportNodes',
-            fields=[
-                ('id', models.TextField(serialize=False, primary_key=True)),
-                ('label', models.TextField()),
-                ('assettype', models.TextField()),
-                ('mergenode', models.TextField()),
-                ('businesstablename', models.TextField(null=True)),
-            ],
-            options={
-                'db_table': 'ontology"."vw_export_nodes',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='VwNodes',
-            fields=[
-                ('label', models.TextField()),
-                ('id', models.TextField(serialize=False, primary_key=True)),
-                ('val', models.TextField()),
-            ],
-            options={
-                'db_table': 'vw_nodes',
-                'managed': False,
-            },
-        ),
+        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
+
+        CreateFunction(name="get_conceptid", body="v_return = (select a.conceptid from concepts a, values b where 1=1 and b.valuetype = 'prefLabel' and b.value = p_label and b.conceptid = a.conceptid LIMIT 1); Return v_return;", returntype="uuid", arguments=["p_label text"], declarations=["v_return text"], language="plpgsql"),
+        CreateFunction(name="insert_concept", body="INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES (v_conceptid, p_nodetype, p_legacyid); IF trim(p_label) is not null and p_label<>'' then INSERT INTO values (valueid, conceptid, valuetype, value, languageid) VALUES (v_valueid, v_conceptid, 'prefLabel', trim(initcap(p_label)), v_languageid); END IF; IF trim(p_note) is not null and p_note <> '' then INSERT INTO values (valueid, conceptid, valuetype, value, languageid) VALUES (v_valueid, v_conceptid, 'scopeNote', p_note, v_languageid); END IF; return v_conceptid;", returntype="uuid", arguments=["p_label text, p_note text, p_languageid text, p_legacyid text, p_nodetype text"], declarations=["v_conceptid uuid = public.uuid_generate_v1mc();", "v_valueid uuid = public.uuid_generate_v1mc();", "v_languageid text = p_languageid;"], language="plpgsql"),
+        CreateFunction(name="insert_relation", body="v_conceptidfrom = (select conceptid from concepts c where trim(legacyoid) = trim(p_legacyid1)); v_conceptidto = (select conceptid from concepts c where trim(legacyoid) = trim(p_legacyid2)); IF v_conceptidfrom is not null and v_conceptidto is not null and v_conceptidto <> v_conceptidfrom and v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM relations) then INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype); return 'success!'; ELSE return 'fail! no relation inserted.'; END IF;", returntype="text", arguments=["p_legacyid1 text", "p_relationtype text", "p_legacyid2 text"], declarations=["v_conceptidfrom uuid = null;", "v_conceptidto uuid = null;"], language="plpgsql"),
+
         migrations.CreateModel(
             name='Addresses',
             fields=[
-                ('addressid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('addressnum', models.TextField()),
-                ('addressstreet', models.TextField()),
-                ('vintage', models.TextField()),
-                ('city', models.TextField()),
-                ('postalcode', models.TextField()),
-                ('geometry', django.contrib.gis.db.models.fields.MultiPointField(srid=4326)),
+                ('addressnum', models.TextField(null=True, blank=True)),
+                ('addressstreet', models.TextField(null=True, blank=True)),
+                ('vintage', models.TextField(null=True, blank=True)),
+                ('city', models.TextField(null=True, blank=True)),
+                ('postalcode', models.TextField(null=True, blank=True)),
+                ('addressesid', models.AutoField(serialize=False, primary_key=True)),
+                ('geometry', django.contrib.gis.db.models.fields.PointField(srid=4326, null=True, blank=True)),
             ],
             options={
-                'db_table': 'aux"."addresses',
+                'db_table': 'addresses',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Branchmetadata',
+            fields=[
+                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, editable=False, primary_key=True)),
+                ('name', models.BigIntegerField(null=True, blank=True)),
+                ('deploymentfile', models.TextField(null=True, blank=True)),
+                ('author', models.TextField(null=True, blank=True)),
+                ('deploymentdate', models.DateTimeField(null=True, blank=True)),
+                ('version', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'branchmetadata',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Cardgroups',
+            fields=[
+                ('cardgroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('title', models.TextField()),
+                ('subtitle', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'cardgroups',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Cards',
+            fields=[
+                ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('htmltemplate', models.TextField()),
+                ('title', models.TextField()),
+                ('subtitle', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'cards',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='CardsXCardgroups',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('cardgroupid', models.ForeignKey(to='models.Cardgroups', db_column='cardgroupid')),
+                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
+            ],
+            options={
+                'db_table': 'cards_x_cardgroups',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='CardsXNodesXWidgets',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
+            ],
+            options={
+                'db_table': 'cards_x_nodes_x_widgets',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Classes',
             fields=[
-                ('classid', models.TextField(serialize=False, primary_key=True)),
+                ('classid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('classname', models.TextField()),
                 ('isactive', models.BooleanField()),
             ],
             options={
-                'db_table': 'ontology"."classes',
-            },
-        ),
-        migrations.CreateModel(
-            name='ConceptRelations',
-            fields=[
-                ('relationid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-            ],
-            options={
-                'db_table': 'concepts"."relations',
+                'db_table': 'classes',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Concepts',
             fields=[
                 ('conceptid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('legacyoid', models.TextField()),
+                ('legacyoid', models.TextField(unique=True)),
             ],
             options={
-                'db_table': 'concepts"."concepts',
+                'db_table': 'concepts',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -222,7 +172,8 @@ class Migration(migrations.Migration):
                 ('isdefault', models.BooleanField()),
             ],
             options={
-                'db_table': 'concepts"."d_languages',
+                'db_table': 'd_languages',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -232,7 +183,8 @@ class Migration(migrations.Migration):
                 ('namespace', models.TextField()),
             ],
             options={
-                'db_table': 'concepts"."d_nodetypes',
+                'db_table': 'd_nodetypes',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -243,159 +195,234 @@ class Migration(migrations.Migration):
                 ('namespace', models.TextField()),
             ],
             options={
-                'db_table': 'concepts"."d_relationtypes',
+                'db_table': 'd_relationtypes',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='DValuetypes',
+            fields=[
+                ('valuetype', models.TextField(serialize=False, primary_key=True)),
+                ('category', models.TextField(null=True, blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('namespace', models.TextField()),
+                ('datatype', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'd_valuetypes',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Edges',
+            fields=[
+                ('edgeid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('description', models.TextField()),
+                ('crmproperty', models.TextField()),
+                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.Branchmetadata', null=True)),
+            ],
+            options={
+                'db_table': 'edges',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='EditLog',
             fields=[
-                ('editlogid', models.TextField(serialize=False, primary_key=True)),
-                ('resourceentitytypeid', models.TextField(null=True)),
-                ('resourceid', models.TextField(null=True)),
-                ('attributeentitytypeid', models.TextField(null=True)),
-                ('edittype', models.TextField(null=True)),
-                ('userid', models.TextField(null=True)),
-                ('timestamp', models.DateTimeField()),
-                ('oldvalue', models.TextField(null=True)),
-                ('newvalue', models.TextField(null=True)),
-                ('user_email', models.TextField(null=True)),
-                ('user_firstname', models.TextField(null=True)),
-                ('user_lastname', models.TextField(null=True)),
-                ('note', models.TextField(null=True)),
+                ('editlogid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('resourceclassid', models.TextField(null=True, blank=True)),
+                ('resourceinstanceid', models.TextField(null=True, blank=True)),
+                ('attributenodeid', models.TextField(null=True, blank=True)),
+                ('tileinstanceid', models.TextField(null=True, blank=True)),
+                ('edittype', models.TextField(null=True, blank=True)),
+                ('newvalue', models.TextField(null=True, blank=True)),
+                ('oldvalue', models.TextField(null=True, blank=True)),
+                ('timestamp', models.DateTimeField(null=True, blank=True)),
+                ('userid', models.TextField(null=True, blank=True)),
+                ('user_firstname', models.TextField(null=True, blank=True)),
+                ('user_lastname', models.TextField(null=True, blank=True)),
+                ('user_email', models.TextField(null=True, blank=True)),
+                ('note', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'data"."edit_log',
+                'db_table': 'edit_log',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='Entities',
+            name='Forms',
             fields=[
-                ('entityid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('formid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('title', models.TextField(null=True, blank=True)),
+                ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'data"."entities',
+                'db_table': 'forms',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='EntityTypes',
+            name='FormsXCardGroups',
             fields=[
-                ('businesstablename', models.TextField(null=True)),
-                ('publishbydefault', models.BooleanField()),
-                ('icon', models.TextField(null=True)),
-                ('defaultvectorcolor', models.TextField(null=True)),
-                ('entitytypeid', models.TextField(serialize=False, primary_key=True)),
-                ('isresource', models.NullBooleanField()),
-                ('classid', models.ForeignKey(related_name='entitytypes_classid', db_column=b'classid', to='models.Classes')),
-                ('conceptid', models.ForeignKey(related_name='entitytypes_conceptid', db_column=b'conceptid', to='models.Concepts')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('cardgroupid', models.ForeignKey(to='models.Cardgroups', db_column='cardgroupid')),
+                ('formid', models.ForeignKey(to='models.Forms', db_column='formid')),
             ],
             options={
-                'db_table': 'data"."entity_types',
+                'db_table': 'forms_x_card_groups',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='Mappings',
+            name='Nodegroups',
             fields=[
-                ('mappingid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('mergenodeid', models.TextField()),
-                ('entitytypeidfrom', models.ForeignKey(related_name='mappings_entitytypeidfrom', db_column=b'entitytypeidfrom', to='models.EntityTypes')),
-                ('entitytypeidto', models.ForeignKey(related_name='mappings_entitytypeidto', db_column=b'entitytypeidto', to='models.EntityTypes')),
+                ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('cardinality', models.TextField()),
+                ('legacygroupid', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'ontology"."mappings',
+                'db_table': 'nodegroups',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='MappingSteps',
+            name='Nodes',
             fields=[
-                ('mappingstepid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('order', models.IntegerField()),
-                ('mappingid', models.ForeignKey(to='models.Mappings', db_column=b'mappingid')),
+                ('nodeid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('description', models.TextField()),
+                ('istopnode', models.BooleanField()),
+                ('crmclass', models.TextField()),
+                ('datatype', models.TextField()),
+                ('validation', models.TextField(null=True, blank=True)),
+                ('inputlabel', models.TextField(null=True, blank=True)),
+                ('inputmask', models.TextField(null=True, blank=True)),
+                ('status', models.BigIntegerField(null=True, blank=True)),
+                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.Branchmetadata', null=True)),
+                ('nodegroupid', models.ForeignKey(db_column='nodegroupid', blank=True, to='models.Nodegroups', null=True)),
             ],
             options={
-                'db_table': 'ontology"."mapping_steps',
+                'db_table': 'nodes',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Overlays',
             fields=[
-                ('overlayid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('overlayty', models.TextField()),
-                ('overlayval', models.TextField()),
-                ('geometry', django.contrib.gis.db.models.fields.GeometryField(srid=4326)),
+                ('overlaytyp', models.TextField(null=True, blank=True)),
+                ('overlayval', models.TextField(null=True, blank=True)),
+                ('overlayid', models.AutoField(serialize=False, primary_key=True)),
+                ('geometry', django.contrib.gis.db.models.fields.PolygonField(srid=4326, null=True, blank=True)),
             ],
             options={
-                'db_table': 'aux"."overlays',
+                'db_table': 'overlays',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Parcels',
             fields=[
-                ('parcelid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('parcelapn', models.TextField()),
-                ('vintage', models.TextField()),
-                ('geometry', django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326)),
+                ('parcelapn', models.TextField(null=True, blank=True)),
+                ('vintage', models.TextField(null=True, blank=True)),
+                ('parcelsid', models.AutoField(serialize=False, primary_key=True)),
+                ('geometry', django.contrib.gis.db.models.fields.PolygonField(srid=4326, null=True, blank=True)),
             ],
             options={
-                'db_table': 'aux"."parcels',
+                'db_table': 'parcels',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Properties',
             fields=[
-                ('propertyid', models.TextField(serialize=False, primary_key=True)),
-                ('propertydisplay', models.TextField(null=True)),
-                ('classdomain', models.ForeignKey(related_name='properties_classdomain', db_column=b'classdomain', to='models.Classes')),
-                ('classrange', models.ForeignKey(related_name='properties_classrange', db_column=b'classrange', to='models.Classes')),
+                ('propertyid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('propertydisplay', models.TextField(null=True, blank=True)),
+                ('classdomain', models.ForeignKey(related_name='property_classdomains', db_column='classdomain', to='models.Classes')),
+                ('classrange', models.ForeignKey(related_name='property_classranges', db_column='classrange', to='models.Classes')),
             ],
             options={
-                'db_table': 'ontology"."properties',
-            },
-        ),
-        migrations.CreateModel(
-            name='RelatedResource',
-            fields=[
-                ('resourcexid', models.AutoField(serialize=False, primary_key=True)),
-                ('entityid1', models.TextField()),
-                ('entityid2', models.TextField()),
-                ('notes', models.TextField(null=True)),
-                ('relationshiptype', models.TextField(null=True)),
-                ('datestarted', models.DateField(null=True)),
-                ('dateended', models.DateField(null=True)),
-            ],
-            options={
-                'db_table': 'data"."resource_x_resource',
+                'db_table': 'properties',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
             name='Relations',
             fields=[
-                ('relationid', models.AutoField(serialize=False, primary_key=True)),
-                ('notes', models.TextField()),
+                ('relationid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('conceptidfrom', models.ForeignKey(related_name='relation_concepts_from', db_column='conceptidfrom', to='models.Concepts')),
+                ('conceptidto', models.ForeignKey(related_name='relation_concepts_to', db_column='conceptidto', to='models.Concepts')),
+                ('relationtype', models.ForeignKey(to='models.DRelationtypes', db_column='relationtype')),
             ],
             options={
-                'db_table': 'data"."relations',
+                'db_table': 'relations',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='Rules',
+            name='Resource2ResourceConstraints',
             fields=[
-                ('ruleid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('entitytypedomain', models.ForeignKey(related_name='rules_entitytypedomain', db_column=b'entitytypedomain', to='models.EntityTypes')),
-                ('entitytyperange', models.ForeignKey(related_name='rules_entitytyperange', db_column=b'entitytyperange', to='models.EntityTypes')),
-                ('propertyid', models.ForeignKey(to='models.Properties', db_column=b'propertyid')),
+                ('resource2resourceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('cardinality', models.TextField(null=True, blank=True)),
+                ('resourceclassfrom', models.ForeignKey(related_name='resxres_contstraint_classes_from', db_column='resourceclassfrom', blank=True, to='models.Nodes', null=True)),
+                ('resourceclassto', models.ForeignKey(related_name='resxres_contstraint_classes_to', db_column='resourceclassto', blank=True, to='models.Nodes', null=True)),
             ],
             options={
-                'db_table': 'ontology"."rules',
+                'db_table': 'resource2resource_constraints',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='UserProfile',
+            name='ResourceclassesXForms',
             fields=[
-                ('user', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('details', models.TextField()),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('formid', models.ForeignKey(to='models.Forms', db_column='formid')),
+                ('resourceclassid', models.ForeignKey(db_column='resourceclassid', blank=True, to='models.Nodes', null=True)),
             ],
             options={
-                'db_table': 'user_profile',
+                'db_table': 'resourceclasses_x_forms',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Resourceinstances',
+            fields=[
+                ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('col1', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'resourceinstances',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='ResourceXResource',
+            fields=[
+                ('resourcexid', models.AutoField(serialize=False, primary_key=True)),
+                ('notes', models.TextField(null=True, blank=True)),
+                ('datestarted', models.DateField(null=True, blank=True)),
+                ('dateended', models.DateField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'resource_x_resource',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Tileinstances',
+            fields=[
+                ('tileinstanceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('tilegroupid', models.TextField()),
+                ('tileinstancedata', models.TextField(null=True, blank=True)),
+                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
+                ('parenttileinstanceid', models.ForeignKey(db_column='parenttileinstanceid', blank=True, to='models.Tileinstances', null=True)),
+                ('resourceclassid', models.ForeignKey(to='models.Nodes', db_column='resourceclassid')),
+                ('resourceinstanceid', models.ForeignKey(to='models.Resourceinstances', db_column='resourceinstanceid')),
+            ],
+            options={
+                'db_table': 'tileinstances',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
@@ -403,147 +430,112 @@ class Migration(migrations.Migration):
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('value', models.TextField()),
-                ('conceptid', models.ForeignKey(to='models.Concepts', db_column=b'conceptid')),
-                ('languageid', models.ForeignKey(to='models.DLanguages', db_column=b'languageid', null=True)),
+                ('conceptid', models.ForeignKey(to='models.Concepts', db_column='conceptid')),
+                ('languageid', models.ForeignKey(db_column='languageid', blank=True, to='models.DLanguages', null=True)),
+                ('valuetype', models.ForeignKey(to='models.DValuetypes', db_column='valuetype')),
             ],
             options={
-                'db_table': 'concepts"."values',
+                'db_table': 'values',
+                'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='ValueTypes',
+            name='Widgets',
             fields=[
-                ('valuetype', models.TextField(serialize=False, primary_key=True)),
-                ('category', models.TextField(null=True)),
-                ('description', models.TextField(null=True)),
-                ('namespace', models.TextField()),
-                ('datatype', models.TextField(null=True)),
+                ('widgetid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField()),
+                ('defaultlabel', models.TextField(null=True, blank=True)),
+                ('defaultmask', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'concepts"."d_valuetypes',
-            },
-        ),
-        migrations.CreateModel(
-            name='Dates',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-                ('val', models.DateTimeField()),
-            ],
-            options={
-                'db_table': 'data"."dates',
-            },
-        ),
-        migrations.CreateModel(
-            name='Domains',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-            ],
-            options={
-                'db_table': 'data"."domains',
-            },
-        ),
-        migrations.CreateModel(
-            name='Files',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-                ('val', models.FileField(upload_to=b'files')),
-            ],
-            options={
-                'db_table': 'data"."files',
-            },
-        ),
-        migrations.CreateModel(
-            name='Geometries',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-                ('val', django.contrib.gis.db.models.fields.GeometryField(srid=4326)),
-            ],
-            options={
-                'db_table': 'data"."geometries',
-            },
-        ),
-        migrations.CreateModel(
-            name='Numbers',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-                ('val', models.FloatField()),
-            ],
-            options={
-                'db_table': 'data"."numbers',
-            },
-        ),
-        migrations.CreateModel(
-            name='Strings',
-            fields=[
-                ('entityid', models.OneToOneField(primary_key=True, db_column=b'entityid', serialize=False, to='models.Entities')),
-                ('val', models.TextField()),
-            ],
-            options={
-                'db_table': 'data"."strings',
+                'db_table': 'widgets',
+                'managed': True,
             },
         ),
         migrations.AddField(
-            model_name='values',
-            name='valuetype',
-            field=models.ForeignKey(to='models.ValueTypes', db_column=b'valuetype'),
+            model_name='resourcexresource',
+            name='relationshiptype',
+            field=models.ForeignKey(to='models.Values', db_column='relationshiptype'),
         ),
         migrations.AddField(
-            model_name='relations',
-            name='entityiddomain',
-            field=models.ForeignKey(related_name='rules_entityiddomain', db_column=b'entityiddomain', to='models.Entities'),
+            model_name='resourcexresource',
+            name='resourceinstanceidfrom',
+            field=models.ForeignKey(related_name='resxres_resource_instance_ids_from', db_column='resourceinstanceidfrom', blank=True, to='models.Resourceinstances', null=True),
         ),
         migrations.AddField(
-            model_name='relations',
-            name='entityidrange',
-            field=models.ForeignKey(related_name='rules_entityidrange', db_column=b'entityidrange', to='models.Entities'),
+            model_name='resourcexresource',
+            name='resourceinstanceidto',
+            field=models.ForeignKey(related_name='resxres_resource_instance_ids_to', db_column='resourceinstanceidto', blank=True, to='models.Resourceinstances', null=True),
         ),
         migrations.AddField(
-            model_name='relations',
-            name='ruleid',
-            field=models.ForeignKey(to='models.Rules', db_column=b'ruleid'),
+            model_name='edges',
+            name='domainnodeid',
+            field=models.ForeignKey(related_name='edge_domains', db_column='domainnodeid', to='models.Nodes'),
         ),
         migrations.AddField(
-            model_name='mappingsteps',
-            name='ruleid',
-            field=models.ForeignKey(to='models.Rules', db_column=b'ruleid'),
-        ),
-        migrations.AddField(
-            model_name='entities',
-            name='entitytypeid',
-            field=models.ForeignKey(to='models.EntityTypes', db_column=b'entitytypeid'),
+            model_name='edges',
+            name='rangenodeid',
+            field=models.ForeignKey(related_name='edge_ranges', db_column='rangenodeid', to='models.Nodes'),
         ),
         migrations.AddField(
             model_name='concepts',
             name='nodetype',
-            field=models.ForeignKey(to='models.DNodetypes', db_column=b'nodetype'),
+            field=models.ForeignKey(to='models.DNodetypes', db_column='nodetype'),
         ),
         migrations.AddField(
-            model_name='conceptrelations',
-            name='conceptidfrom',
-            field=models.ForeignKey(related_name='concept_relation_from', db_column=b'conceptidfrom', to='models.Concepts'),
+            model_name='cardsxnodesxwidgets',
+            name='nodeid',
+            field=models.ForeignKey(to='models.Nodes', db_column='nodeid'),
         ),
         migrations.AddField(
-            model_name='conceptrelations',
-            name='conceptidto',
-            field=models.ForeignKey(related_name='concept_relation_to', db_column=b'conceptidto', to='models.Concepts'),
+            model_name='cardsxnodesxwidgets',
+            name='widgetid',
+            field=models.ForeignKey(to='models.Widgets', db_column='widgetid'),
         ),
         migrations.AddField(
-            model_name='conceptrelations',
-            name='relationtype',
-            field=models.ForeignKey(related_name='concept_relation_type', db_column=b'relationtype', to='models.DRelationtypes'),
+            model_name='cardgroups',
+            name='nodeid',
+            field=models.ForeignKey(db_column='nodeid', blank=True, to='models.Nodes', null=True),
         ),
         migrations.AlterUniqueTogether(
-            name='mappingsteps',
-            unique_together=set([('mappingid', 'ruleid', 'order')]),
+            name='resourceclassesxforms',
+            unique_together=set([('resourceclassid', 'formid')]),
         ),
-        migrations.AddField(
-            model_name='domains',
-            name='val',
-            field=models.ForeignKey(db_column=b'val', to='models.Values', null=True),
+        migrations.AlterUniqueTogether(
+            name='formsxcardgroups',
+            unique_together=set([('formid', 'cardgroupid')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='edges',
+            unique_together=set([('rangenodeid', 'domainnodeid')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='cardsxnodesxwidgets',
+            unique_together=set([('nodeid', 'cardid', 'widgetid')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='cardsxcardgroups',
+            unique_together=set([('cardgroupid', 'cardid')]),
         ),
 
+        CreateAutoPopulateUUIDField('branchmetadata', ['branchmetadataid']),
+        CreateAutoPopulateUUIDField('cardgroups', ['cardgroupid']),
+        CreateAutoPopulateUUIDField('cards', ['cardid']),
+        CreateAutoPopulateUUIDField('classes', ['classid']),
+        CreateAutoPopulateUUIDField('concepts', ['conceptid']),
+        CreateAutoPopulateUUIDField('edges', ['edgeid']),
+        CreateAutoPopulateUUIDField('edit_log', ['editlogid']),
+        CreateAutoPopulateUUIDField('forms', ['formid']),
+        CreateAutoPopulateUUIDField('nodegroups', ['nodegroupid']),
+        CreateAutoPopulateUUIDField('nodes', ['nodeid']),
+        CreateAutoPopulateUUIDField('properties', ['propertyid']),
+        CreateAutoPopulateUUIDField('relations', ['relationid']),
+        CreateAutoPopulateUUIDField('resource2resource_constraints', ['resource2resourceid']),
+        CreateAutoPopulateUUIDField('resourceinstances', ['resourceinstanceid']),
+        CreateAutoPopulateUUIDField('tileinstances', ['tileinstanceid']),
+        CreateAutoPopulateUUIDField('values', ['valueid']),
+        CreateAutoPopulateUUIDField('widgets', ['widgetid']),
+
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
-        migrations.RunSQL("SET search_path TO " + settings.DATABASES['default']['SCHEMAS'], ''),
-        
         migrations.RunPython(forwards_func, reverse_func),
     ]
