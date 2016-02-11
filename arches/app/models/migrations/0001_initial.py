@@ -56,9 +56,93 @@ class Migration(migrations.Migration):
 
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'install', 'dependencies', 'postgis_backward_compatibility.sql')), ''),
 
-        CreateFunction(name="get_conceptid", body="v_return = (select a.conceptid from concepts a, values b where 1=1 and b.valuetype = 'prefLabel' and b.value = p_label and b.conceptid = a.conceptid LIMIT 1); Return v_return;", returntype="uuid", arguments=["p_label text"], declarations=["v_return text"], language="plpgsql"),
-        CreateFunction(name="insert_concept", body="INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES (v_conceptid, p_nodetype, p_legacyid); IF trim(p_label) is not null and p_label<>'' then INSERT INTO values (valueid, conceptid, valuetype, value, languageid) VALUES (v_valueid, v_conceptid, 'prefLabel', trim(initcap(p_label)), v_languageid); END IF; IF trim(p_note) is not null and p_note <> '' then INSERT INTO values (valueid, conceptid, valuetype, value, languageid) VALUES (v_valueid, v_conceptid, 'scopeNote', p_note, v_languageid); END IF; return v_conceptid;", returntype="uuid", arguments=["p_label text, p_note text, p_languageid text, p_legacyid text, p_nodetype text"], declarations=["v_conceptid uuid = public.uuid_generate_v1mc();", "v_valueid uuid = public.uuid_generate_v1mc();", "v_languageid text = p_languageid;"], language="plpgsql"),
-        CreateFunction(name="insert_relation", body="v_conceptidfrom = (select conceptid from concepts c where trim(legacyoid) = trim(p_legacyid1)); v_conceptidto = (select conceptid from concepts c where trim(legacyoid) = trim(p_legacyid2)); IF v_conceptidfrom is not null and v_conceptidto is not null and v_conceptidto <> v_conceptidfrom and v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM relations) then INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype); return 'success!'; ELSE return 'fail! no relation inserted.'; END IF;", returntype="text", arguments=["p_legacyid1 text", "p_relationtype text", "p_legacyid2 text"], declarations=["v_conceptidfrom uuid = null;", "v_conceptidto uuid = null;"], language="plpgsql"),
+        CreateFunction(
+           name='insert_relation',
+           arguments=[
+               'p_label text'
+           ],
+           declarations=[
+               'v_conceptidfrom uuid = null;',
+               'v_conceptidto uuid = null;'
+           ],
+           language='plpgsql',
+           body='''
+               v_conceptidfrom = 
+                    (select conceptid from concepts c 
+                    where trim(legacyoid) = trim(p_legacyid1)); 
+
+                v_conceptidto = (select conceptid from concepts c 
+                    where trim(legacyoid) = trim(p_legacyid2)); 
+
+                IF v_conceptidfrom is not null and v_conceptidto is not null and 
+                   v_conceptidto <> v_conceptidfrom and 
+                   v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM relations) then 
+                            INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype); 
+                            return 'success!'; 
+
+                ELSE return 'fail! no relation inserted.'; 
+
+                END IF;
+           ''',
+           returntype='text'
+       ),
+
+        CreateFunction(
+           name='get_conceptid',
+           arguments=[
+               'p_label text'
+           ],
+           declarations=[
+               'v_return text;',
+           ],
+           language='plpgsql',
+           body='''
+               v_return = 
+                    (select a.conceptid from concepts a, values b 
+                    where 1=1 and 
+                    b.valuetype = 'prefLabel' and 
+                    b.value = p_label and 
+                    b.conceptid = a.conceptid LIMIT 1); 
+
+                    return v_return;
+           ''',
+           returntype='uuid'
+       ),
+
+        CreateFunction(
+           name='insert_concept',
+           arguments=[
+               'p_label text',
+               'p_note text',
+               'p_languageid text',
+               'p_legacyid text',
+               'p_nodetype text'
+           ],
+           declarations=[
+               'v_conceptid uuid = public.uuid_generate_v1mc();',
+               'v_valueid uuid = public.uuid_generate_v1mc();',
+               'v_languageid text = p_languageid;',
+           ],
+           language='plpgsql',
+           body='''
+               INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES (v_conceptid, p_nodetype, p_legacyid);
+
+               IF trim(p_label) is not null and p_label<>'' then
+                 INSERT INTO values (valueid, conceptid, valuetype, value, languageid)
+                 VALUES (v_valueid, v_conceptid, 'prefLabel', trim(initcap(p_label)), v_languageid);
+               END IF;
+
+               IF trim(p_note) is not null and p_note <> '' then 
+                 INSERT INTO values (valueid, conceptid, valuetype, value, languageid)
+                 VALUES (v_valueid, v_conceptid, 'scopeNote', p_note, v_languageid);
+               END IF;  
+
+               return v_conceptid;
+           ''',
+           returntype='uuid'
+       ),
+
+
 
         migrations.CreateModel(
             name='Addresses',

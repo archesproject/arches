@@ -25,7 +25,6 @@ from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from arches.app.models import models
-from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
