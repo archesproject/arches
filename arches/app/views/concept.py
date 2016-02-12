@@ -18,12 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from django.conf import settings
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
-from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
@@ -55,14 +54,14 @@ def rdm(request, conceptid):
     for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
         concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
-    return render_to_response('rdm.htm', {
+    return render(request, 'rdm.htm', {
             'main_script': 'rdm',
             'active_page': 'RDM',
             'languages': languages,
             'conceptid': conceptid,
             'concept_schemes': concept_schemes,
             'CORE_CONCEPTS': CORE_CONCEPTS
-        }, context_instance=RequestContext(request))
+        })
 
 
 
@@ -85,14 +84,14 @@ def concept(request, conceptid):
         if f == 'html':
             depth_limit = 1
             if not conceptid:
-                return render_to_response('views/rdm/concept-report.htm', {
+                return render(request, 'views/rdm/concept-report.htm', {
                     'lang': lang,
                     'concept_count': models.Concepts.objects.filter(nodetype='Concept').count(),
                     'collection_count': models.Concepts.objects.filter(nodetype='Collection').count(),
                     'scheme_count': models.Concepts.objects.filter(nodetype='ConceptScheme').count(),
                     'entitytype_count': models.Concepts.objects.filter(nodetype='EntityType').count(),
                     'default_report': True
-                }, context_instance=RequestContext(request))
+                })
 
         ret = []
         labels = []
@@ -125,7 +124,7 @@ def concept(request, conceptid):
                     parent_relations = relationtypes.filter(category='Properties')
                 else:
                     parent_relations = relationtypes.filter(category='Semantic Relations').exclude(relationtype = 'related').exclude(relationtype='broader').exclude(relationtype='broaderTransitive')
-                return render_to_response('views/rdm/concept-report.htm', {
+                return render(request, 'views/rdm/concept-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
                     'labels': labels,
@@ -140,9 +139,9 @@ def concept(request, conceptid):
                     'concept_paths': concept_graph.get_paths(lang=lang),
                     'graph_json': JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
                     'direct_parents': [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts]
-                }, context_instance=RequestContext(request))
+                })
             else:
-                return render_to_response('views/rdm/entitytype-report.htm', {
+                return render(request, 'views/rdm/entitytype-report.htm', {
                     'lang': lang,
                     'prefLabel': prefLabel,
                     'labels': labels,
@@ -153,7 +152,7 @@ def concept(request, conceptid):
                     'valuetype_related_values': valuetypes.filter(category='undefined'),
                     'related_relations': relationtypes.filter(relationtype = 'member'),
                     'concept_paths': concept_graph.get_paths(lang=lang)
-                }, context_instance=RequestContext(request))
+                })
 
 
         concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts, 

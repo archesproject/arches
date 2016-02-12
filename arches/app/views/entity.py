@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.conf import settings
 from django.http import HttpResponse
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from arches.app.models.entity import Entity
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -66,7 +66,7 @@ def EntityTypes(request, entitytypeid):
         return HttpResponse(JSONSerializer().serialize({}, ensure_ascii=True, indent=4))
     else:
         if request.GET.get('f') is None:
-            return render_to_response('graph.htm', {}, context_instance=RequestContext(request))
+            return render(request, 'graph.htm', {})
         else:
             entityschema = {entitytypeid: Entity.get_mapping_schema(entitytypeid)}            
             if request.GET.get('f') == 'json':

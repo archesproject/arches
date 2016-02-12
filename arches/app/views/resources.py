@@ -17,8 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
-from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import permission_required
 from django.conf import settings
@@ -81,24 +80,23 @@ def resource_manager(request, resourcetypeid='', form_id='default', resourceid='
         if form != None:
             lang = request.GET.get('lang', settings.LANGUAGE_CODE)
             form.load(lang)
-            return render_to_response('resource-manager.htm', {
-                    'form': form,
-                    'formdata': JSONSerializer().serialize(form.data),
-                    'form_template': 'views/forms/' + form_id + '.htm',
-                    'form_id': form_id,
-                    'resourcetypeid': resourcetypeid,
-                    'resourceid': resourceid,
-                    'main_script': 'resource-manager',
-                    'active_page': 'ResourceManger',
-                    'resource': resource,
-                    'resource_name': resource.get_primary_name(),
-                    'resource_type_name': resource.get_type_name(),
-                    'form_groups': resource.form_groups,
-                    'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
-                    'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
-                    'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
-                },
-                context_instance=RequestContext(request))
+            return render(request, 'resource-manager.htm', {
+                'form': form,
+                'formdata': JSONSerializer().serialize(form.data),
+                'form_template': 'views/forms/' + form_id + '.htm',
+                'form_id': form_id,
+                'resourcetypeid': resourcetypeid,
+                'resourceid': resourceid,
+                'main_script': 'resource-manager',
+                'active_page': 'ResourceManger',
+                'resource': resource,
+                'resource_name': resource.get_primary_name(),
+                'resource_type_name': resource.get_type_name(),
+                'form_groups': resource.form_groups,
+                'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
+                'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
+                'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
+            })
         else:
             return HttpResponseNotFound('<h1>Arches form not found.</h1>')
 
