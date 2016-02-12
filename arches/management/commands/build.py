@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 """This module contains commands for building Arches."""
-from optparse import make_option
+
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from django.conf import settings
@@ -25,11 +25,11 @@ from django.conf import settings
 class Command(BaseCommand):
     """A general command used in compiling all the required static data files and js file in Arches."""
     
-    option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='collectstatic',
-            type='choice', choices=['collectstatic'],
-            help='Operation Type; collectstatic=Alias for the collectstatic command provided by django'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-o', '--operation', action='store', dest='operation', 
+            default='collectstatic',choices=['collectstatic'],
+            help='Operation Type; collectstatic=Alias for the collectstatic command provided by django')
+    
     
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']

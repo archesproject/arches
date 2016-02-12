@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.apps import apps
@@ -30,10 +29,9 @@ class Command(BaseCommand):
 
     """
     
-    option_list = BaseCommand.option_list + (
-        make_option('-s', '--source', action='store', dest='source', default='',
-            help='A self executing python file.'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-s', '--source', action='store', dest='source', default='',
+            help='A self executing python file.')
 
     def handle(self, *args, **options):
         self.run_patch_file(options['source'])
