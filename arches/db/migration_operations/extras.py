@@ -67,7 +67,6 @@ class CreateFunction(Operation):
             'declarations': ';\n\t\t'.join(self.declarations) + ';', 'language': self.language, 
             'body': self.body, 'returntype': self.returntype}
         sql = sql.replace(';;', ';')
-        print sql
 
         schema_editor.execute(sql)
 
