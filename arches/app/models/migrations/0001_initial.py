@@ -59,7 +59,9 @@ class Migration(migrations.Migration):
         CreateFunction(
            name='insert_relation',
            arguments=[
-               'p_label text'
+               'p_label text',
+               'p_relationtype text', 
+               'p_legacyid2 text'
            ],
            declarations=[
                'v_conceptidfrom uuid = null;',
