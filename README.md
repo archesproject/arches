@@ -10,8 +10,6 @@ The Arches Installation Guide and Arches User Guide are available [here](http://
 
 ## System Requirements
 
-There are a few things to know about Arches before we get started.
-
 Please note that Arches has been developed for modern browsers. It supports:
 
 * Firefox
@@ -36,6 +34,7 @@ These instructions will provide some guidance on installing
 the required dependencies and getting Arches up and running quickly:
 
 http://arches3.readthedocs.org/en/latest/installing-dependencies-linux/
+
 http://arches3.readthedocs.org/en/latest/installing-dependencies-windows/
 
 ## Installing Arches
@@ -67,11 +66,11 @@ If you have installed the dependencies, you're ready to install Arches.
 
         * On Linux (and other POSIX systems):
 
-                `$ source ENV/bin/activate`
+                $ source ENV/bin/activate
 
         * On Windows:
 
-                `\path to 'Projects'\ENV\Scripts\activate`
+                \path to 'Projects'\ENV\Scripts\activate
 
     * You should see the name of your virtual environment in parentheses proceeding your command prompt like so `(ENV)`:
 
@@ -93,7 +92,7 @@ That's it, you're done.  You should now have a folder structure that looks like 
 Generally arches applications are installed in a folder directly under the Arches root folder.  You can install as many Arches applications as you like, and they'll all use the same Arches framework and virtual environment.  A typical Arches application installation will therefore look something like this::
 
     /Projects
-        /ENV (virtual environment where the Arches frameowrk is installed)
+        /ENV (virtual environment where the Arches framework is installed)
         /my_arches_app
         /another_arches_app
 
