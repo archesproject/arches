@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-from optparse import make_option
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -41,26 +40,30 @@ class Command(BaseCommand):
     Commands for managing the loading and running of packages in Arches
 
     """
-    
-    option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
+
+    def add_arguments(self, parser):
+        parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
+            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
-            '\'livereload\'=Starts livereload for this package on port 35729'),
-        make_option('-s', '--source', action='store', dest='source', default='',
-            help='Directory containing a .arches or .shp file containing resource records'),
-        make_option('-f', '--format', action='store', dest='format', default='arches',
-            help='Format: shp or arches'),
-        make_option('-l', '--load_id', action='store', dest='load_id',
-            help='Text string identifying the resources in the data load you want to delete.'),
-        make_option('-d', '--dest_dir', action='store', dest='dest_dir',
-            help='Directory where you want to save exported files.'),
-    )
+            '\'livereload\'=Starts livereload for this package on port 35729')
+        
+        parser.add_argument('-s', '--source', action='store', dest='source', default='',
+            help='Directory containing a .arches or .shp file containing resource records')
+        
+        parser.add_argument('-f', '--format', action='store', dest='format', default='arches',
+            help='Format: shp or arches')
+        
+        parser.add_argument('-l', '--load_id', action='store', dest='load_id',
+            help='Text string identifying the resources in the data load you want to delete.')
+        
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
+            help='Directory where you want to save exported files.')
+    
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -123,7 +126,6 @@ class Command(BaseCommand):
         """
 
         install = import_string('%s.setup.install' % package_name)
-        # install = getattr(module, 'install')
         install() 
 
     def setup_elasticsearch(self, package_name, port=9200):
@@ -271,8 +273,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_string('%s.setup' % package_name)
-        load = getattr(module, 'load_resources')
+        load = import_string('%s.setup.load_resources' % package_name)
         load(data_source) 
 
     def remove_resources(self, load_id):
@@ -288,8 +289,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_string('%s.setup' % package_name)
-        load = getattr(module, 'load_authority_files')
+        load = import_string('%s.setup.load_authority_files' % package_name)
         load(data_source) 
 
     def index_database(self, package_name):
