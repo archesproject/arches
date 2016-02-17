@@ -35,12 +35,12 @@ urlpatterns = [
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , concept.rdm, name='rdm'),
     url(r'^map', map.get_page, name="map"),
     url(r'^geocoder', search.geocode, name="geocoder"),
-    
+
     url(r'^entities/(?P<entityid>%s)$' % uuid_regex , entity.Entities),
-    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),        
-    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),     
+    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
+    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, concept.confirm_delete, name="confirm_delete"),
     url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , concept.concept, name="concept"),
-    url(r'^concepts/tree$', concept.concept_tree, name="concept_tree"),      
+    url(r'^concepts/tree$', concept.concept_tree, name="concept_tree"),
     url(r'^concepts/search$', concept.search, name="concept_search"),
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
@@ -62,6 +62,9 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', admin.site.urls),
+
+    # Working on configmanager
+    url(r'^configmanager.htm', 'arches.app.views.config.index'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
