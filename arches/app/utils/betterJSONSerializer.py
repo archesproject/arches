@@ -3,6 +3,7 @@ import decimal
 import types
 import json
 import inspect
+import uuid
 from io import StringIO
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import Model
@@ -14,6 +15,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+
 
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
@@ -52,6 +54,11 @@ class JSONSerializer(object):
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
 
+        # prevent raw strings from begin re-encoded
+        # this is especially important when doing bulk operations in elasticsearch
+        if (isinstance(obj, basestring)):
+            return obj
+        
         ret = self.handle_object(obj)
 
         return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())
@@ -102,6 +109,8 @@ class JSONSerializer(object):
             return getattr(object, self.geom_format)
         elif isinstance(object, File):
             return object.name
+        elif isinstance(object, uuid.UUID):
+            return str(object)
         elif hasattr(object, '__dict__'):
             return self.handle_dictionary(object.__dict__)
         else:
@@ -113,7 +122,7 @@ class JSONSerializer(object):
         for key, value in d.iteritems():
             try:
                 #print key + ': ' + str(type(value))
-                obj[key] = self.handle_object(value)
+                obj[str(key)] = self.handle_object(value)
             except(UnableToSerializeMethodTypesError):
                 pass
 

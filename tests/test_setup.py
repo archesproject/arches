@@ -15,7 +15,6 @@ from arches.app.models.resource import Resource
 def install(path_to_source_data_dir=None):
     #truncate_db()
 
-    execute_sql("Truncate ontology.mappings Cascade;")
     execute_sql("Truncate public.auth_permission Cascade;")
 
     for concept in models.Concepts.objects.filter(nodetype='Concept'):

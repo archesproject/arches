@@ -18,14 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import date
 from django.conf import settings
-from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.core.paginator import Paginator
-from django.utils.importlib import import_module
+from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Max, Min
 from arches.app.models import models
-from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -42,20 +40,17 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-geocoder = import_module(settings.GEOCODING_PROVIDER)
-
 def home_page(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     min_max_dates = models.Dates.objects.aggregate(Min('val'), Max('val'))
-    return render_to_response('search.htm', {
-            'main_script': 'search',
-            'active_page': 'Search',
-            'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
-            'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
-            'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
-        }, 
-        context_instance=RequestContext(request))
-        
+    return render(request, 'search.htm', {
+        'main_script': 'search',
+        'active_page': 'Search',
+        'min_date': min_max_dates['val__min'].year if min_max_dates['val__min'] != None else 0,
+        'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
+        'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
+    })
+    
 def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     
@@ -238,10 +233,17 @@ def get_paginator(results, total_count, page, count_per_page, all_ids):
         if len(after) > ct_after:
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
-    return render_to_response('pagination.htm', {'pages': pages, 'page_obj': paginator.page(page), 'results': JSONSerializer().serialize(results), 'all_ids': JSONSerializer().serialize(all_ids)})
+        
+    return render(request, 'pagination.htm', {
+        'pages': pages, 
+        'page_obj': paginator.page(page), 
+        'results': JSONSerializer().serialize(results), 
+        'all_ids': JSONSerializer().serialize(all_ids)
+    })
 
 def geocode(request):
-    search_string = request.GET.get('q', '')    
+    geocoder = apps.import_string(settings.GEOCODING_PROVIDER)  
+    search_string = request.GET.get('q', '')  
     return JSONResponse({ 'results': geocoder.find_candidates(search_string) })
 
 def export_results(request):

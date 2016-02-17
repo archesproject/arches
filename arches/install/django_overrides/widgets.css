@@ -54,8 +54,8 @@
 .selector ul.selector-chooser {
     float: left;
     width: 22px;
-    height: 50px;
-    background: url(../img/chooser-bg.gif) top center no-repeat;
+    background-color: #eee;
+    border-radius: 10px;
     margin: 10em 5px 0 5px;
     padding: 0;
 }
@@ -168,8 +168,9 @@ a.active.selector-clearall {
 .stacked ul.selector-chooser {
     height: 22px;
     width: 50px;
-    margin: 0 0 3px 50%;
-    background: url(../img/chooser_stacked-bg.gif) top center no-repeat;
+    margin: 0 0 3px 40%;
+    background-color: #eee;
+    border-radius: 10px;
 }
 
 .stacked .selector-chooser li {
@@ -576,3 +577,16 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
     border-top: 1px solid #ddd;
 }
 
+/* RELATED WIDGET WRAPPER */
+.related-widget-wrapper {
+    float: left;       /* display properly in form rows with multiple fields */
+    overflow: hidden;  /* clear floated contents */
+}
+
+.related-widget-wrapper-link {
+    opacity: 0.3;
+}
+
+.related-widget-wrapper-link:link {
+    opacity: 1;
+}

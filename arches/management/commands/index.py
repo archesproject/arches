@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import sys
-from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
 import arches.app.models.models as archesmodels
@@ -31,17 +30,17 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 class Command(BaseCommand):
     """A general command used index Arches data into Elasticsearch."""
 
-    option_list = BaseCommand.option_list + (
-        make_option('-d', '--delete', action='store', dest='delete', default='',
-            type='choice', choices=['all', 'maplayers', 'entity', 'term', 'concept', ''],
+    def add_arguments(self, parser):
+        parser.add_argument('-d', '--delete', action='store', dest='delete', default='',
+            choices=['all', 'maplayers', 'entity', 'term', 'concept', ''],
             help='Delete Type; all=Deletes the "maplayers, entity, term, and concept" indexes from Elasticsearch, ' +
             '\'maplayers\'=Deletes just the maplayers index, ' + 
             '\'entity\'=Deletes just the entity index, ' +
-            '\'term\'=Deletes just the term index, '),
+            '\'term\'=Deletes just the term index, ')
 
-        make_option('-i', '--index', action='store', dest='index', default='',
-            type='choice', choices=['concept', ''],
-            help='Index Type; concept=Indexes just the concepts, '),
+        parser.add_argument('-i', '--index', action='store', dest='index', default='',
+            choices=['concept', ''],
+            help='Index Type; concept=Indexes just the concepts, ')
     )
     
     def handle(self, *args, **options):

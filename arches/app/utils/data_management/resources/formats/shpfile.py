@@ -7,8 +7,8 @@ from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiLineString
 from django.contrib.gis.geos import MultiPolygon
 from arches.app.models.models import Concepts
-from arches.app.models.models import VwConcepts
-from arches.app.models.models import EntityTypes
+# from arches.app.models.models import VwConcepts
+# from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from format import Writer
 import datetime

@@ -22,12 +22,18 @@ import logging
 from django.conf import settings
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class SearchEngine(object):
 
     def __init__(self):
-        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
+        # 
+        serializer = JSONSerializer()
+        serializer.mimetype = 'application/json'
+        serializer.dumps = serializer.serialize
+        serializer.loads = JSONDeserializer().deserialize
+        self.es = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS, serializer=serializer, **settings.ELASTICSEARCH_CONNECTION_OPTIONS)
         self.logger = logging.getLogger(__name__)
 
     def delete(self, **kwargs):
@@ -38,10 +44,16 @@ class SearchEngine(object):
 
         """
 
-        body = kwargs.get('body', None)
+        body = kwargs.pop('body', None)
         if body != None:
             try:
-                return self.es.delete_by_query(ignore=[404], **kwargs)
+                data = []
+                refresh = kwargs.pop('refresh', False)
+                for hit in helpers.scan(self.es, query=body, **kwargs):
+                    hit['_op_type'] = 'delete'
+                    data.append(hit)
+
+                return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
             except Exception as detail:
                 self.logger.warning('%s: WARNING: failed to delete document by query: %s \nException detail: %s\n' % (datetime.now(), body, detail))
                 raise detail   
@@ -169,7 +181,7 @@ class SearchEngine(object):
                     else:
                         self.delete(index='term', doc_type='value', id=document['_id'])
 
-    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex='analyzed', body=None):
+    def create_mapping(self, index, doc_type, fieldname='', fieldtype='string', fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
@@ -184,11 +196,14 @@ class SearchEngine(object):
                         }
                     }
                 } 
-            else:           
+            else:
+                fn = { 'type' : fieldtype }
+                if fieldindex:
+                    fn['index'] = fieldindex
                 body =  { 
                     doc_type : {
                         'properties' : {
-                            fieldname : { 'type' : fieldtype, 'index' : fieldindex }
+                            fieldname : fn
                         }
                     }
                 }

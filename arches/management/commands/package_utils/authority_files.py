@@ -205,8 +205,8 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
     # insert the concept relations
     for relation in lookups.concept_relationships:
         sql = """
-            INSERT INTO concepts.relations(conceptidfrom, conceptidto, relationtype)
-            VALUES ('%s', '%s', '%s');
+            INSERT INTO concepts.relations(relationid, conceptidfrom, conceptidto, relationtype)
+            VALUES (public.uuid_generate_v1mc(), '%s', '%s', '%s');
         """%(relation['source'], relation['target'], relation['type'])
         #print sql
         try:

@@ -107,8 +107,8 @@ class Query(Dsl):
         #print self
         return self.se.search(index=index, doc_type=doc_type, body=self.dsl)
 
-    def delete(self, index=''):
-        return self.se.delete(index=index, body=self.dsl)
+    def delete(self, index='', **kwargs):
+        return self.se.delete(index=index, body=self.dsl, **kwargs)
 
     def prepare(self):
         self.dsl['from'] = self.start

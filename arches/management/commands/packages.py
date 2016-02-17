@@ -18,13 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-from optparse import make_option
+from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_string
 import os, sys, subprocess
 from arches.setup import get_elasticsearch_download_url, download_elasticsearch, unzip_file
-from arches.db.install import truncate_db, install_db
+from arches.db.install import truncate_db
 from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
@@ -40,26 +40,30 @@ class Command(BaseCommand):
     Commands for managing the loading and running of packages in Arches
 
     """
-    
-    option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='setup',
-            type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
+
+    def add_arguments(self, parser):
+        parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
+            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
             '\'install\'=Runs the setup file defined in your package root' + 
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
-            '\'livereload\'=Starts livereload for this package on port 35729'),
-        make_option('-s', '--source', action='store', dest='source', default='',
-            help='Directory containing a .arches or .shp file containing resource records'),
-        make_option('-f', '--format', action='store', dest='format', default='arches',
-            help='Format: shp or arches'),
-        make_option('-l', '--load_id', action='store', dest='load_id',
-            help='Text string identifying the resources in the data load you want to delete.'),
-        make_option('-d', '--dest_dir', action='store', dest='dest_dir',
-            help='Directory where you want to save exported files.'),
-    )
+            '\'livereload\'=Starts livereload for this package on port 35729')
+        
+        parser.add_argument('-s', '--source', action='store', dest='source', default='',
+            help='Directory containing a .arches or .shp file containing resource records')
+        
+        parser.add_argument('-f', '--format', action='store', dest='format', default='arches',
+            help='Format: shp or arches')
+        
+        parser.add_argument('-l', '--load_id', action='store', dest='load_id',
+            help='Text string identifying the resources in the data load you want to delete.')
+        
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
+            help='Directory where you want to save exported files.')
+    
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
@@ -121,8 +125,7 @@ class Command(BaseCommand):
 
         """
 
-        module = import_module('%s.setup' % package_name)
-        install = getattr(module, 'install')
+        install = import_string('%s.setup.install' % package_name)
         install() 
 
     def setup_elasticsearch(self, package_name, port=9200):
@@ -139,10 +142,8 @@ class Command(BaseCommand):
         url = get_elasticsearch_download_url(os.path.join(settings.ROOT_DIR, 'install'))
         file_name = url.split('/')[-1]
 
-        try:
-            unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
-        except:
-            download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
+        download_elasticsearch(os.path.join(settings.ROOT_DIR, 'install'))
+        unzip_file(os.path.join(settings.ROOT_DIR, 'install', file_name), install_root)
 
         es_config_directory = os.path.join(install_location, 'config')
         try:
@@ -163,11 +164,11 @@ class Command(BaseCommand):
 
         # install plugin
         if sys.platform == 'win32':
-            os.system("call %s --install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
+            os.system("call %s install mobz/elasticsearch-head" % (os.path.join(install_location, 'bin', 'plugin.bat')))
         else:
             os.chdir(os.path.join(install_location, 'bin'))
             os.system("chmod u+x plugin")
-            os.system("./plugin -install mobz/elasticsearch-head")
+            os.system("./plugin install mobz/elasticsearch-head")
             os.system("chmod u+x elasticsearch")
 
     def start_elasticsearch(self, package_name):
@@ -198,19 +199,14 @@ class Command(BaseCommand):
         """
 
         db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
-        install_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'install_db.sql')  
+        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')  
         db_settings['truncate_path'] = truncate_path
-        db_settings['install_path'] = install_path   
         
         truncate_db.create_sqlfile(db_settings, truncate_path)
-        install_db.create_sqlfile(db_settings, install_path)
         
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-        os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d %(NAME)s -f "%(install_path)s"' % db_settings)
-
-        self.create_groups()
-        self.create_users()
+        
+        management.call_command('migrate') 
 
     def generate_procfile(self, package_name):
         """
@@ -243,32 +239,6 @@ class Command(BaseCommand):
         package_root = settings.PACKAGE_ROOT
         return os.path.join(package_root, 'elasticsearch', file_name_wo_extention)
 
-    def create_groups(self):
-        """
-        Creates read and edit groups.
-        """
-
-        from django.contrib.auth.models import User, Group
-
-        edit_group = Group.objects.create(name='edit')
-        read_group = Group.objects.create(name='read')
-
-    def create_users(self):
-        """
-        Creates anonymous user and adds anonymous and admin user to appropriate groups.
-        """
-
-        from django.contrib.auth.models import User, Group
-
-        anonymous_user = User.objects.create_user('anonymous', '', '')
-        read_group = Group.objects.get(name='read')
-        anonymous_user.groups.add(read_group)
-
-        edit_group = Group.objects.get(name='edit')
-        admin_user = User.objects.get(username='admin')
-        admin_user.groups.add(edit_group)
-        admin_user.groups.add(read_group)
-
     def build_permissions(self):
         """
         Creates permissions based on all the installed resource types
@@ -291,7 +261,7 @@ class Command(BaseCommand):
 
         for resourcetype in resourcetypes:
             for entitytype in resourcetypes[resourcetype]:
-                content_type = ContentType.objects.get_or_create(name='Arches', app_label=resourcetype, model=entitytype)
+                content_type = ContentType.objects.get_or_create(app_label=resourcetype, model=entitytype)
                 Permission.objects.create(codename='add_%s' % entitytype, name='%s - add' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='update_%s' % entitytype, name='%s - update' % entitytype , content_type=content_type[0])
                 Permission.objects.create(codename='read_%s' % entitytype, name='%s - read' % entitytype , content_type=content_type[0])
@@ -303,8 +273,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_module('%s.setup' % package_name)
-        load = getattr(module, 'load_resources')
+        load = import_string('%s.setup.load_resources' % package_name)
         load(data_source) 
 
     def remove_resources(self, load_id):
@@ -320,8 +289,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        module = import_module('%s.setup' % package_name)
-        load = getattr(module, 'load_authority_files')
+        load = import_string('%s.setup.load_authority_files' % package_name)
         load(data_source) 
 
     def index_database(self, package_name):

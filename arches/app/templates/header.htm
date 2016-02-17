@@ -63,7 +63,7 @@
                 <ul class="nav navbar-nav">
                     
                     <!-- Home -->
-                    <li class="{% if active_page = 'Home' %}active{% endif %}">
+                    <li class="{% if active_page == 'Home' %}active{% endif %}">
                         <a href="{% url 'home' %}">
                             {% trans "Home" %}
                         </a>
@@ -71,7 +71,7 @@
                     <!-- End Home -->
 
                     <!-- New Search-->
-                    <li class="{% if active_page = 'Search' %}active{% endif %}">
+                    <li class="{% if active_page == 'Search' %}active{% endif %}">
                         <a href="{% url 'search_home' %}">
                             {% trans "Search" %}
                         </a>
@@ -79,7 +79,7 @@
                     <!-- End Search-->
 
                     <!-- Map-->
-                    <li class="{% if active_page = 'Map' %}active{% endif %}">
+                    <li class="{% if active_page == 'Map' %}active{% endif %}">
                         <a href="{% url 'map' %}">
                             {% trans "Map View" %}
                         </a>
@@ -88,7 +88,7 @@
 
                     {% if 'edit' in user.user_groups %}
                     <!-- Resource Editor-->
-                    <li class="dropdown {% if active_page = 'ResourceManger' %}active{% endif %}">
+                    <li class="dropdown {% if active_page == 'ResourceManger' %}active{% endif %}">
                         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                             {% trans "Resource Manager" %}
                         </a>
@@ -101,7 +101,7 @@
                     <!-- End Resource Editor -->
 
                      <!-- RDM-->
-                    <li class="{% if active_page = 'RDM' %}active{% endif %}">
+                    <li class="{% if active_page == 'RDM' %}active{% endif %}">
                         <a href="{% url 'rdm' '' %}">
                             {% trans "RDM" %}
                         </a>
