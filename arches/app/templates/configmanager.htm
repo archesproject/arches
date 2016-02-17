@@ -1,0 +1,877 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}Arches v4 | Configuration Manager{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+<!-- Nifty Stylesheet [ REQUIRED ]-->
+<link rel="stylesheet" href="{% static 'css/nifty.min.css' %}">
+
+<!--Switchery [ OPTIONAL ]-->
+<!-- <link href="plugins/switchery/switchery.min.css" rel="stylesheet"> -->
+
+<!--Bootstrap Select [ OPTIONAL ]-->
+<!-- <link href="plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet"> -->
+
+ <!--Chosen [ OPTIONAL ]-->
+<!-- <link href="plugins/chosen/chosen.min.css" rel="stylesheet"> -->
+
+<!--Bootstrap Table [ OPTIONAL ]-->
+<!-- <link href="plugins/datatables/media/css/dataTables.bootstrap.css" rel="stylesheet">
+<link href="plugins/datatables/extensions/Responsive/css/dataTables.responsive.css" rel="stylesheet"> -->
+
+<!--Demo [ DEMONSTRATION ]-->
+<!-- <link href="css/demo/nifty-demo.min.css" rel="stylesheet"> -->
+
+<!-- Select2 -->
+<!-- <link href="plugins/select2/css/select2.min.css" rel="stylesheet" /> -->
+
+<!-- Arches CSS -->
+<link rel="stylesheet" href="{% static 'css/cards_1_0_0.css' %}">
+<link href="{% static 'css/app_configuration.css' %}" rel="stylesheet">
+{% endblock css %}
+
+{% block header %}
+<div id="container" class="effect mainnav-sm aside-in aside-left aside-bright navbar-fixed">
+  <header id="navbar" style="z-index: 1000; opacity: .9;">
+
+
+      <!--Brand logo & name-->
+      <div class="navbar-header">
+        <a href="index.html" class="navbar-brand">
+          <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+          <div class="brand-title">
+            <span class="brand-text">Arches</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="navbar-content clearfix">
+        <ul class="nav navbar-top-links pull-left">
+
+          <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
+            <a class="mainnav-toggle" href="#">
+              <i class="fa fa-navicon fa-lg"></i>
+            </a>
+          </li>
+
+          <li class="hidden-xs">
+            <a id="toggle-aside" class="" href="#">
+              <i id="toggle-aside-icon" class="fa fa-toggle-on fa-lg"></i>
+            </a>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <i class="fa fa-envelope fa-lg"></i>
+              <span class="badge badge-header badge-warning">9</span>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-md with-arrow">
+              <div class="pad-all bord-btm">
+                <p class="text-lg text-muted text-thin mar-no">You have 3 messages.</p>
+              </div>
+              <div class="nano scrollable">
+                <div class="nano-content">
+                  <ul class="head-list">
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av2.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Andy sent you a message</div>
+                          <small class="text-muted">15 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av4.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Lucy sent you a message</div>
+                          <small class="text-muted">30 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av3.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Jackson sent you a message</div>
+                          <small class="text-muted">40 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av6.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Donna sent you a message</div>
+                          <small class="text-muted">5 hours ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av4.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Lucy sent you a message</div>
+                          <small class="text-muted">Yesterday</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <img src="img/av3.png" alt="Profile Picture" class="img-circle img-sm">
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Jackson sent you a message</div>
+                          <small class="text-muted">Yesterday</small>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="pad-all bord-top">
+                <a href="#" class="btn-link text-dark box-block">
+                  <i class="fa fa-angle-right fa-lg pull-right"></i>Show All Messages
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+              <i class="fa fa-bell fa-lg"></i>
+              <span class="badge badge-header badge-danger">5</span>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-md with-arrow">
+              <div class="pad-all bord-btm">
+                <p class="text-lg text-muted text-thin mar-no">You have 3 messages.</p>
+              </div>
+              <div class="nano scrollable">
+                <div class="nano-content">
+                  <ul class="head-list">
+
+                    <li>
+                      <a href="#">
+                        <div class="clearfix">
+                          <p class="pull-left">Database Repair</p>
+                          <p class="pull-right">70%</p>
+                        </div>
+                        <div class="progress progress-sm">
+                          <div style="width: 70%;" class="progress-bar">
+                            <span class="sr-only">70% Complete</span>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#">
+                        <div class="clearfix">
+                          <p class="pull-left">Upgrade Progress</p>
+                          <p class="pull-right">10%</p>
+                        </div>
+                        <div class="progress progress-sm">
+                          <div style="width: 10%;" class="progress-bar progress-bar-warning">
+                            <span class="sr-only">10% Complete</span>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <span class="icon-wrap icon-circle bg-primary">
+                            <i class="fa fa-comment fa-lg"></i>
+                          </span>
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">New comments waiting approval</div>
+                          <small class="text-muted">15 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                    <span class="badge badge-success pull-right">90%</span>
+                        <div class="media-left">
+                          <span class="icon-wrap icon-circle bg-danger">
+                            <i class="fa fa-hdd-o fa-lg"></i>
+                          </span>
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">HDD is full</div>
+                          <small class="text-muted">50 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <span class="icon-wrap bg-info">
+                            <i class="fa fa-file-word-o fa-lg"></i>
+                          </span>
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Write a news article</div>
+                          <small class="text-muted">Last Update 8 hours ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                    <span class="label label-danger pull-right">New</span>
+                        <div class="media-left">
+                          <span class="icon-wrap bg-purple">
+                            <i class="fa fa-comment fa-lg"></i>
+                          </span>
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">Comment Sorting</div>
+                          <small class="text-muted">Last Update 8 hours ago</small>
+                        </div>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a href="#" class="media">
+                        <div class="media-left">
+                          <span class="icon-wrap bg-success">
+                            <i class="fa fa-user fa-lg"></i>
+                          </span>
+                        </div>
+                        <div class="media-body">
+                          <div class="text-nowrap">New User Registered</div>
+                          <small class="text-muted">4 minutes ago</small>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="pad-all bord-top">
+                <a href="#" class="btn-link text-dark box-block">
+                  <i class="fa fa-angle-right fa-lg pull-right"></i>Show All Notifications
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="mega-dropdown">
+            <a href="#" class="mega-dropdown-toggle">
+              <i class="fa fa-th-large fa-lg"></i>
+            </a>
+            <div class="dropdown-menu mega-dropdown-menu">
+              <div class="clearfix">
+                <div class="col-sm-12 col-md-3">
+
+                  <div class="text-center bg-purple pad-all">
+                    <h3 class="text-thin mar-no">Weekend shopping</h3>
+                    <div class="pad-ver box-inline">
+                      <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                        <i class="fa fa-shopping-cart fa-4x"></i>
+                      </span>
+                    </div>
+                    <p class="pad-btm">
+                      Members get <span class="text-lg text-bold">50%</span> more points. Lorem ipsum dolor sit amet!
+                    </p>
+                    <a href="#" class="btn btn-purple">Learn More...</a>
+                  </div>
+
+                </div>
+                <div class="col-sm-4 col-md-3">
+
+                  <ul class="list-unstyled">
+                    <li class="dropdown-header">Pages</li>
+                    <li><a href="#">Profile</a></li>
+                    <li><a href="#">Search Result</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Sreen Lock</a></li>
+                    <li><a href="#" class="disabled">Disabled</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Icons</li>
+                    <li><a href="#"><span class="pull-right badge badge-purple">479</span> Font Awesome</a></li>
+                    <li><a href="#">Skycons</a></li>
+                  </ul>
+
+                </div>
+                <div class="col-sm-4 col-md-3">
+
+                  <ul class="list-unstyled">
+                    <li class="dropdown-header">Mailbox</li>
+                    <li><a href="#"><span class="pull-right label label-danger">Hot</span>Indox</a></li>
+                    <li><a href="#">Read Message</a></li>
+                    <li><a href="#">Compose</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Featured</li>
+                    <li><a href="#">Smart navigation</a></li>
+                    <li><a href="#"><span class="pull-right badge badge-success">6</span>Exclusive plugins</a></li>
+                    <li><a href="#">Lot of themes</a></li>
+                    <li><a href="#">Transition effects</a></li>
+                  </ul>
+
+                </div>
+                <div class="col-sm-4 col-md-3">
+
+                  <ul class="list-unstyled">
+                    <li class="dropdown-header">Components</li>
+                    <li><a href="#">Tables</a></li>
+                    <li><a href="#">Charts</a></li>
+                    <li><a href="#">Forms</a></li>
+                    <li class="divider"></li>
+                    <li>
+                      <form role="form" class="form">
+                        <div class="form-group">
+                          <label class="dropdown-header" for="demo-megamenu-input">Newsletter</label>
+                          <input id="demo-megamenu-input" type="email" placeholder="Enter email" class="form-control">
+                        </div>
+                        <button class="btn btn-primary btn-block" type="submit">Submit</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+        <ul class="nav navbar-top-links pull-right">
+
+          <li class="dropdown">
+            <a id="demo-lang-switch" class="lang-selector dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="lang-selected">
+                <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                <span class="lang-id">EN</span>
+                <span class="lang-name">English</span>
+              </span>
+            </a>
+
+            <ul class="head-list dropdown-menu with-arrow">
+              <li>
+                <a href="#" class="active">
+                  <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                  <span class="lang-id">EN</span>
+                  <span class="lang-name">English</span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/france.png" alt="France">
+                  <span class="lang-id">FR</span>
+                  <span class="lang-name">Fran&ccedil;ais</span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/germany.png" alt="Germany">
+                  <span class="lang-id">DE</span>
+                  <span class="lang-name">Deutsch</span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/italy.png" alt="Italy">
+                  <span class="lang-id">IT</span>
+                  <span class="lang-name">Italiano</span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/spain.png" alt="Spain">
+                  <span class="lang-id">ES</span>
+                  <span class="lang-name">Espa&ntilde;ol</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li id="dropdown-user" class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+              <span class="pull-right">
+                <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+              </span>
+              <div class="username hidden-xs">John Doe</div>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
+
+              <div class="pad-all bord-btm">
+                <p class="text-lg text-muted text-thin mar-btm">750Gb of 1,000Gb Used</p>
+                <div class="progress progress-sm">
+                  <div class="progress-bar" style="width: 70%;">
+                    <span class="sr-only">70%</span>
+                  </div>
+                </div>
+              </div>
+
+
+              <ul class="head-list">
+                <li>
+                  <a href="#">
+                    <i class="fa fa-user fa-fw fa-lg"></i> Profile
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <span class="badge badge-danger pull-right">9</span>
+                    <i class="fa fa-envelope fa-fw fa-lg"></i> Messages
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <span class="label label-success pull-right">New</span>
+                    <i class="fa fa-gear fa-fw fa-lg"></i> Settings
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-question-circle fa-fw fa-lg"></i> Help
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-lock fa-fw fa-lg"></i> Lock screen
+                  </a>
+                </li>
+              </ul>
+
+              <div class="pad-all text-right">
+                <a href="pages-login.html" class="btn btn-primary">
+                  <i class="fa fa-sign-out fa-fw"></i> Logout
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+  </header>
+{% endblock header %}
+
+{% block content %}
+	<div class="boxed">
+
+		<div id="content-container" style="padding-bottom: 20px;">
+			<div class="slide" style="">
+				<div id="page-content" class="form-page" style="padding-left: 15px;">
+					<div class="tab-content" style="box-shadow: none; min-height: 415px; padding-right: 0px;">
+						<div id="core-form" class="tab-pane fade"></div>
+						<div id="maps-form" class="tab-pane fade"></div>
+						<div id="gui-form" class="tab-pane fade"></div>
+						<div id="search-form" class="tab-pane fade"></div>
+					</div>
+				</div>
+
+				<div  class="hidden" style="height: 50px; background-color: #f9f9f9; border-bottom: 1px solid #eee;">
+					<div class="">
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock content %}
+
+{% block navbar %}
+		<nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
+			<div id="mainnav">
+
+				<!--Shortcut buttons-->
+				<div id="mainnav-shortcut" class="hidden">
+					<ul class="list-unstyled">
+						<li class="col-xs-4" data-content="Additional Sidebar">
+							<a id="demo-toggle-aside" class="shortcut-grid" href="#">
+								<i class="fa fa-magic"></i>
+							</a>
+						</li>
+						<li class="col-xs-4" data-content="Notification">
+							<a id="demo-alert" class="shortcut-grid" href="#">
+								<i class="fa fa-bullhorn"></i>
+							</a>
+						</li>
+						<li class="col-xs-4" data-content="Page Alerts">
+							<a id="demo-page-alert" class="shortcut-grid" href="#">
+								<i class="fa fa-bell"></i>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!--End shortcut buttons-->
+
+
+				<!--Menu-->
+				<div id="mainnav-menu-wrap">
+					<div class="nano">
+						<div class="nano-content">
+							<ul id="mainnav-menu" class="list-group">
+								<li class="list-header">Admin Tools</li>
+								<li>
+									<a href="index.html">
+										<i class="fa fa-dashboard"></i>
+										<span class="menu-title">
+											<strong>Dashboard</strong>
+											<span class="label label-success pull-right">Top</span>
+										</span>
+									</a>
+								</li>
+								<li class="active-sub">
+									<a href="#">
+										<i class="fa fa-th"></i>
+										<span class="menu-title">
+											<strong>Application Configuration</strong>
+										</span>
+										<i class="arrow"></i>
+									</a>
+
+									<ul class="collapse in">
+										<li>
+											<a href="layouts-collapsed-navigation.html">Server Settings</a>
+										</li>
+										<li>
+											<a href="layouts-offcanvas-navigation.html">Map Settings</a>
+										</li>
+										<li>
+											<a href="layouts-offcanvas-slide-in-navigation.html">Saved Searches</a>
+										</li>
+										<li>
+											<a href="layouts-offcanvas-revealing-navigation.html">Branding/Appearance</a>
+										</li>
+										<li>
+											<a href="layouts-offcanvas-revealing-navigation.html">Backup Manager</a>
+										</li>
+										<li class="list-divider"></li>
+									</ul>
+								</li>
+								<li class="list-divider"></li>
+								<li class="list-header">Data Management</li>
+								<li>
+									<a href="#">
+										<i class="fa fa-briefcase"></i>
+										<span class="menu-title">Resource Manager</span>
+										<i class="arrow"></i>
+									</a>
+
+									<ul class="collapse">
+										<li>
+											<a href="#">Resource Library</a>
+										</li>
+										<li>
+											<a href="#">Graph Library</a>
+										</li>
+										<li class="list-divider"></li>
+									</ul>
+								</li>
+								<li>
+									<a href="#">
+										<i class="fa fa-line-chart"></i>
+										<span class="menu-title">Reference Data Manager</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="fa fa-table"></i>
+										<span class="menu-title">Data Exchange Manager</span>
+										<i class="arrow"></i>
+									</a>
+
+									<ul class="collapse">
+										<li>
+											<a href="tables-static.html">Data Import/Export</a>
+										</li>
+										<li>
+											<a href="tables-bootstrap.html">Resource Import/Export</a>
+										</li>
+										<li>
+											<a href="tables-bootstrap.html">Thesauri Import/Export</a>
+										</li>
+										<li class="list-divider"></li>
+									</ul>
+								</li>
+
+								<li class="list-divider"></li>
+								<li class="list-header">Mobile Projects</li>
+								<li>
+									<a href="#">
+										<i class="fa fa-briefcase"></i>
+										<span class="menu-title">Manage Projects</span>
+										<i class="arrow"></i>
+									</a>
+									<ul class="collapse">
+										<li>
+											<a href="#">Project Library</a>
+										</li>
+										<li>
+											<a href="#">New Project</a>
+										</li>
+										<li class="list-divider"></li>
+									</ul>
+								</li>
+								<li>
+									<a href="#">
+										<i class="fa fa-briefcase"></i>
+										<span class="menu-title">Manage Mobile Data</span>
+										<i class="arrow"></i>
+									</a>
+									<ul class="collapse">
+										<li>
+											<a href="#">Data Review</a>
+										</li>
+										<li class="list-divider"></li>
+									</ul>
+								</li>
+								<li class="list-divider"></li>
+							</ul>
+
+							<div class="mainnav-widget">
+								<div class="show-small">
+									<a href="#" data-toggle="menu-widget" data-target="#demo-wg-server">
+										<i class="fa fa-desktop"></i>
+									</a>
+								</div>
+								<div id="demo-wg-server" class="hide-small mainnav-widget-content">
+									<ul class="list-group">
+										<li class="list-header pad-no pad-ver">Server Status</li>
+										<li class="mar-btm">
+											<span class="label label-primary pull-right">15%</span>
+											<p>CPU Usage</p>
+											<div class="progress progress-sm">
+												<div class="progress-bar progress-bar-primary" style="width: 15%;">
+													<span class="sr-only">15%</span>
+												</div>
+											</div>
+										</li>
+										<li class="mar-btm">
+											<span class="label label-purple pull-right">75%</span>
+											<p>Bandwidth</p>
+											<div class="progress progress-sm">
+												<div class="progress-bar progress-bar-purple" style="width: 75%;">
+													<span class="sr-only">75%</span>
+												</div>
+											</div>
+										</li>
+										<li class="pad-ver"><a href="#" class="btn btn-success btn-bock">View Details</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<aside id="aside-container" style="position: fixed;">
+			<div id="aside">
+				<div class="nano">
+					<div class="nano-content">
+
+						<!--Nav tabs (keeping tabs hook to support future expansion)-->
+						<ul class="nav nav-tabs nav-justified v-menu-title" style="">
+							<li class="pad-lft pad-top" style="">
+								<h4 class="text-normal" style=""> Application Settings </h4>
+							</li>
+						</ul>
+
+						<div class="tab-content v-menu-items">
+							<div class="tab-base tab-pane fade in active" id="tab-1">
+								<div class="list-group bg-trans" style="background: #fff;">
+									<a id="menu-core" href="#core-form" class="list-group-item active">
+										<div class="media-body">
+											<div class="text-lg text-semibold"><i class="fa fa-wrench"></i> Server Settings</div>
+											<span class="text-muted">Check/Update settings for Arches</span>
+										</div>
+									</a>
+									<a id="menu-maps" href="#maps-form" class="list-group-item active">
+										<div class="media-body">
+											<div class="text-lg text-semibold"><i class="fa fa-map-marker"></i> Map Settings</div>
+											<span class="text-muted">Define map parameters for Arches</span>
+										</div>
+									</a>
+									<a id="menu-gui" href="#gui-form" class="list-group-item active">
+										<div class="media-body">
+											<div class="text-lg text-semibold"><i class="fa fa-desktop"></i> Application UI</div>
+											<span class="text-muted">Manage basic UI parameters</span>
+										</div>
+									</a>
+									<a id="menu-search" href="#search-form" class="list-group-item active">
+										<div class="media-body">
+											<div class="text-lg text-semibold"><i class="fa fa-search"></i> Saved Searches</div>
+											<span class="text-muted">Manage common searches</span>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<aside id="aside-help-page" class="hide help" style="width: 300px; background: #42cca5; max-height: none; padding-top: 40px; height: 100%; position: absolute; top: 0px; right: 0px; opacity: .9; z-index: 500; margin-top: 40px;">
+			<div >
+				<div class="">
+					<div class="" style="">
+
+						<div  class="bg-mint" style="">
+							<div class="panel panel-colorful panel-mint" style="box-shadow: none; margin-top: -40px;">
+								<div class="panel-heading">
+									<div class="panel-control">
+										<a  href="" class="add-tooltip help-close fa fa-times fa-lg"></a>
+									</div>
+
+									<h3 class="panel-title" style="padding: 0 10px 0 10px;">Addresses</h3>
+								</div>
+								<div class="panel-body" style="padding: 10px 10px 15px 10px;">
+									<p>Put Card-Specific help text here.  When panel is initiated from a controlled vocabulary, put thesaurus listing here instead.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</aside>
+	</div>
+{% endblock navbar %}
+
+{% block footer %}
+      <footer id="footer">
+
+          <!-- Visible when footer positions are fixed -->
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <div class="show-fixed pull-right">
+              <ul class="footer-list list-inline">
+                  <li>
+                      <p class="text-sm">SEO Proggres</p>
+                      <div class="progress progress-sm progress-light-base">
+                          <div style="width: 80%" class="progress-bar progress-bar-danger"></div>
+                      </div>
+                  </li>
+
+                  <li>
+                      <p class="text-sm">Online Tutorial</p>
+                      <div class="progress progress-sm progress-light-base">
+                          <div style="width: 80%" class="progress-bar progress-bar-primary"></div>
+                      </div>
+                  </li>
+                  <li>
+                      <button class="btn btn-sm btn-dark btn-active-success">Checkout</button>
+                  </li>
+              </ul>
+          </div>
+
+
+
+          <!-- Visible when footer positions are static -->
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
+
+
+
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+          <!-- Remove the class name "show-fixed" and "hide-fixed" to make the content always appears. -->
+          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+          <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
+
+
+      </footer>
+      <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+</div>
+{% endblock footer %}
+
+{% block copyright %}
+{% endblock copyright %}
+
+<!--JAVASCRIPT-->
+<!--=================================================-->
+{% block pre_require_js %}
+{{ block.super }}
+
+<!--jQuery [ REQUIRED ]-->
+<script src="http://archesproject.github.io/mockups/js/jquery-2.1.1.min.js"></script>
+
+<!--BootstrapJS [ RECOMMENDED ]-->
+<script src="http://archesproject.github.io/mockups/js/bootstrap.min.js"></script>
+
+<!--Fast Click [ OPTIONAL ]-->
+<script src="http://archesproject.github.io/mockups/plugins/fast-click/fastclick.min.js"></script>
+
+
+<!--Nifty Admin [ RECOMMENDED ]-->
+<script src="http://archesproject.github.io/mockups/js/nifty.min.js"></script>
+
+
+<!--Switchery [ OPTIONAL ]-->
+<script src="http://archesproject.github.io/mockups/plugins/switchery/switchery.min.js"></script>
+
+
+<!--Bootstrap Select [ OPTIONAL ]-->
+<script src="http://archesproject.github.io/mockups/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+
+<!--Demo script [ DEMONSTRATION ]-->
+<script src="http://archesproject.github.io/mockups/js/demo/nifty-demo.min.js"></script>
+<script src="http://archesproject.github.io/mockups/js/demo/layouts.js"></script>
+
+
+<!--Gmaps -->
+<script src="http://maps.google.com/maps/api/js"></script>
+<script src="http://archesproject.github.io/mockups/plugins/gmaps/gmaps.js"></script>
+
+<!-- Select2 -->
+<script src="http://archesproject.github.io/mockups/plugins/select2/js/select2.min.js"></script>
+
+<!--Chosen [ OPTIONAL ]-->
+<script src="http://archesproject.github.io/mockups/plugins/chosen/chosen.jquery.min.js"></script>
+
+<!--DataTables [ OPTIONAL ]-->
+<script src="http://archesproject.github.io/mockups/plugins/datatables/media/js/jquery.dataTables.js"></script>
+<script src="http://archesproject.github.io/mockups/plugins/datatables/media/js/dataTables.bootstrap.js"></script>
+<script src="http://archesproject.github.io/mockups/plugins/datatables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+
+<!--Arches Forms -->
+<script src="http://archesproject.github.io/mockups/js/arches/forms/config_manager.js"></script>
+{% endblock pre_require_js %}

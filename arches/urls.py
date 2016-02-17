@@ -34,13 +34,13 @@ urlpatterns = patterns('',
     url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.rdm', name='rdm'),
     url(r'^map', 'arches.app.views.map.get_page', name="map"),
     url(r'^geocoder', 'arches.app.views.search.geocode', name="geocoder"),
-    
+
     url(r'^entities/(?P<entityid>%s)$' % uuid_regex , 'arches.app.views.entity.Entities'),
     url(r'^entityTypes/(?P<entitytypeid>.*)$', 'arches.app.views.entity.EntityTypes'),
-    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, 'arches.app.views.concept.manage_parents', name="concept_manage_parents"),        
-    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, 'arches.app.views.concept.confirm_delete', name="confirm_delete"),     
+    url(r'^concepts/(?P<conceptid>%s)/manage_parents/$' % uuid_regex, 'arches.app.views.concept.manage_parents', name="concept_manage_parents"),
+    url(r'^concepts/(?P<conceptid>%s)/confirm_delete/$' % uuid_regex, 'arches.app.views.concept.confirm_delete', name="confirm_delete"),
     url(r'^concepts/(?P<conceptid>%s|())$' % uuid_regex , 'arches.app.views.concept.concept', name="concept"),
-    url(r'^concepts/tree$', 'arches.app.views.concept.concept_tree', name="concept_tree"),      
+    url(r'^concepts/tree$', 'arches.app.views.concept.concept_tree', name="concept_tree"),
     url(r'^concepts/search$', 'arches.app.views.concept.search', name="concept_search"),
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, 'arches.app.views.concept.add_concepts_from_sparql_endpoint', name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', 'arches.app.views.concept.search_sparql_endpoint_for_concepts', name="search_sparql_endpoint"),
@@ -62,6 +62,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
+
+    # Working on configmanager
+    url(r'^configmanager.htm', 'arches.app.views.config.index'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
