@@ -98,3 +98,9 @@ Generally arches applications are installed in a folder directly under the Arche
 
 **Note:**
     If you want to install an existing Arches application, such as the Heritage Inventory Package (HIP), you should stop here and go to: http://arches-hip.readthedocs.org/en/latest/getting-started/#installation.
+
+## Contributing
+
+Issue reports are encouraged.  [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
+
+Good guidelines on how to contribute can be found [here](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).
