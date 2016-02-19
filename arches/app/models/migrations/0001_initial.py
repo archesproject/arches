@@ -47,9 +47,9 @@ def reverse_func(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('auth', '0006_require_contenttypes_0002'),
-    ]
+    dependencies = []
+
+    initial = True
 
     operations = [
         CreateExtension(name='uuid-ossp'),
