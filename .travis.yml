@@ -1,29 +1,24 @@
-
 language: python
-
 python:
-  - 2.7
-
+- 2.7
 sudo: required
-
 services:
-  - postgresql
-  - elasticsearch
-  
+- postgresql
+- elasticsearch
 addons:
-  postgresql: "9.3"
-  
+  postgresql: '9.3'
 before_install:
-  - bash arches/install/ubuntu_trusty_setup.sh
-  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.deb && sudo dpkg -i --force-confnew elasticsearch-1.4.1.deb
-
-install: 
-  - python setup.py install
-  - pip install -r arches/install/requirements_dev.txt
-  - pip install coveralls
-  
-script: 
-  - python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
- 
+- bash arches/install/ubuntu_trusty_setup.sh
+- curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.deb
+  && sudo dpkg -i --force-confnew elasticsearch-1.4.1.deb
+install:
+- python setup.py install
+- pip install -r arches/install/requirements_dev.txt
+- pip install coveralls
+script:
+- python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 after_success:
-  - coveralls
+- coveralls
+notifications:
+  slack:
+    secure: Oi1UkHxL+mkYL/KfTeGhR/o8UVHIWcc0xQK2tARpRkATPRdcdniR40OSSLezgwvnFK1Mnk79XXY8m2FyzBAuxy61vd3CtCInRwwH9oD4We7J2W/PXxp2S+dequ6daEBDFwmuxyz3ADzJluZwzKd7KKgOipuonNBwspqb3xifU94izM7TvX4feaJqxJRi1eHFxFnpi8HHdiSzejbNs5+dfSogGjyzGDy3JNWtdf8nWhNhrl6p0z34hqIiq6ymc/MA6FDuaXiurxCCIQrbYifRvOuDqfhv9ye4BRDL1qK3TL+eXTy+gLlbrqbfjyN5fBPmgbPK87Yd0DrH4vhiVBiaKvBPXYWnqr8ltyyZkMctdDszcXjaZkbK+WZFaGIGfbrQtBWNe/mT9DSp2x27ccAeGyV7gnZ8QE5pD10TMTcPd7MlYVEY6IwTuEm7V77LsmtCIrE08zi1KmhBcRF0qColg3vdJcd7dls+GI4XN1FvPPEJdwqBGLx6Xgv1cT8+/HszQfaveQguYON3WEc2FC07koyfjMwkG5pkotl5IId3APEfDd2kUVJWYgacVIzSFTZlLhgsNRthAdfymRQbVgE1dddVxRHeMXQ5JksmtjvCpRYeCI6/07qbL5JQXpjPifEg8EmDBvxXF2JuuLPomS851/83/U5Ncncljsc8xA5jaUQ=
