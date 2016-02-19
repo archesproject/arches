@@ -37,23 +37,23 @@ from django.contrib.sessions.middleware import SessionMiddleware
 
 from arches.app.utils.set_anonymous_user import SetAnonymousUser
 from arches.management.commands.packages import Command as PackageCommand
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.data_management.resources.importer import ResourceLoader
-import arches.app.utils.data_management.resources.remover as resource_remover
-from arches.management.commands.package_utils import resource_graphs
-from arches.management.commands.package_utils import authority_files
-from arches.app.models import models
-from arches.app.models.entity import Entity
-from arches.app.models.resource import Resource
-from arches.app.models.concept import Concept
-from arches.app.models.concept import ConceptValue
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+# from arches.app.search.search_engine_factory import SearchEngineFactory
+# from arches.app.utils.data_management.resources.importer import ResourceLoader
+# import arches.app.utils.data_management.resources.remover as resource_remover
+# from arches.management.commands.package_utils import resource_graphs
+# from arches.management.commands.package_utils import authority_files
+# from arches.app.models import models
+# from arches.app.models.entity import Entity
+# from arches.app.models.resource import Resource
+# from arches.app.models.concept import Concept
+# from arches.app.models.concept import ConceptValue
+# from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
 
-class AuthTests(SimpleTestCase):
+class AuthTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.client = Client()

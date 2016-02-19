@@ -29,7 +29,7 @@ def install(path_to_source_data_dir=None):
     load_authority_files(path_to_source_data_dir)
     load_map_layers()
 
-    resource_remover.truncate_resources()
+    #resource_remover.truncate_resources()
     delete_index(index='resource')
     delete_index(index='entity')
     delete_index(index='maplayers')

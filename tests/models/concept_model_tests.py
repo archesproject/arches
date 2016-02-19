@@ -3,19 +3,18 @@
 import os
 from tests import test_settings
 from tests import test_setup
-from django.core import management
+# from django.core import management
 from django.test import SimpleTestCase, TestCase
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.data_management.resources.importer import ResourceLoader
-import arches.app.utils.data_management.resources.remover as resource_remover
-from arches.management.commands.package_utils import resource_graphs
-from arches.management.commands.package_utils import authority_files
+# from arches.app.search.search_engine_factory import SearchEngineFactory
+# from arches.app.utils.data_management.resources.importer import ResourceLoader
+# import arches.app.utils.data_management.resources.remover as resource_remover
+# from arches.management.commands.package_utils import resource_graphs
+# from arches.management.commands.package_utils import authority_files
 from arches.app.models import models
-from arches.app.models.entity import Entity
-from arches.app.models.resource import Resource
+# from arches.app.models.resource import Resource
 from arches.app.models.concept import Concept
 from arches.app.models.concept import ConceptValue
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+# from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -23,7 +22,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 def setUpModule():
     test_setup.install()
 
-class ConceptModelTests(SimpleTestCase):
+class ConceptModelTests(TestCase):
 
     def test_create_concept(self):
         """
