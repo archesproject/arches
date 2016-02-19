@@ -373,22 +373,39 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        ret = []
+        score = 0
+        ranked_labels = []
+        #ret = ConceptValue()
         if self.values == []: 
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
         else:
             concept = self
+
         for value in concept.values:
+            ranked_label = {
+                'weight': 1,
+                'value': value
+            }
             if value.type == 'prefLabel':
-                if value.language == lang:
-                    return value
-                elif value.language == lang.split('-')[0]:
-                    ret.insert(0, value)
+                ranked_label['weight'] = ranked_label['weight'] * 10
             elif value.type == 'altLabel':
-                if value.language == lang:
-                    ret.insert(0, value)
-            ret.append(value)
-        return ret[0] if len(ret) > 0 else ConceptValue()
+                ranked_label['weight'] = ranked_label['weight'] * 4
+
+            if value.language == lang:
+                ranked_label['weight'] = ranked_label['weight'] * 10
+            elif value.language.split('-')[0] == lang.split('-')[0]:
+                ranked_label['weight'] = ranked_label['weight'] * 5
+
+            ranked_labels.append(ranked_label)
+
+        ranked_labels = sorted(ranked_labels, key=lambda label: label['weight'], reverse=True)
+        if len(ranked_labels) == 0:
+            ranked_labels.append({
+                'weight': 1,
+                'value': ConceptValue()
+            })
+
+        return ranked_labels[0]['value']
 
     def flatten(self, ret=None):
         """
@@ -765,6 +782,8 @@ class ConceptValue(object):
             elif isinstance(args[0], object):
                 self.load(args[0])  
 
+    def __repr__(self):
+        return ('%s: %s = "%s" in lang %s') % (self.__class__, self.type, self.value, self.language)
 
     def get(self, id=''):
         self.load(models.Values.objects.get(pk = id))
