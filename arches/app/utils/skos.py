@@ -146,7 +146,7 @@ class SKOSReader(object):
 
                 # insert the concept relations
                 for relation in self.relations:
-                    newrelation = models.ConceptRelations()
+                    newrelation = models.Relations()
                     newrelation.relationid = str(uuid.uuid4())
                     newrelation.conceptidfrom_id = relation['source']
                     newrelation.conceptidto_id = relation['target']
