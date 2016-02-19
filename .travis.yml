@@ -17,9 +17,13 @@ before_install:
   - bash arches/install/ubuntu_trusty_setup.sh
   - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.1.deb && sudo dpkg -i --force-confnew elasticsearch-1.4.1.deb
 
-
 install: 
   - python setup.py install
+  - pip install -r arches/install/requirements_dev.txt
+  - pip install coveralls
   
-script: python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
+script: 
+  python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
  
+after_success:
+  coveralls
