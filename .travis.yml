@@ -23,7 +23,7 @@ install:
   - pip install coveralls
   
 script: 
-  python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
+  - python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
  
 after_success:
-  coveralls
+  - coveralls
