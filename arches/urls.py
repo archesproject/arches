@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
-from arches.app.views import concept, entity, main, map, resources, search
+from arches.app.views import concept, entity, main, map, resources, search, config
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -64,7 +64,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     # Working on configmanager
-    url(r'^configmanager.htm', 'arches.app.views.config.index'),
+    url(r'^configmanager.htm', config.index),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

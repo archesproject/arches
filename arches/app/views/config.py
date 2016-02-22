@@ -16,55 +16,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
-from django.contrib.auth import authenticate, login, logout
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.contrib.auth.models import User
+from django.shortcuts import render
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.app_settings import AppSettings
 
 def index(request):
-    return render_to_response('configmanager.htm', {
-            'main_script': 'index',
-            'active_page': 'Home',
-        },
-        context_instance=RequestContext(request))
-
-
-@never_cache
-@csrf_exempt
-def auth(request):
-    auth_attempt_success = None
-    # POST request is taken to mean user is logging in
+    app_settings = AppSettings()
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None and user.is_active:
-            login(request, user)
-            user.password = ''
-            auth_attempt_success = True
-        else:
-            auth_attempt_success = False
+        json = request.body
+        if json != None:
+            data = JSONDeserializer().deserialize(json)
+            app_settings.update(data)
 
-    next = request.GET.get('next', reverse('home'))
-    if auth_attempt_success:
-        return redirect(next)
-    else:
-        if request.GET.get('logout', None) is not None:
-            logout(request)
-            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
-            return redirect('auth')
-        else:
-            return render_to_response('login.htm', {
-                    'main_script': 'login',
-                    'auth_failed': (auth_attempt_success is not None),
-                    'next': next
-                },
-                context_instance=RequestContext(request))
+    return render(request, 'configmanager.htm', {
+        'main_script': 'configmanager',
+        'active_page': 'Home',
+        'app_settings': app_settings
+    })
 
 
-def search(request):
-    return render_to_response('search.htm', context_instance=RequestContext(request))
