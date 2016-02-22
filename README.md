@@ -1,4 +1,4 @@
-# Arches
+# Arches [![Build Status](https://travis-ci.org/archesproject/arches.svg?branch=master)](https://travis-ci.org/archesproject/arches) [![Coverage Status](https://coveralls.io/repos/github/archesproject/arches/badge.svg?branch=master)](https://coveralls.io/github/archesproject/arches?branch=master)
 
 A web-based, geospatial information system for cultural heritage inventory and management.
 

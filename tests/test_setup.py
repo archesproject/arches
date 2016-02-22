@@ -25,7 +25,7 @@ def install(path_to_source_data_dir=None):
     delete_index(index='term') 
     Resource().prepare_term_index(create=True)
 
-    load_resource_graphs()
+    #load_resource_graphs()
     load_authority_files(path_to_source_data_dir)
     load_map_layers()
 
@@ -36,7 +36,7 @@ def install(path_to_source_data_dir=None):
     delete_index(index='resource_relations') 
     create_indexes()   
 
-    load_resources()
+    #load_resources()
 
 def export_data():
     pass

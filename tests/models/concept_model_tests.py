@@ -215,12 +215,29 @@ class ConceptModelTests(TestCase):
 
         """
 
-        values = [
-            {'type': 'prefLabel', 'value': 'bier', 'language': 'nl'},
-            {'type': 'prefLabel', 'value': 'beer', 'language': 'en'},
+        concept = Concept()
+        concept.values = [
+            ConceptValue({
+                'type': 'prefLabel', 
+                'value': 'bier', 
+                'language': 'nl'
+            }),
+            ConceptValue({
+                'type': 'prefLabel',
+                'category': 'label',
+                'value': 'beer',
+                'language': 'es-SP'
+            }),
+            ConceptValue({
+                'type': 'altLabel',
+                'category': 'label',
+                'value': 'test alt label en-US',
+                'language': 'en-US'
+            })
         ]
-        c = Concept({'values': values})
-        pl = c.get_preflabel('fr-BE')
+
+        pl = concept.get_preflabel('fr-BE')
+
         self.assertEquals(pl.type,'prefLabel')
-        self.assertEquals(pl.value,'bier')
-        self.assertEquals(pl.language,'nl')
+        self.assertEquals(pl.value,'bier' or 'beer')
+        self.assertEquals(pl.language,'nl' or 'es-SP')
