@@ -89,7 +89,7 @@ That's it, you're done.  You should now have a folder structure that looks like 
 
 ## Arches Applications
 
-Generally arches applications are installed in a folder directly under the Arches root folder.  You can install as many Arches applications as you like, and they'll all use the same Arches framework and virtual environment.  A typical Arches application installation will therefore look something like this::
+Generally arches applications are installed in a folder directly under the Arches root folder.  You can install as many Arches applications as you like, and they'll all use the same Arches framework and virtual environment.  A typical Arches application installation will therefore look something like this:
 
     /Projects
         /ENV (virtual environment where the Arches framework is installed)
