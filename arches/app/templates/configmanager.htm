@@ -51,6 +51,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock css %}
 
 {% block header %}
+{% endblock header %}
+
+{% block content %}
 <div id="container" class="effect mainnav-sm aside-in aside-left aside-bright navbar-fixed">
   <header id="navbar" style="z-index: 1000; opacity: .9;">
 
@@ -491,9 +494,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </div>
 
   </header>
-{% endblock header %}
-
-{% block content %}
 	<div class="boxed">
 
 		<div id="content-container" style="padding-bottom: 20px;">
@@ -513,10 +513,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				</div>
 			</div>
 		</div>
-{% endblock content %}
 
-{% block navbar %}
-		<nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
+    <nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
 			<div id="mainnav">
 
 				<!--Shortcut buttons-->
@@ -773,52 +771,57 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 			</div>
 		</aside>
 	</div>
+  <footer id="footer">
+
+      <!-- Visible when footer positions are fixed -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <div class="show-fixed pull-right">
+          <ul class="footer-list list-inline">
+              <li>
+                  <p class="text-sm">SEO Proggres</p>
+                  <div class="progress progress-sm progress-light-base">
+                      <div style="width: 80%" class="progress-bar progress-bar-danger"></div>
+                  </div>
+              </li>
+
+              <li>
+                  <p class="text-sm">Online Tutorial</p>
+                  <div class="progress progress-sm progress-light-base">
+                      <div style="width: 80%" class="progress-bar progress-bar-primary"></div>
+                  </div>
+              </li>
+              <li>
+                  <button class="btn btn-sm btn-dark btn-active-success">Checkout</button>
+              </li>
+          </ul>
+      </div>
+
+
+
+      <!-- Visible when footer positions are static -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
+
+
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- Remove the class name "show-fixed" and "hide-fixed" to make the content always appears. -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+      <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
+
+
+  </footer>
+  <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+</div>
+{% endblock content %}
+
+{% block navbar %}
+
 {% endblock navbar %}
 
 {% block footer %}
-      <footer id="footer">
 
-          <!-- Visible when footer positions are fixed -->
-          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-          <div class="show-fixed pull-right">
-              <ul class="footer-list list-inline">
-                  <li>
-                      <p class="text-sm">SEO Proggres</p>
-                      <div class="progress progress-sm progress-light-base">
-                          <div style="width: 80%" class="progress-bar progress-bar-danger"></div>
-                      </div>
-                  </li>
-
-                  <li>
-                      <p class="text-sm">Online Tutorial</p>
-                      <div class="progress progress-sm progress-light-base">
-                          <div style="width: 80%" class="progress-bar progress-bar-primary"></div>
-                      </div>
-                  </li>
-                  <li>
-                      <button class="btn btn-sm btn-dark btn-active-success">Checkout</button>
-                  </li>
-              </ul>
-          </div>
-
-
-
-          <!-- Visible when footer positions are static -->
-          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-          <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
-
-
-
-          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-          <!-- Remove the class name "show-fixed" and "hide-fixed" to make the content always appears. -->
-          <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-          <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
-
-
-      </footer>
-      <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
-</div>
 {% endblock footer %}
 
 {% block copyright %}
