@@ -128,7 +128,7 @@ SPARQL_ENDPOINT_PROVIDERS = (
     'arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider',
 )
 
-APP_NAME = 'Arches v3.0'
+APP_NAME = 'Arches'
 
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
@@ -164,8 +164,8 @@ USE_TZ = False
 # Default Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
-# see https://docs.djangoproject.com/en/1.6/topics/i18n/translation/#how-django-discovers-language-preference 
-# to see how LocaleMiddleware tries to determine the user's language preference 
+# see https://docs.djangoproject.com/en/1.6/topics/i18n/translation/#how-django-discovers-language-preference
+# to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
@@ -183,7 +183,7 @@ USE_L10N = True
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT =  os.path.join(ROOT_DIR, 'uploadedfiles')
 
-# URL that handles the media served from MEDIA_ROOT, used for managing stored files. 
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
 MEDIA_URL = '/files/'
 
@@ -244,7 +244,7 @@ TEMPLATES = [
                 'arches.app.utils.context_processors.livereload',
                 'arches.app.utils.context_processors.resource_types',
                 'arches.app.utils.context_processors.map_info',
-                'arches.app.utils.context_processors.app_settings',         
+                'arches.app.utils.context_processors.app_settings',
             ],
             'debug': DEBUG
         },
