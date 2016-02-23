@@ -45,7 +45,8 @@ If you have installed the dependencies, you're ready to install Arches.
 
 1. Create the Arches Project folder:
 
-    * Create a folder called 'Projects' (or some other meaningful name) on your system.    
+    * Create a folder called 'Projects' (or some other meaningful name) on your system.  
+
 2.  Install virtualenv:
 
     * Open a command prompt and type:
@@ -79,8 +80,6 @@ If you have installed the dependencies, you're ready to install Arches.
     Install Arches (your virtual environment must be activated):
 
             (ENV)$ pip install arches
-
-
 
 That's it, you're done.  You should now have a folder structure that looks like this:
 
