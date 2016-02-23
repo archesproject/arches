@@ -45,31 +45,31 @@ class Command(BaseCommand):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
             choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
             help='Operation Type; ' +
-            '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
-            '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' + 
-            '\'install\'=Runs the setup file defined in your package root' + 
-            '\'start_elasticsearch\'=Runs the setup file defined in your package root' + 
+            '\'setup\'=Sets up Elasticsearch and core database schema and code' +
+            '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
+            '\'install\'=Runs the setup file defined in your package root' +
+            '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
             '\'livereload\'=Starts livereload for this package on port 35729')
-        
+
         parser.add_argument('-s', '--source', action='store', dest='source', default='',
             help='Directory containing a .arches or .shp file containing resource records')
-        
+
         parser.add_argument('-f', '--format', action='store', dest='format', default='arches',
             help='Format: shp or arches')
-        
+
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
-        
+
         parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
             help='Directory where you want to save exported files.')
-    
+
 
     def handle(self, *args, **options):
         print 'operation: '+ options['operation']
         package_name = settings.PACKAGE_NAME
         print 'package: '+ package_name
-        
+
         if options['operation'] == 'setup':
             self.setup(package_name)
 
@@ -93,8 +93,8 @@ class Command(BaseCommand):
 
         if options['operation'] == 'load_resources':
             self.load_resources(package_name, options['source'])
-            
-        if options['operation'] == 'remove_resources':     
+
+        if options['operation'] == 'remove_resources':
             self.remove_resources(options['load_id'])
 
         if options['operation'] == 'load_concept_scheme':
@@ -111,11 +111,11 @@ class Command(BaseCommand):
 
     def setup(self, package_name):
         """
-        Installs Elasticsearch into the package directory and 
+        Installs Elasticsearch into the package directory and
         installs the database into postgres as "arches_<package_name>"
 
         """
-        self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)  
+        self.setup_elasticsearch(package_name, port=settings.ELASTICSEARCH_HTTP_PORT)
         self.setup_db(package_name)
         self.generate_procfile(package_name)
 
@@ -126,7 +126,7 @@ class Command(BaseCommand):
         """
 
         install = import_string('%s.setup.install' % package_name)
-        install() 
+        install()
 
     def setup_elasticsearch(self, package_name, port=9200):
         """
@@ -179,15 +179,15 @@ class Command(BaseCommand):
         """
 
         es_start = os.path.join(self.get_elasticsearch_install_location(package_name), 'bin')
-        
+
         # use this instead to start in a non-blocking way
         if sys.platform == 'win32':
             import time
-            p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)  
+            p = subprocess.Popen(['service.bat', 'install'], cwd=es_start, shell=True)
             time.sleep(10)
-            p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True) 
+            p = subprocess.Popen(['service.bat', 'start'], cwd=es_start, shell=True)
         else:
-            p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)  
+            p = subprocess.Popen(es_start + '/elasticsearch', cwd=es_start, shell=False)
         return p
         #os.system('honcho start')
 
@@ -199,14 +199,14 @@ class Command(BaseCommand):
         """
 
         db_settings = settings.DATABASES['default']
-        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')  
+        truncate_path = os.path.join(settings.ROOT_DIR, 'db', 'install', 'truncate_db.sql')
         db_settings['truncate_path'] = truncate_path
-        
+
         truncate_db.create_sqlfile(db_settings, truncate_path)
-        
+
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
-        
-        management.call_command('migrate') 
+
+        management.call_command('migrate')
 
     def generate_procfile(self, package_name):
         """
@@ -274,7 +274,7 @@ class Command(BaseCommand):
         """
         data_source = None if data_source == '' else data_source
         load = import_string('%s.setup.load_resources' % package_name)
-        load(data_source) 
+        load(data_source)
 
     def remove_resources(self, load_id):
         """
@@ -290,7 +290,7 @@ class Command(BaseCommand):
         """
         data_source = None if data_source == '' else data_source
         load = import_string('%s.setup.load_authority_files' % package_name)
-        load(data_source) 
+        load(data_source)
 
     def index_database(self, package_name):
         """
@@ -311,7 +311,7 @@ class Command(BaseCommand):
         """
         resource_exporter = ResourceExporter('json')
         resource_exporter.export(search_results=False, dest_dir=data_dest)
-        related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()] 
+        related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
         relations_file = os.path.splitext(data_dest)[0] + '.relations'
         with open(relations_file, 'w') as f:
             csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
@@ -324,6 +324,6 @@ class Command(BaseCommand):
         server = Server()
         for path in settings.STATICFILES_DIRS:
             server.watch(path)
-        for path in settings.TEMPLATE_DIRS:
+        for path in settings.TEMPLATES[0]['DIRS']:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
