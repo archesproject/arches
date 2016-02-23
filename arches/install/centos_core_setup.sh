@@ -30,7 +30,7 @@ echo 'CHANGED CONF FILE PERMISSIONS'
 sudo echo "standard_conforming_strings = off" | sudo tee --append  /var/lib/pgsql/9.3/data/postgresql.conf
 sudo echo "listen_addresses = '*'" | sudo tee --append  /var/lib/pgsql/9.3/data/postgresql.conf
 
-sudo cp /var/lib/pgsql/9.3/data/pg_hba.conf var/lib/pgsql/9.3/data/pg_hba.conf.backup
+sudo cp /var/lib/pgsql/9.3/data/pg_hba.conf /var/lib/pgsql/9.3/data/pg_hba.conf.backup
 sudo truncate /var/lib/pgsql/9.3/data/pg_hba.conf --size 0
 
 sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" | sudo tee --append  /var/lib/pgsql/9.3/data/pg_hba.conf
