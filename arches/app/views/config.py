@@ -20,7 +20,7 @@ from django.shortcuts import render
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.app_settings import AppSettings
 
-def index(request):
+def manager(request):
     app_settings = AppSettings()
     if request.method == 'POST':
         json = request.body
@@ -28,10 +28,8 @@ def index(request):
             data = JSONDeserializer().deserialize(json)
             app_settings.update(data)
 
-    return render(request, 'configmanager.htm', {
-        'main_script': 'configmanager',
+    return render(request, 'config-manager.htm', {
+        'main_script': 'config-manager',
         'active_page': 'Home',
         'app_settings': app_settings
     })
-
-
