@@ -8,9 +8,8 @@ from arches.management.commands import utils
 class AppSettings(object):
 
     def __init__(self, path_to_settings_file='arches.settings'):
-        settings = import_string(path_to_settings_file)
-        #settings = reload(import_string(path_to_settings_file))
-        #print id(settings)
+        #settings = import_string(path_to_settings_file)
+        settings = reload(import_string(path_to_settings_file))
 
         self.load(settings)
         #print 'mode=%s' % self.settings['MODE']
