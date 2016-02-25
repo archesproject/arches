@@ -1,0 +1,139 @@
+<div id="{{form.id}}" class="arches-form tab-pane fade in active">
+    {% for cardgroup in form.cardgroups %}
+    <div id="arches-server" class="panel card-panel">
+        <div class="panel-heading">
+            <h3 class="panel-title card-main-title" style="color: grey !important;">
+                {{ cardgroup.title }}
+            </h3>
+        </div>
+        
+        <div class="panel-body card-body" style="">
+            <div id="arches-server-help-cc" class="tab-base card-content-container" style="">
+
+                <!--Nav Tabs-->
+                <ul class="nav nav-tabs card-nav-container" style="">
+                    {% for card in cardgroup.cards %}
+                    <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
+                        <a id="settings-menu" data-toggle="tab" href="#{{card.id}}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div id="db-arches-app-alert" class="panel data-card-alert" style=""></div>
+
+                <!--Tabs Content-->
+                {% load i18n %}
+                <div class="tab-content card-content-tab" style="">
+                    {% for card in cardgroup.cards %}
+                        <!-- Db Checks -->
+                    <div id="{{card.id}}" class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+                        <div class="panel-body card-panel-body" style="">
+                            
+                            <!-- Card Level Alert -->
+                            <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+
+                            <!-- Card Instruction -->
+                            <p id="" class="content-instructions">{{ card.description }}</p>
+
+                            
+                            <!-- Actual Card HTML goes here -->
+                            <div data-bind="with: form.tiles">
+                                <div data-bind="with: $data['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}']()[0].tileinstancedata">
+                                    {{ card.htmltemplate|safe }}
+                                </div>
+
+                                <div class="install-buttons">
+                                    {% if card.cardinality != 'n' %}
+                                    <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: $root.form.cancelEdit.bind($data, $data['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}'])">{% trans "Cancel" %}</button>
+                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($data, '{{card.id}}', $data['{{card.id}}'])">{% trans "Save" %}</button>
+                                    {% endif %}
+                                    {% if card.cardinality == 'n' %}
+                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($data, '{{card.id}}', $data['{{card.id}}-blank'])">{% trans "Save" %}</button>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                            {% if card.cardinality == 'n' %}
+
+                            <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: form.tiles['{{card.id}}']">
+                                
+                                <!-- Record -->
+                                <div data-bind="with: $data.tileinstancedata">
+                                    <div id="record-1" class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250);" data-bind="click: $root.form.expandTile">
+                                        <h5 class="list-group-item-heading text-thin">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                                        
+                                        <div id="record-1-form" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none">
+                                            <a id="record-1-close" href="#" class="record-close" style="display: block;" data-bind="click: $root.form.collapseTile">
+                                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-times"></i>
+                                                </span>
+                                            </a>
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($data, $root.form.tiles['{{card.id}}'])">
+                                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                                </span>
+                                            </a>
+                                            
+                                            <!-- Card Level Alert -->
+                                            <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+
+                                            <!-- Card Instruction -->
+                                            <p id="" class="content-instructions">{{ card.description }}</p>
+
+                                            <!-- Actual Card HTML goes here -->
+                                            {{ card.htmltemplate|safe }}
+
+                                            <div class="install-buttons">
+                                                <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                                <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" style="">{% trans "Save" %}</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% endif %}
+
+
+
+                        </div>
+
+                    </div>
+
+                    <!-- Help/Thesaurus term Panel -->
+                    <aside id="arches-server-help" data-page="./help/config_manager/arches_server_summary.html" class="card-help-panel" style="display: none;">
+                        <div class="relative">
+                            <a id="arches-server-help-close" href="" class="help-close fa fa-times fa-lg" style=""></a>
+                        </div>
+                        <div id="arches-server-help-content" class="" style="">
+                            <div id="" class="" style="">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title" style="padding: 0 10px 0 10px;"><span class="help-text-small"> Help</span> Database Connection</h3>
+                                </div>
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;">
+                                    <p>Put Card-Specific help text here.  When panel is initiated from a controlled vocabulary, put thesaurus listing here instead.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-footer card-footer" style="">
+            <div class="row">
+                <div class="col-sm-6">
+                    <p id="arches-server-footer" class="" style="padding-right: 15px;"><strong>{% trans "Last Updated:" %}</strong> ???  &nbsp; &nbsp; <strong>{% trans "Updated By:" %}</strong> ???</p>
+                </div>
+
+                <div class="col-sm-6">
+                    <!-- Help link -->
+                    <a id="arches-server-help-link" href="" class="pull-right card-help help" style="">{% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <input id="tiledata" name="tiledata" type="hidden" value="{{tiledata}}"/>
+</div>

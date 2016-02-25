@@ -38,7 +38,7 @@ class AppSettings(object):
         t = Template(
         "MODE = '{{ MODE }}'\n"
         "DEBUG = {{ DEBUG }}\n"
-        "\n"
+        "DATABASES = {{ DATABASES }}\n"
         "\n"
         )
 

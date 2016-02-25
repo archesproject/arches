@@ -25,7 +25,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock title %}
 
 {% block content %}
-    config manager
+    {% for form in forms %}
+      {% include 'views/form.htm' %}
+    {% endfor %}
 {% endblock content %}
 
 {% block tabs %}
@@ -39,7 +41,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="tab-content v-menu-items">
             <div class="tab-base tab-pane fade in active" id="tab-1">
                 <div class="list-group bg-trans" style="background: #fff;">
-                    <a id="menu-core" href="#core-form" class="list-group-item active">
+                    {% for form in forms %}
+                        <a id="menu-core" href="#core-form" class="list-group-item active">
+                            <div class="media-body">
+                                <div class="text-lg text-semibold"><i class="fa fa-wrench"></i>{{form.title}}</div>
+                                <span class="text-muted">{{form.subtitle}}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                <!--     <a id="menu-core" href="#core-form" class="list-group-item active">
                         <div class="media-body">
                             <div class="text-lg text-semibold"><i class="fa fa-wrench"></i> Server Settings</div>
                             <span class="text-muted">Check/Update settings for Arches</span>
@@ -62,7 +72,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="text-lg text-semibold"><i class="fa fa-search"></i> Saved Searches</div>
                             <span class="text-muted">Manage common searches</span>
                         </div>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </div>
