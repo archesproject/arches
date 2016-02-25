@@ -10,3 +10,5 @@ build
 arches.egg*
 arches/elasticsearch
 arches/uploadedfiles
+arches/settings_local.py
+.coverage
