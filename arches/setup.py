@@ -43,7 +43,7 @@ def install():
         else:
             # Install psycopg2 through pip - Works fine if the correct header files are present
             # See http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
-            os.system("pip install psycopg2==2.5.4")
+            os.system("pip install psycopg2==2.6.1")
 
 def site_packages_dir():
     if sys.platform == 'win32':
