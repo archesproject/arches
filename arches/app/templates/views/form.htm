@@ -39,7 +39,9 @@
                             <!-- Actual Card HTML goes here -->
                             <div data-bind="with: form.tiles">
                                 <div data-bind="with: $data['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}']()[0].tileinstancedata">
-                                    {{ card.htmltemplate|safe }}
+                                    {% for widget in card.widgets %}
+                                        {% include widget.path %}
+                                    {% endfor %}
                                 </div>
 
                                 <div class="install-buttons">
@@ -80,7 +82,9 @@
                                             <p id="" class="content-instructions">{{ card.description }}</p>
 
                                             <!-- Actual Card HTML goes here -->
-                                            {{ card.htmltemplate|safe }}
+                                            {% for widget in card.widgets %}
+                                                {% include widget.path %}
+                                            {% endfor %}
 
                                             <div class="install-buttons">
                                                 <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>

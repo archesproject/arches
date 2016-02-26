@@ -27,6 +27,8 @@ from arches.app.models.app_settings import AppSettings
 @csrf_exempt
 def manager(request):
 
+    widgets = models.Widgets.objects.all()
+    string_widget = widgets.get(name='string')
 
     forms = [{
         'id': '1',
@@ -40,71 +42,48 @@ def manager(request):
                 'title': _('Database'),
                 'cardinality': '1',
                 'description': _('Update your PostgreSQL database access information'),
-                'htmltemplate': '''<form>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">Database Name</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: NAME" placeholder="template_postgis_20" class="form-control input-lg widget-input">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">User</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: USER" placeholder="postgres" class="form-control input-lg widget-input">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">Password</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="password" data-bind="value: PASSWORD" placeholder="password" class="form-control input-lg widget-input">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">Port</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: PORT" placeholder="5432" class="form-control input-lg widget-input widget-input">
-                            </div>
-                        </div>
-                    </div>
-                </form>'''
+                'widgets':[{
+                    'path': string_widget.template.path,
+                    'label': 'Database Name',
+                    'placeholder': '',
+                    'nodeid': 'NAME'
+                },{
+                    'path': string_widget.template.path,
+                    'label': 'User',
+                    'placeholder': '',
+                    'nodeid': 'USER'
+                },{
+                    'path': string_widget.template.path,
+                    'label': 'Password',
+                    'placeholder': '',
+                    'nodeid': 'PASSWORD'
+                },{
+                    'path': string_widget.template.path,
+                    'label': 'Port',
+                    'placeholder': '',
+                    'nodeid': 'PORT'
+                }]
             },{
                 'id': 'cardid1-1-2',
                 'title': _('Keys'),
                 'cardinality': 'n',
                 'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
-                'htmltemplate': '''<form>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">Service Provider</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: nodeid5" placeholder="e.g.: MapBox" class="form-control input-lg widget-input">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 control-label widget-input-label" for="">Service Name</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: nodeid6" placeholder="e.g. MapBox Base Maps" class="form-control input-lg widget-input">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mar-btm">
-                        <div class="form-group">
-                            <label class="col-xs-12 widget-input-label" for="">Key</label>
-                            <div class="col-xs-12 col-md-9">
-                                <input type="" data-bind="value: nodeid7" placeholder="Enter key value" class="form-control input-lg widget-input widget-input-disabled">
-                            </div>
-                        </div>
-                    </div>
-                </form>'''
+                'widgets':[{
+                    'path': string_widget.template.path,
+                    'label': 'Service Provider',
+                    'placeholder': 'e.g.: MapBox',
+                    'nodeid': 'nodeid5'
+                },{
+                    'path': string_widget.template.path,
+                    'label': 'Service Name',
+                    'placeholder': 'e.g. MapBox Base Maps',
+                    'nodeid': 'nodeid6'
+                },{
+                    'path': string_widget.template.path,
+                    'label': 'Key',
+                    'placeholder': 'Enter key value',
+                    'nodeid': 'nodeid7'
+                }]
             }]
         }]
     }]

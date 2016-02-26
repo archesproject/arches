@@ -351,6 +351,7 @@ class Values(models.Model):
 class Widgets(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
+    template = models.FileField(upload_to='app/templates/views/forms/widgets/')
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
 
