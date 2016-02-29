@@ -29,6 +29,7 @@ def manager(request):
 
     widgets = models.Widgets.objects.all()
     string_widget = widgets.get(name='string')
+    select_widget = widgets.get(name='select')
 
     forms = [{
         'id': '1',
@@ -69,10 +70,11 @@ def manager(request):
                 'cardinality': 'n',
                 'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                 'widgets':[{
-                    'path': string_widget.template.path,
+                    'path': select_widget.template.path,
                     'label': 'Service Provider',
                     'placeholder': 'e.g.: MapBox',
-                    'nodeid': 'nodeid5'
+                    'nodeid': 'nodeid5',
+                    'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
                 },{
                     'path': string_widget.template.path,
                     'label': 'Service Name',
@@ -111,7 +113,7 @@ def manager(request):
             'tileinstanceid': '',
             'tilegroupid': '',
             'tileinstancedata': {
-                "nodeid5": "Bing",
+                "nodeid5": "1",
                 "nodeid6": "Map Key",
                 "nodeid7": "23984ll2399494",
             },
@@ -123,7 +125,7 @@ def manager(request):
             'tileinstanceid': '',
             'tilegroupid': '',
             'tileinstancedata': {
-                "nodeid5": "MapBox",
+                "nodeid5": "2",
                 "nodeid6": "MapBox Base Maps",
                 "nodeid7": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
             },

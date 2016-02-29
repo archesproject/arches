@@ -18,8 +18,8 @@ define(['jquery',
         },
 
         saveTile: function(cardid, data, e){
-            console.log(ko.toJSON(data));
-            this[cardid].push(ko.toJS(data)[0]);
+            console.log(ko.toJS(data));
+            this[cardid].push(koMapping.fromJS(ko.toJS(data)[0]));
         },
 
         updateTile: function(cardid, data, e){

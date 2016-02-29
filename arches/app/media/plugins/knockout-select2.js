@@ -3,11 +3,8 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
-            var data;
-            var domains = {};
-            var allBindings = allBindingsAccessor();
-            var branchList = bindingContext.$data;
-            var select2Config = ko.utils.unwrapObservable(allBindings.select2);            
+            var allBindings = allBindingsAccessor().select2;
+            var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);            
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).select2('destroy');
@@ -16,10 +13,6 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             select2Config.formatResult = function (item) {
                 return item.text;
             };
-
-            domains[select2Config.dataKey] = [];
-            domains = select2Config.domains || branchList.domains || (branchList.viewModel ? branchList.viewModel.domains : undefined) || domains;
-            select2Config.data = domains[select2Config.dataKey];
 
             _.each(select2Config.data, function (item) {
                 if (item.collector === 'collector') {
@@ -79,11 +72,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
 
             $(el).on("change", function(val) {
-                // $(".select2-container .select2-choice").css({ "height": "200px;" }); Trying to change height of select2 result container to show more parents
-                if(val.added){
-                    return select2Config.value({'value':val.added.id, 'label':val.added.text, 'entitytypeid': val.added.entitytypeid});
-                }
-                return select2Config.value(val.val);
+                return allBindings.value(val.val);
             });
         },
 
