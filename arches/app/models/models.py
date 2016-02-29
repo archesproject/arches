@@ -7,10 +7,17 @@
 #
 # Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'
 # into your database.
+
 from __future__ import unicode_literals
 
-from django.contrib.gis.db import models
+import os
 import uuid
+from django.conf import settings
+from django.contrib.gis.db import models
+from django.core.files.storage import FileSystemStorage
+
+widget_storage_location = FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'app/templates/views/forms/widgets/'))
+
 
 class Addresses(models.Model):
     addressnum = models.TextField(blank=True, null=True)
@@ -351,7 +358,7 @@ class Values(models.Model):
 class Widgets(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
-    template = models.FileField(upload_to='app/templates/views/forms/widgets/')
+    template = models.FileField(storage=widget_storage_location)
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
 

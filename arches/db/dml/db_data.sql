@@ -124,7 +124,7 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'string', 'app/templates/views/forms/widgets/string.htm');
+    VALUES ('10000000-0000-0000-0000-000000000001', 'string', 'string.htm');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'app/templates/views/forms/widgets/select.htm');
+    VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'select.htm');
