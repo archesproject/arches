@@ -42,7 +42,7 @@ class Command(BaseCommand):
     """
     
     option_list = BaseCommand.option_list + (
-        make_option('-o', '--operation', action='store', dest='operation', default='setup',
+        make_option('-o', '--operation', action='store', dest='operation', default='',
             type='choice', choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' + 
