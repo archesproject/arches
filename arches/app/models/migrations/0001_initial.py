@@ -451,6 +451,7 @@ class Migration(migrations.Migration):
             name='ResourceInstance',
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('resourceclassid', models.ForeignKey(to='models.Node', db_column='resourceclassid')),
                 ('col1', models.TextField(null=True, blank=True)),
             ],
             options={

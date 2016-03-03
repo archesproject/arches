@@ -302,6 +302,7 @@ class ResourceClassXForm(models.Model):
 
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    resourceclassid = models.ForeignKey(Node, db_column='resourceclassid')
     col1 = models.TextField(blank=True, null=True)
 
     class Meta:
