@@ -14,6 +14,7 @@ import os
 import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 
 widget_storage_location = FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'app/templates/views/forms/widgets/'))
@@ -314,7 +315,7 @@ class Tile(models.Model): #Tile
     cardid = models.ForeignKey('Card', db_column='cardid')
     parenttileid = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     tilegroupid = models.TextField()  # This field type is a guess.
-    data = models.TextField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
+    data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
 
     class Meta:
         managed = True

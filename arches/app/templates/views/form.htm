@@ -37,8 +37,8 @@
 
                             
                             <!-- Actual Card HTML goes here -->
-                            <div data-bind="with: form.tiles">
-                                <div data-bind="with: $data['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}']()[0].tileinstancedata">
+                            <div data-bind="with: form.tiles['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}']">
+                                <div data-bind="with: $data[0].data">
                                     {% for widget in card.widgets %}
                                         {% include widget.path %}
                                     {% endfor %}
@@ -46,11 +46,11 @@
 
                                 <div class="install-buttons">
                                     {% if card.cardinality != 'n' %}
-                                    <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: $root.form.cancelEdit.bind($data, $data['{{card.id}}{% if card.cardinality == 'n' %}-blank{% endif %}'])">{% trans "Cancel" %}</button>
-                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($data, '{{card.id}}', $data['{{card.id}}'])">{% trans "Save" %}</button>
+                                    <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: $root.form.cancelEdit.bind($data, $data[0])">{% trans "Cancel" %}</button>
+                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($parent.form.tiles, '{{card.id}}', $data[0])">{% trans "Save" %}</button>
                                     {% endif %}
                                     {% if card.cardinality == 'n' %}
-                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($data, '{{card.id}}', $data['{{card.id}}-blank'])">{% trans "Save" %}</button>
+                                    <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($parent.form.tiles, '{{card.id}}', $data[0])">{% trans "Save" %}</button>
                                     {% endif %}
                                 </div>
 
@@ -61,7 +61,7 @@
                             <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: form.tiles['{{card.id}}']">
                                 
                                 <!-- Record -->
-                                <div data-bind="with: $data.tileinstancedata">
+                                <div data-bind="with: $data.data">
                                     <div id="record-1" class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250);" data-bind="click: $root.form.expandTile">
                                         <h5 class="list-group-item-heading text-thin">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
                                         
@@ -88,7 +88,7 @@
 
                                             <div class="install-buttons">
                                                 <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
-                                                <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" style="">{% trans "Save" %}</button>
+                                                <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($parent, '{{card.id}}', $parent)">{% trans "Save" %}</button>
                                             </div>
 
                                         </div>

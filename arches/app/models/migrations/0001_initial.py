@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import os
 from django.conf import settings
 from django.db import migrations, models
+from django.contrib.postgres.fields import JSONField
 import uuid
 import django.contrib.gis.db.models.fields
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
@@ -475,7 +476,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('tilegroupid', models.TextField()),
-                ('data', models.TextField(null=True, blank=True, db_column='tiledata')),
+                ('data', JSONField(null=True, blank=True, db_column='tiledata')),
                 ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
                 ('parenttileid', models.ForeignKey(db_column='parenttileid', blank=True, to='models.Tile', null=True)),
                 ('resourceinstanceid', models.ForeignKey(to='models.ResourceInstance', db_column='resourceinstanceid')),

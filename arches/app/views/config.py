@@ -21,154 +21,187 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from arches.app.models import models
 from django.utils.translation import ugettext as _
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.app_settings import AppSettings
 
 @csrf_exempt
 def manager(request):
 
-    widgets = models.Widget.objects.all()
-    string_widget = widgets.get(name='string')
-    select_widget = widgets.get(name='select')
+    if request.method == 'GET':
+        resourceinstanceid = '40000000-0000-0000-0000-000000000000'
+        resourceclassid = '20000000-0000-0000-0000-000000000000'
 
-    forms = [{
-        'id': '1',
-        'title': _('Server Settings'),
-        'subtitle': _('Check/Update settings for Arches'),
-        'cardgroups': [{
-            'id': '1-1',
-            'title': _('Arches Server Settings'),
-            'cards': [{
-                'id': 'DATABASE',
-                'title': _('Database'),
-                'cardinality': '1',
-                'description': _('Update your PostgreSQL database access information'),
-                'widgets':[{
-                    'path': string_widget.template.path,
-                    'label': 'Database Name',
-                    'placeholder': '',
-                    'nodeid': 'NAME'
-                },{
-                    'path': string_widget.template.path,
-                    'label': 'User',
-                    'placeholder': '',
-                    'nodeid': 'USER'
-                },{
-                    'path': string_widget.template.path,
-                    'label': 'Password',
-                    'placeholder': '',
-                    'nodeid': 'PASSWORD'
-                },{
-                    'path': string_widget.template.path,
-                    'label': 'Port',
-                    'placeholder': '',
-                    'nodeid': 'PORT'
-                }]
-            },{
-                'id': 'cardid1-1-2',
-                'title': _('Keys'),
-                'cardinality': 'n',
-                'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
-                'widgets':[{
-                    'path': select_widget.template.path,
-                    'label': 'Service Provider',
-                    'placeholder': 'e.g.: MapBox',
-                    'nodeid': 'nodeid5',
-                    'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
-                },{
-                    'path': string_widget.template.path,
-                    'label': 'Service Name',
-                    'placeholder': 'e.g. MapBox Base Maps',
-                    'nodeid': 'nodeid6'
-                },{
-                    'path': string_widget.template.path,
-                    'label': 'Key',
-                    'placeholder': 'Enter key value',
-                    'nodeid': 'nodeid7'
+        widgets = models.Widget.objects.all()
+        string_widget = widgets.get(name='string')
+        select_widget = widgets.get(name='select')
+
+        forms = [{
+            'id': '1',
+            'title': _('Server Settings'),
+            'subtitle': _('Check/Update settings for Arches'),
+            'cardgroups': [{
+                'id': '1-1',
+                'title': _('Arches Server Settings'),
+                'cards': [
+                # {
+                #     'id': 'DATABASE',
+                #     'title': _('Database'),
+                #     'cardinality': '1',
+                #     'description': _('Update your PostgreSQL database access information'),
+                #     'widgets':[{
+                #         'path': string_widget.template.path,
+                #         'label': 'Database Name',
+                #         'placeholder': '',
+                #         'nodeid': 'NAME'
+                #     },{
+                #         'path': string_widget.template.path,
+                #         'label': 'User',
+                #         'placeholder': '',
+                #         'nodeid': 'USER'
+                #     },{
+                #         'path': string_widget.template.path,
+                #         'label': 'Password',
+                #         'placeholder': '',
+                #         'nodeid': 'PASSWORD'
+                #     },{
+                #         'path': string_widget.template.path,
+                #         'label': 'Port',
+                #         'placeholder': '',
+                #         'nodeid': 'PORT'
+                #     }]
+                # },
+                {
+                    'id': '30000000-0000-0000-0000-000000000000',
+                    'title': _('Keys'),
+                    'cardinality': 'n',
+                    'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
+                    'widgets':[{
+                        'path': select_widget.template.path,
+                        'label': 'Service Provider',
+                        'placeholder': 'e.g.: MapBox',
+                        'nodeid': '20000000-0000-0000-0000-000000000003',
+                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
+                    },{
+                        'path': string_widget.template.path,
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                    },{
+                        'path': string_widget.template.path,
+                        'label': 'Key',
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                    }]
                 }]
             }]
         }]
-    }]
 
-    app_settings = AppSettings()
+        # add placeholders for each card
+        t = {}
+        for form in forms:
+            for cardgroup in form['cardgroups']:
+                for card in cardgroup['cards']:
+                    tile = models.Tile()
+                    tile.tileid = ''
+                    tile.resourceinstanceid_id = resourceinstanceid
+                    #tile.resourceclassid_id = resourceclassid
+                    tile.cardid_id = card['id']
+                    tile.data = {}
+                    for widget in card['widgets']:
+                        tile.data[widget['nodeid']] = ''
+                    t[card['id']+'-blank'] = [tile]
+                    t[card['id']] = []
+        
+        # append actual data            
+        for tile in models.Tile.objects.filter(resourceinstanceid=resourceinstanceid):
+            t[str(tile.cardid_id)].append(tile)
 
-    db = app_settings.get('DATABASES')['default']
 
-    tiles = {
-        "DATABASE": [{
-            'tileinstanceid': '',
-            'tilegroupid': '12',
-            'tileinstancedata': {
-                "USER": db['USER'],
-                "PASSWORD": db['PASSWORD'],
-                "PORT": db['PORT'],
-                "NAME": db['NAME'],
-            },
-            'cardid': '5d28d9c0-db90-11e5-8719-ef7f5d2d967b',
-            'parenttileinstanceid': '',
-            'resourceclassid': 'b9157be4-db90-11e5-8aeb-b7c0a160df7a',
-            'resourceinstanceid': '89f12728-db90-11e5-9016-5748aec58ad1'
-        }],
-        "cardid1-1-2": [{
-            'tileinstanceid': '',
-            'tilegroupid': '',
-            'tileinstancedata': {
-                "nodeid5": "1",
-                "nodeid6": "Map Key",
-                "nodeid7": "23984ll2399494",
-            },
-            'cardid': 'cardid1-1-2',
-            'parenttileinstanceid': '',
-            'resourceclassid': '',
-            'resourceinstanceid': ''
-        },{
-            'tileinstanceid': '',
-            'tilegroupid': '',
-            'tileinstancedata': {
-                "nodeid5": "2",
-                "nodeid6": "MapBox Base Maps",
-                "nodeid7": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
-            },
-            'cardid': 'cardid1-1-2',
-            'parenttileinstanceid': '',
-            'resourceclassid': '',
-            'resourceinstanceid': ''
-        }],
-        "cardid1-1-2-blank": [{
-            'tileinstanceid': '',
-            'tilegroupid': '',
-            'tileinstancedata': {
-                "nodeid5": "",
-                "nodeid6": "",
-                "nodeid7": "",
-            },
-            'cardid': 'cardid1-1-2',
-            'parenttileinstanceid': '',
-            'resourceclassid': '',
-            'resourceinstanceid': ''
-        }]
-    }
+        # t = {
+        #     "DATABASE": [{
+        #         'tileid': '',
+        #         'tilegroupid': '12',
+        #         'data': {
+        #             "USER": db['USER'],
+        #             "PASSWORD": db['PASSWORD'],
+        #             "PORT": db['PORT'],
+        #             "NAME": db['NAME'],
+        #         },
+        #         'cardid': '5d28d9c0-db90-11e5-8719-ef7f5d2d967b',
+        #         'resourceclassid': 'b9157be4-db90-11e5-8aeb-b7c0a160df7a',
+        #         'resourceinstanceid': '89f12728-db90-11e5-9016-5748aec58ad1'
+        #     }],
+        #     "30000000-0000-0000-0000-000000000000": [{
+        #         'tileid': '',
+        #         'tilegroupid': '',
+        #         'data': {
+        #             "20000000-0000-0000-0000-000000000003": "1",
+        #             "20000000-0000-0000-0000-000000000002": "Map Key",
+        #             "20000000-0000-0000-0000-000000000004": "23984ll2399494",
+        #         },
+        #         'cardid': '30000000-0000-0000-0000-000000000000',
+        #         'resourceclassid': '',
+        #         'resourceinstanceid': ''
+        #     },{
+        #         'tileid': '',
+        #         'tilegroupid': '',
+        #         'data': {
+        #             "20000000-0000-0000-0000-000000000003": "2",
+        #             "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
+        #             "20000000-0000-0000-0000-000000000004": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
+        #         },
+        #         'cardid': '30000000-0000-0000-0000-000000000000',
+        #         'resourceclassid': '',
+        #         'resourceinstanceid': ''
+        #     }],
+        #     "30000000-0000-0000-0000-000000000000-blank": [{
+        #         'tileid': '',
+        #         'tilegroupid': '',
+        #         'data': {
+        #             "20000000-0000-0000-0000-000000000003": "",
+        #             "20000000-0000-0000-0000-000000000002": "",
+        #             "20000000-0000-0000-0000-000000000004": "",
+        #         },
+        #         'cardid': '30000000-0000-0000-0000-000000000000',
+        #         'resourceclassid': '',
+        #         'resourceinstanceid': ''
+        #     }]
+        # }
 
-    
+        return render(request, 'config-manager.htm', {
+            'main_script': 'config-manager',
+            'active_page': 'Home',
+            'forms': forms,
+            'tiledata': JSONSerializer().serialize(t)
+        })
+
+
     if request.method == 'POST':
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
             print data
-            # tile = models.Tileinstances()
-            # tile.tileinstanceid = str(uuid.uuid4())
-            # tile.cardid_id = data['cardid']
-            # tile.tileinstancedata = data['tileinstancedata']
-            # tile.tilegroupid = data['tilegroupid']
-            # tile.resourceinstanceid_id = data['resourceinstanceid']
-            # tile.resourceclassid_id = data['resourceclassid']
-            # tile.save()
-            #app_settings.update(data)
+            data['tileid'], created = uuid.get_or_create(data['tileid'])
+            tile, created = models.Tile.objects.update_or_create(
+                tileid = data['tileid'], 
+                defaults = {
+                    'tilegroupid': data['tilegroupid'], 
+                    'cardid_id': data['cardid'],
+                    'data': data['data'],
+                    'resourceinstanceid_id': data['resourceinstanceid'],
+                    #'resourceclassid_id': data['resourceclassid']
+                }
+            )
+        return JSONResponse(tile)
 
-    return render(request, 'config-manager.htm', {
-        'main_script': 'config-manager',
-        'active_page': 'Home',
-        'app_settings': app_settings,
-        'forms': forms,
-        'tiledata': JSONSerializer().serialize(tiles)
-    })
+# Move to util function
+def get(id):
+    try:
+        uuid.UUID(id)
+        return uuid.UUID(id), False
+    except(ValueError):
+        return uuid.uuid4(), True
+
+
+uuid.get_or_create = get

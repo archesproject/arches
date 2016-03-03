@@ -3,7 +3,7 @@
     <div class="form-group">
         <label class="col-xs-12 control-label widget-input-label" for="">{{widget.label}}</label>
         <div class="col-xs-12 col-md-9">
-            <input class="select2 arches-select2-crud-form" data-bind="select2: {value: {{widget.nodeid}}, select2Config: {{widget.select2Config}}, placeholder: '{{widget.placeholder}}'}"></input>
+            <input class="select2 arches-select2-crud-form" data-bind="select2: {value: $data['{{widget.nodeid}}'], select2Config: {{widget.select2Config}}, placeholder: '{{widget.placeholder}}'}"></input>
         </div>
     </div>
 </div>

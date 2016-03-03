@@ -19,12 +19,20 @@ define(['jquery',
 
         saveTile: function(cardid, data, e){
             console.log(ko.toJS(data));
-            this[cardid].push(koMapping.fromJS(ko.toJS(data)[0]));
+            var model = new ConfigModel(ko.toJS(data));
+            model.save(function(request, status, model){
+                if(request.status === 200){
+                    if(!(cardid in this)){
+                        this[cardid] = koMapping.fromJS([]);
+                    }
+                    this[cardid].push(koMapping.fromJS(request.responseJSON));
+                }
+            }, this);
         },
 
         updateTile: function(cardid, data, e){
             console.log(ko.toJS(data));
-            var model = new ConfigModel(ko.toJS(data)[0]);
+            var model = new ConfigModel(ko.toJS(data));
             model.save();
         },
 
