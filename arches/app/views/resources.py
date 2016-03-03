@@ -215,5 +215,5 @@ def edit_history(request, resourceid=''):
 def get_admin_areas(request):
     geomString = request.GET.get('geom', '')
     geom = GEOSGeometry(geomString)
-    intersection = models.Overlays.objects.filter(geometry__intersects=geom)
+    intersection = models.Overlay.objects.filter(geometry__intersects=geom)
     return JSONResponse({'results': intersection}, indent=4)

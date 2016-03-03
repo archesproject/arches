@@ -27,7 +27,7 @@ import os
 from tests import test_settings
 from django.test import TestCase,SimpleTestCase
 from arches.app.models.app_settings import AppSettings
-from arches.app.models.models import Nodes
+from arches.app.models.models import Node
 import codecs
 
 

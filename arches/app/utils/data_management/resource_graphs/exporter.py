@@ -1,4 +1,4 @@
-# from arches.app.models.models import VwExportNodes as Nodes
+# from arches.app.models.models import VwExportNodes as Node
 # from arches.app.models.models import VwExportEdges as Edges
 import csv
 from pprint import pprint as pp
@@ -12,7 +12,7 @@ def export(export_dir):
     write_edges(export_dir)
 
 def write_nodes(export_dir):
-    nodes = Nodes.objects.all()
+    nodes = Node.objects.all()
     entitytypeids = {}
     for node in nodes:
         if node.assettype not in entitytypeids:
@@ -28,7 +28,7 @@ def write_nodes(export_dir):
                 writer.writerow(node)
 
 def write_edges(export_dir):
-    edges = Edges.objects.all()
+    edges = Edge.objects.all()
     entitytypeids = {}
     for edge in edges:
         if edge.assettype not in entitytypeids:

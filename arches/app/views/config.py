@@ -27,7 +27,7 @@ from arches.app.models.app_settings import AppSettings
 @csrf_exempt
 def manager(request):
 
-    widgets = models.Widgets.objects.all()
+    widgets = models.Widget.objects.all()
     string_widget = widgets.get(name='string')
     select_widget = widgets.get(name='select')
 

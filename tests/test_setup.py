@@ -17,7 +17,7 @@ def install(path_to_source_data_dir=None):
 
     execute_sql("Truncate public.auth_permission Cascade;")
 
-    for concept in models.Concepts.objects.filter(nodetype='Concept'):
+    for concept in models.Concept.objects.filter(nodetype='Concept'):
         concept.delete()
 
     

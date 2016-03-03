@@ -52,14 +52,14 @@ class SKOSReader(object):
         """
 
         baseuuid = uuid.uuid4()
-        allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
+        allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
         value_types = models.ValueTypes.objects.all()
         skos_value_types = value_types.filter(namespace = 'skos')
         skos_value_types_list = skos_value_types.values_list('valuetype', flat=True)
         dcterms_value_types = value_types.filter(namespace = 'dcterms')
 
-        relation_types = models.DRelationtypes.objects.all()
+        relation_types = models.DRelationType.objects.all()
         skos_relation_types = relation_types.filter(namespace = 'skos')
 
         
@@ -78,12 +78,12 @@ class SKOSReader(object):
                 for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
                         if hasattr(object, 'language') and object.language not in allowed_languages: 
-                            newlang = models.DLanguages()
+                            newlang = models.DLanguage()
                             newlang.pk = object.language
                             newlang.languagename = object.language
                             newlang.isdefault = False
                             newlang.save()
-                            allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
+                            allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                         try:
                             # first try and get any values associated with the concept_scheme
@@ -118,12 +118,12 @@ class SKOSReader(object):
                     for predicate, object in graph.predicate_objects(subject = s):
                         if str(SKOS) in predicate:
                             if hasattr(object, 'language') and object.language not in allowed_languages: 
-                                newlang = models.DLanguages()
+                                newlang = models.DLanguage()
                                 newlang.pk = object.language
                                 newlang.languagename = object.language
                                 newlang.isdefault = False
                                 newlang.save()
-                                allowed_languages = models.DLanguages.objects.values_list('pk', flat=True)
+                                allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
                             relation_or_value_type = predicate.replace(SKOS, '') # this is essentially the skos element type within a <skos:Concept> element (eg: prefLabel, broader, etc...)
 
@@ -146,7 +146,7 @@ class SKOSReader(object):
 
                 # insert the concept relations
                 for relation in self.relations:
-                    newrelation = models.Relations()
+                    newrelation = models.Relation()
                     newrelation.relationid = str(uuid.uuid4())
                     newrelation.conceptidfrom_id = relation['source']
                     newrelation.conceptidto_id = relation['target']

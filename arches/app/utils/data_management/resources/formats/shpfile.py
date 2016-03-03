@@ -6,8 +6,8 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiLineString
 from django.contrib.gis.geos import MultiPolygon
-from arches.app.models.models import Concepts
 # from arches.app.models.models import VwConcepts
+from arches.app.models.models import Concept
 # from arches.app.models.models import EntityTypes
 from arches.app.models.concept import Concept
 from format import Writer
@@ -217,7 +217,7 @@ class ShapeReader():
         '''
         concept = None
         try:
-            concept = Concepts.objects.get(legacyoid = concept_name)
+            concept = Concept.objects.get(legacyoid = concept_name)
         except:
             print "No Concept found with the name %s"%concept_name
         if concept is not None:

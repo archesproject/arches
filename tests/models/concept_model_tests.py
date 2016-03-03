@@ -56,7 +56,7 @@ class ConceptModelTests(TestCase):
         self.assertEqual(concept_out.values[0].value, 'updated pref label')
 
         concept_out.delete(delete_self=True)
-        with self.assertRaises(models.Concepts.DoesNotExist):
+        with self.assertRaises(models.Concept.DoesNotExist):
             deleted_concept = Concept().get(id=concept_out.id)
 
 

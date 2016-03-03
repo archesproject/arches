@@ -4,8 +4,8 @@ import sys
 from django.conf import settings
 from django.db import connection
 from django.forms.models import model_to_dict
-from arches.app.models.models import Concepts
-from arches.app.models.models import Values
+from arches.app.models.models import Concept
+from arches.app.models.models import Value
 from arches.app.models.concept import Concept, CORE_CONCEPTS
 from arches.app.models.resource import Resource
 import arches.app.models.models as archesmodels

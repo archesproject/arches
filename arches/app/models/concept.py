@@ -87,16 +87,16 @@ class Concept(object):
                 for relatedconcept in value['relatedconcepts']:
                     self.addrelatedconcept(relatedconcept)
 
-        if isinstance(value, models.Concepts):
+        if isinstance(value, models.Concept):
             self.id = str(value.pk)
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
     def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
         if id != '':
-            self.load(models.Concepts.objects.get(pk=id))
+            self.load(models.Concept.objects.get(pk=id))
         elif legacyoid != '':
-            self.load(models.Concepts.objects.get(legacyoid=legacyoid))
+            self.load(models.Concept.objects.get(legacyoid=legacyoid))
 
         if semantic == True:
             pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
@@ -113,22 +113,22 @@ class Concept(object):
             if include != None:
                 if len(include) > 0 and len(exclude) > 0:
                     raise Exception('Only include values for include or exclude, but not both')
-                include = include if len(include) != 0 else models.DValuetypes.objects.distinct('category').values_list('category', flat=True)
+                include = include if len(include) != 0 else models.DValueType.objects.distinct('category').values_list('category', flat=True)
                 include = set(include).difference(exclude)
                 exclude = []
 
                 if len(include) > 0:
-                    values = models.Values.objects.filter(conceptid = self.id)
+                    values = models.Value.objects.filter(conceptid = self.id)
                     for value in values:
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.Relations.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))[0:1]
+            hassubconcepts = models.Relation.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))[0:1]
             if len(hassubconcepts) > 0:
                 self.hassubconcepts = True
 
             if include_subconcepts:
-                conceptrealations = models.Relations.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))
+                conceptrealations = models.Relation.objects.filter(Q(conceptidfrom = self.id), pathway_filter, ~Q(relationtype = 'related'))
                 if depth_limit == None or downlevel < depth_limit:
                     if depth_limit != None:
                         downlevel = downlevel + 1                
@@ -142,7 +142,7 @@ class Concept(object):
                     self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False) 
 
             if include_parentconcepts:
-                conceptrealations = models.Relations.objects.filter(Q(conceptidto = self.id), pathway_filter, ~Q(relationtype = 'related'))
+                conceptrealations = models.Relation.objects.filter(Q(conceptidto = self.id), pathway_filter, ~Q(relationtype = 'related'))
                 if up_depth_limit == None or uplevel < up_depth_limit:
                     if up_depth_limit != None:
                         uplevel = uplevel + 1          
@@ -155,7 +155,7 @@ class Concept(object):
                         self.parentconcepts.append(parentconcept)
 
             if include_relatedconcepts:
-                conceptrealations = models.Relations.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
+                conceptrealations = models.Relation.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptidto = self.id) | Q(conceptidfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptidto_id != self.id:
                         relatedconcept = Concept().get(relation.conceptidto_id, include=['label'])
@@ -170,7 +170,7 @@ class Concept(object):
             
     def save(self):
         self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-        concept, created = models.Concepts.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid if self.legacyoid != '' else self.id, 'nodetype_id': self.nodetype})
+        concept, created = models.Concept.objects.get_or_create(pk=self.id, defaults={'legacyoid': self.legacyoid if self.legacyoid != '' else self.id, 'nodetype_id': self.nodetype})
 
         for value in self.values:
             if not isinstance(value, ConceptValue): 
@@ -214,21 +214,21 @@ class Concept(object):
         for subconcept in self.subconcepts:
             concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
             for key, concept in concepts_to_delete.iteritems():
-                models.Concepts.objects.get(pk=key).delete()
+                models.Concept.objects.get(pk=key).delete()
 
         for parentconcept in self.parentconcepts:
-            conceptrelations = models.Relations.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
+            conceptrelations = models.Relation.objects.filter(relationtype__category = 'Semantic Relations', conceptidfrom = parentconcept.id, conceptidto = self.id)
             for relation in conceptrelations:
                 relation.delete()
 
         deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:
-            conceptrelations = models.Relations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
+            conceptrelations = models.Relation.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidto = relatedconcept.id, conceptidfrom = self.id)
             for relation in conceptrelations:
                 relation.delete()
                 deletedrelatedconcepts.append(relatedconcept)
 
-            conceptrelations = models.Relations.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
+            conceptrelations = models.Relation.objects.filter(Q(relationtype = 'related') | Q(relationtype = 'member') | Q(relationtype__category = 'Mapping Properties'), conceptidfrom = relatedconcept.id, conceptidto = self.id)
             for relation in conceptrelations:
                 relation.delete()
                 deletedrelatedconcepts.append(relatedconcept)
@@ -245,7 +245,7 @@ class Concept(object):
         if delete_self:
             concepts_to_delete = Concept.gather_concepts_to_delete(self)
             for key, concept in concepts_to_delete.iteritems():
-                models.Concepts.objects.get(pk=key).delete()
+                models.Concept.objects.get(pk=key).delete()
         return
 
     def add_relation(self, concepttorelate, relationtype):
@@ -254,7 +254,7 @@ class Concept(object):
 
         """
 
-        relation = models.Relations()
+        relation = models.Relation()
         relation.pk = str(uuid.uuid4())
         relation.conceptidfrom_id = self.id
         relation.conceptidto_id = concepttorelate.id
@@ -452,7 +452,7 @@ class Concept(object):
             self.values.append(ConceptValue(value))
         elif isinstance(value, ConceptValue):
             self.values.append(value)
-        elif isinstance(value, models.Values):
+        elif isinstance(value, models.Value):
             self.values.append(ConceptValue(value))
         else:
             raise Exception('Invalid value definition: %s' % (value))
@@ -492,7 +492,7 @@ class Concept(object):
                 self.children = []    
 
         def _findNarrowerConcept(conceptid, depth_limit=None, level=0):
-            labels = models.Values.objects.filter(conceptid = conceptid)
+            labels = models.Value.objects.filter(conceptid = conceptid)
             ret = concept()  
             temp = Concept()        
             for label in labels:
@@ -506,7 +506,7 @@ class Concept(object):
             ret.id = label.conceptid
             ret.labelid = label.id
 
-            conceptrealations = models.Relations.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
+            conceptrealations = models.Relation.objects.filter(Q(conceptidfrom = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if depth_limit != None and len(conceptrealations) > 0 and level >= depth_limit:
                 ret.load_on_demand = True
             else:
@@ -518,9 +518,9 @@ class Concept(object):
             return ret 
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
-            conceptrealations = models.Relations.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
+            conceptrealations = models.Relation.objects.filter(Q(conceptidto = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if len(conceptrealations) > 0 and conceptid != top_concept:
-                labels = models.Values.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
+                labels = models.Value.objects.filter(conceptid = conceptrealations[0].conceptidfrom_id)
                 ret = concept()          
                 temp = Concept()        
                 for label in labels:
@@ -537,7 +537,7 @@ class Concept(object):
 
         graph = []
         #if self.id == None or self.id == '' or self.id == top_concept:
-        concepts = models.Concepts.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
+        concepts = models.Concept.objects.filter(Q(nodetype = 'ConceptScheme') | Q(nodetype = 'GroupingNode'))
         for conceptmodel in concepts:
             graph.append(_findNarrowerConcept(conceptmodel.pk, depth_limit=1))
         #else:
@@ -786,31 +786,31 @@ class ConceptValue(object):
         return ('%s: %s = "%s" in lang %s') % (self.__class__, self.type, self.value, self.language)
 
     def get(self, id=''):
-        self.load(models.Values.objects.get(pk = id))
+        self.load(models.Value.objects.get(pk = id))
         return self
 
     def save(self):
         if self.value.strip() != '':
             self.id = self.id if (self.id != '' and self.id != None) else str(uuid.uuid4())
-            value = models.Values()
+            value = models.Value()
             value.pk = self.id
             value.value = self.value
-            value.conceptid_id = self.conceptid # models.Concepts.objects.get(pk=self.conceptid)
-            value.valuetype_id = self.type # models.DValuetypes.objects.get(pk=self.type)
+            value.conceptid_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
+            value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
             if self.language != '':
-                value.languageid_id = self.language # models.DLanguages.objects.get(pk=self.language)
+                value.languageid_id = self.language # models.DLanguage.objects.get(pk=self.language)
             value.save()
             self.category = value.valuetype.category
 
     def delete(self):
         if self.id != '':
-            newvalue = models.Values.objects.get(pk=self.id)
+            newvalue = models.Value.objects.get(pk=self.id)
             newvalue.delete()
             self = ConceptValue()
             return self
     
     def load(self, value):
-        if isinstance(value, models.Values):
+        if isinstance(value, models.Value):
             self.id = str(value.pk)
             self.conceptid = str(value.conceptid.pk)
             self.type = value.valuetype.pk

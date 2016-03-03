@@ -147,7 +147,7 @@ class Migration(migrations.Migration):
 
 
         migrations.CreateModel(
-            name='Addresses',
+            name='Address',
             fields=[
                 ('addressnum', models.TextField(null=True, blank=True)),
                 ('addressstreet', models.TextField(null=True, blank=True)),
@@ -163,7 +163,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Branchmetadata',
+            name='BranchMetadata',
             fields=[
                 ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, editable=False, primary_key=True)),
                 ('name', models.BigIntegerField(null=True, blank=True)),
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Cardgroups',
+            name='CardGroup',
             fields=[
                 ('cardgroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Cards',
+            name='Card',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
@@ -205,11 +205,11 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='CardsXCardgroups',
+            name='CardXCardGroup',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('cardgroupid', models.ForeignKey(to='models.Cardgroups', db_column='cardgroupid')),
-                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
+                ('cardgroupid', models.ForeignKey(to='models.CardGroup', db_column='cardgroupid')),
+                ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
             ],
             options={
                 'db_table': 'cards_x_cardgroups',
@@ -217,10 +217,10 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='CardsXNodesXWidgets',
+            name='CardXNodeXWidget',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
+                ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
             ],
             options={
                 'db_table': 'cards_x_nodes_x_widgets',
@@ -228,19 +228,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Classes',
-            fields=[
-                ('classid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('classname', models.TextField()),
-                ('isactive', models.BooleanField()),
-            ],
-            options={
-                'db_table': 'classes',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='Concepts',
+            name='Concept',
             fields=[
                 ('conceptid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('legacyoid', models.TextField(unique=True)),
@@ -251,7 +239,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='DLanguages',
+            name='DLanguage',
             fields=[
                 ('languageid', models.TextField(serialize=False, primary_key=True)),
                 ('languagename', models.TextField()),
@@ -263,7 +251,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='DNodetypes',
+            name='DNodeType',
             fields=[
                 ('nodetype', models.TextField(serialize=False, primary_key=True)),
                 ('namespace', models.TextField()),
@@ -274,7 +262,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='DRelationtypes',
+            name='DRelationType',
             fields=[
                 ('relationtype', models.TextField(serialize=False, primary_key=True)),
                 ('category', models.TextField()),
@@ -286,7 +274,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='DValuetypes',
+            name='DValueType',
             fields=[
                 ('valuetype', models.TextField(serialize=False, primary_key=True)),
                 ('category', models.TextField(null=True, blank=True)),
@@ -300,13 +288,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Edges',
+            name='Edge',
             fields=[
                 ('edgeid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
                 ('description', models.TextField()),
                 ('crmproperty', models.TextField()),
-                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.Branchmetadata', null=True)),
+                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.BranchMetadata', null=True)),
             ],
             options={
                 'db_table': 'edges',
@@ -337,7 +325,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Forms',
+            name='Form',
             fields=[
                 ('formid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
@@ -350,11 +338,11 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='FormsXCardGroups',
+            name='FormXCardGroup',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('cardgroupid', models.ForeignKey(to='models.Cardgroups', db_column='cardgroupid')),
-                ('formid', models.ForeignKey(to='models.Forms', db_column='formid')),
+                ('cardgroupid', models.ForeignKey(to='models.CardGroup', db_column='cardgroupid')),
+                ('formid', models.ForeignKey(to='models.Form', db_column='formid')),
             ],
             options={
                 'db_table': 'forms_x_card_groups',
@@ -362,7 +350,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Nodegroups',
+            name='NodeGroup',
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('cardinality', models.TextField()),
@@ -374,7 +362,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Nodes',
+            name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
@@ -386,8 +374,8 @@ class Migration(migrations.Migration):
                 ('inputlabel', models.TextField(null=True, blank=True)),
                 ('inputmask', models.TextField(null=True, blank=True)),
                 ('status', models.BigIntegerField(null=True, blank=True)),
-                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.Branchmetadata', null=True)),
-                ('nodegroupid', models.ForeignKey(db_column='nodegroupid', blank=True, to='models.Nodegroups', null=True)),
+                ('branchmetadataid', models.ForeignKey(db_column='branchmetadataid', blank=True, to='models.BranchMetadata', null=True)),
+                ('nodegroupid', models.ForeignKey(db_column='nodegroupid', blank=True, to='models.NodeGroup', null=True)),
             ],
             options={
                 'db_table': 'nodes',
@@ -395,7 +383,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Overlays',
+            name='Overlay',
             fields=[
                 ('overlaytyp', models.TextField(null=True, blank=True)),
                 ('overlayval', models.TextField(null=True, blank=True)),
@@ -408,7 +396,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Parcels',
+            name='Parcel',
             fields=[
                 ('parcelapn', models.TextField(null=True, blank=True)),
                 ('vintage', models.TextField(null=True, blank=True)),
@@ -421,25 +409,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Properties',
-            fields=[
-                ('propertyid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('propertydisplay', models.TextField(null=True, blank=True)),
-                ('classdomain', models.ForeignKey(related_name='property_classdomains', db_column='classdomain', to='models.Classes')),
-                ('classrange', models.ForeignKey(related_name='property_classranges', db_column='classrange', to='models.Classes')),
-            ],
-            options={
-                'db_table': 'properties',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='Relations',
+            name='Relation',
             fields=[
                 ('relationid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('conceptidfrom', models.ForeignKey(related_name='relation_concepts_from', db_column='conceptidfrom', to='models.Concepts')),
-                ('conceptidto', models.ForeignKey(related_name='relation_concepts_to', db_column='conceptidto', to='models.Concepts')),
-                ('relationtype', models.ForeignKey(to='models.DRelationtypes', db_column='relationtype')),
+                ('conceptidfrom', models.ForeignKey(related_name='relation_concepts_from', db_column='conceptidfrom', to='models.Concept')),
+                ('conceptidto', models.ForeignKey(related_name='relation_concepts_to', db_column='conceptidto', to='models.Concept')),
+                ('relationtype', models.ForeignKey(to='models.DRelationType', db_column='relationtype')),
             ],
             options={
                 'db_table': 'relations',
@@ -447,12 +422,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Resource2ResourceConstraints',
+            name='Resource2ResourceConstraint',
             fields=[
                 ('resource2resourceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('cardinality', models.TextField(null=True, blank=True)),
-                ('resourceclassfrom', models.ForeignKey(related_name='resxres_contstraint_classes_from', db_column='resourceclassfrom', blank=True, to='models.Nodes', null=True)),
-                ('resourceclassto', models.ForeignKey(related_name='resxres_contstraint_classes_to', db_column='resourceclassto', blank=True, to='models.Nodes', null=True)),
+                ('resourceclassfrom', models.ForeignKey(related_name='resxres_contstraint_classes_from', db_column='resourceclassfrom', blank=True, to='models.Node', null=True)),
+                ('resourceclassto', models.ForeignKey(related_name='resxres_contstraint_classes_to', db_column='resourceclassto', blank=True, to='models.Node', null=True)),
             ],
             options={
                 'db_table': 'resource2resource_constraints',
@@ -460,11 +435,11 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='ResourceclassesXForms',
+            name='ResourceClassXForm',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('formid', models.ForeignKey(to='models.Forms', db_column='formid')),
-                ('resourceclassid', models.ForeignKey(db_column='resourceclassid', blank=True, to='models.Nodes', null=True)),
+                ('formid', models.ForeignKey(to='models.Form', db_column='formid')),
+                ('resourceclassid', models.ForeignKey(db_column='resourceclassid', blank=True, to='models.Node', null=True)),
             ],
             options={
                 'db_table': 'resourceclasses_x_forms',
@@ -472,7 +447,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Resourceinstances',
+            name='ResourceInstance',
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('col1', models.TextField(null=True, blank=True)),
@@ -496,29 +471,28 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Tileinstances',
+            name='Tile',
             fields=[
-                ('tileinstanceid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('tileid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('tilegroupid', models.TextField()),
-                ('tileinstancedata', models.TextField(null=True, blank=True)),
-                ('cardid', models.ForeignKey(to='models.Cards', db_column='cardid')),
-                ('parenttileinstanceid', models.ForeignKey(db_column='parenttileinstanceid', blank=True, to='models.Tileinstances', null=True)),
-                ('resourceclassid', models.ForeignKey(to='models.Nodes', db_column='resourceclassid')),
-                ('resourceinstanceid', models.ForeignKey(to='models.Resourceinstances', db_column='resourceinstanceid')),
+                ('data', models.TextField(null=True, blank=True, db_column='tiledata')),
+                ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
+                ('parenttileid', models.ForeignKey(db_column='parenttileid', blank=True, to='models.Tile', null=True)),
+                ('resourceinstanceid', models.ForeignKey(to='models.ResourceInstance', db_column='resourceinstanceid')),
             ],
             options={
-                'db_table': 'tileinstances',
+                'db_table': 'tiles',
                 'managed': True,
             },
         ),
         migrations.CreateModel(
-            name='Values',
+            name='Value',
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('value', models.TextField()),
-                ('conceptid', models.ForeignKey(to='models.Concepts', db_column='conceptid')),
-                ('languageid', models.ForeignKey(db_column='languageid', blank=True, to='models.DLanguages', null=True)),
-                ('valuetype', models.ForeignKey(to='models.DValuetypes', db_column='valuetype')),
+                ('conceptid', models.ForeignKey(to='models.Concept', db_column='conceptid')),
+                ('languageid', models.ForeignKey(db_column='languageid', blank=True, to='models.DLanguage', null=True)),
+                ('valuetype', models.ForeignKey(to='models.DValueType', db_column='valuetype')),
             ],
             options={
                 'db_table': 'values',
@@ -526,7 +500,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Widgets',
+            name='Widget',
             fields=[
                 ('widgetid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
@@ -542,84 +516,82 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='resourcexresource',
             name='relationshiptype',
-            field=models.ForeignKey(to='models.Values', db_column='relationshiptype'),
+            field=models.ForeignKey(to='models.Value', db_column='relationshiptype'),
         ),
         migrations.AddField(
             model_name='resourcexresource',
             name='resourceinstanceidfrom',
-            field=models.ForeignKey(related_name='resxres_resource_instance_ids_from', db_column='resourceinstanceidfrom', blank=True, to='models.Resourceinstances', null=True),
+            field=models.ForeignKey(related_name='resxres_resource_instance_ids_from', db_column='resourceinstanceidfrom', blank=True, to='models.ResourceInstance', null=True),
         ),
         migrations.AddField(
             model_name='resourcexresource',
             name='resourceinstanceidto',
-            field=models.ForeignKey(related_name='resxres_resource_instance_ids_to', db_column='resourceinstanceidto', blank=True, to='models.Resourceinstances', null=True),
+            field=models.ForeignKey(related_name='resxres_resource_instance_ids_to', db_column='resourceinstanceidto', blank=True, to='models.ResourceInstance', null=True),
         ),
         migrations.AddField(
-            model_name='edges',
+            model_name='edge',
             name='domainnodeid',
-            field=models.ForeignKey(related_name='edge_domains', db_column='domainnodeid', to='models.Nodes'),
+            field=models.ForeignKey(related_name='edge_domains', db_column='domainnodeid', to='models.Node'),
         ),
         migrations.AddField(
-            model_name='edges',
+            model_name='edge',
             name='rangenodeid',
-            field=models.ForeignKey(related_name='edge_ranges', db_column='rangenodeid', to='models.Nodes'),
+            field=models.ForeignKey(related_name='edge_ranges', db_column='rangenodeid', to='models.Node'),
         ),
         migrations.AddField(
-            model_name='concepts',
+            model_name='concept',
             name='nodetype',
-            field=models.ForeignKey(to='models.DNodetypes', db_column='nodetype'),
+            field=models.ForeignKey(to='models.DNodeType', db_column='nodetype'),
         ),
         migrations.AddField(
-            model_name='cardsxnodesxwidgets',
+            model_name='cardxnodexwidget',
             name='nodeid',
-            field=models.ForeignKey(to='models.Nodes', db_column='nodeid'),
+            field=models.ForeignKey(to='models.Node', db_column='nodeid'),
         ),
         migrations.AddField(
-            model_name='cardsxnodesxwidgets',
+            model_name='cardxnodexwidget',
             name='widgetid',
-            field=models.ForeignKey(to='models.Widgets', db_column='widgetid'),
+            field=models.ForeignKey(to='models.Widget', db_column='widgetid'),
         ),
         migrations.AddField(
-            model_name='cardgroups',
+            model_name='cardgroup',
             name='nodeid',
-            field=models.ForeignKey(db_column='nodeid', blank=True, to='models.Nodes', null=True),
+            field=models.ForeignKey(db_column='nodeid', blank=True, to='models.Node', null=True),
         ),
         migrations.AlterUniqueTogether(
-            name='resourceclassesxforms',
+            name='resourceclassxform',
             unique_together=set([('resourceclassid', 'formid')]),
         ),
         migrations.AlterUniqueTogether(
-            name='formsxcardgroups',
+            name='formxcardgroup',
             unique_together=set([('formid', 'cardgroupid')]),
         ),
         migrations.AlterUniqueTogether(
-            name='edges',
+            name='edge',
             unique_together=set([('rangenodeid', 'domainnodeid')]),
         ),
         migrations.AlterUniqueTogether(
-            name='cardsxnodesxwidgets',
+            name='cardxnodexwidget',
             unique_together=set([('nodeid', 'cardid', 'widgetid')]),
         ),
         migrations.AlterUniqueTogether(
-            name='cardsxcardgroups',
+            name='cardxcardgroup',
             unique_together=set([('cardgroupid', 'cardid')]),
         ),
 
         CreateAutoPopulateUUIDField('branchmetadata', ['branchmetadataid']),
         CreateAutoPopulateUUIDField('cardgroups', ['cardgroupid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
-        CreateAutoPopulateUUIDField('classes', ['classid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),
         CreateAutoPopulateUUIDField('edit_log', ['editlogid']),
         CreateAutoPopulateUUIDField('forms', ['formid']),
         CreateAutoPopulateUUIDField('nodegroups', ['nodegroupid']),
         CreateAutoPopulateUUIDField('nodes', ['nodeid']),
-        CreateAutoPopulateUUIDField('properties', ['propertyid']),
         CreateAutoPopulateUUIDField('relations', ['relationid']),
         CreateAutoPopulateUUIDField('resource2resource_constraints', ['resource2resourceid']),
         CreateAutoPopulateUUIDField('resourceinstances', ['resourceinstanceid']),
-        CreateAutoPopulateUUIDField('tileinstances', ['tileinstanceid']),
+        CreateAutoPopulateUUIDField('tiles', ['tileid']),
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 

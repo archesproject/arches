@@ -48,10 +48,10 @@ def get_sparql_providers(endpoint=None):
 @permission_required('edit')
 def rdm(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
-    languages = models.DLanguages.objects.all()
+    languages = models.DLanguage.objects.all()
 
     concept_schemes = []
-    for concept in models.Concepts.objects.filter(nodetype = 'ConceptScheme'):
+    for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
         concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
 
     return render(request, 'rdm.htm', {
@@ -86,10 +86,10 @@ def concept(request, conceptid):
             if not conceptid:
                 return render(request, 'views/rdm/concept-report.htm', {
                     'lang': lang,
-                    'concept_count': models.Concepts.objects.filter(nodetype='Concept').count(),
-                    'collection_count': models.Concepts.objects.filter(nodetype='Collection').count(),
-                    'scheme_count': models.Concepts.objects.filter(nodetype='ConceptScheme').count(),
-                    'entitytype_count': models.Concepts.objects.filter(nodetype='EntityType').count(),
+                    'concept_count': models.Concept.objects.filter(nodetype='Concept').count(),
+                    'collection_count': models.Concept.objects.filter(nodetype='Collection').count(),
+                    'scheme_count': models.Concept.objects.filter(nodetype='ConceptScheme').count(),
+                    'entitytype_count': models.Concept.objects.filter(nodetype='EntityType').count(),
                     'default_report': True
                 })
 
@@ -107,9 +107,9 @@ def concept(request, conceptid):
                     include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                     depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
             
-            languages = models.DLanguages.objects.all()
+            languages = models.DLanguage.objects.all()
             valuetypes = models.ValueTypes.objects.all()
-            relationtypes = models.DRelationtypes.objects.all()
+            relationtypes = models.DRelationType.objects.all()
             prefLabel = concept_graph.get_preflabel(lang=lang)
             for subconcept in concept_graph.subconcepts:
                 subconcept.prefLabel = subconcept.get_preflabel(lang=lang) 
@@ -183,7 +183,7 @@ def concept(request, conceptid):
             imagefile = request.FILES.get('file', None)
 
             if imagefile:
-                value = models.FileValues(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = settings.LANGUAGE_CODE)
+                value = models.FileValue(valueid = str(uuid.uuid4()), value = request.FILES.get('file', None), conceptid_id = conceptid, valuetype_id = 'image',languageid_id = settings.LANGUAGE_CODE)
                 value.save()
                 return JSONResponse(value)
 

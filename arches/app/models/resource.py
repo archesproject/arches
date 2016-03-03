@@ -340,7 +340,7 @@ class Resource(Entity):
         for entity in self.flatten():
             if entity.entityid != self.entityid:
                 if entity.businesstablename == 'domains':
-                    value = archesmodels.Values.objects.get(pk=entity.value)
+                    value = archesmodels.Value.objects.get(pk=entity.value)
                     entity_copy = entity.copy()
                     entity_copy.conceptid = value.conceptid_id
                     document.domains.append(entity_copy)
