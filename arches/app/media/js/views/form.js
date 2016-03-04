@@ -28,6 +28,8 @@ define(['jquery',
                         this[cardid].tiles = koMapping.fromJS([]);
                     }
                     this[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
+                }else{
+                    // inform the user
                 }
             }, this);
         },
@@ -35,12 +37,26 @@ define(['jquery',
         updateTile: function(data, e){
             console.log(ko.toJS(data));
             var model = new ConfigModel(ko.toJS(data));
-            model.save();
+            model.save(function(request, status, model){
+                if(request.status === 200){
+                    // inform the user???
+                }else{
+                    // inform the user
+                }
+            }, this);
         },
 
-        deleteTile: function(tiles, data, e){
+        deleteTile: function(data, e){
             console.log(ko.toJSON(data));
-            tiles.remove(data);
+            var cardid = data.cardid();
+            var model = new ConfigModel(ko.toJS(data));
+            model.delete(function(request, status, model){
+                if(request.status === 200){
+                    this[cardid].tiles.remove(data)
+                }else{
+                    // inform the user
+                }
+            }, this);
         },
 
         cancelEdit: function(data, e){

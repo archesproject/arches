@@ -123,6 +123,28 @@ def manager(request):
                         'placeholder': 'Enter key value',
                         'nodeid': '20000000-0000-0000-0000-000000000004'
                     }]
+                },{
+                    'id': '30000000-0000-0000-0000-000000000001',
+                    'title': _('TEST'),
+                    'cardinality': 'n',
+                    'description': _('TEAFASDF'),
+                    'widgets':[{
+                        'path': select_widget.template.path,
+                        'label': 'Service Provider',
+                        'placeholder': 'e.g.: MapBox',
+                        'nodeid': '20000000-0000-0000-0000-000000000003',
+                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
+                    },{
+                        'path': string_widget.template.path,
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                    },{
+                        'path': string_widget.template.path,
+                        'label': 'Key',
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                    }]
                 }]
             }]
         }]
@@ -304,6 +326,17 @@ def manager(request):
                 }
             )
         return JSONResponse(tile)
+
+    if request.method == 'DELETE':
+        json = request.body
+        if json != None:
+            data = JSONDeserializer().deserialize(json)
+            print data
+            tile = models.Tile.objects.get(tileid = data['tileid'])
+            tile.delete()
+            tile.tileid = data['tileid']
+        return JSONResponse(tile)
+
 
 # Move to util function
 def get(id):
