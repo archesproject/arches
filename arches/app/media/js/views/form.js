@@ -13,24 +13,26 @@ define(['jquery',
 
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
+            this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
 
         },
 
-        saveTile: function(cardid, data, e){
+        saveTile: function(data, e){
             console.log(ko.toJS(data));
+            var cardid = data.cardid();
             var model = new ConfigModel(ko.toJS(data));
             model.save(function(request, status, model){
                 if(request.status === 200){
                     if(!(cardid in this)){
-                        this[cardid] = koMapping.fromJS([]);
+                        this[cardid].tiles = koMapping.fromJS([]);
                     }
-                    this[cardid].push(koMapping.fromJS(request.responseJSON));
+                    this[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
                 }
             }, this);
         },
 
-        updateTile: function(cardid, data, e){
+        updateTile: function(data, e){
             console.log(ko.toJS(data));
             var model = new ConfigModel(ko.toJS(data));
             model.save();

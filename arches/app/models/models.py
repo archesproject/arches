@@ -315,7 +315,7 @@ class Tile(models.Model): #Tile
     resourceinstanceid = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
     cardid = models.ForeignKey('Card', db_column='cardid')
     parenttileid = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
-    tilegroupid = models.TextField()  # This field type is a guess.
+    cardgroupid = models.ForeignKey('CardGroup', db_column='cardgroupid')  # This field type is a guess.
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
 
     class Meta:

@@ -160,6 +160,9 @@ INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
 INSERT INTO cards(cardid, name, htmltemplate, title, subtitle)
     VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', '', 'Keys', '');
 
+INSERT INTO cardgroups(cardgroupid, name, title, subtitle)
+    VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '');
+
 INSERT INTO resourceinstances(resourceinstanceid, resourceclassid)
     VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
 

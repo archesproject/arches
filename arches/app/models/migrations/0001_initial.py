@@ -476,7 +476,7 @@ class Migration(migrations.Migration):
             name='Tile',
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('tilegroupid', models.TextField()),
+                ('cardgroupid', models.ForeignKey('CardGroup', db_column='cardgroupid')),
                 ('data', JSONField(null=True, blank=True, db_column='tiledata')),
                 ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
                 ('parenttileid', models.ForeignKey(db_column='parenttileid', blank=True, to='models.Tile', null=True)),
