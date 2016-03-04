@@ -11,8 +11,8 @@ services:
   - elasticsearch
   
 addons:
-  postgresql: "9.4.5"
-  
+  postgresql: "9.4"
+
 before_install:
   - bash arches/install/ubuntu_trusty_setup.sh
   - curl -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.2.0/elasticsearch-2.2.0.deb && sudo dpkg -i --force-confnew elasticsearch-2.2.0.deb
