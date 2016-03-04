@@ -45,35 +45,7 @@ def manager(request):
             #     'id': '1-1',
             #     'title': _('Arches Server Settings'),
             #     'cardinality': '1',
-            #     'cards': [
-            #     # {
-            #     #     'id': 'DATABASE',
-            #     #     'title': _('Database'),
-            #     #     'cardinality': '1',
-            #     #     'description': _('Update your PostgreSQL database access information'),
-            #     #     'widgets':[{
-            #     #         'path': string_widget.template.path,
-            #     #         'label': 'Database Name',
-            #     #         'placeholder': '',
-            #     #         'nodeid': 'NAME'
-            #     #     },{
-            #     #         'path': string_widget.template.path,
-            #     #         'label': 'User',
-            #     #         'placeholder': '',
-            #     #         'nodeid': 'USER'
-            #     #     },{
-            #     #         'path': string_widget.template.path,
-            #     #         'label': 'Password',
-            #     #         'placeholder': '',
-            #     #         'nodeid': 'PASSWORD'
-            #     #     },{
-            #     #         'path': string_widget.template.path,
-            #     #         'label': 'Port',
-            #     #         'placeholder': '',
-            #     #         'nodeid': 'PORT'
-            #     #     }]
-            #     # },
-            #     {
+            #     'cards': [{
             #         'id': '30000000-0000-0000-0000-000000000000',
             #         'title': _('Keys'),
             #         'cardinality': 'n',
@@ -175,23 +147,10 @@ def manager(request):
 
 
         # t = {
-        #     # "DATABASE": [{
-        #     #     'tileid': '',
-        #     #     'cardgroupid': '12',
-        #     #     'data': {
-        #     #         "USER": db['USER'],
-        #     #         "PASSWORD": db['PASSWORD'],
-        #     #         "PORT": db['PORT'],
-        #     #         "NAME": db['NAME'],
-        #     #     },
-        #     #     'cardid': '5d28d9c0-db90-11e5-8719-ef7f5d2d967b',
-        #     #     'resourceclassid': 'b9157be4-db90-11e5-8aeb-b7c0a160df7a',
-        #     #     'resourceinstanceid': '89f12728-db90-11e5-9016-5748aec58ad1'
-        #     # }],
-        #     "cg1-2":[{
+        #     '50000000-0000-0000-0000-000000000000':[{
         #         "30000000-0000-0000-0000-000000000000": [{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "1",
         #                 "20000000-0000-0000-0000-000000000002": "Map Key",
@@ -202,7 +161,7 @@ def manager(request):
         #             'resourceinstanceid': ''
         #         },{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "2",
         #                 "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
@@ -214,7 +173,7 @@ def manager(request):
         #         }],
         #         "30000000-0000-0000-0000-000000000000-blank": [{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "",
         #                 "20000000-0000-0000-0000-000000000002": "",
@@ -227,7 +186,7 @@ def manager(request):
         #     },{
         #         "30000000-0000-0000-0000-000000000000": [{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "1",
         #                 "20000000-0000-0000-0000-000000000002": "Map Key",
@@ -238,7 +197,7 @@ def manager(request):
         #             'resourceinstanceid': resourceinstanceid
         #         },{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "2",
         #                 "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
@@ -250,7 +209,7 @@ def manager(request):
         #         }],
         #         "30000000-0000-0000-0000-000000000000-blank": [{
         #             'tileid': '',
-        #             'cardgroupid': 'cg1-2',
+        #             'cardgroupid': '50000000-0000-0000-0000-000000000000',
         #             'data': {
         #                 "20000000-0000-0000-0000-000000000003": "",
         #                 "20000000-0000-0000-0000-000000000002": "",
@@ -262,6 +221,48 @@ def manager(request):
         #         }]
         #     }]
         # }
+
+        t = {
+            '50000000-0000-0000-0000-000000000000':[{
+                "30000000-0000-0000-0000-000000000000": {
+                    'tiles': [{
+                        'tileid': '',
+                        'cardgroupid': '50000000-0000-0000-0000-000000000000',
+                        'data': {
+                            "20000000-0000-0000-0000-000000000003": "1",
+                            "20000000-0000-0000-0000-000000000002": "Map Key",
+                            "20000000-0000-0000-0000-000000000004": "23984ll2399494",
+                        },
+                        'cardid': '30000000-0000-0000-0000-000000000000',
+                        'resourceclassid': '',
+                        'resourceinstanceid': resourceinstanceid
+                    },{
+                        'tileid': '',
+                        'cardgroupid': '50000000-0000-0000-0000-000000000000',
+                        'data': {
+                            "20000000-0000-0000-0000-000000000003": "2",
+                            "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
+                            "20000000-0000-0000-0000-000000000004": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
+                        },
+                        'cardid': '30000000-0000-0000-0000-000000000000',
+                        'resourceclassid': '',
+                        'resourceinstanceid': resourceinstanceid
+                    }],
+                    "blanktile": [{
+                        'tileid': '',
+                        'cardgroupid': '50000000-0000-0000-0000-000000000000',
+                        'data': {
+                            "20000000-0000-0000-0000-000000000003": "",
+                            "20000000-0000-0000-0000-000000000002": "",
+                            "20000000-0000-0000-0000-000000000004": "",
+                        },
+                        'cardid': '30000000-0000-0000-0000-000000000000',
+                        'resourceclassid': '',
+                        'resourceinstanceid': resourceinstanceid
+                    }]
+                }
+            }]
+        }
 
         # t = {
         #     "30000000-0000-0000-0000-000000000000": {

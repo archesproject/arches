@@ -14,6 +14,7 @@ define(['jquery',
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
             this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
+            
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
 
         },
