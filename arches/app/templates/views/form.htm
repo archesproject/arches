@@ -9,32 +9,15 @@
         </div>
         
         <div class="panel-body card-body" style="">
-            <div id="arches-server-help-cc" class="tab-base card-content-container" style="">
 
-                <!--Nav Tabs-->
-                <ul class="nav nav-tabs card-nav-container" style="">
-                    {% for card in cardgroup.cards %}
-                    <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
-                        <a id="settings-menu" data-toggle="tab" href="#{{card.id}}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <!-- ko with: form.tiles -->
 
-                <div id="db-arches-app-alert" class="panel data-card-alert" style=""></div>
-
-                <!--Tabs Content-->
-                <div class="tab-content card-content-tab" style="">
-                    {% for card in cardgroup.cards %}
-                        
-                        <!-- ko with: form.tiles -->
-                        {% include 'views/forms/card.htm' %}
-                        <!-- /ko -->
-
-                    {% endfor %}
-                </div>
-
-            </div>
+            {% include 'views/forms/cards.htm' %}
+            
+            <!-- /ko -->
+            
         </div>
+
         <div class="panel-footer card-footer" style="">
             <div class="row">
                 <div class="col-sm-6">
