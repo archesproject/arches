@@ -3,12 +3,10 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         url: arches.urls.tile,
 
         defaults: {
-            'tileinstanceid': '',
-            'tilegroupid': '',
-            'tileinstancedata': '',
+            'tileid': '',
+            'data': '',
             'cardid': '',
-            'parenttileinstanceid': '',
-            'resourceclassid': '',
+            'cardgroupid': '',
             'resourceinstanceid': ''
         }
     });
