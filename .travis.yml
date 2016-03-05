@@ -1,30 +1,51 @@
-
 language: python
 
 python:
   - 2.7
 
-sudo: required
+sudo: false
+
+cache:
+  - apt
+  - pip
+
+addons:
+  postgresql: 9.4
+  apt:
+    sources:
+      - elasticsearch-1.7
+    packages:
+      - elasticsearch
+      - libproj-dev
+      - libxml2-dev
+      - libjson0-dev
+      - xsltproc
+      - docbook-xsl
+      - docbook-mathml
+      - libpq-dev
+      - openjdk-7-jdk
+      - python-setuptools
+      - python-dev
+      - postgis
 
 services:
   - postgresql
   - elasticsearch
-  
-addons:
-  postgresql: "9.4"
 
 before_install:
-  - bash arches/install/ubuntu_trusty_setup.sh
-  - curl -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.2.0/elasticsearch-2.2.0.deb && sudo dpkg -i --force-confnew elasticsearch-2.2.0.deb
+  - psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
+  - echo "*:*:*:postgres:postgis" >> ~/.pgpass
+  - psql -d postgres -c "SET standard_conforming_strings = off;"
+  - psql -d postgres -c "CREATE EXTENSION postgis;"
 
-install: 
+install:
   - python setup.py install
   - pip install -r arches/install/requirements_dev.txt
   - pip install coveralls
-  
-script: 
-  - python manage.py test tests --pattern="*.py" --settings="tests.test_settings" 
- 
+
+script:
+  - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+
 after_success:
   - coveralls
   
