@@ -14,7 +14,7 @@ define(['jquery',
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
             this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
-            
+
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
 
         },
@@ -26,9 +26,9 @@ define(['jquery',
             model.save(function(request, status, model){
                 if(request.status === 200){
                     if(!(cardid in this)){
-                        this[cardid].tiles = koMapping.fromJS([]);
+                        this[cardid] = koMapping.fromJS([]);
                     }
-                    this[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
+                    this[cardid].unshift(koMapping.fromJS(request.responseJSON));
                 }else{
                     // inform the user
                 }
@@ -53,7 +53,7 @@ define(['jquery',
             var model = new ConfigModel(ko.toJS(data));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    this[cardid].tiles.remove(data)
+                    this[cardid].remove(data)
                 }else{
                     // inform the user
                 }

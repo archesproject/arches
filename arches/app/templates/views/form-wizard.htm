@@ -9,86 +9,112 @@
         </div>
         
         <div class="panel-body card-body" style="">
-            <div id="arches-server-help-cc" class="tab-base card-content-container" style="">
 
-                {% if cardgroup.cardinality == 'n' %}
-                <div id="add-basemap-card" class="tile-grid-container" style="">
-                    
-                    <!-- Add New Button and Wizard Record Display Grid -->
-                    <ul id="" class="og-grid card-wz-grid" style="">
+            {% if cardgroup.cardinality != 'n' %}
+                
+                <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
 
-                        <!-- Add New Record -->
-                        <li class="" style="">
-                            <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record" style="">
+                {% include 'views/forms/cards.htm' %}
+            
+                <!-- /ko -->
+
+            {% endif %}
+
+
+            {% if cardgroup.cardinality == 'n' %}
+
+                <div id="card-group" class="panel-group tab-base card-content-container" style="">
+
+                    <div id="add-basemap-card" class="tile-grid-container" style="">
+                        
+                        <!-- Add New Button and Wizard Record Display Grid -->
+                        <ul id="" class="og-grid card-wz-grid" style="">
+
+                            <!-- Add New Record -->
+                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.id}}-blank" role="tab">
+                                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record" style="">
+                                    
+                                    <a id="add-basemap" href="" class="" style="">
+                                        <h3 class="text-thin" style="margin-top: 10px;"> New Basemap</h3>
+
+                                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+                                        </span>
+
+                                        <h5 class="" style="font-weight: 200;"> Add basemaps to support enhanced mapping</h5>
+                                    </a>
+
+                                </div>
+                            </li>
+
+                            <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
+                            
+                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.id}}" role="tab" class="fade in effect">      
+
+                                <!-- Record Summary Container -->
+                                <div id="tile-test" class="panel tile-panel" style="cursor: pointer;">
+                                    
+                                    <!-- Edit Menu -->
+                                    <div class="tile-menu" style="">
+                                        <!-- Edit/Delete Buttons -->
+                                        <div class="" style="">
+                                            <!-- Edit Button -->
+                                            <button class="btn btn-icon fa fa-pencil tile-menu-btn" title="edit" style=""></button>
+                                            
+                                            <!-- Delete Button -->
+                                            <button id="basemap-delete" class="btn btn-icon fa fa-trash tile-menu-btn" title="delete" style=""></button>
+                                        </div>
+                                    </div>
                                 
-                                <a id="add-basemap" href="" class="" style="">
-                                    <h3 class="text-thin" style="margin-top: 10px;"> New Basemap</h3>
+                                    <!-- Data -->
+                                    <div class="panel-body tile-basemap" style="">
+                                        
+                                        <img alt="Google Streets Basemap" class="tile-img-lg" src="http://archesproject.github.io/mockups/img/arches/basemaps/google_streets.png">
 
-                                    <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
-                                        <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
-                                    </span>
+                                        <!-- Basemap Summary -->
+                                        <div class="tile-basemap-title" style="">
+                                            <dl class="" style="">
+                                                <dt class="card-category" data-bind="text: $index()">Google Streets</dt>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                            </li>
 
-                                    <h5 class="" style="font-weight: 200;"> Add basemaps to support enhanced mapping</h5>
-                                </a>
+                            <!-- /ko -->
 
+                        </ul>
+                        <!-- End New Button and Record Display Grid -->
+
+                        <div id="add-basemap-scroll" class="scroll-shim" style=""></div>
+                    </div>
+
+                    <div style="{% if cardgroup.cardinality == 'n' %}display:block;{% endif %}">
+
+                        {% if cardgroup.cardinality == 'n' %}
+                            
+                            <!-- ko foreach: form.cardgroups['{{cardgroup.id}}-blank'] -->
+                            <div id="{{cardgroup.id}}-blank" class="collapse">
+                            {% include 'views/forms/cards.htm' with forceblank=True %}
                             </div>
-                        </li>
+                            <!-- /ko -->
+
+                        {% endif %}
+
 
                         <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
-                        
-                        <li id="add-basemp-1" class="fade in effect" style="">      
-
-                            <!-- Record Summary Container -->
-                            <div id="tile-test" class="panel tile-panel" style="cursor: pointer;">
-                                
-                                <!-- Edit Menu -->
-                                <div class="tile-menu" style="">
-                                    <!-- Edit/Delete Buttons -->
-                                    <div class="" style="">
-                                        <!-- Edit Button -->
-                                        <button class="btn btn-icon fa fa-pencil tile-menu-btn" title="edit" style=""></button>
-                                        
-                                        <!-- Delete Button -->
-                                        <button id="basemap-delete" class="btn btn-icon fa fa-trash tile-menu-btn" title="delete" style=""></button>
-                                    </div>
-                                </div>
-                            
-                                <!-- Data -->
-                                <div class="panel-body tile-basemap" style="">
-                                    
-                                    <img alt="Google Streets Basemap" class="tile-img-lg" src="http://archesproject.github.io/mockups/img/arches/basemaps/google_streets.png">
-
-                                    <!-- Basemap Summary -->
-                                    <div class="tile-basemap-title" style="">
-                                        <dl class="" style="">
-                                            <dt class="card-category" data-bind="text: $index()">Google Streets</dt>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </div>
-                
-                        </li>
-
+                        <div id="{{cardgroup.id}}" class="collapse">
+                        {% include 'views/forms/cards.htm' %}
+                        </div>
                         <!-- /ko -->
 
-                    </ul>
-                    <!-- End New Button and Record Display Grid -->
-
-                    <div id="add-basemap-scroll" class="scroll-shim" style=""></div>
-                </div>
-                {% endif %}
-
-                <div id="card_group" style="{% if cardgroup.cardinality == 'n' %}display:block;{% endif %}">
-
-                    <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
-
-                    {% include 'views/forms/cards.htm' %}
-                    
-                    <!-- /ko -->
+                    </div>
 
                 </div>
 
-            </div>
+            {% endif %}
+            
         </div>
 
         <div class="panel-footer card-footer" style="">

@@ -30,7 +30,7 @@
 
                     
                     <!-- Actual Card HTML goes here -->
-                    <div data-bind="with: $data['{{card.id}}'].{% if card.cardinality != 'n' %}tiles{% endif %}{% if card.cardinality == 'n' %}blanktile{% endif %}">
+                    <div data-bind="with: $data['{{card.id}}{% if card.cardinality == 'n' or forceblank %}-blank{% endif %}']">
                         <div data-bind="with: $data[0].data">
                             {% for widget in card.widgets %}
                                 {% include widget.path %}
@@ -51,7 +51,7 @@
 
                     {% if card.cardinality == 'n' %}
 
-                    <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data['{{card.id}}'].tiles">
+                    <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data['{{card.id}}']">
                         
                         <!-- Record -->
 
