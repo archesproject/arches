@@ -146,7 +146,18 @@ class Migration(migrations.Migration):
        ),
 
 
-
+        migrations.CreateModel(
+            name='NodeGroup',
+            fields=[
+                ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('cardinality', models.TextField()),
+                ('legacygroupid', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'nodegroups',
+                'managed': True,
+            },
+        ),
         migrations.CreateModel(
             name='Address',
             fields=[
@@ -179,41 +190,18 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='CardGroup',
-            fields=[
-                ('cardgroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('name', models.TextField()),
-                ('title', models.TextField()),
-                ('subtitle', models.TextField(null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'cardgroups',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
             name='Card',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
-                ('htmltemplate', models.TextField()),
                 ('title', models.TextField()),
                 ('subtitle', models.TextField(null=True, blank=True)),
+                ('helptext', models.TextField(null=True, blank=True)),
+                ('nodegroupid', models.ForeignKey(to='models.NodeGroup', db_column='nodegroupid', null=True, blank=True)),
+                ('parentcardid', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='CardXCardGroup',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('cardgroupid', models.ForeignKey(to='models.CardGroup', db_column='cardgroupid')),
-                ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
-            ],
-            options={
-                'db_table': 'cards_x_cardgroups',
                 'managed': True,
             },
         ),
@@ -339,26 +327,14 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='FormXCardGroup',
+            name='FormXCard',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('cardgroupid', models.ForeignKey(to='models.CardGroup', db_column='cardgroupid')),
+                ('parentcardid', models.ForeignKey(to='models.Card', db_column='parentcardid')),
                 ('formid', models.ForeignKey(to='models.Form', db_column='formid')),
             ],
             options={
-                'db_table': 'forms_x_card_groups',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='NodeGroup',
-            fields=[
-                ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('cardinality', models.TextField()),
-                ('legacygroupid', models.TextField(null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'nodegroups',
+                'db_table': 'forms_x_card',
                 'managed': True,
             },
         ),
@@ -476,9 +452,8 @@ class Migration(migrations.Migration):
             name='Tile',
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('cardgroupid', models.ForeignKey('CardGroup', db_column='cardgroupid')),
-                ('data', JSONField(null=True, blank=True, db_column='tiledata')),
-                ('cardid', models.ForeignKey(to='models.Card', db_column='cardid')),
+                ('nodegroupid', models.ForeignKey('NodeGroup', db_column='nodegroupid')),
+                ('tiledata', JSONField(null=True, blank=True, db_column='tiledata')),
                 ('parenttileid', models.ForeignKey(db_column='parenttileid', blank=True, to='models.Tile', null=True)),
                 ('resourceinstanceid', models.ForeignKey(to='models.ResourceInstance', db_column='resourceinstanceid')),
             ],
@@ -555,18 +530,13 @@ class Migration(migrations.Migration):
             name='widgetid',
             field=models.ForeignKey(to='models.Widget', db_column='widgetid'),
         ),
-        migrations.AddField(
-            model_name='cardgroup',
-            name='nodeid',
-            field=models.ForeignKey(db_column='nodeid', blank=True, to='models.Node', null=True),
-        ),
         migrations.AlterUniqueTogether(
             name='resourceclassxform',
             unique_together=set([('resourceclassid', 'formid')]),
         ),
         migrations.AlterUniqueTogether(
-            name='formxcardgroup',
-            unique_together=set([('formid', 'cardgroupid')]),
+            name='formxcard',
+            unique_together=set([('formid', 'parentcardid')]),
         ),
         migrations.AlterUniqueTogether(
             name='edge',
@@ -576,13 +546,8 @@ class Migration(migrations.Migration):
             name='cardxnodexwidget',
             unique_together=set([('nodeid', 'cardid', 'widgetid')]),
         ),
-        migrations.AlterUniqueTogether(
-            name='cardxcardgroup',
-            unique_together=set([('cardgroupid', 'cardid')]),
-        ),
 
         CreateAutoPopulateUUIDField('branchmetadata', ['branchmetadataid']),
-        CreateAutoPopulateUUIDField('cardgroups', ['cardgroupid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),

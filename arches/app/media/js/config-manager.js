@@ -7,14 +7,13 @@ require([
     'plugins/knockout-select2'
 ], function($, PageView, Form) {
     var viewModel = {
-        form: new Form({ 
-            el: $('.arches-form')[0]
+        form: new Form({
+            el: $('.arches-form')[0],
+            modelName: 'config'
         })
     };
 
     new PageView({
         viewModel: viewModel
     });
-
-
 });
