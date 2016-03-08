@@ -14,7 +14,7 @@
                 
                 <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
 
-                {% include 'views/forms/cards.htm' %}
+                    {% include 'views/forms/cards.htm' %}
             
                 <!-- /ko -->
 
@@ -90,23 +90,18 @@
                         <div id="add-basemap-scroll" class="scroll-shim" style=""></div>
                     </div>
 
-                    <div style="{% if cardgroup.cardinality == 'n' %}display:block;{% endif %}">
+                    <div>
 
-                        {% if cardgroup.cardinality == 'n' %}
-                            
-                            <!-- ko foreach: form.cardgroups['{{cardgroup.id}}-blank'] -->
+                        <!-- ko foreach: form.cardgroups['{{cardgroup.id}}-blank'] -->
                             <div id="{{cardgroup.id}}-blank" class="collapse">
                             {% include 'views/forms/cards.htm' with forceblank=True %}
                             </div>
-                            <!-- /ko -->
-
-                        {% endif %}
-
+                        <!-- /ko -->
 
                         <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
-                        <div id="{{cardgroup.id}}" class="collapse">
-                        {% include 'views/forms/cards.htm' %}
-                        </div>
+                            <div id="{{cardgroup.id}}" class="collapse">
+                            {% include 'views/forms/cards.htm' %}
+                            </div>
                         <!-- /ko -->
 
                     </div>
@@ -114,7 +109,7 @@
                 </div>
 
             {% endif %}
-            
+
         </div>
 
         <div class="panel-footer card-footer" style="">
