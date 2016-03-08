@@ -1,14 +1,19 @@
-define(['jquery', 
-    'backbone', 
+define([
+    'jquery',
+    'backbone',
     'knockout',
-    'knockout-mapping', 
-    'underscore',
-    'models/config'
-], function ($, Backbone, ko, koMapping, _, ConfigModel) {
+    'knockout-mapping',
+    'underscore'
+], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
 
-        initialize: function() {
+        initialize: function(opts) {
             var self = this;
+            self.modelReady = ko.observable(false);
+            require(['models/'+(opts.modelName?opts.modelName:'tile')], function (TileModel) {
+                self.TileModel = TileModel;
+                self.modelReady(true);
+            })
             this.form = this.$el;
 
             // parse then restringify JSON data to ensure whitespace is identical
@@ -18,25 +23,25 @@ define(['jquery',
 
         },
 
-        saveTile: function(data, e){
+        saveTile: function(card, data, e){
             console.log(ko.toJS(data));
             var cardid = data.cardid();
-            var model = new ConfigModel(ko.toJS(data));
+            var model = new this.TileModel(ko.toJS(data));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    if(!(cardid in this)){
-                        this[cardid].tiles = koMapping.fromJS([]);
+                    if(!(cardid in card)){
+                        card[cardid].tiles = koMapping.fromJS([]);
                     }
-                    this[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
+                    card[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
                 }else{
                     // inform the user
                 }
             }, this);
         },
 
-        updateTile: function(data, e){
+        updateTile: function(card, data, e){
             console.log(ko.toJS(data));
-            var model = new ConfigModel(ko.toJS(data));
+            var model = new this.TileModel(ko.toJS(data));
             model.save(function(request, status, model){
                 if(request.status === 200){
                     // inform the user???
@@ -46,13 +51,13 @@ define(['jquery',
             }, this);
         },
 
-        deleteTile: function(data, e){
+        deleteTile: function(card, data, e){
             console.log(ko.toJSON(data));
             var cardid = data.cardid();
-            var model = new ConfigModel(ko.toJS(data));
+            var model = new this.TileModel(ko.toJS(data));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    this[cardid].tiles.remove(data)
+                    card[cardid].tiles.remove(data)
                 }else{
                     // inform the user
                 }
