@@ -157,10 +157,10 @@ INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, vali
 INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
     VALUES ('99900000-0000-0000-0000-000000000000', 'n', '');
 
-INSERT INTO cards(cardid, name, htmltemplate, title, subtitle)
-    VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', '', 'Keys', '');
+INSERT INTO cards(cardid, name, title, subtitle)
+    VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', 'Keys', '');
 
-INSERT INTO cardgroups(cardgroupid, name, title, subtitle)
+INSERT INTO cards(cardid, name, title, subtitle)
     VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '');
 
 INSERT INTO resourceinstances(resourceinstanceid, resourceclassid)

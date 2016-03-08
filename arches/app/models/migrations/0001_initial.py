@@ -146,7 +146,18 @@ class Migration(migrations.Migration):
        ),
 
 
-
+        migrations.CreateModel(
+            name='NodeGroup',
+            fields=[
+                ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('cardinality', models.TextField()),
+                ('legacygroupid', models.TextField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'nodegroups',
+                'managed': True,
+            },
+        ),
         migrations.CreateModel(
             name='Address',
             fields=[
@@ -186,8 +197,8 @@ class Migration(migrations.Migration):
                 ('title', models.TextField()),
                 ('subtitle', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
-                ('nodegroupid', models.ForeignKey(to='models.NodeGroup', db_column='nodegroupid')),
-                ('parentcardid', models.TextField()),
+                ('nodegroupid', models.ForeignKey(to='models.NodeGroup', db_column='nodegroupid', null=True, blank=True)),
+                ('parentcardid', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
@@ -324,18 +335,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'forms_x_card',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='NodeGroup',
-            fields=[
-                ('nodegroupid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('cardinality', models.TextField()),
-                ('legacygroupid', models.TextField(null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'nodegroups',
                 'managed': True,
             },
         ),
@@ -546,10 +545,6 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='cardxnodexwidget',
             unique_together=set([('nodeid', 'cardid', 'widgetid')]),
-        ),
-        migrations.AlterUniqueTogether(
-            name='cardxcard',
-            unique_together=set([('parentcardid', 'cardid')]),
         ),
 
         CreateAutoPopulateUUIDField('branchmetadata', ['branchmetadataid']),

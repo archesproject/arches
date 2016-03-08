@@ -54,8 +54,8 @@ class Card(models.Model):
     title = models.TextField()
     subtitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
-    nodegroupid = models.ForeignKey('NodeGroup', db_column='nodegroupid')
-    parentcardid = models.TextField()
+    nodegroupid = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
+    parentcardid = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
