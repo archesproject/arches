@@ -481,7 +481,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('widgetid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField()),
-                ('template', models.FileField(upload_to='app/templates/views/forms/widgets/')),
                 ('defaultlabel', models.TextField(null=True, blank=True)),
                 ('defaultmask', models.TextField(null=True, blank=True)),
             ],
