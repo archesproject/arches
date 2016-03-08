@@ -48,38 +48,18 @@ class BranchMetadata(models.Model):
         db_table = 'branchmetadata'
 
 
-class CardGroup(models.Model):
-    cardgroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
-    title = models.TextField()
-    subtitle = models.TextField(blank=True, null=True)
-    nodeid = models.ForeignKey('Node', db_column='nodeid', blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'cardgroups'
-
-
 class Card(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
-    htmltemplate = models.TextField()
     title = models.TextField()
     subtitle = models.TextField(blank=True, null=True)
+    helptext = models.TextField(blank=True, null=True)
+    nodegroupid = models.ForeignKey('NodeGroup', db_column='nodegroupid')
+    parentcardid = models.TextField()
 
     class Meta:
         managed = True
         db_table = 'cards'
-
-
-class CardXCardGroup(models.Model):
-    cardgroupid = models.ForeignKey(CardGroup, db_column='cardgroupid')
-    cardid = models.ForeignKey('Card', db_column='cardid')
-
-    class Meta:
-        managed = True
-        db_table = 'cards_x_cardgroups'
-        unique_together = (('cardgroupid', 'cardid'),)
 
 
 class CardXNodeXWidget(models.Model):
@@ -191,14 +171,14 @@ class Form(models.Model):
         db_table = 'forms'
 
 
-class FormXCardGroup(models.Model):
+class FormXCard(models.Model):
     formid = models.ForeignKey(Form, db_column='formid')
-    cardgroupid = models.ForeignKey(CardGroup, db_column='cardgroupid')
+    parentcardid = models.ForeignKey(Card, db_column='parentcardid')
 
     class Meta:
         managed = True
-        db_table = 'forms_x_card_groups'
-        unique_together = (('formid', 'cardgroupid'),)
+        db_table = 'forms_x_card'
+        unique_together = (('formid', 'parentcardid'),)
 
 
 class NodeGroup(models.Model):
@@ -212,8 +192,11 @@ class NodeGroup(models.Model):
 
 
 class Node(models.Model):
-    nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
+    """
+    Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
+    """
+    nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(unique=True)
     description = models.TextField()
     istopnode = models.BooleanField()
     crmclass = models.TextField()
@@ -313,10 +296,9 @@ class ResourceInstance(models.Model):
 class Tile(models.Model): #Tile
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceid = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
-    cardid = models.ForeignKey('Card', db_column='cardid')
     parenttileid = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
-    cardgroupid = models.ForeignKey('CardGroup', db_column='cardgroupid')  # This field type is a guess.
-    data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
+    tiledata = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
+    nodegroupid = models.ForeignKey(NodeGroup, db_column='nodegroupid')
 
     class Meta:
         managed = True
