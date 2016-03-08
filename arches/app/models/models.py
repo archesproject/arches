@@ -320,6 +320,7 @@ class Value(models.Model):
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
+    template = models.FileField(storage=widget_storage_location)
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
 
