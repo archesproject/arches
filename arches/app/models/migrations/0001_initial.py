@@ -22,7 +22,7 @@ def get_sql_string_from_file(pathtofile):
 def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
-    
+
     Group = apps.get_model("auth", "Group")
     User = apps.get_model("auth", "User")
     db_alias = schema_editor.connection.alias
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
            name='insert_relation',
            arguments=[
                'p_label text',
-               'p_relationtype text', 
+               'p_relationtype text',
                'p_legacyid2 text'
            ],
            declarations=[
@@ -70,20 +70,20 @@ class Migration(migrations.Migration):
            ],
            language='plpgsql',
            body='''
-               v_conceptidfrom = 
-                    (select conceptid from concepts c 
-                    where trim(legacyoid) = trim(p_legacyid1)); 
+               v_conceptidfrom =
+                    (select conceptid from concepts c
+                    where trim(legacyoid) = trim(p_legacyid1));
 
-                v_conceptidto = (select conceptid from concepts c 
-                    where trim(legacyoid) = trim(p_legacyid2)); 
+                v_conceptidto = (select conceptid from concepts c
+                    where trim(legacyoid) = trim(p_legacyid2));
 
-                IF v_conceptidfrom is not null and v_conceptidto is not null and 
-                   v_conceptidto <> v_conceptidfrom and 
-                   v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM relations) then 
-                            INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype); 
-                            return 'success!'; 
+                IF v_conceptidfrom is not null and v_conceptidto is not null and
+                   v_conceptidto <> v_conceptidfrom and
+                   v_conceptidfrom::text||v_conceptidto::text NOT IN (SELECT conceptidfrom::text||conceptidto::text FROM relations) then
+                            INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (uuid_generate_v1mc(), v_conceptidfrom, v_conceptidto, p_relationtype);
+                            return 'success!';
 
-                ELSE return 'fail! no relation inserted.'; 
+                ELSE return 'fail! no relation inserted.';
 
                 END IF;
            ''',
@@ -100,12 +100,12 @@ class Migration(migrations.Migration):
            ],
            language='plpgsql',
            body='''
-               v_return = 
-                    (select a.conceptid from concepts a, values b 
-                    where 1=1 and 
-                    b.valuetype = 'prefLabel' and 
-                    b.value = p_label and 
-                    b.conceptid = a.conceptid LIMIT 1); 
+               v_return =
+                    (select a.conceptid from concepts a, values b
+                    where 1=1 and
+                    b.valuetype = 'prefLabel' and
+                    b.value = p_label and
+                    b.conceptid = a.conceptid LIMIT 1);
 
                     return v_return;
            ''',
@@ -135,10 +135,10 @@ class Migration(migrations.Migration):
                  VALUES (v_valueid, v_conceptid, 'prefLabel', trim(initcap(p_label)), v_languageid);
                END IF;
 
-               IF trim(p_note) is not null and p_note <> '' then 
+               IF trim(p_note) is not null and p_note <> '' then
                  INSERT INTO values (valueid, conceptid, valuetype, value, languageid)
                  VALUES (v_valueid, v_conceptid, 'scopeNote', p_note, v_languageid);
-               END IF;  
+               END IF;
 
                return v_conceptid;
            ''',
@@ -468,7 +468,7 @@ class Migration(migrations.Migration):
                 ('valueid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('value', models.TextField()),
                 ('conceptid', models.ForeignKey(to='models.Concept', db_column='conceptid')),
-                ('languageid', models.ForeignKey(db_column='languageid', blank=True, to='models.DLanguage', null=True)),
+                ('language', models.ForeignKey(to='models.DLanguage', db_column='languageid', blank=True, null=True)),
                 ('valuetype', models.ForeignKey(to='models.DValueType', db_column='valuetype')),
             ],
             options={

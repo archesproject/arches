@@ -310,7 +310,7 @@ class Value(models.Model):
     conceptid = models.ForeignKey('Concept', db_column='conceptid')
     valuetype = models.ForeignKey(DValueType, db_column='valuetype')
     value = models.TextField()
-    languageid = models.ForeignKey(DLanguage, db_column='languageid', blank=True, null=True)
+    language = models.ForeignKey(DLanguage, db_column='languageid', blank=True, null=True)
 
     class Meta:
         managed = True
