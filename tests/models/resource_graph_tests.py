@@ -32,9 +32,9 @@ class ResourceGraphTests(TestCase):
         from arches.management.commands.package_utils import resource_graphs
         from arches.app.models.models import Node
 
-        resource_graphs.load_graphs(os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'archesv4_resource.json'))
+        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
-        self.assertTrue(Node.objects.count() == 112)
+        self.assertEqual(Node.objects.count(), 117)
 
 
     # def test_intial_edge_import(self):

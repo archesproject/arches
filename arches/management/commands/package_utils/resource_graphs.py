@@ -22,7 +22,7 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     if not settings:
         from django.conf import settings        
   
-    suffix = 'archesv4_resource.json'
+    suffix = 'json'
     errors = []
     file_list = []
     graph_location = settings.RESOURCE_GRAPH_LOCATIONS

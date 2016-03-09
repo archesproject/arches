@@ -27,7 +27,7 @@ ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, '..', 'arches'))
 PACKAGE_ROOT = os.path.normpath(os.path.join(ROOT_DIR, '..', 'tests'))
 
 
-RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'archesv4_resources.json'),)
+RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'resource_graphs'),)
 
 CONCEPT_SCHEME_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'authority_files'),)
 
