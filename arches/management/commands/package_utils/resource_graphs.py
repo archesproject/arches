@@ -8,8 +8,11 @@ from django.core import management
 from django.db import connection, transaction
 import concepts
 from .. import utils
+from arches.app.models.resource_graphs import ResourceGraph
+import json
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-def load_graphs(break_on_error=True, settings=None):
+def load_graphs(break_on_error=True, settings=None, path=None):
     """
     Iterates through the resource node and edge files to load entitytypes and mappings into the database.
     Generates node level permissions for each resourcetype/entitytype combination
@@ -19,58 +22,49 @@ def load_graphs(break_on_error=True, settings=None):
     if not settings:
         from django.conf import settings        
   
-    suffix = '_nodes.csv'
+    suffix = 'archesv4_resource.json'
     errors = []
-    #file_list = []
+    file_list = []
+    graph_location = settings.RESOURCE_GRAPH_LOCATIONS
+        
+    if path:
+        graph_location = [path]
 
-    for path in settings.RESOURCE_GRAPH_LOCATIONS:
+    for path in graph_location:
+        print os.path.exists(path)
         if os.path.exists(path):
             print '\nLOADING GRAPHS (%s)' % (path)
             print '---------------'
             for f in listdir(path):
                 if isfile(join(path,f)) and f.endswith(suffix):
-                    #file_list.append(join(path,f))
+                    file_list.append(join(path,f))
                     path_to_file = join(path,f)
-                    basepath = path_to_file[:-10]
+                    basepath = path_to_file
                     name = basepath.split(os.sep)[-1]
-                    if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or name in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
-                        print name
-                        node_list = get_list_dict(basepath + '_nodes.csv', ['ID', 'LABEL', 'MERGENODE', 'BUSINESSTABLE'])
-                        edge_list = get_list_dict(basepath + '_edges.csv', ['SOURCE', 'TARGET', 'TYPE', 'ID', 'LABEL', 'WEIGHT'])
-                        mods = append_branch(os.path.join(settings.ROOT_DIR, 'management', 'resource_graphs', 'ARCHES_RECORD.E31'), node_list, edge_list)
-                        node_list = mods['node_list']
-                        edge_list = mods['edge_list']
 
-                        file_errors = validate_graph(node_list, edge_list)
-                        try:
-                            insert_mappings(node_list, edge_list)
-                            link_entitytypes_to_concepts(node_list)
-                        except Exception as e:
-                            file_errors.append('\nERROR: %s\n%s' % (str(e), traceback.format_exc()))
-                            pass
+                    with open(basepath, 'rU') as f:
+                        file = json.load(f)
 
-                        if len(file_errors) > 0:
-                            file_errors.insert(0, 'ERRORS IN FILE: %s\n' % (basepath))
-                            file_errors.append('\n\n\n\n')
-                            errors = errors + file_errors  
+                        resource_graph = ResourceGraph(file['graph'][0])
+                        resource_graph._save()
         else:
             errors.append('\n\nPath in settings.RESOURCE_GRAPH_LOCATIONS doesn\'t exist (%s)' % (path))                 
 
-    utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '')
-    if len(errors) > 0:
-        utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '\n'.join(errors))
-        print "\n\nERROR: There were errors in some of the resource graphs."
-        print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'))
-        if break_on_error:
-            sys.exit(101)
+    # utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '')
+    # if len(errors) > 0:
+    #     utils.write_to_file(os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'), '\n'.join(errors))
+    #     print "\n\nERROR: There were errors in some of the resource graphs."
+    #     print "Please review the errors at %s, \ncorrect the errors and then rerun this script." % (os.path.join(settings.PACKAGE_ROOT, 'logs', 'resource_graph_errors.txt'))
+    #     if break_on_error:
+    #         sys.exit(101)
 
-    print '\nINDEXING ENTITY NODES'
-    print '---------------------'
-    concepts.index_entity_concept_lables()
+    # print '\nINDEXING ENTITY NODES'
+    # print '---------------------'
+    # concepts.index_entity_concept_lables()
 
-    print '\nADDING NODE LEVEL PERMISSIONS'
-    print '-----------------------------'
-    management.call_command('packages', operation='build_permissions') 
+    # print '\nADDING NODE LEVEL PERMISSIONS'
+    # print '-----------------------------'
+    # management.call_command('packages', operation='build_permissions') 
 
 def append_branch(path_to_branch, node_list, edge_list):
     """
