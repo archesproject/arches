@@ -453,7 +453,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('nodegroupid', models.ForeignKey('NodeGroup', db_column='nodegroupid')),
-                ('tiledata', JSONField(null=True, blank=True, db_column='tiledata')),
+                ('data', JSONField(null=True, blank=True, db_column='tiledata')),
                 ('parenttileid', models.ForeignKey(db_column='parenttileid', blank=True, to='models.Tile', null=True)),
                 ('resourceinstanceid', models.ForeignKey(to='models.ResourceInstance', db_column='resourceinstanceid')),
             ],

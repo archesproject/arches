@@ -137,25 +137,34 @@ INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, vali
 INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
             inputlabel, inputmask, status, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', '', '', 
-            '?', '?', 0, '99900000-0000-0000-0000-000000000000');
+            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
             inputlabel, inputmask, status, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99900000-0000-0000-0000-000000000000');
+            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
             inputlabel, inputmask, status, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99900000-0000-0000-0000-000000000000');
+            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
             inputlabel, inputmask, status, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99900000-0000-0000-0000-000000000000');
+            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('99900000-0000-0000-0000-000000000000', 'n', '');
+    VALUES ('99999999-0000-0000-0000-000000000000', 'n', '');
+
+INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
+    VALUES ('99999999-0000-0000-0000-000000000001', 'n', '');
+
+INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
+    VALUES ('21111111-0000-0000-0000-000000000000', '1', '');
+
+INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
+    VALUES ('11111111-0000-0000-0000-000000000000', 'n', '');    
 
 INSERT INTO cards(cardid, name, title, subtitle)
     VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', 'Keys', '');

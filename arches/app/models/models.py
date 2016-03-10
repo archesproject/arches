@@ -297,7 +297,7 @@ class Tile(models.Model): #Tile
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstanceid = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
     parenttileid = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
-    tiledata = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
+    data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroupid = models.ForeignKey(NodeGroup, db_column='nodegroupid')
 
     class Meta:

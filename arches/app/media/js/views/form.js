@@ -19,29 +19,33 @@ define([
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
             this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
+            this.blanks = JSON.parse(this.form.find('#blanks').val());
+
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
+
+            console.log(JSON.parse(this._rawdata));
 
         },
 
-        saveTile: function(card, data, e){
-            console.log(ko.toJS(data));
-            var cardid = data.cardid();
-            var model = new this.TileModel(ko.toJS(data));
+        saveTile: function(tilegroup, tile, e){
+            console.log(ko.toJS(tile));
+            var nodegroupid = tile.nodegroupid();
+            var model = new this.TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    if(!(cardid in card)){
-                        card[cardid].tiles = koMapping.fromJS([]);
+                    if(!(nodegroupid in tilegroup)){
+                        tilegroup[nodegroupid] = koMapping.fromJS([]);
                     }
-                    card[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
+                    tilegroup[nodegroupid].unshift(koMapping.fromJS(request.responseJSON));
                 }else{
                     // inform the user
                 }
             }, this);
         },
 
-        updateTile: function(card, data, e){
-            console.log(ko.toJS(data));
-            var model = new this.TileModel(ko.toJS(data));
+        updateTile: function(tile, e){
+            console.log(ko.toJS(tile));
+            var model = new this.TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
                     // inform the user???
@@ -51,13 +55,13 @@ define([
             }, this);
         },
 
-        deleteTile: function(card, data, e){
-            console.log(ko.toJSON(data));
-            var cardid = data.cardid();
-            var model = new this.TileModel(ko.toJS(data));
+        deleteTile: function(tilegroup, tile, e){
+            console.log(ko.toJS(tile));
+            var nodegroupid = tile.nodegroupid();
+            var model = new this.TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    card[cardid].tiles.remove(data)
+                    tilegroup[nodegroupid].remove(tile)
                 }else{
                     // inform the user
                 }

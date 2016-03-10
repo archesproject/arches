@@ -10,9 +10,9 @@
         
         <div class="panel-body card-body" style="">
 
-            {% if cardgroup.cardinality != 'n' %}
+            {% if cardgroup.cardinality == '1' %}
                 
-                <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
+                <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
 
                     {% include 'views/forms/cards.htm' %}
             
@@ -31,7 +31,7 @@
                         <ul id="" class="og-grid card-wz-grid" style="">
 
                             <!-- Add New Record -->
-                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.id}}-blank" role="tab">
+                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.nodegroupid}}-blank" role="tab">
                                 <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record" style="">
                                     
                                     <a id="add-basemap" href="" class="" style="">
@@ -47,9 +47,9 @@
                                 </div>
                             </li>
 
-                            <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
+                            <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
                             
-                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.id}}" role="tab" class="fade in effect">      
+                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.nodegroupid}}" data-bind="attr: { href: '#abc' + $index() }" role="tab" class="fade in effect">      
 
                                 <!-- Record Summary Container -->
                                 <div id="tile-test" class="panel tile-panel" style="cursor: pointer;">
@@ -92,14 +92,14 @@
 
                     <div>
 
-                        <!-- ko foreach: form.cardgroups['{{cardgroup.id}}-blank'] -->
-                            <div id="{{cardgroup.id}}-blank" class="collapse">
+                        <!-- ko with: $root.form.blanks['{{cardgroup.nodegroupid}}'] -->
+                            <div id="{{cardgroup.nodegroupid}}-blank" class="collapse">
                             {% include 'views/forms/cards.htm' with forceblank=True %}
                             </div>
                         <!-- /ko -->
 
-                        <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
-                            <div id="{{cardgroup.id}}" class="collapse">
+                        <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
+                            <div id="{{cardgroup.nodegroupid}}" data-bind="attr: { id: 'abc' + $index() }" class="collapse">
                             {% include 'views/forms/cards.htm' %}
                             </div>
                         <!-- /ko -->
@@ -127,4 +127,5 @@
     </div>
     {% endfor %}
     <input id="tiledata" name="tiledata" type="hidden" value="{{tiledata}}"/>
+    <input id="blanks" name="blanks" type="hidden" value="{{blanks}}"/>
 </div>

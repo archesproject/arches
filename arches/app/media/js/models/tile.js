@@ -5,8 +5,8 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         defaults: {
             'tileid': '',
             'data': '',
-            'cardid': '',
-            'cardgroupid': '',
+            'nodegroupid': '',
+            'parenttileid': '',
             'resourceinstanceid': ''
         }
     });
