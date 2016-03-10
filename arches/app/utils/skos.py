@@ -30,12 +30,12 @@ class SKOSReader(object):
     def __init__(self):
         self.nodes = []
         self.relations = []
-            
+
     def read_file(self, path_to_file, format='xml'):
         """
         parse the skos file and extract all available data
 
-        """       
+        """
         rdf_graph = Graph()
         start = time()
         try:
@@ -44,7 +44,7 @@ class SKOSReader(object):
         except:
             raise Exception('Error occurred while parsing the file %s'%path_to_file)
         return rdf
-    
+
     def save_concepts_from_skos(self, graph):
         """
         given an RDF graph, tries to save the concpets to the system
@@ -62,7 +62,7 @@ class SKOSReader(object):
         relation_types = models.DRelationType.objects.all()
         skos_relation_types = relation_types.filter(namespace = 'skos')
 
-        
+
         # if the graph is of the type rdflib.graph.Graph
         if isinstance(graph, Graph):
 
@@ -77,7 +77,7 @@ class SKOSReader(object):
 
                 for predicate, object in graph.predicate_objects(subject = scheme):
                     if str(DCTERMS) in predicate and predicate.replace(DCTERMS, '') in dcterms_value_types.values_list('valuetype', flat=True):
-                        if hasattr(object, 'language') and object.language not in allowed_languages: 
+                        if hasattr(object, 'language') and object.language not in allowed_languages:
                             newlang = models.DLanguage()
                             newlang.pk = object.language
                             newlang.languagename = object.language
@@ -89,10 +89,10 @@ class SKOSReader(object):
                             # first try and get any values associated with the concept_scheme
                             value_type = dcterms_value_types.get(valuetype=predicate.replace(DCTERMS, '')) # predicate.replace(SKOS, '') should yield something like 'prefLabel' or 'scopeNote', etc..
                             if predicate == DCTERMS.title:
-                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'category': value_type.category}) 
+                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'prefLabel', 'category': value_type.category})
                                 print 'Casting dcterms:title to skos:prefLabel'
                             if predicate == DCTERMS.description:
-                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'category': value_type.category}) 
+                                concept_scheme.addvalue({'value':object, 'language': object.language, 'type': 'scopeNote', 'category': value_type.category})
                                 print 'Casting dcterms:description to skos:scopeNote'
                         except:
                             pass
@@ -101,10 +101,10 @@ class SKOSReader(object):
                         if predicate == SKOS.hasTopConcept:
                             self.relations.append({'source': scheme_id, 'type': 'hasTopConcept', 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
-                self.nodes.append(concept_scheme)   
+                self.nodes.append(concept_scheme)
 
                 if len(self.nodes) == 0:
-                    raise Exception('No ConceptScheme found in file.')         
+                    raise Exception('No ConceptScheme found in file.')
 
                 # Search for Concepts
                 for s, v, o in graph.triples((None, SKOS.inScheme , scheme)):
@@ -117,7 +117,7 @@ class SKOSReader(object):
                     # loop through all the elements within a <skos:Concept> element
                     for predicate, object in graph.predicate_objects(subject = s):
                         if str(SKOS) in predicate:
-                            if hasattr(object, 'language') and object.language not in allowed_languages: 
+                            if hasattr(object, 'language') and object.language not in allowed_languages:
                                 newlang = models.DLanguage()
                                 newlang.pk = object.language
                                 newlang.languagename = object.language
@@ -129,7 +129,7 @@ class SKOSReader(object):
 
                             if relation_or_value_type in skos_value_types_list:
                                 value_type = skos_value_types.get(valuetype=relation_or_value_type)
-                                concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category}) 
+                                concept.addvalue({'value':object, 'language': object.language, 'type': value_type.valuetype, 'category': value_type.category})
                             elif predicate == SKOS.broader:
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, object), 'type': 'narrower', 'target': self.generate_uuid_from_subject(baseuuid, s)})
                             elif predicate == SKOS.narrower:
@@ -138,11 +138,11 @@ class SKOSReader(object):
                                 self.relations.append({'source': self.generate_uuid_from_subject(baseuuid, s), 'type': relation_or_value_type, 'target': self.generate_uuid_from_subject(baseuuid, object)})
 
                     self.nodes.append(concept)
-                
+
             # insert and index the concpets
             with transaction.atomic():
                 for node in self.nodes:
-                    node.save()        
+                    node.save()
 
                 # insert the concept relations
                 for relation in self.relations:
@@ -153,10 +153,10 @@ class SKOSReader(object):
                     newrelation.relationtype_id = relation['type']
                     newrelation.save()
 
-                # need to index after the concepts and relations have been entered into the db 
+                # need to index after the concepts and relations have been entered into the db
                 # so that the proper context gets indexed with the concept
                 for node in self.nodes:
-                    node.index()  
+                    node.index()
 
             return self
         else:
@@ -181,7 +181,7 @@ class SKOSWriter(object):
         rdf_graph.bind('arches',ARCHES)
         rdf_graph.bind('skos',SKOS)
         rdf_graph.bind('dcterms',DCTERMS)
-        
+
         """
         #add main concept to the graph
         rdf_graph.add((subject, predicate, object))
@@ -201,8 +201,8 @@ class SKOSWriter(object):
                     rdf_graph.add((ARCHES[node.id], SKOS[subconcept.relationshiptype], ARCHES[subconcept.id]))
 
                 for relatedconcept in node.relatedconcepts:
-                    rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))                
-                
+                    rdf_graph.add((ARCHES[node.id], SKOS[relatedconcept.relationshiptype], ARCHES[relatedconcept.id]))
+
                 for value in node.values:
                     if value.category == 'label' or value.category == 'note':
                         if node.nodetype == 'ConceptScheme':
