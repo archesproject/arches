@@ -389,8 +389,8 @@ class Migration(migrations.Migration):
             name='Relation',
             fields=[
                 ('relationid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('conceptidfrom', models.ForeignKey(related_name='relation_concepts_from', db_column='conceptidfrom', to='models.Concept')),
-                ('conceptidto', models.ForeignKey(related_name='relation_concepts_to', db_column='conceptidto', to='models.Concept')),
+                ('conceptfrom', models.ForeignKey(related_name='relation_concepts_from', db_column='conceptidfrom', to='models.Concept')),
+                ('conceptto', models.ForeignKey(related_name='relation_concepts_to', db_column='conceptidto', to='models.Concept')),
                 ('relationtype', models.ForeignKey(to='models.DRelationType', db_column='relationtype')),
             ],
             options={

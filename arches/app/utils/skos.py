@@ -148,8 +148,8 @@ class SKOSReader(object):
                 for relation in self.relations:
                     newrelation = models.Relation()
                     newrelation.relationid = str(uuid.uuid4())
-                    newrelation.conceptidfrom_id = relation['source']
-                    newrelation.conceptidto_id = relation['target']
+                    newrelation.conceptfrom_id = relation['source']
+                    newrelation.conceptto_id = relation['target']
                     newrelation.relationtype_id = relation['type']
                     newrelation.save()
 

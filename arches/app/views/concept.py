@@ -323,20 +323,20 @@ def search(request):
     # def crawl(conceptid, path=[]):
     #     query = Query(se, start=0, limit=100)
     #     bool = Bool()
-    #     bool.must(Match(field='conceptidto', query=conceptid, type='phrase'))
+    #     bool.must(Match(field='conceptto', query=conceptid, type='phrase'))
     #     bool.must(Match(field='relationtype', query='narrower', type='phrase'))
     #     query.add_query(bool)
     #     relations = query.search(index='concept_relations')
     #     for relation in relations['hits']['hits']:
     #         path.insert(0, relation)
-    #         crawl(relation['_source']['conceptidfrom'], path=path)
+    #         crawl(relation['_source']['conceptfrom'], path=path)
     #     return path
 
     # for result in results['hits']['hits']:
     #     if result['_source']['conceptid'] not in ids:
     #         concept_relations = crawl(result['_source']['conceptid'], path=[])
     #         if len(concept_relations) > 0:
-    #             conceptid = concept_relations[0]['_source']['conceptidfrom']
+    #             conceptid = concept_relations[0]['_source']['conceptfrom']
     #             if conceptid in cached_scheme_names:
     #                 result['in_scheme_name'] = cached_scheme_names[conceptid]
     #             else:

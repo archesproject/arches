@@ -238,8 +238,8 @@ class Parcel(models.Model):
 
 
 class Relation(models.Model):
-    conceptidfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
-    conceptidto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
+    conceptfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
+    conceptto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
     relationtype = models.ForeignKey(DRelationType, db_column='relationtype')
     relationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
 
