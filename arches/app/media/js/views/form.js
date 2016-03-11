@@ -19,28 +19,34 @@ define([
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
             this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
-            this.blanks = JSON.parse(this.form.find('#blanks').val());
+            this.blanks = koMapping.fromJS(JSON.parse(this.form.find('#blanks').val()));
 
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
 
             console.log(JSON.parse(this._rawdata));
+            console.log(koMapping.toJS(this.blanks));
 
         },
 
-        saveTile: function(tilegroup, tile, e){
-            console.log(ko.toJS(tile));
-            var nodegroupid = tile.nodegroupid();
-            var model = new this.TileModel(ko.toJS(tile));
-            model.save(function(request, status, model){
-                if(request.status === 200){
-                    if(!(nodegroupid in tilegroup)){
-                        tilegroup[nodegroupid] = koMapping.fromJS([]);
+        saveTile: function(tilegroup, justadd, tile, e){
+            console.log(koMapping.toJS(tile));
+            if(justadd === "true"){
+                tilegroup.tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
+            }else{
+                var nodegroupid = tile.nodegroupid();
+                var model = new this.TileModel(koMapping.toJS(tile));
+                model.save(function(request, status, model){
+                    if(request.status === 200){
+                        // if(!(nodegroupid in tilegroup)){
+                        //     tilegroup[nodegroupid] = koMapping.fromJS([]);
+                        // }
+                        // tilegroup[nodegroupid].unshift(koMapping.fromJS(request.responseJSON));
+                        tilegroup.tiles.unshift(koMapping.fromJS(request.responseJSON));
+                    }else{
+                        // inform the user
                     }
-                    tilegroup[nodegroupid].unshift(koMapping.fromJS(request.responseJSON));
-                }else{
-                    // inform the user
-                }
-            }, this);
+                }, this);
+            }
         },
 
         updateTile: function(tile, e){
@@ -61,7 +67,7 @@ define([
             var model = new this.TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    tilegroup[nodegroupid].remove(tile)
+                    tilegroup.tiles.remove(tile)
                 }else{
                     // inform the user
                 }

@@ -12,10 +12,12 @@
 
             {% if cardgroup.cardinality == '1' %}
                 
-                <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
+                <!-- ko foreach: form.cardgroups -->
+                <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
 
                     {% include 'views/forms/cards.htm' %}
             
+                <!-- /ko -->
                 <!-- /ko -->
 
             {% endif %}
@@ -47,7 +49,8 @@
                                 </div>
                             </li>
 
-                            <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
+                            <!-- ko foreach: form.cardgroups -->
+                            <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
                             
                             <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.nodegroupid}}" data-bind="attr: { href: '#abc' + $index() }" role="tab" class="fade in effect">      
 
@@ -83,6 +86,7 @@
                             </li>
 
                             <!-- /ko -->
+                            <!-- /ko -->
 
                         </ul>
                         <!-- End New Button and Record Display Grid -->
@@ -92,17 +96,26 @@
 
                     <div>
 
+                        <!-- ko foreach: form.cardgroups -->
                         <!-- ko with: $root.form.blanks['{{cardgroup.nodegroupid}}'] -->
                             <div id="{{cardgroup.nodegroupid}}-blank" class="collapse">
-                            {% include 'views/forms/cards.htm' with forceblank=True %}
+                                {% include 'views/forms/cards.htm' with forceblank=True %}
+                                <div class="wizard-buttons" style="">
+                                    <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
+                                    <button id="map-preview" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $parent, false)"> Save</button>
+                                </div>
                             </div>
+                        <!-- /ko -->
                         <!-- /ko -->
 
-                        <!-- ko foreach: form.cardgroups['{{cardgroup.nodegroupid}}'] -->
+                        <!-- ko foreach: form.cardgroups -->
+                        <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
                             <div id="{{cardgroup.nodegroupid}}" data-bind="attr: { id: 'abc' + $index() }" class="collapse">
-                            {% include 'views/forms/cards.htm' %}
+                                {% include 'views/forms/cards.htm'  %}
                             </div>
                         <!-- /ko -->
+                        <!-- /ko -->
+
 
                     </div>
 

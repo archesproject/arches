@@ -7,9 +7,13 @@
     <!--Nav Tabs-->
     <ul class="nav nav-tabs card-nav-container" style="">
         {% for card in cardgroup.cards %}
+        <!-- ko foreach: $data.tiles -->
+        <!-- ko if: nodegroupid() == '{{card.nodegroupid}}' -->
         <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
-            <a id="settings-menu" data-toggle="tab" href="#{{card.nodegroupid}}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
+            <a id="settings-menu" data-toggle="tab" href="" data-bind="attr: { href: '#' + nodegroupid() }"  class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
         </li>
+        <!-- /ko -->
+        <!-- /ko -->
         {% endfor %}
     </ul>
 
@@ -18,8 +22,10 @@
     <!--Tabs Content-->
     <div class="tab-content card-content-tab" style="">
         {% for card in cardgroup.cards %}
-
-        <div id="{{card.nodegroupid}}" class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+        <!-- ko foreach: $data.tiles -->
+        <!-- ko if: nodegroupid() == '{{card.nodegroupid}}' -->
+        
+        <div id="" data-bind="attr: { id: nodegroupid() }" class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
             <div class="panel-body card-panel-body" style="">
                 
                 <!-- Card Level Alert -->
@@ -29,7 +35,7 @@
                 <p id="" class="content-instructions">{{ card.description }}</p>
 
                 <!-- Actual Card HTML goes here -->
-                <div data-bind="with:$data['{{card.nodegroupid}}{% if card.cardinality == 'n' or forceblank %}-blank{% endif %}']()[0]" >
+                <div data-bind="with:{% if card.cardinality == '1'%}$data.tiles()[0]{% endif %}{% if card.cardinality == 'n' or forceblank %}$root.form.blanks['{{card.nodegroupid}}']{% endif %}" >
                     <div data-bind="with: $data.data">
                         {% for widget in card.widgets %}
                             {% include widget.path %}
@@ -41,8 +47,8 @@
                         <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: $root.form.cancelEdit.bind($root.form)">{% trans "Cancel" %}</button>
                         <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
                         {% endif %}
-                        {% if card.cardinality == 'n' %}
-                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($root.form, $parent)">{% trans "Save" %}</button>
+                        {% if card.cardinality == 'n'%}
+                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($root.form, $parent, {% if forceblank %}'true'{% endif %}{% if not forceblank %}'false'{% endif %})">{% if forceblank %}{% trans "Add" %}{% endif %}{% if not forceblank %}{% trans "Save" %}{% endif %}</button>
                         {% endif %}
                     </div>
 
@@ -50,7 +56,7 @@
 
                 {% if card.cardinality == 'n' %}
 
-                <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data['{{card.nodegroupid}}']">
+                <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data.tiles">
                     
                     <!-- Record -->
 
@@ -111,7 +117,8 @@
                 </div>
             </div>
         </aside>
-
+        <!-- /ko -->
+        <!-- /ko -->
         {% endfor %}
 
     </div>

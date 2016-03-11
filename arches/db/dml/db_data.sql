@@ -161,6 +161,12 @@ INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
     VALUES ('99999999-0000-0000-0000-000000000001', 'n', '');
 
 INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
+    VALUES ('32999999-0000-0000-0000-000000000000', 'n', '');
+
+INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
+    VALUES ('19999999-0000-0000-0000-000000000000', 'n', ''); 
+
+INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
     VALUES ('21111111-0000-0000-0000-000000000000', '1', '');
 
 INSERT INTO nodegroups(nodegroupid, cardinality, legacygroupid)
