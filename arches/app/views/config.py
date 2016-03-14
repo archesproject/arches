@@ -142,52 +142,35 @@ def manager(request):
         
         tiles = models.Tile.objects.filter(resourceinstanceid_id=resourceinstanceid)
 
-        t = {}
+        t = []
         blanks = {}
         for form in forms:
             for cardgroup in form['cardgroups']:
-                t[cardgroup['nodegroupid']] = tiles.filter(nodegroupid=cardgroup['nodegroupid'])
-
-                if len(t[cardgroup['nodegroupid']]) == 0:
-                    # add blank parent tile
-                    parentTile = JSONSerializer().serializeToPython(models.Tile())
-                    parentTile['tileid'] = ''
-                    # parentTile.nodegroupid_id = cardgroup['nodegroupid']
-                    # parentTile.resourceinstanceid_id = resourceinstanceid
-                    if cardgroup['cardinality'] == 'n':
-                        t[cardgroup['nodegroupid']+'-blank'] = [parentTile]
-                    else:
-                        t[cardgroup['nodegroupid']] = [parentTile]
-                    
-                    for card in cardgroup['cards']:
-                        # make a blank tile
-                        tile = models.Tile()
-                        tile.tileid = ''
-                        tile.parenttileid = None # parentTile
-                        tile.resourceinstanceid_id = resourceinstanceid
-                        tile.nodegroupid_id = card['nodegroupid']
-                        tile.data = {}
-                        for widget in card['widgets']:
-                            tile.data[widget['nodeid']] = ''
-                        
-                        if cardgroup['cardinality'] == 'n':
-                            t[cardgroup['nodegroupid']+'-blank'][0][card['nodegroupid'] + '-blank'] = [tile]
-                        else:
-                            t[cardgroup['nodegroupid']][0][card['nodegroupid'] + '-blank'] = [tile]
-
-                            t[cardgroup['nodegroupid']][0][card['nodegroupid']] = tiles.filter(nodegroupid=card['nodegroupid'])
-                            if len(t[cardgroup['nodegroupid']][0][card['nodegroupid']]) == 0:
-                                if card['cardinality'] == '1':
-                                    t[cardgroup['nodegroupid']][0][card['nodegroupid']] = [tile]
-
-                # if cardgroup['cardinality'] == 'n':
-                #     pass
+                c = {
+                    'title': cardgroup['title'],
+                    'tiles': JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid'])),
+                    'cards': [],
+                    'nodegroupid': cardgroup['nodegroupid']
+                }
+                for card in cardgroup['cards']:
+                    c['cards'].append({
+                        'title': card['title'],
+                        'tiles': tiles.filter(nodegroupid=card['nodegroupid']),
+                        'cards': [],
+                        'nodegroupid': card['nodegroupid']
+                    })
+                t.append(c)
 
         t2 = []
         blanks = {}
         for form in forms:
             for cardgroup in form['cardgroups']:
                 parentTiles = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid']))
+                
+                if len(parentTiles) > 0:
+                    for parentTile in parentTiles:
+                        print parentTile['tileid']
+                        parentTile['tiles'] = tiles.filter(parenttileid_id=parentTile['tileid'])
 
                 if len(parentTiles) == 0 and cardgroup['cardinality'] == '1':
                     # add blank parent tile
@@ -210,12 +193,13 @@ def manager(request):
                             tile['data'][widget['nodeid']] = ''
                         #blanks[tile['nodegroupid']] = copy.deepcopy(tile)
 
-                        tile['tiles'] = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=card['nodegroupid']))
+                        tile['tiles'] = tiles.filter(nodegroupid=card['nodegroupid'])
 
                         if len(tile['tiles']) == 0 and card['cardinality'] == '1':
                             tile['tiles'] = [copy.deepcopy(tile)]
                         
                         parentTile['tiles'].append(tile)
+
 
                 t2 = t2 + parentTiles
 
@@ -470,6 +454,7 @@ def manager(request):
             print data
 
             def saveTile(data, parenttileid=None):
+                print data
                 data['parenttileid'] = parenttileid
                 data['tileid'], created = uuid.get_or_create(data['tileid'])
                 tile, created = models.Tile.objects.update_or_create(

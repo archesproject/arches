@@ -13,6 +13,7 @@
             {% if cardgroup.cardinality == '1' %}
                 
                 <!-- ko foreach: form.cardgroups -->
+                <div data-bind="text: $index"></div>
                 <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
 
                     {% include 'views/forms/cards.htm' %}
@@ -27,78 +28,10 @@
 
                 <div id="card-group" class="panel-group tab-base card-content-container" style="">
 
-                    <div id="add-basemap-card" class="tile-grid-container" style="">
-                        
-                        <!-- Add New Button and Wizard Record Display Grid -->
-                        <ul id="" class="og-grid card-wz-grid" style="">
-
-                            <!-- Add New Record -->
-                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.nodegroupid}}-blank" role="tab">
-                                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record" style="">
-                                    
-                                    <a id="add-basemap" href="" class="" style="">
-                                        <h3 class="text-thin" style="margin-top: 10px;"> New Basemap</h3>
-
-                                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
-                                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
-                                        </span>
-
-                                        <h5 class="" style="font-weight: 200;"> Add basemaps to support enhanced mapping</h5>
-                                    </a>
-
-                                </div>
-                            </li>
-
-                            <!-- ko foreach: form.cardgroups -->
-                            <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
-                            
-                            <li data-toggle="collapse" data-parent="#card-group" href="#{{cardgroup.nodegroupid}}" data-bind="attr: { href: '#abc' + $index() }" role="tab" class="fade in effect">      
-
-                                <!-- Record Summary Container -->
-                                <div id="tile-test" class="panel tile-panel" style="cursor: pointer;">
-                                    
-                                    <!-- Edit Menu -->
-                                    <div class="tile-menu" style="">
-                                        <!-- Edit/Delete Buttons -->
-                                        <div class="" style="">
-                                            <!-- Edit Button -->
-                                            <button class="btn btn-icon fa fa-pencil tile-menu-btn" title="edit" style=""></button>
-                                            
-                                            <!-- Delete Button -->
-                                            <button id="basemap-delete" class="btn btn-icon fa fa-trash tile-menu-btn" title="delete" style=""></button>
-                                        </div>
-                                    </div>
-                                
-                                    <!-- Data -->
-                                    <div class="panel-body tile-basemap" style="">
-                                        
-                                        <img alt="Google Streets Basemap" class="tile-img-lg" src="http://archesproject.github.io/mockups/img/arches/basemaps/google_streets.png">
-
-                                        <!-- Basemap Summary -->
-                                        <div class="tile-basemap-title" style="">
-                                            <dl class="" style="">
-                                                <dt class="card-category" data-bind="text: $index()">Google Streets</dt>
-                                            </dl>
-                                        </div>
-                                    </div>
-                                </div>
-                    
-                            </li>
-
-                            <!-- /ko -->
-                            <!-- /ko -->
-
-                        </ul>
-                        <!-- End New Button and Record Display Grid -->
-
-                        <div id="add-basemap-scroll" class="scroll-shim" style=""></div>
-                    </div>
-
                     <div>
 
-                        <!-- ko foreach: form.cardgroups -->
                         <!-- ko with: $root.form.blanks['{{cardgroup.nodegroupid}}'] -->
-                            <div id="{{cardgroup.nodegroupid}}-blank" class="collapse">
+                            <div>
                                 {% include 'views/forms/cards.htm' with forceblank=True %}
                                 <div class="wizard-buttons" style="">
                                     <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
@@ -106,15 +39,43 @@
                                 </div>
                             </div>
                         <!-- /ko -->
-                        <!-- /ko -->
 
-                        <!-- ko foreach: form.cardgroups -->
-                        <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
-                            <div id="{{cardgroup.nodegroupid}}" data-bind="attr: { id: 'abc' + $index() }" class="collapse">
-                                {% include 'views/forms/cards.htm'  %}
+                        <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: form.cardgroups">
+                    
+                            <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
+
+                            <div id="record-1" class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250);" data-bind="click: $root.form.expandTile">
+                                <h5 class="list-group-item-heading text-thin">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                                
+                                <div id="record-1-form" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none">
+                                    <a id="record-1-close" href="#" class="record-close" style="display: block;" data-bind="click: $root.form.collapseTile">
+                                        <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-times"></i>
+                                        </span>
+                                    </a>
+                                    <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent)">
+                                        <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                        </span>
+                                    </a>
+                                    
+                                    <!-- Card Level Alert -->
+                                    <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+
+                                    <!-- Card Instruction -->
+                                    <p id="" class="content-instructions">{{ card.description }}</p>
+
+                                    {% include 'views/forms/cards.htm'  %}
+
+                                    <div class="install-buttons">
+                                        <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
+                                    </div>
+
+                                </div>
                             </div>
-                        <!-- /ko -->
-                        <!-- /ko -->
+
+                            <!-- /ko -->
+
+                        </div>
 
 
                     </div>
