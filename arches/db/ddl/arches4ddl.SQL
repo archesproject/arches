@@ -346,18 +346,18 @@ WITH (OIDS=FALSE)
 ALTER TABLE "d_languages" ADD CONSTRAINT "pk_d_languages" PRIMARY KEY ("languageid")
 ;
 
--- Table d_nodetypes
+-- Table d_node_types
 
-CREATE TABLE "d_nodetypes"(
+CREATE TABLE "d_node_types"(
  "nodetype" Text NOT NULL,
  "namespace" Text DEFAULT 'arches'::text NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
 
--- Add keys for table d_nodetypes
+-- Add keys for table d_node_types
 
-ALTER TABLE "d_nodetypes" ADD CONSTRAINT "pk_d_nodetypes" PRIMARY KEY ("nodetype")
+ALTER TABLE "d_node_types" ADD CONSTRAINT "pk_d_nodetypes" PRIMARY KEY ("nodetype")
 ;
 
 -- Table d_relationtypes
@@ -865,7 +865,7 @@ ALTER TABLE "forms_x_cards" ADD CONSTRAINT "cards_cards_x_forms_fk" FOREIGN KEY 
 ALTER TABLE "forms_x_cards" ADD CONSTRAINT "forms_forms_x_cards_fk" FOREIGN KEY ("formid") REFERENCES "forms" ("formid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
-ALTER TABLE "concepts" ADD CONSTRAINT "fk_concepts_x_nodetypes" FOREIGN KEY ("nodetype") REFERENCES "d_nodetypes" ("nodetype") ON DELETE NO ACTION ON UPDATE NO ACTION
+ALTER TABLE "concepts" ADD CONSTRAINT "fk_concepts_x_nodetypes" FOREIGN KEY ("nodetype") REFERENCES "d_node_types" ("nodetype") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
 ALTER TABLE "relations" ADD CONSTRAINT "fk_relations_x_d_relationtypes" FOREIGN KEY ("relationtype") REFERENCES "d_relationtypes" ("relationtype") ON DELETE NO ACTION ON UPDATE NO ACTION
