@@ -173,7 +173,7 @@ class ResourceLoader(object):
 
         if archesjson == False:
             relationshiptype_concept = Concept.objects.get(legacyoid = relationship['RELATION_TYPE'])
-            concept_value = Value.objects.filter(conceptid = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
+            concept_value = Value.objects.filter(concept = relationshiptype_concept.conceptid).filter(valuetype = 'prefLabel')
             entityid1 = legacyid_to_entityid[relationship['RESOURCEID_FROM']]
             entityid2 = legacyid_to_entityid[relationship['RESOURCEID_TO']]
 

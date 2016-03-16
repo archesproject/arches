@@ -5,9 +5,9 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         defaults: {
             'tileid': '',
             'data': '',
-            'nodegroupid': '',
-            'parenttileid': '',
-            'resourceinstanceid': ''
+            'nodegroup_id': '',
+            'parenttile_id': '',
+            'resourceinstance_id': ''
         }
     });
 });

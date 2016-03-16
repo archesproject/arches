@@ -13,7 +13,7 @@
             {% if cardgroup.cardinality == '1' %}
                 
                 <!-- ko foreach: form.cardgroups -->
-                <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
+                <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
 
                     {% include 'views/forms/cards.htm' %}
             
@@ -29,7 +29,7 @@
 
                     <div>
 
-                        <!-- ko with: $root.form.blanks['{{cardgroup.nodegroupid}}'] -->
+                        <!-- ko with: $root.form.blanks['{{cardgroup.nodegroup_id}}'] -->
                             <div>
                                 {% include 'views/forms/cards.htm' with forceblank=True %}
                                 <div class="wizard-buttons" style="">
@@ -41,7 +41,7 @@
 
                         <div class="list-group" style="margin-top:8px; display:none;" data-bind="visible: true, foreach: form.cardgroups">
                     
-                            <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
+                            <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
 
                             <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">
                                 <h5 style="cursor: pointer;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>

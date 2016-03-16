@@ -30,17 +30,17 @@ define([
 
         saveTile: function(tilegroup, justadd, tile, e){
             console.log(koMapping.toJS(tile));
-            var nodegroupid = tile.nodegroupid();
+            var nodegroup_id = tile.nodegroup_id();
             if(justadd === "true"){
                 tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
             }else{
                 var model = new this.TileModel(koMapping.toJS(tile));
                 model.save(function(request, status, model){
                     if(request.status === 200){
-                        // if(!(nodegroupid in tilegroup)){
-                        //     tilegroup[nodegroupid] = koMapping.fromJS([]);
+                        // if(!(nodegroup_id in tilegroup)){
+                        //     tilegroup[nodegroup_id] = koMapping.fromJS([]);
                         // }
-                        // tilegroup[nodegroupid].unshift(koMapping.fromJS(request.responseJSON));
+                        // tilegroup[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
                         tilegroup.unshift(koMapping.fromJS(request.responseJSON));
                     }else{
                         // inform the user
@@ -63,7 +63,7 @@ define([
 
         deleteTile: function(tilegroup, tile, e){
             console.log(ko.toJS(tile));
-            var nodegroupid = tile.nodegroupid();
+            var nodegroup_id = tile.nodegroup_id();
             var model = new this.TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){

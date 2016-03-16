@@ -9,7 +9,7 @@
         {% for card in cardgroup.cards %}
 
         <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
-            <a id="settings-menu" data-toggle="tab" href="#{{card.nodegroupid}}" data-bind="attr: {href: '#abc' + '{{card.nodegroupid}}' + $data.tileid()}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
+            <a id="settings-menu" data-toggle="tab" href="#{{card.nodegroup_id}}" data-bind="attr: {href: '#abc' + '{{card.nodegroup_id}}' + $data.tileid()}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
         </li>
 
         {% endfor %}
@@ -23,7 +23,7 @@
         
 
         
-        <div id="{{card.nodegroupid}}" data-bind="attr: {id: 'abc{{card.nodegroupid}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+        <div id="{{card.nodegroup_id}}" data-bind="attr: {id: 'abc{{card.nodegroup_id}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
             <div class="panel-body card-panel-body" style="">
                 
                 <!-- Card Level Alert -->
@@ -35,11 +35,11 @@
                 <!-- Actual Card HTML goes here -->
                 
                 {% if card.cardinality != 'n' %}
-                    <div data-bind="with:$data.tiles['{{card.nodegroupid}}']()[0]" >
+                    <div data-bind="with:$data.tiles['{{card.nodegroup_id}}']()[0]" >
                 {% endif %}
 
                 {% if card.cardinality == 'n' or forceBlank %}
-                    <div data-bind="with:$root.form.blanks['{{card.nodegroupid}}']" >
+                    <div data-bind="with:$root.form.blanks['{{card.nodegroup_id}}']" >
                 {% endif %}
 
                     <div data-bind="with: $data.data">
@@ -54,22 +54,22 @@
                         <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
                         {% endif %}
                         {% if card.cardinality == 'n'%}
-                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($root.form, $parent.tiles['{{card.nodegroupid}}'], {% if forceblank %}'true'{% endif %}{% if not forceblank %}'false'{% endif %})">{% if forceblank %}{% trans "Add" %}{% endif %}{% if not forceblank %}{% trans "Save" %}{% endif %}</button>
+                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.saveTile.bind($root.form, $parent.tiles['{{card.nodegroup_id}}'], {% if forceblank %}'true'{% endif %}{% if not forceblank %}'false'{% endif %})">{% if forceblank %}{% trans "Add" %}{% endif %}{% if not forceblank %}{% trans "Save" %}{% endif %}</button>
                         {% endif %}
                     </div>
                 </div>
 
                 {% if card.cardinality == 'n' %}
 
-                <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data.tiles['{{card.nodegroupid}}']">
+                <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data.tiles['{{card.nodegroup_id}}']">
                     
-                    <!-- ko if: nodegroupid() == '{{card.nodegroupid}}' -->
+                    <!-- ko if: nodegroup_id() == '{{card.nodegroup_id}}' -->
 
                     <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">
                         <h5 style="cursor: pointer;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
                         
                         <div id="" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none;" data-bind="attr: {id: 'abc' + $data.tileid()}">
-                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent.tiles['{{card.nodegroupid}}'])">
+                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent.tiles['{{card.nodegroup_id}}'])">
                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                 </span>
                             </a>

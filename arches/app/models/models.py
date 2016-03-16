@@ -45,7 +45,7 @@ class BranchMetadata(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'branchmetadata'
+        db_table = 'branch_metadata'
 
 
 class Card(models.Model):
@@ -54,7 +54,7 @@ class Card(models.Model):
     title = models.TextField()
     subtitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
-    nodegroupid = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
+    nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
     parentcardid = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -63,14 +63,14 @@ class Card(models.Model):
 
 
 class CardXNodeXWidget(models.Model):
-    nodeid = models.ForeignKey('Node', db_column='nodeid')
-    cardid = models.ForeignKey(Card, db_column='cardid')
-    widgetid = models.ForeignKey('Widget', db_column='widgetid')
+    node = models.ForeignKey('Node', db_column='nodeid')
+    card = models.ForeignKey(Card, db_column='cardid')
+    widget = models.ForeignKey('Widget', db_column='widgetid')
 
     class Meta:
         managed = True
         db_table = 'cards_x_nodes_x_widgets'
-        unique_together = (('nodeid', 'cardid', 'widgetid'),)
+        unique_together = (('node', 'card', 'widget'),)
 
 
 class Concept(models.Model):
@@ -99,7 +99,7 @@ class DNodeType(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'd_nodetypes'
+        db_table = 'd_node_types'
 
 
 class DRelationType(models.Model):
@@ -109,7 +109,7 @@ class DRelationType(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'd_relationtypes'
+        db_table = 'd_relation_types'
 
 
 class DValueType(models.Model):
@@ -121,7 +121,7 @@ class DValueType(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'd_valuetypes'
+        db_table = 'd_value_types'
 
 
 class Edge(models.Model):
@@ -129,14 +129,14 @@ class Edge(models.Model):
     name = models.TextField()
     description = models.TextField()
     crmproperty = models.TextField()
-    domainnodeid = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
-    rangenodeid = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    branchmetadataid = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
+    rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
+    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'edges'
-        unique_together = (('rangenodeid', 'domainnodeid'),)
+        unique_together = (('rangenode', 'domainnode'),)
 
 
 class EditLog(models.Model):
@@ -172,13 +172,13 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    formid = models.ForeignKey(Form, db_column='formid')
-    parentcardid = models.ForeignKey(Card, db_column='parentcardid')
+    form = models.ForeignKey(Form, db_column='formid')
+    parentcard = models.ForeignKey(Card, db_column='parentcardid')
 
     class Meta:
         managed = True
         db_table = 'forms_x_card'
-        unique_together = (('formid', 'parentcardid'),)
+        unique_together = (('form', 'parentcard'),)
 
 
 class NodeGroup(models.Model):
@@ -188,7 +188,7 @@ class NodeGroup(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'nodegroups'
+        db_table = 'node_groups'
 
 
 class Node(models.Model):
@@ -205,8 +205,8 @@ class Node(models.Model):
     inputlabel = models.TextField(blank=True, null=True)
     inputmask = models.TextField(blank=True, null=True)
     status = models.BigIntegerField(blank=True, null=True)
-    nodegroupid = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    branchmetadataid = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
+    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -238,8 +238,8 @@ class Parcel(models.Model):
 
 
 class Relation(models.Model):
-    conceptidfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
-    conceptidto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
+    conceptfrom = models.ForeignKey(Concept, db_column='conceptidfrom', related_name='relation_concepts_from')
+    conceptto = models.ForeignKey(Concept, db_column='conceptidto', related_name='relation_concepts_to')
     relationtype = models.ForeignKey(DRelationType, db_column='relationtype')
     relationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
 
@@ -256,7 +256,7 @@ class Resource2ResourceConstraint(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'resource2resource_constraints'
+        db_table = 'resource_2_resource_constraints'
 
 
 class ResourceXResource(models.Model):
@@ -274,31 +274,31 @@ class ResourceXResource(models.Model):
 
 
 class ResourceClassXForm(models.Model):
-    resourceclassid = models.ForeignKey(Node, db_column='resourceclassid', blank=True, null=True)
-    formid = models.ForeignKey(Form, db_column='formid')
+    resourceclass = models.ForeignKey(Node, db_column='resourceclassid', blank=True, null=True)
+    form = models.ForeignKey(Form, db_column='formid')
 
     class Meta:
         managed = True
-        db_table = 'resourceclasses_x_forms'
-        unique_together = (('resourceclassid', 'formid'),)
+        db_table = 'resource_classes_x_forms'
+        unique_together = (('resourceclass', 'form'),)
 
 
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclassid = models.ForeignKey(Node, db_column='resourceclassid')
+    resourceclass = models.ForeignKey(Node, db_column='resourceclassid')
     col1 = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
-        db_table = 'resourceinstances'
+        db_table = 'resource_instances'
 
 
 class Tile(models.Model): #Tile
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceinstanceid = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
-    parenttileid = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
+    resourceinstance = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
+    parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
-    nodegroupid = models.ForeignKey(NodeGroup, db_column='nodegroupid')
+    nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
 
     class Meta:
         managed = True
@@ -307,10 +307,10 @@ class Tile(models.Model): #Tile
 
 class Value(models.Model):
     valueid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    conceptid = models.ForeignKey('Concept', db_column='conceptid')
+    concept = models.ForeignKey('Concept', db_column='conceptid')
     valuetype = models.ForeignKey(DValueType, db_column='valuetype')
     value = models.TextField()
-    languageid = models.ForeignKey(DLanguage, db_column='languageid', blank=True, null=True)
+    language = models.ForeignKey(DLanguage, db_column='languageid', blank=True, null=True)
 
     class Meta:
         managed = True

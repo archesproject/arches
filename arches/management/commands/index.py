@@ -34,7 +34,7 @@ class Command(BaseCommand):
         parser.add_argument('-d', '--delete', action='store', dest='delete', default='',
             choices=['all', 'maplayers', 'entity', 'term', 'concept', ''],
             help='Delete Type; all=Deletes the "maplayers, entity, term, and concept" indexes from Elasticsearch, ' +
-            '\'maplayers\'=Deletes just the maplayers index, ' + 
+            '\'maplayers\'=Deletes just the maplayers index, ' +
             '\'entity\'=Deletes just the entity index, ' +
             '\'term\'=Deletes just the term index, ')
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             choices=['concept', ''],
             help='Index Type; concept=Indexes just the concepts, ')
     )
-    
+
     def handle(self, *args, **options):
         if options['delete'] != '':
             print 'delete: '+ options['delete']
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             else:
                 self.delete_index(options['delete'])
 
-        if options['index'] != '':    
+        if options['index'] != '':
             print 'index: '+ options['index']
             cursor = connection.cursor()
 
@@ -70,12 +70,12 @@ class Command(BaseCommand):
                     self.index_concepts_by_entitytypeid(entitytypeid[0])
 
     def index_concepts_for_search(self):
-        # see http://sqlblog.com/blogs/adam_machanic/archive/2006/07/12/swinging-from-tree-to-tree-using-ctes-part-1-adjacency-to-nested-sets.aspx          
+        # see http://sqlblog.com/blogs/adam_machanic/archive/2006/07/12/swinging-from-tree-to-tree-using-ctes-part-1-adjacency-to-nested-sets.aspx
         # Value of Lft for the root node is 1
         # Value of Rgt for the root node is 2 * (Number of nodes)
         # Value of Lft for any node is ((Number of nodes visited) * 2) - (Level of current node)
-        # Value of Rgt for any node is (Lft value) + ((Number of subnodes) * 2) + 1 
-     
+        # Value of Rgt for any node is (Lft value) + ((Number of subnodes) * 2) + 1
+
 
         sys.setrecursionlimit(3000)
         se = SearchEngineFactory().create()
@@ -85,23 +85,23 @@ class Command(BaseCommand):
         def _findNarrowerConcept(conceptid, ret=None, limit=200000, level=1):
             returnobj = {'subnodes': 0}
             if ret == None: # the root node
-                labels = archesmodels.Value.objects.filter(conceptid = conceptid)
+                labels = archesmodels.Value.objects.filter(concept = conceptid)
                 ret = {}
                 nodesvisited = len(ret) + 1
-                ret[conceptid] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}               
+                ret[conceptid] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}
                 for label in labels:
                     ret[conceptid]['labels'].append({'labelid': label.pk, 'label': label.value})
                 level = level + 1
 
-            conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptidfrom = conceptid)
+            conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptfrom = conceptid)
             for relation in conceptrealations:
                 nodesvisited = len(ret) + 1
-                labels = archesmodels.Value.objects.filter(conceptid = relation.conceptidto)
-                ret[relation.conceptidto_id] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}
+                labels = archesmodels.Value.objects.filter(concept = relation.conceptto)
+                ret[relation.conceptto_id] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}
                 for label in labels:
-                    ret[relation.conceptidto_id]['labels'].append({'labelid': label.pk, 'label': label.value})
-                returnobj = _findNarrowerConcept(relation.conceptidto_id, ret=ret, level=level+1)      
-            
+                    ret[relation.conceptto_id]['labels'].append({'labelid': label.pk, 'label': label.value})
+                returnobj = _findNarrowerConcept(relation.conceptto_id, ret=ret, level=level+1)
+
             subnodes = returnobj['subnodes']
             if subnodes == 0: # meaning we're at a leaf node
                 ret[conceptid]['right'] = ret[conceptid]['left'] + 1
@@ -110,7 +110,7 @@ class Command(BaseCommand):
             return {'all_concepts': ret, 'subnodes': ret[conceptid]['right']}
 
         concepts = _findNarrowerConcept('00000000-0000-0000-0000-000000000003')
-        
+
         all_concepts = []
         for key, concept in concepts['all_concepts'].iteritems():
             all_concepts.append({'conceptid': key, 'labels': concept['labels'], 'left': concept['left'], 'right': concept['right']})
@@ -133,12 +133,12 @@ class Command(BaseCommand):
                 data = processdoc(document)
             id = None
             if getid != None:
-                id = getid(document, data)            
+                id = getid(document, data)
             try:
                 if bulk:
                     bulkitem = se.create_bulk_item(index, type, id, data)
                     bulkitems.append(bulkitem[0])
-                    bulkitems.append(bulkitem[1])        
+                    bulkitems.append(bulkitem[1])
                 else:
                     se.index_data(index, type, data, idfield=idfield, id=id)
             except Exception as detail:
@@ -161,7 +161,7 @@ class Command(BaseCommand):
         concept_graph = Concept().get(id=conceptid, include_subconcepts=True, exclude=['note'])
         if len(concept_graph.subconcepts) > 0:
             data = JSONSerializer().serializeToPython(concept_graph, ensure_ascii=True, indent=4)
-            self.index(data, 'concept', entitytypeid, 'id', processdoc=None, getid=None, bulk=False)  
+            self.index(data, 'concept', entitytypeid, 'id', processdoc=None, getid=None, bulk=False)
 
     def delete_index(self, index):
         se = SearchEngineFactory().create()
