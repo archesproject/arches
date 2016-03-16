@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<!-- it's assumed that ko.$data is a card array context -->
+<!-- it's assumed that ko.$data is a tile array context -->
 
 <div id="arches-server-help-cc" class="tab-base card-content-container" style="">
 
@@ -62,6 +62,7 @@
                 {% if card.cardinality == 'n' %}
 
                 <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data.tiles['{{card.nodegroupid}}']">
+                    
                     <!-- ko if: nodegroupid() == '{{card.nodegroupid}}' -->
 
                     <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">

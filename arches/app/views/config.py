@@ -142,35 +142,11 @@ def manager(request):
         
         tiles = models.Tile.objects.filter(resourceinstanceid_id=resourceinstanceid)
 
-        # t = []
-        # blanks = {}
-        # for form in forms:
-        #     for cardgroup in form['cardgroups']:
-        #         c = {
-        #             'title': cardgroup['title'],
-        #             'tiles': JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid'])),
-        #             'cards': [],
-        #             'nodegroupid': cardgroup['nodegroupid']
-        #         }
-        #         for card in cardgroup['cards']:
-        #             c['cards'].append({
-        #                 'title': card['title'],
-        #                 'tiles': tiles.filter(nodegroupid=card['nodegroupid']),
-        #                 'cards': [],
-        #                 'nodegroupid': card['nodegroupid']
-        #             })
-        #         t.append(c)
-
         t2 = []
         blanks = {}
         for form in forms:
             for cardgroup in form['cardgroups']:
                 parentTiles = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid']))
-                
-                # if len(parentTiles) > 0:
-                #     for parentTile in parentTiles:
-                #         #print parentTile['tileid']
-                #         parentTile['tiles'] = tiles.filter(parenttileid_id=parentTile['tileid'])
 
                 if len(parentTiles) > 0:
                     for parentTile in parentTiles:
@@ -200,15 +176,11 @@ def manager(request):
                         tile['data'] = {}
                         for widget in card['widgets']:
                             tile['data'][widget['nodeid']] = ''
-                        #blanks[tile['nodegroupid']] = copy.deepcopy(tile)
 
                         parentTile['tiles'][card['nodegroupid']] = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=card['nodegroupid']))
 
                         if len(parentTile['tiles'][card['nodegroupid']]) == 0 and card['cardinality'] == '1':
                             parentTile['tiles'][card['nodegroupid']] = [copy.deepcopy(tile)]
-                        
-                        # parentTile['tiles'].append(tile)
-
 
                 t2 = t2 + parentTiles
 
@@ -222,6 +194,7 @@ def manager(request):
                 parentTile['nodegroupid'] = cardgroup['nodegroupid']
                 parentTile['resourceinstanceid'] = resourceinstanceid
 
+                # add a blank tile for the cardgroup
                 blanks[parentTile['nodegroupid']] = parentTile
 
                 for card in cardgroup['cards']:
@@ -236,218 +209,12 @@ def manager(request):
                     for widget in card['widgets']:
                         tile['data'][widget['nodeid']] = ''
 
-                    # if cardgroup['cardinality'] == '1':
                     parentTile['tiles'][card['nodegroupid']] = []
-                    #parentTile['tiles'].append(tile)
                     
+                    # add a blank tile for each card 
                     blanks[tile['nodegroupid']] = tile
              
-        
-
-
-        ##
-        ##  path down through the nodegroups until you get to actual data
-        ##
-
-        # t = [{
-        #     'tileid': '123',
-        #     'parenttileid': '',
-        #     'nodegroupid': '21111111-0000-0000-0000-000000000000',
-        #     'data': {},
-        #     'resourceclassid': '',
-        #     'resourceinstanceid': resourceinstanceid,
-        #     'tiles': [{
-        #         'tileid': 'xyz',
-        #         'parenttileid': '123',
-        #         'nodegroupid': '99999999-0000-0000-0000-000000000000',
-        #         'data': {
-        #             "20000000-0000-0000-0000-000000000003": "1",
-        #             "20000000-0000-0000-0000-000000000002": "Map Key",
-        #             "20000000-0000-0000-0000-000000000004": "23984ll2399494",
-        #         },
-        #         'resourceclassid': '',
-        #         'resourceinstanceid': resourceinstanceid,
-        #         'tiles': [
-        #             ....
-        #         ]
-        #     }]
-        # }]
-
-        # No need for a blank cardgroup if the cardgroup cardinality is 1
-        # '21111111-0000-0000-0000-000000000000-blank': [{
-        #     '99999999-0000-0000-0000-000000000000': [],
-        #     "99999999-0000-0000-0000-000000000000-blank": [{
-        #         'tileid': '',
-        #         'parenttileid': '',
-        #         'nodegroupid': '99999999-0000-0000-0000-000000000000',
-        #         'data': {
-        #             "20000000-0000-0000-0000-000000000003": "",
-        #             "20000000-0000-0000-0000-000000000002": "",
-        #             "20000000-0000-0000-0000-000000000004": "",
-        #         },
-        #         'resourceclassid': '',
-        #         'resourceinstanceid': resourceinstanceid
-        #     }]
-        # }],
-
-        ta = {
-            '21111111-0000-0000-0000-000000000000': [{ # <-- this is a virtual node group 
-                'tileid': '123',
-                'parenttileid': '',
-                'nodegroupid': '21111111-0000-0000-0000-000000000000',
-                'data': {},
-                'resourceclassid': '',
-                'resourceinstanceid': resourceinstanceid,
-                '99999999-0000-0000-0000-000000000000': [{
-                    'tileid': '',
-                    'parenttileid': '123',
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "1",
-                        "20000000-0000-0000-0000-000000000002": "Map Key",
-                        "20000000-0000-0000-0000-000000000004": "23984ll2399494",
-                    },
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                },{
-                    'tileid': '',
-                    'parenttileid': '123',
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "2",
-                        "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
-                        "20000000-0000-0000-0000-000000000004": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
-                    },
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                }],
-                '99999999-0000-0000-0000-000000000001': [{
-                    'tileid': '',
-                    'parenttileid': '123',
-                    'nodegroupid': '99999999-0000-0000-0000-000000000001',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000002": "Map Key",
-                        "20000000-0000-0000-0000-000000000004": "23984ll2399494",
-                    },
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                }]
-            }],
-            '11111111-0000-0000-0000-000000000000': [{   # <-- this is a semantic node group 
-                'tileid': '62345678-0000-0000-0000-000000000000',
-                'parenttileid': '7777777-0000-0000-0000-000000000000',
-                'nodegroupid': '11111111-0000-0000-0000-000000000000',
-                'data': {},
-                'resourceclassid': '',
-                'resourceinstanceid': resourceinstanceid,
-                '99999999-0000-0000-0000-000000000000': [{
-                    'tileid': '',
-                    'parenttileid': '62345678-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "1",
-                        "20000000-0000-0000-0000-000000000002": "Map Key",
-                        "20000000-0000-0000-0000-000000000004": "23984ll2399494",
-                    },
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                },{
-                    'tileid': '',
-                    'parenttileid': '62345678-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "2",
-                        "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
-                        "20000000-0000-0000-0000-000000000004": "At53AAkpRmfAAU6uclyo7DDveGo_PHSJE5nT4PDJ9htfDRZwjGcxFTXnLJY2GBcd",
-                    },
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                }]
-            },{
-                'tileid': '12345678-0000-0000-0000-000000000000',
-                'parenttileid': '7777777-0000-0000-0000-000000000000',
-                'nodegroupid': '11111111-0000-0000-0000-000000000000',
-                'data': {},
-                'resourceclassid': '',
-                'resourceinstanceid': resourceinstanceid,
-                '99999999-0000-0000-0000-000000000000': [{
-                    'tileid': '',
-                    'parenttileid': '12345678-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "1",
-                        "20000000-0000-0000-0000-000000000002": "Map Key",
-                        "20000000-0000-0000-0000-000000000004": "TESTING 123",
-                    },
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                },{
-                    'tileid': '',
-                    'parenttileid': '12345678-0000-0000-0000-000000000000',
-                    'data': {
-                        "20000000-0000-0000-0000-000000000003": "2",
-                        "20000000-0000-0000-0000-000000000002": "MapBox Base Maps",
-                        "20000000-0000-0000-0000-000000000004": "holy mackrel",
-                    },
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
-                    'resourceclassid': '',
-                    'resourceinstanceid': resourceinstanceid
-                }]
-            }]
-        }
-
-        # blanks = {
-        #     '99999999-0000-0000-0000-000000000000': [{
-        #         'tileid': '',
-        #         'parenttileid': '',
-        #         'data': {
-        #             "20000000-0000-0000-0000-000000000003": "",
-        #             "20000000-0000-0000-0000-000000000002": "",
-        #             "20000000-0000-0000-0000-000000000004": "",
-        #         },
-        #         'nodegroupid': '99999999-0000-0000-0000-000000000000',
-        #         'resourceclassid': '',
-        #         'resourceinstanceid': resourceinstanceid
-        #     }],
-        #     '99999999-0000-0000-0000-000000000001': [{
-        #         'tileid': '',
-        #         'parenttileid': '',
-        #         'data': {
-        #             "20000000-0000-0000-0000-000000000003": "",
-        #             "20000000-0000-0000-0000-000000000002": "",
-        #             "20000000-0000-0000-0000-000000000004": "",
-        #         },
-        #         'nodegroupid': '99999999-0000-0000-0000-000000000001',
-        #         'resourceclassid': '',
-        #         'resourceinstanceid': resourceinstanceid
-        #     }],
-        #     '19999999-0000-0000-0000-000000000000': [{
-        #         'tileid': '',
-        #         'parenttileid': '',
-        #         'data': {
-        #             "20000000-0000-0000-0000-000000000002": "",
-        #             "20000000-0000-0000-0000-000000000004": "",
-        #         },
-        #         'nodegroupid': '99999999-0000-0000-0000-000000000001',
-        #         'resourceclassid': '',
-        #         'resourceinstanceid': resourceinstanceid
-        #     }],
-        #     '11111111-0000-0000-0000-000000000000': [{
-        #         '99999999-0000-0000-0000-000000000000': [],
-        #         "99999999-0000-0000-0000-000000000000": [{
-        #             'tileid': '',
-        #             'parenttileid': '',
-        #             'nodegroupid': '99999999-0000-0000-0000-000000000000',
-        #             'data': {
-        #                 "20000000-0000-0000-0000-000000000003": "",
-        #                 "20000000-0000-0000-0000-000000000002": "",
-        #                 "20000000-0000-0000-0000-000000000004": "",
-        #             },
-        #             'resourceclassid': '',
-        #             'resourceinstanceid': resourceinstanceid
-        #         }]
-        #     }],
-        # }
+             
 
         return render(request, 'config-manager.htm', {
             'main_script': 'config-manager',
