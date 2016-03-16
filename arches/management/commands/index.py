@@ -85,7 +85,7 @@ class Command(BaseCommand):
         def _findNarrowerConcept(conceptid, ret=None, limit=200000, level=1):
             returnobj = {'subnodes': 0}
             if ret == None: # the root node
-                labels = archesmodels.Value.objects.filter(conceptid = conceptid)
+                labels = archesmodels.Value.objects.filter(concept = conceptid)
                 ret = {}
                 nodesvisited = len(ret) + 1
                 ret[conceptid] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}
@@ -96,7 +96,7 @@ class Command(BaseCommand):
             conceptrealations = archesmodels.ConceptRelations.objects.filter(conceptfrom = conceptid)
             for relation in conceptrealations:
                 nodesvisited = len(ret) + 1
-                labels = archesmodels.Value.objects.filter(conceptid = relation.conceptto)
+                labels = archesmodels.Value.objects.filter(concept = relation.conceptto)
                 ret[relation.conceptto_id] = {'labels': [], 'left': (nodesvisited*2)-level, 'right': 0}
                 for label in labels:
                     ret[relation.conceptto_id]['labels'].append({'labelid': label.pk, 'label': label.value})

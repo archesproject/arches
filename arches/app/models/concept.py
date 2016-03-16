@@ -118,7 +118,7 @@ class Concept(object):
                 exclude = []
 
                 if len(include) > 0:
-                    values = models.Value.objects.filter(conceptid = self.id)
+                    values = models.Value.objects.filter(concept = self.id)
                     for value in values:
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
@@ -492,7 +492,7 @@ class Concept(object):
                 self.children = []
 
         def _findNarrowerConcept(conceptid, depth_limit=None, level=0):
-            labels = models.Value.objects.filter(conceptid = conceptid)
+            labels = models.Value.objects.filter(concept = conceptid)
             ret = concept()
             temp = Concept()
             for label in labels:
@@ -520,7 +520,7 @@ class Concept(object):
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
             conceptrealations = models.Relation.objects.filter(Q(conceptto = conceptid), ~Q(relationtype = 'related'), ~Q(relationtype__category = 'Mapping Properties'))
             if len(conceptrealations) > 0 and conceptid != top_concept:
-                labels = models.Value.objects.filter(conceptid = conceptrealations[0].conceptfrom_id)
+                labels = models.Value.objects.filter(concept = conceptrealations[0].conceptfrom_id)
                 ret = concept()
                 temp = Concept()
                 for label in labels:
@@ -795,7 +795,7 @@ class ConceptValue(object):
             value = models.Value()
             value.pk = self.id
             value.value = self.value
-            value.conceptid_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
+            value.concept_id = self.conceptid # models.Concept.objects.get(pk=self.conceptid)
             value.valuetype_id = self.type # models.DValueType.objects.get(pk=self.type)
             if self.language != '':
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
@@ -812,7 +812,7 @@ class ConceptValue(object):
     def load(self, value):
         if isinstance(value, models.Value):
             self.id = str(value.pk)
-            self.conceptid = str(value.conceptid.pk)
+            self.conceptid = str(value.concept.pk)
             self.type = value.valuetype.pk
             self.category = value.valuetype.category
             self.value = value.value
