@@ -49,17 +49,11 @@ def manager(request):
                 'nodegroupid': '21111111-0000-0000-0000-000000000000',  # <-- virtual nodegroup because this cardgroup has a cardinality of 1
                 'cards': [{
                     'id': '30000000-0000-0000-0000-000000000000',
-                    'title': _('Keys'),
-                    'cardinality': 'n',
-                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
+                    'title': _('TEst'),
+                    'cardinality': '1',
+                    'nodegroupid': '99999999-0000-0000-0000-000000000001',
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
-                        'path': select_widget.template.path,
-                        'label': 'Service Provider',
-                        'placeholder': 'e.g.: MapBox',
-                        'nodeid': '20000000-0000-0000-0000-000000000003',
-                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
-                    },{
                         'path': string_widget.template.path,
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
@@ -72,11 +66,17 @@ def manager(request):
                     }]
                 },{
                     'id': '30000000-0000-0000-0000-000000000000',
-                    'title': _('TEst'),
-                    'cardinality': '1',
-                    'nodegroupid': '99999999-0000-0000-0000-000000000001',
+                    'title': _('Keys'),
+                    'cardinality': 'n',
+                    'nodegroupid': '99999999-0000-0000-0000-000000000000',
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
+                        'path': select_widget.template.path,
+                        'label': 'Service Provider',
+                        'placeholder': 'e.g.: MapBox',
+                        'nodeid': '20000000-0000-0000-0000-000000000003',
+                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
+                    },{
                         'path': string_widget.template.path,
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
@@ -142,24 +142,24 @@ def manager(request):
         
         tiles = models.Tile.objects.filter(resourceinstanceid_id=resourceinstanceid)
 
-        t = []
-        blanks = {}
-        for form in forms:
-            for cardgroup in form['cardgroups']:
-                c = {
-                    'title': cardgroup['title'],
-                    'tiles': JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid'])),
-                    'cards': [],
-                    'nodegroupid': cardgroup['nodegroupid']
-                }
-                for card in cardgroup['cards']:
-                    c['cards'].append({
-                        'title': card['title'],
-                        'tiles': tiles.filter(nodegroupid=card['nodegroupid']),
-                        'cards': [],
-                        'nodegroupid': card['nodegroupid']
-                    })
-                t.append(c)
+        # t = []
+        # blanks = {}
+        # for form in forms:
+        #     for cardgroup in form['cardgroups']:
+        #         c = {
+        #             'title': cardgroup['title'],
+        #             'tiles': JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid'])),
+        #             'cards': [],
+        #             'nodegroupid': cardgroup['nodegroupid']
+        #         }
+        #         for card in cardgroup['cards']:
+        #             c['cards'].append({
+        #                 'title': card['title'],
+        #                 'tiles': tiles.filter(nodegroupid=card['nodegroupid']),
+        #                 'cards': [],
+        #                 'nodegroupid': card['nodegroupid']
+        #             })
+        #         t.append(c)
 
         t2 = []
         blanks = {}
@@ -167,21 +167,30 @@ def manager(request):
             for cardgroup in form['cardgroups']:
                 parentTiles = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=cardgroup['nodegroupid']))
                 
+                # if len(parentTiles) > 0:
+                #     for parentTile in parentTiles:
+                #         #print parentTile['tileid']
+                #         parentTile['tiles'] = tiles.filter(parenttileid_id=parentTile['tileid'])
+
                 if len(parentTiles) > 0:
                     for parentTile in parentTiles:
-                        print parentTile['tileid']
-                        parentTile['tiles'] = tiles.filter(parenttileid_id=parentTile['tileid'])
+                        parentTile['tiles'] = {}
+                        for card in cardgroup['cards']:
+                            parentTile['tiles'][card['nodegroupid']] = []
+                        for tile in JSONSerializer().serializeToPython(tiles.filter(parenttileid_id=parentTile['tileid'])):
+                            parentTile['tiles'][tile['nodegroupid']].append(tile)
 
                 if len(parentTiles) == 0 and cardgroup['cardinality'] == '1':
                     # add blank parent tile
                     parentTile = JSONSerializer().serializeToPython(models.Tile())
                     parentTile['tileid'] = ''
-                    parentTile['tiles'] = []
+                    parentTile['tiles'] = {}
                     parentTile['nodegroupid'] = cardgroup['nodegroupid']
                     parentTile['resourceinstanceid'] = resourceinstanceid
                     parentTiles = [parentTile]
 
                     for card in cardgroup['cards']:
+                        #print card
                         # make a blank tile
                         tile = JSONSerializer().serializeToPython(models.Tile())
                         tile['tileid'] = ''
@@ -193,12 +202,12 @@ def manager(request):
                             tile['data'][widget['nodeid']] = ''
                         #blanks[tile['nodegroupid']] = copy.deepcopy(tile)
 
-                        tile['tiles'] = tiles.filter(nodegroupid=card['nodegroupid'])
+                        parentTile['tiles'][card['nodegroupid']] = JSONSerializer().serializeToPython(tiles.filter(nodegroupid=card['nodegroupid']))
 
-                        if len(tile['tiles']) == 0 and card['cardinality'] == '1':
-                            tile['tiles'] = [copy.deepcopy(tile)]
+                        if len(parentTile['tiles'][card['nodegroupid']]) == 0 and card['cardinality'] == '1':
+                            parentTile['tiles'][card['nodegroupid']] = [copy.deepcopy(tile)]
                         
-                        parentTile['tiles'].append(tile)
+                        # parentTile['tiles'].append(tile)
 
 
                 t2 = t2 + parentTiles
@@ -209,7 +218,7 @@ def manager(request):
                 # add blank parent tile
                 parentTile = JSONSerializer().serializeToPython(models.Tile())
                 parentTile['tileid'] = ''
-                parentTile['tiles'] = []
+                parentTile['tiles'] = {}
                 parentTile['nodegroupid'] = cardgroup['nodegroupid']
                 parentTile['resourceinstanceid'] = resourceinstanceid
 
@@ -227,10 +236,12 @@ def manager(request):
                     for widget in card['widgets']:
                         tile['data'][widget['nodeid']] = ''
 
-                    parentTile['tiles'].append(tile)
+                    # if cardgroup['cardinality'] == '1':
+                    parentTile['tiles'][card['nodegroupid']] = []
+                    #parentTile['tiles'].append(tile)
                     
                     blanks[tile['nodegroupid']] = tile
-                 
+             
         
 
 
@@ -454,8 +465,9 @@ def manager(request):
             print data
 
             def saveTile(data, parenttileid=None):
+                print 'in saveTile'
                 print data
-                data['parenttileid'] = parenttileid
+                #data['parenttileid'] = parenttileid
                 data['tileid'], created = uuid.get_or_create(data['tileid'])
                 tile, created = models.Tile.objects.update_or_create(
                     tileid = data['tileid'], 
@@ -463,7 +475,7 @@ def manager(request):
                         'nodegroupid_id': data['nodegroupid'], 
                         'data': data['data'],
                         'resourceinstanceid_id': data['resourceinstanceid'],
-                        'parenttileid_id': parenttileid
+                        'parenttileid_id': data['parenttileid']
                     }
                 )
                 return data
@@ -471,8 +483,10 @@ def manager(request):
             if 'tiles' in data and len(data['tiles']) > 0:                
                 parenttile = saveTile(data)
 
-                for tile in data['tiles']:
-                    saveTile(tile, parenttileid=parenttile['tileid'])
+                for key, tiles in data['tiles'].iteritems():
+                    for tile in tiles:
+                        tile['parenttileid'] = parenttile['tileid']
+                        saveTile(tile)
             else:
                 saveTile(data)
 

@@ -30,10 +30,10 @@ define([
 
         saveTile: function(tilegroup, justadd, tile, e){
             console.log(koMapping.toJS(tile));
+            var nodegroupid = tile.nodegroupid();
             if(justadd === "true"){
-                tilegroup.tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
+                tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
             }else{
-                var nodegroupid = tile.nodegroupid();
                 var model = new this.TileModel(koMapping.toJS(tile));
                 model.save(function(request, status, model){
                     if(request.status === 200){
@@ -41,7 +41,7 @@ define([
                         //     tilegroup[nodegroupid] = koMapping.fromJS([]);
                         // }
                         // tilegroup[nodegroupid].unshift(koMapping.fromJS(request.responseJSON));
-                        tilegroup.tiles.unshift(koMapping.fromJS(request.responseJSON));
+                        tilegroup.unshift(koMapping.fromJS(request.responseJSON));
                     }else{
                         // inform the user
                     }
@@ -67,7 +67,7 @@ define([
             var model = new this.TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    tilegroup.tiles.remove(tile)
+                    tilegroup.remove(tile)
                 }else{
                     // inform the user
                 }
@@ -81,7 +81,7 @@ define([
         expandTile: function(data, e){
             console.log(ko.toJSON(data));
             if(!self.collapsing){
-                $(e.currentTarget).find('.effect').show('slow');
+                $(e.currentTarget).find('.effect').show('fast');
             }else{
                 self.collapsing = false;
             }
@@ -89,7 +89,7 @@ define([
 
         collapseTile: function(data, e){
             console.log(ko.toJSON(data));
-            $(e.currentTarget.parentElement).hide('slow');
+            $(e.currentTarget.parentElement).hide('fast');
             self.collapsing = true;
         }
     });

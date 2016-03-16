@@ -13,7 +13,6 @@
             {% if cardgroup.cardinality == '1' %}
                 
                 <!-- ko foreach: form.cardgroups -->
-                <div data-bind="text: $index"></div>
                 <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
 
                     {% include 'views/forms/cards.htm' %}
@@ -35,7 +34,7 @@
                                 {% include 'views/forms/cards.htm' with forceblank=True %}
                                 <div class="wizard-buttons" style="">
                                     <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
-                                    <button id="map-preview" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $parent, false)"> Save</button>
+                                    <button id="map-preview" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups, false)"> Save</button>
                                 </div>
                             </div>
                         <!-- /ko -->
@@ -52,7 +51,7 @@
                                         <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-times"></i>
                                         </span>
                                     </a>
-                                    <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent)">
+                                    <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $root.form.cardgroups)">
                                         <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                         </span>
                                     </a>
