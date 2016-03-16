@@ -78,19 +78,8 @@ define([
             console.log(ko.toJSON(data));
         },
 
-        expandTile: function(data, e){
-            console.log(ko.toJSON(data));
-            if(!self.collapsing){
-                $(e.currentTarget).find('.effect').show('fast');
-            }else{
-                self.collapsing = false;
-            }
-        },
-
-        collapseTile: function(data, e){
-            console.log(ko.toJSON(data));
-            $(e.currentTarget.parentElement).hide('fast');
-            self.collapsing = true;
+        toggleTile: function(data, e){
+            $('#abc'+data.tileid()).toggle('fast');
         }
     });
 });

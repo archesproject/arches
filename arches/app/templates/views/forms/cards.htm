@@ -9,7 +9,7 @@
         {% for card in cardgroup.cards %}
 
         <li id="settings-menu-li" class="{% if forloop.first %}active{% endif %}">
-            <a id="settings-menu" data-toggle="tab" href="#{{card.nodegroupid}}" data-bind="attr: {t: '#abc' + '{{card.nodegroupid}}' + $data.tileid()}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
+            <a id="settings-menu" data-toggle="tab" href="#{{card.nodegroupid}}" data-bind="attr: {href: '#abc' + '{{card.nodegroupid}}' + $data.tileid()}" class="card-tab-title" aria-expanded="false">{{ card.title }}</a>
         </li>
 
         {% endfor %}
@@ -23,7 +23,7 @@
         
 
         
-        <div id="{{card.nodegroupid}}" data-bind="attr: {t: 'abc{{card.nodegroupid}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
+        <div id="{{card.nodegroupid}}" data-bind="attr: {id: 'abc{{card.nodegroupid}}' + $data.tileid() }"  class="tab-pane fade in {% if forloop.first %}active{% endif %}"> 
             <div class="panel-body card-panel-body" style="">
                 
                 <!-- Card Level Alert -->
@@ -64,14 +64,10 @@
                 <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: $data.tiles['{{card.nodegroupid}}']">
                     <!-- ko if: nodegroupid() == '{{card.nodegroupid}}' -->
 
-                    <div id="record-1" class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250);" data-bind="click: $root.form.expandTile">
-                        <h5 class="list-group-item-heading text-thin">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                    <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">
+                        <h5 style="cursor: pointer;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
                         
-                        <div id="record-1-form" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none">
-                            <a id="record-1-close" href="#" class="record-close" style="display: block;" data-bind="click: $root.form.collapseTile">
-                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-times"></i>
-                                </span>
-                            </a>
+                        <div id="" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none;" data-bind="attr: {id: 'abc' + $data.tileid()}">
                             <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $parent.tiles['{{card.nodegroupid}}'])">
                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                 </span>

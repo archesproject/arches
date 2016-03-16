@@ -39,18 +39,14 @@
                             </div>
                         <!-- /ko -->
 
-                        <div class="list-group" style="margin: 30px -25px 30px -20px; display:none;" data-bind="visible: true, foreach: form.cardgroups">
+                        <div class="list-group" style="margin-top:8px; display:none;" data-bind="visible: true, foreach: form.cardgroups">
                     
                             <!-- ko if: nodegroupid() == '{{cardgroup.nodegroupid}}' -->
 
-                            <div id="record-1" class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250);" data-bind="click: $root.form.expandTile">
-                                <h5 class="list-group-item-heading text-thin">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                            <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">
+                                <h5 style="cursor: pointer;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
                                 
-                                <div id="record-1-form" class="effect" style="margin-top: 15px; padding: 60px 10px 20px; display: block; background: rgb(255, 255, 255); display:none">
-                                    <a id="record-1-close" href="#" class="record-close" style="display: block;" data-bind="click: $root.form.collapseTile">
-                                        <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-times"></i>
-                                        </span>
-                                    </a>
+                                <div id="" style="margin-top: 15px; padding: 60px 10px 20px; display: none; background: rgb(255, 255, 255);"  data-bind="attr: {id: 'abc' + $data.tileid()}">
                                     <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $root.form.cardgroups)">
                                         <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                         </span>
