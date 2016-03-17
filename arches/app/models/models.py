@@ -50,12 +50,12 @@ class BranchMetadata(models.Model):
 
 class Card(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
-    title = models.TextField()
+    name = models.TextField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
-    parentcardid = models.TextField(blank=True, null=True)
+    parentcardid = models.ForeignKey('self', db_column='cardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
 
     class Meta:
         managed = True
@@ -63,9 +63,13 @@ class Card(models.Model):
 
 
 class CardXNodeXWidget(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey(Card, db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
+    inputmask = models.TextField(blank=True, null=True)
+    inputlabel = models.TextField(blank=True, null=True)
+
 
     class Meta:
         managed = True
@@ -126,9 +130,9 @@ class DValueType(models.Model):
 
 class Edge(models.Model):
     edgeid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
-    description = models.TextField()
-    crmproperty = models.TextField()
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
@@ -162,7 +166,6 @@ class EditLog(models.Model):
 
 class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField()
     title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
 
@@ -172,19 +175,21 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
     form = models.ForeignKey(Form, db_column='formid')
-    parentcard = models.ForeignKey(Card, db_column='parentcardid')
+    card = models.ForeignKey(Card, db_column='cardid')
 
     class Meta:
         managed = True
         db_table = 'forms_x_card'
-        unique_together = (('form', 'parentcard'),)
+        unique_together = (('form', 'card'),)
 
 
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    cardinality = models.TextField()
+    cardinality = models.TextField(blank=True, null=True)
     legacygroupid = models.TextField(blank=True, null=True)
+    parentnodegroupid = models.ForeignKey('self', db_column='nodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
     class Meta:
         managed = True
@@ -197,14 +202,10 @@ class Node(models.Model):
     """
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField(unique=True)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
     crmclass = models.TextField()
     datatype = models.TextField()
-    validation = models.TextField(blank=True, null=True)
-    inputlabel = models.TextField(blank=True, null=True)
-    inputmask = models.TextField(blank=True, null=True)
-    status = models.BigIntegerField(blank=True, null=True)
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
@@ -264,7 +265,7 @@ class ResourceXResource(models.Model):
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
-    relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
+    relationshiptype = models.ForeignKey('Value', db_column='valueid')
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
 
@@ -274,8 +275,10 @@ class ResourceXResource(models.Model):
 
 
 class ResourceClassXForm(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
     resourceclass = models.ForeignKey(Node, db_column='resourceclassid', blank=True, null=True)
     form = models.ForeignKey(Form, db_column='formid')
+    status = models.TextField(blank=True, null=True) #This hides forms that may be deployed by an implementor for testing purposes. Once the switch is flipped to "prod" then regular permissions (defined at the nodegroup level) come into play.
 
     class Meta:
         managed = True
@@ -286,7 +289,7 @@ class ResourceClassXForm(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclass = models.ForeignKey(Node, db_column='resourceclassid')
-    col1 = models.TextField(blank=True, null=True)
+    resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
 
     class Meta:
         managed = True
@@ -323,6 +326,7 @@ class Widget(models.Model):
     template = models.FileField(storage=widget_storage_location)
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
+    helptext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
