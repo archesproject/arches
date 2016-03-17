@@ -33,6 +33,7 @@ define([
             var nodegroup_id = tile.nodegroup_id();
             if(justadd === "true"){
                 tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
+                this.clearTile(tile);
             }else{
                 var model = new this.TileModel(koMapping.toJS(tile));
                 model.save(function(request, status, model){
@@ -42,6 +43,7 @@ define([
                         // }
                         // tilegroup[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
                         tilegroup.unshift(koMapping.fromJS(request.responseJSON));
+                        this.clearTile(tile);
                     }else{
                         // inform the user
                     }
@@ -80,6 +82,15 @@ define([
 
         toggleTile: function(data, e){
             $('#abc'+data.tileid()).toggle('fast');
+        },
+
+        clearTile: function(tile){
+            _.each(tile.data, function(value, key, list){
+                value("");
+            }, this);
+            _.each(tile.tiles, function(value, key, list){
+                value.removeAll();
+            }, this);
         }
     });
 });
