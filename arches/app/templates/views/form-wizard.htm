@@ -1,14 +1,14 @@
 {% load i18n %}
 <div id="{{form.id}}" class="arches-form tab-pane fade in active">
     {% for cardgroup in form.cardgroups %}
-    <div id="arches-server" class="panel card-panel">
+    <div class="card-panel">
         <div class="panel-heading">
             <h3 class="panel-title card-main-title" style="color: grey !important;">
                 {{ cardgroup.title }}
             </h3>
         </div>
         
-        <div class="panel-body card-body" style="">
+        <div class="panel card-body" style="">
 
             {% if cardgroup.cardinality == '1' %}
                 
@@ -25,73 +25,56 @@
 
             {% if cardgroup.cardinality == 'n' %}
 
-                <div id="card-group" class="panel-group tab-base card-content-container" style="">
+                <div>
 
-                    <div>
-
-                        <!-- ko with: $root.form.blanks['{{cardgroup.nodegroup_id}}'] -->
-                            <div>
-                                {% include 'views/forms/cards.htm' with forceblank=True %}
-                                <div class="wizard-buttons" style="">
-                                    <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
-                                    <button id="map-preview" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups, false)"> Save</button>
-                                </div>
+                    <!-- ko with: $root.form.blanks['{{cardgroup.nodegroup_id}}'] -->
+                        <div>
+                            {% include 'views/forms/cards.htm' with forceblank=True %}
+                            <div class="wizard-buttons">
+                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
+                                <button class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups, false)"> Save</button>
                             </div>
-                        <!-- /ko -->
+                        </div>
+                    <!-- /ko -->
 
-                        <div class="list-group" style="margin-top:8px; display:none;" data-bind="visible: true, foreach: form.cardgroups">
-                    
-                            <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
+                    <div class="list-group" style="margin-top:15px;" data-bind="visible: true, foreach: form.cardgroups">
+                
+                        <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
 
-                            <div id="" class="tile-record list-group-item" style="background: rgb(250, 250, 250);">
-                                <h5 style="cursor: pointer;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                        <div class="list-group-item" style="background: rgb(250, 250, 250);">
+                            <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                            
+                            <div style="display: none;"  data-bind="attr: {id: 'abc' + $data.tileid()}">
+                                <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $root.form.cardgroups)">
+                                    <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                    </span>
+                                </a>
                                 
-                                <div id="" style="margin-top: 15px; padding: 60px 10px 20px; display: none; background: rgb(255, 255, 255);"  data-bind="attr: {id: 'abc' + $data.tileid()}">
-                                    <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $root.form.cardgroups)">
-                                        <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
-                                        </span>
-                                    </a>
-                                    
-                                    <!-- Card Level Alert -->
-                                    <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+                                <!-- Card Level Alert -->
+                                <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
 
-                                    <!-- Card Instruction -->
-                                    <p id="" class="content-instructions">{{ card.description }}</p>
+                                <!-- Card Instruction -->
+                                <p class="content-instructions">{{ card.description }}</p>
 
-                                    {% include 'views/forms/cards.htm'  %}
+                                {% include 'views/forms/cards.htm'  %}
 
-                                    <div class="install-buttons">
-                                        <button id="" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
-                                        <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
-                                    </div>
-
+                                <div class="wizard-buttons">
+                                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
                                 </div>
+
                             </div>
-
-                            <!-- /ko -->
-
                         </div>
 
+                        <!-- /ko -->
 
                     </div>
+
 
                 </div>
 
             {% endif %}
 
-        </div>
-
-        <div class="panel-footer card-footer" style="">
-            <div class="row">
-                <div class="col-sm-6">
-                    <p id="arches-server-footer" class="" style="padding-right: 15px;"><strong>{% trans "Last Updated:" %}</strong> ???  &nbsp; &nbsp; <strong>{% trans "Updated By:" %}</strong> ???</p>
-                </div>
-
-                <div class="col-sm-6">
-                    <!-- Help link -->
-                    <a id="arches-server-help-link" href="" class="pull-right card-help help" style="">{% trans "Help" %} <i class="fa fa-question-circle"></i></a>
-                </div>
-            </div>
         </div>
     </div>
     {% endfor %}

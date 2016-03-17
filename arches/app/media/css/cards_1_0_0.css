@@ -13,16 +13,19 @@
 
 .card-panel {
 	border: 0px solid #ddd; 
-	margin-bottom: 20px;
+	margin-bottom: 0px;
+	background: #f8f8f8;
+    padding: 0px 20px 1px 20px;
 }
 
 .card-body {
-	padding: 10px 20px 0 10px;
+	padding: 20px;
+	border: 1px solid #ddd;
+	background-color: white;
 }
 
 .card-content-container {
 	border: 0px solid #eee; 
-	margin-left: 10px;
 	margin-bottom: 0px; 
 	position: relative;
 }
@@ -34,7 +37,7 @@
 .card-nav-container {
 	background: #f4f4f4; 
 	margin-left: 0px;
-	margin-bottom: 5px;
+	margin-bottom: 0px;
 }
 
 .card-content-tab {
@@ -48,7 +51,8 @@
 .card-panel-body {
 	padding-top: 0px; 
 	padding-bottom: 10px;
-	margin-top: 10px;
+	margin-top: 0px;
+	background-color: white;
 }
 
 .card-content {
@@ -121,7 +125,7 @@ input[type="checkbox"]{
 .content-instructions {
 	font-size: 13px;
 	color: #8d8d8d;
-	margin-top: -50px;
+	margin-top: 0px;
 	line-height: 1.25;
 	margin-bottom: 20px;
 }
@@ -135,7 +139,6 @@ input[type="checkbox"]{
 	right: 10px;
 	font-size: 10px;
 	top: 5px;
-	right: 45px;
 	height: 20px;
 	width: 20px;
 	margin-right: 10px;
@@ -154,9 +157,13 @@ input[type="checkbox"]{
 }
 
 .wizard-buttons {
-	padding: 5px 0 10px 10px;
+	padding: 20px 0px 0px 0px;
+    direction: rtl;
 }
 
+.wizard-buttons button {
+    direction: ltr;
+}
 
 /* Card Classes
 ---------------------------------------------- */
@@ -200,9 +207,15 @@ input[type="checkbox"]{
 	background: #eee;
 }
 
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    border: 0px solid #ddd;
+    border-bottom-color: transparent;
+}
+
 .tab-base .tab-content {
 	box-shadow: none;
 	padding-bottom: 0px;
+	margin: 0px;
 
 }
 

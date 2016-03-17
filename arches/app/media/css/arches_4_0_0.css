@@ -18,6 +18,11 @@ div.tab-content.arches-tab {
 	padding-top: 0px;
 }
 
+.arches-form{
+	height: 100vh;
+    background-color: #F8F8F8;
+}
+
 
 /* ASIDE CLASSESS =============================== */
 #aside-container #aside .tab-content {
