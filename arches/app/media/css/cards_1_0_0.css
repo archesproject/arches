@@ -161,7 +161,7 @@ input[type="checkbox"]{
     direction: rtl;
 }
 
-.wizard-buttons button {
+.wizard-buttons * {
     direction: ltr;
 }
 
