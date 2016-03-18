@@ -12,3 +12,4 @@ arches/elasticsearch
 arches/uploadedfiles
 arches/settings_local.py
 .coverage
+arches.log
