@@ -129,30 +129,28 @@ INSERT INTO widgets(widgetid, name, template)
 INSERT INTO widgets(widgetid, name, template)
     VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'select.htm');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
-            inputlabel, inputmask, status)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', '', '', 
-            '?', '?', 0);
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype)
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', '');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
-            inputlabel, inputmask, status, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', '', '', 
-            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
+            nodegroupid)
+    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', '',
+            '99999999-0000-0000-0000-000000000000');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
-            inputlabel, inputmask, status, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
+            nodegroupid)
+    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', '',
+            '99999999-0000-0000-0000-000000000000');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
-            inputlabel, inputmask, status, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
+            nodegroupid)
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', '',
+            '99999999-0000-0000-0000-000000000000');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, crmclass, datatype, validation, 
-            inputlabel, inputmask, status, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', '', '', 
-            '?', '?', 0, '99999999-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
+            nodegroupid)
+    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', '',
+            '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('99999999-0000-0000-0000-000000000000', 'n', '');
@@ -164,13 +162,13 @@ INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('32999999-0000-0000-0000-000000000000', 'n', '');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('19999999-0000-0000-0000-000000000000', 'n', ''); 
+    VALUES ('19999999-0000-0000-0000-000000000000', 'n', '');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('21111111-0000-0000-0000-000000000000', '1', '');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('11111111-0000-0000-0000-000000000000', 'n', '');    
+    VALUES ('11111111-0000-0000-0000-000000000000', 'n', '');
 
 INSERT INTO cards(cardid, name, title, subtitle)
     VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', 'Keys', '');
@@ -187,6 +185,5 @@ INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
 --                 "20000000-0000-0000-0000-000000000003": "1",
 --                 "20000000-0000-0000-0000-000000000002": "Map Key",
 --                 "20000000-0000-0000-0000-000000000004": "23984ll2399494"
---             }', '30000000-0000-0000-0000-000000000000', 
+--             }', '30000000-0000-0000-0000-000000000000',
 --             '20000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000');
-
