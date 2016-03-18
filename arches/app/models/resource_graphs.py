@@ -79,8 +79,8 @@ class ResourceGraph(object):
                 edge['edgeid'] = str(uuid.uuid4())
 
             newEdge.edgeid = edge.get('edgeid')
-            newEdge.rangenodeid_id = edge.get('rangenodeid')
-            newEdge.domainnodeid_id = edge.get('domainnodeid')
+            newEdge.rangenode_id = edge.get('rangenodeid')
+            newEdge.domainnode_id = edge.get('domainnodeid')
             newEdge.ontologyproperty = edge.get('ontologyproperty', '')
             newEdge.branchmetadataid = edge.get('branchmetadataid', '')
 
