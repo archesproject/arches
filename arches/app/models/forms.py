@@ -16,14 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import copy
 from arches.app.models import models
+from arches.app.models.tile import Tile
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Form(object):
     def __init__(self, resourceid=None):
         self.forms = []
-        self.tiles = []
+        self.tiles = {}
         self.blanks = {}
 
         if resourceid:
@@ -137,29 +139,33 @@ class Form(object):
             }]
         }]
 
-
         tiles = models.Tile.objects.filter(resourceinstance_id=resourceid)
+
+        # def addTiles(parentObj, nodegroup_id, tiles):
+        #     parentObj.tiles[nodegroup_id] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=nodegroup_id))
+        #     return parentObj.tiles[nodegroup_id]
 
         for form in self.forms:
             for cardgroup in form['cardgroups']:
-                parentTiles = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=cardgroup['nodegroup_id']))
+                #addedTiles = addTiles(self, cardgroup['nodegroup_id'], tiles)
+                self.tiles[cardgroup['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=cardgroup['nodegroup_id']))
 
-                if len(parentTiles) > 0:
-                    for parentTile in parentTiles:
+                if len(self.tiles[cardgroup['nodegroup_id']]) > 0:
+                    for parentTile in self.tiles[cardgroup['nodegroup_id']]:
                         parentTile['tiles'] = {}
                         for card in cardgroup['cards']:
                             parentTile['tiles'][card['nodegroup_id']] = []
                         for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
                             parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
 
-                if len(parentTiles) == 0 and cardgroup['cardinality'] == '1':
+                if len(self.tiles[cardgroup['nodegroup_id']]) == 0 and cardgroup['cardinality'] == '1':
                     # add blank parent tile
                     parentTile = JSONSerializer().serializeToPython(models.Tile())
                     parentTile['tileid'] = ''
                     parentTile['tiles'] = {}
                     parentTile['nodegroup_id'] = cardgroup['nodegroup_id']
                     parentTile['resourceinstance_id'] = resourceid
-                    parentTiles = [parentTile]
+                    self.tiles[cardgroup['nodegroup_id']] = [parentTile]
 
                     for card in cardgroup['cards']:
                         #print card
@@ -178,7 +184,6 @@ class Form(object):
                         if len(parentTile['tiles'][card['nodegroup_id']]) == 0 and card['cardinality'] == '1':
                             parentTile['tiles'][card['nodegroup_id']] = [copy.deepcopy(tile)]
 
-                self.tiles = self.tiles + parentTiles
 
 
         for form in self.forms:
