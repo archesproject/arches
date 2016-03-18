@@ -55,7 +55,7 @@ class Card(models.Model):
     subtitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
-    parentcardid = models.ForeignKey('self', db_column='cardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
+    parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
 
     class Meta:
         managed = True
@@ -63,7 +63,7 @@ class Card(models.Model):
 
 
 class CardXNodeXWidget(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey(Card, db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
@@ -175,7 +175,7 @@ class Form(models.Model):
 
 
 class FormXCard(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     form = models.ForeignKey(Form, db_column='formid')
     card = models.ForeignKey(Card, db_column='cardid')
 
@@ -189,7 +189,7 @@ class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     cardinality = models.TextField(blank=True, null=True)
     legacygroupid = models.TextField(blank=True, null=True)
-    parentnodegroupid = models.ForeignKey('self', db_column='nodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
+    parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
     class Meta:
         managed = True
@@ -204,7 +204,7 @@ class Node(models.Model):
     name = models.TextField(unique=True)
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
-    crmclass = models.TextField()
+    ontologyclass = models.TextField()
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
@@ -275,7 +275,7 @@ class ResourceXResource(models.Model):
 
 
 class ResourceClassXForm(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     resourceclass = models.ForeignKey(Node, db_column='resourceclassid', blank=True, null=True)
     form = models.ForeignKey(Form, db_column='formid')
     status = models.TextField(blank=True, null=True) #This hides forms that may be deployed by an implementor for testing purposes. Once the switch is flipped to "prod" then regular permissions (defined at the nodegroup level) come into play.
