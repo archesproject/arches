@@ -10,10 +10,10 @@
         
         <div class="panel-body card-body" style="">
 
-            <!-- ko with: form.tiles -->
+            <!-- ko foreach: form.cardgroups['{{cardgroup.id}}'] -->
 
-            {% include 'views/forms/cards.htm' %}
-            
+                {% include 'views/forms/cards.htm' %}
+        
             <!-- /ko -->
             
         </div>

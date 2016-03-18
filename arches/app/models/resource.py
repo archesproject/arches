@@ -342,7 +342,7 @@ class Resource(Entity):
                 if entity.businesstablename == 'domains':
                     value = archesmodels.Value.objects.get(pk=entity.value)
                     entity_copy = entity.copy()
-                    entity_copy.conceptid = value.conceptid_id
+                    entity_copy.conceptid = value.concept_id
                     document.domains.append(entity_copy)
                 elif entity.businesstablename == 'dates':
                     document.dates.append(entity)

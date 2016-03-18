@@ -19,29 +19,39 @@ define([
             // parse then restringify JSON data to ensure whitespace is identical
             this._rawdata = ko.toJSON(JSON.parse(this.form.find('#tiledata').val()));
             this.cardgroups = koMapping.fromJS(JSON.parse(this._rawdata));
+            this.blanks = koMapping.fromJS(JSON.parse(this.form.find('#blanks').val()));
+
             this.tiles = koMapping.fromJS(JSON.parse(this._rawdata));
 
+            console.log(JSON.parse(this._rawdata));
+            console.log(koMapping.toJS(this.blanks));
+
         },
 
-        saveTile: function(card, data, e){
-            console.log(ko.toJS(data));
-            var cardid = data.cardid();
-            var model = new this.TileModel(ko.toJS(data));
-            model.save(function(request, status, model){
-                if(request.status === 200){
-                    if(!(cardid in card)){
-                        card[cardid].tiles = koMapping.fromJS([]);
+        saveTile: function(tilegroup, justadd, tile, e){
+            console.log(koMapping.toJS(tile));
+            var nodegroup_id = tile.nodegroup_id();
+            if(justadd === "true"){
+                tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
+            }else{
+                var model = new this.TileModel(koMapping.toJS(tile));
+                model.save(function(request, status, model){
+                    if(request.status === 200){
+                        // if(!(nodegroup_id in tilegroup)){
+                        //     tilegroup[nodegroup_id] = koMapping.fromJS([]);
+                        // }
+                        // tilegroup[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
+                        tilegroup.unshift(koMapping.fromJS(request.responseJSON));
+                    }else{
+                        // inform the user
                     }
-                    card[cardid].tiles.unshift(koMapping.fromJS(request.responseJSON));
-                }else{
-                    // inform the user
-                }
-            }, this);
+                }, this);
+            }
         },
 
-        updateTile: function(card, data, e){
-            console.log(ko.toJS(data));
-            var model = new this.TileModel(ko.toJS(data));
+        updateTile: function(tile, e){
+            console.log(ko.toJS(tile));
+            var model = new this.TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
                     // inform the user???
@@ -51,13 +61,13 @@ define([
             }, this);
         },
 
-        deleteTile: function(card, data, e){
-            console.log(ko.toJSON(data));
-            var cardid = data.cardid();
-            var model = new this.TileModel(ko.toJS(data));
+        deleteTile: function(tilegroup, tile, e){
+            console.log(ko.toJS(tile));
+            var nodegroup_id = tile.nodegroup_id();
+            var model = new this.TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    card[cardid].tiles.remove(data)
+                    tilegroup.remove(tile)
                 }else{
                     // inform the user
                 }
@@ -68,19 +78,8 @@ define([
             console.log(ko.toJSON(data));
         },
 
-        expandTile: function(data, e){
-            console.log(ko.toJSON(data));
-            if(!self.collapsing){
-                $(e.currentTarget).find('.effect').show('slow');
-            }else{
-                self.collapsing = false;
-            }
-        },
-
-        collapseTile: function(data, e){
-            console.log(ko.toJSON(data));
-            $(e.currentTarget.parentElement).hide('slow');
-            self.collapsing = true;
+        toggleTile: function(data, e){
+            $('#abc'+data.tileid()).toggle('fast');
         }
     });
 });

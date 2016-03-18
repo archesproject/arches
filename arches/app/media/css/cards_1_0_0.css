@@ -1,0 +1,1098 @@
+/* =============================================== */
+/* Arches v4 Default CSS for forms*/
+/* =============================================== */
+
+
+
+/* Generic Card Classes
+---------------------------------------------- */
+.card-main-title {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.card-panel {
+	border: 0px solid #ddd; 
+	margin-bottom: 0px;
+	background: #f8f8f8;
+    padding: 0px 20px 1px 20px;
+}
+
+.card-body {
+	padding: 20px;
+	border: 1px solid #ddd;
+	background-color: white;
+}
+
+.card-content-container {
+	border: 0px solid #eee; 
+	margin-bottom: 0px; 
+	position: relative;
+}
+
+.outline {
+	border: 1px solid #eee; 
+}
+
+.card-nav-container {
+	background: #f4f4f4; 
+	margin-left: 0px;
+	margin-bottom: 0px;
+}
+
+.card-content-tab {
+	padding: 5px 0 0 0; 
+	min-height: 350px;
+	margin-top: 15px;
+	margin-left: -15px;
+	box-shadow: none; 
+}
+
+.card-panel-body {
+	padding-top: 0px; 
+	padding-bottom: 10px;
+	margin-top: 0px;
+	background-color: white;
+}
+
+.card-content {
+	padding: 20px 0 20px 0; 
+	margin: -20px -35px 0 -20px; 
+	margin-bottom: 20px;
+}
+
+.card-tab-title {
+	font-size: 14px;
+}
+
+.sub-title {
+	font-weight: 600;
+}
+
+.data-card-alert {
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+
+.card-footer {
+	padding: 20px 0 20px 25px; 
+	margin: 0 0 0 0; 
+	border-top: 1px solid #eef0f2;
+}
+
+.card-help {
+	padding-right: 20px; 
+	font-size: 13px; 
+	margin-top: -3px;
+}
+
+.card-help-panel {
+	width: 40%; 
+	max-width: 250px; 
+	min-width: 250px; 
+	padding-top: 0px; 
+	height: 100%; 
+	position: absolute; 
+	bottom: 0px; 
+	right: -20px; 
+	background: #37495b; /*#3acaa1;*/
+	opacity: .9; 
+	z-index: 500; 
+	margin-top: 50px; 
+	overflow-y: scroll; 
+	color: #fff;
+}
+
+.card-checkbox {
+	height: 1.25em;
+	width: 1.25em;
+}
+
+input[type="checkbox"]{
+  width: 30px; /*Desired width*/
+  height: 30px; /*Desired height*/
+}
+
+
+.wizard-data-card-alert {
+	margin-left: 0px; 
+	margin-right: 0px; 
+	margin-top: 1px; 
+	margin-bottom: 0px;
+	box-shadow: none;
+}
+
+.content-instructions {
+	font-size: 13px;
+	color: #8d8d8d;
+	margin-top: 0px;
+	line-height: 1.25;
+	margin-bottom: 20px;
+}
+
+.relative {
+	position: relative;
+}
+
+.record-delete {
+	position: absolute;
+	right: 10px;
+	font-size: 10px;
+	top: 5px;
+	height: 20px;
+	width: 20px;
+	margin-right: 10px;
+}
+
+
+.record-close {
+	position: absolute;
+	right: 10px;
+	font-size: 10px;
+	top: 5px;
+	right: px;
+	height: 20px;
+	width: 20px;
+	margin-right: 10px;
+}
+
+.wizard-buttons {
+	padding: 20px 0px 0px 0px;
+    direction: rtl;
+}
+
+.wizard-buttons button {
+    direction: ltr;
+}
+
+/* Card Classes
+---------------------------------------------- */
+.summary-panel {
+	background: #f9f9f9; 
+	margin-top: -30px;
+}
+
+#map-settings {
+	margin: -40px -35px -10px -20px; 
+	margin-bottom: 10px; 
+	position: relative;
+}
+
+.help-close {
+	color: #ddd;
+    position: absolute;
+    right: 10px;
+    top: 20px;
+    z-index: 600;
+}
+
+.help-close:hover {
+	color: #fff;
+}
+
+.scroll-shim {
+	height: 1px; 
+	color: #fff; 
+	font-size: 1px; 
+	margin-bottom: 25px;
+}
+
+/* Base Class Overrides 
+---------------------------------------------- */
+.tab-base .nav-tabs>li:not(.active)>a:hover {
+	border-top: 1px solid #eee;
+	border-right: 1px solid #eee;
+	border-left: 1px solid #eee;
+	border-bottom: 1px solid #fff;
+	background: #eee;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    border: 1px solid #fff;
+}
+
+.tab-base .tab-content {
+	box-shadow: none;
+	padding-bottom: 0px;
+	margin: 0px;
+
+}
+
+.panel .panel-heading, .panel>:first-child {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+
+.ol-control button {
+	height: 1.9em;
+	width: 1.9em;
+	font-size: 1.3em;
+}
+
+.chosen-container {
+	margin-bottom: 0px;
+	color: #8d8d8d;
+	line-height: 1.3333333;
+}
+
+.chosen-container-multi .chosen-choices li.search-field {
+    margin: 2px 3px 0 10px;
+}
+
+.chosen-container-single .chosen-single {
+	height: 36px;
+}
+
+.form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
+	padding-right: 20px;
+	padding-top: 5px;
+}
+
+span.icon-wrap.icon-circle.bg-gray-dark:hover {
+	background: #94A6BC;
+	color: #123;
+}
+
+.bg-gray-dark, .bg-gray-dark a {
+	color: #999;
+}
+
+
+
+@media (min-width: 992px) {
+	#page-content {
+    	padding: 15px 15px 25px 15px;
+    }
+}
+
+@media (min-width: 400px) {
+	.card-wz-grid {
+    	padding-top: 0px;
+    	margin-top: -10px;
+    }
+}
+
+
+
+
+/* Widget Classes     
+---------------------------------------------- */
+.widget-input-group {
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.widget-input-label {
+	font-size: 12px;
+	margin-top: 2px;
+	font-weight: 600;
+}
+
+.widget-input {
+	border-radius: 2px;
+}
+
+.card-wz-grid {
+	padding-top: 0px; 
+	margin-top: -10px;
+}
+
+.card-wz-add-record {
+	display: block; 
+	opacity: 1.0; 
+	height: 200px; 
+	width: 200px; 
+	<!-- border: 1px solid #266fb0; -->
+}
+
+.btn-shim {
+	margin-bottom: 3px;
+}
+
+
+/* Tile Classes     
+---------------------------------------------- */
+.tile-grid-container {
+	padding: 10px 20px 5px 15px;
+}
+
+.tile-panel {
+	box-shadow: none;
+	position: relative;
+}
+
+.tile {
+	border-left: 2px solid #0594BC;  
+	border-right: 1px solid #ddd; 
+	border-top: 0px solid #ddd; 
+	border-bottom: 1px solid #ddd; 
+	background: #fbfbfb;
+	color: #5f5f5f; 
+	width: 200px; 
+	height: 170px; 
+	padding: 5px 5px 7px 5px;
+	position: relative;
+	overflow-y: scroll; 
+}
+
+
+.tile-heading {
+	background: #46bbdc;
+	height: 30px; 
+	color: #fff;
+	border-left: 2px solid #0594BC;
+}
+
+.tile-menu {
+	position: absolute; 
+	background: #3b8dd5; 
+	border: 1px solid #0859A1;
+	border-radius: 2px;
+	top: 5px; 
+	right: 5px; 
+	opacity: .95; 
+	font-size: 13px; 
+	padding-right: 5px;
+	opacity: .7;
+}
+
+.tile-menu-btn {
+	float: left; 
+	padding: 6px 0 6px 6px; 
+	margin-top: 0px; 
+	font-size: 15px;
+	color: #fff;
+	font-size: 15px;
+}
+
+.tile-body {
+	padding: 25px 0 0 5px;
+}
+
+.tile-card-section {
+	margin-bottom: 10px;
+	color: #999;
+	margin-left: 7px; 
+	margin-bottom: 10px; 
+	margin-top: 0px; 
+	padding-right: 3px;
+}
+
+.tile-card-title {
+	margin: 2px 0 -5px 0; 
+	font-size: 13px;
+}
+
+.tile-spacer {
+	margin-bottom: 0px; 
+	padding: 0 5px 0 20px;
+}
+
+.tile-sm {
+	border: 1px solid #ddd;
+    background: #fbfbfb;
+    color: #5f5f5f;
+    width: 150px;
+    height: 150px;
+    padding: 0px;
+}
+
+.og-grid-sm {
+	padding-left: 0px;
+}
+
+.og-grid-sm li {
+    display: inline-block;
+    margin: 10px 5px 5px 5px;
+    vertical-align: top;
+    height: 150px;
+    min-width: 150px;
+}
+
+.tile-grid-container-sm {
+	padding: 10px 5px 5px 0;
+}
+
+.tile-basemap-title-sm {
+	position: absolute;
+    bottom: 0px;
+    padding: 5px;
+    background: #eee;
+    width: 150px;
+    height: 40px;
+    opacity: .8;
+    color: #123;
+}
+
+.tile-menu-sm {
+	position: absolute; 
+	background: #3b8dd5; 
+	border: 1px solid #0859A1;
+	border-radius: 2px;
+	top: 5px; 
+	right: 5px; 
+	opacity: .95; 
+	font-size: 11px; 
+	padding-right: 5px;
+	opacity: .7;
+}
+
+.tile-basemap {
+	border: 1px solid #ddd;
+    background: #fbfbfb;
+    color: #5f5f5f;
+    width: 200px;
+    height: 200px;
+    padding: 0px;
+}
+
+.tile-basemap-title {
+	position: absolute;
+    bottom: 0px;
+    padding: 5px;
+    background: #eee;
+    width: 200px;
+    height: 40px;
+    opacity: .8;
+    color: #123;
+}
+
+/*.tile-basemap:hover {
+	cursor: pointer;
+}*/
+
+.tile-img-lg {
+	height: 198px;
+	width: 198px;
+}
+
+.truncate-tile {
+  width: 197px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.help-text-small {
+	font-size: 12px;
+}
+
+.tile-record {
+	position: relative;
+	background: #fafafa; /*#90EAD1;*/
+	color: #123;
+	margin-left: 0px;
+	margin-right: -10px;
+	/*border: 1px solid #3acaa1;*/
+}
+
+.tile-record:hover {
+	color: #123;
+}
+
+
+
+/* Grid Classes  */
+.grid {
+  background: #DDD;
+  max-width: 1200px;
+}
+
+/* clear fix */
+.grid:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.grid-item {
+  float: left;
+  width: 100px;
+  height: 100px;
+  background: #0D8;
+  border: 1px solid #333;
+  border-color: hsla(0, 0%, 0%, 0.7);
+  margin: 3px;
+}
+
+.grid-item--width2 { width: 200px; }
+.grid-item--height2 { height: 200px; }
+
+.grid-card {
+  float: left;
+  width: 250px;
+  height: 170px;
+  margin: 3px;
+}
+
+
+/* Card Classes
+.card-bg {
+	background: #fcfcfc;
+}
+
+.card {
+	padding: 12px 10px 10px 5px;
+}
+
+.card-form {
+	border: 1px solid #eee; 
+	margin-top: 0px; 
+	margin-left: 5px;
+}
+
+.card-tabs {
+	margin-bottom: 0px;
+}
+
+.card-tabs-bg {
+	background: #f4f4f4;
+}
+
+.card-pane {
+	margin-top: -10px;
+}
+
+.card-alert {
+	margin-left: -10px; 
+	margin-right: -10px; 
+	margin-top: -10px;
+}
+
+
+
+
+
+.card-footer {
+	padding: 20px 0 20px 25px; 
+	margin: 0 0 0 0; 
+	border-top: 1px solid #eef0f2;
+}
+
+
+
+
+
+
+
+.card-category {
+	margin-top: 5px;
+}
+.card-value {
+	margin-bottom: 0px;
+	line-height: 1.2;
+}
+
+.card-help {
+	padding-right: 20px; 
+	font-size: 13px; 
+	margin-top: -3px;
+}
+
+
+
+.wz-card-tab {
+	font-size: 13px;
+}
+
+.wz-btn {
+	margin: 5px 10px 0 0;
+}
+
+
+
+.data-card-header {
+	padding: 12px 0 0 0;
+}
+
+.data-card-title {
+	font-weight: 300;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    line-height: 30px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.data-card-alert {
+	margin-left: -12px; 
+	margin-right: -12px; 
+	margin-top: -12px; 
+	box-shadow: none;
+}
+
+.data-card-body {
+	padding-top: 25px; 
+	padding-bottom: 5px;
+}
+
+
+.data-card-add-button {
+	position: relative;
+	height: 48px;
+	width: 48px; 
+	top: -22px; 
+	left: 60px;
+	z-index: 2; 
+	box-shadow: 0 2px 6px 0 rgba(0,0,0,.4); 
+	border-color: steelblue;
+	font-size: 19px; 
+	font-weight: 200;
+}
+
+.data-card-add-button:hover {
+	border-color: steelblue;
+	color: #fff;
+}
+
+.data-card-widget-container {
+	padding: 10px 40px 10px 40px;
+}
+
+.widget-container {
+	padding: 20px 0 20px 5px;
+}
+
+.data-card-results-container {
+	margin: 0 12px 12px 12px;
+}
+
+.data-card-results-icon {
+	padding: 10px 0 30px 0;
+}
+
+.data-card-help-icon {
+	position: relative; 
+	top: 13px; 
+	border: 1px solid steelblue;
+}
+
+.data-card-results-title {
+	padding: 8px 0 5px 0; 
+	margin-bottom: 2px;
+}
+
+.data-card-results-subtitle {
+	margin-top: -5px;
+	font-size: 13px;
+	line-height: 1.1em;
+}
+
+.data-card-results-list {
+	list-style: none; 
+	padding: 0 0 0 0;
+}
+
+.data-card-results-control {
+	padding: 0 0 5px 0;
+}
+
+.data-card-record-icon {
+	font-size: 13px;
+}
+
+.data-card-results-text {
+	font-size: 17px; 
+	font-weight: 400; 
+	color:#fff; 
+	line-height: 1; 
+	position: relative; 
+	left: 80px; 
+	top: -30px;
+}
+
+.data-card-spacer {
+	height: 1px;
+}
+
+
+.current {
+	background: #f9f9f9;
+}
+
+.list-group-item.active.current {
+	background: #f9f9f9;
+}
+
+*/
+
+/* =============================================== */
+/*Widget Classes
+.widget-label-input {
+	margin-bottom: 5px;
+	font-size: 15px; 
+	padding: 0 0 0 20px;
+	text-align: right;
+}
+
+.widget-label-domain {
+	margin-bottom: 5px;
+	margin-top: 5px;
+	font-size: 15px; 
+	padding: 0 0 0 20px;
+	text-align: right;
+}
+
+.arches-input-widget {
+	border-left-width: 0px; 
+	border-right-width: 0px; 
+	border-top-width: 0px;
+	border-bottom: 1px solid #e9e9e9;
+	padding-top: 0px; 
+	padding-left: 2px; 
+	font-size: 15px; 
+	color: steelblue; 
+	padding-bottom: 0px;
+	height: 100%;
+	width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    transition-duration: .5s;
+}
+
+textarea:focus, input:focus{
+    outline: 0;
+}
+
+
+/*End Widget Classes*/
+/* =============================================== */
+
+
+
+
+
+
+
+
+
+/* =============================================== */
+/* Data Card Classes                               */
+
+
+
+
+
+
+/*.data-card {
+	background: #fff;
+	border-radius: 0;
+    border: 0;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.15);
+}
+
+
+
+.data-card-footer {
+	padding: 10px 0 0 0;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    color: #515151;
+    border-color: #f1f2f4;
+    position: relative;
+    background: #f9f9f9;
+}
+
+
+
+.data-card-caption {
+	padding: 0 20px 10px 25px; 
+	margin-top: -5px; 
+	font-size: 1.25em; 
+	line-height: 20px; 
+	color: #999;
+}
+
+
+
+.data-card-widget {
+	border: 3px dashed #ddd;
+	border-radius: 3px;
+	margin-left: 10px;
+	background: #fcfcfc;
+}
+
+.widget {
+	margin: 30px;
+	margin-bottom: 40px;
+}
+
+.widget-selector {
+	font-size: 25px;
+	color: #bbb;
+	line-height: 30px;
+}
+
+.data-card-toggle {
+	height: 20px;
+}
+
+
+
+
+.input-card-name {
+	font-weight: 400;
+	margin-left: 25px;
+	margin-right: -25px;
+    padding: 15px 0 0 0;
+    margin-bottom: -5px;
+    font-size: 1.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 50%;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-bottom: 0px solid #eee;
+}
+
+.input-card-caption {
+	padding: 0 20px 0 0;
+	margin-left: 26px;
+	margin-right: -25px;
+    margin-top: 2px;
+    font-size: 1.25em;
+    color: #999;
+    width: 90%;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-bottom: 0px solid #eee;
+}
+
+.data-card-icon {
+	font-size: 13px;
+}
+
+.data-card-node {
+	position: relative;
+    display: inline-block;
+    width: 220px;
+    font-size: 13px;
+    padding: 3px 0 3px 15px;
+    margin-bottom: -1px;
+}
+
+.data-card-node:hover {
+	background: #49596A;
+}*/
+
+/*End Data Card Classes*/
+/* =============================================== */
+
+
+
+
+
+/* =============================================== */
+/*Data Form Classes*
+
+.form-title {
+	font-weight: 300;
+	margin-top: 5px;
+	margin-bottom: 20px;
+}
+
+.form-menu-panel {
+	background: #fff;
+	height: 100vh;
+}
+
+.form-menu-title {
+	margin-top: 0px;
+	font-weight: 400;
+    padding: 0 20px 0 20px;
+    font-size: 1.8em;
+    line-height: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.form-menu-caption {
+	margin-top: -15px;
+	padding-bottom: 5px;
+}
+
+.form-menu-control {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.form-menu-button-group {
+	padding-bottom: 15px;
+}
+
+.form-menu-button {
+	margin-top: 5px;
+}
+
+.form-menu-item {
+	margin-right: -2px;
+	padding-bottom: 17px;
+}
+
+.active-form-menu-item {
+	background: #f4f4f4;
+	/*border-right: 1px solid #eeeff2;*/
+}
+
+
+/*End Data Form Classes*/
+/* =============================================== */
+
+/
+
+
+
+/*Resource Manager Classes*/
+/* =============================================== 
+
+.graph-control-panel {
+	width: 350px;  
+	height: 100vh; 
+	margin-bottom: 0px; 
+	margin-top: 0px; 
+	margin-left: 0px;
+	background: #fff;
+    border-radius: 0;
+    border: 0;
+}
+
+.graph-display-panel {
+	position: absolute; 
+	left: 375px; 
+	top:0px; 
+	height: 100vh; 
+	width: calc(100% - 400px); 
+	margin-bottom: 0px;
+	background: #fff;
+    border-radius: 0;
+    border: 0;
+}
+
+.graph-display-heading {
+	border-bottom: 1px solid #eee;
+}
+
+
+.resource-control-panel {
+	width: 300px;  
+	height: 100vh; 
+	margin-bottom: 0px; 
+	margin-top: 0px; 
+	margin-left: 0px;
+	background: #fff;
+    border-radius: 0;
+    border: 0;
+}
+
+.btn-resource {
+	font-size: 13px;
+	margin-left: 20px;
+	margin-bottom: 15px;
+}
+
+.resource-control-panel-body {
+	padding: 15px 0 10px 0;
+
+}
+
+.resource-list {
+	margin-right: 1px;
+}
+
+.resource-display-panel {
+	position: absolute; 
+	left: 320px; 
+	top:0px; 
+	height: 100vh; 
+	width: calc(100% - 345px); 
+	margin-bottom: 0px;
+	background: #fff;
+    border-radius: 0;
+    border: 0;
+}
+
+.resource-panel-title {
+	margin-top: 0;
+    margin-bottom: 0;
+	font-weight: 300;
+    padding: 0 20px 0 20px;
+    font-size: 1.7em;
+    line-height: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.resource-panel-caption {
+	padding: 0 20px 5px 20px; 
+	margin-top: -5px; 
+	font-size: 1.1em; 
+	line-height: 17px; 
+	color: #919191;
+
+}
+
+.resource-display-tab-bar {
+	background: #f4f4f4;
+}
+
+.resource-display-tab {
+	height: 50px;
+	font-size: 15px;
+}
+
+
+
+.admin-menu-item {
+	border-width: 0px;
+	margin-left: 0px;
+	padding-left: 30px;
+	font-size: 14px;
+}
+
+
+.admin-menu-href {
+	font-size: 1.0em; 
+	font-weight: 400; 
+	margin-left: 0px;
+	display: block;
+	color: #999;
+}
+
+.admin-menu-button {
+	margin-top: -25px; 
+	padding: 3px;
+}
+
+.admin-menu-item:hover {
+	background: #f8f8f8;
+}
+
+.list-group-footer {
+	padding: 0 0 10px 30px;
+}
+
+
+.control-label {
+	margin-top: 0px;
+}
+
+
+/*End Resource Manager Classes*/
+/* =============================================== */
+
+
+
+
+
+
+
+

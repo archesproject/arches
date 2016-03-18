@@ -1,0 +1,83 @@
+{% load i18n %}
+<div id="{{form.id}}" class="arches-form tab-pane fade in active">
+    {% for cardgroup in form.cardgroups %}
+    <div class="card-panel">
+        <div class="panel-heading">
+            <h3 class="panel-title card-main-title" style="color: grey !important;">
+                {{ cardgroup.title }}
+            </h3>
+        </div>
+        
+        <div class="panel card-body" style="">
+
+            {% if cardgroup.cardinality == '1' %}
+                
+                <!-- ko foreach: form.cardgroups -->
+                <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
+
+                    {% include 'views/forms/cards.htm' %}
+            
+                <!-- /ko -->
+                <!-- /ko -->
+
+            {% endif %}
+
+
+            {% if cardgroup.cardinality == 'n' %}
+
+                <div>
+
+                    <!-- ko with: $root.form.blanks['{{cardgroup.nodegroup_id}}'] -->
+                        <div>
+                            {% include 'views/forms/cards.htm' with forceblank=True %}
+                            <div class="wizard-buttons">
+                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
+                                <button class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups, false)"> Save</button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+
+                    <div class="list-group" style="margin-top:15px;" data-bind="visible: true, foreach: form.cardgroups">
+                
+                        <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
+
+                        <div class="list-group-item" style="background: rgb(250, 250, 250);">
+                            <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
+                            
+                            <div style="display: none;"  data-bind="attr: {id: 'abc' + $data.tileid()}">
+                                <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: $root.form.deleteTile.bind($root.form, $root.form.cardgroups)">
+                                    <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                    </span>
+                                </a>
+                                
+                                <!-- Card Level Alert -->
+                                <div id="db-connection-alert" class="panel install-card-alert" style=""></div>
+
+                                <!-- Card Instruction -->
+                                <p class="content-instructions">{{ card.description }}</p>
+
+                                {% include 'views/forms/cards.htm'  %}
+
+                                <div class="wizard-buttons">
+                                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: $root.form.updateTile.bind($root.form)">{% trans "Save" %}</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- /ko -->
+
+                    </div>
+
+
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+    {% endfor %}
+    <input id="tiledata" name="tiledata" type="hidden" value="{{tiledata}}"/>
+    <input id="blanks" name="blanks" type="hidden" value="{{blanks}}"/>
+</div>

@@ -1062,7 +1062,7 @@ ALTER TABLE concepts.concepts OWNER TO postgres;
 -- Name: concepts; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
 --
 
-CREATE TABLE d_nodetypes (
+CREATE TABLE d_node_types (
     nodetype text NOT NULL,
     namespace text NOT NULL DEFAULT 'arches',
     CONSTRAINT pk_d_nodetypes PRIMARY KEY (nodetype)
@@ -1088,24 +1088,24 @@ ALTER TABLE concepts.d_languages OWNER TO postgres;
 --
 -- TOC entry 225 (class 1259 OID 15704322)
 -- Dependencies: 9
--- Name: d_relationtypes; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace: 
+-- Name: d_relation_types; Type: TABLE; Schema: concepts; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE d_relationtypes (
+CREATE TABLE d_relation_types (
     relationtype text NOT NULL,
 	category text NOT NULL,
 	namespace text NOT NULL DEFAULT 'arches'
 );
 
 
-ALTER TABLE concepts.d_relationtypes OWNER TO postgres;
+ALTER TABLE concepts.d_relation_types OWNER TO postgres;
 
 --
--- Table: concepts.d_valuetypes
+-- Table: concepts.d_value_types
 
--- DROP TABLE concepts.d_valuetypes;
+-- DROP TABLE concepts.d_value_types;
 
-CREATE TABLE concepts.d_valuetypes
+CREATE TABLE concepts.d_value_types
 (
   valuetype text NOT NULL,
   category text,
@@ -1117,7 +1117,7 @@ CREATE TABLE concepts.d_valuetypes
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE concepts.d_valuetypes
+ALTER TABLE concepts.d_value_types
   OWNER TO postgres;
 
 
@@ -1717,7 +1717,7 @@ ALTER TABLE ONLY d_languages
 -- Name: pk_d_relationtypes; Type: CONSTRAINT; Schema: concepts; Owner: postgres; Tablespace: 
 --
 
-ALTER TABLE ONLY d_relationtypes
+ALTER TABLE ONLY d_relation_types
     ADD CONSTRAINT pk_d_relationtypes PRIMARY KEY (relationtype);
 
 
@@ -1960,7 +1960,7 @@ SET search_path = concepts, pg_catalog;
 --
 
 ALTER TABLE ONLY concepts
-    ADD CONSTRAINT fk_concepts_x_nodetypes FOREIGN KEY (nodetype) REFERENCES d_nodetypes(nodetype);
+    ADD CONSTRAINT fk_concepts_x_nodetypes FOREIGN KEY (nodetype) REFERENCES d_node_types(nodetype);
 
 --
 -- TOC entry 3434 (class 2606 OID 15704589)
@@ -2009,7 +2009,7 @@ ALTER TABLE ONLY "values"
 --
 
 ALTER TABLE ONLY relations
-    ADD CONSTRAINT fk_relations_x_d_relationtypes FOREIGN KEY (relationtype) REFERENCES d_relationtypes(relationtype);
+    ADD CONSTRAINT fk_relations_x_d_relationtypes FOREIGN KEY (relationtype) REFERENCES d_relation_types(relationtype);
 
 
 --
@@ -2019,7 +2019,7 @@ ALTER TABLE ONLY relations
 --
 
 ALTER TABLE ONLY "values"
-    ADD CONSTRAINT fk_valuetype_d_valuetype FOREIGN KEY (valuetype) REFERENCES d_valuetypes(valuetype);
+    ADD CONSTRAINT fk_valuetype_d_valuetype FOREIGN KEY (valuetype) REFERENCES d_value_types(valuetype);
 
 
 SET search_path = data, pg_catalog;
