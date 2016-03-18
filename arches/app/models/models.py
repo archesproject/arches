@@ -187,7 +187,7 @@ class FormXCard(models.Model):
 
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    cardinality = models.TextField(blank=True, null=True)
+    cardinality = models.TextField(blank=True, default='n')
     legacygroupid = models.TextField(blank=True, null=True)
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 

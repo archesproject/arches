@@ -344,7 +344,7 @@ class Migration(migrations.Migration):
             name='NodeGroup',
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('cardinality', models.TextField(blank=True, null=True)),
+                ('cardinality', models.TextField(blank=True, default='n')),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
                 ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
             ],
