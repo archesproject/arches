@@ -636,3 +636,72 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background-image: none !important;
     padding-top: 2px;
 }
+
+.switch{
+    background-color:#fff;
+    border:1px solid #dfdfdf;
+    border-radius:20px;
+    cursor:pointer;
+    display:inline-block;
+    height:30px;
+    position:relative;
+    vertical-align:middle;
+    width:50px;
+    -moz-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    box-sizing:content-box;
+    background-clip:content-box;
+}
+
+.switch>small{
+    background:#fff;
+    border-radius:100%;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+    height:30px;
+    position:absolute;
+    top:0;
+    width:30px;
+}
+
+.switch-small{
+    border-radius:20px;
+    height:20px;
+    width:33px;
+}
+
+.switch-small>small{
+    height:20px;
+    width:20px;
+}
+
+.switch-large{
+    border-radius:40px;
+    height:40px;
+    width:66px;
+}
+
+.switch-large>small{
+    height:40px;
+    width:40px;
+}
+
+.switch {
+    transition-duration: 0.1s;
+}
+
+.switch > small {
+    transition-duration: 0.1s;
+    left: 0px;
+}
+
+.switch.on {
+    border-color: rgb(100, 189, 99);
+    background-color: rgb(100, 189, 99);
+}
+
+.switch.on > small {
+    left: 13px;
+}
