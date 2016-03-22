@@ -3,7 +3,8 @@ define([
     'backbone',
     'knockout',
     'knockout-mapping',
-    'underscore'
+    'underscore',
+    'bindings/datepicker'
 ], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
 
