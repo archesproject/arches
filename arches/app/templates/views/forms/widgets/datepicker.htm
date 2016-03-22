@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="row mar-btm">
+    <div class="form-group">
+        <label class="col-xs-12 control-label widget-input-label" for="">{{widget.label}}</label>
+        <div class="col-xs-12 col-md-9">
+            <input type="text" data-bind="datepicker: $data['{{widget.nodeid}}']" placeholder="{{widget.placeholder}}" class="form-control input-lg widget-input">
+        </div>
+    </div>
+</div>

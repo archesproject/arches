@@ -2,8 +2,9 @@
 /* Arches v4 Installation CSS                      */
 /* =============================================== */
 
-@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
-@import url("http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
+@import url("//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.min.css");
 @import url("nifty.min.css");
 @import url("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css");
 
