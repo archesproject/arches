@@ -25,7 +25,6 @@ from arches.app.models.forms import Form
 from django.utils.translation import ugettext as _
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.models.app_settings import AppSettings
 
 @csrf_exempt
 def manager(request):
