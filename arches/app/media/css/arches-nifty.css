@@ -2,8 +2,9 @@
 /* Arches v4 Installation CSS                      */
 /* =============================================== */
 
-@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
-@import url("http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
+@import url("//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.min.css");
 @import url("nifty.min.css");
 @import url("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css");
 
@@ -635,4 +636,73 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: none !important;
     background-image: none !important;
     padding-top: 2px;
+}
+
+.switch{
+    background-color:#fff;
+    border:1px solid #dfdfdf;
+    border-radius:20px;
+    cursor:pointer;
+    display:inline-block;
+    height:30px;
+    position:relative;
+    vertical-align:middle;
+    width:50px;
+    -moz-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    box-sizing:content-box;
+    background-clip:content-box;
+}
+
+.switch>small{
+    background:#fff;
+    border-radius:100%;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+    height:30px;
+    position:absolute;
+    top:0;
+    width:30px;
+}
+
+.switch-small{
+    border-radius:20px;
+    height:20px;
+    width:33px;
+}
+
+.switch-small>small{
+    height:20px;
+    width:20px;
+}
+
+.switch-large{
+    border-radius:40px;
+    height:40px;
+    width:66px;
+}
+
+.switch-large>small{
+    height:40px;
+    width:40px;
+}
+
+.switch {
+    transition-duration: 0.1s;
+}
+
+.switch > small {
+    transition-duration: 0.1s;
+    left: 0px;
+}
+
+.switch.on {
+    border-color: rgb(100, 189, 99);
+    background-color: rgb(100, 189, 99);
+}
+
+.switch.on > small {
+    left: 13px;
 }
