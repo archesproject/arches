@@ -108,7 +108,7 @@ def concept(request, conceptid):
                     depth_limit=depth_limit, up_depth_limit=None, lang=lang, semantic=False)
 
             languages = models.DLanguage.objects.all()
-            valuetypes = models.ValueTypes.objects.all()
+            valuetypes = models.DValueType.objects.all()
             relationtypes = models.DRelationType.objects.all()
             prefLabel = concept_graph.get_preflabel(lang=lang)
             for subconcept in concept_graph.subconcepts:
