@@ -48,7 +48,28 @@ script:
 
 after_success:
   - coveralls
-  
+
 notifications:
   slack:
     secure: j8ECDivRYYfWY/ZpWHDEDNjbJarKjBwzmbQLDRV/8JnI61xi965c8IdflUXrKNbTE7AV0QQIsSRj0Aq7e3V0aipH1xpWDGVPX18c80a9HbAV1MHTPjWNfkxzrCdhhTiq2wxzGQjObO298IcEdzHrZPYi0TA+P8PjtVj5c3cvmPYiB03irgLDeLZjbOaUvIn7/tzaO9GMINwY8zDG4rpjI3/yQ/KqofWu1M8tDLoA5+KBlGTYXQsBkh2CFd0AMQ0C5iejyG0PSe5vstVmLmD93HZoOzeKP9E10h5+JxONJ8cgQtNTYdrEZ5/zo3H1UJ+zB+UOxq8UdtwtvyZ/bej4HmjZJpxaXKnvC/hTVvCW4sd1Cty8At874UtPfUvnRYeIj0cCvtTcvQ/4bifkdfLY7GrhMm9e3PeMM3hYxM4+v0Q6q8TLxhaHZe06jDlNjp6vJTW31MAetJJw+894MDd5EHXpF6yf7VUrtkD01frVUEEMP7ZNN9oClPimOChoc73FaM1HRviwN31jScXN3NkW5lusEyoBPJALV3cGVUEfRaUUg5wvObJ+/vTG8h9kXj/N5NJl8E/SAJi74ro6nWoZFwX0JH5IrXW9d2Do12pJR3cEAdafryzvCF4R/8kOyWgumoAUklR8Stm064Go/9gnfCdJBwsfxv7pSvGLRi8DF/4=
+
+deploy:
+- provider: s3
+  access_key_id: AKIAIPJSP4QJ5VLPBKIQ
+  secret_access_key: &1
+    secure: b6ChtPwd8UnRfLPX5GlmX48k+3hbOTV2iJue128v5YWhcq83N0P6X/HZ4n5/v3S70YORJ4b/kSjRYw8f0GjMnocrFQYS/WLp2L4k2TbaBZ6iGFSgDMkKR6J/QTkNPglurLXdgoMC/6PHSjhSYM3jWyx69t4WS5nd6d4Up6cDH87EsMYaOLvBF9z3QGTywb9SKv0UVa+g5zUOgMGMaydhsQUgLECm6eGJTO5DqzS95d/uSYk+4UalxnXYwZfgKg7ftHVyJltldhQGADcITHx5G4aqmjyZUIoCtDB+Z4mp/NORuh0geQfG5c+dXbx+9uYIcpCu/hXIEl4b1PdT+n2DA/2svcqGwhKt8vsCkRHSej7bLY5GwBW8/31yfcHFU89dFl3oF7KHcH41LALazaHmrbdepkgFdpEwZvsrXBI7UFsSpTAMDMQhLmKsMuShs6BYkEfE+73KdvdppSVRn4mAnoGG2VkELdh+wrCGKdK75Atv5/AzZqcfsaUr5Pf/I9O1Us6KGi0SwnjHUOBz/PBmk+Df6w/gu8xkRsbKGV/Wsg0ys8pi7XD5iNTR46Uy6QRDferVBHAZK9p4f3rRCLvbiGep3udewiAHBglxMS2iE9oaJ1y7sFKAsJ+YwT0vddIHAkcEStSFWpQEwPgUACNQUDUQry5jKc8pSnxnOk0MIWQ=
+  skip_cleanup: true
+  on: &2
+    repo: archesproject/arches
+    branch: travis_ci_tests
+  bucket: arches-codedeploy
+- provider: codedeploy
+  access_key_id: AKIAIPJSP4QJ5VLPBKIQ
+  secret_access_key: *1
+  bucket: arches-codedeploy
+  application: Arches
+  deployment_group: Arches_Group
+  on: *2
+#before_deploy:
+#- mkdir -p dpl_cd_upload
+#- mv '' dpl_cd_upload/''
