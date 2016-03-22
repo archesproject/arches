@@ -265,7 +265,7 @@ class ResourceXResource(models.Model):
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
-    relationshiptype = models.ForeignKey('Value', db_column='valueid')
+    relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
 

@@ -489,7 +489,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='resourcexresource',
             name='relationshiptype',
-            field=models.ForeignKey(db_column='valueid', to='models.Value'),
+            field=models.ForeignKey(db_column='relationshiptype', to='models.Value'),
         ),
         migrations.AddField(
             model_name='resourcexresource',
