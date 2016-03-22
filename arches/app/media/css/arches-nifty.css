@@ -2,8 +2,9 @@
 /* Arches v4 Installation CSS                      */
 /* =============================================== */
 
-@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
-@import url("http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin");
+@import url("//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css");
+@import url("//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.min.css");
 @import url("nifty.min.css");
 @import url("http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css");
 
@@ -635,4 +636,819 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: none !important;
     background-image: none !important;
     padding-top: 2px;
+}
+
+.switch{
+    background-color:#fff;
+    border:1px solid #dfdfdf;
+    border-radius:20px;
+    cursor:pointer;
+    display:inline-block;
+    height:30px;
+    position:relative;
+    vertical-align:middle;
+    width:50px;
+    -moz-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    box-sizing:content-box;
+    background-clip:content-box;
+}
+
+.switch>small{
+    background:#fff;
+    border-radius:100%;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+    height:30px;
+    position:absolute;
+    top:0;
+    width:30px;
+}
+
+.switch-small{
+    border-radius:20px;
+    height:20px;
+    width:33px;
+}
+
+.switch-small>small{
+    height:20px;
+    width:20px;
+}
+
+.switch-large{
+    border-radius:40px;
+    height:40px;
+    width:66px;
+}
+
+.switch-large>small{
+    height:40px;
+    width:40px;
+}
+
+.switch {
+    transition-duration: 0.1s;
+}
+
+.switch > small {
+    transition-duration: 0.1s;
+    left: 0px;
+}
+
+.switch.on {
+    border-color: rgb(100, 189, 99);
+    background-color: rgb(100, 189, 99);
+}
+
+.switch.on > small {
+    left: 13px;
+}
+
+/* Chosen Overrides
+---------------------------------------------- */
+.chosen-container-single .chosen-single {
+	background: #314151;
+	border: 1px solid #314151;
+	color: #fff;
+	height: 32px;
+}
+
+.chosen-container .chosen-results {
+	background: #314151;
+	color: #fff;
+	margin-right: 0px;
+}
+
+.chosen-container-single .chosen-drop {
+	background: #314151;
+}
+
+.chosen-container-single .chosen-single div b:before {
+    content: "\f0d7";
+    font: normal normal normal 14px/1 FontAwesome;
+    vertical-align: -50%;
+    color: #ddd;
+}
+
+.chosen-container {
+	color: #bbb;
+}
+
+.chosen-container a, .chosen-container a:hover {
+    cursor: pointer;
+    color: #fff;
+}
+
+
+
+/* Library Panel
+---------------------------------------------- */
+.library {
+	position: absolute;
+	top: 0px;
+	bottom: 0;
+	opacity: .95;
+	padding: 0px 20px 20px 10px;
+	z-index: 200;
+}
+
+.library-right {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	/*border-right: 1px solid #123;*/
+	z-index: 400;
+	opacity: .95;
+	padding: 0 0 20px 0;
+}
+
+.library-wide {
+	width: 400px;
+}
+
+.library-medium {
+	width: 300px;
+}
+
+.library-narrow {
+	width: 220px;
+}
+
+.library-dark {
+	background: #37495b; /*#1E3143; */
+	border-left: 1px solid #1E3143;
+	color: #ddd;
+}
+
+.library-bright {
+	background: #fff;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+}
+
+.library-instructions {
+	font-size: 11px;
+	margin-left: 5px;
+	margin-top: -15px;
+}
+
+.clear-search {
+	position: absolute;
+	right: 15px;
+	top: 97px;
+	color: #123;
+	font-size: 19px;
+}
+
+.clear-search:hover {
+	cursor: pointer;
+	color: rgba(0,0,0,0.95);
+}
+
+.key {
+	margin-top: 98px;
+}
+
+.library-close-btn {
+	position: absolute;
+	right: 15px;
+	top: 20px;
+	color: #ddd;
+}
+
+.library-close-btn:hover {
+	color: #fff;
+}
+
+.alert {
+    padding: 15px;
+}
+
+
+.library-card {
+  float: left;
+  width: 220px;
+  height: 58px;
+  margin: 0 0 0 -5px;
+  position: relative;
+  padding: 5px;
+  color: #eee;
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+
+.library-card:first-of-type {
+	border-top: 1px solid rgba(0,0,0,0.25);
+}
+
+.selected-card {
+	background-color: rgba(0,0,0,0.2);
+	/*border-top: 1px solid rgba(0,0,0,0.25);*/
+	opacity: .9;
+	color: #fff;
+}
+
+.library-card:hover {
+	background-color: rgba(0,0,0,0.10);
+	cursor: pointer;
+}
+
+.library-icon {
+	width: 30px;
+	position: absolute;
+	left: 10px;
+	top: 10px;
+}
+
+.library-card-main {
+	width: 155px;
+	position: absolute;
+	left: 52px;
+	top: 12px;
+	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+  	font-size: 12px;
+}
+
+.library-card-main a {
+	color: #ddd;
+}
+
+.library-card-subtitle {
+	width: 155px;
+	position: absolute;
+	left: 50px;
+	top: 25px;
+	padding: 2px 2px 3px 2px;
+	color: #8ba2b9;
+	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+}
+
+.permission-level-icon {
+	height: 20px;
+    margin-top: -5px;
+}
+
+
+.library-search {
+	background: #314151;
+	border: 1px solid #314151;
+	color: #fff;
+	height: 32px;
+	width: 200px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+
+.key-container {
+	position: relative;
+	padding-bottom: 15px;
+}
+
+.key-icon {
+	width: 50px;
+}
+
+.key-class {
+	position: absolute;
+	top: 0px;
+	left: 50px;
+}
+
+.nav-library {
+	margin-left: -1px;
+	margin-top: 0px;
+	background: #314151;
+	border-left: 1px solid #123;
+}
+
+.nav-library-tab {
+	border-width: 0px;
+	color: #eee;
+	background: #314151;
+}
+
+.nav-library-tab-link {
+	height: 59px;
+	padding-top: 20px;
+	background: transparent;
+}
+
+
+#library .nav-tabs li:not(active) a {
+    border-radius: 0;
+    border: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    background-color: #314151;
+    color: rgba(255,255,255,0.5);
+    padding: 20px 0;
+}
+
+#library .nav-tabs .active a {
+    border-left: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid transparent;
+    background-color: #37495b;
+    color: inherit !important;
+}
+
+
+/* Branches
+---------------------------------------------- */
+#branch-panel {
+	position: absolute;
+	top: 0px;
+	right: 220px;
+	padding-left: 7px;
+	padding-right: 5px;
+	overflow-y: scroll;
+}
+
+
+.branch-preview {
+	height: 550px;
+	width: 280px;
+	background: #f1f1f1;
+	border: 1px solid #123;
+	color: #123;
+}
+
+.branch-metadata {
+	padding-top: 8px;
+}
+
+.branch-icon{
+	border: 1px solid rgba(0,0,0,0.25);
+}
+
+.branch-icon:hover{
+	border: 1px solid rgba(0,0,0,0.25);
+	background: #5fa2dd;
+}
+
+
+/* Permissions
+---------------------------------------------- */
+#permissions-panel {
+	position: absolute;
+	top: 0px;
+	right: 220px;
+	padding-left: 7px;
+	padding-right: 5px;
+	overflow-y: scroll;
+}
+
+
+
+.clear-selection {
+	background: #314151;
+	width: 100%;
+	height: 21px;
+	padding-top: 4px;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+	margin-top: 10px;
+}
+
+.clear-selection-link {
+	font-size: 9px;
+	float: right;
+	color: #ddd;
+}
+
+.clear-selection-link:hover {
+	color: #fff;
+}
+
+
+
+/* Overrides
+---------------------------------------------- */
+.ltr {
+	direction: ltr;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.node-text {
+	font-size: 10px;
+	text-overflow: ellipsis;
+}
+
+.link {
+  fill: none;
+  stroke: #ddd;
+  stroke-width: 1.5px;
+}
+
+.nodeMouseOver {
+	stroke: navy;
+    fill: steelblue;
+    cursor: pointer;
+}
+
+#nodeCrud {
+	position: absolute;
+	width: 250px;
+	right: 220px;
+	top: 0px;
+	bottom: 0px;
+	padding: 10px;
+	background-color: #37495b;
+	color: #fff;
+	z-index: 200;
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	-webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#nodeCrud.hidden {
+	display: none;
+}
+
+#nodeCrud p {
+	margin: 0;
+	font-family: sans-serif;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+
+.morphsearch {
+	width: 200px;
+	min-height: 30px;
+	background: #f1f1f1;
+	position: absolute;
+	z-index: 500;
+	top: 45px;
+	right: 50px;
+	-webkit-transform-origin: 100% 0;
+	transform-origin: 100% 0;
+	-webkit-transition-property: min-height, width, top, right;
+	transition-property: min-height, width, top, right;
+	-webkit-transition-duration: 0.5s;
+	transition-duration: 0.5s;
+	-webkit-transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+	transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+}
+
+.morphsearch.open {
+	width: 100%;
+	min-height: 100%;
+	top: 0px;
+	right: 0px;
+}
+
+.morphsearch-form {
+	width: 100%;
+	height: 30px;
+	margin: 0 auto;
+	position: relative;
+	-webkit-transition-property: width, height, -webkit-transform;
+	transition-property: width, height, transform;
+	-webkit-transition-duration: 0.5s;
+	transition-duration: 0.5s;
+	-webkit-transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+	transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+}
+
+.morphsearch.open .morphsearch-form {
+	width: 80%;
+	height: 160px;
+	-webkit-transform: translate3d(0,3em,0);
+	transform: translate3d(0,3em,0);
+}
+
+.morphsearch-input {
+	width: 100%;
+	height: 100%;
+	padding: 0 10% 0 10px;
+	font-weight: 400;
+	border: none;
+	background: transparent;
+	font-size: 1.2em;
+	font-weight: 600;
+	color: #123;
+	-webkit-transition: font-size 0.5s cubic-bezier(0.7,0,0.3,1);
+	transition: font-size 0.5s cubic-bezier(0.7,0,0.3,1);
+}
+
+.morphsearch-input::-ms-clear { /* remove cross in IE */
+    display: none;
+}
+
+.morphsearch.hideInput .morphsearch-input {
+	color: transparent;
+	-webkit-transition: color 0.3s;
+	transition: color 0.3s;
+}
+
+.morphsearch.open .morphsearch-input {
+	font-size: 7em;
+	color: #123;
+	font-weight: 400;
+}
+
+/* placeholder */
+.morphsearch-input::-webkit-input-placeholder {
+	color: #777;
+}
+
+.morphsearch-input:-moz-placeholder {
+	color: #777;
+}
+
+.morphsearch-input::-moz-placeholder {
+	color: #777;
+}
+
+.morphsearch-input:-ms-input-placeholder {
+	color: #777;
+}
+
+/* hide placeholder when active in Chrome */
+.gn-search:focus::-webkit-input-placeholder {
+	color: transparent;
+}
+
+input[type="search"] { /* reset normalize */
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.morphsearch-input:focus,
+.morphsearch-submit:focus {
+	outline: none;
+}
+
+.morphsearch-submit {
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	text-indent: 100px;
+	overflow: hidden;
+	right: 0;
+	top: 50%;
+	background: transparent url(../img/magnifier.svg) no-repeat center center;
+	background-size: 100%;
+	border: none;
+	pointer-events: none;
+	transform-origin: 50% 50%;
+	opacity: 0;
+	-webkit-transform: translate3d(-30px,-50%,0) scale3d(0,0,1);
+	transform: translate3d(-30px,-50%,0) scale3d(0,0,1);
+}
+
+.morphsearch.open .morphsearch-submit {
+	pointer-events: auto;
+	opacity: 1;
+	-webkit-transform: translate3d(-30px,-50%,0) scale3d(1,1,1);
+	transform: translate3d(-30px,-50%,0) scale3d(1,1,1);
+	-webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+	transition: opacity 0.3s, transform 0.3s;
+	-webkit-transition-delay: 0.5s;
+	transition-delay: 0.5s;
+}
+
+.morphsearch-close {
+	width: 36px;
+	height: 36px;
+	position: absolute;
+	right: 1em;
+	top: 1em;
+	overflow: hidden;
+	text-indent: 100%;
+	cursor: pointer;
+	pointer-events: none;
+	opacity: 0;
+	-webkit-transform: scale3d(0,0,1);
+	transform: scale3d(0,0,1);
+}
+
+.morphsearch.open .morphsearch-close {
+	opacity: 1;
+	pointer-events: auto;
+	-webkit-transform: scale3d(1,1,1);
+	transform: scale3d(1,1,1);
+	-webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+	transition: opacity 0.3s, transform 0.3s;
+	-webkit-transition-delay: 0.5s;
+	transition-delay: 0.5s;
+}
+
+.morphsearch-close::before,
+.morphsearch-close::after {
+	content: '';
+	position: absolute;
+	width: 2px;
+	height: 100%;
+	top: 0;
+	left: 50%;
+	border-radius: 3px;
+	opacity: 0.2;
+	background: #000;
+}
+
+.morphsearch-close:hover.morphsearch-close::before,
+.morphsearch-close:hover.morphsearch-close::after {
+	opacity: 1;
+}
+
+.morphsearch-close::before {
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+.morphsearch-close::after {
+	-webkit-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+}
+
+.morphsearch-content {
+	color: #333;
+	margin-top: 4.5em;
+	width: 100%;
+	height: 0;
+	overflow: hidden;
+	padding: 0 10.5%;
+	background: #f1f1f1;
+	position: absolute;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.morphsearch.open .morphsearch-content {
+	opacity: 1;
+	height: 100vh;
+	overflow: visible; /* this breaks the transition of the children in FF: https://bugzilla.mozilla.org/show_bug.cgi?id=625289 */
+	pointer-events: auto;
+	-webkit-transition: opacity 0.3s 0.5s;
+	transition: opacity 0.3s 0.5s;
+}
+
+.dummy-column {
+	width: 30%;
+	padding: 0 0 6em;
+	float: left;
+	opacity: 0;
+	-webkit-transform: translate3d(0,100px,0);
+	transform: translateY(100px);
+	-webkit-transition: -webkit-transform 0.5s, opacity 0.5s;
+	transition: transform 0.5s, opacity 0.5s;
+}
+
+.morphsearch.open .dummy-column:first-child {
+	-webkit-transition-delay: 0.4s;
+	transition-delay: 0.4s;
+}
+
+.morphsearch.open .dummy-column:nth-child(2) {
+	-webkit-transition-delay: 0.45s;
+	transition-delay: 0.45s;
+}
+
+.morphsearch.open .dummy-column:nth-child(3) {
+	-webkit-transition-delay: 0.5s;
+	transition-delay: 0.5s;
+}
+
+.morphsearch.open .dummy-column {
+	opacity: 1;
+	-webkit-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+}
+
+.dummy-column:nth-child(2) {
+	margin: 0 5%;
+}
+
+.dummy-column h2 {
+	font-size: 1em;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-weight: 800;
+	color: #c2c2c2;
+	padding: 0.5em 0;
+}
+
+.round {
+	border-radius: 50%;
+}
+
+.dummy-media-object {
+	padding: 0.75em;
+	font-size: 1.25em;
+	display: block;
+	margin: 0.3em 0;
+	cursor: pointer;
+	border-radius: 5px;
+	background: rgba(118,117,128,0.05);
+}
+
+.dummy-media-object:hover,
+.dummy-media-object:focus {
+	background: rgba(118,117,128,0.1);
+}
+
+.dummy-media-object img {
+	display: inline-block;
+	width: 50px;
+	margin: 0 10px 0 0;
+	vertical-align: middle;
+}
+
+.dummy-media-object h3 {
+	vertical-align: middle;
+	font-size: 0.85em;
+	display: inline-block;
+	font-weight: 600;
+	margin: 0 0 0 0;
+	width: calc(100% - 70px);
+	color: #777;  /* rgba(145,145,145,0.7) */
+}
+
+.dummy-media-object:hover h3 {
+	color: rgba(236,90,98,1);
+}
+
+
+/* Overlay */
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.5);
+	opacity: 0;
+	pointer-events: none;
+	-webkit-transition: opacity 0.5s;
+	transition: opacity 0.5s;
+	-webkit-transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+	transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+}
+
+.morphsearch.open ~ .overlay {
+	opacity: 1;
+}
+
+@media screen and (max-width: 767px) {
+	.morphsearch {
+		width: 30%;
+		top: 50px;
+		right: 10%;
+	}
+
+	.morphsearch-input {
+		padding: 0 25% 0 10px;
+	}
+	.morphsearch.open .morphsearch-input {
+		font-size: 2em;
+	}
+	.dummy-column {
+		float: none;
+		width: auto;
+		padding: 0 0 2em;
+	}
+	.dummy-column:nth-child(2) {
+		margin: 0;
+	}
+	.morphsearch.open .morphsearch-submit {
+		-webkit-transform: translate3d(0,-50%,0) scale3d(0.5,0.5,1);
+		transform: translate3d(0,-50%,0) scale3d(0.5,0.5,1);
+	}
+}
+
+@media screen and (max-width: 969px) {
+	.morphsearch {
+		width: 30%;
+		top: 10px;
+		right: 25px;
+	}
+}
+
+@media screen and (min-width: 970px) {
+	.morphsearch {
+		width: 30%;
+		top: 15px;
+		right: 25px;
+	}
 }
