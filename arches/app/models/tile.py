@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid
+from arches.app.utils.uuid_helpers import uuid_get_or_create
 from arches.app.models import models
 from django.forms.models import model_to_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -33,8 +33,10 @@ class Tile(object):
         if len(args) != 0:
             if isinstance(args[0], basestring):
                 self.load(JSONDeserializer().deserialize(args[0]))  
+            elif isinstance(args[0], models.Tile): 
+                self.map(args[0])
             elif args[0] != None and isinstance(args[0], object):
-                self.load(args[0])  
+                self.load(args[0]) 
 
     def load(self, obj):
         """
@@ -56,8 +58,14 @@ class Tile(object):
                 self.tiles[nodegroup_id].append(Tile(tile))
         return self
 
+    @classmethod
+    def get(cls, **kwargs):
+        #tile = models.Tile.objects.get(**kwargs)
+        ret = Tile(models.Tile.objects.get(**kwargs))
+        return ret
+
     def save(self):
-        self.tileid, created = uuid.get_or_create(self.tileid)
+        self.tileid, created = uuid_get_or_create(self.tileid)
         tile, created = models.Tile.objects.update_or_create(
             tileid = self.tileid, 
             defaults = {
@@ -73,41 +81,25 @@ class Tile(object):
                 childtile.parenttile_id = tile.tileid
                 childtile.save()
 
+    # @classmethod    
+    # def aggregate(cls, queryset, aggregate=False):
+    #     ret = {} if aggregate else []
 
-    @classmethod    
-    def aggregate(cls, queryset, aggregate=False):
-        ret = {} if aggregate else []
+    #     if aggregate:
+    #         for tile in queryset:
+    #             if t.nodegroup not in ret:
+    #                 ret[str(tile.nodegroup_id)] = []
+    #             ret[str(tile.nodegroup_id)].append(cls._map(tile))
+    #     else:
+    #         for tile in queryset:
+    #             ret.append(cls._map(tile))
 
-        if aggregate:
-            for tile in queryset:
-                if t.nodegroup not in ret:
-                    ret[str(tile.nodegroup_id)] = []
-                ret[str(tile.nodegroup_id)].append(cls._map(tile))
-        else:
-            for tile in queryset:
-                ret.append(cls._map(tile))
+    #     return ret
 
-        return ret
-
-    @classmethod 
-    def _map(cls, ormTile):
-        t = Tile()
-        t.tileid = ormTile.tileid
-        t.parenttile_id = ormTile.parenttile_id
-        t.resourceinstance_id = ormTile.resourceinstance_id
-        t.nodegroup_id = ormTile.nodegroup_id
-        t.data = ormTile.data
-        return t
-
-
-
-# # Move to util function
-# def get(id):
-#     try:
-#         uuid.UUID(id)
-#         return uuid.UUID(id), False
-#     except(ValueError, TypeError):
-#         return uuid.uuid4(), True
-
-
-# uuid.get_or_create = get
+    def map(self, ormTile):
+        self.tileid = ormTile.tileid
+        self.parenttile_id = ormTile.parenttile_id
+        self.resourceinstance_id = ormTile.resourceinstance_id
+        self.nodegroup_id = ormTile.nodegroup_id
+        self.data = ormTile.data
+        return self

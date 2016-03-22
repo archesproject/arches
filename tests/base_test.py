@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from arches.app.utils import uuid_helpers
 from django.core import management
 from django.test import TestCase
 

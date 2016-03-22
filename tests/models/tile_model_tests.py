@@ -20,11 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
 
-Replace this with more appropriate tests for your application.
+Replace this with more appropriate tests for your application. 
 """
 
+from django.db import connection
 from django.core import management
-from django.test import TestCase,SimpleTestCase
+from tests.base_test import ArchesTestCase
 from arches.app.models.tile import Tile
 from arches.app.models import models
 
@@ -32,14 +33,14 @@ from arches.app.models import models
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
-def setUpModule():
-    management.call_command('packages', operation='setup_db') 
-    pass
+class TileTests(ArchesTestCase):
 
-def tearDownModule():
-    pass
+    def setUp(self):
+        cursor = connection.cursor()
+        cursor.execute("Truncate public.tiles Cascade;")
 
-class TileTests(TestCase):
+    def tearDown(self):
+        pass
 
     def test_load_from_JSON(self):
         """
@@ -64,36 +65,36 @@ class TileTests(TestCase):
         """
 
         json = {
-          "tiles": {
-            "19999999-0000-0000-0000-000000000000": [{
-                "tiles": {},
-                "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-                "parenttile_id": '',
-                "nodegroup_id": "19999999-0000-0000-0000-000000000000",
-                "tileid": "",
-                "data": {
-                  "20000000-0000-0000-0000-000000000004": "TEST 1",
-                  "20000000-0000-0000-0000-000000000002": "TEST 2",
-                  "20000000-0000-0000-0000-000000000003": "TEST 3"
-                }
-            }],
-            "32999999-0000-0000-0000-000000000000": [{
-                "tiles": {},
-                "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-                "parenttile_id": '',
-                "nodegroup_id": "32999999-0000-0000-0000-000000000000",
-                "tileid": "",
-                "data": {
-                  "20000000-0000-0000-0000-000000000004": "TEST 4",
-                  "20000000-0000-0000-0000-000000000002": "TEST 5",
-                }
-            }]
-          },
-          "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-          "parenttile_id": '',
-          "nodegroup_id": "11111111-0000-0000-0000-000000000000",
-          "tileid": "",
-          "data": '{}'
+            "tiles": {
+                "19999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "19999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 1",
+                      "20000000-0000-0000-0000-000000000002": "TEST 2",
+                      "20000000-0000-0000-0000-000000000003": "TEST 3"
+                    }
+                }],
+                "32999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "32999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 4",
+                      "20000000-0000-0000-0000-000000000002": "TEST 5",
+                    }
+                }]
+            },
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "tileid": "",
+            "data": '{}'
         }
 
         t = Tile(json)
@@ -106,41 +107,41 @@ class TileTests(TestCase):
 
     def test_save(self):
         """
-        Test that we can initialize a Tile object from JSON
+        Test that we can save a Tile object back to the database
 
         """
 
         json = {
-          "tiles": {
-            "19999999-0000-0000-0000-000000000000": [{
-                "tiles": {},
-                "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-                "parenttile_id": '',
-                "nodegroup_id": "19999999-0000-0000-0000-000000000000",
-                "tileid": "",
-                "data": {
-                  "20000000-0000-0000-0000-000000000004": "TEST 1",
-                  "20000000-0000-0000-0000-000000000002": "TEST 2",
-                  "20000000-0000-0000-0000-000000000003": "TEST 3"
-                }
-            }],
-            "32999999-0000-0000-0000-000000000000": [{
-                "tiles": {},
-                "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-                "parenttile_id": '',
-                "nodegroup_id": "32999999-0000-0000-0000-000000000000",
-                "tileid": "",
-                "data": {
-                  "20000000-0000-0000-0000-000000000004": "TEST 4",
-                  "20000000-0000-0000-0000-000000000002": "TEST 5",
-                }
-            }]
-          },
-          "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-          "parenttile_id": '',
-          "nodegroup_id": "11111111-0000-0000-0000-000000000000",
-          "tileid": "",
-          "data": {}
+            "tiles": {
+                "19999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "19999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 1",
+                      "20000000-0000-0000-0000-000000000002": "TEST 2",
+                      "20000000-0000-0000-0000-000000000003": "TEST 3"
+                    }
+                }],
+                "32999999-0000-0000-0000-000000000000": [{
+                    "tiles": {},
+                    "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+                    "parenttile_id": '',
+                    "nodegroup_id": "32999999-0000-0000-0000-000000000000",
+                    "tileid": "",
+                    "data": {
+                      "20000000-0000-0000-0000-000000000004": "TEST 4",
+                      "20000000-0000-0000-0000-000000000002": "TEST 5",
+                    }
+                }]
+            },
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "tileid": "",
+            "data": {}
         }
 
         t = Tile(json)
@@ -148,6 +149,32 @@ class TileTests(TestCase):
 
         tiles = models.Tile.objects.filter(resourceinstance_id="40000000-0000-0000-0000-000000000000")
         self.assertEqual(tiles.count(), 3)
+
+    def test_simple_get(self):
+        """
+        Test that we can get a Tile object
+
+        """
+
+        json = {
+            "tiles": {},
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "tileid": "",
+            "data": {
+              "20000000-0000-0000-0000-000000000004": "TEST 1"
+            }
+        }
+
+        t = Tile(json)
+        t.save()
+
+        t2 = Tile.get(tileid=t.tileid)
+
+        self.assertEqual(t.tileid, t2.tileid)
+        self.assertEqual(t2.data["20000000-0000-0000-0000-000000000004"], "TEST 1")
+
 
 
        
