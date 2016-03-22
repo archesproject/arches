@@ -73,6 +73,7 @@ deploy:
   bundle_type: zip
   application: arches
   deployment_group: arches_group
+  region: us-west-1
   on: *2
 before_deploy:
 - zip -r  --exclude=*__pycache__* arches *
