@@ -16,14 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.core import management
 from django.test import TestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
 def setUpModule():
-    management.call_command('packages', operation='setup_db') 
+    pass
 
 def tearDownModule():
     pass
