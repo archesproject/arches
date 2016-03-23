@@ -89,13 +89,16 @@ define(['jquery',
                         }, 500);                        
                     }
                 }).layer();
-                this.map = new MapView({
-                    el: $('#map'),
-                    overlays: [this.vectorLayer]
+
+                this.drawingFeatures = new ol.Collection()
+
+                this.drawingFeatureSource = new ol.source.Vector({
+                    features: this.drawingFeatures
                 });
+                this.bufferFeatureSource = new ol.source.Vector();
 
-
-                this.bufferFeatureOverlay = new ol.FeatureOverlay({
+                this.bufferFeatureOverlay = new ol.layer.Vector({
+                    source: this.bufferFeatureSource,
                     style: new ol.style.Style({
                         fill: new ol.style.Fill({
                             color: 'rgba(123, 123, 255, 0.5)'
@@ -107,9 +110,10 @@ define(['jquery',
                         })
                     })
                 }); 
-                this.bufferFeatureOverlay.setMap(this.map.map);                   
+                // this.bufferFeatureSource.setMap(this.map.map);                   
                 
-                this.drawingFeatureOverlay = new ol.FeatureOverlay({
+                this.drawingFeatureOverlay = new ol.layer.Vector({
+                    source: this.drawingFeatureSource,
                     style: new ol.style.Style({
                         fill: new ol.style.Fill({
                             color: 'rgba(255, 255, 255, 0.2)'
@@ -120,8 +124,16 @@ define(['jquery',
                         })
                     })
                 });
-                this.drawingFeatureOverlay.setMap(this.map.map);
+                // this.drawingFeatureSource.setMap(this.map.map);
+
+
+                this.map = new MapView({
+                    el: $('#map'),
+                    overlays: [this.bufferFeatureOverlay, this.drawingFeatureOverlay, this.vectorLayer]
+                });
                 
+
+
                 ko.applyBindings(this.map, $('#basemaps-panel')[0]);
 
                 var hideAllPanels = function(){
@@ -521,7 +533,7 @@ define(['jquery',
                         self.currentPageLayer.getSource().addFeatures(currentPageFeatures);
                         self.resultLayer.vectorSource.addFeatures(resultFeatures);
                         self.vectorLayer.vectorSource.addFeatures(nonResultFeatures);
-                        if (self.drawingFeatureOverlay.getFeatures().getLength() === 0 && this.query.filter.geometry.type() !== 'bbox') {
+                        if (self.drawingFeatureSource.getFeatures().length === 0 && this.query.filter.geometry.type() !== 'bbox') {
                             self.zoomToResults();
                         }
                     }
@@ -596,7 +608,7 @@ define(['jquery',
                 this.disableDrawingTools();
 
                 this.modifyTool = new ol.interaction.Modify({
-                    features: this.drawingFeatureOverlay.getFeatures(),
+                    features: this.drawingFeatures,
                     // the SHIFT key must be pressed to delete vertices, so
                     // that new vertices can be drawn at the same position
                     // of existing vertices
@@ -608,7 +620,7 @@ define(['jquery',
                 map.addInteraction(this.modifyTool);                
 
                 this.drawingtool = new ol.interaction.Draw({
-                    features: this.drawingFeatureOverlay.getFeatures(),
+                    features: this.drawingFeatures,
                     type: tooltype
                 });
                 this.drawingtool.set('type', tooltype);
@@ -656,11 +668,11 @@ define(['jquery',
             },
 
             clearDrawingFeatures: function(){
-                if (this.bufferFeatureOverlay){
-                    this.bufferFeatureOverlay.getFeatures().clear();                 
+                if (this.bufferFeatureSource){
+                    this.bufferFeatureSource.clear();                 
                 }
-                if (this.drawingFeatureOverlay){
-                    this.drawingFeatureOverlay.getFeatures().clear();
+                if (this.drawingFeatureSource){
+                    this.drawingFeatureSource.clear();
                 }
             },
 
@@ -669,7 +681,7 @@ define(['jquery',
                 var params = {
                     filter: ko.toJSON(this.query.filter)
                 }; 
-                if(this.query.filter.buffer.width() > 0 && this.drawingFeatureOverlay.getFeatures().getLength() > 0){
+                if(this.query.filter.buffer.width() > 0 && this.drawingFeatureSource.getFeatures().length > 0){
                     $.ajax({
                         type: "GET",
                         url: arches.urls.buffer,
@@ -681,13 +693,13 @@ define(['jquery',
                             var feature = source.getFeatures()[0];
                             
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
-                            self.bufferFeatureOverlay.getFeatures().clear();  
-                            self.bufferFeatureOverlay.addFeature(feature);
+                            self.bufferFeatureSource.clear();  
+                            self.bufferFeatureSource.addFeature(feature);
                         },
                         error: function(){}
                     });                    
                 }else{
-                    this.bufferFeatureOverlay.getFeatures().clear();  
+                    this.bufferFeatureSource.clear();  
                 }
             },
 
@@ -753,7 +765,7 @@ define(['jquery',
 
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
                             this.zoomToExtent(feature.getGeometry().getExtent());
-                            this.drawingFeatureOverlay.addFeature(feature);
+                            this.drawingFeatureSource.addFeature(feature);
                             this.changeDrawingTool(this.map.map, type);
                             this.disableDrawingTools();
 
