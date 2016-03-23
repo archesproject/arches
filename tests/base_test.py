@@ -16,32 +16,29 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
-from tests import test_settings
-from tests.base_test import ArchesTestCase
-from arches.app.models import models
+from django.test import TestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
+def setUpModule():
+    pass
 
-class ResourceGraphTests(ArchesTestCase):
+def tearDownModule():
+    pass
 
-    def test_initial_node_import(self):
-        """
-        Test that correct number of nodes load
+class ArchesTestCase(TestCase):
 
-        """
-        from arches.management.commands.package_utils import resource_graphs
-        from arches.app.models.models import Node
+    @classmethod
+    def setUpClass(cls):
+        pass
 
-        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+    @classmethod
+    def tearDownClass(cls):
+        pass
 
-        self.assertEqual(Node.objects.count(), 117)
+    def setUp(self):
+        pass
 
-
-    # def test_intial_edge_import(self):
-    #     """
-    #     Test that correct number of edges load
-
-    #     """
+    def tearDown(self):
+        pass

@@ -129,6 +129,12 @@ INSERT INTO widgets(widgetid, name, template)
 INSERT INTO widgets(widgetid, name, template)
     VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'select.htm');
 
+INSERT INTO widgets(widgetid, name, template)
+    VALUES ('10000000-0000-0000-0000-000000000003', 'switch', 'switch.htm');
+
+INSERT INTO widgets(widgetid, name, template)
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'datepicker.htm');
+
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype)
     VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', '');
 

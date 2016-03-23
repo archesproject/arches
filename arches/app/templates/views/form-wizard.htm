@@ -12,12 +12,10 @@
 
             {% if cardgroup.cardinality == '1' %}
                 
-                <!-- ko foreach: form.cardgroups -->
-                <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
+                <!-- ko with: (form.cardgroups['{{cardgroup.nodegroup_id}}']().length > 0 ? form.cardgroups['{{cardgroup.nodegroup_id}}']()[0] : $root.form.blanks['{{cardgroup.nodegroup_id}}']) -->
 
                     {% include 'views/forms/cards.htm' %}
             
-                <!-- /ko -->
                 <!-- /ko -->
 
             {% endif %}
@@ -32,14 +30,12 @@
                             {% include 'views/forms/cards.htm' with forceblank=True %}
                             <div class="wizard-buttons">
                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" style="">Cancel</button>
-                                <button class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups, false)"> Save</button>
+                                <button class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-plus" data-bind="click: $root.form.saveTile.bind($root.form, $root.form.cardgroups['{{cardgroup.nodegroup_id}}'], false)"> Save</button>
                             </div>
                         </div>
                     <!-- /ko -->
 
-                    <div class="list-group" style="margin-top:15px;" data-bind="visible: true, foreach: form.cardgroups">
-                
-                        <!-- ko if: nodegroup_id() == '{{cardgroup.nodegroup_id}}' -->
+                    <div class="list-group" style="margin-top:15px;" data-bind="visible: true, foreach: form.cardgroups['{{cardgroup.nodegroup_id}}']">
 
                         <div class="list-group-item" style="background: rgb(250, 250, 250);">
                             <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: $root.form.toggleTile">Key of first node in card:<span class="text-semibold"> Value of first node in card</span></h5>
@@ -65,8 +61,6 @@
 
                             </div>
                         </div>
-
-                        <!-- /ko -->
 
                     </div>
 
