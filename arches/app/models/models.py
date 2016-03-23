@@ -319,6 +319,25 @@ class Value(models.Model):
         managed = True
         db_table = 'values'
 
+class FileValue(models.Model):
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid1) # This field type is a guess.
+    concept = models.ForeignKey('Concept', db_column='conceptid')
+    valuetype = models.ForeignKey('DValueType', db_column='valuetype')
+    value = models.FileField(upload_to='concepts')
+    language = models.ForeignKey('DLanguage', db_column='languageid', blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'values'
+
+    def geturl(self):
+        if self.value != None:
+            return self.value.url
+        return ''
+
+    def getname(self):
+        if self.value != None:
+            return self.value.name
+        return ''
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.

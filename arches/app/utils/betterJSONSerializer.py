@@ -167,7 +167,7 @@ class JSONSerializer(object):
             if isinstance(f, ForeignKey):
                 # Emulate the naming convention used by django when accessing the 
                 # related model's id field
-                data[f.name+'_id'] = f.value_from_object(instance)
+                data[f.name+'_id'] = self.handle_object(f.value_from_object(instance))
             elif isinstance(f, ManyToManyField):
                 # If the object doesn't have a primary key yet, just use an empty
                 # list for its m2m fields. Calling f.value_from_object will raise
@@ -182,7 +182,7 @@ class JSONSerializer(object):
                     else:
                         data[f.name] = list(qs.values_list('pk', flat=True))
             else:
-                data[f.name] = f.value_from_object(instance)
+                data[f.name] = self.handle_object(f.value_from_object(instance))
         return data
 
 
