@@ -19,15 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.resource_graphs import ResourceGraph
 
 @csrf_exempt
-def manager(request, graphid):
-    nodes = []
-    edges = []
+def manager(request, nodeid):
+    graph = ResourceGraph({"nodes": [], "edges": []})
+    graph.get_graph_from_rootid(nodeid)
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
-        'graph': JSONSerializer().serialize({
-            'nodes': nodes,
-            'edges': edges
-        })
+        'graph': JSONSerializer().serialize(graph)
     })

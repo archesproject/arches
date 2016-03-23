@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
-from arches.app.views import concept, entity, main, map, resources, search, config, graphs
+from arches.app.views import concept, entity, main, map, resources, search, config, graph
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -57,7 +57,7 @@ urlpatterns = [
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
-    url(r'^graphs/(?P<graphid>%s|())', graphs.manager, name='graphs'),
+    url(r'^graph/(?P<nodeid>%s)$' % uuid_regex, graph.manager, name='graph'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
