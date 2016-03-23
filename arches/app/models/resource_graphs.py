@@ -31,12 +31,14 @@ from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class ResourceGraph(object):
-    """ 
+    """
     Used for mapping complete resource graph objects to and from the database
 
     """
-    
+
     def __init__(self, *args, **kwargs):
+        self.nodes = []
+        self.edges = []
         if args[0]["nodes"] and args[0]["edges"]:
             self.nodes = args[0]["nodes"]
             self.edges = args[0]["edges"]
@@ -88,6 +90,18 @@ class ResourceGraph(object):
             newEdge.save()
 
 
+    def get_graph_from_rootid(self, rootid):
+        root = archesmodels.Node.objects.get(pk=rootid)
+        self.nodes.append(root)
+
+        def get_related_edges_and_nodes(node):
+            edges = archesmodels.Edge.objects.filter(domainnode=node)
+            self.edges = self.edges + edges
+            for edge in edges:
+                self.nodes.append(edge.rangenode)
+                get_related_edges_and_nodes(edge.rangenode)
+
+
     def get_node_id_from_text(self):
         for edge in self.edges:
             for node in self.nodes:
@@ -95,4 +109,3 @@ class ResourceGraph(object):
                     edge['domainnodeid'] = node['nodeid']
                 if edge['rangenodeid'] == node['name']:
                     edge['rangenodeid'] = node['nodeid']
-
