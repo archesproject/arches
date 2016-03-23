@@ -11,9 +11,15 @@ require([
     'views/graph-manager/branch-info',
     'bootstrap-nifty'
 ], function($, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
+    var graphData = JSON.parse($('#graph-data').val());
+
+    graphData.nodes.forEach(function (node) {
+        node.selected = ko.observable(false);
+    });
+
     var viewModel = {
-        nodes: ko.observableArray([]),
-        edges: ko.observableArray([])
+        nodes: ko.observableArray(graphData.nodes),
+        edges: ko.observableArray(graphData.edges)
     };
 
     viewModel.selectNode = function (node) {

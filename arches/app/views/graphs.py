@@ -18,9 +18,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 @csrf_exempt
 def manager(request, graphid):
+    nodes = []
+    edges = []
     return render(request, 'graph-manager.htm', {
-        'main_script': 'graph-manager'
+        'main_script': 'graph-manager',
+        'graph': JSONSerializer().serialize({
+            'nodes': nodes,
+            'edges': edges
+        })
     })
