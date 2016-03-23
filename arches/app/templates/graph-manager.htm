@@ -1,0 +1,132 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-nifty.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+Configuration Manager
+{% endblock title %}
+
+{% block content %}
+<!-- Form Container -->
+<div class="slide" style="">
+
+	<!-- Page Title/Saerch -->
+	<div id="page-title">
+		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">Resource Graph Editor</h1>
+	</div>
+	<!--End page title-->
+
+	<!--Breadcrumb-->
+	<ol class="breadcrumb" style="margin-top: -8px;">
+		<li><a href="#">{{ APP_NAME }}</a></li>
+		<li><a href="#">Admin Tools</a></li>
+		<li><a href="#">Resource Manager</a></li>
+		<li class="active">New Resource</li>
+	</ol>
+	<!--End breadcrumb-->
+
+
+	<!-- Page Content -->
+	<div id="graph-container" class="" style="padding: 0 25px 30px 25px;">
+
+		<div id="" class="panel" style="border: 1px solid #ddd;">
+			<div class="eq-height clearfix">
+				<div class="row mar-no" style="">
+					<div id="" class="col-xs-12 eq-box-md eq-no-panel">
+
+						<!-- Graph -->
+						<div id="graph" class="" style=""></div>
+
+						<!-- Node Editor -->
+						<div id="nodeCrud" class="hidden" style="" class="ui-widget-content" data-bind="with: nodeForm">
+                            {% include 'views/graph-manager/node-form.htm' %}
+						</div>
+
+						<!-- Library/Permissions/Search -->
+						<div class="relative">
+							<div id="library" class="library library-right library-narrow library-dark">
+
+								<!-- nav bar -->
+								<ul class="nav nav-tabs nav-justified nav-library" style="">
+									<li id="branches-tab" class="nav-library-tab active" style="">
+										<a href="#branch-library" class="nav-library-tab-link" style="" data-toggle="tab">
+											<i class="fa fa-archive"></i>
+										</a>
+									</li>
+									<li id="permissions-tab" class="nav-library-tab">
+										<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
+											<i class="fa fa-users"></i>
+										</a>
+									</li>
+									<li id="nodes-tab" class="nav-library-tab">
+										<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
+											<i class="fa fa-sitemap"></i>
+										</a>
+									</li>
+								</ul>
+
+								<!-- Tabs Content -->
+								<div class="tab-content">
+
+									<!--Node Listing tab -->
+									<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
+                                        {% include 'views/graph-manager/node-list.htm' %}
+									</div>
+
+									<!--Permissions tab -->
+									<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
+                                        {% include 'views/graph-manager/permissions-list.htm' %}
+									</div>
+
+									<!--Branch Library tab -->
+									<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
+                                        {% include 'views/graph-manager/branch-list.htm' %}
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Permissions Form -->
+						<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
+                            {% include 'views/graph-manager/permissions-form.htm' %}
+						</div>
+
+						<!-- Graph Library -->
+						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: branchInfo">
+                            {% include 'views/graph-manager/branch-info.htm' %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Page Content -->
+
+</div>
+
+<input id="graph-data" name="graph-data" type="hidden" value="{{graph}}"/>
+{% endblock content %}
+
+{% block tabs %}
+{% endblock tabs %}
