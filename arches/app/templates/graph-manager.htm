@@ -25,702 +25,104 @@ Configuration Manager
 {% endblock title %}
 
 {% block content %}
-<div id="content-container" style="margin-bottom: 0px; background: #f8f8f8; padding-bottom: 0px;">
+<!-- Form Container -->
+<div class="slide" style="">
+
+	<!-- Page Title/Saerch -->
+	<div id="page-title">
+		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">Resource Graph Editor</h1>
+	</div>
+	<!--End page title-->
+
+	<!--Breadcrumb-->
+	<ol class="breadcrumb" style="margin-top: -8px;">
+		<li><a href="#">{{ APP_NAME }}</a></li>
+		<li><a href="#">Admin Tools</a></li>
+		<li><a href="#">Resource Manager</a></li>
+		<li class="active">New Resource</li>
+	</ol>
+	<!--End breadcrumb-->
+
+
+	<!-- Page Content -->
+	<div id="graph-container" class="" style="padding: 0 25px 30px 25px;">
+
+		<div id="" class="panel" style="border: 1px solid #ddd;">
+			<div class="eq-height clearfix">
+				<div class="row mar-no" style="">
+					<div id="" class="col-xs-12 eq-box-md eq-no-panel">
+
+						<!-- Graph -->
+						<div id="graph" class="" style=""></div>
+
+						<!-- Node Editor -->
+						<div id="nodeCrud" class="hidden" style="" class="ui-widget-content" data-bind="with: nodeForm">
+                            {% include 'views/graph-manager/node-form.htm' %}
+						</div>
+
+						<!-- Library/Permissions/Search -->
+						<div class="relative">
+							<div id="library" class="library library-right library-narrow library-dark">
+
+								<!-- nav bar -->
+								<ul class="nav nav-tabs nav-justified nav-library" style="">
+									<li id="branches-tab" class="nav-library-tab active" style="">
+										<a href="#branch-library" class="nav-library-tab-link" style="" data-toggle="tab">
+											<i class="fa fa-archive"></i>
+										</a>
+									</li>
+									<li id="permissions-tab" class="nav-library-tab">
+										<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
+											<i class="fa fa-users"></i>
+										</a>
+									</li>
+									<li id="nodes-tab" class="nav-library-tab">
+										<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
+											<i class="fa fa-sitemap"></i>
+										</a>
+									</li>
+								</ul>
+
+								<!-- Tabs Content -->
+								<div class="tab-content">
+
+									<!--Node Listing tab -->
+									<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
+                                        {% include 'views/graph-manager/node-list.htm' %}
+									</div>
+
+									<!--Permissions tab -->
+									<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
+                                        {% include 'views/graph-manager/permissions-list.htm' %}
+									</div>
+
+									<!--Branch Library tab -->
+									<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
+                                        {% include 'views/graph-manager/branch-list.htm' %}
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Permissions Form -->
+						<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
+                            {% include 'views/graph-manager/permissions-form.htm' %}
+						</div>
+
+						<!-- Graph Library -->
+						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: branchInfo">
+                            {% include 'views/graph-manager/branch-info.htm' %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Page Content -->
 
-    <!-- Form Container -->
-    <div class="slide" style="">
-
-        <!-- Page Title/Saerch -->
-        <div id="page-title">
-            <h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">Resource Graph Editor</h1>
-
-            <!--Searchbox-->
-            <div id="morphsearch" class="morphsearch">
-                <form class="morphsearch-form">
-                    <input class="morphsearch-input" type="search" placeholder="Search...">
-                    <button class="morphsearch-submit" type="submit">Search</button>
-                </form>
-                <div class="morphsearch-content">
-                    <div class="dummy-column">
-                        <h2>People</h2>
-                        <a class="dummy-media-object" href="http://twitter.com/SaraSoueidan">
-                            <img class="round" src="http://0.gravatar.com/avatar/81b58502541f9445253f30497e53c280?s=50&amp;d=identicon&amp;r=G" alt="Sara Soueidan">
-                            <h3>Sara Soueidan</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://twitter.com/rachsmithtweets">
-                            <img class="round" src="http://0.gravatar.com/avatar/48959f453dffdb6236f4b33eb8e9f4b7?s=50&amp;d=identicon&amp;r=G" alt="Rachel Smith">
-                            <h3>Rachel Smith</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://www.twitter.com/peterfinlan">
-                            <img class="round" src="http://0.gravatar.com/avatar/06458359cb9e370d7c15bf6329e5facb?s=50&amp;d=identicon&amp;r=G" alt="Peter Finlan">
-                            <h3>Peter Finlan</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://www.twitter.com/pcridesagain">
-                            <img class="round" src="http://1.gravatar.com/avatar/db7700c89ae12f7d98827642b30c879f?s=50&amp;d=identicon&amp;r=G" alt="Patrick Cox">
-                            <h3>Patrick Cox</h3>
-                        </a>
-                        <a class="dummy-media-object" href="https://twitter.com/twholman">
-                            <img class="round" src="http://0.gravatar.com/avatar/cb947f0ebdde8d0f973741b366a51ed6?s=50&amp;d=identicon&amp;r=G" alt="Tim Holman">
-                            <h3>Tim Holman</h3>
-                        </a>
-                        <a class="dummy-media-object" href="https://twitter.com/shaund0na">
-                            <img class="round" src="http://1.gravatar.com/avatar/9bc7250110c667cd35c0826059b81b75?s=50&amp;d=identicon&amp;r=G" alt="Shaun Dona">
-                            <h3>Shaun Dona</h3>
-                        </a>
-                    </div>
-                    <div class="dummy-column">
-                        <h2>Popular</h2>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/08/05/page-preloading-effect/">
-                            <img src="img/thumbs/PagePreloadingEffect.png" alt="PagePreloadingEffect">
-                            <h3>Page Preloading Effect</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/05/28/arrow-navigation-styles/">
-                            <img src="img/thumbs/ArrowNavigationStyles.png" alt="ArrowNavigationStyles">
-                            <h3>Arrow Navigation Styles</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/06/19/ideas-for-subtle-hover-effects/">
-                            <img src="img/thumbs/HoverEffectsIdeasNew.png" alt="HoverEffectsIdeasNew">
-                            <h3>Ideas for Subtle Hover Effects</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/07/14/freebie-halcyon-days-one-page-website-template/">
-                            <img src="img/thumbs/FreebieHalcyonDays.png" alt="FreebieHalcyonDays">
-                            <h3>Halcyon Days Template</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/05/22/inspiration-for-article-intro-effects/">
-                            <img src="img/thumbs/ArticleIntroEffects.png" alt="ArticleIntroEffects">
-                            <h3>Inspiration for Article Intro Effects</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/06/26/draggable-dual-view-slideshow/">
-                            <img src="img/thumbs/DraggableDualViewSlideshow.png" alt="DraggableDualViewSlideshow">
-                            <h3>Draggable Dual-View Slideshow</h3>
-                        </a>
-                    </div>
-                    <div class="dummy-column">
-                        <h2>Recent</h2>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/10/07/tooltip-styles-inspiration/">
-                            <img src="img/thumbs/TooltipStylesInspiration.png" alt="TooltipStylesInspiration">
-                            <h3>Tooltip Styles Inspiration</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/09/23/animated-background-headers/">
-                            <img src="img/thumbs/AnimatedHeaderBackgrounds.png" alt="AnimatedHeaderBackgrounds">
-                            <h3>Animated Background Headers</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/09/16/off-canvas-menu-effects/">
-                            <img src="img/thumbs/OffCanvas.png" alt="OffCanvas">
-                            <h3>Off-Canvas Menu Effects</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/09/02/tab-styles-inspiration/">
-                            <img src="img/thumbs/TabStyles.png" alt="TabStyles">
-                            <h3>Tab Styles Inspiration</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/08/19/making-svgs-responsive-with-css/">
-                            <img src="img/thumbs/ResponsiveSVGs.png" alt="ResponsiveSVGs">
-                            <h3>Make SVGs Responsive with CSS</h3>
-                        </a>
-                        <a class="dummy-media-object" href="http://tympanus.net/codrops/2014/07/23/notification-styles-inspiration/">
-                            <img src="img/thumbs/NotificationStyles.png" alt="NotificationStyles">
-                            <h3>Notification Styles Inspiration</h3>
-                        </a>
-                    </div>
-                </div><!-- /morphsearch-content -->
-                <span class="morphsearch-close"></span>
-            </div>
-            <!-- /morphsearch -->
-        </div>
-        <!--End page title-->
-
-        <!--Breadcrumb-->
-        <ol class="breadcrumb" style="margin-top: -8px;">
-            <li><a href="#">DISCO Home</a></li>
-            <li><a href="#">Admin Tools</a></li>
-            <li><a href="#">Resource Manager</a></li>
-            <li class="active">Instruments Resource</li>
-        </ol>
-        <!--End breadcrumb-->
-
-
-        <!-- Page Content -->
-        <div id="graph-container" class="" style="padding: 0 25px 30px 25px;">
-
-            <div id="" class="panel" style="border: 1px solid #ddd;">
-                <div class="eq-height clearfix">
-                    <div class="row mar-no" style="">
-                        <div id="" class="col-xs-12 eq-box-md eq-no-panel">
-
-                            <!-- Graph -->
-                            <div id="graph"></div>
-
-                            <!-- Node Editor -->
-                            <div id="nodeCrud" class="hidden" style="">
-                                <p><span id="nodeName">100</span></p>
-                                <div class="relative">
-                                    <a id="node-crud-close" href="" class="library-close-btn fa fa-times fa-lg" style="margin-top: -5px;"></a>
-                                </div>
-
-                                <!-- Settings -->
-                                <div class="">
-
-                                    <!-- Node Information -->
-                                    <hr class="section-division-dark node-section-division" style="">
-                                    <div class="node-section" style="">
-
-                                        <!-- Node Settings -->
-                                        <div class="" style="padding-bottom: 25px;">
-
-                                            <!-- Node Type -->
-                                            <div class="node-widget-label" style="">
-                                                <div class="control-label">
-                                                    Node Name
-                                                </div>
-                                                <div class="col-sm-12 pad-no node-attribute-label node-input-widget" style="">
-                                                    <input type="text" placeholder="Enter node name here..." id="" class="node-attribute-widget" style="background: #314151; height: 32px;" value="">
-                                                </div>
-                                            </div>
-                                            <!-- End Label Text -->
-
-                                            <!-- CRM -->
-                                            <div class="node-widget-label" style="">
-                                                <div class="control-label">
-                                                    CRM Class
-                                                </div>
-                                                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                                                    <select class="design" data-placeholder="" id="crm" tabindex="0" style="display: none;">
-                                                        <option>E1 CRM Entity</option>
-                                                        <option>E2 Temporal Entity</option>
-                                                        <option>E3 Condition State</option>
-                                                        <option>E4 Period</option>
-                                                        <option>E5 Event</option>
-                                                        <option>E6 Destruction</option>
-                                                        <option>E7 Activity</option>
-                                                        <option>E8 Acquisition</option>
-                                                    </select><div class="chosen-container chosen-container-single design" style="width: 100%;" title="" id="crm_chosen"><a class="chosen-single" tabindex="-1"><span>E1 CRM Entity</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off"></div><ul class="chosen-results"></ul></div></div>
-                                                </div>
-                                            </div>
-                                            <!-- End CRM -->
-
-                                            <!-- Parent Relation -->
-                                            <div class="node-widget-label" style="">
-                                                <div class="control-label">
-                                                    Relation to parent
-                                                </div>
-                                                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                                                    <select class="design" data-placeholder="" id="property" tabindex="0" style="display: none;">
-                                                        <option>P1 Is identified by</option>
-                                                        <option>P2 Has type</option>
-                                                        <option>P3 Has note</option>
-                                                        <option>P4 Has time span</option>
-                                                        <option>P5 Consists of</option>
-                                                        <option>P6 A really long propety name just to see what will happen</option>
-                                                    </select><div class="chosen-container chosen-container-single design chosen-container-single-nosearch" style="width: 100%;" title="" id="property_chosen"><a class="chosen-single" tabindex="-1"><span>P1 Is identified by</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
-                                                </div>
-                                            </div>
-                                            <!-- End Parent Relation -->
-
-                                            <!-- Data Type -->
-                                            <div class="node-widget-label" style="">
-                                                <div class="control-label">
-                                                    Data type
-                                                </div>
-                                                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                                                    <select class="design" data-placeholder="" id="data-type" tabindex="0" style="display: none;">
-                                                        <option>Semantic</option>
-                                                        <option>String</option>
-                                                        <option>Number</option>
-                                                        <option>Date</option>
-                                                        <option>Domain</option>
-                                                        <option>Boolean</option>
-                                                        <option>Geometry</option>
-                                                        <option>File</option>
-                                                        <option>Image</option>
-                                                    </select><div class="chosen-container chosen-container-single design chosen-container-single-nosearch" style="width: 100%;" title="" id="data_type_chosen"><a class="chosen-single" tabindex="-1"><span>Semantic</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Group -->
-                                            <div class="node-widget-label" style="">
-                                                <div class="control-label">
-                                                    Group
-                                                </div>
-                                                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                                                    <select class="design" data-placeholder="" id="node-group" tabindex="0" style="display: none;">
-                                                        <option>Geospatial coordinates</option>
-                                                        <option>Geometry type</option>
-                                                        <option>Address</option>
-                                                        <option>Address type</option>
-                                                    </select><div class="chosen-container chosen-container-single design chosen-container-single-nosearch" style="width: 100%;" title="" id="node_group_chosen"><a class="chosen-single" tabindex="-1"><span>Geospatial coordinates</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <!-- End Widget Settings -->
-
-                                    </div>
-                                    <!-- End Widget Information -->
-
-
-                                    <!-- Widget Validation -->
-                                    <hr class="section-division-dark node-section-division" style="">
-                                    <div class="node-section" style="">
-
-                                        <!-- Widget Settings -->
-                                        <div class="" style="">
-
-                                            <!-- Required -->
-                                            <div class="" style="padding-bottom: 15px;">
-
-                                                <input id="node-required" class="arches-switch" type="checkbox" checked="" data-switchery="true" style="display: none;"><span class="switchery switchery-small" style="border-color: rgb(100, 189, 99); box-shadow: rgb(100, 189, 99) 0px 0px 0px 0px inset; transition: border 0.4s, box-shadow 0.4s, background-color 1.2s; background-color: rgb(100, 189, 99);"><small style="left: 12px; transition: left 0.2s; background-color: rgb(255, 255, 255);"></small></span>
-                                                <p class="" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                                                    Required
-                                                </p>
-                                                <span class="" style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                                                    Users are required to provide a value for this node
-                                                </span>
-
-                                            </div>
-
-                                            <!-- Repeatable -->
-                                            <div class="" style="padding-bottom: 15px;">
-
-                                                <input id="node-cardinality" class="arches-switch" type="checkbox" checked="" data-switchery="true" style="display: none;"><span class="switchery switchery-small" style="border-color: rgb(100, 189, 99); box-shadow: rgb(100, 189, 99) 0px 0px 0px 0px inset; transition: border 0.4s, box-shadow 0.4s, background-color 1.2s; background-color: rgb(100, 189, 99);"><small style="left: 12px; transition: left 0.2s; background-color: rgb(255, 255, 255);"></small></span>
-                                                <p class="" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                                                    Repeatable
-                                                </p>
-                                                <span class="" style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                                                    Users may enter multiple values for this node
-                                                </span>
-
-                                            </div>
-                                        </div>
-                                        <!-- End Widget Settings -->
-
-                                    </div>
-                                    <!-- End Widget Validation -->
-
-                                    <div class="pull-right">
-                                        <button class="btn btn-primary btn-sm btn-labeled fa fa-check"> Save</button>
-                                        <button class="btn btn-danger btn-sm btn-labeled fa fa-times"> Delete</button>
-                                    </div>
-                                </div>
-                                <!-- End Settings -->
-                            </div>
-
-                            <!-- Library/Permissions/Search -->
-                            <div class="relative">
-                                <div id="library" class="library library-right library-narrow library-dark">
-
-                                    <!-- nav bar -->
-                                    <ul class="nav nav-tabs nav-justified nav-library" style="">
-                                        <li id="branches-tab" class="nav-library-tab active" style="">
-                                            <a href="#branch-library" class="nav-library-tab-link" style="" data-toggle="tab">
-                                                <i class="fa fa-archive"></i>
-                                            </a>
-                                        </li>
-                                        <li id="permissions-tab" class="nav-library-tab">
-                                            <a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
-                                                <i class="fa fa-users"></i>
-                                            </a>
-                                        </li>
-                                        <li id="nodes-tab" class="nav-library-tab">
-                                            <a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
-                                                <i class="fa fa-sitemap"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-
-                                    <!-- Tabs Content -->
-                                    <div class="tab-content">
-
-                                        <!--Node Listing tab -->
-                                        <div class="tab-pane fade" id="node-listing">
-                                            <!-- Title -->
-                                            <div class="">
-                                                <h4 class="node-title" style=""> Node List </h4>
-                                            </div>
-
-                                            <!-- Node Search -->
-                                            <div class="relative" style="">
-                                                <input id="node-search" type="text" class="form-control library-search" style="" placeholder="Find a node in the graph">
-
-                                                <!-- Remove Search -->
-                                                <span class="clear-search" style=""><i class="fa fa-times-circle"></i></span>
-                                            </div>
-
-                                            <!-- Clear Selection -->
-                                            <div class="pad-rgt pad-btm clear-selection" style="">
-                                                <a id="clear-node-selection" class="clear-selection-link" style="" href="">clear selection</a>
-                                            </div>
-
-                                            <!-- Group/User List  -->
-                                            <div class="" style="margin-left: 5px;">
-
-                                                <!-- Group/User Grid -->
-                                                <div id="node-grid" class="grid" style="margin-top: 0px; height: 0px; position: relative; background: rgb(248, 248, 248);">
-
-                                                    <!-- Card -->
-                                                    <div class="library-card node-list">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-info"><i class="fa fa-file-code-o"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="name" style="" href="#">
-                                                                Names
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle none" style="">
-                                                            String; E49
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card node-list">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-info"><i class="fa fa-list-ul"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="name" style="" href="#">
-                                                                Name Type
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle none" style="">
-                                                            Domain; E32
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card node-list">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-info"><i class="fa fa-calendar"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="name" style="" href="#">
-                                                                End of Existence
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle none" style="">
-                                                            Date; E19
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!--Permissions tab -->
-                                        <div class="tab-pane fade" id="node-permissions">
-                                            <!-- Title -->
-                                            <div class="">
-                                                <h4 class="node-title" style=""> Permissions</h4>
-                                            </div>
-
-                                            <!-- Group/User Search -->
-                                            <div class="" style="">
-                                                <input type="text" class="form-control library-search" style="" placeholder="Find a group or user account">
-
-                                                <!-- Remove Search -->
-                                                <span class="clear-search" style=""><i class="fa fa-times-circle"></i></span>
-                                            </div>
-
-                                            <!-- Clear Selection -->
-                                            <div class="pad-rgt pad-btm clear-selection" style="">
-                                                <a id="clear-user-selection" class="clear-selection-link" style="" href="">clear selection</a>
-                                            </div>
-
-                                            <!-- Group/User List  -->
-                                            <div class="" style="margin-left: 5px;">
-
-                                                <!-- Group/User Grid -->
-                                                <div id="user-grid" class="grid" style="margin-top: 0px; position: relative; height: 0px; background: rgb(248, 248, 248);">
-
-                                                    <!-- Card -->
-                                                    <div id="all" class="library-card permissions all">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                All accounts
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle none" style="">
-                                                            Permission: ---
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions" style="">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Guest
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle text-muted full" style="">
-                                                            N - No Access
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Crowd Source
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle full" style="">
-                                                            RW - Read/Write
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Editor
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle full" style="">
-                                                            F -Full Access
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                RDM Admin
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle read" style="">
-                                                            R -Read Only
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                rgaston@realsuperuser.com
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle full" style="">
-                                                            F - Full Access
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card permissions">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                adalgity@gci.edu
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle delete" style="">
-                                                            D - Delete
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!--Branch Library tab -->
-                                        <div class="tab-pane fade in active" id="branch-library">
-                                            <!-- Title -->
-                                            <div class="">
-                                                <h4 class="node-title" style=""> Branch Library</h4>
-                                            </div>
-
-                                            <!-- Group/User Search -->
-                                            <div class="" style="">
-                                                <input type="text" class="form-control library-search" style="" placeholder="Find a graph branch">
-
-                                                <!-- Remove Search -->
-                                                <span class="clear-search" style=""><i class="fa fa-times-circle"></i></span>
-                                            </div>
-
-                                            <!-- Group/User List  -->
-                                            <div class="pad-top" style="margin-left: 5px;">
-
-                                                <h4 class="node-section-title" style="font-size: 13px;"> Graph Branches</h4>
-
-                                                <!-- Group/User Grid -->
-                                                <div id="branch-grid" class="grid" style="margin-top: 0px; position: relative; height: 0px; background: rgb(248, 248, 248);">
-
-                                                    <!-- Card -->
-                                                    <div class="library-card graph-library">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" style=""><i class="fa fa-hand-o-left"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Node
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle delete" style="">
-                                                            Adds single node
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card graph-library">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" style=""><i class="fa fa-hand-o-left"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Node/Type
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle delete" style="">
-                                                            Adds single node and domain
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Card -->
-                                                    <div class="library-card graph-library">
-                                                        <div class="library-icon" style="">
-                                                            <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" style=""><i class="fa fa-hand-o-left"></i></span>
-                                                        </div>
-                                                        <div class="library-card-main" style="">
-                                                            <a id="" class="" style="" href="#">
-                                                                Location Description
-                                                            </a>
-                                                        </div>
-                                                        <div class="library-card-subtitle delete" style="">
-                                                            Adds location nodes
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <!-- Permissions Form -->
-                            <div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;">
-
-                                <!-- Title -->
-                                <h4 class="node-title" style=""> Manage Permissions </h4>
-                                <div class="relative">
-                                    <a id="permissions-close" href="" class="library-close-btn fa fa-times fa-lg" style=""></a>
-                                </div>
-                                <div id="" class="" style="padding-top: 20px; position: relative;">
-                                    <p class="library-instructions" style=""> Update the Groups/User Accounts you selected with the following permissions:</p>
-                                </div>
-
-                                <!-- Premission Selector -->
-                                <div class="col-sm-12 pad-no node-attribute-label" style="margin-top: 8px;">
-                                    <select class="design" data-placeholder="" id="permissions" tabindex="0" style="display: none;">
-                                        <option>N - No Access</option>
-                                        <option>R - Read Only</option>
-                                        <option>RW -Read/Write</option>
-                                        <option>D - Delete</option>
-                                        <option>F - Full Access (read, write, delete)</option>
-                                    </select><div class="chosen-container chosen-container-single design chosen-container-single-nosearch" style="width: 100%;" title="" id="permissions_chosen"><a class="chosen-single" tabindex="-1"><span>N - No Access</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
-
-                                    <div class="" style="margin: -5px 0px 10px 10px;">
-                                        <label class="form-checkbox form-normal form-primary active form-text"><input type="checkbox" checked=""> Cascade permissions to children</label>
-                                    </div>
-
-                                    <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;"> Apply permissions</button>
-                                </div>
-
-
-
-                                <!-- Premission Key -->
-                                <div id="confirm-permissions" class="key" style="display: none;">
-
-                                    <h4 class="node-title" style="font-size: 13px;"> Applying F- Full Access permissions to: </h4>
-
-                                    <!-- Alert -->
-                                    <div id="permission-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
-
-
-                                    <div id="" class="panel-body" style="padding: 0 10px 10px 10px;">
-                                        <dl>
-                                            <dd><i class="fa fa-check"></i> Guests Group updated</dd>
-                                            <dd><i class="fa fa-check"></i> Crowd Source Group updated</dd>
-                                            <dd><i class="fa fa-times"></i> rgaston@superuser.com <a id="" class="text-primary permission-alert" href="#">IGNORED</a></dd>
-                                            <dd><i class="fa fa-check"></i> adalgity@gci.edu updated</dd>
-                                        </dl>
-                                    </div>
-                                    <div class="" style="">
-                                        <dt>Permission updates completed!</dt>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- Graph Library -->
-                            <div id="branch-panel" class="library-right library-medium library-dark" style="display: none;">
-
-                                <div class="ltr" style="">
-                                    <!-- Title -->
-                                    <h4 class="node-title" style=""> Location Branch  </h4>
-                                    <div class="relative">
-                                        <a id="branch-close" href="" class="library-close-btn fa fa-times fa-lg" style=""></a>
-                                    </div>
-                                    <div id="" class="" style="padding-top: 20px; position: relative;">
-                                        <p class="library-instructions" style=""> A graph branch that describes the location of assets with geospatial coordinates and other location information.</p>
-                                    </div>
-
-                                    <!-- Alert -->
-                                    <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
-
-                                    <!-- Add Button -->
-                                    <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;"> Append to current node</button>
-
-                                    <!-- Preview -->
-                                    <div id="" class="branch-preview" style="">
-                                        Graph Preview goes here
-                                    </div>
-
-                                    <!-- Branch Metadata -->
-                                    <div class="" style="">
-                                        <dl>
-                                            <dt class="branch-metadata">Top Node Class</dt>
-                                            <dd>E45</dd>
-                                            <dt class="branch-metadata">Connects to</dt>
-                                            <dd>E1, E23, E34, E39, E59, E79</dd>
-                                            <dt class="branch-metadata">Author</dt>
-                                            <dd>Arches Community</dd>
-                                            <dt class="branch-metadata">Version</dt>
-                                            <dd>4.0.2</dd>
-                                        </dl>
-
-                                    </div>
-
-                                    <!-- Close Panel -->
-                                    <button id="branch-close" class="btn btn-mint btn pull-right btn-labeled fa fa-times" style="margin-bottom: 45px;"> Close</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End Page Content -->
-
-    </div>
 </div>
 {% endblock content %}
 
