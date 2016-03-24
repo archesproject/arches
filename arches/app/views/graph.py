@@ -32,5 +32,13 @@ def manager(request, nodeid):
         'node_list': {
             'title': _('Node List'),
             'search_placeholder': _('Find a node in the graph')
+        },
+        'permissions_list': {
+            'title': _('Permissions'),
+            'search_placeholder': _('Find a group or user account')
+        },
+        'branch_list': {
+            'title': _('Branch Library'),
+            'search_placeholder': _('Find a graph branch')
         }
     })
