@@ -50,7 +50,8 @@ require([
     });
 
     viewModel.nodeList = new NodeListView({
-        el: $('#node-listing')
+        el: $('#node-listing'),
+        nodes: viewModel.nodes
     });
 
     viewModel.permissionsList = new PermissionsListView({

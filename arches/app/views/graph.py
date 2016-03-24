@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
+from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.resource_graphs import ResourceGraph
 
@@ -27,5 +28,9 @@ def manager(request, nodeid):
     graph.get_graph_from_rootid(nodeid)
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
-        'graph': JSONSerializer().serialize(graph)
+        'graph': JSONSerializer().serialize(graph),
+        'node_list': {
+            'title': _('Node List'),
+            'search_placeholder': _('Find a node in the graph')
+        }
     })

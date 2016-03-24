@@ -1,2 +1,33 @@
 {% load staticfiles %}
 {% load i18n %}
+
+<div class="tab-pane fade active in" id="branch-library">
+    <!-- Title -->
+    <div class="">
+        <h4 class="node-title" style="">{% block title %}{% endblock %}</h4>
+    </div>
+    
+    <!-- Group/User Search -->
+    <div class="" style="">
+        <input type="text" class="form-control library-search" style="" placeholder="{% block search_placeholder %}{% endblock %}"> 
+
+        <!-- Remove Search -->
+        <span class="clear-search" style=""><i class="fa fa-times-circle"></i></span>
+    </div>
+
+    <!-- Group/User List  -->
+    <div class="pad-top" style="margin-left: 5px;">
+
+        <!-- Group/User Grid -->
+        <div class="grid" style="margin-top: 0px; position: relative; height: 0px; background: rgb(248, 248, 248);">
+
+            <!-- Card -->
+            <!-- ko foreach: $data.items -->
+
+                {% block list %}{% endblock %}
+
+            <!-- /ko -->                                  
+
+        </div>
+    </div>
+</div>
