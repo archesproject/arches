@@ -13,6 +13,23 @@ define([
             var diameter = 960;
 
             this.tree = d3.layout.tree()
+                .children(function (d) {
+                    var nodes = self.nodes();
+                    var edges = self.edges();
+                    var children = [];
+
+                    edges.forEach(function(edge) {
+                        if (edge.rangenodeid === d.nodeid) {
+                            nodes.forEach(function(node) {
+                                if (edge.rangenodeid === node.nodeid) {
+                                    children.push(node);
+                                }
+                            })
+                        }
+                    });
+
+                    return children;
+                })
                 .size([360, diameter / 2 ])
                 .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
 
@@ -44,8 +61,12 @@ define([
         render: function () {
             var nodesize = 6;  //Default node size
             var nodeMouseOver = 8;
-            var nodes = this.tree(this.nodes());
-            var links = this.edges();
+            var root = this.nodes().reduce(function (node) { if (node.istopnode) { return node } });
+            var nodes = this.tree.nodes(root);
+            var links = this.tree.links(nodes);
+            if (isNaN(nodes[0].x)) {
+                nodes[0].x = 0;
+            }
 
             var link = this.svg.selectAll(".link")
                 .data(links)
@@ -57,7 +78,7 @@ define([
                 .data(nodes)
                 .enter().append("g")
                 .attr("class", "node")
-                // .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+                .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
 
             node.append("circle")
@@ -86,14 +107,12 @@ define([
             node.append("text")
                 .attr("dy", ".31em")
                 .attr("class", "node-text")
-                // .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                // .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+                .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
                 .text(function (d) {
-                    // if(d.entitytypeid.length > 13)
-                    // return d.entitytypeid.substring(0,13)+'...';
-                    // else
-                    // return d.entitytypeid;
-                    console.log(d);
+                    if(d.name.length > 13) {
+                        return d.name.substring(0,13)+'...';
+                    }
                     return d.name;
                 });
 
