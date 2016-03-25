@@ -10,7 +10,7 @@ define([
             this.edges = ko.observableArray([]);
             _.extend(this, _.pick(options, 'nodes', 'edges'));
 
-            var diameter = 960;
+            var diameter = this.$el.width();
 
             this.tree = d3.layout.tree()
                 .children(function (d) {
@@ -38,14 +38,17 @@ define([
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
-                .attr("height", diameter - 150)
+                .attr("height", $(window).height()-200)
                 .call(d3.behavior.zoom().on("zoom", function() {
                     self.redraw();
                 }))
                 .append("g")
-                .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + "), rotate(0)");
 
-            d3.select(this.el).style("height", diameter - 150 + "px");
+            this.center = [(this.$el.width() / 2) - 220, this.$el.height() / 2];
+            
+            this.svg.attr("transform", "translate(" + this.center[0] + "," + this.center[1] + "), rotate(0)");
+
+            d3.select(this.el).style("height", $(window).height()-200 + "px");
 
             this.render();
 
@@ -124,10 +127,11 @@ define([
 
         },
         redraw: function () {
-            var xt = d3.event.translate[0] + 180;
+            var xt = d3.event.translate[0] + this.center[0];
+            var yt = d3.event.translate[1] + this.center[1];
 
             this.svg.attr("transform",
-                "translate(" + xt + "," + d3.event.translate[1] + ")" +
+                "translate(" + xt + "," + yt + ")" +
                 " scale(" + d3.event.scale + ")");
         }
     });
