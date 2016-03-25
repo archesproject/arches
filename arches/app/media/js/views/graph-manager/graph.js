@@ -48,6 +48,13 @@ define([
             d3.select(this.el).style("height", diameter - 150 + "px");
 
             this.render();
+
+            this.nodes.subscribe(function() {
+                self.render();
+            });
+            this.edges.subscribe(function() {
+                self.render();
+            });
         },
         render: function () {
             var self = this;
@@ -58,6 +65,9 @@ define([
                 if (node.istopnode) {
                     root = node;
                 }
+                if (node.children) {
+                    delete node.children;
+                }
             });
             var nodes = this.tree.nodes(root);
             var links = this.tree.links(nodes);
@@ -66,14 +76,17 @@ define([
             }
 
             var link = this.svg.selectAll(".link")
-                .data(links)
-                .enter().append("path")
+                .data(links, function(d) { return d.target.nodeid });
+            link.enter().append("path")
                 .attr("class", "link")
                 .attr("d", this.diagonal);
+            link.exit()
+                .remove();
 
-            var node = this.svg.selectAll(".node")
-                .data(nodes)
-                .enter().append("g")
+            var allNodes = this.svg.selectAll(".node")
+                .data(nodes, function(d) { return d.nodeid });
+
+            var node = allNodes.enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
@@ -105,6 +118,9 @@ define([
                     }
                     return d.name;
                 });
+
+            allNodes.exit()
+                .remove();
 
         },
         redraw: function () {
