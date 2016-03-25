@@ -1452,3 +1452,10 @@ input[type="search"] { /* reset normalize */
 		right: 25px;
 	}
 }
+
+.library-wrapper {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+}
