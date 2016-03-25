@@ -1,24 +1,40 @@
 define([
     'jquery',
     'backbone',
+    'knockout',
     'isotope',
     'isotope-packery'
-], function($, Backbone, Isotope) {
+], function($, Backbone, ko, Isotope) {
     var ListView = Backbone.View.extend({
 
-        items: [],
+        items: ko.observableArray(),
         single_select: true,
 
         initialize: function(options) {
             console.log(options);
-            var elem = document.querySelector('.grid');
-            var iso = new Isotope( elem, {
+            var elem = this.$el.find('.grid')[0];
+            this.isotopeContainer = new Isotope( elem, {
               // options
               itemSelector: '.grid-item',
               layoutMode: 'packery'
             });
-        }
 
+            this.filter = ko.observable('');
+            this.filter.subscribe(function(newValue){
+                var filter = this.filter().toLowerCase();
+                this.items().forEach(function(item){
+                    item.filtered(true);
+                    if(item.name.toLowerCase().indexOf(filter) !== -1){
+                        item.filtered(false);
+                    }
+                }, this);
+            }, this, 'change')
+
+        },
+
+        clear_selection: function(){
+            console.log('clear selection')
+        },
 
     });
     

@@ -15,6 +15,7 @@ require([
 
     graphData.nodes.forEach(function (node) {
         node.selected = ko.observable(false);
+        node.filtered = ko.observable(false);
     });
 
     var viewModel = {
