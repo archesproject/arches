@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
-from django.contrib.gis.db import models
+from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class ResourceGraph(object):
@@ -36,7 +36,7 @@ class ResourceGraph(object):
                 self.get_nodes_and_edges(root)
             except(ValueError):
                 pass
-                #self.load(JSONDeserializer().deserialize(args[0]))  
+                #self.load(JSONDeserializer().deserialize(args[0]))
         elif args[0]["nodes"] and args[0]["edges"]:
             self.nodes = args[0]["nodes"]
             self.edges = args[0]["edges"]
