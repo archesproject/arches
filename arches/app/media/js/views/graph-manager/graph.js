@@ -36,7 +36,7 @@ define([
             this.diagonal = d3.svg.diagonal.radial()
                 .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-            this.svg = d3.select("#graph").append("svg")
+            this.svg = d3.select(this.el).append("svg")
                 .attr("width", diameter)
                 .attr("height", diameter - 150)
                 .call(d3.behavior.zoom().on("zoom", function() {
@@ -45,23 +45,19 @@ define([
                 .append("g")
                 .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + "), rotate(0)");
 
-            d3.select("#graph").style("height", diameter - 150 + "px");
-
-            this.$el.click(function(e){
-                var x = e.pageX + 15;
-                var y = e.pageY;
-
-                var xScreen = e.clientX;
-                var yScreen = e.clientY;
-                var windowHeight = $(window).height();
-            });
+            d3.select(this.el).style("height", diameter - 150 + "px");
 
             this.render();
         },
         render: function () {
             var nodesize = 6;  //Default node size
             var nodeMouseOver = 8;
-            var root = this.nodes().reduce(function (node) { if (node.istopnode) { return node } });
+            var root;
+            this.nodes().forEach(function (node) {
+                if (node.istopnode) {
+                    root = node;
+                }
+            });
             var nodes = this.tree.nodes(root);
             var links = this.tree.links(nodes);
             if (isNaN(nodes[0].x)) {
@@ -80,13 +76,12 @@ define([
                 .attr("class", "node")
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
-
             node.append("circle")
                 .attr("r", nodesize)
                 .on("mouseover", function() {
                     d3.select(this)
-                    .attr("r", nodeMouseOver)
-                    .attr("class", "nodeMouseOver")
+                        .attr("r", nodeMouseOver)
+                        .attr("class", "nodeMouseOver")
                 })
                 .on("click", function (d) {
                     d3.select(this)
@@ -94,13 +89,13 @@ define([
                     var nodeName = d.entitytypeid;
 
                     d3.select("#nodeCrud")
-                    .select("#nodeName")
-                    .text(nodeName);
+                        .select("#nodeName")
+                        .text(nodeName);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
-                    .attr("r", nodesize)
-                    .attr("class", "node");
+                        .attr("r", nodesize)
+                        .attr("class", "node");
                 });
 
 
