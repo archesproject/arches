@@ -37,7 +37,7 @@ define([
                 .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
             this.svg = d3.select(this.el).append("svg")
-                .attr("width", diameter)
+                .attr("width", "100%")
                 .attr("height", diameter - 150)
                 .call(d3.behavior.zoom().on("zoom", function() {
                     self.redraw();
