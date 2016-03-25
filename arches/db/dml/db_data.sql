@@ -158,6 +158,18 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
     VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', '',
             '99999999-0000-0000-0000-000000000000');
 
+INSERT INTO edges(domainnodeid, rangenodeid)
+    VALUES ('20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001');
+
+INSERT INTO edges(domainnodeid, rangenodeid)
+    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002');
+
+INSERT INTO edges(domainnodeid, rangenodeid)
+    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003');
+
+INSERT INTO edges(domainnodeid, rangenodeid)
+    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004');
+
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('99999999-0000-0000-0000-000000000000', 'n', '');
 
