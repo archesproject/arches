@@ -45,6 +45,10 @@ require([
         edges: viewModel.edges
     });
 
+    viewModel.graph.on('node-selected', function(node) {
+        viewModel.selectNode(node);
+    });
+
     viewModel.branchList = new BranchListView({
         el: $('#branch-library')
     });

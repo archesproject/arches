@@ -50,7 +50,8 @@ define([
             this.render();
         },
         render: function () {
-            var nodesize = 6;  //Default node size
+            var self = this;
+            var nodesize = 6;
             var nodeMouseOver = 8;
             var root;
             this.nodes().forEach(function (node) {
@@ -84,13 +85,7 @@ define([
                         .attr("class", "nodeMouseOver")
                 })
                 .on("click", function (d) {
-                    d3.select(this)
-
-                    var nodeName = d.entitytypeid;
-
-                    d3.select("#nodeCrud")
-                        .select("#nodeName")
-                        .text(nodeName);
+                    self.trigger('node-selected', d);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
