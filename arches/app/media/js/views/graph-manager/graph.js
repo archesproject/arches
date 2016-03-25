@@ -45,15 +45,17 @@ define([
                 .append("g")
 
             this.center = [(this.$el.width() / 2) - 220, this.$el.height() / 2];
-            
+
             this.svg.attr("transform", "translate(" + this.center[0] + "," + this.center[1] + "), rotate(0)");
 
             d3.select(this.el).style("height", $(window).height()-200 + "px");
 
             this.render();
 
+            this.addNodeListeners();
             this.nodes.subscribe(function() {
                 self.render();
+                this.addNodeListeners();
             });
             this.edges.subscribe(function() {
                 self.render();
@@ -90,15 +92,24 @@ define([
                 .data(nodes, function(d) { return d.nodeid });
 
             var node = allNodes.enter().append("g")
-                .attr("class", "node")
+                .attr("class", 'node')
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
+
+            allNodes.selectAll('circle').attr("class", function (d) {
+                    return d.selected() ? ' node-selected' : '';
+                });
 
             node.append("circle")
                 .attr("r", nodesize)
+                .attr("class", function (d) {
+                    return d.selected() ? ' node-selected' : '';
+                })
                 .on("mouseover", function() {
                     d3.select(this)
                         .attr("r", nodeMouseOver)
-                        .attr("class", "nodeMouseOver")
+                        .attr("class", function (d) {
+                            return 'node-over' + (d.selected() ? ' node-selected' : '');
+                        })
                 })
                 .on("click", function (d) {
                     self.trigger('node-selected', d);
@@ -106,7 +117,9 @@ define([
                 .on("mouseout", function(d) {
                     d3.select(this)
                         .attr("r", nodesize)
-                        .attr("class", "node");
+                        .attr("class", function (d) {
+                            return d.selected() ? ' node-selected' : '';
+                        });
                 });
 
 
@@ -114,17 +127,29 @@ define([
                 .attr("dy", ".31em")
                 .attr("class", "node-text")
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; });
+
+            allNodes.selectAll('text')
                 .text(function (d) {
-                    if(d.name.length > 13) {
-                        return d.name.substring(0,13)+'...';
+                    if(d.name().length > 13) {
+                        return d.name().substring(0,13)+'...';
                     }
-                    return d.name;
+                    return d.name();
                 });
 
             allNodes.exit()
                 .remove();
 
+        },
+        addNodeListeners: function () {
+            var self = this;
+            var nodes = this.nodes();
+
+            nodes.forEach(function (node) {
+                node.name.subscribe(function () {
+                    self.render();
+                });
+            });
         },
         redraw: function () {
             var xt = d3.event.translate[0] + this.center[0];

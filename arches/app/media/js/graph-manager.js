@@ -15,6 +15,7 @@ require([
 
     graphData.nodes.forEach(function (node) {
         node.selected = ko.observable(false);
+        node.name = ko.observable(node.name);
     });
 
     var viewModel = {
@@ -43,6 +44,10 @@ require([
         el: $('#graph'),
         nodes: viewModel.nodes,
         edges: viewModel.edges
+    });
+
+    viewModel.selectedNode.subscribe(function () {
+        viewModel.graph.render();
     });
 
     viewModel.graph.on('node-selected', function(node) {

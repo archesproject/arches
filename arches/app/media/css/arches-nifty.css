@@ -1045,6 +1045,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   font: 10px sans-serif;
 }
 
+.node .node-selected {
+  fill: steelblue;
+  font: 10px sans-serif;
+}
+
 .node-text {
 	font-size: 10px;
 	text-overflow: ellipsis;
@@ -1056,9 +1061,8 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   stroke-width: 1.5px;
 }
 
-.nodeMouseOver {
+.node .node-over {
 	stroke: navy;
-    fill: steelblue;
     cursor: pointer;
 }
 
