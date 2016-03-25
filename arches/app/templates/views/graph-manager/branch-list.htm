@@ -1,3 +1,7 @@
 {% extends "views/list.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+
+{% block title %}{{branch_list.title}}{% endblock %}
+
+{% block search_placeholder %}{{branch_list.search_placeholder}}{% endblock %}

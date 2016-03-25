@@ -24,13 +24,20 @@ from arches.app.models.resource_graphs import ResourceGraph
 
 @csrf_exempt
 def manager(request, nodeid):
-    graph = ResourceGraph({"nodes": [], "edges": []})
-    graph.get_graph_from_rootid(nodeid)
+    graph = ResourceGraph(nodeid)
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
         'node_list': {
             'title': _('Node List'),
             'search_placeholder': _('Find a node in the graph')
+        },
+        'permissions_list': {
+            'title': _('Permissions'),
+            'search_placeholder': _('Find a group or user account')
+        },
+        'branch_list': {
+            'title': _('Branch Library'),
+            'search_placeholder': _('Find a graph branch')
         }
     })

@@ -35,8 +35,8 @@
             'blueimp-helper': 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
             'chosen': 'https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
-            'isotope': 'https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.2/isotope.pkgd.min',
-            'isotope-packery': 'https://raw.githubusercontent.com/metafizzy/isotope-packery/master/packery-mode.pkgd'
+            'isotope': 'https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.2/isotope.pkgd',
+            'isotope-packery': 'https://cdn.rawgit.com/metafizzy/isotope-packery/master/packery-mode.pkgd',
         },
         shim: {
             'openlayers': {
@@ -46,7 +46,7 @@
     });
 
     // application wide require calls
-    require(["jquery"], function($) {
+    require(["jquery", 'isotope'], function($, Isotope) {
         var jQuery = $;
 
         // put values here that should be accessible application wide
