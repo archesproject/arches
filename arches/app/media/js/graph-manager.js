@@ -17,6 +17,7 @@ require([
         node.selected = ko.observable(false);
         node.filtered = ko.observable(false);
         node.editing = ko.observable(false);
+        node.name = ko.observable(node.name);
     });
 
     var viewModel = {
@@ -42,6 +43,14 @@ require([
         el: $('#graph'),
         nodes: viewModel.nodes,
         edges: viewModel.edges
+    });
+
+    viewModel.getEditedNode.subscribe(function () {
+        viewModel.graph.render();
+    });
+
+    viewModel.graph.on('node-selected', function(node) {
+        viewModel.editNode(node);
     });
 
     viewModel.branchList = new BranchListView({

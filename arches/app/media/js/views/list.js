@@ -24,7 +24,7 @@ define([
                 var filter = this.filter().toLowerCase();
                 this.items().forEach(function(item){
                     item.filtered(true);
-                    if(item.name.toLowerCase().indexOf(filter) !== -1){
+                    if(item.name().toLowerCase().indexOf(filter) !== -1){
                         item.filtered(false);
                     }
                 }, this);
