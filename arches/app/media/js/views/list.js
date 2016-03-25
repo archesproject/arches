@@ -32,8 +32,16 @@ define([
 
         },
 
+        selectItem: function(item, evt){
+            item.selected(!item.selected());
+            $(evt.currentTarget).toggleClass('selected-card');
+        },
+
         clearSelection: function(){
-            console.log('clear selection')
+            this.items().forEach(function(item){
+                item.selected(false);
+            }, this);
+            this.$el.find('.grid').children().removeClass('selected-card');
         },
 
         clearSearch: function(){
