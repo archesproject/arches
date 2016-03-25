@@ -24,8 +24,7 @@ from arches.app.models.resource_graphs import ResourceGraph
 
 @csrf_exempt
 def manager(request, nodeid):
-    graph = ResourceGraph({"nodes": [], "edges": []})
-    graph.get_graph_from_rootid(nodeid)
+    graph = ResourceGraph(nodeid)
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
