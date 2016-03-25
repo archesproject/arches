@@ -19,9 +19,9 @@ define([
                     var children = [];
 
                     edges.forEach(function(edge) {
-                        if (edge.rangenodeid === d.nodeid) {
+                        if (edge.domainnode_id === d.nodeid) {
                             nodes.forEach(function(node) {
-                                if (edge.rangenodeid === node.nodeid) {
+                                if (edge.rangenode_id === node.nodeid) {
                                     children.push(node);
                                 }
                             })

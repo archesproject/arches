@@ -96,10 +96,12 @@ class ResourceGraph(object):
 
         def get_related_edges_and_nodes(node):
             edges = archesmodels.Edge.objects.filter(domainnode=node)
-            self.edges = self.edges + edges
+            self.edges = self.edges + list(edges)
             for edge in edges:
                 self.nodes.append(edge.rangenode)
                 get_related_edges_and_nodes(edge.rangenode)
+
+        get_related_edges_and_nodes(root)
 
 
     def get_node_id_from_text(self):
