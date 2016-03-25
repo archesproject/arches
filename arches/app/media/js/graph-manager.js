@@ -16,6 +16,7 @@ require([
     graphData.nodes.forEach(function (node) {
         node.selected = ko.observable(false);
         node.filtered = ko.observable(false);
+        node.editing = ko.observable(false);
     });
 
     var viewModel = {
@@ -23,21 +24,18 @@ require([
         edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.selectNode = function (node) {
+    viewModel.editNode = function (node) {
         viewModel.nodes().forEach(function(node) {
-            node.selected(false);
+            node.editing(false);
         })
-        node.selected(true);
+        node.editing(true);
     };
 
-    viewModel.selectedNode = ko.computed(function() {
+    viewModel.getEditedNode = ko.computed(function() {
         var selection = null;
-        viewModel.nodes().forEach(function(node) {
-            if (node.selected()) {
-                selection = node;
-            }
-        })
-        return selection;
+        return _.find(viewModel.nodes(), function(node){
+            return node.editing();
+        }, this)
     });
 
     viewModel.graph = new GraphView({
