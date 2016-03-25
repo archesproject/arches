@@ -32,9 +32,13 @@ define([
 
         },
 
-        clear_selection: function(){
+        clearSelection: function(){
             console.log('clear selection')
         },
+
+        clearSearch: function(){
+            this.filter('');
+        }
 
     });
     

@@ -12,12 +12,12 @@
         <input type="text" class="form-control library-search" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'"> 
 
         <!-- Remove Search -->
-        <span class="clear-search" style=""><i class="fa fa-times-circle"></i></span>
+        <span class="clear-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
     </div>
 
     <!-- ko if: $data.single_select == false -->
     <div class="pad-rgt pad-btm clear-selection" style="">
-        <a class="clear-selection-link" style="" data-bind="click: clear_selection">clear selection</a>
+        <a class="clear-selection-link" style="" data-bind="click: clearSelection">clear selection</a>
     </div>
     <!-- /ko -->                                  
 
