@@ -11,7 +11,6 @@ define([
         single_select: true,
 
         initialize: function(options) {
-            console.log(options);
             var elem = this.$el.find('.grid')[0];
             this.isotopeContainer = new Isotope( elem, {
               // options
@@ -47,9 +46,7 @@ define([
         clearSearch: function(){
             this.filter('');
         }
-
     });
-    
 
     return ListView;
 });
