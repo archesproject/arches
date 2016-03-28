@@ -1046,6 +1046,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   font: 10px sans-serif;
 }
 
+.node .node-selected {
+  fill: yellow;
+  font: 10px sans-serif;
+}
+
 .node .node-editing {
   fill: steelblue;
   font: 10px sans-serif;
