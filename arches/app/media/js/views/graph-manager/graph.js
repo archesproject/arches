@@ -96,19 +96,19 @@ define([
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
             allNodes.selectAll('circle').attr("class", function (d) {
-                    return d.selected() ? ' node-selected' : '';
+                    return d.editing() ? ' node-selected' : '';
                 });
 
             node.append("circle")
                 .attr("r", nodesize)
                 .attr("class", function (d) {
-                    return d.selected() ? ' node-selected' : '';
+                    return d.editing() ? ' node-selected' : '';
                 })
                 .on("mouseover", function() {
                     d3.select(this)
                         .attr("r", nodeMouseOver)
                         .attr("class", function (d) {
-                            return 'node-over' + (d.selected() ? ' node-selected' : '');
+                            return 'node-over' + (d.editing() ? ' node-selected' : '');
                         })
                 })
                 .on("click", function (d) {
@@ -118,7 +118,7 @@ define([
                     d3.select(this)
                         .attr("r", nodesize)
                         .attr("class", function (d) {
-                            return d.selected() ? ' node-selected' : '';
+                            return d.editing() ? ' node-selected' : '';
                         });
                 });
 
