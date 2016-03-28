@@ -86,6 +86,13 @@ class Concept(models.Model):
         managed = True
         db_table = 'concepts'
 
+class DDataType(models.Model):
+    datatype = models.TextField(primary_key=True)
+    iconclass = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = 'd_data_types'
 
 class DLanguage(models.Model):
     languageid = models.TextField(primary_key=True)
@@ -331,3 +338,13 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class WidgetXDataType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    widget = models.ForeignKey(db_column='widgetid', to='models.Widget')
+    datatype = models.ForeignKey(db_column='datatypeid', to='models.DDataType')
+
+    class Meta:
+        managed = True
+        db_table = 'widgets_x_datatypes'

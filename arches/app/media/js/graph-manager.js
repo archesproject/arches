@@ -12,12 +12,18 @@ require([
     'bootstrap-nifty'
 ], function($, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
     var graphData = JSON.parse($('#graph-data').val());
+    var datatypes = JSON.parse($('#datatypes').val());
+    var datatypelookup = {}
+    _.each(datatypes, function(datatype){
+        datatypelookup[datatype.datatype] = datatype.iconclass;
+    }, this)
 
     graphData.nodes.forEach(function (node) {
         node.selected = ko.observable(false);
         node.filtered = ko.observable(false);
         node.editing = ko.observable(false);
         node.name = ko.observable(node.name);
+        node.iconclass = datatypelookup[node.datatype];
     });
 
     var viewModel = {

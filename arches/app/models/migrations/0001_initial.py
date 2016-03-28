@@ -215,6 +215,17 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='DDataType',
+            fields=[
+                ('datatype', models.TextField(primary_key=True, serialize=False)),
+                ('iconclass', models.TextField()),
+            ],
+            options={
+                'db_table': 'd_data_types',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='DLanguage',
             fields=[
                 ('languageid', models.TextField(primary_key=True, serialize=False)),
@@ -483,6 +494,18 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'widgets',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='WidgetXDataType',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('widget', models.ForeignKey(db_column='widgetid', to='models.Widget')),
+                ('datatype', models.ForeignKey(db_column='datatypeid', to='models.DDataType')),
+            ],
+            options={
+                'db_table': 'widgets_x_datatypes',
                 'managed': True,
             },
         ),

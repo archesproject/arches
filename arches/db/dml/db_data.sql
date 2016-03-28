@@ -92,6 +92,16 @@ INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 
 
+--Data types
+INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o');
+INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
+INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar');
+INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
+INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul');
+INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on');
+INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
+INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
+
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
@@ -136,26 +146,26 @@ INSERT INTO widgets(widgetid, name, template)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'datepicker.htm');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', '');
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', 'semantic');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', '',
+    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', 'semantic',
             '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', '',
+    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', 'string',
             '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', '',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', 'domain',
             '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', '',
+    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', 'string',
             '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO edges(domainnodeid, rangenodeid)
