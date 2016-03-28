@@ -33,7 +33,6 @@ require([
     };
 
     viewModel.getEditedNode = ko.computed(function() {
-        var selection = null;
         return _.find(viewModel.nodes(), function(node){
             return node.editing();
         }, this)
@@ -49,7 +48,7 @@ require([
         viewModel.graph.render();
     });
 
-    viewModel.graph.on('node-selected', function(node) {
+    viewModel.graph.on('node-clicked', function(node) {
         viewModel.editNode(node);
     });
 

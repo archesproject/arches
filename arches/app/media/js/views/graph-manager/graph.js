@@ -96,29 +96,29 @@ define([
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
             allNodes.selectAll('circle').attr("class", function (d) {
-                    return d.editing() ? ' node-selected' : '';
+                    return d.editing() ? ' node-editing' : '';
                 });
 
             node.append("circle")
                 .attr("r", nodesize)
                 .attr("class", function (d) {
-                    return d.editing() ? ' node-selected' : '';
+                    return d.editing() ? ' node-editing' : '';
                 })
                 .on("mouseover", function() {
                     d3.select(this)
                         .attr("r", nodeMouseOver)
                         .attr("class", function (d) {
-                            return 'node-over' + (d.editing() ? ' node-selected' : '');
+                            return 'node-over' + (d.editing() ? ' node-editing' : '');
                         })
                 })
                 .on("click", function (d) {
-                    self.trigger('node-selected', d);
+                    self.trigger('node-clicked', d);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
                         .attr("r", nodesize)
                         .attr("class", function (d) {
-                            return d.editing() ? ' node-selected' : '';
+                            return d.editing() ? ' node-editing' : '';
                         });
                 });
 
