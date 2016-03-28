@@ -21,13 +21,16 @@ from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models import models
 
 @csrf_exempt
 def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
+    datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
+        'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
             'title': _('Node List'),
             'search_placeholder': _('Find a node in the graph')
