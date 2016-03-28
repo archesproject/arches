@@ -15,20 +15,15 @@ define([
             this.tree = d3.layout.tree()
                 .children(function (d) {
                     var nodes = self.nodes();
-                    var edges = self.edges();
-                    var children = [];
-
-                    edges.forEach(function(edge) {
-                        if (edge.domainnode_id === d.nodeid) {
-                            nodes.forEach(function(node) {
-                                if (edge.rangenode_id === node.nodeid) {
-                                    children.push(node);
-                                }
-                            })
-                        }
-                    });
-
-                    return children;
+                    return self.edges()
+                        .filter(function (edge) {
+                            return edge.domainnode_id === d.nodeid;
+                        })
+                        .map(function (edge) {
+                            return nodes.find(function (node) {
+                                return edge.rangenode_id === node.nodeid;
+                            });
+                        });
                 })
                 .size([360, diameter / 2 ])
                 .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
