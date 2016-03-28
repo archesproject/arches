@@ -15,6 +15,8 @@ require([
 
     graphData.nodes.forEach(function (node) {
         node.selected = ko.observable(false);
+        node.filtered = ko.observable(false);
+        node.editing = ko.observable(false);
         node.name = ko.observable(node.name);
     });
 
@@ -23,21 +25,18 @@ require([
         edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.selectNode = function (node) {
+    viewModel.editNode = function (node) {
         viewModel.nodes().forEach(function(node) {
-            node.selected(false);
+            node.editing(false);
         })
-        node.selected(true);
+        node.editing(true);
     };
 
-    viewModel.selectedNode = ko.computed(function() {
+    viewModel.getEditedNode = ko.computed(function() {
         var selection = null;
-        viewModel.nodes().forEach(function(node) {
-            if (node.selected()) {
-                selection = node;
-            }
-        })
-        return selection;
+        return _.find(viewModel.nodes(), function(node){
+            return node.editing();
+        }, this)
     });
 
     viewModel.graph = new GraphView({
@@ -46,12 +45,12 @@ require([
         edges: viewModel.edges
     });
 
-    viewModel.selectedNode.subscribe(function () {
+    viewModel.getEditedNode.subscribe(function () {
         viewModel.graph.render();
     });
 
     viewModel.graph.on('node-selected', function(node) {
-        viewModel.selectNode(node);
+        viewModel.editNode(node);
     });
 
     viewModel.branchList = new BranchListView({

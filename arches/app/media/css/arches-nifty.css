@@ -1021,6 +1021,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 	font-size: 9px;
 	float: right;
 	color: #ddd;
+    cursor: pointer;
 }
 
 .clear-selection-link:hover {
