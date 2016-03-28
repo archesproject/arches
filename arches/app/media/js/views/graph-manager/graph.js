@@ -96,7 +96,7 @@ define([
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
             allNodes.selectAll('circle').attr("class", function (d) {
-                    return d.editing() ? ' node-editing' : '';
+                    return d.editing() ? ' node-editing' : (d.selected() ? ' node-selected' : '');
                 });
 
             node.append("circle")
@@ -111,8 +111,11 @@ define([
                             return 'node-over' + (d.editing() ? ' node-editing' : '');
                         })
                 })
-                .on("click", function (d) {
-                    self.trigger('node-clicked', d);
+                .on("click", function (node) {
+                    self.nodes().forEach(function (node) {
+                        node.editing(false);
+                    });
+                    node.editing(true);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)

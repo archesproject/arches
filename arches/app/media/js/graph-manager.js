@@ -25,17 +25,14 @@ require([
         edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.editNode = function (node) {
-        viewModel.nodes().forEach(function(node) {
-            node.editing(false);
-        })
-        node.editing(true);
-    };
-
-    viewModel.getEditedNode = ko.computed(function() {
-        return _.find(viewModel.nodes(), function(node){
+    viewModel.onNodeStateChange = ko.computed(function() {
+        var editNode = _.find(viewModel.nodes(), function(node){
             return node.editing();
         }, this)
+        var selectedNodes = _.filter(viewModel.nodes(), function(node){
+            return node.selected();
+        }, this)
+        return {editNode: editNode, selectedNodes: selectedNodes}
     });
 
     viewModel.graph = new GraphView({
@@ -44,12 +41,8 @@ require([
         edges: viewModel.edges
     });
 
-    viewModel.getEditedNode.subscribe(function () {
+    viewModel.onNodeStateChange.subscribe(function () {
         viewModel.graph.render();
-    });
-
-    viewModel.graph.on('node-clicked', function(node) {
-        viewModel.editNode(node);
     });
 
     viewModel.branchList = new BranchListView({
