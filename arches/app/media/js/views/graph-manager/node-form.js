@@ -7,6 +7,9 @@ define([
             var self = this;
             this.node = ko.observable(null);
             _.extend(this, _.pick(options, 'node'));
+        },
+        close: function() {
+            this.node().editing(false);
         }
     });
     return NodeFormView;
