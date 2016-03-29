@@ -31,14 +31,18 @@ require([
         edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.onNodeStateChange = ko.computed(function() {
+    viewModel.editNode = ko.computed(function() {
         var editNode = _.find(viewModel.nodes(), function(node){
             return node.editing();
         }, this)
+        return editNode;
+    });
+
+    viewModel.selectedNodes = ko.computed(function() {
         var selectedNodes = _.filter(viewModel.nodes(), function(node){
             return node.selected();
         }, this)
-        return {editNode: editNode, selectedNodes: selectedNodes}
+        return selectedNodes;
     });
 
     viewModel.graph = new GraphView({
@@ -47,7 +51,9 @@ require([
         edges: viewModel.edges
     });
 
-    viewModel.onNodeStateChange.subscribe(function () {
+    ko.computed(function() {
+        viewModel.editNode();
+        viewModel.selectedNodes();
         viewModel.graph.render();
     });
 
