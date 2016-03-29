@@ -1,6 +1,7 @@
 define([
-    'backbone'
-], function(Backbone) {
+    'backbone',
+    'knockout'
+], function(Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
