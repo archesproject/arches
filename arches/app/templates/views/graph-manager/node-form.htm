@@ -3,7 +3,7 @@
 <!-- ko if: node -->
 <p><span id="nodeName" data-bind="text: node().name"></span></p>
 <div class="relative">
-    <a id="node-crud-close" href="" class="library-close-btn fa fa-times fa-lg" style="margin-top: -5px;"></a>
+    <a id="node-crud-close" href="" class="library-close-btn fa fa-times fa-lg" style="margin-top: -5px;" data-bind="click: function () { node().editing(false) }"></a>
 </div>
 
 <div class="">
