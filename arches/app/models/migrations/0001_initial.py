@@ -164,7 +164,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BranchMetadata',
             fields=[
-                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, editable=False, primary_key=True)),
+                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
                 ('deploymentfile', models.TextField(null=True, blank=True)),
                 ('author', models.TextField(null=True, blank=True)),
