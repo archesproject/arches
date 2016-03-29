@@ -34,14 +34,14 @@ require([
     viewModel.editNode = ko.computed(function() {
         var editNode = _.find(viewModel.nodes(), function(node){
             return node.editing();
-        }, this)
+        }, this);
         return editNode;
     });
 
     viewModel.selectedNodes = ko.computed(function() {
         var selectedNodes = _.filter(viewModel.nodes(), function(node){
             return node.selected();
-        }, this)
+        }, this);
         return selectedNodes;
     });
 
