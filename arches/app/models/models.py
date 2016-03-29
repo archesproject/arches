@@ -37,7 +37,7 @@ class Address(models.Model):
 
 class BranchMetadata(models.Model):
     branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)  # This field type is a guess.
-    name = models.BigIntegerField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
