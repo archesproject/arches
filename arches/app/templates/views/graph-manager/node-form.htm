@@ -3,31 +3,31 @@
 <!-- ko if: node -->
 <p><span id="nodeName" data-bind="text: node().name"></span></p>
 <div class="relative">
-    <a id="node-crud-close" href="" class="library-close-btn fa fa-times fa-lg" style="margin-top: -5px;" data-bind="click: close"></a>
+    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
 </div>
 
-<div class="">
+<div>
 
-    <hr class="section-division-dark node-section-division" style="">
-    <div class="node-section" style="">
+    <hr class="section-division-dark node-section-division">
+    <div class="node-section">
 
-        <div class="" style="padding-bottom: 25px;">
+        <div style="padding-bottom: 25px;">
 
-            <div class="node-widget-label" style="">
+            <div class="node-widget-label">
                 <div class="control-label">
                     Node Name
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label node-input-widget" style="">
-                    <input type="text" placeholder="Enter node name here..." id="" class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
+                <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
+                    <input type="text" placeholder="Enter node name here..." class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
                 </div>
             </div>
 
-            <div class="node-widget-label" style="">
+            <div class="node-widget-label">
                 <div class="control-label">
                     CRM Class
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                    <select class="design" data-placeholder="" id="crm" tabindex="0">
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select class="design" id="crm" tabindex="0">
                         <option>E1 CRM Entity</option>
                         <option>E2 Temporal Entity</option>
                         <option>E3 Condition State</option>
@@ -40,12 +40,12 @@
                 </div>
             </div>
 
-            <div class="node-widget-label" style="">
+            <div class="node-widget-label">
                 <div class="control-label">
                     Relation to parent
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                    <select class="design" data-placeholder="" id="property" tabindex="0">
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select class="design" id="property" tabindex="0">
                         <option>P1 Is identified by</option>
                         <option>P2 Has type</option>
                         <option>P3 Has note</option>
@@ -56,12 +56,12 @@
                 </div>
             </div>
 
-            <div class="node-widget-label" style="">
+            <div class="node-widget-label">
                 <div class="control-label">
                     Data type
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                    <select class="design" data-placeholder="" id="data-type" tabindex="0">
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select class="design" id="data-type" tabindex="0">
                         <option>Semantic</option>
                         <option>String</option>
                         <option>Number</option>
@@ -75,12 +75,12 @@
                 </div>
             </div>
 
-            <div class="node-widget-label" style="">
+            <div class="node-widget-label">
                 <div class="control-label">
                     Group
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label" style="">
-                    <select class="design" data-placeholder="" id="node-group" tabindex="0">
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select class="design" id="node-group" tabindex="0">
                         <option>Geospatial coordinates</option>
                         <option>Geometry type</option>
                         <option>Address</option>
@@ -93,30 +93,30 @@
 
     </div>
 
-    <hr class="section-division-dark node-section-division" style="">
-    <div class="node-section" style="">
+    <hr class="section-division-dark node-section-division">
+    <div class="node-section">
 
-        <div class="" style="">
+        <div>
 
-            <div class="" style="padding-bottom: 15px;">
+            <div style="padding-bottom: 15px;">
 
-                <input id="node-required" class="arches-switch" type="checkbox" checked="" data-switchery="true" style="display: none;">
-                <p class="" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
+                <input id="node-required" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
+                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
                     Required
                 </p>
-                <span class="" style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
                     Users are required to provide a value for this node
                 </span>
 
             </div>
 
-            <div class="" style="padding-bottom: 15px;">
+            <div style="padding-bottom: 15px;">
 
-                <input id="node-cardinality" class="arches-switch" type="checkbox" checked="" data-switchery="true" style="display: none;">
-                <p class="" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
+                <input id="node-cardinality" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
+                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
                     Repeatable
                 </p>
-                <span class="" style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
                     Users may enter multiple values for this node
                 </span>
 
