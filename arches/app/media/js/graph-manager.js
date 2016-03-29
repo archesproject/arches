@@ -34,7 +34,8 @@ require([
 
     var viewModel = {
         nodes: ko.observableArray(graphData.nodes),
-        edges: ko.observableArray(graphData.edges)
+        edges: ko.observableArray(graphData.edges),
+        branches: ko.observableArray(branches)
     };
 
     viewModel.onNodeStateChange = ko.computed(function() {
@@ -59,7 +60,7 @@ require([
 
     viewModel.branchList = new BranchListView({
         el: $('#branch-library'),
-        branches: branches
+        branches: viewModel.branches
     });
 
     viewModel.nodeList = new NodeListView({
