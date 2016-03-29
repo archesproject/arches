@@ -71,7 +71,8 @@ require([
     });
 
     viewModel.nodeForm = new NodeFormView({
-        el: $('#nodeCrud')
+        el: $('#nodeCrud'),
+        node: viewModel.editNode
     });
 
     viewModel.permissionsForm = new PermissionsFormView({
