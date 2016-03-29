@@ -16,6 +16,6 @@
         <a class="listitem_name" data-bind="text: $data.name">
         </a>
     </div>
-    <div class="library-card-subtitle delete" data-bind="text: $data.description">
+    <div class="library-card-subtitle" data-bind="text: $data.datatype.toLowerCase() + '; ' + $data.ontologyclass">
     </div>
 {% endblock %}

@@ -160,7 +160,7 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E1', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55', 'domain',
             '99999999-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
