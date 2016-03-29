@@ -1,23 +1,14 @@
 define([
     'jquery',
     'backbone',
-    'knockout',
-    'isotope',
-    'isotope-packery'
-], function($, Backbone, ko, Isotope) {
+    'knockout'
+], function($, Backbone, ko) {
     var ListView = Backbone.View.extend({
 
         items: ko.observableArray(),
         single_select: true,
 
         initialize: function(options) {
-            var elem = this.$el.find('.grid')[0];
-            this.isotopeContainer = new Isotope( elem, {
-              // options
-              itemSelector: '.grid-item',
-              layoutMode: 'packery'
-            });
-
             this.filter = ko.observable('');
             this.filter.subscribe(function(newValue){
                 var filter = this.filter().toLowerCase();

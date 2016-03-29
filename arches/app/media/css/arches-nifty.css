@@ -586,6 +586,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 
 /* Grid Classes  */
+.grid-container {
+  margin-left: 5px; 
+  overflow: scroll;
+}
+
 .grid {
   background: #DDD;
   max-width: 1200px;
@@ -888,6 +893,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 	white-space: nowrap;
   	overflow: hidden;
   	text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 .permission-level-icon {
