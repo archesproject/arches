@@ -20,6 +20,8 @@ import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
+from arches.management.commands.package_utils import resource_graphs
+from arches.app.models.models import Node
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -32,12 +34,12 @@ class ResourceGraphTests(ArchesTestCase):
         Test that correct number of nodes load
 
         """
-        from arches.management.commands.package_utils import resource_graphs
-        from arches.app.models.models import Node
+
+        count_before = Node.objects.count()
 
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
-        self.assertEqual(Node.objects.count(), 117)
+        self.assertEqual(Node.objects.count()-count_before, 112)
 
 
     # def test_intial_edge_import(self):
