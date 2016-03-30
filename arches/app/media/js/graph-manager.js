@@ -10,8 +10,9 @@ require([
     'views/graph-manager/node-form',
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
+    'models/node',
     'bootstrap-nifty'
-], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
     var graphData = JSON.parse($('#graph-data').val());
     var datatypes = JSON.parse($('#datatypes').val());
     var datatypelookup = {}
@@ -19,27 +20,8 @@ require([
         datatypelookup[datatype.datatype] = datatype.iconclass;
     }, this)
 
-    var resetNode = function(source, target) {
-        target._node = JSON.stringify(source)
-        target.selected = ko.observable(false);
-        target.filtered = ko.observable(false);
-        target.editing = ko.observable(false);
-        target.name = ko.observable(source.name);
-        target.iconclass = datatypelookup[source.datatype];
-        target.reset = function () {
-            resetNode(JSON.parse(target._node), target);
-        };
-        target.json = ko.computed(function() {
-            return JSON.stringify(_.extend(JSON.parse(target._node), {
-                name: target.name()
-            }))
-        });
-        target.dirty = ko.computed(function() {
-            return target.json() !== target._node;
-        });
-    }
-    graphData.nodes.forEach(function (node) {
-        resetNode(node, node);
+    graphData.nodes.forEach(function (node, i) {
+        graphData.nodes[i] = new NodeModel(node, datatypelookup);
     });
 
     var viewModel = {
