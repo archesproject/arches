@@ -90,33 +90,35 @@ define([
                 .attr("class", 'node')
                 .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
 
+            var getNodeClass = function (d, className) {
+                className += d.editing() ? ' node-editing' : '';
+                className += d.selected() ? ' node-selected' : '';
+                return className;
+            }
             allNodes.selectAll('circle').attr("class", function (d) {
-                    return d.editing() ? ' node-editing' : (d.selected() ? ' node-selected' : '');
+                    return getNodeClass(d, '');
                 });
 
             node.append("circle")
                 .attr("r", nodesize)
                 .attr("class", function (d) {
-                    return d.editing() ? ' node-editing' : '';
+                    return getNodeClass(d, '');
                 })
                 .on("mouseover", function() {
                     d3.select(this)
                         .attr("r", nodeMouseOver)
                         .attr("class", function (d) {
-                            return 'node-over' + (d.editing() ? ' node-editing' : '');
+                            return getNodeClass(d, 'node-over');
                         })
                 })
                 .on("click", function (node) {
-                    self.nodes().forEach(function (node) {
-                        node.editing(false);
-                    });
-                    node.editing(true);
+                    self.trigger('node-clicked', node);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
                         .attr("r", nodesize)
                         .attr("class", function (d) {
-                            return d.editing() ? ' node-editing' : '';
+                            return getNodeClass(d, '');
                         });
                 });
 
