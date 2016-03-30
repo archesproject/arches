@@ -60,14 +60,6 @@ define([
                     self.render();
                 });
             });
-        },
-        redraw: function () {
-            var xt = d3.event.translate[0] + this.center[0];
-            var yt = d3.event.translate[1] + this.center[1];
-
-            this.svg.attr("transform",
-                "translate(" + xt + "," + yt + ")" +
-                " scale(" + d3.event.scale + ")");
         }
     });
     return GraphView;
