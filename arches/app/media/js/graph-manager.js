@@ -22,7 +22,10 @@ require([
     }, this)
 
     graphData.nodes.forEach(function (node, i) {
-        graphData.nodes[i] = new NodeModel(node, datatypelookup);
+        graphData.nodes[i] = new NodeModel({
+            source: node,
+            datatypelookup: datatypelookup
+        });
     });
 
     branches.forEach(function(branch){
@@ -65,6 +68,43 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         node: viewModel.editNode
+    });
+
+    var getEdges = function (node) {
+        var edges = viewModel.edges()
+            .filter(function (edge) {
+                return edge.domainnode_id === node.nodeid;
+            });
+        var nodes = edges.map(function (edge) {
+            return viewModel.nodes().find(function (node) {
+                return edge.rangenode_id === node.nodeid;
+            });
+        });
+        nodes.forEach(function (node) {
+            edges = edges.concat(getEdges(node));
+        });
+        return edges
+    };
+
+    viewModel.nodeForm.on('node-deleted', function (node) {
+        var edges = getEdges(node);
+        var nodes = edges.map(function (edge) {
+            return viewModel.nodes().find(function (node) {
+                return edge.rangenode_id === node.nodeid;
+            });
+        });
+        var edge = viewModel.edges()
+            .find(function (edge) {
+                return edge.rangenode_id === node.nodeid;
+            });
+        nodes.push(node);
+        edges.push(edge);
+        viewModel.edges.remove(function (edge) {
+            return _.contains(edges, edge);
+        });
+        viewModel.nodes.remove(function (node) {
+            return _.contains(nodes, node);
+        });
     });
 
     viewModel.graph.on('node-clicked', function (node) {
