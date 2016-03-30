@@ -31,7 +31,6 @@ def load_graphs(break_on_error=True, settings=None, path=None):
         graph_location = [path]
 
     for path in graph_location:
-        print os.path.exists(path)
         if os.path.exists(path):
             print '\nLOADING GRAPHS (%s)' % (path)
             print '---------------'
