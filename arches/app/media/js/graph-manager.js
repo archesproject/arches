@@ -1,5 +1,6 @@
 require([
     'jquery',
+    'underscore',
     'knockout',
     'views/page-view',
     'views/graph-manager/graph',
@@ -10,7 +11,7 @@ require([
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
     'bootstrap-nifty'
-], function($, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
     var graphData = JSON.parse($('#graph-data').val());
     var datatypes = JSON.parse($('#datatypes').val());
     var datatypelookup = {}
@@ -18,12 +19,27 @@ require([
         datatypelookup[datatype.datatype] = datatype.iconclass;
     }, this)
 
+    var resetNode = function(source, target) {
+        target._node = JSON.stringify(source)
+        target.selected = ko.observable(false);
+        target.filtered = ko.observable(false);
+        target.editing = ko.observable(false);
+        target.name = ko.observable(source.name);
+        target.iconclass = datatypelookup[source.datatype];
+        target.reset = function () {
+            resetNode(JSON.parse(target._node), target);
+        };
+        target.json = ko.computed(function() {
+            return JSON.stringify(_.extend(JSON.parse(target._node), {
+                name: target.name()
+            }))
+        });
+        target.dirty = ko.computed(function() {
+            return target.json() !== target._node;
+        });
+    }
     graphData.nodes.forEach(function (node) {
-        node.selected = ko.observable(false);
-        node.filtered = ko.observable(false);
-        node.editing = ko.observable(false);
-        node.name = ko.observable(node.name);
-        node.iconclass = datatypelookup[node.datatype];
+        resetNode(node, node);
     });
 
     var viewModel = {
