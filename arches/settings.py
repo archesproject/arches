@@ -262,7 +262,6 @@ INSTALLED_APPS = (
     'arches',
     'arches.app.models',
     'arches.management',
-    'django_nose',
 )
 
 MIDDLEWARE_CLASSES = (
