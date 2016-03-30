@@ -39,6 +39,14 @@ define(['knockout'], function (ko) {
 
         reset: function () {
             this.parse(JSON.parse(this._node()), self);
+        },
+
+        save: function (callback) {
+            callback(false);
+        },
+
+        remove: function (callback) {
+            callback(false);
         }
     };
 

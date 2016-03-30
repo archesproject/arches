@@ -10,8 +10,16 @@
 
     <hr class="section-division-dark node-section-division">
 
+    <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
+        <i class="fa fa-spinner fa-spin"> </i> <span> Loading...</span>
+    </div>
+
     <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
         <span>You have pending edits. Please save or cancel your edits before closing.</span>
+    </div>
+
+    <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
+        <span>We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.</span>
     </div>
 
     <div class="node-section">
@@ -132,11 +140,11 @@
     </div>
 
     <div class="pull-right">
-        <button class="btn btn-primary btn-sm btn-labeled fa fa-check"> Save</button>
+        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
         <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
     </div>
     <div class="pull-right" style="margin-top:5px;">
-        <button class="btn btn-danger btn-sm btn-labeled fa fa-times"> Delete</button>
+        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:remove"> Delete</button>
     </div>
 </div>
 <!-- /ko -->
