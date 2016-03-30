@@ -29,7 +29,7 @@
 
             <!-- Card -->
             <!-- ko foreach: $data.items -->
-                <div class="library-card graph-library" data-bind="visible: $data.filtered() == false, click: $parent.selectItem">
+                <div class="library-card graph-library" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent)">
                     {% block listitem %}{% endblock %}
                 </div>
 
