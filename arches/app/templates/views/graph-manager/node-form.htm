@@ -9,6 +9,11 @@
 <div>
 
     <hr class="section-division-dark node-section-division">
+
+    <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
+        <span>You have pending edits. Please save or cancel your edits before closing.</span>
+    </div>
+
     <div class="node-section">
 
         <div style="padding-bottom: 25px;">
@@ -21,6 +26,7 @@
                     <input type="text" placeholder="Enter node name here..." class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
                 </div>
             </div>
+
 
             <div class="node-widget-label">
                 <div class="control-label">
@@ -127,6 +133,9 @@
 
     <div class="pull-right">
         <button class="btn btn-primary btn-sm btn-labeled fa fa-check"> Save</button>
+        <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
+    </div>
+    <div class="pull-right" style="margin-top:5px;">
         <button class="btn btn-danger btn-sm btn-labeled fa fa-times"> Delete</button>
     </div>
 </div>
