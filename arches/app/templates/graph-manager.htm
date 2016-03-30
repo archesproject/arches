@@ -56,7 +56,7 @@ Configuration Manager
 						<div id="graph" class="" style=""></div>
 
 						<!-- Node Editor -->
-						<div id="nodeCrud" class="hidden" style="" class="ui-widget-content" data-bind="with: nodeForm">
+						<div id="nodeCrud" data-bind="visible: editNode(), with: nodeForm" style="display: none;" class="ui-widget-content">
                             {% include 'views/graph-manager/node-form.htm' %}
 						</div>
 
@@ -112,7 +112,7 @@ Configuration Manager
 						</div>
 
 						<!-- Graph Library -->
-						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: branchInfo">
+						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.showingForm, with: branchList.selectedItem">
                             {% include 'views/graph-manager/branch-info.htm' %}
 						</div>
 

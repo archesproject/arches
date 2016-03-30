@@ -111,7 +111,7 @@ class Command(BaseCommand):
             self.export_resources(package_name, options['dest_dir'])
 
         if options['operation'] == 'import_json':
-            self.import_json(options['source'])
+            self.import_json(package_name, options['source'])
 
     def setup(self, package_name):
         """
@@ -328,7 +328,8 @@ class Command(BaseCommand):
         Imports objects from arches.json.
 
         """
-        resource_graphs.load_graphs(data_source)
+        data_source = None if data_source == '' else data_source
+        resource_graphs.load_graphs(path=data_source)
 
     def start_livereload(self):
         from livereload import Server

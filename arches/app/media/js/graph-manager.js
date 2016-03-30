@@ -1,5 +1,6 @@
 require([
     'jquery',
+    'underscore',
     'knockout',
     'views/page-view',
     'views/graph-manager/graph',
@@ -9,43 +10,37 @@ require([
     'views/graph-manager/node-form',
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
+    'models/node',
     'bootstrap-nifty'
-], function($, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
     var graphData = JSON.parse($('#graph-data').val());
-    var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
     var datatypelookup = {}
     _.each(datatypes, function(datatype){
         datatypelookup[datatype.datatype] = datatype.iconclass;
     }, this)
 
-    graphData.nodes.forEach(function (node) {
-        node.selected = ko.observable(false);
-        node.filtered = ko.observable(false);
-        node.editing = ko.observable(false);
-        node.name = ko.observable(node.name);
-        node.iconclass = datatypelookup[node.datatype];
+    graphData.nodes.forEach(function (node, i) {
+        graphData.nodes[i] = new NodeModel(node, datatypelookup);
     });
-
-    branches.forEach(function(branch){
-        branch.selected = ko.observable(false);
-        branch.filtered = ko.observable(false);
-    }, this);
 
     var viewModel = {
         nodes: ko.observableArray(graphData.nodes),
-        edges: ko.observableArray(graphData.edges),
-        branches: ko.observableArray(branches)
+        edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.onNodeStateChange = ko.computed(function() {
+    viewModel.editNode = ko.computed(function() {
         var editNode = _.find(viewModel.nodes(), function(node){
             return node.editing();
-        }, this)
+        }, this);
+        return editNode;
+    });
+
+    viewModel.selectedNodes = ko.computed(function() {
         var selectedNodes = _.filter(viewModel.nodes(), function(node){
             return node.selected();
-        }, this)
-        return {editNode: editNode, selectedNodes: selectedNodes}
+        }, this);
+        return selectedNodes;
     });
 
     viewModel.graph = new GraphView({
@@ -54,13 +49,30 @@ require([
         edges: viewModel.edges
     });
 
-    viewModel.onNodeStateChange.subscribe(function () {
+    ko.computed(function() {
+        viewModel.editNode();
+        viewModel.selectedNodes();
         viewModel.graph.render();
     });
 
+    viewModel.nodeForm = new NodeFormView({
+        el: $('#nodeCrud'),
+        node: viewModel.editNode
+    });
+
+    viewModel.graph.on('node-clicked', function (node) {
+        if (viewModel.editNode() && viewModel.editNode().dirty()) {
+            viewModel.nodeForm.closeClicked(true);
+            return;
+        }
+        viewModel.nodes().forEach(function (node) {
+            node.editing(false);
+        });
+        node.editing(true);
+    });
+
     viewModel.branchList = new BranchListView({
-        el: $('#branch-library'),
-        branches: viewModel.branches
+        el: $('#branch-library')
     });
 
     viewModel.nodeList = new NodeListView({
@@ -70,10 +82,6 @@ require([
 
     viewModel.permissionsList = new PermissionsListView({
         el: $('#node-permissions')
-    });
-
-    viewModel.nodeForm = new NodeFormView({
-        el: $('#nodeCrud')
     });
 
     viewModel.permissionsForm = new PermissionsFormView({

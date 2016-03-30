@@ -821,7 +821,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .library-close-btn {
 	position: absolute;
 	right: 15px;
-	top: 20px;
+    top: -20px;
 	color: #ddd;
 }
 
