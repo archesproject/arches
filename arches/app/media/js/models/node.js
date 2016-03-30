@@ -3,6 +3,12 @@ define(['knockout'], function (ko) {
         var self = this;
         self.datatypelookup = datatypelookup;
 
+        self._node = ko.observable('');
+        self.selected = ko.observable(false);
+        self.filtered = ko.observable(false);
+        self.editing = ko.observable(false);
+        self.name = ko.observable('');
+
         self.parse(source);
 
         self.json = ko.computed(function() {
@@ -21,11 +27,8 @@ define(['knockout'], function (ko) {
 
         parse: function(source) {
             var self = this;
-            self._node = ko.observable(JSON.stringify(source));
-            self.selected = ko.observable(false);
-            self.filtered = ko.observable(false);
-            self.editing = ko.observable(false);
-            self.name = ko.observable(source.name);
+            self._node(JSON.stringify(source));
+            self.name(source.name);
 
             self.nodeid = source.nodeid;
             self.datatype = source.datatype;
@@ -35,7 +38,7 @@ define(['knockout'], function (ko) {
         },
 
         reset: function () {
-            self.parse(JSON.parse(self._node()), self);
+            this.parse(JSON.parse(this._node()), self);
         }
     };
 
