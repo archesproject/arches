@@ -56,7 +56,7 @@ Configuration Manager
 						<div id="graph" class="" style=""></div>
 
 						<!-- Node Editor -->
-						<div id="nodeCrud" class="hidden" style="" class="ui-widget-content" data-bind="with: nodeForm">
+						<div id="nodeCrud" data-bind="visible: editNode(), with: nodeForm" style="display: none;" class="ui-widget-content">
                             {% include 'views/graph-manager/node-form.htm' %}
 						</div>
 

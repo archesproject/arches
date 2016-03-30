@@ -1,5 +1,6 @@
 require([
     'jquery',
+    'underscore',
     'knockout',
     'views/page-view',
     'views/graph-manager/graph',
@@ -9,8 +10,9 @@ require([
     'views/graph-manager/node-form',
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
+    'models/node',
     'bootstrap-nifty'
-], function($, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
     var graphData = JSON.parse($('#graph-data').val());
     var datatypes = JSON.parse($('#datatypes').val());
     var datatypelookup = {}
@@ -18,12 +20,8 @@ require([
         datatypelookup[datatype.datatype] = datatype.iconclass;
     }, this)
 
-    graphData.nodes.forEach(function (node) {
-        node.selected = ko.observable(false);
-        node.filtered = ko.observable(false);
-        node.editing = ko.observable(false);
-        node.name = ko.observable(node.name);
-        node.iconclass = datatypelookup[node.datatype];
+    graphData.nodes.forEach(function (node, i) {
+        graphData.nodes[i] = new NodeModel(node, datatypelookup);
     });
 
     var viewModel = {
@@ -31,14 +29,18 @@ require([
         edges: ko.observableArray(graphData.edges)
     };
 
-    viewModel.onNodeStateChange = ko.computed(function() {
+    viewModel.editNode = ko.computed(function() {
         var editNode = _.find(viewModel.nodes(), function(node){
             return node.editing();
-        }, this)
+        }, this);
+        return editNode;
+    });
+
+    viewModel.selectedNodes = ko.computed(function() {
         var selectedNodes = _.filter(viewModel.nodes(), function(node){
             return node.selected();
-        }, this)
-        return {editNode: editNode, selectedNodes: selectedNodes}
+        }, this);
+        return selectedNodes;
     });
 
     viewModel.graph = new GraphView({
@@ -47,7 +49,9 @@ require([
         edges: viewModel.edges
     });
 
-    viewModel.onNodeStateChange.subscribe(function () {
+    ko.computed(function() {
+        viewModel.editNode();
+        viewModel.selectedNodes();
         viewModel.graph.render();
     });
 
@@ -65,7 +69,8 @@ require([
     });
 
     viewModel.nodeForm = new NodeFormView({
-        el: $('#nodeCrud')
+        el: $('#nodeCrud'),
+        node: viewModel.editNode
     });
 
     viewModel.permissionsForm = new PermissionsFormView({
