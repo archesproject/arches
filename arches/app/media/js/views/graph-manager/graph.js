@@ -112,10 +112,7 @@ define([
                         })
                 })
                 .on("click", function (node) {
-                    self.nodes().forEach(function (node) {
-                        node.editing(false);
-                    });
-                    node.editing(true);
+                    self.trigger('node-clicked', node);
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
