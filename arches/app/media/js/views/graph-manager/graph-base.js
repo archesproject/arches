@@ -39,7 +39,7 @@ define([
                 }))
                 .append("g")
 
-            this.center = [(this.$el.width() / 2) - 220, this.$el.height() / 2];
+            this.center = [(this.$el.width() / 2), this.$el.height() / 2];
 
             this.svg.attr("transform", "translate(" + this.center[0] + "," + this.center[1] + "), rotate(0)");
 
