@@ -50,7 +50,7 @@ define([
             this.addNodeListeners();
             this.nodes.subscribe(function() {
                 self.render();
-                this.addNodeListeners();
+                self.addNodeListeners();
             });
             this.edges.subscribe(function() {
                 self.render();

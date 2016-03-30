@@ -1,29 +1,33 @@
-define(['knockout'], function (ko) {
-    var NodeModel = function(source, datatypelookup) {
-        var self = this;
-        self.datatypelookup = datatypelookup;
+define([
+    'knockout',
+    'models/abstract',
+    'arches'
+], function (ko, AbstractModel, arches) {
+    return AbstractModel.extend({
+        url: arches.urls.node,
 
-        self._node = ko.observable('');
-        self.selected = ko.observable(false);
-        self.filtered = ko.observable(false);
-        self.editing = ko.observable(false);
-        self.name = ko.observable('');
+        initialize: function (options) {
+            var self = this;
+            self.datatypelookup = options.datatypelookup;
 
-        self.parse(source);
+            self._node = ko.observable('');
+            self.selected = ko.observable(false);
+            self.filtered = ko.observable(false);
+            self.editing = ko.observable(false);
+            self.name = ko.observable('');
 
-        self.json = ko.computed(function() {
-            return JSON.stringify(_.extend(JSON.parse(self._node()), {
-                name: self.name()
-            }))
-        });
+            self.parse(options.source);
 
-        self.dirty = ko.computed(function() {
-            return self.json() !== self._node();
-        });
-    };
+            self.json = ko.computed(function() {
+                return JSON.stringify(_.extend(JSON.parse(self._node()), {
+                    name: self.name()
+                }))
+            });
 
-    NodeModel.prototype = {
-        constructor: NodeModel,
+            self.dirty = ko.computed(function() {
+                return self.json() !== self._node();
+            });
+        },
 
         parse: function(source) {
             var self = this;
@@ -35,20 +39,16 @@ define(['knockout'], function (ko) {
             self.iconclass = self.datatypelookup[source.datatype];
             self.istopnode = source.istopnode;
             self.ontologyclass = source.ontologyclass;
+
+            self.set('id', self.nodeid);
         },
 
         reset: function () {
             this.parse(JSON.parse(this._node()), self);
         },
 
-        save: function (callback) {
-            callback(false);
-        },
-
-        remove: function (callback) {
-            callback(false);
+        toJSON: function () {
+            return JSON.parse(this.json());
         }
-    };
-
-    return NodeModel;
+    });
 });

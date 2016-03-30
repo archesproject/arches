@@ -27,24 +27,34 @@ define([
             this.node().reset();
             this.close();
         },
-        callAsync: function (methodName) {
+        callAsync: function (methodName, onSuccess) {
             var self = this
             self.loading(true);
             self.failed(false);
-            self.node()[methodName](function (success) {
+            self.node()[methodName](function (request, status) {
+                var success = (status === 'success');
                 self.loading(false);
                 self.closeClicked(false);
                 self.failed(!success);
                 if (success) {
+                    if (onSuccess) {
+                        onSuccess(request);
+                    }
                     self.close();
                 }
-            });
+            }, self.node());
         },
         save: function () {
-            this.callAsync('save');
+            var self = this;
+            this.callAsync('save', function (request) {
+                self.node()._node(JSON.stringify(request.responseJSON));
+            });
         },
-        remove: function () {
-            this.callAsync('remove');
+        deleteNode: function () {
+            var self = this;
+            this.callAsync('delete', function () {
+                self.trigger('node-deleted', self.node());
+            });
         }
     });
     return NodeFormView;
