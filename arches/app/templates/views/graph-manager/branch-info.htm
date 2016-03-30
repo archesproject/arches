@@ -1,2 +1,41 @@
 {% load staticfiles %}
 {% load i18n %}
+<div class="ltr">
+    <!-- Title -->
+    <h4 class="node-title" data-bind="text: $data.name"> Location Branch </h4>
+    <div class="relative">
+        <a id="branch-close" href="" class="library-close-btn fa fa-times fa-lg"></a>
+    </div>
+    <div id="" class="" style="padding-top: 20px; position: relative;">
+        <p class="library-instructions" data-bind="text: $data.name"> A graph branch that describes the location of assets with geospatial coordinates and other location information.</p>
+    </div>
+
+    <!-- Alert -->
+    <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
+
+    <!-- Add Button -->
+    <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;"> Append to current node</button>
+
+    <!-- Preview -->
+    <div id="branch-preview" class="branch-preview">
+        Graph Preview goes here
+    </div>
+
+    <!-- Branch Metadata -->
+    <div class="">
+        <dl>
+            <dt class="branch-metadata">{% trans "Top Node Class" %}</dt>
+            <dd>E45</dd>
+            <dt class="branch-metadata">{% trans "Connects to" %}</dt>
+            <dd>E1, E23, E34, E39, E59, E79</dd>
+            <dt class="branch-metadata">{% trans "Author" %}</dt>
+            <dd data-bind="text: $data.author"></dd>
+            <dt class="branch-metadata">{% trans "Version" %}</dt>
+            <dd data-bind="text: $data.version"></dd>
+        </dl>
+
+    </div>
+
+    <!-- Close Panel -->
+    <button id="branch-close" class="btn btn-mint btn pull-right btn-labeled fa fa-times" style="margin-bottom: 45px;"> Close</button>
+</div>

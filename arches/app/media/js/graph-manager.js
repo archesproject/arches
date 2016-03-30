@@ -14,6 +14,7 @@ require([
     'bootstrap-nifty'
 ], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
     var graphData = JSON.parse($('#graph-data').val());
+    var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
     var datatypelookup = {}
     _.each(datatypes, function(datatype){
@@ -27,9 +28,15 @@ require([
         });
     });
 
+    branches.forEach(function(branch){
+        branch.selected = ko.observable(false);
+        branch.filtered = ko.observable(false);
+    }, this);
+
     var viewModel = {
         nodes: ko.observableArray(graphData.nodes),
-        edges: ko.observableArray(graphData.edges)
+        edges: ko.observableArray(graphData.edges),
+        branches: ko.observableArray(branches)
     };
 
     viewModel.editNode = ko.computed(function() {
@@ -112,7 +119,8 @@ require([
     });
 
     viewModel.branchList = new BranchListView({
-        el: $('#branch-library')
+        el: $('#branch-library'),
+        branches: viewModel.branches
     });
 
     viewModel.nodeList = new NodeListView({
@@ -126,10 +134,6 @@ require([
 
     viewModel.permissionsForm = new PermissionsFormView({
         el: $('#permissions-panel')
-    });
-
-    viewModel.branchInfo = new BranchInfoView({
-        el: $('#branch-panel')
     });
 
     new PageView({

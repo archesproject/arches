@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.shortcuts import render
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -29,10 +30,15 @@ from arches.app.models import models
 @csrf_exempt
 def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
+    branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
+    branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
+    for branch in branches:
+        branch['graph'] = ResourceGraph(branch_nodes.get(branchmetadata_id=branch['branchmetadataid']))
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
+        'branches': JSONSerializer().serialize(branches),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
             'title': _('Node List'),

@@ -13,8 +13,9 @@ define([
             this.filter.subscribe(function(newValue){
                 var filter = this.filter().toLowerCase();
                 this.items().forEach(function(item){
+                    var name = typeof item.name === 'string' ? item.name : item.name();
                     item.filtered(true);
-                    if(item.name().toLowerCase().indexOf(filter) !== -1){
+                    if(name.toLowerCase().indexOf(filter) !== -1){
                         item.filtered(false);
                     }
                 }, this);

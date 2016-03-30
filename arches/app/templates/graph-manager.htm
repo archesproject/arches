@@ -112,7 +112,7 @@ Configuration Manager
 						</div>
 
 						<!-- Graph Library -->
-						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: branchInfo">
+						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.showingForm, with: branchList.selectedItem">
                             {% include 'views/graph-manager/branch-info.htm' %}
 						</div>
 
@@ -127,6 +127,7 @@ Configuration Manager
 
 <input id="graph-data" name="graph-data" type="hidden" value="{{graph}}"/>
 <input id="datatypes" name="datatypes" type="hidden" value="{{datatypes}}"/>
+<input id="branches" name="branches" type="hidden" value="{{branches}}"/>
 {% endblock content %}
 
 {% block tabs %}
