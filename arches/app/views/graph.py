@@ -17,9 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
+from django.http import HttpResponseNotFound
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.resource_graphs import ResourceGraph
 from arches.app.models import models
 
@@ -44,3 +47,37 @@ def manager(request, nodeid):
             'search_placeholder': _('Find a graph branch')
         }
     })
+
+@csrf_exempt
+def node(request, nodeid):
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        if data:
+            with transaction.atomic():
+                node = models.Node.objects.get(nodeid=nodeid)
+                node.name = data.get('name', '')
+                node.description = data.get('description','')
+                node.istopnode = data.get('istopnode','')
+                node.crmclass = data.get('crmclass','')
+                node.datatype = data.get('datatype','')
+                node.status = data.get('status','')
+                node.save()
+                return JSONResponse(node)
+
+
+    if request.method == 'DELETE':
+        data = JSONDeserializer().deserialize(request.body)
+
+        if data:
+            with transaction.atomic():
+                node = models.Node.objects.get(nodeid=nodeid)
+                edge = models.Edge.objects.get(rangenode=node)
+                edge.delete()
+                graph = ResourceGraph(nodeid)
+                for edge in graph.edges:
+                    edge.delete()
+                for node in graph.nodes:
+                    node.delete()
+                return JSONResponse({})
+
+    return HttpResponseNotFound

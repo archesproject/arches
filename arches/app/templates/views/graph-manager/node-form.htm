@@ -10,8 +10,16 @@
 
     <hr class="section-division-dark node-section-division">
 
+    <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
+        <i class="fa fa-spinner fa-spin"> </i> <span> Loading...</span>
+    </div>
+
     <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
         <span>You have pending edits. Please save or cancel your edits before closing.</span>
+    </div>
+
+    <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
+        <span>We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.</span>
     </div>
 
     <div class="node-section">
@@ -27,116 +35,18 @@
                 </div>
             </div>
 
-
-            <div class="node-widget-label">
-                <div class="control-label">
-                    CRM Class
-                </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select class="design" id="crm" tabindex="0">
-                        <option>E1 CRM Entity</option>
-                        <option>E2 Temporal Entity</option>
-                        <option>E3 Condition State</option>
-                        <option>E4 Period</option>
-                        <option>E5 Event</option>
-                        <option>E6 Destruction</option>
-                        <option>E7 Activity</option>
-                        <option>E8 Acquisition</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="node-widget-label">
-                <div class="control-label">
-                    Relation to parent
-                </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select class="design" id="property" tabindex="0">
-                        <option>P1 Is identified by</option>
-                        <option>P2 Has type</option>
-                        <option>P3 Has note</option>
-                        <option>P4 Has time span</option>
-                        <option>P5 Consists of</option>
-                        <option>P6 A really long propety name just to see what will happen</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="node-widget-label">
-                <div class="control-label">
-                    Data type
-                </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select class="design" id="data-type" tabindex="0">
-                        <option>Semantic</option>
-                        <option>String</option>
-                        <option>Number</option>
-                        <option>Date</option>
-                        <option>Domain</option>
-                        <option>Boolean</option>
-                        <option>Geometry</option>
-                        <option>File</option>
-                        <option>Image</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="node-widget-label">
-                <div class="control-label">
-                    Group
-                </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select class="design" id="node-group" tabindex="0">
-                        <option>Geospatial coordinates</option>
-                        <option>Geometry type</option>
-                        <option>Address</option>
-                        <option>Address type</option>
-                    </select>
-                </div>
-            </div>
-
         </div>
 
     </div>
 
     <hr class="section-division-dark node-section-division">
-    <div class="node-section">
-
-        <div>
-
-            <div style="padding-bottom: 15px;">
-
-                <input id="node-required" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
-                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                    Required
-                </p>
-                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                    Users are required to provide a value for this node
-                </span>
-
-            </div>
-
-            <div style="padding-bottom: 15px;">
-
-                <input id="node-cardinality" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
-                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                    Repeatable
-                </p>
-                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                    Users may enter multiple values for this node
-                </span>
-
-            </div>
-        </div>
-
-    </div>
 
     <div class="pull-right">
-        <button class="btn btn-primary btn-sm btn-labeled fa fa-check"> Save</button>
+        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
         <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
     </div>
     <div class="pull-right" style="margin-top:5px;">
-        <button class="btn btn-danger btn-sm btn-labeled fa fa-times"> Delete</button>
+        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> Delete</button>
     </div>
 </div>
 <!-- /ko -->

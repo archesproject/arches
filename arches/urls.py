@@ -58,6 +58,7 @@ urlpatterns = [
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
     url(r'^graph/(?P<nodeid>%s)$' % uuid_regex, graph.manager, name='graph'),
+    url(r'^node/(?P<nodeid>%s)$' % uuid_regex, graph.node, name='node'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
