@@ -142,9 +142,9 @@ require([
 
     var resize = function(){
         $('#graph').height($(window).height()-200);
-        $('svg').height($(window).height()-200);
         $('.tab-content').height($(window).height()-259);
         $('.grid-container').height($(window).height()-360);
+        viewModel.graph.resize();
     }
 
     $( window ).resize(resize);
