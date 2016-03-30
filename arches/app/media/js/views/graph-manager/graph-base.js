@@ -33,7 +33,7 @@ define([
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
-                .attr("height", $(window).height()-200)
+                .attr("height", this.$el.height())
                 .call(d3.behavior.zoom().on("zoom", function() {
                     self.redraw();
                 }))
@@ -43,7 +43,7 @@ define([
 
             this.svg.attr("transform", "translate(" + this.center[0] + "," + this.center[1] + "), rotate(0)");
 
-            d3.select(this.el).style("height", $(window).height()-200 + "px");
+            d3.select(this.el).style("height", this.$el.height() + "px");
 
             this.render();
         },
