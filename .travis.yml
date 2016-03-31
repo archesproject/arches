@@ -76,6 +76,6 @@ deploy:
   region: us-west-1
   on: *2
 before_deploy:
-- zip arches -r  --exclude=*__pycache__* arches/arches/install/appspec.yml arches/arches/install/*.sh
+- zip arches -r  --exclude=*__pycache__* arches/install/appspec.yml arches/install/*.sh
 - mkdir -p dpl_cd_upload
 - mv arches.zip dpl_cd_upload/arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
