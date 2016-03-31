@@ -18,4 +18,7 @@ python setup.py install
 
 python manage.py packages -o setup
 
-python manage.py runserver
+python manage.py packages -o setup_elasticsearch
+source ~/arches/arches/elasticsearch/elasticsearch-2.2.0/bin/elasticsearch >> ~/elasticsearch.log &
+
+python manage.py runserver 0.0.0.0:80 &
