@@ -5,7 +5,7 @@ files:
     destination: /var/www/html/
 hooks:
   BeforeInstall:
-    - location: ~/arches/install/ubuntu_tusty_setup.sh
+    - location: ~/arches/install/ubuntu_trusty_setup.sh
       timeout: 300
       runas: root
     - location: ~/arches/install/install_arches.sh
