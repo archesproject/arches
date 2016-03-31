@@ -7,12 +7,13 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
-            // this.branchInfoPanel = new BranchInfoView({
-            //     el: $('#branch-panel')
-            // });
-
             this.items = options.branches;
-            //this.showingForm = ko.observable(false);
+            this.items().forEach(function (branch) {
+                branch.graph.nodes.forEach(function (node) {
+                    node.editing = ko.observable(false);
+                    node.name = ko.observable(node.name);
+                });
+            });
             this.selectedItem = ko.observable(null);
         },
 
@@ -21,10 +22,6 @@ define([
                 this.selectedItem(null)
             }else{
                 this.selectedItem(item);
-                item.graph.nodes.forEach(function (node) {
-                    node.editing = ko.observable(false);
-                    node.name = ko.observable(node.name);
-                });
                 this.graph = new GraphBase({
                     el: $('#branch-preview'),
                     nodes: ko.observableArray(item.graph.nodes),
