@@ -1,7 +1,8 @@
 {% load staticfiles %}
 {% load i18n %}
 <!-- ko if: node -->
-<p><span id="nodeName" data-bind="text: title"></span></p>
+<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">Unnamed node</span></span</p>
+
 <div class="relative">
     <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
 </div>

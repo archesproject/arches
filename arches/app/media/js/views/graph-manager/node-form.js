@@ -14,9 +14,8 @@ define([
 
             this.title = ko.computed(function () {
                 var node = self.node();
-                var title = 'Unamed node...';
                 if (!node || !node.name()) {
-                    return title;
+                    return '';
                 }
                 title = node.name();
                 if (title.length > 16) {
