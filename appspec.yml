@@ -1,10 +1,13 @@
 version: 0.0
 os: linux
+files:
+  - source: /
+    destination: /var/www/html/
 hooks:
   BeforeInstall:
-    - location: ~/scripts/ubuntu_tusty_setup.sh
+    - location: ~/arches/install/ubuntu_tusty_setup.sh
       timeout: 300
       runas: root
-    - location: ~/scripts/install_arches.sh
+    - location: ~/arches/install/install_arches.sh
       timeout: 300
       runas: root
