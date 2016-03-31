@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-rm -r -y ~/arches
-rm -r -y ~/ENV
+sudo rm -r -y ~/arches
+sudo rm -r -y ~/ENV
 
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
