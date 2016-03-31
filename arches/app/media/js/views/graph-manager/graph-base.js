@@ -28,7 +28,7 @@ define([
                             });
                         });
                 })
-                .size([360, 1000])
+                .size([360, this.size])
                 .separation(function(a, b) { 
                     return (a.parent == b.parent ? 1 : 2) / a.depth;  
                 });
