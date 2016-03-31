@@ -33,7 +33,10 @@ def manager(request, nodeid):
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
     for branch in branches:
-        branch['graph'] = ResourceGraph(branch_nodes.get(branchmetadata_id=branch['branchmetadataid']))
+        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
+        branch['rootnode'] = rootnode
+        branch['graph'] = ResourceGraph(rootnode)
+
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
@@ -85,5 +88,24 @@ def node(request, nodeid):
                 for node in graph.nodes:
                     node.delete()
                 return JSONResponse({})
+
+    return HttpResponseNotFound
+
+
+@csrf_exempt
+def appendbranch(request, nodeid, branchid):
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        if data:
+            with transaction.atomic():
+                node = models.Node.objects.get(nodeid=nodeid)
+                node.name = data.get('name', '')
+                node.description = data.get('description','')
+                node.istopnode = data.get('istopnode','')
+                node.crmclass = data.get('crmclass','')
+                node.datatype = data.get('datatype','')
+                node.status = data.get('status','')
+                node.save()
+                return JSONResponse(node)
 
     return HttpResponseNotFound
