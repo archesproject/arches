@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+hooks:
+  BeforeInstall:
+    - location: ~/scripts/ubuntu_tusty_setup.sh
+      timeout: 300
+      runas: root
+    - location: ~/scripts/install_arches.sh
+      timeout: 300
+      runas: root
