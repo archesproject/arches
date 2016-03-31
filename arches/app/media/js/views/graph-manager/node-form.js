@@ -12,6 +12,19 @@ define([
 
             _.extend(this, _.pick(options, 'node'));
 
+            this.title = ko.computed(function () {
+                var node = self.node();
+                var title = 'Unamed node...';
+                if (!node || !node.name()) {
+                    return title;
+                }
+                title = node.name();
+                if (title.length > 16) {
+                    return title.substring(0,16) + '...';
+                }
+                return title;
+            });
+
             this.node.subscribe(function () {
                 self.closeClicked(false);
             })
