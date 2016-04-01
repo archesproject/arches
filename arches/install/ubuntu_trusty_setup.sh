@@ -5,6 +5,8 @@ sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update -y
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
 wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+sudo sh -c 'echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" >> /etc/apt/sources.list.d/elasticsearch-2.x.list'
+wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 sudo apt-get update -y
 
 sudo apt-get install -y postgresql postgresql-contrib
@@ -18,7 +20,7 @@ sudo apt-get install -y docbook-mathml
 sudo apt-get install -y libgdal1-dev
 sudo apt-get install -y libpq-dev
 sudo apt-get install -y libgeos-3.4.2
-sudo apt-get install -y openjdk-7-jdk python-setuptools python-dev
+sudo apt-get install -y openjdk-7-jdk elasticsearch=2.2.0
 
 sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
 sudo echo "*:*:*:postgres:postgis" >> ~/.pgpass
