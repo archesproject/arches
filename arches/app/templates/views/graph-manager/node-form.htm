@@ -1,7 +1,8 @@
 {% load staticfiles %}
 {% load i18n %}
 <!-- ko if: node -->
-<p><span id="nodeName" data-bind="text: node().name"></span></p>
+<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">Unnamed node</span></span</p>
+
 <div class="relative">
     <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
 </div>
@@ -40,6 +41,31 @@
     </div>
 
     <hr class="section-division-dark node-section-division">
+
+    <hr class="section-division-dark node-section-division">
+    <div class="node-section">
+
+        <div>
+
+            <div style="padding-bottom: 15px;" data-bind="if: !node().istopnode">
+
+
+                <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
+
+                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
+                    Collector
+                </p>
+                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                    Data from this node and downstream nodes will be collected in a single form section
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 
     <div class="pull-right">
         <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
