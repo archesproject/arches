@@ -29,19 +29,20 @@ class ResourceGraph(object):
     def __init__(self, *args, **kwargs):
         self.nodes = []
         self.edges = []
-        if isinstance(args[0], basestring):
-            try:
-                uuid.UUID(args[0])
-                root = models.Node.objects.get(pk=args[0])
-                self.get_nodes_and_edges(root)
-            except(ValueError):
-                pass
-                #self.load(JSONDeserializer().deserialize(args[0]))
-        elif isinstance(args[0], models.Node):
-            self.get_nodes_and_edges(args[0])
-        elif args[0]["nodes"] and args[0]["edges"]:
-            self.nodes = args[0]["nodes"]
-            self.edges = args[0]["edges"]
+        if args:
+            if isinstance(args[0], basestring):
+                try:
+                    uuid.UUID(args[0])
+                    root = models.Node.objects.get(pk=args[0])
+                    self.get_nodes_and_edges(root)
+                except(ValueError):
+                    pass
+                    #self.load(JSONDeserializer().deserialize(args[0]))
+            elif isinstance(args[0], models.Node):
+                self.get_nodes_and_edges(args[0])
+            elif args[0]["nodes"] and args[0]["edges"]:
+                self.nodes = args[0]["nodes"]
+                self.edges = args[0]["edges"]
 
     def _save(self):
         """
