@@ -54,23 +54,15 @@ def manager(request, nodeid):
         }
     })
 
-def get_node_group(node, node_list=[], collector_list=[]):
-    node_list.append(node)
-    edges = models.Edge.objects.filter(domainnode=node)
-    for edge in edges:
-        if edge.rangenode.nodeid == edge.rangenode.nodegroup_id:
-            collector_list.append(edge.rangenode)
-        else:
-            get_node_group(edge.rangenode, node_list, collector_list)
-    return {'nodes': node_list, 'collectors': collector_list}
 
 @csrf_exempt
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         if data:
+            node = models.Node.objects.get(nodeid=nodeid)
+            node_group = node.get_node_group([],[])
             with transaction.atomic():
-                node = models.Node.objects.get(nodeid=nodeid)
                 node.name = data.get('name', '')
                 node.description = data.get('description','')
                 node.istopnode = data.get('istopnode','')
@@ -82,7 +74,6 @@ def node(request, nodeid):
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
                     new_group = parent_group
-                    node_group = get_node_group(node)
                     if new_nodegroup_id == nodeid:
                          new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
                          new_group.parentnodegroup = parent_group
@@ -98,8 +89,7 @@ def node(request, nodeid):
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': node_group['nodes']})
-
+                return JSONResponse({'node': node, 'group_nodes': node_group['nodes'], 'collectors': node_group['collectors']})
 
     if request.method == 'DELETE':
         data = JSONDeserializer().deserialize(request.body)
