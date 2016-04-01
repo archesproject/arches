@@ -14,7 +14,7 @@
     <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
 
     <!-- Add Button -->
-    <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;">{% trans "Append to current node" %}</button>
+    <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;" data-bind="click: $parent.appendBranch.bind($parent)">{% trans "Append to current node" %}</button>
 
     <!-- Preview -->
     <div id="branch-preview" class="branch-preview">

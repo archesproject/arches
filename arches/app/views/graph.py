@@ -89,23 +89,15 @@ def node(request, nodeid):
                     node.delete()
                 return JSONResponse({})
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
 
 
 @csrf_exempt
-def appendbranch(request, nodeid, branchid):
+def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
-        data = JSONDeserializer().deserialize(request.body)
-        if data:
-            with transaction.atomic():
-                node = models.Node.objects.get(nodeid=nodeid)
-                node.name = data.get('name', '')
-                node.description = data.get('description','')
-                node.istopnode = data.get('istopnode','')
-                node.crmclass = data.get('crmclass','')
-                node.datatype = data.get('datatype','')
-                node.status = data.get('status','')
-                node.save()
-                return JSONResponse(node)
+        graph = ResourceGraph(nodeid)
+        newBranch = graph.append_branch(branchmetadataid=branchmetadataid)
+        return JSONResponse(newBranch)
 
-    return HttpResponseNotFound
+
+    return HttpResponseNotFound()

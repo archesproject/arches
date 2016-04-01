@@ -120,7 +120,8 @@ require([
 
     viewModel.branchList = new BranchListView({
         el: $('#branch-library'),
-        branches: viewModel.branches
+        branches: viewModel.branches,
+        editNode: viewModel.editNode
     });
 
     viewModel.nodeList = new NodeListView({

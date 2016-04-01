@@ -7,6 +7,7 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
+            this.editNode = options.editNode
             this.items = options.branches;
             this.items().forEach(function (branch) {
                 branch.graph.nodes.forEach(function (node) {
@@ -29,6 +30,16 @@ define([
                 });
             }
             ListView.prototype.selectItem.apply(this, arguments);
+        },
+
+        appendBranch: function(){
+            if(this.editNode()){
+                var model = new GraphModel();
+                model.appendBranch(this.editNode().nodeid, 'P1', this.selectedItem().branchmetadataid, function(response){
+                    console.log(response)
+                }, this)
+
+            }
         },
 
         closeForm: function(){
