@@ -209,7 +209,7 @@ class Node(models.Model):
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
     """
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(unique=True)
+    name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
     ontologyclass = models.TextField()

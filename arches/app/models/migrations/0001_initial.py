@@ -340,7 +340,7 @@ class Migration(migrations.Migration):
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField(unique=True)),
+                ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.TextField()),
