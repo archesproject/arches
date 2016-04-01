@@ -6,6 +6,7 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
+            _.extend(this, _.pick(options, 'editNode'));
             GraphBase.prototype.initialize.apply(this, arguments);
 
             this.addNodeListeners();
@@ -24,6 +25,7 @@ define([
             var getNodeClass = function (d, className) {
                 className += d.editing() ? ' node-editing' : '';
                 className += d.selected() ? ' node-selected' : '';
+                className += (self.editNode() && self.editNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
                 return className;
             }
             this.allNodes.selectAll('circle')
@@ -57,6 +59,9 @@ define([
 
             nodes.forEach(function (node) {
                 node.name.subscribe(function () {
+                    self.render();
+                });
+                node.nodeGroupId.subscribe(function () {
                     self.render();
                 });
             });

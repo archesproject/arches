@@ -54,6 +54,16 @@ def manager(request, nodeid):
         }
     })
 
+def get_node_group(node, node_list=[], collector_list=[]):
+    node_list.append(node)
+    edges = models.Edge.objects.filter(domainnode=node)
+    for edge in edges:
+        if edge.rangenode.nodeid == edge.rangenode.nodegroup_id:
+            collector_list.append(edge.rangenode)
+        else:
+            get_node_group(edge.rangenode, node_list, collector_list)
+    return {'nodes': node_list, 'collectors': collector_list}
+
 @csrf_exempt
 def node(request, nodeid):
     if request.method == 'POST':
@@ -67,8 +77,28 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass','')
                 node.datatype = data.get('datatype','')
                 node.status = data.get('status','')
+                new_nodegroup_id = data.get('nodegroup_id','')
+                if node.nodegroup_id != new_nodegroup_id:
+                    edge = models.Edge.objects.get(rangenode_id=nodeid)
+                    parent_group = edge.domainnode.nodegroup
+                    new_group = parent_group
+                    node_group = get_node_group(node)
+                    if new_nodegroup_id == nodeid:
+                         new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+                         new_group.parentnodegroup = parent_group
+                         new_group.save()
+                         for collector in node_group['collectors']:
+                             collector.nodegroup.parentnodegroup = new_group
+                             collector.nodegroup.save()
+
+                    for group_node in node_group['nodes']:
+                        group_node.nodegroup = new_group
+                        group_node.save()
+
+                    node.nodegroup = new_group
+
                 node.save()
-                return JSONResponse(node)
+                return JSONResponse({'node': node, 'group_nodes': node_group['nodes']})
 
 
     if request.method == 'DELETE':
