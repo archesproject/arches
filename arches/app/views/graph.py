@@ -61,7 +61,7 @@ def node(request, nodeid):
         data = JSONDeserializer().deserialize(request.body)
         if data:
             node = models.Node.objects.get(nodeid=nodeid)
-            node_group = node.get_node_group([],[])
+            node_group = node.get_downstream_nodes_and_collectors()
             with transaction.atomic():
                 node.name = data.get('name', '')
                 node.description = data.get('description','')

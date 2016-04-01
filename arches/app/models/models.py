@@ -216,7 +216,9 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
-    def get_node_group(self, node_list=[], collector_list=[]):
+    def get_downstream_nodes_and_collectors(self):
+        node_list = []
+        collector_list = []
         edges = Edge.objects.filter(domainnode=self)
 
         for edge in edges:
@@ -224,7 +226,9 @@ class Node(models.Model):
                 collector_list.append(edge.rangenode)
             else:
                 node_list.append(edge.rangenode)
-                edge.rangenode.get_node_group(node_list, collector_list)
+                nodes_and_collectors = edge.rangenode.get_downstream_nodes_and_collectors()
+                node_list.extend(nodes_and_collectors['nodes'])
+                collector_list.extend(nodes_and_collectors['collectors'])
 
         return {'nodes': node_list, 'collectors': collector_list}
 
