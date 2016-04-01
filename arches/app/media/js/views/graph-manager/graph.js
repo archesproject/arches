@@ -53,6 +53,21 @@ define([
             this.allNodes.exit()
                 .remove();
         },
+        renderLinks: function(){
+            var self = this;
+            GraphBase.prototype.renderLinks.apply(this, arguments);
+            this.svg.selectAll(".link")
+                .attr("class", function (d) {
+                    var className = 'link';
+                    if (self.editNode()) {
+                        var selectedGroup = self.editNode().nodeGroupId();
+                        if (d.source.nodeGroupId() === selectedGroup && d.target.nodeGroupId() === selectedGroup) {
+                            className += ' link-collected';
+                        }
+                    }
+                    return className;
+                });
+        },
         addNodeListeners: function () {
             var self = this;
             var nodes = this.nodes();

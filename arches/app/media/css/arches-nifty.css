@@ -1063,8 +1063,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .node .node-collected {
-  fill: red;
-  stroke-width: 5px;
+  stroke-width: 3px;
 }
 
 .node-text {
@@ -1076,6 +1075,9 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   fill: none;
   stroke: #ddd;
   stroke-width: 1.5px;
+}
+.link.link-collected {
+  stroke-width: 3px;
 }
 
 .node .node-over {
