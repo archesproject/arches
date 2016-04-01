@@ -1062,6 +1062,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   font: 10px sans-serif;
 }
 
+.node .node-collected {
+  stroke-width: 3px;
+}
+
 .node-text {
 	font-size: 10px;
 	text-overflow: ellipsis;
@@ -1071,6 +1075,9 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
   fill: none;
   stroke: #ddd;
   stroke-width: 1.5px;
+}
+.link.link-collected {
+  stroke-width: 3px;
 }
 
 .node .node-over {

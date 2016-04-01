@@ -12,6 +12,8 @@ from arches.app.models.resource_graphs import ResourceGraph
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+suffix = 'json'
+
 def load_graphs(break_on_error=True, settings=None, path=None):
     """
     Iterates through the resource node and edge files to load entitytypes and mappings into the database.
@@ -22,9 +24,7 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     if not settings:
         from django.conf import settings        
   
-    suffix = 'json'
     errors = []
-    file_list = []
     graph_location = settings.RESOURCE_GRAPH_LOCATIONS
         
     if path:
@@ -34,18 +34,11 @@ def load_graphs(break_on_error=True, settings=None, path=None):
         if os.path.exists(path):
             print '\nLOADING GRAPHS (%s)' % (path)
             print '---------------'
-            for f in listdir(path):
-                if isfile(join(path,f)) and f.endswith(suffix):
-                    file_list.append(join(path,f))
-                    path_to_file = join(path,f)
-                    basepath = path_to_file
-                    name = basepath.split(os.sep)[-1]
-
-                    with open(basepath, 'rU') as f:
-                        file = json.load(f)
-
-                        resource_graph = ResourceGraph(file['graph'][0])
-                        resource_graph._save()
+            if isfile(join(path)) and path.endswith(suffix):
+                load_resource_graph_file(path)
+            else:
+                for f in listdir(path):
+                    load_resource_graph_file(join(path,f))
         else:
             errors.append('\n\nPath in settings.RESOURCE_GRAPH_LOCATIONS doesn\'t exist (%s)' % (path))                 
 
@@ -64,6 +57,16 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     # print '\nADDING NODE LEVEL PERMISSIONS'
     # print '-----------------------------'
     # management.call_command('packages', operation='build_permissions') 
+
+def load_resource_graph_file(path_to_file):
+    if isfile(path_to_file) and path_to_file.endswith(suffix):
+        basepath = path_to_file
+        name = basepath.split(os.sep)[-1]
+
+        with open(basepath, 'rU') as f:
+            file = json.load(f)
+            resource_graph = ResourceGraph(file['graph'][0])
+            resource_graph._save()
 
 def append_branch(path_to_branch, node_list, edge_list):
     """

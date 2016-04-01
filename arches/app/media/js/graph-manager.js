@@ -56,7 +56,8 @@ require([
     viewModel.graph = new GraphView({
         el: $('#graph'),
         nodes: viewModel.nodes,
-        edges: viewModel.edges
+        edges: viewModel.edges,
+        editNode: viewModel.editNode
     });
 
     ko.computed(function() {
@@ -68,6 +69,16 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         node: viewModel.editNode
+    });
+
+    viewModel.nodeForm.on('node-updated', function(res) {
+        var nodes = viewModel.nodes();
+        res.group_nodes.forEach(function(nodeJSON) {
+            var node = _.find(nodes, function (node) {
+                return node.nodeid === nodeJSON.nodeid;
+            });
+            node.parse(nodeJSON);
+        });
     });
 
     var getEdges = function (node) {
@@ -142,9 +153,9 @@ require([
 
     var resize = function(){
         $('#graph').height($(window).height()-200);
-        $('svg').height($(window).height()-200);
         $('.tab-content').height($(window).height()-259);
         $('.grid-container').height($(window).height()-360);
+        viewModel.graph.resize();
     }
 
     $( window ).resize(resize);

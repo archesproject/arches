@@ -6,6 +6,7 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
+            _.extend(this, _.pick(options, 'editNode'));
             GraphBase.prototype.initialize.apply(this, arguments);
 
             this.addNodeListeners();
@@ -24,6 +25,7 @@ define([
             var getNodeClass = function (d, className) {
                 className += d.editing() ? ' node-editing' : '';
                 className += d.selected() ? ' node-selected' : '';
+                className += (self.editNode() && self.editNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
                 return className;
             }
             this.allNodes.selectAll('circle')
@@ -51,6 +53,21 @@ define([
             this.allNodes.exit()
                 .remove();
         },
+        renderLinks: function(){
+            var self = this;
+            GraphBase.prototype.renderLinks.apply(this, arguments);
+            this.svg.selectAll(".link")
+                .attr("class", function (d) {
+                    var className = 'link';
+                    if (self.editNode()) {
+                        var selectedGroup = self.editNode().nodeGroupId();
+                        if (d.source.nodeGroupId() === selectedGroup && d.target.nodeGroupId() === selectedGroup) {
+                            className += ' link-collected';
+                        }
+                    }
+                    return className;
+                });
+        },
         addNodeListeners: function () {
             var self = this;
             var nodes = this.nodes();
@@ -59,15 +76,10 @@ define([
                 node.name.subscribe(function () {
                     self.render();
                 });
+                node.nodeGroupId.subscribe(function () {
+                    self.render();
+                });
             });
-        },
-        redraw: function () {
-            var xt = d3.event.translate[0] + this.center[0];
-            var yt = d3.event.translate[1] + this.center[1];
-
-            this.svg.attr("transform",
-                "translate(" + xt + "," + yt + ")" +
-                " scale(" + d3.event.scale + ")");
         }
     });
     return GraphView;
