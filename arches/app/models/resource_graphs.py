@@ -93,12 +93,9 @@ class ResourceGraph(object):
         Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
 
         """
-
         self.nodes.append(node)
-        edges = models.Edge.objects.filter(domainnode=node)
-        for edge in edges:
-            self.edges.append(edge)
-            self.get_nodes_and_edges(edge.rangenode)
+        self.nodes.extend(node.get_downstream_nodes())
+        self.edges.extend(node.get_downstream_edges())
 
     def get_node_id_from_text(self):
         for edge in self.edges:
