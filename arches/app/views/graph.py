@@ -57,22 +57,42 @@ def manager(request, nodeid):
         }
     })
 
+
 @csrf_exempt
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         if data:
+            node = models.Node.objects.get(nodeid=nodeid)
+            node_group = node.get_downstream_nodes_and_collectors()
             with transaction.atomic():
-                node = models.Node.objects.get(nodeid=nodeid)
                 node.name = data.get('name', '')
                 node.description = data.get('description','')
                 node.istopnode = data.get('istopnode','')
                 node.crmclass = data.get('crmclass','')
                 node.datatype = data.get('datatype','')
                 node.status = data.get('status','')
-                node.save()
-                return JSONResponse(node)
+                new_nodegroup_id = data.get('nodegroup_id','')
+                if node.nodegroup_id != new_nodegroup_id:
+                    edge = models.Edge.objects.get(rangenode_id=nodeid)
+                    parent_group = edge.domainnode.nodegroup
+                    new_group = parent_group
+                    if new_nodegroup_id == nodeid:
+                         new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+                         new_group.parentnodegroup = parent_group
+                         new_group.save()
+                         for collector in node_group['collectors']:
+                             collector.nodegroup.parentnodegroup = new_group
+                             collector.nodegroup.save()
 
+                    for group_node in node_group['nodes']:
+                        group_node.nodegroup = new_group
+                        group_node.save()
+
+                    node.nodegroup = new_group
+
+                node.save()
+                return JSONResponse({'node': node, 'group_nodes': node_group['nodes'], 'collectors': node_group['collectors']})
 
     if request.method == 'DELETE':
         data = JSONDeserializer().deserialize(request.body)

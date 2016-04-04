@@ -12,6 +12,18 @@ define([
 
             _.extend(this, _.pick(options, 'node'));
 
+            this.title = ko.computed(function () {
+                var node = self.node();
+                if (!node || !node.name()) {
+                    return '';
+                }
+                title = node.name();
+                if (title.length > 16) {
+                    return title.substring(0,16) + '...';
+                }
+                return title;
+            });
+
             this.node.subscribe(function () {
                 self.closeClicked(false);
             })
@@ -47,7 +59,8 @@ define([
         save: function () {
             var self = this;
             this.callAsync('save', function (request) {
-                self.node()._node(JSON.stringify(request.responseJSON));
+                self.node().parse(request.responseJSON.node);
+                self.trigger('node-updated', request.responseJSON);
             });
         },
         deleteNode: function () {
@@ -55,6 +68,9 @@ define([
             this.callAsync('delete', function () {
                 self.trigger('node-deleted', self.node());
             });
+        },
+        toggleIsCollector: function () {
+            this.node().toggleIsCollector();
         }
     });
     return NodeFormView;
