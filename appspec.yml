@@ -14,4 +14,9 @@ hooks:
       timeout: 300
       mode: 755
       runas: root
+  ApplicationStart:
+    - location: arches/install/start_arches.sh
+      timeout: 300
+      mode: 755
+      runas: root
       
