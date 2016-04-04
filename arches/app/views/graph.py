@@ -95,17 +95,14 @@ def node(request, nodeid):
                 return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors})
 
     if request.method == 'DELETE':
-        data = JSONDeserializer().deserialize(request.body)
-
-        if data:
-            node = models.Node.objects.get(nodeid=nodeid)
-            nodes = node.get_downstream_nodes()
-            edges = node.get_downstream_edges()
-            edges.append(models.Edge.objects.get(rangenode=node))
-            nodes.append(node)
-            with transaction.atomic():
-                [edge.delete() for edge in edges]
-                [node.delete() for node in nodes]
-                return JSONResponse({})
+        node = models.Node.objects.get(nodeid=nodeid)
+        nodes = node.get_downstream_nodes()
+        edges = node.get_downstream_edges()
+        edges.append(models.Edge.objects.get(rangenode=node))
+        nodes.append(node)
+        with transaction.atomic():
+            [edge.delete() for edge in edges]
+            [node.delete() for node in nodes]
+            return JSONResponse({})
 
     return HttpResponseNotFound
