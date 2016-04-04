@@ -4,6 +4,11 @@ files:
   - source: /
     destination: /var/www/html/
 hooks:
+  ApplicationStop:
+    - location: arches/install/arches_stop.sh
+      timeout: 300
+      mode: 755
+      runas: root
   BeforeInstall:
     - location: arches/install/ubuntu_trusty_setup.sh
       timeout: 300
@@ -15,7 +20,7 @@ hooks:
       mode: 755
       runas: root
   ApplicationStart:
-    - location: arches/install/start_arches.sh
+    - location: arches/install/arches_start.sh
       timeout: 300
       mode: 755
       runas: root
