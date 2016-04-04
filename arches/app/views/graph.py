@@ -62,8 +62,9 @@ def node(request, nodeid):
         if data:
             node = models.Node.objects.get(nodeid=nodeid)
             nodes = node.get_downstream_nodes()
-            collectors = [node_ for node_ in nodes if (node_.nodeid == node_.nodegroup_id)]
-            nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in [id_node.nodeid for id_node in nodes])]
+            collectors = [node_ for node_ in nodes if node_.is_collector()]
+            node_ids = [id_node.nodeid for id_node in nodes]
+            nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
             with transaction.atomic():
                 node.name = data.get('name', '')
                 node.description = data.get('description','')
@@ -71,7 +72,7 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass','')
                 node.datatype = data.get('datatype','')
                 node.status = data.get('status','')
-                new_nodegroup_id = data.get('nodegroup_id','')
+                new_nodegroup_id = data.get('nodegroup_id',None)
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
@@ -97,12 +98,12 @@ def node(request, nodeid):
         data = JSONDeserializer().deserialize(request.body)
 
         if data:
+            node = models.Node.objects.get(nodeid=nodeid)
+            nodes = node.get_downstream_nodes()
+            edges = node.get_downstream_edges()
+            edges.append(models.Edge.objects.get(rangenode=node))
+            nodes.append(node)
             with transaction.atomic():
-                node = models.Node.objects.get(nodeid=nodeid)
-                nodes = node.get_downstream_nodes()
-                edges = node.get_downstream_edges()
-                edges.append(models.Edge.objects.get(rangenode=node))
-                nodes.append(node)
                 [edge.delete() for edge in edges]
                 [node.delete() for node in nodes]
                 return JSONResponse({})

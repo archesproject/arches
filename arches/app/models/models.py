@@ -227,6 +227,9 @@ class Node(models.Model):
         map(edges.extend, [edge.rangenode.get_downstream_edges() for edge in edges])
         return edges
 
+    def is_collector(self):
+        return self.nodeid == self.nodegroup_id
+
     class Meta:
         managed = True
         db_table = 'nodes'
