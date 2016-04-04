@@ -16,24 +16,21 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
+import os, json
 from tests import test_settings
 from tests.base_test import ArchesTestCase
+from django.test import Client
+from django.core.urlresolvers import reverse
 from arches.app.models import models
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node
 
-# these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+def setUpModule():
+    resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
+NODE_COUNT = 112
 
 class ResourceGraphTests(ArchesTestCase):
-
-    def setUp(self):
-        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
-
-    def tearDown(self):
-        pass
 
     def test_graph_import(self):
         """
@@ -42,6 +39,19 @@ class ResourceGraphTests(ArchesTestCase):
         """
         root = Node.objects.get(nodeid='d8f4db21-343e-4af3-8857-f7322dc9eb4b')
         node_count = len(root.get_downstream_nodes())
-        self.assertEqual(node_count, 111)
+        self.assertEqual(node_count, NODE_COUNT-1)
         edge_count = len(root.get_downstream_edges())
-        self.assertEqual(edge_count, 111)
+        self.assertEqual(edge_count, NODE_COUNT-1)
+
+    def test_graph_manager(self):
+        """
+        Test the graph manager view
+
+        """
+        c = Client()
+        response = c.get(reverse('graph', kwargs={'nodeid':'d8f4db21-343e-4af3-8857-f7322dc9eb4b'}))
+        graph = json.loads(response.context['graph'])
+        node_count = len(graph['nodes'])
+        self.assertEqual(node_count, NODE_COUNT)
+        edge_count = len(graph['edges'])
+        self.assertEqual(edge_count, NODE_COUNT-1)
