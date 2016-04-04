@@ -29,21 +29,19 @@ from arches.app.models.models import Node
 
 class ResourceGraphTests(ArchesTestCase):
 
-    def test_initial_node_import(self):
-        """
-        Test that correct number of nodes load
-
-        """
-
-        count_before = Node.objects.count()
-
+    def setUp(self):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
-        self.assertEqual(Node.objects.count()-count_before, 112)
+    def tearDown(self):
+        pass
 
+    def test_graph_import(self):
+        """
+        Test that correct number of nodes and edges load
 
-    # def test_intial_edge_import(self):
-    #     """
-    #     Test that correct number of edges load
-
-    #     """
+        """
+        root = Node.objects.get(nodeid='d8f4db21-343e-4af3-8857-f7322dc9eb4b')
+        node_count = len(root.get_downstream_nodes())
+        self.assertEqual(node_count, 111)
+        edge_count = len(root.get_downstream_edges())
+        self.assertEqual(edge_count, 111)
