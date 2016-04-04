@@ -9,7 +9,9 @@ hooks:
       timeout: 300
       mode: 755
       runas: root
+  Install:
     - location: arches/install/install_arches.sh
       timeout: 300
       mode: 755
       runas: root
+      
