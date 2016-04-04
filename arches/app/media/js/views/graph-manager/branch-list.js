@@ -1,8 +1,9 @@
 define([
     'views/list',
     'views/graph-manager/graph-base',
+    'models/graph',
     'knockout'
-], function(ListView, GraphBase, ko) {
+], function(ListView, GraphBase, GraphModel , ko) {
     var BranchList = ListView.extend({
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
