@@ -8,10 +8,9 @@ define([
             var self = this;
             this.size = 1000;
             this.currentOffset = [0,0];
-            this.currentScale = 1;
-            this.nodes = ko.observableArray([]);
-            this.edges = ko.observableArray([]);
-            _.extend(this, _.pick(options, 'nodes', 'edges'));
+            this.currentScale = 1; 
+            this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
+            this.edges = options.graphModel.get('edges') || ko.observableArray([]);
 
             var diameter = this.$el.width() < this.$el.height() ? this.$el.width() : this.$el.height();
 

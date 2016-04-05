@@ -12,10 +12,10 @@ define([
             this.editNode = this.graphModel.get('editNode');
             this.items = options.branches;
             this.items().forEach(function (branch) {
-                branch.graph.nodes.forEach(function (node) {
-                    node.editing = ko.observable(false);
-                    node.name = ko.observable(node.name);
-                });
+                branch.graphModel = new GraphModel({
+                    nodes: branch.graph.nodes,
+                    edges: branch.graph.edges
+                })
             });
             this.selectedItem = ko.observable(null);
         },
@@ -27,9 +27,9 @@ define([
                 this.selectedItem(item);
                 this.graph = new GraphBase({
                     el: $('#branch-preview'),
-                    nodes: ko.observableArray(item.graph.nodes),
-                    edges: ko.observableArray(item.graph.edges)
+                    graphModel: item.graphModel
                 });
+
             }
             ListView.prototype.selectItem.apply(this, arguments);
         },

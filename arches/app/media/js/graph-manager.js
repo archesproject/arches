@@ -65,9 +65,7 @@ require([
 
     viewModel.graphView = new GraphView({
         el: $('#graph'),
-        nodes: viewModel.nodes,
-        edges: viewModel.edges,
-        editNode: viewModel.editNode
+        graphModel: graphModel
     });
 
     ko.computed(function() {

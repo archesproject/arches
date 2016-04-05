@@ -6,7 +6,7 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'editNode'));
+            this.editNode = options.graphModel.get('editNode');
             GraphBase.prototype.initialize.apply(this, arguments);
 
             this.addNodeListeners();
