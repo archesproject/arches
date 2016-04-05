@@ -64,7 +64,7 @@ require([
         return selectedNodes;
     });
 
-    viewModel.graph = new GraphView({
+    viewModel.graphView = new GraphView({
         el: $('#graph'),
         nodes: viewModel.nodes,
         edges: viewModel.edges,
@@ -74,7 +74,7 @@ require([
     ko.computed(function() {
         graphModel.get('editNode')();
         graphModel.get('selectedNodes')();
-        viewModel.graph.render();
+        viewModel.graphView.render();
     });
 
     viewModel.nodeForm = new NodeFormView({
@@ -96,7 +96,7 @@ require([
         graphModel.deleteNode(node);
     });
 
-    viewModel.graph.on('node-clicked', function (node) {
+    viewModel.graphView.on('node-clicked', function (node) {
         if (viewModel.editNode() && viewModel.editNode().dirty()) {
             viewModel.nodeForm.closeClicked(true);
             return;
@@ -134,7 +134,7 @@ require([
         $('#graph').height($(window).height()-200);
         $('.tab-content').height($(window).height()-259);
         $('.grid-container').height($(window).height()-360);
-        viewModel.graph.resize();
+        viewModel.graphView.resize();
     }
 
     $( window ).resize(resize);
