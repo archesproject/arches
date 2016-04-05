@@ -8,20 +8,20 @@ hooks:
     - location: arches/install/arches_stop.sh
       timeout: 300
       mode: 755
-      runas: root
+      runas: ubuntu
   BeforeInstall:
     - location: arches/install/ubuntu_trusty_setup.sh
       timeout: 300
       mode: 755
-      runas: root
+      runas: ubuntu
   Install:
     - location: arches/install/install_arches.sh
       timeout: 300
       mode: 755
-      runas: root
+      runas: ubuntu
   ApplicationStart:
     - location: arches/install/arches_start.sh
       timeout: 300
       mode: 755
-      runas: root
+      runas: ubuntu
       
