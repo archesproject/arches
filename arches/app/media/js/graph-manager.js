@@ -44,7 +44,7 @@ require([
 
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
-        node: graphModel.get('editNode')
+        graphModel: graphModel
     });
 
     viewModel.nodeForm.on('node-updated', function(res) {
@@ -55,10 +55,6 @@ require([
             });
             node.parse(nodeJSON);
         });
-    });
-
-    viewModel.nodeForm.on('node-deleted', function (node) {
-        graphModel.deleteNode(node);
     });
 
     viewModel.graphView.on('node-clicked', function (node) {
