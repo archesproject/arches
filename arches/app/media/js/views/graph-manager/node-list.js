@@ -7,7 +7,7 @@ define([
 
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
-            this.items = options.nodes;
+            this.items = options.graphModel.get('nodes');
         }
 
     });

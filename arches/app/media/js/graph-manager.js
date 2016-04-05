@@ -92,41 +92,7 @@ require([
         });
     });
 
-    // var getEdges = function (node) {
-    //     var edges = viewModel.edges()
-    //         .filter(function (edge) {
-    //             return edge.domainnode_id === node.nodeid;
-    //         });
-    //     var nodes = edges.map(function (edge) {
-    //         return viewModel.nodes().find(function (node) {
-    //             return edge.rangenode_id === node.nodeid;
-    //         });
-    //     });
-    //     nodes.forEach(function (node) {
-    //         edges = edges.concat(getEdges(node));
-    //     });
-    //     return edges
-    // };
-
     viewModel.nodeForm.on('node-deleted', function (node) {
-        // var edges = getEdges(node);
-        // var nodes = edges.map(function (edge) {
-        //     return viewModel.nodes().find(function (node) {
-        //         return edge.rangenode_id === node.nodeid;
-        //     });
-        // });
-        // var edge = viewModel.edges()
-        //     .find(function (edge) {
-        //         return edge.rangenode_id === node.nodeid;
-        //     });
-        // nodes.push(node);
-        // edges.push(edge);
-        // viewModel.edges.remove(function (edge) {
-        //     return _.contains(edges, edge);
-        // });
-        // viewModel.nodes.remove(function (node) {
-        //     return _.contains(nodes, node);
-        // });
         graphModel.deleteNode(node);
     });
 
@@ -150,8 +116,7 @@ require([
 
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
-        nodes: viewModel.nodes,
-        //graphModel: graphModel
+        graphModel: graphModel
     });
 
     viewModel.permissionsList = new PermissionsListView({
