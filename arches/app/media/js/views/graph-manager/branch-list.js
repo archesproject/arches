@@ -37,7 +37,6 @@ define([
         appendBranch: function(){
             if(this.editNode()){
                 this.graphModel.appendBranch(this.editNode().nodeid, 'P1', this.selectedItem().branchmetadataid, function(response){
-                    console.log(response)
                 }, this)
 
             }

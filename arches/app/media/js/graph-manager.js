@@ -31,6 +31,7 @@ require([
 
     graphModel.on('changed', function(model, options){
         console.log('changed');
+        viewModel.graphView.redraw(true);
     })
 
     var viewModel = {
