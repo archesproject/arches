@@ -23,13 +23,13 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 def setUpModule():
     resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
 ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
-
 NODE_COUNT = 111
 PLACE_NODE_COUNT = 17
 client = Client()
@@ -66,24 +66,18 @@ class ResourceGraphTests(ArchesTestCase):
 
         """
         url = reverse('node', kwargs={'nodeid':HERITAGE_RESOURCE_PLACE_ID})
-        post_data = {
-            "description": "",
-            "istopnode": False,
-            "ontologyclass": "",
-            "nodeid": HERITAGE_RESOURCE_PLACE_ID,
-            "branchmetadata_id": None,
-            "datatype": "",
-            "nodegroup_id": HERITAGE_RESOURCE_PLACE_ID,
-            "name": "new node name"
-        }
+        node = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
+        node.name = "new node name"
+        node.nodegroup_id = HERITAGE_RESOURCE_PLACE_ID
+        post_data = JSONSerializer().serialize(node)
         content_type = 'application/x-www-form-urlencoded'
-        response = client.post(url, json.dumps(post_data), content_type)
+        response = client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['group_nodes']), PLACE_NODE_COUNT-1)
         self.assertEqual(response_json['node']['name'], 'new node name')
-        node = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
-        self.assertEqual(node.name, 'new node name')
-        self.assertTrue(node.is_collector())
+        node_ = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
+        self.assertEqual(node_.name, 'new node name')
+        self.assertTrue(node_.is_collector())
 
     def test_node_delete(self):
         """
