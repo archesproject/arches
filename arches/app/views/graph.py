@@ -64,7 +64,10 @@ def node(request, nodeid):
         data = JSONDeserializer().deserialize(request.body)
         if data:
             node = models.Node.objects.get(nodeid=nodeid)
-            node_group = node.get_downstream_nodes_and_collectors()
+            nodes, edges = node.get_child_nodes_and_edges()
+            collectors = [node_ for node_ in nodes if node_.is_collector()]
+            node_ids = [id_node.nodeid for id_node in nodes]
+            nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
             with transaction.atomic():
                 node.name = data.get('name', '')
                 node.description = data.get('description','')
@@ -72,7 +75,7 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass','')
                 node.datatype = data.get('datatype','')
                 node.status = data.get('status','')
-                new_nodegroup_id = data.get('nodegroup_id','')
+                new_nodegroup_id = data.get('nodegroup_id',None)
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
@@ -81,33 +84,28 @@ def node(request, nodeid):
                          new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
                          new_group.parentnodegroup = parent_group
                          new_group.save()
-                         for collector in node_group['collectors']:
+                         for collector in collectors:
                              collector.nodegroup.parentnodegroup = new_group
                              collector.nodegroup.save()
 
-                    for group_node in node_group['nodes']:
+                    for group_node in nodes:
                         group_node.nodegroup = new_group
                         group_node.save()
 
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': node_group['nodes'], 'collectors': node_group['collectors']})
+                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors})
 
     if request.method == 'DELETE':
-        data = JSONDeserializer().deserialize(request.body)
-
-        if data:
-            with transaction.atomic():
-                node = models.Node.objects.get(nodeid=nodeid)
-                edge = models.Edge.objects.get(rangenode=node)
-                edge.delete()
-                graph = ResourceGraph(nodeid)
-                for edge in graph.edges:
-                    edge.delete()
-                for node in graph.nodes:
-                    node.delete()
-                return JSONResponse({})
+        node = models.Node.objects.get(nodeid=nodeid)
+        nodes, edges = node.get_child_nodes_and_edges()
+        edges.append(models.Edge.objects.get(rangenode=node))
+        nodes.append(node)
+        with transaction.atomic():
+            [edge.delete() for edge in edges]
+            [node.delete() for node in nodes]
+            return JSONResponse({})
 
     return HttpResponseNotFound()
 

@@ -207,7 +207,9 @@ class NodeGroup(models.Model):
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
+    
     """
+
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
@@ -217,21 +219,20 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
-    def get_downstream_nodes_and_collectors(self):
-        node_list = []
-        collector_list = []
-        edges = Edge.objects.filter(domainnode=self)
+    def get_child_nodes_and_edges(self):
+        nodes = []
+        edges = []
+        for edge in Edge.objects.filter(domainnode=self):
+            nodes.append(edge.rangenode)
+            edges.append(edge)
 
-        for edge in edges:
-            if edge.rangenode.nodeid == edge.rangenode.nodegroup_id:
-                collector_list.append(edge.rangenode)
-            else:
-                node_list.append(edge.rangenode)
-                nodes_and_collectors = edge.rangenode.get_downstream_nodes_and_collectors()
-                node_list.extend(nodes_and_collectors['nodes'])
-                collector_list.extend(nodes_and_collectors['collectors'])
+            child_nodes, child_edges = edge.rangenode.get_child_nodes_and_edges()
+            nodes.extend(child_nodes)
+            edges.extend(child_edges)
+        return (nodes, edges)
 
-        return {'nodes': node_list, 'collectors': collector_list}
+    def is_collector(self):
+        return self.nodeid == self.nodegroup_id
 
     class Meta:
         managed = True
