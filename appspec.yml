@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu
+    destination: /var/www/html/
 hooks:
   ApplicationStop:
     - location: arches/install/arches_stop.sh
