@@ -8,8 +8,8 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
-            this.editNode = options.editNode;
             this.graphModel = options.graphModel;
+            this.editNode = this.graphModel.get('editNode');
             this.items = options.branches;
             this.items().forEach(function (branch) {
                 branch.graph.nodes.forEach(function (node) {
