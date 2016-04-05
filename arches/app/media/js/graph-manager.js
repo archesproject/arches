@@ -42,12 +42,6 @@ require([
         graphModel: graphModel
     });
 
-    ko.computed(function() {
-        graphModel.get('editNode')();
-        graphModel.get('selectedNodes')();
-        viewModel.graphView.render();
-    });
-
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         node: graphModel.get('editNode')
