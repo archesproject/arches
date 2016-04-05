@@ -103,9 +103,11 @@ class ResourceGraph(object):
             self.edges.append(edge)
             self.get_nodes_and_edges(edge.rangenode)
 
-    def append_branch(self, nodeid=None, branch_root=None, branchmetadataid=None):  
+    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):  
         """
         Appends a branch onto this graph
+
+        property: the property to use when appending the branch
 
         nodeid: if given will append the branch to this node, if not supplied will 
         append the branch to the root of this graph 
@@ -124,7 +126,8 @@ class ResourceGraph(object):
         new_branch = branch_graph.copy()
         newEdge = models.Edge(
             domainnode_id = (nodeid if nodeid else self.root.pk),
-            rangenode = new_branch.root
+            rangenode = new_branch.root,
+            ontologyproperty = property
         )
         newEdge.save()
         branch_graph.edges.append(newEdge)

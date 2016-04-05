@@ -116,7 +116,7 @@ def node(request, nodeid):
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = ResourceGraph(nodeid)
-        newBranch = graph.append_branch(branchmetadataid=branchmetadataid)
+        newBranch = graph.append_branch(property, nodeid=nodeid, branchmetadataid=branchmetadataid)
         return JSONResponse(newBranch)
 
 

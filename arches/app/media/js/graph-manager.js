@@ -11,27 +11,38 @@ require([
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
     'models/node',
+    'models/graph',
     'bootstrap-nifty'
-], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel, GraphModel) {
     var graphData = JSON.parse($('#graph-data').val());
     var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
-    var datatypelookup = {}
-    _.each(datatypes, function(datatype){
-        datatypelookup[datatype.datatype] = datatype.iconclass;
-    }, this)
+    // var datatypelookup = {}
+    // _.each(datatypes, function(datatype){
+    //     datatypelookup[datatype.datatype] = datatype.iconclass;
+    // }, this)
 
-    graphData.nodes.forEach(function (node, i) {
-        graphData.nodes[i] = new NodeModel({
-            source: node,
-            datatypelookup: datatypelookup
-        });
-    });
+    // graphData.nodes.forEach(function (node, i) {
+    //     graphData.nodes[i] = new NodeModel({
+    //         source: node,
+    //         datatypelookup: datatypelookup
+    //     });
+    // });
 
     branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
     }, this);
+
+    var graphModel = new GraphModel({
+        nodes: graphData.nodes,
+        edges: graphData.edges,
+        datatypes: datatypes
+    });
+
+    graphModel.on('changed', function(model, options){
+        console.log('changed');
+    })
 
     var viewModel = {
         nodes: ko.observableArray(graphData.nodes),
@@ -61,14 +72,14 @@ require([
     });
 
     ko.computed(function() {
-        viewModel.editNode();
-        viewModel.selectedNodes();
+        graphModel.get('editNode')();
+        graphModel.get('selectedNodes')();
         viewModel.graph.render();
     });
 
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
-        node: viewModel.editNode
+        node: graphModel.get('editNode')
     });
 
     viewModel.nodeForm.on('node-updated', function(res) {
@@ -81,41 +92,42 @@ require([
         });
     });
 
-    var getEdges = function (node) {
-        var edges = viewModel.edges()
-            .filter(function (edge) {
-                return edge.domainnode_id === node.nodeid;
-            });
-        var nodes = edges.map(function (edge) {
-            return viewModel.nodes().find(function (node) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        });
-        nodes.forEach(function (node) {
-            edges = edges.concat(getEdges(node));
-        });
-        return edges
-    };
+    // var getEdges = function (node) {
+    //     var edges = viewModel.edges()
+    //         .filter(function (edge) {
+    //             return edge.domainnode_id === node.nodeid;
+    //         });
+    //     var nodes = edges.map(function (edge) {
+    //         return viewModel.nodes().find(function (node) {
+    //             return edge.rangenode_id === node.nodeid;
+    //         });
+    //     });
+    //     nodes.forEach(function (node) {
+    //         edges = edges.concat(getEdges(node));
+    //     });
+    //     return edges
+    // };
 
     viewModel.nodeForm.on('node-deleted', function (node) {
-        var edges = getEdges(node);
-        var nodes = edges.map(function (edge) {
-            return viewModel.nodes().find(function (node) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        });
-        var edge = viewModel.edges()
-            .find(function (edge) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        nodes.push(node);
-        edges.push(edge);
-        viewModel.edges.remove(function (edge) {
-            return _.contains(edges, edge);
-        });
-        viewModel.nodes.remove(function (node) {
-            return _.contains(nodes, node);
-        });
+        // var edges = getEdges(node);
+        // var nodes = edges.map(function (edge) {
+        //     return viewModel.nodes().find(function (node) {
+        //         return edge.rangenode_id === node.nodeid;
+        //     });
+        // });
+        // var edge = viewModel.edges()
+        //     .find(function (edge) {
+        //         return edge.rangenode_id === node.nodeid;
+        //     });
+        // nodes.push(node);
+        // edges.push(edge);
+        // viewModel.edges.remove(function (edge) {
+        //     return _.contains(edges, edge);
+        // });
+        // viewModel.nodes.remove(function (node) {
+        //     return _.contains(nodes, node);
+        // });
+        graphModel.deleteNode(node);
     });
 
     viewModel.graph.on('node-clicked', function (node) {
@@ -132,12 +144,14 @@ require([
     viewModel.branchList = new BranchListView({
         el: $('#branch-library'),
         branches: viewModel.branches,
-        editNode: viewModel.editNode
+        editNode: viewModel.editNode,
+        graphModel: graphModel
     });
 
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
-        nodes: viewModel.nodes
+        nodes: viewModel.nodes,
+        //graphModel: graphModel
     });
 
     viewModel.permissionsList = new PermissionsListView({
