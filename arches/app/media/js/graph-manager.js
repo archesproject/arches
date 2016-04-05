@@ -17,17 +17,6 @@ require([
     var graphData = JSON.parse($('#graph-data').val());
     var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
-    // var datatypelookup = {}
-    // _.each(datatypes, function(datatype){
-    //     datatypelookup[datatype.datatype] = datatype.iconclass;
-    // }, this)
-
-    // graphData.nodes.forEach(function (node, i) {
-    //     graphData.nodes[i] = new NodeModel({
-    //         source: node,
-    //         datatypelookup: datatypelookup
-    //     });
-    // });
 
     branches.forEach(function(branch){
         branch.selected = ko.observable(false);
@@ -45,23 +34,8 @@ require([
     })
 
     var viewModel = {
-        nodes: ko.observableArray(graphData.nodes),
-        edges: ko.observableArray(graphData.edges)
+        graphModel: graphModel
     };
-
-    viewModel.editNode = ko.computed(function() {
-        var editNode = _.find(viewModel.nodes(), function(node){
-            return node.editing();
-        }, this);
-        return editNode;
-    });
-
-    viewModel.selectedNodes = ko.computed(function() {
-        var selectedNodes = _.filter(viewModel.nodes(), function(node){
-            return node.selected();
-        }, this);
-        return selectedNodes;
-    });
 
     viewModel.graphView = new GraphView({
         el: $('#graph'),
@@ -80,7 +54,7 @@ require([
     });
 
     viewModel.nodeForm.on('node-updated', function(res) {
-        var nodes = viewModel.nodes();
+        var nodes = graphModel.get('nodes')();
         res.group_nodes.forEach(function(nodeJSON) {
             var node = _.find(nodes, function (node) {
                 return node.nodeid === nodeJSON.nodeid;
@@ -94,11 +68,12 @@ require([
     });
 
     viewModel.graphView.on('node-clicked', function (node) {
-        if (viewModel.editNode() && viewModel.editNode().dirty()) {
+        var editNode = graphModel.get('editNode');
+        if (editNode() && editNode().dirty()) {
             viewModel.nodeForm.closeClicked(true);
             return;
         }
-        viewModel.nodes().forEach(function (node) {
+        graphModel.get('nodes')().forEach(function (node) {
             node.editing(false);
         });
         node.editing(true);

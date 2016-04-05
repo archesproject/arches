@@ -7,15 +7,6 @@ define(['arches',
     return AbstractModel.extend({
         url: arches.urls.graph,
 
-        // defaults: {
-        //     '_nodes': [],
-        //     '_edges': []
-        // },
-
-        // initialize: function(attributes, options){
-        //     AbstractModel.prototype.initialize.apply(this, arguments);
-        // },
-
         constructor: function(attributes, options){
             options || (options = {});
             options.parse = true;
@@ -82,11 +73,6 @@ define(['arches',
             }, scope, 'changed');
         },
 
-        set: function(){
-            console.log(arguments)
-            AbstractModel.prototype.set.apply(this, arguments);
-        },
-
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
@@ -120,9 +106,6 @@ define(['arches',
                 }, this);
                 return selectedNodes;
             }));
-
-            // this.set('_nodes', attributes.nodes);
-            // this.set('_edges', attributes.edges);
         },
 
         _doRequest: function (config, callback, scope, eventname) {
@@ -136,7 +119,6 @@ define(['arches',
                         callback.call(scope, request, status, self);
                     }                    
                     if (status === 'success' &&  request.responseJSON) {
-                        //self.set(request.responseJSON);
                         self.trigger(eventname, self);
                     }
                 }

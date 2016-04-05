@@ -55,11 +55,6 @@ Configuration Manager
 						<!-- Graph -->
 						<div id="graph" class="" style="padding-right:220px;"></div>
 
-						<!-- Node Editor -->
-						<div id="nodeCrud" data-bind="visible: editNode(), with: nodeForm" style="display: none;" class="ui-widget-content">
-                            {% include 'views/graph-manager/node-form.htm' %}
-						</div>
-
 						<!-- Library/Permissions/Search -->
 						<div class="library-wrapper">
 							<div id="library" class="library library-right library-narrow library-dark">
@@ -105,6 +100,10 @@ Configuration Manager
 							</div>
 						</div>
 
+						<!-- Node Editor -->
+						<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
+                            {% include 'views/graph-manager/node-form.htm' %}
+						</div>
 
 						<!-- Permissions Form -->
 						<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
