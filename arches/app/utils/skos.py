@@ -54,7 +54,7 @@ class SKOSReader(object):
         baseuuid = uuid.uuid4()
         allowed_languages = models.DLanguage.objects.values_list('pk', flat=True)
 
-        value_types = models.ValueTypes.objects.all()
+        value_types = models.DValueType.objects.all()
         skos_value_types = value_types.filter(namespace = 'skos')
         skos_value_types_list = skos_value_types.values_list('valuetype', flat=True)
         dcterms_value_types = value_types.filter(namespace = 'dcterms')

@@ -17,30 +17,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
-import types
-import copy
-import arches.app.models.models as archesmodels
-from django.apps import apps
-from django.contrib.gis.db import models
-from django.contrib.gis.geos import fromstr
-from django.contrib.gis.geos import GEOSGeometry
-from django.db import connection
-from django.db import transaction
-from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from arches.app.models.concept import Concept
+from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class ResourceGraph(object):
-    """ 
+    """
     Used for mapping complete resource graph objects to and from the database
 
     """
-    
+
     def __init__(self, *args, **kwargs):
-        if args[0]["nodes"] and args[0]["edges"]:
+        self.nodes = []
+        self.edges = []
+        if isinstance(args[0], basestring):
+            try:
+                uuid.UUID(args[0])
+                root = models.Node.objects.get(pk=args[0])
+                self.get_nodes_and_edges(root)
+            except(ValueError):
+                pass
+                #self.load(JSONDeserializer().deserialize(args[0]))
+        elif isinstance(args[0], models.Node):
+            self.get_nodes_and_edges(args[0])
+        elif args[0]["nodes"] and args[0]["edges"]:
             self.nodes = args[0]["nodes"]
             self.edges = args[0]["edges"]
-
 
     def _save(self):
         """
@@ -49,7 +50,7 @@ class ResourceGraph(object):
         """
 
         for node in self.nodes:
-            newNode = archesmodels.Node()
+            newNode = models.Node()
 
             try:
                 uuid.UUID(str(node['nodeid']))
@@ -70,7 +71,7 @@ class ResourceGraph(object):
 
 
         for edge in self.edges:
-            newEdge = archesmodels.Edge()
+            newEdge = models.Edge()
             # self.get_node_id_from_text()
 
             try:
@@ -87,6 +88,14 @@ class ResourceGraph(object):
             edge['edgeid'] = newEdge.edgeid
             newEdge.save()
 
+    def get_nodes_and_edges(self, node):
+        """
+        Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
+
+        """
+        self.nodes.append(node)
+        self.nodes.extend(node.get_downstream_nodes())
+        self.edges.extend(node.get_downstream_edges())
 
     def get_node_id_from_text(self):
         for edge in self.edges:
@@ -95,4 +104,3 @@ class ResourceGraph(object):
                     edge['domainnodeid'] = node['nodeid']
                 if edge['rangenodeid'] == node['name']:
                     edge['rangenodeid'] = node['nodeid']
-

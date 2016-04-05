@@ -309,6 +309,27 @@ PACKAGE_VALIDATOR = 'arches.app.utils.mock_package_validator'
 # NOTE: This is not used by the front end of the application.
 DATA_VALIDATION_BBOX = [(-180,-90), (-180,90), (180,90), (180,-90), (-180,-90)]
 
+RESOURCE_GRAPH_LOCATIONS = (
+    # Put strings here, like "/home/data/resource_graphs" or "C:/data/resource_graphs".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+
+CONCEPT_SCHEME_LOCATIONS = (
+    # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    
+    # 'absolute/path/to/authority_files',
+    # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
+)
+
+BUSISNESS_DATA_FILES = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+
 try:
     from settings_local import *
 except ImportError:

@@ -36,8 +36,8 @@ class Address(models.Model):
 
 
 class BranchMetadata(models.Model):
-    branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)  # This field type is a guess.
-    name = models.BigIntegerField(blank=True, null=True)
+    branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
@@ -86,6 +86,13 @@ class Concept(models.Model):
         managed = True
         db_table = 'concepts'
 
+class DDataType(models.Model):
+    datatype = models.TextField(primary_key=True)
+    iconclass = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = 'd_data_types'
 
 class DLanguage(models.Model):
     languageid = models.TextField(primary_key=True)
@@ -209,6 +216,20 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
+    def get_downstream_nodes(self):
+        edges = Edge.objects.filter(domainnode=self)
+        nodes = [edge.rangenode for edge in edges]
+        map(nodes.extend, [node.get_downstream_nodes() for node in nodes])
+        return nodes
+
+    def get_downstream_edges(self):
+        edges = list(Edge.objects.filter(domainnode=self))
+        map(edges.extend, [edge.rangenode.get_downstream_edges() for edge in edges])
+        return edges
+
+    def is_collector(self):
+        return self.nodeid == self.nodegroup_id
+
     class Meta:
         managed = True
         db_table = 'nodes'
@@ -265,7 +286,7 @@ class ResourceXResource(models.Model):
     resourceinstanceidfrom = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidfrom', blank=True, null=True, related_name='resxres_resource_instance_ids_from')
     resourceinstanceidto = models.ForeignKey('ResourceInstance', db_column='resourceinstanceidto', blank=True, null=True, related_name='resxres_resource_instance_ids_to')
     notes = models.TextField(blank=True, null=True)
-    relationshiptype = models.ForeignKey('Value', db_column='valueid')
+    relationshiptype = models.ForeignKey('Value', db_column='relationshiptype')
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
 
@@ -331,3 +352,13 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class WidgetXDataType(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    widget = models.ForeignKey(db_column='widgetid', to='models.Widget')
+    datatype = models.ForeignKey(db_column='datatypeid', to='models.DDataType')
+
+    class Meta:
+        managed = True
+        db_table = 'widgets_x_datatypes'

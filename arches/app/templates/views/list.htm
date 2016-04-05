@@ -1,0 +1,40 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<div class="tab-pane fade active in">
+    <!-- Title -->
+    <div class="">
+        <h4 class="node-title" style="">{% block title %}{% endblock %}</h4>
+    </div>
+    
+    <!-- Group/User Search -->
+    <div class="" style="">
+        <input type="text" class="form-control library-search" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'"> 
+
+        <!-- Remove Search -->
+        <span class="clear-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+    </div>
+
+    <!-- ko if: $data.single_select == false -->
+    <div class="pad-rgt pad-btm clear-selection" style="">
+        <a class="clear-selection-link" style="" data-bind="click: clearSelection">clear selection</a>
+    </div>
+    <!-- /ko -->                                  
+
+    <!-- Group/User List  -->
+    <div class="grid-container">
+
+        <!-- Group/User Grid -->
+        <div class="grid" style="margin-top: 0px; background: none;" data-packery='{ "itemSelector": ".library-card", "gutter": 10 }'>
+
+            <!-- Card -->
+            <!-- ko foreach: $data.items -->
+                <div class="library-card graph-library" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent)">
+                    {% block listitem %}{% endblock %}
+                </div>
+
+            <!-- /ko -->                                  
+
+        </div>
+    </div>
+</div>

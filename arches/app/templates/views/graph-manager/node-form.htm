@@ -1,0 +1,78 @@
+{% load staticfiles %}
+{% load i18n %}
+<!-- ko if: node -->
+<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">Unnamed node</span></span</p>
+
+<div class="relative">
+    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
+</div>
+
+<div>
+
+    <hr class="section-division-dark node-section-division">
+
+    <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
+        <i class="fa fa-spinner fa-spin"> </i> <span> Loading...</span>
+    </div>
+
+    <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
+        <span>You have pending edits. Please save or cancel your edits before closing.</span>
+    </div>
+
+    <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
+        <span>We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.</span>
+    </div>
+
+    <div class="node-section">
+
+        <div style="padding-bottom: 25px;">
+
+            <div class="node-widget-label">
+                <div class="control-label">
+                    Node Name
+                </div>
+                <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
+                    <input type="text" placeholder="Enter node name here..." class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr class="section-division-dark node-section-division">
+
+    <hr class="section-division-dark node-section-division">
+    <div class="node-section">
+
+        <div>
+
+            <div style="padding-bottom: 15px;" data-bind="if: !node().istopnode">
+
+
+                <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
+
+                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
+                    Collector
+                </p>
+                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                    Data from this node and downstream nodes will be collected in a single form section
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="pull-right">
+        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
+        <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
+    </div>
+    <div class="pull-right" style="margin-top:5px;">
+        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> Delete</button>
+    </div>
+</div>
+<!-- /ko -->

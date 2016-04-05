@@ -164,8 +164,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BranchMetadata',
             fields=[
-                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, editable=False, primary_key=True)),
-                ('name', models.BigIntegerField(null=True, blank=True)),
+                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('name', models.TextField(null=True, blank=True)),
                 ('deploymentfile', models.TextField(null=True, blank=True)),
                 ('author', models.TextField(null=True, blank=True)),
                 ('deploymentdate', models.DateTimeField(null=True, blank=True)),
@@ -211,6 +211,17 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'concepts',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='DDataType',
+            fields=[
+                ('datatype', models.TextField(primary_key=True, serialize=False)),
+                ('iconclass', models.TextField()),
+            ],
+            options={
+                'db_table': 'd_data_types',
                 'managed': True,
             },
         ),
@@ -486,10 +497,22 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='WidgetXDataType',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('widget', models.ForeignKey(db_column='widgetid', to='models.Widget')),
+                ('datatype', models.ForeignKey(db_column='datatypeid', to='models.DDataType')),
+            ],
+            options={
+                'db_table': 'widgets_x_datatypes',
+                'managed': True,
+            },
+        ),
         migrations.AddField(
             model_name='resourcexresource',
             name='relationshiptype',
-            field=models.ForeignKey(db_column='valueid', to='models.Value'),
+            field=models.ForeignKey(db_column='relationshiptype', to='models.Value'),
         ),
         migrations.AddField(
             model_name='resourcexresource',

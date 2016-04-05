@@ -6,21 +6,27 @@
 
 /* Generic Card Classes
 ---------------------------------------------- */
+.card-container-header {
+	background-color: #ffffff;
+	border: 1px solid #ddd;
+	border-bottom-width: 0px;
+}
+
 .card-main-title {
-	font-size: 16px;
+	font-size: 19px;
 	font-weight: 500;
 }
 
 .card-panel {
 	border: 0px solid #ddd; 
 	margin-bottom: 0px;
-	background: #f8f8f8;
     padding: 0px 20px 1px 20px;
 }
 
 .card-body {
-	padding: 20px;
+	padding: 10px 20px 20px 20px;
 	border: 1px solid #ddd;
+	border-top-width: 0px;
 	background-color: white;
 }
 
@@ -161,7 +167,7 @@ input[type="checkbox"]{
     direction: rtl;
 }
 
-.wizard-buttons button {
+.wizard-buttons * {
     direction: ltr;
 }
 
@@ -308,6 +314,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 
 .btn-shim {
 	margin-bottom: 3px;
+}
+
+.select2-search {
+	margin-top: 10px;	
 }
 
 

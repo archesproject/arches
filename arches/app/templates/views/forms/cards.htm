@@ -39,7 +39,7 @@
                 <!-- Actual Card HTML goes here -->
                 
                 {% if card.cardinality != 'n' %}
-                    <div data-bind="with:$data.tiles['{{card.nodegroup_id}}']()[0]" >
+                    <div data-bind="with: ($data.tiles['{{card.nodegroup_id}}']().length > 0 ? $data.tiles['{{card.nodegroup_id}}']()[0] : $root.form.blanks['{{card.nodegroup_id}}'])" >
                 {% endif %}
 
                 {% if card.cardinality == 'n' or forceBlank %}
