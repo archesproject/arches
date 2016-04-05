@@ -5,22 +5,22 @@ files:
     destination: /home/ubuntu
 hooks:
   ApplicationStop:
-    - location: arches/install/arches_stop.sh
+    - location: ~/codedeploy/install/arches_stop.sh
       timeout: 300
       mode: 755
       runas: ubuntu
   BeforeInstall:
-    - location: arches/install/ubuntu_trusty_setup.sh
+    - location: ~/codedeploy/install/ubuntu_trusty_setup.sh
       timeout: 300
       mode: 755
       runas: ubuntu
   Install:
-    - location: arches/install/install_arches.sh
+    - location: ~/codedeploy/install/install_arches.sh
       timeout: 300
       mode: 755
       runas: ubuntu
   ApplicationStart:
-    - location: arches/install/arches_start.sh
+    - location: ~/codedeploy/install/arches_start.sh
       timeout: 300
       mode: 755
       runas: ubuntu
