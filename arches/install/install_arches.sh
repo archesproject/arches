@@ -17,5 +17,5 @@ python setup.py install
 
 python manage.py packages -o setup
 
-python manage.py collectstatic -y
-sudo service apache2 restart
+# python manage.py collectstatic -y
+# sudo service apache2 restart
