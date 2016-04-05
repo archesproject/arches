@@ -23,19 +23,19 @@ define(['arches',
                     return this.get('nodes')().find(function (node) {
                         return edge.rangenode_id === node.nodeid;
                     });
-                });
+                }, this);
                 nodes.forEach(function (node) {
-                    edges = edges.concat(getEdges(node));
-                });
+                    edges = edges.concat(getEdges.call(this, node));
+                }, this);
                 return edges
             };
 
             var edges = getEdges.call(this, node);
             var nodes = edges.map(function (edge) {
-                return this.get('nodes').find(function (node) {
+                return this.get('nodes')().find(function (node) {
                     return edge.rangenode_id === node.nodeid;
                 });
-            });
+            }, this);
             var edge = this.get('edges')()
                 .find(function (edge) {
                     return edge.rangenode_id === node.nodeid;
