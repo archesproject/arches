@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-sudo rm -r -y /home/ubuntu/arches
-sudo rm -r -y /home/ubuntu/ENV
+sudo rm -r /home/ubuntu/arches
+sudo rm -r /home/ubuntu/ENV
 
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
@@ -16,6 +16,9 @@ cd /home/ubuntu/arches
 python setup.py install
 
 python manage.py packages -o setup
+
+python manage.py packages -o setup_db
+python manage.py packages -o import_json
 
 sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
 python manage.py collectstatic --noinput
