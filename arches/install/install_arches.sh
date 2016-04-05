@@ -17,5 +17,7 @@ python setup.py install
 
 python manage.py packages -o setup
 
-# python manage.py collectstatic -y
-# sudo service apache2 restart
+sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
+python manage.py collectstatic --noinput
+sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log
+sudo service apache2 restart
