@@ -34,7 +34,6 @@ def manager(request, nodeid):
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['rootnode'] = rootnode
         branch['graph'] = ResourceGraph(rootnode)
 
     datatypes = models.DDataType.objects.all()
