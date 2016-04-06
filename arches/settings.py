@@ -62,7 +62,7 @@ SEARCH_EXPORT_ITEMS_PER_PAGE = 100000
 SEARCH_DROPDOWN_LENGTH = 100
 WORDS_PER_SEARCH_TERM = 10 # set to None for unlimited number of words allowed for search terms
 
-DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resources' # override this setting in your packages settings.py file
+DISPLAY_NAME_FOR_UNNAMED_ENTITIES = 'Unnamed Resource' # override this setting in your packages settings.py file
 
 # override this setting in your packages settings.py file
 # entity type that holds the spatial coordinates of resources
