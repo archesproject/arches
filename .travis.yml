@@ -62,7 +62,7 @@ deploy:
   skip_cleanup: true
   on: &2
     repo: archesproject/arches
-    branch: travis_ci_tests
+    branch: master
   bucket: arches-codedeploy
 #  upload_dir: latest
 - provider: codedeploy
