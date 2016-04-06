@@ -48,16 +48,6 @@ require([
         graphModel: graphModel
     });
 
-    viewModel.nodeForm.on('node-updated', function(res) {
-        var nodes = graphModel.get('nodes')();
-        res.group_nodes.forEach(function(nodeJSON) {
-            var node = _.find(nodes, function (node) {
-                return node.nodeid === nodeJSON.nodeid;
-            });
-            node.parse(nodeJSON);
-        });
-    });
-
     viewModel.graphView.on('node-clicked', function (node) {
         var editNode = graphModel.get('editNode');
         if (editNode() && editNode().dirty()) {

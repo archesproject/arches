@@ -58,15 +58,21 @@ define([
         save: function () {
             var self = this;
             this.callAsync('save', function (request) {
+                var groupNodes = request.responseJSON.group_nodes;
+                var nodes = self.graphModel.get('nodes')();
                 self.node().parse(request.responseJSON.node);
-                self.trigger('node-updated', request.responseJSON);
+                groupNodes.forEach(function(nodeJSON) {
+                    var node = _.find(nodes, function (node) {
+                        return node.nodeid === nodeJSON.nodeid;
+                    });
+                    node.parse(nodeJSON);
+                });
             });
         },
         deleteNode: function () {
             var self = this;
             this.callAsync('delete', function () {
                 self.graphModel.deleteNode(self.node())
-                self.trigger('node-deleted', self.node());
             });
         },
         toggleIsCollector: function () {
