@@ -17,10 +17,8 @@ python setup.py install
 
 python manage.py packages -o setup
 
-cd /home/ubuntu
-mv /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
+cp /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
 
-cd /home/ubuntu/arches
 python manage.py packages -o setup_db
 python manage.py packages -o import_json
 
