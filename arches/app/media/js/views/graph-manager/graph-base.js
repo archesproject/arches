@@ -33,7 +33,9 @@ define([
                 });
 
             this.diagonal = d3.svg.diagonal.radial()
-                .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+                .projection(function(d) { 
+                    return [d.y, d.x / 180 * Math.PI];   
+                });
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
@@ -54,33 +56,32 @@ define([
                 if (node.istopnode) {
                     this.root = node;
                 }
-                if (node.children) {
-                    delete node.children;
-                }
             }, this);
 
-            this.renderLinks();
+            this.tree_nodes = this.tree.nodes(this.root);
+            this.tree_nodes.forEach(function(node){
+                if (isNaN(node.x)) {
+                    node.x = 0;
+                }
+            })
 
-            var nodes = this.tree.nodes(this.root);
-            if (isNaN(nodes[0].x)) {
-                nodes[0].x = 0;
-            }
+            this.renderLinks();
+            this.renderNodes();
+        },
+        renderNodes: function(){
             this.allNodes = this.svg.selectAll(".node")
-                .data(nodes, function(d) { return d.nodeid });
+                .data(this.tree_nodes, function(d) { return d.nodeid });
 
             this.node = this.allNodes.enter().append("g")
                 .attr("class", 'node')
                 .attr("transform", function(d) { 
                     return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; 
                 });
-
-            this.renderNodes();
-            this.renderNodeText();
-        },
-        renderNodes: function(){
+                
             this.node.append("circle")
                 .attr("r", this.nodesize)
-
+            
+            this.renderNodeText();
         },
         renderNodeText: function(){
             var self = this;
@@ -99,8 +100,7 @@ define([
                 });
         },
         renderLinks: function(){
-            var nodes = this.tree.nodes(this.root);
-            var links = this.tree.links(nodes);
+            var links = this.tree.links(this.tree_nodes);
 
             var link = this.svg.selectAll(".link")
                 .data(links, function(d) { return d.target.nodeid });
