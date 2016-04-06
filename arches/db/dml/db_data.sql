@@ -145,7 +145,7 @@ INSERT INTO widgets(widgetid, name, template)
 INSERT INTO widgets(widgetid, name, template)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'datepicker.htm');
 
-
+-- Node branch
 INSERT INTO branch_metadata(branchmetadataid, name, author, version, description)
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph');
 
@@ -156,7 +156,7 @@ INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
 
 
-
+-- Node/NodeType branch
 INSERT INTO branch_metadata(branchmetadataid, name, author, version, description)
     VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing');
 
