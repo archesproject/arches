@@ -7,7 +7,7 @@ sudo apt-get install -y git
 sudo apt-get install -y python-pip
 sudo -H pip install virtualenv==13.1.2
 
-git clone -b travis_ci_tests https://github.com/archesproject/arches.git /home/ubuntu/arches
+git clone -b master https://github.com/archesproject/arches.git /home/ubuntu/arches
 
 virtualenv /home/ubuntu/ENV
 source /home/ubuntu/ENV/bin/activate
