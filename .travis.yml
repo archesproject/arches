@@ -48,7 +48,34 @@ script:
 
 after_success:
   - coveralls
-  
+
 notifications:
   slack:
     secure: j8ECDivRYYfWY/ZpWHDEDNjbJarKjBwzmbQLDRV/8JnI61xi965c8IdflUXrKNbTE7AV0QQIsSRj0Aq7e3V0aipH1xpWDGVPX18c80a9HbAV1MHTPjWNfkxzrCdhhTiq2wxzGQjObO298IcEdzHrZPYi0TA+P8PjtVj5c3cvmPYiB03irgLDeLZjbOaUvIn7/tzaO9GMINwY8zDG4rpjI3/yQ/KqofWu1M8tDLoA5+KBlGTYXQsBkh2CFd0AMQ0C5iejyG0PSe5vstVmLmD93HZoOzeKP9E10h5+JxONJ8cgQtNTYdrEZ5/zo3H1UJ+zB+UOxq8UdtwtvyZ/bej4HmjZJpxaXKnvC/hTVvCW4sd1Cty8At874UtPfUvnRYeIj0cCvtTcvQ/4bifkdfLY7GrhMm9e3PeMM3hYxM4+v0Q6q8TLxhaHZe06jDlNjp6vJTW31MAetJJw+894MDd5EHXpF6yf7VUrtkD01frVUEEMP7ZNN9oClPimOChoc73FaM1HRviwN31jScXN3NkW5lusEyoBPJALV3cGVUEfRaUUg5wvObJ+/vTG8h9kXj/N5NJl8E/SAJi74ro6nWoZFwX0JH5IrXW9d2Do12pJR3cEAdafryzvCF4R/8kOyWgumoAUklR8Stm064Go/9gnfCdJBwsfxv7pSvGLRi8DF/4=
+
+deploy:
+- provider: s3
+  access_key_id: AKIAIPJSP4QJ5VLPBKIQ
+  secret_access_key: &1
+    secure: i5uomoX4V0wrn3y09g0vcjPkvoeBYhaA0BR4inAyXM599UbEn15qXa7bdopyVz92Z5Q1EFOHUbd1mLQH8nJ/F3B2Bb4MKQkwyH3oDIcDbFgtwwmC4CbZAfJ6QtKiKZF1eisrRn1YwcEMT27HWbRBYiEuqJBhA3OV+szLRia7frtdOMujzox5EwxW5cTRNSJEaXh89I51FjurTI544Tk6y47SQjc0V7tquyd9bQF9bRXMARhdKj4D93jBGLhXhi8REoyerNHIw0CgHv5LK36lG5MFJTMrDYcmDTfnqXGVVItQ/iTAoDGqtqNwof1xk56oCxCcB5HbQEH2pp+IK+wLCvFXAkp75pBujbY7fOEKe7cgRjmIYls8XLiOLvNpkON1JvnBZvQJAhiHPWSIWfeMO5rZk7CliWyOhV/YCnwwN2nEGcTKP6VU/2ReyqvV5ZCz5vY6ymrwsR+UTxaZmjJBs7Bvd9F/v6LaFOJOZnc8qGiK42RktH5/63m72UJA2x5HDpLVtbHf7pZ+vXoXD1b6ePIU0JcW8Ka7p9MKWuYPJM27QERdvOBS4d51Uuyzspk6uRLydVuXqSErjiid6CbQS6YKVCnOQoOTbSQT1QcsFyA+Jf1I4usrkq8Wi4wHY8GcFnyf1uHxJMBaP83C7ZV76HQ1WhX2QGaLUxvDYdXi8xQ=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &2
+    repo: archesproject/arches
+    branch: master
+  bucket: arches-codedeploy
+#  upload_dir: latest
+- provider: codedeploy
+  access_key_id: AKIAIPJSP4QJ5VLPBKIQ
+  secret_access_key: *1
+  bucket: arches-codedeploy
+  key: arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip
+  bundle_type: zip
+  application: arches
+  deployment_group: arches_group
+  region: us-west-1
+  on: *2
+before_deploy:
+- zip codedeploy.zip -r  --exclude=*__pycache__* appspec.yml arches/install/*.sh
+- mkdir -p dpl_cd_upload
+- mv codedeploy.zip dpl_cd_upload/arches-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER-$TRAVIS_COMMIT.zip

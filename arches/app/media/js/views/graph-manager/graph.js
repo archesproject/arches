@@ -6,7 +6,8 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'editNode'));
+            this.editNode = options.graphModel.get('editNode');
+            this.selectedNodes = options.graphModel.get('selectedNodes');
             GraphBase.prototype.initialize.apply(this, arguments);
 
             this.addNodeListeners();
@@ -15,6 +16,12 @@ define([
                 this.addNodeListeners();
             }, this);
             this.edges.subscribe(function() {
+                this.render();
+            }, this);
+
+            ko.computed(function() {
+                this.editNode();
+                this.selectedNodes();
                 this.render();
             }, this);
         },

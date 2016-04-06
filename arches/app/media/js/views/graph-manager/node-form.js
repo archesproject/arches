@@ -5,12 +5,11 @@ define([
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            this.node = ko.observable(null);
+            this.graphModel = options.graphModel;
+            this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);
             this.failed = ko.observable(false);
-
-            _.extend(this, _.pick(options, 'node'));
 
             this.title = ko.computed(function () {
                 var node = self.node();
@@ -66,6 +65,7 @@ define([
         deleteNode: function () {
             var self = this;
             this.callAsync('delete', function () {
+                self.graphModel.deleteNode(self.node())
                 self.trigger('node-deleted', self.node());
             });
         },

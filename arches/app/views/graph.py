@@ -33,7 +33,10 @@ def manager(request, nodeid):
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
     for branch in branches:
-        branch['graph'] = ResourceGraph(branch_nodes.get(branchmetadata_id=branch['branchmetadataid']))
+        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
+        branch['rootnode'] = rootnode
+        branch['graph'] = ResourceGraph(rootnode)
+
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
@@ -61,7 +64,7 @@ def node(request, nodeid):
         data = JSONDeserializer().deserialize(request.body)
         if data:
             node = models.Node.objects.get(nodeid=nodeid)
-            nodes = node.get_downstream_nodes()
+            nodes, edges = node.get_child_nodes_and_edges()
             collectors = [node_ for node_ in nodes if node_.is_collector()]
             node_ids = [id_node.nodeid for id_node in nodes]
             nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
@@ -96,8 +99,7 @@ def node(request, nodeid):
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)
-        nodes = node.get_downstream_nodes()
-        edges = node.get_downstream_edges()
+        nodes, edges = node.get_child_nodes_and_edges()
         edges.append(models.Edge.objects.get(rangenode=node))
         nodes.append(node)
         with transaction.atomic():
@@ -105,4 +107,15 @@ def node(request, nodeid):
             [node.delete() for node in nodes]
             return JSONResponse({})
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
+
+
+@csrf_exempt
+def append_branch(request, nodeid, property, branchmetadataid):
+    if request.method == 'POST':
+        graph = ResourceGraph(nodeid)
+        newBranch = graph.append_branch(property, nodeid=nodeid, branchmetadataid=branchmetadataid)
+        return JSONResponse(newBranch)
+
+
+    return HttpResponseNotFound()

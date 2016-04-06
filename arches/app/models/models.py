@@ -38,6 +38,7 @@ class Address(models.Model):
 class BranchMetadata(models.Model):
     branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
@@ -206,9 +207,11 @@ class NodeGroup(models.Model):
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
+    
     """
+
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(unique=True)
+    name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
     ontologyclass = models.TextField()
@@ -216,16 +219,17 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
-    def get_downstream_nodes(self):
-        edges = Edge.objects.filter(domainnode=self)
-        nodes = [edge.rangenode for edge in edges]
-        map(nodes.extend, [node.get_downstream_nodes() for node in nodes])
-        return nodes
+    def get_child_nodes_and_edges(self):
+        nodes = []
+        edges = []
+        for edge in Edge.objects.filter(domainnode=self):
+            nodes.append(edge.rangenode)
+            edges.append(edge)
 
-    def get_downstream_edges(self):
-        edges = list(Edge.objects.filter(domainnode=self))
-        map(edges.extend, [edge.rangenode.get_downstream_edges() for edge in edges])
-        return edges
+            child_nodes, child_edges = edge.rangenode.get_child_nodes_and_edges()
+            nodes.extend(child_nodes)
+            edges.extend(child_edges)
+        return (nodes, edges)
 
     def is_collector(self):
         return self.nodeid == self.nodegroup_id

@@ -11,68 +11,45 @@ require([
     'views/graph-manager/permissions-form',
     'views/graph-manager/branch-info',
     'models/node',
+    'models/graph',
     'bootstrap-nifty'
-], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel, GraphModel) {
     var graphData = JSON.parse($('#graph-data').val());
     var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
-    var datatypelookup = {}
-    _.each(datatypes, function(datatype){
-        datatypelookup[datatype.datatype] = datatype.iconclass;
-    }, this)
-
-    graphData.nodes.forEach(function (node, i) {
-        graphData.nodes[i] = new NodeModel({
-            source: node,
-            datatypelookup: datatypelookup
-        });
-    });
 
     branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
     }, this);
 
+    var graphModel = new GraphModel({
+        nodes: graphData.nodes,
+        edges: graphData.edges,
+        datatypes: datatypes
+    });
+
+    graphModel.on('changed', function(model, options){
+        console.log('changed');
+        viewModel.graphView.redraw(true);
+    })
+
     var viewModel = {
-        nodes: ko.observableArray(graphData.nodes),
-        edges: ko.observableArray(graphData.edges),
-        branches: ko.observableArray(branches)
+        graphModel: graphModel
     };
 
-    viewModel.editNode = ko.computed(function() {
-        var editNode = _.find(viewModel.nodes(), function(node){
-            return node.editing();
-        }, this);
-        return editNode;
-    });
-
-    viewModel.selectedNodes = ko.computed(function() {
-        var selectedNodes = _.filter(viewModel.nodes(), function(node){
-            return node.selected();
-        }, this);
-        return selectedNodes;
-    });
-
-    viewModel.graph = new GraphView({
+    viewModel.graphView = new GraphView({
         el: $('#graph'),
-        nodes: viewModel.nodes,
-        edges: viewModel.edges,
-        editNode: viewModel.editNode
-    });
-
-    ko.computed(function() {
-        viewModel.editNode();
-        viewModel.selectedNodes();
-        viewModel.graph.render();
+        graphModel: graphModel
     });
 
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
-        node: viewModel.editNode
+        graphModel: graphModel
     });
 
     viewModel.nodeForm.on('node-updated', function(res) {
-        var nodes = viewModel.nodes();
+        var nodes = graphModel.get('nodes')();
         res.group_nodes.forEach(function(nodeJSON) {
             var node = _.find(nodes, function (node) {
                 return node.nodeid === nodeJSON.nodeid;
@@ -81,49 +58,13 @@ require([
         });
     });
 
-    var getEdges = function (node) {
-        var edges = viewModel.edges()
-            .filter(function (edge) {
-                return edge.domainnode_id === node.nodeid;
-            });
-        var nodes = edges.map(function (edge) {
-            return viewModel.nodes().find(function (node) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        });
-        nodes.forEach(function (node) {
-            edges = edges.concat(getEdges(node));
-        });
-        return edges
-    };
-
-    viewModel.nodeForm.on('node-deleted', function (node) {
-        var edges = getEdges(node);
-        var nodes = edges.map(function (edge) {
-            return viewModel.nodes().find(function (node) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        });
-        var edge = viewModel.edges()
-            .find(function (edge) {
-                return edge.rangenode_id === node.nodeid;
-            });
-        nodes.push(node);
-        edges.push(edge);
-        viewModel.edges.remove(function (edge) {
-            return _.contains(edges, edge);
-        });
-        viewModel.nodes.remove(function (node) {
-            return _.contains(nodes, node);
-        });
-    });
-
-    viewModel.graph.on('node-clicked', function (node) {
-        if (viewModel.editNode() && viewModel.editNode().dirty()) {
+    viewModel.graphView.on('node-clicked', function (node) {
+        var editNode = graphModel.get('editNode');
+        if (editNode() && editNode().dirty()) {
             viewModel.nodeForm.closeClicked(true);
             return;
         }
-        viewModel.nodes().forEach(function (node) {
+        graphModel.get('nodes')().forEach(function (node) {
             node.editing(false);
         });
         node.editing(true);
@@ -131,12 +72,13 @@ require([
 
     viewModel.branchList = new BranchListView({
         el: $('#branch-library'),
-        branches: viewModel.branches
+        branches: ko.observableArray(branches),
+        graphModel: graphModel
     });
 
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
-        nodes: viewModel.nodes
+        graphModel: graphModel
     });
 
     viewModel.permissionsList = new PermissionsListView({
@@ -155,7 +97,7 @@ require([
         $('#graph').height($(window).height()-200);
         $('.tab-content').height($(window).height()-259);
         $('.grid-container').height($(window).height()-360);
-        viewModel.graph.resize();
+        viewModel.graphView.resize();
     }
 
     $( window ).resize(resize);
