@@ -48,6 +48,7 @@ define(['arches',
             this.get('nodes').remove(function (node) {
                 return _.contains(nodes, node);
             });
+            this.trigger('changed');
         },
 
         appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
