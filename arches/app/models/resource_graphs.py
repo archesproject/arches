@@ -27,21 +27,23 @@ class ResourceGraph(object):
     """
 
     def __init__(self, *args, **kwargs):
+        self.root = None
         self.nodes = []
         self.edges = []
-        if isinstance(args[0], basestring):
-            try:
-                uuid.UUID(args[0])
-                root = models.Node.objects.get(pk=args[0])
-                self.get_nodes_and_edges(root)
-            except(ValueError):
-                pass
-                #self.load(JSONDeserializer().deserialize(args[0]))
-        elif isinstance(args[0], models.Node):
-            self.get_nodes_and_edges(args[0])
-        elif args[0]["nodes"] and args[0]["edges"]:
-            self.nodes = args[0]["nodes"]
-            self.edges = args[0]["edges"]
+        if args:
+            if isinstance(args[0], basestring):
+                try:
+                    uuid.UUID(args[0])
+                    root = models.Node.objects.get(pk=args[0])
+                    self.get_nodes_and_edges(root)
+                except(ValueError):
+                    pass
+                    #self.load(JSONDeserializer().deserialize(args[0]))
+            elif isinstance(args[0], models.Node):
+                self.get_nodes_and_edges(args[0])
+            elif args[0]["nodes"] and args[0]["edges"]:
+                self.nodes = args[0]["nodes"]
+                self.edges = args[0]["edges"]
 
     def _save(self):
         """
@@ -93,9 +95,72 @@ class ResourceGraph(object):
         Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
 
         """
+        
+        self.root = node
         self.nodes.append(node)
-        self.nodes.extend(node.get_downstream_nodes())
-        self.edges.extend(node.get_downstream_edges())
+
+        child_nodes, child_edges = node.get_child_nodes_and_edges()
+
+        self.nodes.extend(child_nodes)
+        self.edges.extend(child_edges)
+
+    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):  
+        """
+        Appends a branch onto this graph
+
+        property: the property to use when appending the branch
+
+        nodeid: if given will append the branch to this node, if not supplied will 
+        append the branch to the root of this graph 
+
+        branch_root: the root node of the branch you want to append
+
+        branchmetadataid: get the branch to append based on the branchmetadataid, 
+        if given, branch_root takes precedence
+
+        """
+        
+        if not branch_root:
+            branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
+        branch_root.istopnode = False
+        branch_graph = ResourceGraph(branch_root)
+        new_branch = branch_graph.copy()
+        newEdge = models.Edge(
+            domainnode_id = (nodeid if nodeid else self.root.pk),
+            rangenode = new_branch.root,
+            ontologyproperty = property
+        )
+        newEdge.save()
+        branch_graph.edges.append(newEdge)
+        return branch_graph
+
+    def copy(self):
+        mapping = {}
+        ret = ResourceGraph()
+        self.root.pk = None
+        self.root.save()
+        mapping[self.root.pk] = self.root
+        for edge in self.edges:
+            if(edge.rangenode_id not in mapping):
+                #mapping[edge.rangenode_id] = None
+                edge.rangenode.pk = None
+                mapping[edge.rangenode_id] = edge.rangenode.save()
+            else:
+                edge.rangenode = mapping[edge.rangenode_id]
+            if(edge.domainnode_id not in mapping):
+                edge.domainnode.pk = None
+                mapping[edge.domainnode_id] = edge.domainnode.save()
+            else:
+                edge.domainnode = mapping[edge.domainnode_id]
+            edge.pk = None
+            edge.save()
+            ret.edges.append(edge)
+        for nodeid, node in mapping.iteritems():
+            if str(self.root.pk) == str(nodeid):
+                ret.root = node
+            ret.nodes.append(node)
+
+        return ret
 
     def get_node_id_from_text(self):
         for edge in self.edges:

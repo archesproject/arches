@@ -41,10 +41,13 @@ class ResourceGraphTests(ArchesTestCase):
         Test that correct number of nodes and edges load
 
         """
+
         root = Node.objects.get(nodeid=ROOT_ID)
-        node_count = len(root.get_downstream_nodes())
+        nodes, edges = root.get_child_nodes_and_edges()
+        node_count = len(nodes)
+        edge_count = len(edges)
+        
         self.assertEqual(node_count, NODE_COUNT)
-        edge_count = len(root.get_downstream_edges())
         self.assertEqual(edge_count, NODE_COUNT)
 
     def test_graph_manager(self):
@@ -55,8 +58,10 @@ class ResourceGraphTests(ArchesTestCase):
         url = reverse('graph', kwargs={'nodeid':ROOT_ID})
         response = client.get(url)
         graph = json.loads(response.context['graph'])
+        
         node_count = len(graph['nodes'])
         self.assertEqual(node_count, NODE_COUNT+1)
+        
         edge_count = len(graph['edges'])
         self.assertEqual(edge_count, NODE_COUNT)
 
@@ -65,6 +70,7 @@ class ResourceGraphTests(ArchesTestCase):
         Test updating a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
+
         url = reverse('node', kwargs={'nodeid':HERITAGE_RESOURCE_PLACE_ID})
         node = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
         node.name = "new node name"
@@ -73,9 +79,12 @@ class ResourceGraphTests(ArchesTestCase):
         content_type = 'application/x-www-form-urlencoded'
         response = client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
+        
         self.assertEqual(len(response_json['group_nodes']), PLACE_NODE_COUNT-1)
         self.assertEqual(response_json['node']['name'], 'new node name')
+        
         node_ = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
+        
         self.assertEqual(node_.name, 'new node name')
         self.assertTrue(node_.is_collector())
 
@@ -84,12 +93,16 @@ class ResourceGraphTests(ArchesTestCase):
         Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
+
         url = reverse('node', kwargs={'nodeid':HERITAGE_RESOURCE_PLACE_ID})
         response = client.delete(url)
         self.assertEqual(response.status_code, 200)
         new_count = NODE_COUNT-PLACE_NODE_COUNT
         root = Node.objects.get(nodeid=ROOT_ID)
-        node_count = len(root.get_downstream_nodes())
+        
+        nodes, edges = root.get_child_nodes_and_edges()
+        node_count = len(nodes)
+        edge_count = len(edges)
+
         self.assertEqual(node_count, new_count)
-        edge_count = len(root.get_downstream_edges())
         self.assertEqual(edge_count, new_count)

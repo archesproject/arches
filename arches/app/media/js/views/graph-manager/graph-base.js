@@ -8,10 +8,9 @@ define([
             var self = this;
             this.size = 1000;
             this.currentOffset = [0,0];
-            this.currentScale = 1;
-            this.nodes = ko.observableArray([]);
-            this.edges = ko.observableArray([]);
-            _.extend(this, _.pick(options, 'nodes', 'edges'));
+            this.currentScale = 1; 
+            this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
+            this.edges = options.graphModel.get('edges') || ko.observableArray([]);
 
             var diameter = this.$el.width() < this.$el.height() ? this.$el.width() : this.$el.height();
 
@@ -28,7 +27,7 @@ define([
                             });
                         });
                 })
-                .size([360, 1000])
+                .size([360, this.size])
                 .separation(function(a, b) { 
                     return (a.parent == b.parent ? 1 : 2) / a.depth;  
                 });
@@ -111,21 +110,28 @@ define([
             link.exit()
                 .remove();
         },
-        redraw: function () {
+        redraw: function (force) {
             var self = this;
+            var previousScale = this.currentScale;
+            force = force || false;
+            
+            if (d3.event){
+                this.currentScale = d3.event.scale || this.currentScale;
+                this.currentOffset = d3.event.translate || this.currentOffset;
+            }
+
             if (!(this.center)){
                 this.center = [(this.$el.width() / 2), this.$el.height() / 2];
             }
-            this.currentOffset = d3.event.translate;
+
             var xt = this.currentOffset[0] + this.center[0];
             var yt = this.currentOffset[1] + this.center[1];
-            
+
             this.svg.attr("transform",
                 "translate(" + xt + "," + yt + ")" +
-                " scale(" + d3.event.scale + ")");
+                " scale(" + this.currentScale + ")");
 
-            if (this.currentScale !== d3.event.scale){
-                this.currentScale = d3.event.scale;
+            if (force || previousScale !== this.currentScale){
                 this.allNodes.remove();
                 this.svg.selectAll(".link").remove();
                 this.tree = d3.layout.tree()
@@ -141,7 +147,7 @@ define([
                                 });
                             });
                     })
-                    .size([360, this.size*d3.event.scale])
+                    .size([360, this.size * this.currentScale])
                     .separation(function(a, b) { 
                         return (a.parent == b.parent ? 1 : 2) / (a.depth);  
                     });
