@@ -45,7 +45,8 @@ require([
 
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
-        graphModel: graphModel
+        graphModel: graphModel,
+        datatypes: datatypes
     });
 
     viewModel.graphView.on('node-clicked', function (node) {

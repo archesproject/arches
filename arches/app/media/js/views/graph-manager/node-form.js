@@ -1,11 +1,12 @@
 define([
+    'underscore',
     'backbone',
     'knockout'
-], function(Backbone, ko) {
+], function(_, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            this.graphModel = options.graphModel;
+            _.extend(this, _.pick(options, 'graphModel', 'datatypes'));
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);
@@ -25,7 +26,7 @@ define([
 
             this.node.subscribe(function () {
                 self.closeClicked(false);
-            })
+            });
         },
         close: function() {
             this.failed(false);
