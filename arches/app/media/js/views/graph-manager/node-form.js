@@ -1,12 +1,14 @@
 define([
     'underscore',
     'backbone',
-    'knockout'
+    'knockout',
+    'bindings/chosen'
 ], function(_, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'datatypes'));
+            this.datatypes = this.datatypes.map(function(datatype){ return datatype.datatype });
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);
