@@ -16,12 +16,18 @@ define([
             self.editing = ko.observable(false);
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
+            self.datatype = ko.observable('');
 
             self.parse(options.source);
+
+            self.iconclass = ko.computed(function () {
+                self.datatypelookup[self.datatype()];
+            });
 
             self.json = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._node()), {
                     name: self.name(),
+                    datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId()
                 }))
             });
@@ -40,10 +46,10 @@ define([
             self._node(JSON.stringify(source));
             self.name(source.name);
             self.nodeGroupId(source.nodegroup_id);
+            self.datatype(source.datatype);
 
             self.nodeid = source.nodeid;
-            self.datatype = source.datatype;
-            self.iconclass = self.datatypelookup[source.datatype];
+
             self.istopnode = source.istopnode;
             self.ontologyclass = source.ontologyclass;
 

@@ -55,7 +55,7 @@
           "ontologyclass": "",
           "nodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -66,7 +66,7 @@
           "ontologyclass": "",
           "nodeid": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -77,7 +77,7 @@
           "ontologyclass": "",
           "nodeid": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -88,7 +88,7 @@
           "ontologyclass": "",
           "nodeid": "9a356cac-3855-461a-bfff-c56bbfb0d644",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -99,7 +99,7 @@
           "ontologyclass": "",
           "nodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -110,7 +110,7 @@
           "ontologyclass": "",
           "nodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -121,7 +121,7 @@
           "ontologyclass": "",
           "nodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -132,7 +132,7 @@
           "ontologyclass": "",
           "nodeid": "aecb48b7-73ba-4171-936b-ee749709d5e5",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -143,7 +143,7 @@
           "ontologyclass": "",
           "nodeid": "bc1a350d-0c7d-448c-8d67-270029777669",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -154,7 +154,7 @@
           "ontologyclass": "",
           "nodeid": "612d3407-e679-486b-a119-a9d87558aef8",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -165,7 +165,7 @@
           "ontologyclass": "",
           "nodeid": "74f6b547-a3cd-4c9b-a470-7f8880212612",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -176,7 +176,7 @@
           "ontologyclass": "",
           "nodeid": "d6d6e299-a42d-4424-9069-af2e5a647907",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -187,7 +187,7 @@
           "ontologyclass": "",
           "nodeid": "ff142283-70e6-4202-84f7-ec5d47ac43e1",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -198,7 +198,7 @@
           "ontologyclass": "",
           "nodeid": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -209,7 +209,7 @@
           "ontologyclass": "",
           "nodeid": "60b8fcc5-9be5-403f-95de-b721c26f5de6",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -220,7 +220,7 @@
           "ontologyclass": "",
           "nodeid": "8b1dc471-bf24-421c-a02e-a830bd2158de",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -231,7 +231,7 @@
           "ontologyclass": "",
           "nodeid": "175c1de9-25a1-4948-bd05-701ad3bc1dbf",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -242,7 +242,7 @@
           "ontologyclass": "",
           "nodeid": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -253,7 +253,7 @@
           "ontologyclass": "",
           "nodeid": "b732d9d2-de7a-45d4-9fbc-2368a5a21b90",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -264,7 +264,7 @@
           "ontologyclass": "",
           "nodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -275,7 +275,7 @@
           "ontologyclass": "",
           "nodeid": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -286,7 +286,7 @@
           "ontologyclass": "",
           "nodeid": "b8cfc362-ae59-4344-8377-8e745ed30eb0",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -297,7 +297,7 @@
           "ontologyclass": "",
           "nodeid": "9505a004-f327-471b-ace3-f549f895a6e6",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -308,7 +308,7 @@
           "ontologyclass": "",
           "nodeid": "7bd3f3ee-945a-4217-baef-5bfd49ee9cb3",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -319,7 +319,7 @@
           "ontologyclass": "",
           "nodeid": "1a113bf2-e066-41f3-a670-8f44995ac849",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -330,7 +330,7 @@
           "ontologyclass": "",
           "nodeid": "179c4a57-0547-425c-bf54-f5d92f4db89e",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -341,7 +341,7 @@
           "ontologyclass": "",
           "nodeid": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -352,7 +352,7 @@
           "ontologyclass": "",
           "nodeid": "692c3a1c-3172-4ea9-b55b-7f385442af5b",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -363,7 +363,7 @@
           "ontologyclass": "",
           "nodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -374,7 +374,7 @@
           "ontologyclass": "",
           "nodeid": "7802f774-ee02-4964-81a3-756680f5c572",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -385,7 +385,7 @@
           "ontologyclass": "",
           "nodeid": "6765184d-51d7-4f21-bd5b-6ed26ba8c5ab",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -396,7 +396,7 @@
           "ontologyclass": "",
           "nodeid": "d4662866-77cd-4298-8a29-3227923307c4",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -407,7 +407,7 @@
           "ontologyclass": "",
           "nodeid": "9d29b9ab-1291-45bf-a71f-a69c75e9f59f",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -418,7 +418,7 @@
           "ontologyclass": "",
           "nodeid": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -429,7 +429,7 @@
           "ontologyclass": "",
           "nodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -440,7 +440,7 @@
           "ontologyclass": "",
           "nodeid": "5b992665-3d77-482b-9792-1e8fd78adbd5",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -451,7 +451,7 @@
           "ontologyclass": "",
           "nodeid": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -462,7 +462,7 @@
           "ontologyclass": "",
           "nodeid": "df0a91d8-4a37-4546-8364-6454cc9316be",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -473,7 +473,7 @@
           "ontologyclass": "",
           "nodeid": "6aa4d889-157b-40a6-be96-1e52846517c9",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -484,7 +484,7 @@
           "ontologyclass": "",
           "nodeid": "d7c05eed-77f2-48b0-bbad-2252078762d3",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -495,7 +495,7 @@
           "ontologyclass": "",
           "nodeid": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -506,7 +506,7 @@
           "ontologyclass": "",
           "nodeid": "90277642-bab2-4040-9f2c-fc7a86a39528",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -517,7 +517,7 @@
           "ontologyclass": "",
           "nodeid": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -528,7 +528,7 @@
           "ontologyclass": "",
           "nodeid": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -539,7 +539,7 @@
           "ontologyclass": "",
           "nodeid": "17498d45-a87d-4a2a-a823-c1b7021b07c0",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -550,7 +550,7 @@
           "ontologyclass": "",
           "nodeid": "c7b1f120-f224-4c33-8a78-f247c475094a",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -561,7 +561,7 @@
           "ontologyclass": "",
           "nodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -572,7 +572,7 @@
           "ontologyclass": "",
           "nodeid": "3dbf24ea-be9d-43ab-97b5-848068807990",
           "nodegroupid": null,
-          "datatype": "files"
+          "datatype": "file"
         },
         {
           "status": null,
@@ -583,7 +583,7 @@
           "ontologyclass": "",
           "nodeid": "c591f44c-4f55-492d-a609-7f6d09fd0ead",
           "nodegroupid": null,
-          "datatype": "files"
+          "datatype": "file"
         },
         {
           "status": null,
@@ -594,7 +594,7 @@
           "ontologyclass": "",
           "nodeid": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -605,7 +605,7 @@
           "ontologyclass": "",
           "nodeid": "15acefea-a73c-463b-b56b-03281f8b993b",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -616,7 +616,7 @@
           "ontologyclass": "",
           "nodeid": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -627,7 +627,7 @@
           "ontologyclass": "",
           "nodeid": "f55061bc-2371-41ab-8f90-45219e604499",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -638,7 +638,7 @@
           "ontologyclass": "",
           "nodeid": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -649,7 +649,7 @@
           "ontologyclass": "",
           "nodeid": "94b50ff6-e4ee-4351-b7ff-536385bd3dc9",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -660,7 +660,7 @@
           "ontologyclass": "",
           "nodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -671,7 +671,7 @@
           "ontologyclass": "",
           "nodeid": "acbb237d-3894-4983-a919-f0a79f478774",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -682,7 +682,7 @@
           "ontologyclass": "",
           "nodeid": "d009c619-e78b-4bbc-966d-f931abca7975",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -693,7 +693,7 @@
           "ontologyclass": "",
           "nodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -715,7 +715,7 @@
           "ontologyclass": "",
           "nodeid": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -726,7 +726,7 @@
           "ontologyclass": "",
           "nodeid": "8c1423c7-73c3-4e86-a5d6-d4f9affe9462",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -737,7 +737,7 @@
           "ontologyclass": "",
           "nodeid": "d72362cb-3c6d-450f-9da8-3bb894073333",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -748,7 +748,7 @@
           "ontologyclass": "",
           "nodeid": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -759,7 +759,7 @@
           "ontologyclass": "",
           "nodeid": "b66d8f0c-746b-4856-abd7-e812feef9b68",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -770,7 +770,7 @@
           "ontologyclass": "",
           "nodeid": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -781,7 +781,7 @@
           "ontologyclass": "",
           "nodeid": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -792,7 +792,7 @@
           "ontologyclass": "",
           "nodeid": "3d6c2c79-ed19-4cc6-bd95-bf5f47f149a5",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -803,7 +803,7 @@
           "ontologyclass": "",
           "nodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -814,7 +814,7 @@
           "ontologyclass": "",
           "nodeid": "78814316-478f-4ff8-835c-316a2cc48090",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -825,7 +825,7 @@
           "ontologyclass": "",
           "nodeid": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -836,7 +836,7 @@
           "ontologyclass": "",
           "nodeid": "f1f672c0-5c48-459a-80fe-4dd7265d25e8",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -847,7 +847,7 @@
           "ontologyclass": "",
           "nodeid": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -858,7 +858,7 @@
           "ontologyclass": "",
           "nodeid": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -869,7 +869,7 @@
           "ontologyclass": "",
           "nodeid": "61d11030-0d24-47ab-ba10-fb029b4ce18a",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -880,7 +880,7 @@
           "ontologyclass": "",
           "nodeid": "0656d4cc-bb98-4187-9485-9f49950a18b3",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -891,7 +891,7 @@
           "ontologyclass": "",
           "nodeid": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -902,7 +902,7 @@
           "ontologyclass": "",
           "nodeid": "28979130-7500-42f5-98ee-977b6cb1caba",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -913,7 +913,7 @@
           "ontologyclass": "",
           "nodeid": "14fa3da6-c131-46b2-a33e-181d8d2a2bf9",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -924,7 +924,7 @@
           "ontologyclass": "",
           "nodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -935,7 +935,7 @@
           "ontologyclass": "",
           "nodeid": "d2788b73-9485-462a-abcb-79f8afdb511d",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -946,7 +946,7 @@
           "ontologyclass": "",
           "nodeid": "37193249-2da8-4f2a-b97c-c445c1f60a19",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -957,7 +957,7 @@
           "ontologyclass": "",
           "nodeid": "17beaae7-5635-4073-86ca-0fc00877d9a6",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -968,7 +968,7 @@
           "ontologyclass": "",
           "nodeid": "931e7ae5-695b-44f2-8f84-fb9dac806903",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -979,7 +979,7 @@
           "ontologyclass": "",
           "nodeid": "45ce0539-6c17-4b16-a1fa-809aae4a84be",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -990,7 +990,7 @@
           "ontologyclass": "",
           "nodeid": "10988901-c874-4bcd-a86f-e8dde8841341",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1001,7 +1001,7 @@
           "ontologyclass": "",
           "nodeid": "9a38c9da-8237-466d-8b11-edf3d540255d",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1012,7 +1012,7 @@
           "ontologyclass": "",
           "nodeid": "1f99e703-5adc-4145-9df8-cc523311d9d3",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1023,7 +1023,7 @@
           "ontologyclass": "",
           "nodeid": "483825b8-7f69-44dd-9576-a23c2d34fb2b",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1034,7 +1034,7 @@
           "ontologyclass": "",
           "nodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1045,7 +1045,7 @@
           "ontologyclass": "",
           "nodeid": "2d5eb21d-2cf1-4f39-9b39-ac7099a49d73",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -1056,7 +1056,7 @@
           "ontologyclass": "",
           "nodeid": "5c92ae97-fb6f-460d-b5d7-281420e0d882",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -1067,7 +1067,7 @@
           "ontologyclass": "",
           "nodeid": "b00fb3e9-cc1b-4d8e-ac26-f9efc5742415",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -1078,7 +1078,7 @@
           "ontologyclass": "",
           "nodeid": "9324ab23-2896-463a-9fcb-04a1447fc279",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1089,7 +1089,7 @@
           "ontologyclass": "",
           "nodeid": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1100,7 +1100,7 @@
           "ontologyclass": "",
           "nodeid": "602dec39-ece3-4433-b88a-fce44c6a050c",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1111,7 +1111,7 @@
           "ontologyclass": "",
           "nodeid": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1122,7 +1122,7 @@
           "ontologyclass": "",
           "nodeid": "5b2c103c-98b3-4ded-b9ce-cb3388cc8ec5",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1133,7 +1133,7 @@
           "ontologyclass": "",
           "nodeid": "d6586394-3124-4657-bfd7-07fad3788083",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1144,7 +1144,7 @@
           "ontologyclass": "",
           "nodeid": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1155,7 +1155,7 @@
           "ontologyclass": "",
           "nodeid": "e9f55677-fd8d-4910-878c-5dd8dce51e09",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1166,7 +1166,7 @@
           "ontologyclass": "",
           "nodeid": "17cae0c1-5b68-49c2-b25f-d4681f0b4818",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1177,7 +1177,7 @@
           "ontologyclass": "",
           "nodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1188,7 +1188,7 @@
           "ontologyclass": "",
           "nodeid": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1199,7 +1199,7 @@
           "ontologyclass": "",
           "nodeid": "693e71c6-acd1-47d3-92eb-e2cd75d0217c",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1210,7 +1210,7 @@
           "ontologyclass": "",
           "nodeid": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1221,7 +1221,7 @@
           "ontologyclass": "",
           "nodeid": "a4b3f194-7b26-4a90-8547-8b62e9fc5f0e",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         },
         {
           "status": null,
@@ -1232,7 +1232,7 @@
           "ontologyclass": "",
           "nodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1243,7 +1243,7 @@
           "ontologyclass": "",
           "nodeid": "a3c20479-fcce-4bf5-9517-5b3df4780429",
           "nodegroupid": null,
-          "datatype": "domains"
+          "datatype": "domain"
         },
         {
           "status": null,
@@ -1254,7 +1254,7 @@
           "ontologyclass": "",
           "nodeid": "766311c8-2e6c-4150-8cda-9daf9c2ed2ea",
           "nodegroupid": null,
-          "datatype": "strings"
+          "datatype": "string"
         },
         {
           "status": null,
@@ -1265,7 +1265,7 @@
           "ontologyclass": "",
           "nodeid": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
           "nodegroupid": null,
-          "datatype": ""
+          "datatype": "semantic"
         },
         {
           "status": null,
@@ -1276,7 +1276,7 @@
           "ontologyclass": "",
           "nodeid": "89e966f4-767f-42e6-b35e-26abc123e819",
           "nodegroupid": null,
-          "datatype": "dates"
+          "datatype": "date"
         }
       ],
       "edges": [
