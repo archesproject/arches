@@ -252,6 +252,8 @@ class Node(models.Model):
         for edge in edges:
             if edge.domainnode.pk == self.pk:
                 edge.domainnode = self
+            else:
+                edge.domainnode = node_mapping[edge.domainnode.pk]
             edge.rangenode = node_mapping[edge.rangenode.pk]
         return (nodes, edges)
 
