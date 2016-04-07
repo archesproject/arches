@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
-from copy import deepcopy 
+from copy import copy
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -32,8 +32,8 @@ class ResourceGraph(object):
         self.nodes = {}
         self.edges = {}
         if args:
-            if isinstance(args[0], basestring):
-                uuid.UUID(args[0])
+            if (isinstance(args[0], basestring) or
+               isinstance(args[0], uuid.UUID)):
                 root = models.Node.objects.get(pk=args[0])
                 self.get_nodes_and_edges(root)
             elif isinstance(args[0], models.Node):
@@ -165,13 +165,17 @@ class ResourceGraph(object):
         returns an unsaved copy of self
 
         """
-
-        copy_of_self = deepcopy(self)
-        for edge_id, edge in copy_of_self.edges.iteritems():
-            edge.domainnode.pk = uuid.uuid4()
-            edge.rangenode.pk = uuid.uuid4()
+        
+        copy_of_self = ResourceGraph(self.root.pk)
+        for node_id, node in copy_of_self.nodes.iteritems():
+            node.pk = uuid.uuid4()
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
+        
+        for edge_id, edge in copy_of_self.edges.iteritems():
+            edge.pk = uuid.uuid4()
+
+        copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
         return copy_of_self
 

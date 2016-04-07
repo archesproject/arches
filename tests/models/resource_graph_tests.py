@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os, json
+import os, json, uuid
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.test import Client
@@ -31,10 +31,11 @@ class ResourceGraphTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        #resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
+        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         
-        cls.NODE_NODETYPE_BRANCH_ID = '22000000-0000-0000-0000-000000000001'
-        # cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
+        cls.NODE_NODETYPE_ROOTNODE_ID = '20000000-0000-0000-0000-100000000001'
+        cls.ARCHES_CONFIG_GRAPH = '20000000-0000-0000-0000-000000000000'
+        cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
         # cls.NODE_COUNT = 111
         # cls.PLACE_NODE_COUNT = 17
         # cls.client = Client()
@@ -57,9 +58,62 @@ class ResourceGraphTests(ArchesTestCase):
         delete_children(self.rootNode)   
         self.rootNode.delete()
 
-    def test_branch_append(self):
-        graph = ResourceGraph(self.rootNode)
-        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCH_ID) 
+    def test_nodes_are_byref(self):
+        """
+        test that the nodes referred to in the ResourceGraph.edges are exact references to 
+        the nodes as opposed to a node with the same attribute values
 
+        """
+
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+
+        node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
         
-        pass
+        for key, edge in graph.edges.iteritems():
+            self.assertEqual(node_mapping[edge.domainnode.pk], id(edge.domainnode))
+            self.assertEqual(node_mapping[edge.rangenode.pk], id(edge.rangenode))
+
+        for key, node in graph.nodes.iteritems():
+            for key, edge in graph.edges.iteritems():
+                newid = uuid.uuid4()
+                if (edge.domainnode.pk == node.pk):
+                    node.pk = newid
+                    self.assertEqual(edge.domainnode.pk, newid) 
+                elif (edge.rangenode.pk == node.pk):
+                    node.pk = newid
+                    self.assertEqual(edge.rangenode.pk, newid)
+
+    def test_copy_graph(self):
+        """
+        test that a copy of a graph has the same number of nodes and edges and that the primary keys have been changed
+        and that the actual node references are different 
+
+        """
+
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        new_graph = graph.copy()
+
+        self.assertEqual(len(graph.nodes), len(new_graph.nodes))
+        self.assertEqual(len(graph.edges), len(new_graph.edges))
+
+        def findNodeByName(graph, name):
+            for key, node in graph.nodes.iteritems():
+                if node.name == name:
+                    return node
+            return None
+
+        for key, node in graph.nodes.iteritems():
+            newNode = findNodeByName(new_graph, node.name)
+            self.assertIsNotNone(newNode)
+            self.assertNotEqual(node.pk, newNode.pk)
+            self.assertNotEqual(id(node), id(newNode))
+
+        for key, newedge in new_graph.edges.iteritems():
+            with self.assertRaises(KeyError):
+                graph.edges[newedge.pk]
+
+    # def test_branch_append(self):
+    #     graph = ResourceGraph(self.rootNode)
+    #     graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_ROOTNODE_ID) 
+
+    #     pass
