@@ -219,16 +219,40 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
 
-    def get_child_nodes_and_edges(self):
+    def _traverse_graph(self):
+        """
+        gather up the child nodes and edges of this node
+
+        returns a tuple of nodes and edges
+        
+        """
+
         nodes = []
         edges = []
         for edge in Edge.objects.filter(domainnode=self):
             nodes.append(edge.rangenode)
             edges.append(edge)
 
-            child_nodes, child_edges = edge.rangenode.get_child_nodes_and_edges()
+            child_nodes, child_edges = edge.rangenode._traverse_graph()
             nodes.extend(child_nodes)
             edges.extend(child_edges)
+        return (nodes, edges)    
+
+    def get_child_nodes_and_edges(self):
+        """
+        _traverse_graph does the bulk of the work in gathering up the child nodes and edges
+
+        what we do here is make sure that the common node referenced by two or more edges is the same node reference in memory
+        that way if a user updates a node attribute that update is reflected accross all edges that reference that node 
+
+        """
+
+        nodes, edges = self._traverse_graph()
+        node_mapping = {node.pk:node for node in nodes}
+        for edge in edges:
+            if edge.domainnode.pk == self.pk:
+                edge.domainnode = self
+            edge.rangenode = node_mapping[edge.rangenode.pk]
         return (nodes, edges)
 
     def is_collector(self):
