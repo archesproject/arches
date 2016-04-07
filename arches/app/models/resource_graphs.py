@@ -69,7 +69,7 @@ class ResourceGraph(object):
             node.branchmetadata_id = nodeobj.get('branchmetadataid','')
 
         if node.pk == None:
-            node.pk = uuid.uuid4()    
+            node.pk = uuid.uuid1()    
         self.nodes[node.pk] = node
         return node
 
@@ -95,7 +95,7 @@ class ResourceGraph(object):
             edge.branchmetadataid = egdeobj.get('branchmetadataid', '')
 
         if edge.pk == None:
-            edge.pk = uuid.uuid4()  
+            edge.pk = uuid.uuid1()  
         self.edges[edge.pk] = edge
         return edge
 
@@ -165,15 +165,15 @@ class ResourceGraph(object):
         returns an unsaved copy of self
 
         """
-        
+
         copy_of_self = ResourceGraph(self.root.pk)
         for node_id, node in copy_of_self.nodes.iteritems():
-            node.pk = uuid.uuid4()
+            node.pk = uuid.uuid1()
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
         
         for edge_id, edge in copy_of_self.edges.iteritems():
-            edge.pk = uuid.uuid4()
+            edge.pk = uuid.uuid1()
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
