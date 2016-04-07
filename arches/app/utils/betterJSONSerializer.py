@@ -166,7 +166,9 @@ class JSONSerializer(object):
             if isinstance(f, ForeignKey):
                 # Emulate the naming convention used by django when accessing the 
                 # related model's id field
-                data[f.name+'_id'] = f.value_from_object(instance)
+                # see https://github.com/django/django/blob/master/django/db/models/fields/__init__.py
+                val = getattr(instance, f.name, None)
+                data[f.attname] = val.pk if val else val
             elif isinstance(f, ManyToManyField):
                 # If the object doesn't have a primary key yet, just use an empty
                 # list for its m2m fields. Calling f.value_from_object will raise
