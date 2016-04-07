@@ -48,18 +48,13 @@ class JSONSerializer(object):
         return self.handle_object(obj)
 
     def serialize(self, obj, **options):
-        self.options = options.copy()
-
-        self.stream = options.pop("stream", StringIO())
-        self.selected_fields = options.pop("fields", None)
-        self.use_natural_keys = options.pop("use_natural_keys", False)
-        self.geom_format = options.pop("geom_format", "wkt")
+        obj = self.serializeToPython(obj, **options)
 
         # prevent raw strings from begin re-encoded
         # this is especially important when doing bulk operations in elasticsearch
         if (isinstance(obj, basestring)):
             return obj
-        
+            
         ret = self.handle_object(obj)
 
         return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())
@@ -113,7 +108,11 @@ class JSONSerializer(object):
         elif isinstance(object, uuid.UUID):
             return str(object)
         elif hasattr(object, '__dict__'):
-            return self.handle_dictionary(object.__dict__)
+            # call an objects serialize method if it exists
+            if hasattr(object, 'serialize'):
+                return getattr(object, 'serialize')()  
+            else:
+                return self.handle_dictionary(object.__dict__)
         else:
             raise UnableToSerializeError(type(object))
 
