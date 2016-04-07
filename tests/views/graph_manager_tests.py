@@ -22,7 +22,7 @@ from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
-from arches.app.models.models import Node
+from arches.app.models.models import Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -77,7 +77,8 @@ class ResourceGraphTests(ArchesTestCase):
         url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
         node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
         node.name = "new node name"
-        node.nodegroup_id = self.HERITAGE_RESOURCE_PLACE_ID
+        nodegroup, created = NodeGroup.objects.get_or_create(pk=self.HERITAGE_RESOURCE_PLACE_ID)
+        node.nodegroup = nodegroup
         post_data = JSONSerializer().serialize(node)
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
