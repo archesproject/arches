@@ -77,6 +77,7 @@ def node(request, nodeid):
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
                 new_nodegroup_id = data.get('nodegroup_id', None)
+                cardinality = data.get('cardinality', 'n')
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
@@ -84,6 +85,8 @@ def node(request, nodeid):
                     if new_nodegroup_id == nodeid:
                         new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
                         new_group.parentnodegroup = parent_group
+                        new_group.cardinality = cardinality
+                        print cardinality
                         new_group.save()
                         parent_group = new_group
 
@@ -98,7 +101,7 @@ def node(request, nodeid):
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors})
+                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)

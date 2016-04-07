@@ -63,7 +63,9 @@ define([
             this.callAsync('save', function (request) {
                 var groupNodes = request.responseJSON.group_nodes;
                 var nodes = self.graphModel.get('nodes')();
-                self.node().parse(request.responseJSON.node);
+                var nodeJSON = request.responseJSON.node;
+                nodeJSON.cardinality = request.responseJSON.nodegroup.cardinality;
+                self.node().parse(nodeJSON);
                 groupNodes.forEach(function(nodeJSON) {
                     var node = _.find(nodes, function (node) {
                         return node.nodeid === nodeJSON.nodeid;
@@ -80,6 +82,9 @@ define([
         },
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
+        },
+        toggleCardinality: function () {
+            this.node().toggleCardinality();
         }
     });
     return NodeFormView;

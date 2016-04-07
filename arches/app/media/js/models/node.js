@@ -17,6 +17,7 @@ define([
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
             self.datatype = ko.observable('');
+            self.cardinality = ko.observable('n');
 
             self.parse(options.source);
 
@@ -28,7 +29,8 @@ define([
                 return JSON.stringify(_.extend(JSON.parse(self._node()), {
                     name: self.name(),
                     datatype: self.datatype(),
-                    nodegroup_id: self.nodeGroupId()
+                    nodegroup_id: self.nodeGroupId(),
+                    cardinality: self.cardinality()
                 }))
             });
 
@@ -47,6 +49,7 @@ define([
             self.name(source.name);
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
+            self.cardinality(source.cardinality);
 
             self.nodeid = source.nodeid;
 
@@ -71,6 +74,11 @@ define([
                 nodeGroupId = (this.nodeid === _node.nodegroup_id) ? null : _node.nodegroup_id;
             }
             this.nodeGroupId(nodeGroupId);
+        },
+
+        toggleCardinality: function () {
+            var cardinality = (this.cardinality()==='n')?'1':'n';
+            this.cardinality(cardinality);
         }
     });
 });

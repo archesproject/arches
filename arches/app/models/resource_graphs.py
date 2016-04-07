@@ -30,6 +30,7 @@ class ResourceGraph(object):
         self.root = None
         self.nodes = []
         self.edges = []
+        self.nodegroups = []
         if args:
             if isinstance(args[0], basestring):
                 try:
@@ -95,7 +96,7 @@ class ResourceGraph(object):
         Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
 
         """
-        
+
         self.root = node
         self.nodes.append(node)
 
@@ -104,22 +105,26 @@ class ResourceGraph(object):
         self.nodes.extend(child_nodes)
         self.edges.extend(child_edges)
 
-    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):  
+        nodegroups = map(lambda n: n.nodegroup, filter(lambda n: n.is_collector(), self.nodes))
+
+        self.nodegroups.extend(nodegroups)
+
+    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
         """
         Appends a branch onto this graph
 
         property: the property to use when appending the branch
 
-        nodeid: if given will append the branch to this node, if not supplied will 
-        append the branch to the root of this graph 
+        nodeid: if given will append the branch to this node, if not supplied will
+        append the branch to the root of this graph
 
         branch_root: the root node of the branch you want to append
 
-        branchmetadataid: get the branch to append based on the branchmetadataid, 
+        branchmetadataid: get the branch to append based on the branchmetadataid,
         if given, branch_root takes precedence
 
         """
-        
+
         if not branch_root:
             branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
         branch_root.istopnode = False
