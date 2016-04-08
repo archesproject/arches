@@ -32,6 +32,7 @@ ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
 NODE_COUNT = 111
 PLACE_NODE_COUNT = 17
+PLACE_NODE_GROUP_COUNT = 12
 client = Client()
 
 class ResourceGraphTests(ArchesTestCase):
@@ -80,7 +81,7 @@ class ResourceGraphTests(ArchesTestCase):
         response = client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         
-        self.assertEqual(len(response_json['group_nodes']), PLACE_NODE_COUNT-1)
+        self.assertEqual(len(response_json['group_nodes']), PLACE_NODE_GROUP_COUNT)
         self.assertEqual(response_json['node']['name'], 'new node name')
         
         node_ = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
