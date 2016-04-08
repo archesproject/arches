@@ -113,8 +113,7 @@ def node(request, nodeid):
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = ResourceGraph(nodeid)
-        newBranch = graph.append_branch(property, nodeid=nodeid, branchmetadataid=branchmetadataid)
+        newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
         return JSONResponse(newBranch)
-
 
     return HttpResponseNotFound()
