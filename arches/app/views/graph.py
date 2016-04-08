@@ -27,6 +27,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.resource_graphs import ResourceGraph
 from arches.app.models import models
 
+
 @csrf_exempt
 def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
@@ -70,25 +71,27 @@ def node(request, nodeid):
             nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
             with transaction.atomic():
                 node.name = data.get('name', '')
-                node.description = data.get('description','')
-                node.istopnode = data.get('istopnode','')
-                node.crmclass = data.get('crmclass','')
-                node.datatype = data.get('datatype','')
-                node.status = data.get('status','')
-                new_nodegroup_id = data.get('nodegroup_id',None)
+                node.description = data.get('description', '')
+                node.istopnode = data.get('istopnode', '')
+                node.crmclass = data.get('crmclass', '')
+                node.datatype = data.get('datatype', '')
+                node.status = data.get('status', '')
+                new_nodegroup_id = data.get('nodegroup_id', None)
+                cardinality = data.get('cardinality', 'n')
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
                     new_group = parent_group
                     if new_nodegroup_id == nodeid:
-                         new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
-                         new_group.parentnodegroup = parent_group
-                         new_group.save()
-                         parent_group = new_group
+                        new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+                        new_group.parentnodegroup = parent_group
+                        new_group.cardinality = cardinality
+                        new_group.save()
+                        parent_group = new_group
 
                     for collector in collectors:
-                         collector.nodegroup.parentnodegroup = parent_group
-                         collector.nodegroup.save()
+                        collector.nodegroup.parentnodegroup = parent_group
+                        collector.nodegroup.save()
 
                     for group_node in nodes:
                         group_node.nodegroup = new_group
@@ -97,7 +100,7 @@ def node(request, nodeid):
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors})
+                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)

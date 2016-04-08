@@ -23,6 +23,16 @@ require([
         branch.filtered = ko.observable(false);
     }, this);
 
+    graphData.nodes.forEach(function(node) {
+        node.cardinality = 'n';
+        if (node.nodeid === node.nodegroup_id) {
+            var group = _.find(graphData.nodegroups, function(nodegroup) {
+                return nodegroup.nodegroupid === node.nodeid;
+            });
+            node.cardinality = group.cardinality;
+        }
+    });
+
     var graphModel = new GraphModel({
         nodes: graphData.nodes,
         edges: graphData.edges,
