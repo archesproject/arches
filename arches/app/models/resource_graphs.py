@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 from copy import copy
+from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -105,11 +106,12 @@ class ResourceGraph(object):
 
         """
 
-        for node_id, node in self.nodes.iteritems():
-            node.save()
+        with transaction.atomic(): 
+            for node_id, node in self.nodes.iteritems():
+                node.save()
 
-        for edge_id, edge in self.edges.iteritems():
-            edge.save()
+            for edge_id, edge in self.edges.iteritems():
+                edge.save()
 
     def get_nodes_and_edges(self, node):
         """
@@ -144,20 +146,21 @@ class ResourceGraph(object):
         if given, branch_root takes precedence
 
         """
-        
+
         if not branch_root:
             branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
         branch_root.istopnode = False
         branch_graph = ResourceGraph(branch_root)
         new_branch = branch_graph.copy()
-        new_branch.save()
-        newEdge = models.Edge(
-            domainnode = (self.nodes[nodeid] if nodeid else self.root),
-            rangenode = new_branch.root,
-            ontologyproperty = property
-        )
-        newEdge.save()
-        branch_graph.addEdge(newEdge)
+
+        with transaction.atomic(): 
+            new_branch.save()
+            newEdge = models.Edge.objects.create(
+                domainnode = (self.nodes[nodeid] if nodeid else self.root),
+                rangenode = new_branch.root,
+                ontologyproperty = property
+            )
+            branch_graph.addEdge(newEdge)
         return branch_graph
 
     def copy(self):
@@ -174,6 +177,8 @@ class ResourceGraph(object):
         
         for edge_id, edge in copy_of_self.edges.iteritems():
             edge.pk = uuid.uuid1()
+            edge.domainnode_id = edge.domainnode.pk
+            edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 

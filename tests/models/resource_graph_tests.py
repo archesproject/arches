@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os, json, uuid
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from django.test import Client
-from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
 from arches.app.models.resource_graphs import ResourceGraph
@@ -33,12 +31,8 @@ class ResourceGraphTests(ArchesTestCase):
     def setUpClass(cls):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         
-        cls.NODE_NODETYPE_ROOTNODE_ID = '20000000-0000-0000-0000-100000000001'
-        cls.ARCHES_CONFIG_GRAPH = '20000000-0000-0000-0000-000000000000'
+        cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
-        # cls.NODE_COUNT = 111
-        # cls.PLACE_NODE_COUNT = 17
-        # cls.client = Client()
 
     def setUp(self):
         self.rootNode = models.Node.objects.create(
@@ -55,7 +49,7 @@ class ResourceGraphTests(ArchesTestCase):
                 edge.delete()
                 delete_children(edge.rangenode)
          
-        delete_children(self.rootNode)   
+        delete_children(self.rootNode)
         self.rootNode.delete()
 
     def test_nodes_are_byref(self):
@@ -91,10 +85,10 @@ class ResourceGraphTests(ArchesTestCase):
         """
 
         graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
-        new_graph = graph.copy()
+        graph_copy = graph.copy()
 
-        self.assertEqual(len(graph.nodes), len(new_graph.nodes))
-        self.assertEqual(len(graph.edges), len(new_graph.edges))
+        self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
+        self.assertEqual(len(graph.edges), len(graph_copy.edges))
 
         def findNodeByName(graph, name):
             for key, node in graph.nodes.iteritems():
@@ -103,17 +97,21 @@ class ResourceGraphTests(ArchesTestCase):
             return None
 
         for key, node in graph.nodes.iteritems():
-            newNode = findNodeByName(new_graph, node.name)
-            self.assertIsNotNone(newNode)
-            self.assertNotEqual(node.pk, newNode.pk)
-            self.assertNotEqual(id(node), id(newNode))
+            node_copy = findNodeByName(graph_copy, node.name)
+            self.assertIsNotNone(node_copy)
+            self.assertNotEqual(node.pk, node_copy.pk)
+            self.assertNotEqual(id(node), id(node_copy))
 
-        for key, newedge in new_graph.edges.iteritems():
+        for key, newedge in graph_copy.edges.iteritems():
+            self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
+            self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
+            self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
+            self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 
-    # def test_branch_append(self):
-    #     graph = ResourceGraph(self.rootNode)
-    #     graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_ROOTNODE_ID) 
+    def test_branch_append(self):
+        graph = ResourceGraph(self.rootNode)
+        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID) 
 
-    #     pass
+        pass
