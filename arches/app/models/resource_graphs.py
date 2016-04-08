@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.db.models import F
 
 class ResourceGraph(object):
     """
@@ -50,8 +51,8 @@ class ResourceGraph(object):
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
-
-        for node in self.nodes:
+        collectorlist = []
+        for i, node in enumerate(self.nodes):
             newNode = models.Node()
 
             try:
@@ -60,6 +61,7 @@ class ResourceGraph(object):
             except(ValueError):
                 node['nodeid'] = str(uuid.uuid4())
 
+
             newNode.nodeid = node.get('nodeid')
             newNode.name = node.get('name', '')
             newNode.description = node.get('description','')
@@ -67,12 +69,15 @@ class ResourceGraph(object):
             newNode.crmclass = node.get('crmclass','')
             newNode.datatype = node.get('datatype','')
             newNode.status = node.get('status','')
+            newNode.nodegroup = self.insert_node_group(node)
 
             node['nodeid'] = newNode.nodeid
             newNode.save()
 
+            self.nodes[i] = newNode
 
-        for edge in self.edges:
+
+        for i, edge in enumerate(self.edges):
             newEdge = models.Edge()
             # self.get_node_id_from_text()
 
@@ -89,6 +94,39 @@ class ResourceGraph(object):
 
             edge['edgeid'] = newEdge.edgeid
             newEdge.save()
+
+            self.edges[i] = newEdge
+
+        self.populate_null_nodegroupids()
+
+        collectorlist = filter(lambda n: (n.nodeid==n.nodegroup_id) and (n.istopnode != False), self.nodes)
+        for collector in collectorlist:
+            edge = models.Edge.objects.get(rangenode = collector)
+            collector.nodegroup.parentnodegroup = edge.domainnode.nodegroup
+            collector.nodegroup.save()
+
+    def populate_null_nodegroupids(self):
+        noncollector_nodes = filter(lambda n: n.nodegroup == None, self.nodes)
+        for node in noncollector_nodes:
+            node.nodegroup = self.traverse_to_nodegroup(node)
+            node.save()
+
+    def traverse_to_nodegroup(self, node):
+        range_edge = models.Edge.objects.get(rangenode = node)
+        if range_edge.domainnode.nodegroup is not None:
+            return range_edge.domainnode.nodegroup
+        else:
+            return self.traverse_to_nodegroup(range_edge.domainnode)
+
+    def insert_node_group(self, node):
+        if node.get('nodegroupid', '') != None:
+            newNodeGroup = models.NodeGroup()
+            newNodeGroup.cardinality = node.get('cardinality', '')
+            newNodeGroup.nodegroupid = node.get('nodegroupid', '')
+            newNodeGroup.save()
+            return models.NodeGroup.objects.get(nodegroupid = newNodeGroup.nodegroupid)
+        else:
+            return None
 
     def get_nodes_and_edges(self, node):
         """
