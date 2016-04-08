@@ -151,17 +151,21 @@ class ResourceGraph(object):
             branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
         branch_root.istopnode = False
         branch_graph = ResourceGraph(branch_root)
-        new_branch = branch_graph.copy()
+        branch_copy = branch_graph.copy()
 
         with transaction.atomic(): 
-            new_branch.save()
+            branch_copy.save()
             newEdge = models.Edge.objects.create(
                 domainnode = (self.nodes[nodeid] if nodeid else self.root),
-                rangenode = new_branch.root,
+                rangenode = branch_copy.root,
                 ontologyproperty = property
             )
-            branch_graph.addEdge(newEdge)
-        return branch_graph
+            branch_copy.addEdge(newEdge)
+        for key, node in branch_copy.nodes.iteritems():
+            self.addNode(node)
+        for key, edge in branch_copy.edges.iteritems():
+            self.addEdge(edge)
+        return branch_copy
 
     def copy(self):
         """

@@ -34,6 +34,21 @@ class ResourceGraphTests(ArchesTestCase):
         cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
+    @classmethod
+    def tearDownClass(cls):
+        root = models.Node.objects.get(pk=cls.HERITAGE_RESOURCE_FIXTURE)
+        cls.deleteGraph(root)
+
+    @classmethod
+    def deleteGraph(cls, root):
+        def delete_children(node):
+            for edge in models.Edge.objects.filter(rangenode=node):
+                edge.delete()
+                delete_children(edge.rangenode)
+         
+        delete_children(root)
+        root.delete()
+
     def setUp(self):
         self.rootNode = models.Node.objects.create(
             name='ROOT NODE',
@@ -44,13 +59,7 @@ class ResourceGraphTests(ArchesTestCase):
         )
 
     def tearDown(self):
-        def delete_children(node):
-            for edge in models.Edge.objects.filter(rangenode=node):
-                edge.delete()
-                delete_children(edge.rangenode)
-         
-        delete_children(self.rootNode)
-        self.rootNode.delete()
+        self.deleteGraph(self.rootNode)
 
     def test_nodes_are_byref(self):
         """
@@ -111,7 +120,20 @@ class ResourceGraphTests(ArchesTestCase):
                 graph.edges[newedge.pk]
 
     def test_branch_append(self):
-        graph = ResourceGraph(self.rootNode)
-        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID) 
+        """
+        test if a branch is properly appended to a graph
 
-        pass
+        """
+
+        graph = ResourceGraph(self.rootNode)
+        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+
+        self.assertEqual(len(graph.nodes), 3)
+        self.assertEqual(len(graph.edges), 2)
+
+        for key, edge in graph.edges.iteritems():
+            self.assertIsNotNone(graph.nodes[edge.domainnode_id])
+            self.assertIsNotNone(graph.nodes[edge.rangenode_id])
+            self.assertEqual(edge.domainnode, graph.nodes[edge.domainnode.pk])
+            self.assertEqual(edge.rangenode, graph.nodes[edge.rangenode.pk])
+
