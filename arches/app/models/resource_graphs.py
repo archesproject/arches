@@ -32,6 +32,7 @@ class ResourceGraph(object):
         self.root = None
         self.nodes = {}
         self.edges = {}
+
         if args:
             if (isinstance(args[0], basestring) or
                isinstance(args[0], uuid.UUID)):
@@ -149,14 +150,15 @@ class ResourceGraph(object):
 
         if not branch_root:
             branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
-        branch_root.istopnode = False
         branch_graph = ResourceGraph(branch_root)
+        
         branch_copy = branch_graph.copy()
+        branch_copy.root.istopnode = False
 
         with transaction.atomic(): 
             branch_copy.save()
             newEdge = models.Edge.objects.create(
-                domainnode = (self.nodes[nodeid] if nodeid else self.root),
+                domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
                 ontologyproperty = property
             )

@@ -137,3 +137,7 @@ class ResourceGraphTests(ArchesTestCase):
             self.assertEqual(edge.domainnode, graph.nodes[edge.domainnode.pk])
             self.assertEqual(edge.rangenode, graph.nodes[edge.rangenode.pk])
 
+        for key, node in graph.nodes.iteritems():
+            if node.istopnode:
+                self.assertEqual(node, self.rootNode)
+
