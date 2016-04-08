@@ -86,7 +86,6 @@ def node(request, nodeid):
                         new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
                         new_group.parentnodegroup = parent_group
                         new_group.cardinality = cardinality
-                        print cardinality
                         new_group.save()
                         parent_group = new_group
 
