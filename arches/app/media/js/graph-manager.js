@@ -17,21 +17,28 @@ require([
     var graphData = JSON.parse($('#graph-data').val());
     var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
+    var validationData = JSON.parse($('#validations').val());
+
+    var prepGraph = function(graph) {
+        graph.nodes.forEach(function(node) {
+            node.cardinality = 'n';
+            if (node.nodeid === node.nodegroup_id) {
+                var group = _.find(graph.nodegroups, function(nodegroup) {
+                    return nodegroup.nodegroupid === node.nodeid;
+                });
+                node.cardinality = group.cardinality;
+            }
+            node.validations = validationData.nodes[node.nodeid];
+        })
+    };
 
     branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
+        prepGraph(branch.graph);
     }, this);
 
-    graphData.nodes.forEach(function(node) {
-        node.cardinality = 'n';
-        if (node.nodeid === node.nodegroup_id) {
-            var group = _.find(graphData.nodegroups, function(nodegroup) {
-                return nodegroup.nodegroupid === node.nodeid;
-            });
-            node.cardinality = group.cardinality;
-        }
-    });
+    prepGraph(graphData);
 
     var graphModel = new GraphModel({
         nodes: graphData.nodes,
@@ -56,7 +63,8 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         graphModel: graphModel,
-        datatypes: datatypes
+        datatypes: datatypes,
+        validations: validationData.validations
     });
 
     viewModel.graphView.on('node-clicked', function (node) {

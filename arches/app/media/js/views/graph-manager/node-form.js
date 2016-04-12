@@ -7,7 +7,7 @@ define([
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'datatypes'));
+            _.extend(this, _.pick(options, 'graphModel', 'datatypes', 'validations'));
             this.datatypes = this.datatypes.map(function(datatype){ return datatype.datatype });
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
@@ -65,11 +65,14 @@ define([
                 var nodes = self.graphModel.get('nodes')();
                 var nodeJSON = request.responseJSON.node;
                 nodeJSON.cardinality = request.responseJSON.nodegroup?request.responseJSON.nodegroup.cardinality:self.node().cardinality();
+                nodeJSON.validations = request.responseJSON.validations;
                 self.node().parse(nodeJSON);
                 groupNodes.forEach(function(nodeJSON) {
                     var node = _.find(nodes, function (node) {
                         return node.nodeid === nodeJSON.nodeid;
                     });
+                    nodeJSON.cardinality = node.cardinality()
+                    nodeJSON.validations = node.validations();
                     node.parse(nodeJSON);
                 });
             });
