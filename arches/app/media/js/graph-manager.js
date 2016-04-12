@@ -33,6 +33,8 @@ require([
         }
     });
 
+
+
     var graphModel = new GraphModel({
         nodes: graphData.nodes,
         edges: graphData.edges,

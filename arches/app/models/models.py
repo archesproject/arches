@@ -207,7 +207,7 @@ class NodeGroup(models.Model):
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
-    
+
     """
 
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -331,6 +331,26 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
+
+
+class Validation(models.Model):
+    validationid = models.TextField(primary_key=True)  # This field type is a guess.
+    validation = models.TextField(blank=True, null=True)
+    validationtype = models.TextField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'validations'
+
+class ValidationXNode(models.Model):
+    validationid = models.ForeignKey(Validation, db_column='validationid')
+    nodeid = models.ForeignKey(Node, db_column='nodeid')
+
+    class Meta:
+        managed = False
+        db_table = 'validations_x_nodes'
 
 
 class Value(models.Model):

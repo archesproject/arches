@@ -217,6 +217,9 @@ INSERT INTO cards(cardid, name, title, subtitle)
 INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
     VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
 
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES (public.uuid_generate_v1mc(), 'required', 'node', 'required', 'A value must be entered for this node.');
+
 -- INSERT INTO tile_instances(tileinstanceid, tilegroupid, tileinstancedata, cardid,
 --             resourceclassid, resourceinstanceid)
 --     VALUES ('40000000-0000-0000-0000-000000000000', '', '{
