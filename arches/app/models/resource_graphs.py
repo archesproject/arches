@@ -190,10 +190,6 @@ class ResourceGraph(object):
         for edge in child_edges:
             self.addEdge(edge)
 
-        # nodegroups = map(lambda n: n.nodegroup, filter(lambda n: n.is_collector(), self.nodes))
-
-        # self.nodegroups.extend(nodegroups)
-
     def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
         """
         Appends a branch onto this graph
@@ -261,11 +257,3 @@ class ResourceGraph(object):
         ret['nodes'] = [node for key, node in self.nodes.iteritems()]
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         return ret
-
-    # def get_node_id_from_text(self):
-    #     for edge in self.edges:
-    #         for node in self.nodes:
-    #             if edge['domainnodeid'] == node['name']:
-    #                 edge['domainnodeid'] = node['nodeid']
-    #             if edge['rangenodeid'] == node['name']:
-    #                 edge['rangenodeid'] = node['nodeid']
