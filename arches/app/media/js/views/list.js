@@ -24,6 +24,9 @@ define([
         },
 
         selectItem: function(item, evt){
+            if(this.single_select){
+                this.clearSelection();
+            }
             item.selected(!item.selected());
             $(evt.currentTarget).toggleClass('selected-card');
         },
