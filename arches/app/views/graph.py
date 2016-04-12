@@ -37,7 +37,6 @@ def manager(request, nodeid):
     validation_nodes.extend(graph.nodes)
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['rootnode'] = rootnode
         branch['graph'] = ResourceGraph(rootnode)
         validation_nodes.extend(branch['graph'].nodes)
 
@@ -134,8 +133,7 @@ def node(request, nodeid):
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = ResourceGraph(nodeid)
-        newBranch = graph.append_branch(property, nodeid=nodeid, branchmetadataid=branchmetadataid)
+        newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
         return JSONResponse(newBranch)
-
 
     return HttpResponseNotFound()

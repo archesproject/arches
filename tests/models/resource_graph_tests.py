@@ -16,93 +16,121 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os, json
+import os, json, uuid
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from django.test import Client
-from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
-from arches.app.models.models import Node
+from arches.app.models import models
+from arches.app.models.resource_graphs import ResourceGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
-def setUpModule():
-    resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
-
-ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
-HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
-NODE_COUNT = 111
-PLACE_NODE_COUNT = 17
-client = Client()
 
 class ResourceGraphTests(ArchesTestCase):
 
-    def test_graph_import(self):
-        """
-        Test that correct number of nodes and edges load
-
-        """
-
-        root = Node.objects.get(nodeid=ROOT_ID)
-        nodes, edges = root.get_child_nodes_and_edges()
-        node_count = len(nodes)
-        edge_count = len(edges)
+    @classmethod
+    def setUpClass(cls):
+        resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
         
-        self.assertEqual(node_count, NODE_COUNT)
-        self.assertEqual(edge_count, NODE_COUNT)
+        cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
+        cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
-    def test_graph_manager(self):
+    @classmethod
+    def tearDownClass(cls):
+        root = models.Node.objects.get(pk=cls.HERITAGE_RESOURCE_FIXTURE)
+        cls.deleteGraph(root)
+
+    def setUp(self):
+        self.rootNode = models.Node.objects.create(
+            name='ROOT NODE',
+            description='Test Root Node',
+            istopnode=True,
+            ontologyclass='E1',
+            datatype='semantic'
+        )
+
+    def tearDown(self):
+        self.deleteGraph(self.rootNode)
+
+    def test_nodes_are_byref(self):
         """
-        Test the graph manager view
-
-        """
-        url = reverse('graph', kwargs={'nodeid':ROOT_ID})
-        response = client.get(url)
-        graph = json.loads(response.context['graph'])
-        
-        node_count = len(graph['nodes'])
-        self.assertEqual(node_count, NODE_COUNT+1)
-        
-        edge_count = len(graph['edges'])
-        self.assertEqual(edge_count, NODE_COUNT)
-
-    def test_node_update(self):
-        """
-        Test updating a node (HERITAGE_RESOURCE_PLACE) via node view
-
-        """
-
-        url = reverse('node', kwargs={'nodeid':HERITAGE_RESOURCE_PLACE_ID})
-        node = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
-        node.name = "new node name"
-        node.nodegroup_id = HERITAGE_RESOURCE_PLACE_ID
-        post_data = JSONSerializer().serialize(node)
-        content_type = 'application/x-www-form-urlencoded'
-        response = client.post(url, post_data, content_type)
-        response_json = json.loads(response.content)
-        
-        self.assertEqual(len(response_json['group_nodes']), PLACE_NODE_COUNT-1)
-        self.assertEqual(response_json['node']['name'], 'new node name')
-        
-        node_ = Node.objects.get(nodeid=HERITAGE_RESOURCE_PLACE_ID)
-        
-        self.assertEqual(node_.name, 'new node name')
-        self.assertTrue(node_.is_collector())
-
-    def test_node_delete(self):
-        """
-        Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
+        test that the nodes referred to in the ResourceGraph.edges are exact references to 
+        the nodes as opposed to a node with the same attribute values
 
         """
 
-        url = reverse('node', kwargs={'nodeid':HERITAGE_RESOURCE_PLACE_ID})
-        response = client.delete(url)
-        self.assertEqual(response.status_code, 200)
-        new_count = NODE_COUNT-PLACE_NODE_COUNT
-        root = Node.objects.get(nodeid=ROOT_ID)
-        
-        nodes, edges = root.get_child_nodes_and_edges()
-        node_count = len(nodes)
-        edge_count = len(edges)
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
 
-        self.assertEqual(node_count, new_count)
-        self.assertEqual(edge_count, new_count)
+        node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
+        
+        for key, edge in graph.edges.iteritems():
+            self.assertEqual(node_mapping[edge.domainnode.pk], id(edge.domainnode))
+            self.assertEqual(node_mapping[edge.rangenode.pk], id(edge.rangenode))
+
+        for key, node in graph.nodes.iteritems():
+            for key, edge in graph.edges.iteritems():
+                newid = uuid.uuid4()
+                if (edge.domainnode.pk == node.pk):
+                    node.pk = newid
+                    self.assertEqual(edge.domainnode.pk, newid) 
+                elif (edge.rangenode.pk == node.pk):
+                    node.pk = newid
+                    self.assertEqual(edge.rangenode.pk, newid)
+
+    def test_copy_graph(self):
+        """
+        test that a copy of a graph has the same number of nodes and edges and that the primary keys have been changed
+        and that the actual node references are different 
+
+        """
+
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        graph_copy = graph.copy()
+
+        self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
+        self.assertEqual(len(graph.edges), len(graph_copy.edges))
+
+        def findNodeByName(graph, name):
+            for key, node in graph.nodes.iteritems():
+                if node.name == name:
+                    return node
+            return None
+
+        for key, node in graph.nodes.iteritems():
+            node_copy = findNodeByName(graph_copy, node.name)
+            self.assertIsNotNone(node_copy)
+            self.assertNotEqual(node.pk, node_copy.pk)
+            self.assertNotEqual(id(node), id(node_copy))
+
+        for key, newedge in graph_copy.edges.iteritems():
+            self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
+            self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
+            self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
+            self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
+            with self.assertRaises(KeyError):
+                graph.edges[newedge.pk]
+
+    def test_branch_append(self):
+        """
+        test if a branch is properly appended to a graph
+
+        """
+
+        graph = ResourceGraph(self.rootNode)
+        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+
+        self.assertEqual(len(graph.nodes), 3)
+        self.assertEqual(len(graph.edges), 2)
+
+        for key, edge in graph.edges.iteritems():
+            self.assertIsNotNone(graph.nodes[edge.domainnode_id])
+            self.assertIsNotNone(graph.nodes[edge.rangenode_id])
+            self.assertEqual(edge.domainnode, graph.nodes[edge.domainnode.pk])
+            self.assertEqual(edge.rangenode, graph.nodes[edge.rangenode.pk])
+
+        for key, node in graph.nodes.iteritems():
+            if node.istopnode:
+                self.assertEqual(node, self.rootNode)
+
+    def test_make_tree(self):
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        print JSONSerializer().serialize(graph.populate_null_nodegroupids())

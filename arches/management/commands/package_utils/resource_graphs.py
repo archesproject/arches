@@ -66,7 +66,7 @@ def load_resource_graph_file(path_to_file):
         with open(basepath, 'rU') as f:
             file = json.load(f)
             resource_graph = ResourceGraph(file['graph'][0])
-            resource_graph._save()
+            resource_graph.save()
 
 def append_branch(path_to_branch, node_list, edge_list):
     """
