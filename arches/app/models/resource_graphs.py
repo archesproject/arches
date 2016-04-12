@@ -44,7 +44,6 @@ class ResourceGraph(object):
                 self.get_nodes_and_edges(args[0])
             elif args[0]["nodes"] and args[0]["edges"]:
                 for node in args[0]["nodes"]:
-                    #self.insert_node_group(node)
                     newNode = self.addNode(node)
                     if node['istopnode']:
                         self.root = newNode
@@ -74,7 +73,7 @@ class ResourceGraph(object):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
             node.branchmetadata_id = nodeobj.get('branchmetadataid','')
-            
+
             if not (node.nodegroup_id == None or node.nodegroup_id == ''):
                 newNodeGroup = models.NodeGroup.objects.get_or_create(
                     pk=node.nodegroup_id,
@@ -127,15 +126,12 @@ class ResourceGraph(object):
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
 
-        
-
-        # collectorlist = filter(lambda n: (n.nodeid==n.nodegroup_id) and (n.istopnode != False), self.nodes)
-        # for collector in collectorlist:
-        #     edge = models.Edge.objects.get(rangenode = collector)
-        #     collector.nodegroup.parentnodegroup = edge.domainnode.nodegroup
-        #     collector.nodegroup.save()
-
     def get_tree(self):
+        """
+        returns a tree based representation of this graph
+
+        """
+
         tree = {
             'node': self.root,
             'children': []
@@ -154,6 +150,11 @@ class ResourceGraph(object):
         return find_child_edges(tree)
 
     def populate_null_nodegroupids(self):
+        """
+        populates any blank nodegroup ids of the nodes in this graph with the nearest parent node
+
+        """
+
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup_id=None):
@@ -172,16 +173,6 @@ class ResourceGraph(object):
             return tree
 
         return traverse_tree(tree)
-
-    def insert_node_group(self, node):
-        if node.get('nodegroupid', '') != None:
-            newNodeGroup = models.NodeGroup()
-            newNodeGroup.cardinality = node.get('cardinality', '')
-            newNodeGroup.nodegroupid = node.get('nodegroupid', '')
-            newNodeGroup.save()
-            return newNodeGroup
-        else:
-            return None
 
     def get_nodes_and_edges(self, node):
         """
