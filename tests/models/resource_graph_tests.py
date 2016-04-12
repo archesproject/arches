@@ -39,16 +39,6 @@ class ResourceGraphTests(ArchesTestCase):
         root = models.Node.objects.get(pk=cls.HERITAGE_RESOURCE_FIXTURE)
         cls.deleteGraph(root)
 
-    @classmethod
-    def deleteGraph(cls, root):
-        def delete_children(node):
-            for edge in models.Edge.objects.filter(rangenode=node):
-                edge.delete()
-                delete_children(edge.rangenode)
-         
-        delete_children(root)
-        root.delete()
-
     def setUp(self):
         self.rootNode = models.Node.objects.create(
             name='ROOT NODE',
@@ -141,3 +131,6 @@ class ResourceGraphTests(ArchesTestCase):
             if node.istopnode:
                 self.assertEqual(node, self.rootNode)
 
+    def test_make_tree(self):
+        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        print JSONSerializer().serialize(graph.populate_null_nodegroupids())

@@ -36,13 +36,21 @@
                 </div>
             </div>
 
+            <div class="node-widget-label">
+                <div class="control-label">
+                    Data type
+                </div>
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select class="design" style="width:100%;" data-bind="value: node().datatype, options: datatypes, chosen: true"></select>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
     <hr class="section-division-dark node-section-division">
 
-    <hr class="section-division-dark node-section-division">
     <div class="node-section">
 
         <div>
@@ -61,17 +69,33 @@
 
             </div>
 
+            <div style="padding-bottom: 15px;" data-bind="if: node().isCollector">
+
+
+                <span class="switch switch-small arches-switch" data-bind="css: {'on': node().cardinality()=='n'}, click: toggleCardinality"><small></small></span>
+
+                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
+                    Repeatable
+                </p>
+                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                    Users may enter multiple values for this node
+                </span>
+
+            </div>
+
         </div>
 
     </div>
 
 
 
-    <div class="pull-right">
+    <div class="pull-right" data-bind="if: node().dirty()">
+        <hr>
         <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
         <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
     </div>
-    <div class="pull-right" style="margin-top:5px;">
+    <div class="pull-right">
+        <hr>
         <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> Delete</button>
     </div>
 </div>

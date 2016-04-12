@@ -22,6 +22,7 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+
 class ResourceGraph(object):
     """
     Used for mapping complete resource graph objects to and from the database
@@ -32,6 +33,7 @@ class ResourceGraph(object):
         self.root = None
         self.nodes = {}
         self.edges = {}
+        self.nodegroups = []
 
         if args:
             if (isinstance(args[0], basestring) or
@@ -42,12 +44,15 @@ class ResourceGraph(object):
                 self.get_nodes_and_edges(args[0])
             elif args[0]["nodes"] and args[0]["edges"]:
                 for node in args[0]["nodes"]:
+                    #self.insert_node_group(node)
                     newNode = self.addNode(node)
                     if node['istopnode']:
                         self.root = newNode
                     
                 for edge in args[0]["edges"]:
                     self.addEdge(edge)
+
+                self.populate_null_nodegroupids()
 
     def addNode(self, node):
         """
@@ -69,9 +74,17 @@ class ResourceGraph(object):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
             node.branchmetadata_id = nodeobj.get('branchmetadataid','')
+            
+            if not (node.nodegroup_id == None or node.nodegroup_id == ''):
+                newNodeGroup = models.NodeGroup.objects.get_or_create(
+                    pk=node.nodegroup_id,
+                    defaults={'cardinality':nodeobj.get('cardinality', '')}
+                )
 
         if node.pk == None:
             node.pk = uuid.uuid1()    
+        if node.is_collector():
+            self.nodegroups.append(node.nodegroup)
         self.nodes[node.pk] = node
         return node
 
@@ -114,12 +127,68 @@ class ResourceGraph(object):
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
 
+        
+
+        # collectorlist = filter(lambda n: (n.nodeid==n.nodegroup_id) and (n.istopnode != False), self.nodes)
+        # for collector in collectorlist:
+        #     edge = models.Edge.objects.get(rangenode = collector)
+        #     collector.nodegroup.parentnodegroup = edge.domainnode.nodegroup
+        #     collector.nodegroup.save()
+
+    def get_tree(self):
+        tree = {
+            'node': self.root,
+            'children': []
+        }
+
+        def find_child_edges(tree):
+            for edge_id, edge in self.edges.iteritems():
+                if edge.domainnode == tree['node']:
+                    tree['children'].append(find_child_edges({
+                        'node': edge.rangenode,
+                        'children':[]
+                    }))
+
+            return tree
+
+        return find_child_edges(tree)
+
+    def populate_null_nodegroupids(self):
+        tree = self.get_tree()
+
+        def traverse_tree(tree, current_nodegroup_id=None):
+            if tree['node'].nodegroup_id == None:
+                tree['node'].nodegroup_id = current_nodegroup_id
+            else:
+                ng = models.NodeGroup(
+                    pk=tree['node'].nodegroup_id,
+                    parentnodegroup_id=current_nodegroup_id
+                )
+                ng.save()
+                current_nodegroup_id = tree['node'].nodegroup_id
+
+            for child in tree['children']:
+                traverse_tree(child, current_nodegroup_id)
+            return tree
+
+        return traverse_tree(tree)
+
+    def insert_node_group(self, node):
+        if node.get('nodegroupid', '') != None:
+            newNodeGroup = models.NodeGroup()
+            newNodeGroup.cardinality = node.get('cardinality', '')
+            newNodeGroup.nodegroupid = node.get('nodegroupid', '')
+            newNodeGroup.save()
+            return newNodeGroup
+        else:
+            return None
+
     def get_nodes_and_edges(self, node):
         """
         Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
 
         """
-        
+
         self.root = node
         self.addNode(node)
 
@@ -130,7 +199,11 @@ class ResourceGraph(object):
         for edge in child_edges:
             self.addEdge(edge)
 
-    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):  
+        # nodegroups = map(lambda n: n.nodegroup, filter(lambda n: n.is_collector(), self.nodes))
+
+        # self.nodegroups.extend(nodegroups)
+
+    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
         """
         Appends a branch onto this graph
 
@@ -193,6 +266,7 @@ class ResourceGraph(object):
     def serialize(self):
         ret = {}
         ret['root'] = self.root
+        ret['nodegroups'] = self.nodegroups
         ret['nodes'] = [node for key, node in self.nodes.iteritems()]
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         return ret

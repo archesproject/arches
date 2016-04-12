@@ -13,3 +13,4 @@ arches/uploadedfiles
 arches/settings_local.py
 .coverage
 arches.log
+.atom-build.json

@@ -16,13 +16,21 @@ define([
             self.editing = ko.observable(false);
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
+            self.datatype = ko.observable('');
+            self.cardinality = ko.observable('n');
 
             self.parse(options.source);
+
+            self.iconclass = ko.computed(function () {
+                self.datatypelookup[self.datatype()];
+            });
 
             self.json = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._node()), {
                     name: self.name(),
-                    nodegroup_id: self.nodeGroupId()
+                    datatype: self.datatype(),
+                    nodegroup_id: self.nodeGroupId(),
+                    cardinality: self.cardinality()
                 }))
             });
 
@@ -40,10 +48,11 @@ define([
             self._node(JSON.stringify(source));
             self.name(source.name);
             self.nodeGroupId(source.nodegroup_id);
+            self.datatype(source.datatype);
+            self.cardinality(source.cardinality);
 
             self.nodeid = source.nodeid;
-            self.datatype = source.datatype;
-            self.iconclass = self.datatypelookup[source.datatype];
+
             self.istopnode = source.istopnode;
             self.ontologyclass = source.ontologyclass;
 
@@ -65,6 +74,11 @@ define([
                 nodeGroupId = (this.nodeid === _node.nodegroup_id) ? null : _node.nodegroup_id;
             }
             this.nodeGroupId(nodeGroupId);
+        },
+
+        toggleCardinality: function () {
+            var cardinality = (this.cardinality()==='n')?'1':'n';
+            this.cardinality(cardinality);
         }
     });
 });

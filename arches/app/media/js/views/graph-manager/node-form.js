@@ -1,11 +1,14 @@
 define([
+    'underscore',
     'backbone',
-    'knockout'
-], function(Backbone, ko) {
+    'knockout',
+    'bindings/chosen'
+], function(_, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            this.graphModel = options.graphModel;
+            _.extend(this, _.pick(options, 'graphModel', 'datatypes'));
+            this.datatypes = this.datatypes.map(function(datatype){ return datatype.datatype });
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);
@@ -25,7 +28,7 @@ define([
 
             this.node.subscribe(function () {
                 self.closeClicked(false);
-            })
+            });
         },
         close: function() {
             this.failed(false);
@@ -58,19 +61,30 @@ define([
         save: function () {
             var self = this;
             this.callAsync('save', function (request) {
-                self.node().parse(request.responseJSON.node);
-                self.trigger('node-updated', request.responseJSON);
+                var groupNodes = request.responseJSON.group_nodes;
+                var nodes = self.graphModel.get('nodes')();
+                var nodeJSON = request.responseJSON.node;
+                nodeJSON.cardinality = request.responseJSON.nodegroup?request.responseJSON.nodegroup.cardinality:self.node().cardinality();
+                self.node().parse(nodeJSON);
+                groupNodes.forEach(function(nodeJSON) {
+                    var node = _.find(nodes, function (node) {
+                        return node.nodeid === nodeJSON.nodeid;
+                    });
+                    node.parse(nodeJSON);
+                });
             });
         },
         deleteNode: function () {
             var self = this;
             this.callAsync('delete', function () {
                 self.graphModel.deleteNode(self.node())
-                self.trigger('node-deleted', self.node());
             });
         },
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
+        },
+        toggleCardinality: function () {
+            this.node().toggleCardinality();
         }
     });
     return NodeFormView;

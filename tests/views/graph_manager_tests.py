@@ -26,7 +26,7 @@ from arches.app.models.models import Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
-class ResourceGraphTests(ArchesTestCase):
+class GraphManagerViewTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -37,6 +37,11 @@ class ResourceGraphTests(ArchesTestCase):
         cls.NODE_COUNT = 111
         cls.PLACE_NODE_COUNT = 17
         cls.client = Client()
+
+    @classmethod
+    def tearDownClass(cls):
+        root = Node.objects.get(pk=cls.ROOT_ID)
+        cls.deleteGraph(root)
 
     def test_graph_import(self):
         """

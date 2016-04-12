@@ -48,6 +48,10 @@ NOSE_ARGS = [
     '--verbosity=1',
 ]
 
+INSTALLED_APPS = INSTALLED_APPS + (
+    'django_nose',
+)
+
 
 try:
     from settings_local import *

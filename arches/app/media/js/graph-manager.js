@@ -23,6 +23,16 @@ require([
         branch.filtered = ko.observable(false);
     }, this);
 
+    graphData.nodes.forEach(function(node) {
+        node.cardinality = 'n';
+        if (node.nodeid === node.nodegroup_id) {
+            var group = _.find(graphData.nodegroups, function(nodegroup) {
+                return nodegroup.nodegroupid === node.nodeid;
+            });
+            node.cardinality = group.cardinality;
+        }
+    });
+
     var graphModel = new GraphModel({
         nodes: graphData.nodes,
         edges: graphData.edges,
@@ -45,17 +55,8 @@ require([
 
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
-        graphModel: graphModel
-    });
-
-    viewModel.nodeForm.on('node-updated', function(res) {
-        var nodes = graphModel.get('nodes')();
-        res.group_nodes.forEach(function(nodeJSON) {
-            var node = _.find(nodes, function (node) {
-                return node.nodeid === nodeJSON.nodeid;
-            });
-            node.parse(nodeJSON);
-        });
+        graphModel: graphModel,
+        datatypes: datatypes
     });
 
     viewModel.graphView.on('node-clicked', function (node) {

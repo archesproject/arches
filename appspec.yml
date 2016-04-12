@@ -1,0 +1,26 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/html/
+hooks:
+  ApplicationStop:
+    - location: arches/install/arches_stop.sh
+      timeout: 300
+      mode: 755
+      runas: ubuntu
+  BeforeInstall:
+    - location: arches/install/ubuntu_trusty_setup.sh
+      timeout: 300
+      mode: 755
+      runas: ubuntu
+    - location: arches/install/install_arches.sh
+      timeout: 300
+      mode: 755
+      runas: ubuntu
+  ApplicationStart:
+    - location: arches/install/arches_start.sh
+      timeout: 300
+      mode: 755
+      runas: ubuntu
+      
