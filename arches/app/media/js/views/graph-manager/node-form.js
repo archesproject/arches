@@ -71,8 +71,9 @@ define([
                     var node = _.find(nodes, function (node) {
                         return node.nodeid === nodeJSON.nodeid;
                     });
-                    nodeJSON.cardinality = node.cardinality()
-                    nodeJSON.validations = node.validations();
+                    var validations = JSON.parse(JSON.stringify(node.validations()))
+                    nodeJSON.cardinality = node.cardinality();
+                    nodeJSON.validations = validations;
                     node.parse(nodeJSON);
                 });
             });

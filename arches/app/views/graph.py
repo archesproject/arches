@@ -35,7 +35,7 @@ def manager(request, nodeid):
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
 
     validation_data = {
-        'validations': [validation for validation in models.Validation.objects.all()],
+        'validations': models.Validation.objects.all(),
         'nodes': {}
     }
 
