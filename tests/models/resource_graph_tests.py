@@ -30,7 +30,7 @@ class ResourceGraphTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
-        
+
         cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
@@ -53,7 +53,7 @@ class ResourceGraphTests(ArchesTestCase):
 
     def test_nodes_are_byref(self):
         """
-        test that the nodes referred to in the ResourceGraph.edges are exact references to 
+        test that the nodes referred to in the ResourceGraph.edges are exact references to
         the nodes as opposed to a node with the same attribute values
 
         """
@@ -61,7 +61,7 @@ class ResourceGraphTests(ArchesTestCase):
         graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
-        
+
         for key, edge in graph.edges.iteritems():
             self.assertEqual(node_mapping[edge.domainnode.pk], id(edge.domainnode))
             self.assertEqual(node_mapping[edge.rangenode.pk], id(edge.rangenode))
@@ -71,7 +71,7 @@ class ResourceGraphTests(ArchesTestCase):
                 newid = uuid.uuid4()
                 if (edge.domainnode.pk == node.pk):
                     node.pk = newid
-                    self.assertEqual(edge.domainnode.pk, newid) 
+                    self.assertEqual(edge.domainnode.pk, newid)
                 elif (edge.rangenode.pk == node.pk):
                     node.pk = newid
                     self.assertEqual(edge.rangenode.pk, newid)
@@ -79,7 +79,7 @@ class ResourceGraphTests(ArchesTestCase):
     def test_copy_graph(self):
         """
         test that a copy of a graph has the same number of nodes and edges and that the primary keys have been changed
-        and that the actual node references are different 
+        and that the actual node references are different
 
         """
 
@@ -133,4 +133,3 @@ class ResourceGraphTests(ArchesTestCase):
 
     def test_make_tree(self):
         graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
-        print JSONSerializer().serialize(graph.populate_null_nodegroupids())
