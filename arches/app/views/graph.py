@@ -43,10 +43,10 @@ def manager(request, nodeid):
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
         for node_id, node in branch['graph'].nodes.iteritems():
-            validation_data['nodes'][str(nodeid)] = node.get_validation_ids()
+            validation_data['nodes'][str(node_id)] = node.get_validation_ids()
 
     for node_id, node in graph.nodes.iteritems():
-        validation_data['nodes'][str(nodeid)] = node.get_validation_ids()
+        validation_data['nodes'][str(node_id)] = node.get_validation_ids()
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
