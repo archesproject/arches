@@ -470,6 +470,31 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Validation',
+            fields=[
+                ('validationid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('validation', models.TextField(blank=True, null=True)),
+                ('validationtype', models.TextField(blank=True, null=True)),
+                ('name', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'validations',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='ValidationXNode',
+            fields=[
+                ('validationid', models.ForeignKey(to='models.Validation', db_column='validationid')),
+                ('nodeid', models.ForeignKey(to='models.Node', db_column='nodeid')),
+            ],
+            options={
+                'db_table': 'validations_x_nodes',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Value',
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
