@@ -33,19 +33,20 @@ def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
-    validation_nodes = []
-    validation_nodes.extend(graph.nodes)
-    for branch in branches:
-        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['graph'] = ResourceGraph(rootnode)
-        validation_nodes.extend(branch['graph'].nodes)
 
     validation_data = {
         'validations': [validation for validation in models.Validation.objects.all()],
         'nodes': {}
     }
-    for node in validation_nodes:
-        validation_data['nodes'][str(node.nodeid)] = node.get_validation_ids()
+
+    for branch in branches:
+        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
+        branch['graph'] = ResourceGraph(rootnode)
+        for node_id, node in branch['graph'].nodes.iteritems():
+            validation_data['nodes'][str(nodeid)] = node.get_validation_ids()
+
+    for node_id, node in graph.nodes.iteritems():
+        validation_data['nodes'][str(nodeid)] = node.get_validation_ids()
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
