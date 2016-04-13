@@ -160,14 +160,14 @@ INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
 INSERT INTO branch_metadata(branchmetadataid, name, author, version, description)
     VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, 
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             branchmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'E1', 'string', 
+    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'E1', 'string',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, 
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             branchmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55', 'domain', 
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55', 'domain',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
@@ -242,6 +242,13 @@ INSERT INTO cards(cardid, name, title, subtitle)
 
 INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
     VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
+
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
+
+INSERT INTO validations_x_nodes(validationid, nodeid)
+    VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
+
 
 -- INSERT INTO tile_instances(tileinstanceid, tilegroupid, tileinstancedata, cardid,
 --             resourceclassid, resourceinstanceid)

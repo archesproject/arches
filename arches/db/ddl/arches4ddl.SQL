@@ -818,7 +818,38 @@ WITH (OIDS=FALSE)
 ALTER TABLE "resourceinstances" ADD CONSTRAINT "resourceinstances_pk" PRIMARY KEY ("resourceinstanceid")
 ;
 
--- Create relationships section ------------------------------------------------- 
+-- Table validations
+CREATE TABLE "validations"(
+ "validationid" UUID NOT NULL,
+ "validation" Text,
+ "validationtype" Text,
+ "name" Text,
+ "description" Text
+)
+WITH (OIDS=FALSE)
+;
+
+-- Add keys for table validations
+
+ALTER TABLE "validations" ADD CONSTRAINT "validations_pk" PRIMARY KEY ("validationid")
+;
+
+-- Table validations
+
+CREATE TABLE "validations_x_nodes"(
+ "id" serial NOT NULL,
+ "validationid" UUID NOT NULL,
+ "nodeid" UUID NOT NULL
+)
+WITH (OIDS=FALSE)
+;
+
+-- Add keys for table validations
+
+ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "validations_x_nodes_pk" PRIMARY KEY ("id")
+;
+
+-- Create relationships section -------------------------------------------------
 
 ALTER TABLE "cardgroups" ADD CONSTRAINT "nodes_cardgroups_fk" FOREIGN KEY ("nodeid") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
@@ -943,3 +974,8 @@ ALTER TABLE "resource2resource_constraints" ADD CONSTRAINT "nodes_rscr2rsrc_cons
 ALTER TABLE "edges" ADD CONSTRAINT "branchmetadata_edges_fk" FOREIGN KEY ("branchmetadataid") REFERENCES "branchmetadata" ("branchmetadataid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
+ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "nodes_validations_x_nodes_fk" FOREIGN KEY ("nodeid") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION
+;
+
+ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "validations_validations_x_nodes_fk" FOREIGN KEY ("validationid") REFERENCES "validations" ("validationid") ON DELETE NO ACTION ON UPDATE NO ACTION
+;

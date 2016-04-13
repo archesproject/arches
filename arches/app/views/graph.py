@@ -33,14 +33,26 @@ def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
+
+    validation_data = {
+        'validations': [validation for validation in models.Validation.objects.all()],
+        'nodes': {}
+    }
+
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
+        for node_id, node in branch['graph'].nodes.iteritems():
+            validation_data['nodes'][str(node_id)] = node.get_validation_ids()
+
+    for node_id, node in graph.nodes.iteritems():
+        validation_data['nodes'][str(node_id)] = node.get_validation_ids()
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
+        'validations': JSONSerializer().serialize(validation_data),
         'branches': JSONSerializer().serialize(branches),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
@@ -77,6 +89,10 @@ def node(request, nodeid):
                 node.status = data.get('status', '')
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
+                validation_ids = data.get('validations', [])
+                models.ValidationXNode.objects.filter(node=node).exclude(validation_id__in=validation_ids).delete()
+                for validation_id in validation_ids:
+                    models.ValidationXNode.objects.get_or_create(node=node, validation_id=validation_id)
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
@@ -99,7 +115,7 @@ def node(request, nodeid):
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup})
+                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup, 'validations': node.get_validation_ids()})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)

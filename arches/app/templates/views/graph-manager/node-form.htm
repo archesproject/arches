@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 <!-- ko if: node -->
-<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">Unnamed node</span></span</p>
+<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">{% trans "Unnamed node" %}</span></span</p>
 
 <div class="relative">
     <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
@@ -42,6 +42,15 @@
                 </div>
                 <div class="col-sm-12 pad-no node-attribute-label">
                     <select class="design" style="width:100%;" data-bind="value: node().datatype, options: datatypes, chosen: true"></select>
+                </div>
+            </div>
+
+            <div class="node-widget-label">
+                <div class="control-label">
+                    Validations
+                </div>
+                <div class="col-sm-12 pad-no node-attribute-label">
+                    <select data-placeholder="Select validations..." class="design" style="width:100%;" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: true"></select>
                 </div>
             </div>
 

@@ -207,7 +207,7 @@ class NodeGroup(models.Model):
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
-    
+
     """
 
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -224,7 +224,7 @@ class Node(models.Model):
         gather up the child nodes and edges of this node
 
         returns a tuple of nodes and edges
-        
+
         """
 
         nodes = []
@@ -236,14 +236,14 @@ class Node(models.Model):
             child_nodes, child_edges = edge.rangenode._traverse_graph()
             nodes.extend(child_nodes)
             edges.extend(child_edges)
-        return (nodes, edges)    
+        return (nodes, edges)
 
     def get_child_nodes_and_edges(self):
         """
         _traverse_graph does the bulk of the work in gathering up the child nodes and edges
 
         what we do here is make sure that the common node referenced by two or more edges is the same node reference in memory
-        that way if a user updates a node attribute that update is reflected accross all edges that reference that node 
+        that way if a user updates a node attribute that update is reflected accross all edges that reference that node
 
         """
 
@@ -259,6 +259,12 @@ class Node(models.Model):
 
     def is_collector(self):
         return self.nodeid == self.nodegroup_id
+
+    def get_validations(self):
+        return [validation.validation for validation in ValidationXNode.objects.filter(node=self)]
+
+    def get_validation_ids(self):
+        return [validation.validationid for validation in self.get_validations()]
 
     class Meta:
         managed = True
@@ -357,6 +363,27 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
+
+
+class Validation(models.Model):
+    validationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    validation = models.TextField(blank=True, null=True)
+    validationtype = models.TextField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'validations'
+
+
+class ValidationXNode(models.Model):
+    validation = models.ForeignKey(Validation, db_column='validationid')
+    node = models.ForeignKey(Node, db_column='nodeid')
+
+    class Meta:
+        managed = True
+        db_table = 'validations_x_nodes'
 
 
 class Value(models.Model):
