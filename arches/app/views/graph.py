@@ -30,6 +30,9 @@ from arches.app.models import models
 
 @csrf_exempt
 def manager(request, nodeid):
+    if nodeid is None or nodeid == '':
+        return render(request, 'resource-list.htm', {})
+
     graph = ResourceGraph(nodeid)
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)

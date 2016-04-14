@@ -1,0 +1,273 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-nifty.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resources" %}
+{% endblock title %}
+
+{% block content %}
+<!-- Form Container -->
+<div class="slide" style="">
+
+	<!-- Page Title/Saerch -->
+	<div id="page-title">
+		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">{% trans "Resources" %}</h1>
+	</div>
+	<!--End page title-->
+
+    <div id="" class="" style="padding: 10px 0px 30px 0px;">
+
+    	<!-- Project Tools -->
+    	<div class="relative" style="height: 36px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+
+    		<div class="" style="">
+
+    			<!-- Summary -->
+    			<p class="" style="padding-top: 5px; padding-left: 25px; font-size: 13px; color: #888;">
+    				You have <span style="color: #123; font-weight: 700;">4</span> active resources.
+    			</p><p>
+
+    			<!-- Sort -->
+    			</p><div class="" style="position: absolute; left: 220px; top: 2px; font-size: 12px; color: #888;">
+    				Sort by:
+    				<div class="btn-group" style="">
+    					<button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+    						Name <i class="dropdown-caret fa fa-caret-down"></i>
+    					</button>
+    					<ul class="dropdown-menu dropdown-menu-right">
+    						<li><a href="#">Name</a>
+    						</li>
+    						<li><a href="#">Type</a>
+    						</li>
+    						<li><a href="#">Status</a>
+    						</li>
+    					</ul>
+    				</div>
+    			</div>
+
+    			<!-- Display -->
+    			<div class="" style="position: absolute; left: 370px; top: 6px; font-size: 12px; color: #888;">
+    				<a href="" class="selected" style="padding-right: 2px;"><i class="fa fa-th-large"></i></a>
+    				<a href="" class="fade-back" style=""><i class="fa fa-align-justify"></i></a>
+    			</div>
+
+    		</div>
+    	</div>
+
+
+    	<!-- Card Report -->
+    	<div class="" style="">
+    		<div class="row" style="">
+
+    			<!-- Section Data -->
+    			<div class="col-xs-12" style="margin: 10px 10px 20px 40px; padding-right: 40px;">
+
+    				<!-- Isotope Layout -->
+    				<div id="report-image-grid" class="report-image-grid">
+
+    					<!-- New Project Button -->
+    					<div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item" style="">
+    						<a id="add-basemap" href="#new-project-modal" data-toggle="modal" class="" style="">
+    							<h3 class="text-thin" style="margin-top: 10px;"> New Resource</h3>
+
+    							<span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+    								<i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+    							</span>
+
+    							<h5 class="" style="font-weight: 200;"> Create a new resource as part of your heritage inventory</h5>
+    						</a>
+    					</div>
+
+    					<!-- Resource -->
+    					<div class="project-grid-item" style="">
+    						<div class="panel mar-no">
+
+    							<!-- Resource Name -->
+    							<div class="panel-heading">
+    				                <h3 class="panel-title" style="padding-left: 10px;">Heritage Asset</h3>
+    				            </div>
+
+    							<!-- Abstract -->
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
+    								A resource that can be used to inventory buildings, structures, and archaeological sites
+    							</div>
+
+    							<!-- Project Tools -->
+    							<div class="panel-footer" style="height: 40px;">
+    								<a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+    								<a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+    									<ul class="dropdown-menu pull-right">
+    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
+    									</li>
+    									<li class="divider"></li>
+    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									</li>
+    								</ul>
+    							</div>
+    						</div>
+    					</div>
+
+    					<!-- Resource -->
+    					<div class="project-grid-item" style="">
+    						<div class="panel mar-no">
+
+    							<!-- Resource Name -->
+    							<div class="panel-heading">
+    				                <h3 class="panel-title" style="padding-left: 10px;">Heritage District</h3>
+    				            </div>
+
+    							<!-- Abstract -->
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
+    								A collection or ensemble of Heritage Assets, a District, or a Landscape that can be thought of as a region of cultural heritage.
+    							</div>
+
+    							<!-- Project Tools -->
+    							<div class="panel-footer" style="height: 40px;">
+    								<a href="" class="" style=""><i class="fa fa-minus-circle"></i> Inactive</a>
+
+    								<a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+    									<ul class="dropdown-menu pull-right">
+    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
+    									</li>
+    									<li class="divider"></li>
+    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									</li>
+    								</ul>
+    							</div>
+    						</div>
+    					</div>
+
+    					<!-- Resource -->
+    					<div class="project-grid-item" style="">
+    						<div class="panel mar-no">
+
+    							<!-- Resource Name -->
+    							<div class="panel-heading">
+    				                <h3 class="panel-title" style="padding-left: 10px;">Excavation Activity</h3>
+    				            </div>
+
+    							<!-- Abstract -->
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
+    								A discrete activity (that may span several intervals or seasons) undertaken to unearth, document, and interpret a a structure or site.
+    							</div>
+
+    							<!-- Project Tools -->
+    							<div class="panel-footer" style="height: 40px;">
+    								<a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+    								<a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+    									<ul class="dropdown-menu pull-right">
+    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
+    									</li>
+    									<li class="divider"></li>
+    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									</li>
+    								</ul>
+    							</div>
+    						</div>
+    					</div>
+
+    					<!-- Resource -->
+    					<div class="project-grid-item" style="">
+    						<div class="panel mar-no">
+
+    							<!-- Resource Name -->
+    							<div class="panel-heading">
+    				                <h3 class="panel-title" style="padding-left: 10px;">Information Object</h3>
+    				            </div>
+
+    							<!-- Abstract -->
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
+    								An information encoding.  These assets include digital files (such as documents, images, vidoe, etc.) and analog (long-playing vinyl records, signs, books).
+    							</div>
+
+    							<!-- Project Tools -->
+    							<div class="panel-footer" style="height: 40px;">
+    								<a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+    								<a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+    									<ul class="dropdown-menu pull-right">
+    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
+    									</li>
+    									<li class="divider"></li>
+    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									</li>
+    								</ul>
+    							</div>
+    						</div>
+    					</div>
+
+    					<!-- Resource -->
+    					<div class="project-grid-item" style="">
+    						<div class="panel mar-no">
+
+    							<!-- Resource Name -->
+    							<div class="panel-heading">
+    				                <h3 class="panel-title" style="padding-left: 10px;">Historic Event</h3>
+    				            </div>
+
+    							<!-- Abstract -->
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
+    								An activity or event that occurred in the past and has cultural heritage significance.  Examples may include the 1906 San Francisco Earthquake.
+    							</div>
+
+    							<!-- Project Tools -->
+    							<div class="panel-footer" style="height: 40px;">
+    								<a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+
+    								<a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+    									<ul class="dropdown-menu pull-right">
+    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									</li>
+    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
+    									</li>
+    									<li class="divider"></li>
+    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									</li>
+    								</ul>
+    							</div>
+    						</div>
+    					</div>
+    				</div>
+    			</div>
+    		</div>
+    	</div>
+
+    </div>
+</div>
+{% endblock content %}

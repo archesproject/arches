@@ -1582,6 +1582,17 @@ div.dropdown-menu.open {
 .text-green, .rp-results-icon-color {
     color: #139F78;
 }
+.project-grid-item {
+	float: left;
+  	margin: 2px;
+  	max-width: 250px;
+  	border: 1px solid #ddd;
+  	opacity: .79;
+}
+.project-grid-item:hover {
+	cursor: pointer;
+	opacity: 1.0;
+}
 @media min-width 992px {
     #page-content {
         padding: 15px 15px 25px;
