@@ -32,6 +32,7 @@ class ResourceGraphTests(ArchesTestCase):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
         cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
+        cls.SINGLE_NODE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000000'
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
     @classmethod
@@ -40,16 +41,75 @@ class ResourceGraphTests(ArchesTestCase):
         cls.deleteGraph(root)
 
     def setUp(self):
+        newid = uuid.uuid1()
+        newgroup = models.NodeGroup.objects.create(
+            pk=newid,
+            cardinality='1'
+        )
         self.rootNode = models.Node.objects.create(
+            pk=newid,
             name='ROOT NODE',
             description='Test Root Node',
             istopnode=True,
             ontologyclass='E1',
-            datatype='semantic'
+            datatype='semantic',
+            nodegroup=newgroup
         )
 
     def tearDown(self):
         self.deleteGraph(self.rootNode)
+
+    def test_graph_doesnt_polute_db(self):
+        """
+        test that the mere act of creating a ResourceGraph instance 
+        doesn't save anything to the database
+
+        """
+
+        graph_obj = {
+            'nodes':[{
+                "status": None,
+                "branchmetadataid": None,
+                "description": "",
+                "name": "ROOT_NODE",
+                "istopnode": True,
+                "ontologyclass": "",
+                "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "nodegroupid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "datatype": "semantic",
+                "cardinality": "1"
+            },{
+                "status": None,
+                "branchmetadataid": None,
+                "description": "",
+                "name": "NODE_NAME",
+                "istopnode": False,
+                "ontologyclass": "",
+                "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                "nodegroupid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "datatype": "string",
+                "cardinality": "n"
+            }],
+            'edges':[{
+                "branchmetadataid": None,
+                "rangenodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                "name": "",
+                "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",
+                "domainnodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "ontologyproperty": "P2",
+                "description": ""
+            }]
+        }
+
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
+        nodegroups_count_before = models.NodeGroup.objects.count()
+
+        graph = ResourceGraph(graph_obj)
+
+        self.assertEqual(models.Node.objects.count()-nodes_count_before, 0)
+        self.assertEqual(models.Edge.objects.count()-edges_count_before, 0)
+        self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 0)
 
     def test_nodes_are_byref(self):
         """
@@ -88,6 +148,7 @@ class ResourceGraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
         self.assertEqual(len(graph.edges), len(graph_copy.edges))
+        self.assertEqual(len(graph.nodegroups), len(graph_copy.nodegroups))
 
         def findNodeByName(graph, name):
             for key, node in graph.nodes.iteritems():
@@ -100,7 +161,9 @@ class ResourceGraphTests(ArchesTestCase):
             self.assertIsNotNone(node_copy)
             self.assertNotEqual(node.pk, node_copy.pk)
             self.assertNotEqual(id(node), id(node_copy))
-
+            if node.nodegroup != None:
+                self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
+            
         for key, newedge in graph_copy.edges.iteritems():
             self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
             self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
@@ -115,11 +178,21 @@ class ResourceGraphTests(ArchesTestCase):
 
         """
 
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
+        nodegroups_count_before = models.NodeGroup.objects.count()
+
         graph = ResourceGraph(self.rootNode)
         graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+        graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
         self.assertEqual(len(graph.edges), 2)
+        self.assertEqual(len(graph.nodegroups), 2)
+
+        self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
+        self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
+        self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
 
         for key, edge in graph.edges.iteritems():
             self.assertIsNotNone(graph.nodes[edge.domainnode_id])
@@ -130,6 +203,19 @@ class ResourceGraphTests(ArchesTestCase):
         for key, node in graph.nodes.iteritems():
             if node.istopnode:
                 self.assertEqual(node, self.rootNode)
+
+
+        appended_branch = graph.append_branch('P1', branchmetadataid=self.SINGLE_NODE_BRANCHMETADATAID)
+        graph.save()
+        self.assertEqual(len(graph.nodes), 4)
+        self.assertEqual(len(graph.edges), 3)
+        self.assertEqual(len(graph.nodegroups), 2)
+
+        self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
+        self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
+        self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
+
+        self.assertEqual(appended_branch.root.nodegroup,self.rootNode.nodegroup)
 
     def test_make_tree(self):
         graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
