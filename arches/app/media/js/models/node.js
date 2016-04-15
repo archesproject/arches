@@ -18,6 +18,7 @@ define([
             self.nodeGroupId = ko.observable('');
             self.datatype = ko.observable('');
             self.cardinality = ko.observable('n');
+            self.validations = ko.observableArray();
 
             self.parse(options.source);
 
@@ -28,7 +29,8 @@ define([
                     name: self.name(),
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
-                    cardinality: self.cardinality()
+                    cardinality: self.cardinality(),
+                    validations: self.validations()
                 }))
             });
 
@@ -48,6 +50,10 @@ define([
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.cardinality(source.cardinality);
+            self.validations.removeAll();
+            source.validations.forEach(function(validation) {
+                self.validations.push(validation);
+            });
 
             self.nodeid = source.nodeid;
 

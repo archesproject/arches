@@ -41,6 +41,7 @@ class ArchesTestCase(TestCase):
     @classmethod
     def deleteGraph(cls, root):
         def delete_children(node):
+            node.nodegroup.delete()
             for edge in models.Edge.objects.filter(rangenode=node):
                 edge.delete()
                 delete_children(edge.rangenode)

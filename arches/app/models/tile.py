@@ -20,6 +20,7 @@ from arches.app.utils.uuid_helpers import uuid_get_or_create
 from arches.app.models import models
 from django.forms.models import model_to_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+import validations as validation_methods
 
 class Tile(object):
     def __init__(self, *args, **kwargs):
@@ -32,15 +33,15 @@ class Tile(object):
 
         if len(args) != 0:
             if isinstance(args[0], basestring):
-                self.load(JSONDeserializer().deserialize(args[0]))  
-            elif isinstance(args[0], models.Tile): 
+                self.load(JSONDeserializer().deserialize(args[0]))
+            elif isinstance(args[0], models.Tile):
                 self.map(args[0])
             elif args[0] != None and isinstance(args[0], object):
-                self.load(args[0]) 
+                self.load(args[0])
 
     def load(self, obj):
         """
-        Populate an Tile instance from a generic python object 
+        Populate an Tile instance from a generic python object
 
         """
 
@@ -64,12 +65,33 @@ class Tile(object):
         ret = Tile(models.Tile.objects.get(**kwargs))
         return ret
 
+    def get_nodes(self):
+        return models.Node.objects.filter(nodegroup_id=self.nodegroup_id)
+
+    def validate(self):
+        validations = {'is_valid': True}
+        for node in self.get_nodes():
+            results = []
+            node_is_valid = True
+            value = None
+            if str(node.nodeid) in self.data:
+                value = self.data[str(node.nodeid)]
+            for validation in node.validations.all():
+                validation_method = getattr(validation_methods, validation.validation)
+                result = validation_method(value, node.nodeid, self.tileid)
+                if not result['valid']:
+                    validations['is_valid'] = False
+                    node_is_valid = False
+                results.append(result)
+            validations[str(node.nodeid)] = {'results': results, 'is_valid': node_is_valid}
+        return validations
+
     def save(self):
         self.tileid, created = uuid_get_or_create(self.tileid)
         tile, created = models.Tile.objects.update_or_create(
-            tileid = self.tileid, 
+            tileid = self.tileid,
             defaults = {
-                'nodegroup_id': self.nodegroup_id, 
+                'nodegroup_id': self.nodegroup_id,
                 'data': self.data,
                 'resourceinstance_id': self.resourceinstance_id,
                 'parenttile_id': self.parenttile_id
@@ -81,7 +103,7 @@ class Tile(object):
                 childtile.parenttile_id = tile.tileid
                 childtile.save()
 
-    # @classmethod    
+    # @classmethod
     # def aggregate(cls, queryset, aggregate=False):
     #     ret = {} if aggregate else []
 

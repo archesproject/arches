@@ -470,6 +470,20 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Validation',
+            fields=[
+                ('validationid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('validation', models.TextField(blank=True, null=True)),
+                ('validationtype', models.TextField(blank=True, null=True)),
+                ('name', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'validations',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Value',
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
@@ -564,6 +578,11 @@ class Migration(migrations.Migration):
             model_name='card',
             name='parentcard',
             field=models.ForeignKey(blank=True, db_column='parentcardid', null=True, to='models.Card'),
+        ),
+        migrations.AddField(
+            model_name='node',
+            name='validations',
+            field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
         ),
         migrations.AlterUniqueTogether(
             name='resourceclassxform',

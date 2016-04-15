@@ -31,8 +31,10 @@ from arches.app.models import models
 @csrf_exempt
 def manager(request, nodeid):
     graph = ResourceGraph(nodeid)
+    validations = models.Validation.objects.all()
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
+
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
@@ -41,6 +43,7 @@ def manager(request, nodeid):
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
+        'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
@@ -75,6 +78,7 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
+                node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
                 if node.nodegroup_id != new_nodegroup_id:
@@ -119,6 +123,7 @@ def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = ResourceGraph(nodeid)
         newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
+        graph.save()
         return JSONResponse(newBranch)
 
     return HttpResponseNotFound()

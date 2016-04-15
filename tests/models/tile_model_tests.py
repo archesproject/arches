@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
 
-Replace this with more appropriate tests for your application. 
+Replace this with more appropriate tests for your application.
 """
 
 from django.db import connection
@@ -52,7 +52,7 @@ class TileTests(ArchesTestCase):
 
         t = Tile(json)
         subTiles = t.tiles["99999999-0000-0000-0000-000000000001"]
-        
+
         self.assertEqual(t.resourceinstance_id, "40000000-0000-0000-0000-000000000000")
         self.assertEqual(t.data, {})
         self.assertEqual(subTiles[0].data["20000000-0000-0000-0000-000000000002"], "TEST 1")
@@ -92,14 +92,14 @@ class TileTests(ArchesTestCase):
             },
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
             "parenttile_id": '',
-            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
             "data": '{}'
         }
 
         t = Tile(json)
         subTiles = t.tiles["19999999-0000-0000-0000-000000000000"]
-        
+
         self.assertEqual(t.resourceinstance_id, "40000000-0000-0000-0000-000000000000")
         self.assertEqual(t.data, {})
         self.assertEqual(subTiles[0].data["20000000-0000-0000-0000-000000000004"], "TEST 1")
@@ -139,7 +139,7 @@ class TileTests(ArchesTestCase):
             },
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
             "parenttile_id": '',
-            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
             "data": {}
         }
@@ -160,7 +160,7 @@ class TileTests(ArchesTestCase):
             "tiles": {},
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
             "parenttile_id": '',
-            "nodegroup_id": "11111111-0000-0000-0000-000000000000",
+            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
             "tileid": "",
             "data": {
               "20000000-0000-0000-0000-000000000004": "TEST 1"
@@ -175,6 +175,27 @@ class TileTests(ArchesTestCase):
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["20000000-0000-0000-0000-000000000004"], "TEST 1")
 
+    def test_validation(self):
+        """
+        Test that we can get a Tile object
 
+        """
 
-       
+        json = {
+            "tiles": {},
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": '',
+            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+            "tileid": "",
+            "data": {
+              "20000000-0000-0000-0000-000000000004": "TEST 1"
+            }
+        }
+
+        t = Tile(json)
+        self.assertTrue(t.validate()['is_valid'])
+
+        json['data']['20000000-0000-0000-0000-000000000004'] = ''
+
+        t2 = Tile(json)
+        self.assertFalse(t2.validate()['is_valid'])
