@@ -65,7 +65,6 @@ define([
                 var nodes = self.graphModel.get('nodes')();
                 var nodeJSON = request.responseJSON.node;
                 nodeJSON.cardinality = request.responseJSON.nodegroup?request.responseJSON.nodegroup.cardinality:self.node().cardinality();
-                nodeJSON.validations = request.responseJSON.validations;
                 self.node().parse(nodeJSON);
                 groupNodes.forEach(function(nodeJSON) {
                     var node = _.find(nodes, function (node) {

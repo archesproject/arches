@@ -76,7 +76,7 @@ class Tile(object):
             value = None
             if str(node.nodeid) in self.data:
                 value = self.data[str(node.nodeid)]
-            for validation in node.get_validations():
+            for validation in node.validations.all():
                 validation_method = getattr(validation_methods, validation.validation)
                 result = validation_method(value, node.nodeid, self.tileid)
                 if not result['valid']:

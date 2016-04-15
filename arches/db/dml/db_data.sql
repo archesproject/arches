@@ -246,7 +246,7 @@ INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
 INSERT INTO validations(validationid, validation, validationtype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
 
-INSERT INTO validations_x_nodes(validationid, nodeid)
+INSERT INTO validations_x_nodes(validation_id, node_id)
     VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
 
 
