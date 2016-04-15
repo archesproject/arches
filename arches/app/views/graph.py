@@ -38,6 +38,7 @@ def manager(request, nodeid):
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
+        branch['relates_via'] = ['P1', 'P2', 'P3']
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
