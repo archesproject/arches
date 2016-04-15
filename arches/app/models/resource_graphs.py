@@ -44,16 +44,16 @@ class ResourceGraph(object):
                 self.get_nodes_and_edges(args[0])
             elif args[0]["nodes"] and args[0]["edges"]:
                 for node in args[0]["nodes"]:
-                    newNode = self.addNode(node)
+                    newNode = self.add_node(node)
                     if node['istopnode']:
                         self.root = newNode
                     
                 for edge in args[0]["edges"]:
-                    self.addEdge(edge)
+                    self.add_edge(edge)
 
                 self.populate_null_nodegroups()
 
-    def addNode(self, node):
+    def add_node(self, node):
         """
         Adds a node to this graph
 
@@ -87,7 +87,7 @@ class ResourceGraph(object):
         self.nodes[node.pk] = node
         return node
 
-    def addEdge(self, edge):
+    def add_edge(self, edge):
         """
         Adds an edge to this graph
 
@@ -182,14 +182,14 @@ class ResourceGraph(object):
         """
 
         self.root = node
-        self.addNode(node)
+        self.add_node(node)
 
         child_nodes, child_edges = node.get_child_nodes_and_edges()
 
         for node in child_nodes:
-            self.addNode(node)
+            self.add_node(node)
         for edge in child_edges:
-            self.addEdge(edge)
+            self.add_edge(edge)
 
     def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
         """
@@ -222,11 +222,11 @@ class ResourceGraph(object):
                 rangenode = branch_copy.root,
                 ontologyproperty = property
             )
-            branch_copy.addEdge(newEdge)
+            branch_copy.add_edge(newEdge)
         for key, node in branch_copy.nodes.iteritems():
-            self.addNode(node)
+            self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
-            self.addEdge(edge)
+            self.add_edge(edge)
 
         self.populate_null_nodegroups()
         return branch_copy
