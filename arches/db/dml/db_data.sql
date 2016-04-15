@@ -149,8 +149,8 @@ INSERT INTO widgets(widgetid, name, template)
 INSERT INTO branch_metadata(branchmetadataid, name, author, version, description)
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, branchmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1', 'string', '22000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-100000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, branchmetadataid)
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1', 'string', '22000000-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
@@ -246,7 +246,7 @@ INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
 INSERT INTO validations(validationid, validation, validationtype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
 
-INSERT INTO validations_x_nodes(validationid, nodeid)
+INSERT INTO validations_x_nodes(validation_id, node_id)
     VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
 
 

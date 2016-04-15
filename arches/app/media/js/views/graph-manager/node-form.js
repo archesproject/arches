@@ -65,15 +65,12 @@ define([
                 var nodes = self.graphModel.get('nodes')();
                 var nodeJSON = request.responseJSON.node;
                 nodeJSON.cardinality = request.responseJSON.nodegroup?request.responseJSON.nodegroup.cardinality:self.node().cardinality();
-                nodeJSON.validations = request.responseJSON.validations;
                 self.node().parse(nodeJSON);
                 groupNodes.forEach(function(nodeJSON) {
                     var node = _.find(nodes, function (node) {
                         return node.nodeid === nodeJSON.nodeid;
                     });
-                    var validations = JSON.parse(JSON.stringify(node.validations()))
                     nodeJSON.cardinality = node.cardinality();
-                    nodeJSON.validations = validations;
                     node.parse(nodeJSON);
                 });
             });

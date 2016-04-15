@@ -17,7 +17,7 @@ require([
     var graphData = JSON.parse($('#graph-data').val());
     var branches = JSON.parse($('#branches').val());
     var datatypes = JSON.parse($('#datatypes').val());
-    var validationData = JSON.parse($('#validations').val());
+    var validations = JSON.parse($('#validations').val());
 
     var prepGraph = function(graph) {
         graph.nodes.forEach(function(node) {
@@ -28,7 +28,6 @@ require([
                 });
                 node.cardinality = group.cardinality;
             }
-            node.validations = validationData.nodes[node.nodeid];
         })
     };
 
@@ -64,7 +63,7 @@ require([
         el: $('#nodeCrud'),
         graphModel: graphModel,
         datatypes: datatypes,
-        validations: validationData.validations
+        validations: validations
     });
 
     viewModel.graphView.on('node-clicked', function (node) {

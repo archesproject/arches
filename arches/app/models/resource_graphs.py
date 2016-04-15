@@ -33,7 +33,7 @@ class ResourceGraph(object):
         self.root = None
         self.nodes = {}
         self.edges = {}
-        self.nodegroups = []
+        self.nodegroups = {}
 
         if args:
             if (isinstance(args[0], basestring) or
@@ -51,7 +51,7 @@ class ResourceGraph(object):
                 for edge in args[0]["edges"]:
                     self.addEdge(edge)
 
-                self.populate_null_nodegroupids()
+                self.populate_null_nodegroups()
 
     def addNode(self, node):
         """
@@ -74,16 +74,16 @@ class ResourceGraph(object):
             node.nodegroup_id = nodeobj.get('nodegroupid','')
             node.branchmetadata_id = nodeobj.get('branchmetadataid','')
 
-            if not (node.nodegroup_id == None or node.nodegroup_id == ''):
-                newNodeGroup = models.NodeGroup.objects.get_or_create(
+            if node.nodegroup_id != None and node.nodegroup_id != '':
+                node.nodegroup = models.NodeGroup(
                     pk=node.nodegroup_id,
-                    defaults={'cardinality':nodeobj.get('cardinality', '')}
+                    cardinality=nodeobj.get('cardinality', '')
                 )
 
         if node.pk == None:
             node.pk = uuid.uuid1()    
-        if node.is_collector():
-            self.nodegroups.append(node.nodegroup)
+        if node.nodegroup != None:
+            self.nodegroups[node.nodegroup.pk] = node.nodegroup
         self.nodes[node.pk] = node
         return node
 
@@ -120,6 +120,9 @@ class ResourceGraph(object):
         """
 
         with transaction.atomic(): 
+            for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+                nodegroup.save()
+
             for node_id, node in self.nodes.iteritems():
                 node.save()
 
@@ -149,7 +152,7 @@ class ResourceGraph(object):
 
         return find_child_edges(tree)
 
-    def populate_null_nodegroupids(self):
+    def populate_null_nodegroups(self):
         """
         populates any blank nodegroup ids of the nodes in this graph with the nearest parent node
 
@@ -157,19 +160,17 @@ class ResourceGraph(object):
 
         tree = self.get_tree()
 
-        def traverse_tree(tree, current_nodegroup_id=None):
-            if tree['node'].nodegroup_id == None:
-                tree['node'].nodegroup_id = current_nodegroup_id
+        def traverse_tree(tree, current_nodegroup=None):
+            if tree['node'].nodegroup == None:
+                tree['node'].nodegroup = current_nodegroup
             else:
-                ng = models.NodeGroup(
+                current_nodegroup = models.NodeGroup(
                     pk=tree['node'].nodegroup_id,
-                    parentnodegroup_id=current_nodegroup_id
+                    parentnodegroup=current_nodegroup
                 )
-                ng.save()
-                current_nodegroup_id = tree['node'].nodegroup_id
 
             for child in tree['children']:
-                traverse_tree(child, current_nodegroup_id)
+                traverse_tree(child, current_nodegroup)
             return tree
 
         return traverse_tree(tree)
@@ -189,10 +190,6 @@ class ResourceGraph(object):
             self.addNode(node)
         for edge in child_edges:
             self.addEdge(edge)
-
-        # nodegroups = map(lambda n: n.nodegroup, filter(lambda n: n.is_collector(), self.nodes))
-
-        # self.nodegroups.extend(nodegroups)
 
     def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
         """
@@ -220,8 +217,7 @@ class ResourceGraph(object):
         branch_copy.root.istopnode = False
 
         with transaction.atomic(): 
-            branch_copy.save()
-            newEdge = models.Edge.objects.create(
+            newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
                 ontologyproperty = property
@@ -231,6 +227,8 @@ class ResourceGraph(object):
             self.addNode(node)
         for key, edge in branch_copy.edges.iteritems():
             self.addEdge(edge)
+
+        self.populate_null_nodegroups()
         return branch_copy
 
     def copy(self):
@@ -239,9 +237,19 @@ class ResourceGraph(object):
 
         """
 
+        new_nodegroups = {}
+
         copy_of_self = ResourceGraph(self.root.pk)
         for node_id, node in copy_of_self.nodes.iteritems():
             node.pk = uuid.uuid1()
+            
+            if node.nodegroup:
+                if node.nodegroup.pk not in new_nodegroups:
+                    new_nodegroups[node.nodegroup.pk] = node.nodegroup
+                    node.nodegroup_id = node.nodegroup.pk = uuid.uuid1()
+                else:
+                    node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
+                    node.nodegroup = new_nodegroups[node.nodegroup.pk]
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
         
@@ -257,15 +265,7 @@ class ResourceGraph(object):
     def serialize(self):
         ret = {}
         ret['root'] = self.root
-        ret['nodegroups'] = self.nodegroups
+        ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['nodes'] = [node for key, node in self.nodes.iteritems()]
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         return ret
-
-    # def get_node_id_from_text(self):
-    #     for edge in self.edges:
-    #         for node in self.nodes:
-    #             if edge['domainnodeid'] == node['name']:
-    #                 edge['domainnodeid'] = node['nodeid']
-    #             if edge['rangenodeid'] == node['name']:
-    #                 edge['rangenodeid'] = node['nodeid']

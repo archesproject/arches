@@ -34,28 +34,19 @@ def manager(request, nodeid):
         return render(request, 'resource-list.htm', {})
 
     graph = ResourceGraph(nodeid)
+    validations = models.Validation.objects.all()
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
-
-    validation_data = {
-        'validations': models.Validation.objects.all(),
-        'nodes': {}
-    }
 
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
-        for node_id, node in branch['graph'].nodes.iteritems():
-            validation_data['nodes'][str(node_id)] = node.get_validation_ids()
-
-    for node_id, node in graph.nodes.iteritems():
-        validation_data['nodes'][str(node_id)] = node.get_validation_ids()
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graph': JSONSerializer().serialize(graph),
-        'validations': JSONSerializer().serialize(validation_data),
+        'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
@@ -90,12 +81,9 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
+                node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
-                validation_ids = data.get('validations', [])
-                models.ValidationXNode.objects.filter(node=node).exclude(validation_id__in=validation_ids).delete()
-                for validation_id in validation_ids:
-                    models.ValidationXNode.objects.get_or_create(node=node, validation_id=validation_id)
                 if node.nodegroup_id != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
@@ -118,7 +106,7 @@ def node(request, nodeid):
                     node.nodegroup = new_group
 
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup, 'validations': node.get_validation_ids()})
+                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)
@@ -138,6 +126,7 @@ def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = ResourceGraph(nodeid)
         newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
+        graph.save()
         return JSONResponse(newBranch)
 
     return HttpResponseNotFound()

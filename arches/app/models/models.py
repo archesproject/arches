@@ -218,6 +218,7 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
     def _traverse_graph(self):
         """
@@ -259,12 +260,6 @@ class Node(models.Model):
 
     def is_collector(self):
         return self.nodeid == self.nodegroup_id
-
-    def get_validations(self):
-        return [validation.validation for validation in ValidationXNode.objects.filter(node=self)]
-
-    def get_validation_ids(self):
-        return [validation.validationid for validation in self.get_validations()]
 
     class Meta:
         managed = True
@@ -375,15 +370,6 @@ class Validation(models.Model):
     class Meta:
         managed = True
         db_table = 'validations'
-
-
-class ValidationXNode(models.Model):
-    validation = models.ForeignKey(Validation, db_column='validationid')
-    node = models.ForeignKey(Node, db_column='nodeid')
-
-    class Meta:
-        managed = True
-        db_table = 'validations_x_nodes'
 
 
 class Value(models.Model):
