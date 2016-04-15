@@ -70,8 +70,7 @@ define([
                     var node = _.find(nodes, function (node) {
                         return node.nodeid === nodeJSON.nodeid;
                     });
-                    nodeJSON.cardinality = node.cardinality()
-                    nodeJSON.validations = node.validations();
+                    nodeJSON.cardinality = node.cardinality();
                     node.parse(nodeJSON);
                 });
             });

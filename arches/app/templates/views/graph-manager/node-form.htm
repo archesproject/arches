@@ -12,15 +12,15 @@
     <hr class="section-division-dark node-section-division">
 
     <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
-        <i class="fa fa-spinner fa-spin"> </i> <span> Loading...</span>
+        <i class="fa fa-spinner fa-spin"> </i> <span> {% trans "Loading..." %}</span>
     </div>
 
     <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
-        <span>You have pending edits. Please save or cancel your edits before closing.</span>
+        <span>{% trans "You have pending edits. Please save or cancel your edits before closing." %}</span>
     </div>
 
     <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
-        <span>We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.</span>
+        <span>{% trans "We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}</span>
     </div>
 
     <div class="node-section">
@@ -29,16 +29,16 @@
 
             <div class="node-widget-label">
                 <div class="control-label">
-                    Node Name
+                    {% trans "Node Name" %}
                 </div>
                 <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
-                    <input type="text" placeholder="Enter node name here..." class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
+                    <input type="text" placeholder="{% trans "Enter node name here..." %}``" class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
                 </div>
             </div>
 
             <div class="node-widget-label">
                 <div class="control-label">
-                    Data type
+                    {% trans "Data type" %}
                 </div>
                 <div class="col-sm-12 pad-no node-attribute-label">
                     <select class="design" style="width:100%;" data-bind="value: node().datatype, options: datatypes, chosen: true"></select>
@@ -47,10 +47,10 @@
 
             <div class="node-widget-label">
                 <div class="control-label">
-                    Validations
+                    {% trans "Validations" %}
                 </div>
                 <div class="col-sm-12 pad-no node-attribute-label">
-                    <select data-placeholder="Select validations..." class="design" style="width:100%;" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: true"></select>
+                    <select data-placeholder="{% trans "Select validations..." %}" class="design" style="width:100%;" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: true"></select>
                 </div>
             </div>
 
@@ -70,10 +70,10 @@
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
 
                 <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                    Collector
+                    {% trans "Collector" %}
                 </p>
                 <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                    Data from this node and downstream nodes will be collected in a single form section
+                    {% trans "Data from this node and downstream nodes will be collected in a single form section" %}
                 </span>
 
             </div>
@@ -84,10 +84,10 @@
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().cardinality()=='n'}, click: toggleCardinality"><small></small></span>
 
                 <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                    Repeatable
+                    {% trans "Repeatable" %}
                 </p>
                 <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                    Users may enter multiple values for this node
+                    {% trans "Users may enter multiple values for this node" %}
                 </span>
 
             </div>
@@ -100,12 +100,12 @@
 
     <div class="pull-right" data-bind="if: node().dirty()">
         <hr>
-        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> Save</button>
-        <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> Cancel</button>
+        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> {% trans "Save" %}</button>
+        <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> {% trans "Cancel" %}</button>
     </div>
     <div class="pull-right">
         <hr>
-        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> Delete</button>
+        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> {% trans "Delete" %}</button>
     </div>
 </div>
 <!-- /ko -->
