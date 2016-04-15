@@ -22,7 +22,9 @@ define([
 
             self.parse(options.source);
 
-            self.iconclass = self.datatypelookup[self.datatype()];
+            self.iconclass = ko.computed(function() {
+                return self.datatypelookup[self.datatype()];
+            });
 
             self.json = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._node()), {
