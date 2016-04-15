@@ -246,7 +246,7 @@ class ResourceGraph(object):
             if node.nodegroup:
                 if node.nodegroup.pk not in new_nodegroups:
                     new_nodegroups[node.nodegroup.pk] = node.nodegroup
-                    node.nodegroup_id = node.nodegroup.pk = uuid.uuid1()
+                    node.nodegroup_id = node.nodegroup.pk = node.pk
                 else:
                     node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
                     node.nodegroup = new_nodegroups[node.nodegroup.pk]
