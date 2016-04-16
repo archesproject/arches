@@ -10,4 +10,4 @@ cards - frames widgets necessary for capturing and editing tile data.  Expecting
 Keeping the tables separate because cards represent UI elements and nodegroups represent grouped data.
 
 ## Visual Data Model
-[[[images/Arches4_ERD_20160310.jpg]]](https://raw.githubusercontent.com/wiki/archesproject/arches/images/Arches4_ERD_20160310.jpg)
+![images/Arches4_ERD_20160310.jpg](https://raw.githubusercontent.com/wiki/archesproject/arches/images/Arches4_ERD_20160310.jpg)
