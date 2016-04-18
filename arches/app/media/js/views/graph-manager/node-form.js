@@ -8,7 +8,7 @@ define([
         initialize: function(options) {
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'datatypes', 'validations'));
-            this.datatypes = this.datatypes.map(function(datatype){ return datatype.datatype });
+            this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);

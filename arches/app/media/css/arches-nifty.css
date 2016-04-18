@@ -717,11 +717,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .node .node-selected {
     fill: #FF0;
-    font: 10px sans-serif;
 }
 .node .node-editing {
     fill: #4682B4;
-    font: 10px sans-serif;
+}
+.node .node-filtered {
+    opacity: .3;
 }
 .node-text {
     font-size: 10px;

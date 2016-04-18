@@ -32,6 +32,7 @@ define([
             var getNodeClass = function (d, className) {
                 className += d.editing() ? ' node-editing' : '';
                 className += d.selected() ? ' node-selected' : '';
+                className += d.filtered() ? ' node-filtered' : '';
                 className += (self.editNode() && self.editNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
                 return className;
             }
@@ -59,6 +60,17 @@ define([
 
             this.allNodes.exit()
                 .remove();
+        },
+        renderNodeText: function(){
+            GraphBase.prototype.renderNodeText.apply(this, arguments);
+            var getNodeClass = function (d, className) {
+                className += d.filtered() ? ' node-filtered' : '';
+                return className;
+            }
+            this.allNodes.selectAll('text')
+                .attr("class", function (d) {
+                    return getNodeClass(d, '');
+                })
         },
         renderLinks: function(){
             var self = this;

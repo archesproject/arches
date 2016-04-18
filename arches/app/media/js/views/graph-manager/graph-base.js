@@ -89,9 +89,7 @@ define([
                 .attr("dy", ".31em")
                 .attr("class", "node-text")
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; });
-
-            this.allNodes.selectAll('text')
+                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
                 .text(function (d) {
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
