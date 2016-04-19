@@ -31,7 +31,11 @@ from arches.app.models import models
 @csrf_exempt
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
-        return render(request, 'resource-list.htm', {})
+        resources = models.Node.objects.filter(istopnode=True)
+        return render(request, 'resource-list.htm', {
+            'main_script': 'resource-list',
+            'resources': JSONSerializer().serialize(resources),
+        })
 
     graph = ResourceGraph(nodeid)
     validations = models.Validation.objects.all()
