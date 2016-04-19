@@ -8,7 +8,8 @@ define([
             var self = this;
             this.size = 1000;
             this.currentOffset = [0,0];
-            this.currentScale = 1; 
+            this.currentScale = 1;
+            this.graphModel = options.graphModel;
             this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
             this.edges = options.graphModel.get('edges') || ko.observableArray([]);
 
@@ -91,6 +92,7 @@ define([
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                 .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
                 .text(function (d) {
+                    return d.x + ', ' + d.y
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
                     }
@@ -169,3 +171,4 @@ define([
     });
     return GraphBase;
 });
+

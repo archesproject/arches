@@ -73,6 +73,24 @@ define(['arches',
                 callback();
             }, scope, 'changed');
         },
+        
+        moveNode: function(node, property, newParentNode, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + 'move_node/' + node.nodeid + '/' + property + '/' + newParentNode.nodeid,
+                data: JSON.stringify(this.toJSON())
+            }, function(response, status, self){
+                self.get('edges')()
+                .find(function (edge) {
+                    if(edge.rangenode_id === node.nodeid){
+                        edge.domainnode_id = newParentNode.nodeid;
+                        return true;
+                    }
+                    return false;
+                });
+                callback();
+            }, scope, 'changed');
+        },
 
         parse: function(attributes){
             var self = this;

@@ -59,6 +59,7 @@ urlpatterns = [
     url(r'^config/', config.manager, name='config'),
     url(r'^graph/(?P<nodeid>%s)$' % uuid_regex, graph.manager, name='graph'),
     url(r'^graph/append_branch/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<branchmetadataid>%s)$' % (uuid_regex, uuid_regex), graph.append_branch, name='append_branch'),
+    url(r'^graph/move_node/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<newparentnodeid>%s)$' % (uuid_regex, uuid_regex), graph.move_node, name='move_node'),
     url(r'^node/(?P<nodeid>%s)$' % uuid_regex, graph.node, name='node'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

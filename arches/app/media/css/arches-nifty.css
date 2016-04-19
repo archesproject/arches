@@ -733,10 +733,22 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke: #ddd;
     stroke-width: 1.5px;
 }
+.templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+}
 .node .node-over {
     stroke: navy;
     cursor: pointer;
 }
+.target-node circle{
+    opacity: 0.2;
+    fill: red;
+    stroke: red;
+    stroke-width: 6px;
+}
+
 #nodeCrud {
     position: absolute;
     width: 250px;

@@ -262,6 +262,9 @@ class ResourceGraph(object):
 
         return copy_of_self
 
+    def move_node(self, nodeid, property, newparentnodeid):
+        pass
+
     def serialize(self):
         ret = {}
         ret['root'] = self.root
