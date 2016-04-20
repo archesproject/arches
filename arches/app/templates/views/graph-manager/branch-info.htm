@@ -1,17 +1,26 @@
 {% load staticfiles %}
 {% load i18n %}
-<div class="ltr" data-bind="with: $data.selectedItem">
+<div class="ltr" data-bind="with: selectedItem">
     <!-- Title -->
-    <h4 class="node-title" data-bind="text: $data.name"></h4>
+    <h4 class="node-title" data-bind="text: name"></h4>
     <div class="relative">
         <a id="branch-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: $parent.closeForm.bind($parent)"></a>
     </div>
     <div id="" class="" style="padding-top: 20px; position: relative;">
-        <p class="library-instructions" data-bind="text: $data.description"></p>
+        <p class="library-instructions" data-bind="text: description"></p>
     </div>
 
     <!-- Alert -->
     <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
+
+    <div class="node-widget-label">
+        <div class="control-label">
+            {% trans "Related By" %}
+        </div>
+        <div class="col-sm-12 pad-no node-attribute-label">
+            <select class="design" style="width:100%;" data-bind="value: ontology_property, options: relates_via, chosen: true"></select>
+        </div>
+    </div>
 
     <!-- Add Button -->
     <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;" data-bind="click: $parent.appendBranch.bind($parent)">{% trans "Append to current node" %}</button>
@@ -24,13 +33,13 @@
     <div class="">
         <dl>
             <dt class="branch-metadata">{% trans "Top Node Class" %}</dt>
-            <dd data-bind="text: $data.graph.root.ontologyclass"></dd>
+            <dd data-bind="text: graph.root.ontologyclass"></dd>
             <dt class="branch-metadata">{% trans "Connects to" %}</dt>
             <dd data-bind="text: '???'"></dd>
             <dt class="branch-metadata">{% trans "Author" %}</dt>
-            <dd data-bind="text: $data.author"></dd>
+            <dd data-bind="text: author"></dd>
             <dt class="branch-metadata">{% trans "Version" %}</dt>
-            <dd data-bind="text: $data.version"></dd>
+            <dd data-bind="text: version"></dd>
         </dl>
 
     </div>

@@ -47,6 +47,7 @@ def manager(request, nodeid):
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
         branch['graph'] = ResourceGraph(rootnode)
+        branch['relates_via'] = ['P1', 'P2', 'P3']
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
@@ -134,5 +135,16 @@ def append_branch(request, nodeid, property, branchmetadataid):
         newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
         graph.save()
         return JSONResponse(newBranch)
+
+    return HttpResponseNotFound()
+
+@csrf_exempt
+def move_node(request, nodeid):
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        graph = ResourceGraph(nodeid)
+        updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+        graph.save()
+        return JSONResponse(updated_nodes_and_edges)
 
     return HttpResponseNotFound()
