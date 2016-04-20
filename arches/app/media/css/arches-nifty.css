@@ -1584,15 +1584,16 @@ div.dropdown-menu.open {
     color: #139F78;
 }
 .project-grid-item {
-	float: left;
-  	margin: 2px;
-  	max-width: 250px;
-  	border: 1px solid #ddd;
-  	opacity: .79;
+    float: left;
+    margin: 2px;
+    max-width: 250px;
+    min-width: 200px;
+    border: 1px solid #ddd;
+    opacity: .79;
 }
 .project-grid-item:hover {
-	cursor: pointer;
-	opacity: 1.0;
+    cursor: pointer;
+    opacity: 1.0;
 }
 @media min-width 992px {
     #page-content {
