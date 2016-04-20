@@ -82,11 +82,20 @@ define(['arches',
             }, function(response, status, self){
                 self.get('edges')()
                 .find(function (edge) {
-                    if(edge.rangenode_id === node.nodeid){
-                        edge.domainnode_id = newParentNode.nodeid;
+                    if(edge.edgeid === response.responseJSON.edges[0].edgeid){
+                        edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
                         return true;
                     }
                     return false;
+                });
+                self.get('nodes')()
+                .forEach(function (node) {
+                    found_node = response.responseJSON.nodes.find(function(response_node){
+                        return response_node.nodeid === node.nodeid;
+                    });
+                    if (found_node){
+                        node.nodeGroupId(found_node.nodegroup_id);
+                    }
                 });
                 callback();
             }, scope, 'changed');

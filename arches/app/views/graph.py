@@ -134,8 +134,8 @@ def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         graph = ResourceGraph(nodeid)
-        graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+        updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
-        return JSONResponse(graph)
+        return JSONResponse(updated_nodes_and_edges)
 
     return HttpResponseNotFound()

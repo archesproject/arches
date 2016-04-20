@@ -281,6 +281,7 @@ class ResourceGraph(object):
 
         """
 
+        ret = {'nodes':[], 'edges':[]}
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
         if not node.is_collector():
@@ -291,12 +292,15 @@ class ResourceGraph(object):
             for node_id, node in graph.nodes.iteritems():
                 if node.nodegroup == nodegroup:
                     self.nodes[node_id].nodegroup = None
+                    ret['nodes'].append(self.nodes[node_id])
 
         for edge_id, edge in self.edges.iteritems():
             if edge.rangenode == node:
                 edge.domainnode = self.nodes[uuid.UUID(str(newparentnodeid))]
+                ret['edges'].append(edge)
 
         self.populate_null_nodegroups()
+        return ret
 
     def serialize(self):
         ret = {}
