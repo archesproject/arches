@@ -31,11 +31,12 @@ class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
-        
+
         cls.ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
         cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
         cls.NODE_COUNT = 111
         cls.PLACE_NODE_COUNT = 17
+        cls.RESOURCE_COUNT = 111
         cls.client = Client()
 
     @classmethod
@@ -53,7 +54,7 @@ class GraphManagerViewTests(ArchesTestCase):
         nodes, edges = root.get_child_nodes_and_edges()
         node_count = len(nodes)
         edge_count = len(edges)
-        
+
         self.assertEqual(node_count, self.NODE_COUNT)
         self.assertEqual(edge_count, self.NODE_COUNT)
 
@@ -62,14 +63,18 @@ class GraphManagerViewTests(ArchesTestCase):
         Test the graph manager view
 
         """
+        url = reverse('graph', kwargs={'nodeid':''})
+        response = self.client.get(url)
+        resources = json.loads(response.context['resources'])
+        self.assertEqual(len(resources), 4)
 
         url = reverse('graph', kwargs={'nodeid':self.ROOT_ID})
         response = self.client.get(url)
         graph = json.loads(response.context['graph'])
-        
+
         node_count = len(graph['nodes'])
         self.assertEqual(node_count, self.NODE_COUNT+1)
-        
+
         edge_count = len(graph['edges'])
         self.assertEqual(edge_count, self.NODE_COUNT)
 
@@ -88,12 +93,12 @@ class GraphManagerViewTests(ArchesTestCase):
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
-        
+
         self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT-1)
         self.assertEqual(response_json['node']['name'], 'new node name')
-        
+
         node_ = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
-        
+
         self.assertEqual(node_.name, 'new node name')
         self.assertTrue(node_.is_collector())
 
@@ -108,7 +113,7 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(response.status_code, 200)
         new_count = self.NODE_COUNT-self.PLACE_NODE_COUNT
         root = Node.objects.get(nodeid=self.ROOT_ID)
-        
+
         nodes, edges = root.get_child_nodes_and_edges()
         node_count = len(nodes)
         edge_count = len(edges)
