@@ -129,14 +129,17 @@ class ResourceGraph(object):
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
 
-    def get_tree(self):
+    def get_tree(self, root=None):
         """
         returns a tree based representation of this graph
+
+        Keyword Arguments:
+        root -- the node from which to root the tree, defaults to the root node of this graph
 
         """
 
         tree = {
-            'node': self.root,
+            'node': root if root else self.root,
             'children': []
         }
 
@@ -162,7 +165,6 @@ class ResourceGraph(object):
 
         def traverse_tree(tree, current_nodegroup=None):
             if tree['node'].nodegroup == None:
-                print current_nodegroup
                 tree['node'].nodegroup = current_nodegroup
             else:
                 current_nodegroup = models.NodeGroup(
@@ -178,7 +180,10 @@ class ResourceGraph(object):
 
     def get_nodes_and_edges(self, node):
         """
-        Populate a ResourceGraph with the child nodes and edges of parameter: 'node'
+        Populate a ResourceGraph from the database with the child nodes and edges of parameter: 'node'
+
+        Arguments:
+        node -- the root node from which to gather all the child nodes and edges
 
         """
 
@@ -264,18 +269,27 @@ class ResourceGraph(object):
         return copy_of_self
 
     def move_node(self, nodeid, property, newparentnodeid):
+        """
+        move a node and it's children to a different location within this graph
+
+        Arguments:
+        nodeid -- the id of node being moved
+
+        property -- the property value to conect the node to it's new parent nodegroup
+
+        newparentnodeid -- the parent node id that the node is being moved to
+
+        """
+
         nodegroup = None
         node = self.nodes[uuid.UUID(nodeid)]
         if not node.is_collector():
-            print 'here'
             nodegroup = node.nodegroup
 
             # make a graph of node, so that we can easily get all the child nodes 
             graph = ResourceGraph(node)
             for node_id, node in graph.nodes.iteritems():
                 if node.nodegroup == nodegroup:
-                    print 'again'
-                    print node_id
                     self.nodes[node_id].nodegroup = None
 
         for edge_id, edge in self.edges.iteritems():
