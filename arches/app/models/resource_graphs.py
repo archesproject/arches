@@ -282,7 +282,7 @@ class ResourceGraph(object):
         """
 
         nodegroup = None
-        node = self.nodes[uuid.UUID(nodeid)]
+        node = self.nodes[uuid.UUID(str(nodeid))]
         if not node.is_collector():
             nodegroup = node.nodegroup
 
@@ -294,7 +294,7 @@ class ResourceGraph(object):
 
         for edge_id, edge in self.edges.iteritems():
             if edge.rangenode == node:
-                edge.domainnode = self.nodes[uuid.UUID(newparentnodeid)]
+                edge.domainnode = self.nodes[uuid.UUID(str(newparentnodeid))]
 
         self.populate_null_nodegroups()
 
