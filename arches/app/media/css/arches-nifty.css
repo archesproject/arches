@@ -746,7 +746,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     opacity: 0.2;
     fill: red;
     stroke: red;
-    stroke-width: 6px;
+    stroke-width: 32px;
 }
 
 #nodeCrud {
