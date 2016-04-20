@@ -92,7 +92,6 @@ define([
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                 .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
                 .text(function (d) {
-                    return d.x + ', ' + d.y
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
                     }

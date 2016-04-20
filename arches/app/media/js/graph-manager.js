@@ -40,8 +40,7 @@ require([
     prepGraph(graphData);
 
     var graphModel = new GraphModel({
-        nodes: graphData.nodes,
-        edges: graphData.edges,
+        data: graphData,
         datatypes: datatypes
     });
 

@@ -162,6 +162,7 @@ class ResourceGraph(object):
 
         def traverse_tree(tree, current_nodegroup=None):
             if tree['node'].nodegroup == None:
+                print current_nodegroup
                 tree['node'].nodegroup = current_nodegroup
             else:
                 current_nodegroup = models.NodeGroup(
@@ -263,7 +264,25 @@ class ResourceGraph(object):
         return copy_of_self
 
     def move_node(self, nodeid, property, newparentnodeid):
-        pass
+        nodegroup = None
+        node = self.nodes[uuid.UUID(nodeid)]
+        if not node.is_collector():
+            print 'here'
+            nodegroup = node.nodegroup
+
+            # make a graph of node, so that we can easily get all the child nodes 
+            graph = ResourceGraph(node)
+            for node_id, node in graph.nodes.iteritems():
+                if node.nodegroup == nodegroup:
+                    print 'again'
+                    print node_id
+                    self.nodes[node_id].nodegroup = None
+
+        for edge_id, edge in self.edges.iteritems():
+            if edge.rangenode == node:
+                edge.domainnode = self.nodes[uuid.UUID(newparentnodeid)]
+
+        self.populate_null_nodegroups()
 
     def serialize(self):
         ret = {}

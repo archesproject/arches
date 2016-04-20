@@ -238,11 +238,11 @@ define([
                     node.attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
                     self.updateTempConnector();
                 }).on("dragend", function(d) {
+                    console.log('drag end');
                     if (d3.event.sourceEvent.shiftKey === false || !self.selectedNode || self.selectedNode.property('canDrop') === false) {
                         self.endDrag();
                         return;
                     }else{
-                        console.log('drag end');
                         draggedNode = this;
                         self.graphModel.moveNode(draggingNode, 'P1', self.selectedNode.data()[0], function(){
                         }, self);
@@ -252,10 +252,10 @@ define([
 
             this.endDrag = function() {
                 this.selectedNode = null;
-                d3.selectAll('.ghostCircle').attr('class', 'ghostCircle');
-                d3.select(draggedNode).attr('class', 'node');
+                //d3.selectAll('.ghostCircle').attr('class', 'ghostCircle');
+                //d3.select(draggedNode).attr('class', 'node');
                 // now restore the mouseover event or we won't be able to drag a 2nd time
-                d3.select(draggedNode).select('.ghostCircle').attr('pointer-events', '');
+                //d3.select(draggedNode).select('.ghostCircle').attr('pointer-events', '');
                 //updateTempConnector();
                 if (draggingNode !== null) {
                     //update(root);

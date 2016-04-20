@@ -130,11 +130,12 @@ def append_branch(request, nodeid, property, branchmetadataid):
     return HttpResponseNotFound()
 
 @csrf_exempt
-def move_node(request, nodeid, property, newparentnodeid):
+def move_node(request, nodeid):
     if request.method == 'POST':
-        # graph = ResourceGraph(nodeid)
-        # newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
-        # graph.save()
-        return JSONResponse(True)
+        data = JSONDeserializer().deserialize(request.body)
+        graph = ResourceGraph(nodeid)
+        graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+        graph.save()
+        return JSONResponse(graph)
 
     return HttpResponseNotFound()

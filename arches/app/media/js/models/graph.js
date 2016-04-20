@@ -73,12 +73,12 @@ define(['arches',
                 callback();
             }, scope, 'changed');
         },
-        
+
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + node.nodeid + '/' + property + '/' + newParentNode.nodeid,
-                data: JSON.stringify(this.toJSON())
+                url: this.url + 'move_node/' + this.get('root').nodeid,
+                data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 self.get('edges')()
                 .find(function (edge) {
@@ -96,21 +96,22 @@ define(['arches',
             var self = this;
             var datatypelookup = {};
 
-            attributes =_.extend({nodes:[], edges:[], datatypes:[]}, attributes);
+            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype.iconclass;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
-            attributes.nodes.forEach(function (node, i) {
-                attributes.nodes[i] = new NodeModel({
+            attributes.data.nodes.forEach(function (node, i) {
+                attributes.data.nodes[i] = new NodeModel({
                     source: node,
                     datatypelookup: datatypelookup
                 });
             });
-            this.set('nodes', ko.observableArray(attributes.nodes)),
-            this.set('edges', ko.observableArray(attributes.edges)),
+            this.set('nodes', ko.observableArray(attributes.data.nodes));
+            this.set('edges', ko.observableArray(attributes.data.edges));
+            this.set('root', attributes.data.root);
 
             this.set('editNode', ko.computed(function() {
                 var editNode = _.find(self.get('nodes')(), function(node){
