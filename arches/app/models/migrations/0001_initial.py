@@ -337,6 +337,20 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Function',
+            fields=[
+                ('functionid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('functiontype', models.TextField(blank=True, null=True)),
+                ('function', models.TextField()),
+                ('name', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'functions',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
@@ -558,6 +572,11 @@ class Migration(migrations.Migration):
             model_name='concept',
             name='nodetype',
             field=models.ForeignKey(db_column='nodetype', to='models.DNodeType'),
+        ),
+        migrations.AddField(
+            model_name='cardxnodexwidget',
+            name='function',
+            field=models.ForeignKey(db_column='functionid', to='models.Function'),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
