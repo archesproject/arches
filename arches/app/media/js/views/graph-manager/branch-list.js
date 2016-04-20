@@ -14,8 +14,7 @@ define([
             this.items().forEach(function (branch) {
                 branch.ontology_property = ko.observable('');
                 branch.graphModel = new GraphModel({
-                    nodes: branch.graph.nodes,
-                    edges: branch.graph.edges
+                    data: branch.graph
                 })
             });
             this.selectedItem = ko.observable(null);
