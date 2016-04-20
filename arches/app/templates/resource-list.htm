@@ -46,30 +46,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     				You have <span style="color: #123; font-weight: 700;" data-bind="text:resources.length"></span> resources.
     			</p><p>
 
-    			<!-- Sort -->
-    			</p><div style="position: absolute; left: 220px; top: 2px; font-size: 12px; color: #888;">
-    				Sort by:
-    				<div class="btn-group">
-    					<button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
-    						Name <i class="dropdown-caret fa fa-caret-down"></i>
-    					</button>
-    					<ul class="dropdown-menu dropdown-menu-right">
-    						<li><a href="#">Name</a>
-    						</li>
-    						<li><a href="#">Type</a>
-    						</li>
-    						<li><a href="#">Status</a>
-    						</li>
-    					</ul>
-    				</div>
-    			</div>
-
-    			<!-- Display -->
-    			<div style="position: absolute; left: 370px; top: 6px; font-size: 12px; color: #888;">
-    				<a class="selected" style="padding-right: 2px;"><i class="fa fa-th-large"></i></a>
-    				<a class="fade-back"><i class="fa fa-align-justify"></i></a>
-    			</div>
-
     		</div>
     	</div>
 
@@ -102,24 +78,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     							<!-- Resource Name -->
     							<div class="panel-heading">
-    				                <h3 class="panel-title" style="padding-left: 10px;" data-bind="text:name"></h3>
+    				                <h3 class="panel-title" style="padding-left: 10px;" data-bind="text:name, click:open"></h3>
     				            </div>
 
     							<!-- Abstract -->
-    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;">
-    								A resource that can be used to inventory buildings, structures, and archaeological sites
-    							</div>
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;" data-bind="text:branch?branch.description:'', click:open"></div>
 
     							<!-- Project Tools -->
     							<div class="panel-footer" style="height: 40px;">
-    								<a><i class="fa fa-check-circle"></i> Active</a>
     								<a class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
     									<ul class="dropdown-menu pull-right">
-    									<li><a href="#"><i class="fa fa-lock"></i> Disable Resource</a>
-    									</li>
     									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
-    									</li>
-    									<li><a href="#"><i class="fa fa-download"></i> Export Resource</a>
     									</li>
     									<li class="divider"></li>
     									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
@@ -137,4 +106,5 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 <input id="resources" name="resources" type="hidden" value="{{resources}}"/>
+<input id="branches" name="branches" type="hidden" value="{{branches}}"/>
 {% endblock content %}
