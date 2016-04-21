@@ -31,8 +31,8 @@ def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         resources = models.Node.objects.filter(istopnode=True)
         branches = models.GraphMetadata.objects.all()
-        return render(request, 'resource-list.htm', {
-            'main_script': 'resource-list',
+        return render(request, 'graph-list.htm', {
+            'main_script': 'graph-list',
             'resources': JSONSerializer().serialize(resources),
             'branches': JSONSerializer().serialize(branches)
         })

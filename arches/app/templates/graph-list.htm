@@ -43,7 +43,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     			<!-- Summary -->
     			<p style="padding-top: 5px; padding-left: 25px; font-size: 13px; color: #888;">
-    				You have <span style="color: #123; font-weight: 700;" data-bind="text:resources.length"></span> resources.
+    				{% trans "You have" %} <span style="color: #123; font-weight: 700;" data-bind="text:resources.length"></span> {% trans "resources" %}.
     			</p><p>
 
     		</div>
@@ -63,13 +63,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     					<!-- New Project Button -->
     					<div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item">
     						<a id="add-basemap" href="#new-project-modal" data-toggle="modal">
-    							<h3 class="text-thin" style="margin-top: 10px;"> New Resource</h3>
+    							<h3 class="text-thin" style="margin-top: 10px;"> {% trans "New Resource" %}</h3>
 
     							<span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
     								<i class="fa fa-plus fa-2x" style="color: #fff;"></i>
     							</span>
 
-    							<h5 style="font-weight: 200;"> Create a new resource as part of your heritage inventory</h5>
+    							<h5 style="font-weight: 200;"> {% trans "Create a new resource as part of your heritage inventory" %}</h5>
     						</a>
     					</div>
                         <!-- ko foreach: resources -->
@@ -82,16 +82,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     				            </div>
 
     							<!-- Abstract -->
-    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;" data-bind="text:branch?branch.description:'', click:open"></div>
+    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;" data-bind='text:description?description:"{% trans "No description available." %}", click:open'></div>
 
     							<!-- Project Tools -->
     							<div class="panel-footer" style="height: 40px;">
+                                    <span><i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "Active" %}":"{% trans "Inactive" %}"'></span></span>
     								<a class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
     									<ul class="dropdown-menu pull-right">
-    									<li><a href="#"><i class="fa fa-copy"></i> Clone Resource</a>
+    									<li><a href="#"><i class="fa fa-copy"></i> {% trans "Clone Resource" %}</a>
     									</li>
     									<li class="divider"></li>
-    									<li><a href="#"><i class="fa fa-trash"></i> Delete Resource</a>
+    									<li><a href="#"><i class="fa fa-trash"></i> {% trans "Delete Resource" %}</a>
     									</li>
     								</ul>
     							</div>
