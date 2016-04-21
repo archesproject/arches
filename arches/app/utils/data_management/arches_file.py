@@ -34,6 +34,8 @@ class ArchesFile(object):
 
 		if not file:
 			file = settings.RESOURCE_GRAPH_LOCATIONS
+		else:
+			file = [file]
 
 		for path in file:
 			if os.path.exists(path):
