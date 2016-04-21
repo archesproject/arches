@@ -101,7 +101,7 @@ def concept(request, conceptid):
             if mode == '' and (this_concept.nodetype == 'Concept' or this_concept.nodetype == 'ConceptScheme' or this_concept.nodetype == 'EntityType'):
                 concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                     include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                    depth_limit=depth_limit, up_depth_limit=None, lang=lang)
+                    depth_limit=depth_limit, up_depth_limit=9, lang=lang)
             else:
                 concept_graph = Concept().get(id=conceptid, include_subconcepts=include_subconcepts,
                     include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
