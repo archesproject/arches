@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.graph import ResourceGraph
+from arches.app.models.graph import Graph
 from arches.app.models import models
 
 
@@ -39,14 +39,14 @@ def manager(request, nodeid):
             'branches': JSONSerializer().serialize(branches)
         })
 
-    graph = ResourceGraph(nodeid)
+    graph = Graph(nodeid)
     validations = models.Validation.objects.all()
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
 
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['graph'] = ResourceGraph(rootnode)
+        branch['graph'] = Graph(rootnode)
         branch['relates_via'] = ['P1', 'P2', 'P3']
 
     datatypes = models.DDataType.objects.all()
@@ -131,7 +131,7 @@ def node(request, nodeid):
 @csrf_exempt
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
-        graph = ResourceGraph(nodeid)
+        graph = Graph(nodeid)
         newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
         graph.save()
         return JSONResponse(newBranch)
@@ -142,7 +142,7 @@ def append_branch(request, nodeid, property, branchmetadataid):
 def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = ResourceGraph(nodeid)
+        graph = Graph(nodeid)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)

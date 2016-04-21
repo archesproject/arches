@@ -23,7 +23,7 @@ from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
-class ResourceGraph(object):
+class Graph(object):
     """
     Used for mapping complete resource graph objects to and from the database
 
@@ -180,7 +180,7 @@ class ResourceGraph(object):
 
     def get_nodes_and_edges(self, node):
         """
-        Populate a ResourceGraph from the database with the child nodes and edges of parameter: 'node'
+        Populate a Graph from the database with the child nodes and edges of parameter: 'node'
 
         Arguments:
         node -- the root node from which to gather all the child nodes and edges
@@ -217,7 +217,7 @@ class ResourceGraph(object):
 
         if not branch_root:
             branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
-        branch_graph = ResourceGraph(branch_root)
+        branch_graph = Graph(branch_root)
         
         branch_copy = branch_graph.copy()
         branch_copy.root.istopnode = False
@@ -245,7 +245,7 @@ class ResourceGraph(object):
 
         new_nodegroups = {}
 
-        copy_of_self = ResourceGraph(self.root.pk)
+        copy_of_self = Graph(self.root.pk)
         for node_id, node in copy_of_self.nodes.iteritems():
             node.pk = uuid.uuid1()
             
@@ -288,7 +288,7 @@ class ResourceGraph(object):
             nodegroup = node.nodegroup
 
             # make a graph of node, so that we can easily get all the child nodes 
-            graph = ResourceGraph(node)
+            graph = Graph(node)
             for node_id, node in graph.nodes.iteritems():
                 if node.nodegroup == nodegroup:
                     self.nodes[node_id].nodegroup = None
