@@ -39,13 +39,18 @@ def manager(request, nodeid):
 
     graph = Graph(nodeid)
     validations = models.Validation.objects.all()
-    branches = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
+    metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
+    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True, isresource=False)
 
-    for branch in branches:
-        rootnode = branch_nodes.get(graphmetadata_id=branch['graphmetadataid'])
-        branch['graph'] = Graph(rootnode)
-        branch['relates_via'] = ['P1', 'P2', 'P3']
+    branches = []
+    for metadata_record in metadata_records:
+        try:
+            rootnode = branch_nodes.get(graphmetadata_id=metadata_record['graphmetadataid'])
+            metadata_record['graph'] = Graph(rootnode)
+            metadata_record['relates_via'] = ['P1', 'P2', 'P3']
+            branches.append(metadata_record)
+        except models.Node.DoesNotExist:
+            pass
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
