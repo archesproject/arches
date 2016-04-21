@@ -30,7 +30,7 @@ from arches.app.models import models
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         resources = models.Node.objects.filter(istopnode=True)
-        branches = models.BranchMetadata.objects.all()
+        branches = models.GraphMetadata.objects.all()
         return render(request, 'resource-list.htm', {
             'main_script': 'resource-list',
             'resources': JSONSerializer().serialize(resources),
@@ -39,11 +39,11 @@ def manager(request, nodeid):
 
     graph = Graph(nodeid)
     validations = models.Validation.objects.all()
-    branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
+    branches = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
+    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
 
     for branch in branches:
-        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
+        rootnode = branch_nodes.get(graphmetadata_id=branch['graphmetadataid'])
         branch['graph'] = Graph(rootnode)
         branch['relates_via'] = ['P1', 'P2', 'P3']
 
@@ -123,10 +123,10 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
-def append_branch(request, nodeid, property, branchmetadataid):
+def append_branch(request, nodeid, property, graphmetadataid):
     if request.method == 'POST':
         graph = Graph(nodeid)
-        newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
+        newBranch = graph.append_branch(property, graphmetadataid=graphmetadataid)
         graph.save()
         return JSONResponse(newBranch)
 

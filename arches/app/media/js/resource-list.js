@@ -8,7 +8,7 @@ require([
     var branches = JSON.parse($('#branches').val());
     resources.forEach(function(resource) {
         resource.branch = _.find(branches, function(branch) {
-            return branch.branchmetadataid === resource.branchmetadata_id;
+            return branch.graphmetadataid === resource.graphmetadata_id;
         });
         resource.open = function() {
             window.location = resource.nodeid;

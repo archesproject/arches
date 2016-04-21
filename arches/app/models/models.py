@@ -35,8 +35,8 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class BranchMetadata(models.Model):
-    branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+class GraphMetadata(models.Model):
+    graphmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -71,7 +71,7 @@ class CardXNodeXWidget(models.Model):
     function = models.ForeignKey('Function', db_column='functionid')
     inputmask = models.TextField(blank=True, null=True)
     inputlabel = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         managed = True
         db_table = 'cards_x_nodes_x_widgets'
@@ -143,7 +143,7 @@ class Edge(models.Model):
     ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -199,7 +199,7 @@ class Function(models.Model):
     function = models.TextField()
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         managed = True
         db_table = 'functions'
@@ -229,7 +229,7 @@ class Node(models.Model):
     ontologyclass = models.TextField()
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
     def _traverse_graph(self):

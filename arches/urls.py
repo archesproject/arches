@@ -58,7 +58,7 @@ urlpatterns = [
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
     url(r'^graph/(?P<nodeid>%s|())$' % uuid_regex, graph.manager, name='graph'),
-    url(r'^graph/append_branch/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<branchmetadataid>%s)$' % (uuid_regex, uuid_regex), graph.append_branch, name='append_branch'),
+    url(r'^graph/append_branch/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<graphmetadataid>%s)$' % (uuid_regex, uuid_regex), graph.append_branch, name='append_branch'),
     url(r'^graph/move_node/(?P<nodeid>%s)$' % (uuid_regex), graph.move_node, name='move_node'),
     url(r'^node/(?P<nodeid>%s)$' % uuid_regex, graph.node, name='node'),
 

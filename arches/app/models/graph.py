@@ -72,7 +72,7 @@ class Graph(object):
             node.ontologyclass = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
-            node.branchmetadata_id = nodeobj.get('branchmetadataid','')
+            node.graphmetadata_id = nodeobj.get('graphmetadataid','')
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup = models.NodeGroup(
@@ -106,7 +106,7 @@ class Graph(object):
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
-            edge.branchmetadataid = egdeobj.get('branchmetadataid', '')
+            edge.graphmetadataid = egdeobj.get('graphmetadataid', '')
 
         if edge.pk == None:
             edge.pk = uuid.uuid1()  
@@ -197,7 +197,7 @@ class Graph(object):
         for edge in child_edges:
             self.add_edge(edge)
 
-    def append_branch(self, property, nodeid=None, branch_root=None, branchmetadataid=None):
+    def append_branch(self, property, nodeid=None, branch_root=None, graphmetadataid=None):
         """
         Appends a branch onto this graph
 
@@ -210,13 +210,13 @@ class Graph(object):
 
         branch_root -- the root node of the branch you want to append
 
-        branchmetadataid -- get the branch to append based on the branchmetadataid, 
+        graphmetadataid -- get the branch to append based on the graphmetadataid, 
         if given, branch_root takes precedence
 
         """
 
         if not branch_root:
-            branch_root = models.Node.objects.get(branchmetadata=branchmetadataid, istopnode=True)
+            branch_root = models.Node.objects.get(graphmetadata=graphmetadataid, istopnode=True)
         branch_graph = Graph(branch_root)
         
         branch_copy = branch_graph.copy()
