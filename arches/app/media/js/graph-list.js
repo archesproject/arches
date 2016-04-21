@@ -1,22 +1,43 @@
 require([
     'jquery',
     'underscore',
+    'knockout',
     'views/page-view',
+    'models/node',
     'bootstrap-nifty'
-], function($, _, PageView) {
-    var resources = JSON.parse($('#resources').val());
-    var branches = JSON.parse($('#branches').val());
-    resources.forEach(function(resource) {
-        resource.branch = _.find(branches, function(branch) {
-            return branch.graphmetadataid === resource.graphmetadata_id;
+], function($, _, ko, PageView, NodeModel) {
+    var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
+    var metadata = JSON.parse($('#metadata').val());
+    var loading = ko.observable(false);
+
+    graphs().forEach(function(graph) {
+        graph.metadata = _.find(metadata, function(metadata) {
+            return metadata.graphmetadataid === graph.graphmetadata_id;
         });
-        resource.open = function() {
-            window.location = resource.nodeid;
-        }
+        graph.open = function() {
+            window.location = graph.nodeid;
+        };
+        graph.deleteGraph = function () {
+            var node = new NodeModel({
+                source: graph,
+                datatypelookup: {}
+            });
+            loading(true);
+            node['delete'](function (request, status) {
+                var success = (status === 'success');
+                loading(false);
+                if (success) {
+                    graphs.remove(graph);
+                }
+            }, node);
+        };
     });
+
     new PageView({
         viewModel: {
-            resources: resources
+            graphs: graphs
         }
     });
+
+    $('.dropdown').dropdown();
 });

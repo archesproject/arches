@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block title %}
 {{ block.super }}
-{% trans "Resources" %}
+{% trans "Graphs" %}
 {% endblock title %}
 
 {% block content %}
@@ -30,11 +30,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 	<!-- Page Title/Saerch -->
 	<div id="page-title">
-		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">{% trans "Resources" %}</h1>
+		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">{% trans "Graphs" %}</h1>
 	</div>
 	<!--End page title-->
 
-    <div style="padding: 10px 0px 30px 0px;display:none;" data-bind="visible:resources.length>0">
+    <div style="padding: 10px 0px 30px 0px;display:none;" data-bind="visible:graphs().length>0">
 
     	<!-- Project Tools -->
     	<div class="relative" style="height: 36px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
@@ -43,7 +43,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     			<!-- Summary -->
     			<p style="padding-top: 5px; padding-left: 25px; font-size: 13px; color: #888;">
-    				{% trans "You have" %} <span style="color: #123; font-weight: 700;" data-bind="text:resources.length"></span> {% trans "resources" %}.
+    				{% trans "You have" %} <span style="color: #123; font-weight: 700;" data-bind="text:graphs().length"></span> {% trans "graphs" %}.
     			</p><p>
 
     		</div>
@@ -63,7 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     					<!-- New Project Button -->
     					<div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item">
     						<a id="add-basemap" href="#new-project-modal" data-toggle="modal">
-    							<h3 class="text-thin" style="margin-top: 10px;"> {% trans "New Resource" %}</h3>
+    							<h3 class="text-thin" style="margin-top: 10px;"> {% trans "New Graph" %}</h3>
 
     							<span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
     								<i class="fa fa-plus fa-2x" style="color: #fff;"></i>
@@ -72,7 +72,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     							<h5 style="font-weight: 200;"> {% trans "Create a new resource as part of your heritage inventory" %}</h5>
     						</a>
     					</div>
-                        <!-- ko foreach: resources -->
+                        <!-- ko foreach: graphs -->
     					<div class="project-grid-item">
     						<div class="panel mar-no">
 
@@ -86,13 +86,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     							<!-- Project Tools -->
     							<div class="panel-footer" style="height: 40px;">
-                                    <span><i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "Active" %}":"{% trans "Inactive" %}"'></span></span>
-    								<a class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+                                    <span data-bind="if:isresource"><i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "Active" %}":"{% trans "Inactive" %}"'></span></span>
+                                    <span data-bind="if:!isresource">{% trans "Non-resource graph" %}</span>
+    								<a class="pull-right dropdown" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
     									<ul class="dropdown-menu pull-right">
     									<li><a href="#"><i class="fa fa-copy"></i> {% trans "Clone Resource" %}</a>
     									</li>
     									<li class="divider"></li>
-    									<li><a href="#"><i class="fa fa-trash"></i> {% trans "Delete Resource" %}</a>
+    									<li><a href="#" data-bind="click:deleteGraph"><i class="fa fa-trash"></i> {% trans "Delete Resource" %}</a>
     									</li>
     								</ul>
     							</div>
@@ -106,6 +107,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-<input id="resources" name="resources" type="hidden" value="{{resources}}"/>
-<input id="branches" name="branches" type="hidden" value="{{branches}}"/>
+<input id="graphs" name="graphs" type="hidden" value="{{graphs}}"/>
+<input id="metadata" name="metadata" type="hidden" value="{{metadata}}"/>
 {% endblock content %}

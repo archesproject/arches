@@ -29,12 +29,12 @@ from arches.app.models import models
 
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
-        resources = models.Node.objects.filter(istopnode=True)
-        branches = models.GraphMetadata.objects.all()
+        graphs = models.Node.objects.filter(istopnode=True)
+        metadata = models.GraphMetadata.objects.all()
         return render(request, 'graph-list.htm', {
             'main_script': 'graph-list',
-            'resources': JSONSerializer().serialize(resources),
-            'branches': JSONSerializer().serialize(branches)
+            'graphs': JSONSerializer().serialize(graphs),
+            'metadata': JSONSerializer().serialize(metadata)
         })
 
     graph = Graph(nodeid)
@@ -116,7 +116,8 @@ def node(request, nodeid):
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)
         nodes, edges = node.get_child_nodes_and_edges()
-        edges.append(models.Edge.objects.get(rangenode=node))
+        if not node.istopnode:
+            edges.append(models.Edge.objects.get(rangenode=node))
         nodes.append(node)
         with transaction.atomic():
             [edge.delete() for edge in edges]
