@@ -74,25 +74,53 @@ define(['arches',
             }, scope, 'changed');
         },
 
+        moveNode: function(node, property, newParentNode, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + 'move_node/' + this.get('root').nodeid,
+                data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
+            }, function(response, status, self){
+                self.get('edges')()
+                .find(function (edge) {
+                    if(edge.edgeid === response.responseJSON.edges[0].edgeid){
+                        edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
+                        return true;
+                    }
+                    return false;
+                });
+                self.get('nodes')()
+                .forEach(function (node) {
+                    found_node = response.responseJSON.nodes.find(function(response_node){
+                        return response_node.nodeid === node.nodeid;
+                    });
+                    if (found_node){
+                        node.nodeGroupId(found_node.nodegroup_id);
+                    }
+                });
+                callback();
+            }, scope, 'changed');
+        },
+
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
 
-            attributes =_.extend({nodes:[], edges:[], datatypes:[]}, attributes);
+            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype.iconclass;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
-            attributes.nodes.forEach(function (node, i) {
-                attributes.nodes[i] = new NodeModel({
+            attributes.data.nodes.forEach(function (node, i) {
+                attributes.data.nodes[i] = new NodeModel({
                     source: node,
                     datatypelookup: datatypelookup
                 });
             });
-            this.set('nodes', ko.observableArray(attributes.nodes)),
-            this.set('edges', ko.observableArray(attributes.edges)),
+            this.set('nodes', ko.observableArray(attributes.data.nodes));
+            this.set('edges', ko.observableArray(attributes.data.edges));
+            this.set('root', attributes.data.root);
 
             this.set('editNode', ko.computed(function() {
                 var editNode = _.find(self.get('nodes')(), function(node){

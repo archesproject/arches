@@ -47,6 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="row">
                         <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                            {% csrf_token %}
                             <div class="col-xs-12 col-md-8 col-md-offset-2">
 
                                 <div class="input-group margin-bottom-20">

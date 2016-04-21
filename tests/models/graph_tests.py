@@ -21,11 +21,11 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
-class ResourceGraphTests(ArchesTestCase):
+class GraphTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -61,7 +61,7 @@ class ResourceGraphTests(ArchesTestCase):
 
     def test_graph_doesnt_polute_db(self):
         """
-        test that the mere act of creating a ResourceGraph instance 
+        test that the mere act of creating a Graph instance 
         doesn't save anything to the database
 
         """
@@ -105,7 +105,7 @@ class ResourceGraphTests(ArchesTestCase):
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
-        graph = ResourceGraph(graph_obj)
+        graph = Graph(graph_obj)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 0)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 0)
@@ -113,12 +113,12 @@ class ResourceGraphTests(ArchesTestCase):
 
     def test_nodes_are_byref(self):
         """
-        test that the nodes referred to in the ResourceGraph.edges are exact references to
+        test that the nodes referred to in the Graph.edges are exact references to
         the nodes as opposed to a node with the same attribute values
 
         """
 
-        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        graph = Graph(self.HERITAGE_RESOURCE_FIXTURE)
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
 
@@ -143,7 +143,7 @@ class ResourceGraphTests(ArchesTestCase):
 
         """
 
-        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+        graph = Graph(self.HERITAGE_RESOURCE_FIXTURE)
         graph_copy = graph.copy()
 
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
@@ -182,7 +182,7 @@ class ResourceGraphTests(ArchesTestCase):
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
-        graph = ResourceGraph(self.rootNode)
+        graph = Graph(self.rootNode)
         graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
         graph.save()
 
@@ -217,5 +217,90 @@ class ResourceGraphTests(ArchesTestCase):
 
         self.assertEqual(appended_branch.root.nodegroup,self.rootNode.nodegroup)
 
-    def test_make_tree(self):
-        graph = ResourceGraph(self.HERITAGE_RESOURCE_FIXTURE)
+    def test_move_node(self):
+        """
+        test if a node can be successfully moved to another node in the graph
+
+        """
+
+        # test moving a single node to another branch
+        # this node should be grouped with it's new parent nodegroup 
+        graph = Graph(self.rootNode)
+        branch_one = graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+        branch_two = graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+        branch_three = graph.append_branch('P1', branchmetadataid=self.SINGLE_NODE_BRANCHMETADATAID)
+
+        branch_three_nodeid = branch_three.nodes.iterkeys().next()
+        branch_one_rootnodeid = branch_one.root.nodeid
+        graph.move_node(branch_three_nodeid, 'P1', branch_one_rootnodeid)
+
+        new_parent_nodegroup = None
+        moved_branch_nodegroup = None
+        for node_id, node in graph.nodes.iteritems():
+            if node_id == branch_one_rootnodeid:
+                new_parent_nodegroup = node.nodegroup
+            if node_id == branch_three_nodeid:
+                moved_branch_nodegroup = node.nodegroup
+
+        self.assertIsNotNone(new_parent_nodegroup)
+        self.assertIsNotNone(moved_branch_nodegroup)
+        self.assertEqual(new_parent_nodegroup, moved_branch_nodegroup)
+
+
+        # test moving a branch to another branch
+        # this branch should NOT be grouped with it's new parent nodegroup 
+        branch_two_rootnodeid = branch_two.root.nodeid
+        graph.move_node(branch_one_rootnodeid, 'P1', branch_two_rootnodeid)
+
+        new_parent_nodegroup = None
+        moved_branch_nodegroup = None
+        for node_id, node in graph.nodes.iteritems():
+            if node_id == branch_two_rootnodeid:
+                new_parent_nodegroup = node.nodegroup
+            if node_id == branch_one_rootnodeid:
+                moved_branch_nodegroup = node.nodegroup
+
+        self.assertIsNotNone(new_parent_nodegroup)
+        self.assertIsNotNone(moved_branch_nodegroup)
+        self.assertNotEqual(new_parent_nodegroup, moved_branch_nodegroup)
+
+        updated_edge = None
+        for edge_id, edge in graph.edges.iteritems():
+            if (edge.domainnode_id == branch_two_rootnodeid and
+                edge.rangenode_id == branch_one_rootnodeid):
+                updated_edge = edge
+
+        self.assertIsNotNone(updated_edge)
+
+        # save and retrieve the graph from the database and confirm that 
+        # the graph shape has been saved properly
+        graph.save()
+        graph = Graph(self.rootNode)
+        tree = graph.get_tree()
+
+        self.assertEqual(len(tree['children']), 1)
+        level_one_node = tree['children'][0]
+        
+        self.assertEqual(branch_two_rootnodeid, level_one_node['node'].nodeid)
+        self.assertEqual(len(level_one_node['children']), 2)
+        for child in level_one_node['children']:
+            if child['node'].nodeid == branch_one_rootnodeid:
+                self.assertEqual(len(child['children']), 2)
+                found_branch_three = False
+                for child in child['children']:
+                    if child['node'].nodeid == branch_three_nodeid:
+                        found_branch_three = True
+                self.assertTrue(found_branch_three)
+            else:
+                self.assertEqual(len(child['children']), 0)
+
+
+# Pressumed final graph shape
+# 
+#                                                self.rootNode
+#                                                      |
+#                                            branch_two_rootnodeid (Node)
+#                                                    /   \
+#                         branch_one_rootnodeid (Node)    branch_two_child (NodeType)
+#                                 /   \
+# branch_one_childnodeid (NodeType)    branch_three_nodeid (Node)

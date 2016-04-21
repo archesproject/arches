@@ -8,7 +8,7 @@ from django.core import management
 from django.db import connection, transaction
 import concepts
 from .. import utils
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import Graph
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -65,7 +65,7 @@ def load_resource_graph_file(path_to_file):
 
         with open(basepath, 'rU') as f:
             file = json.load(f)
-            resource_graph = ResourceGraph(file['graph'][0])
+            resource_graph = Graph(file['graph'][0])
             resource_graph.save()
 
 def append_branch(path_to_branch, node_list, edge_list):

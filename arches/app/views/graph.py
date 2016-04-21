@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -24,11 +23,10 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import Graph
 from arches.app.models import models
 
 
-@csrf_exempt
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         resources = models.Node.objects.filter(istopnode=True)
@@ -39,14 +37,15 @@ def manager(request, nodeid):
             'branches': JSONSerializer().serialize(branches)
         })
 
-    graph = ResourceGraph(nodeid)
+    graph = Graph(nodeid)
     validations = models.Validation.objects.all()
     branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
 
     for branch in branches:
         rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['graph'] = ResourceGraph(rootnode)
+        branch['graph'] = Graph(rootnode)
+        branch['relates_via'] = ['P1', 'P2', 'P3']
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
@@ -69,8 +68,6 @@ def manager(request, nodeid):
         }
     })
 
-
-@csrf_exempt
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -126,13 +123,21 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
-
-@csrf_exempt
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
-        graph = ResourceGraph(nodeid)
+        graph = Graph(nodeid)
         newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
         graph.save()
         return JSONResponse(newBranch)
+
+    return HttpResponseNotFound()
+
+def move_node(request, nodeid):
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        graph = Graph(nodeid)
+        updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+        graph.save()
+        return JSONResponse(updated_nodes_and_edges)
 
     return HttpResponseNotFound()

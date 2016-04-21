@@ -21,7 +21,6 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from arches.app.models import models
@@ -66,7 +65,6 @@ def rdm(request, conceptid):
 
 
 @permission_required('edit')
-@csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     mode = request.GET.get('mode', '')
@@ -234,7 +232,6 @@ def concept(request, conceptid):
 
     return HttpResponseNotFound
 
-@csrf_exempt
 def manage_parents(request, conceptid):
     #  need to check user credentials here
 
@@ -265,7 +262,6 @@ def manage_parents(request, conceptid):
 
     return HttpResponseNotFound()
 
-@csrf_exempt
 def confirm_delete(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
@@ -273,7 +269,6 @@ def confirm_delete(request, conceptid):
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
-@csrf_exempt
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
@@ -348,7 +343,6 @@ def search(request):
     results['hits']['hits'] = newresults
     return JSONResponse(results)
 
-@csrf_exempt
 def add_concepts_from_sparql_endpoint(request, conceptid):
     if request.method == 'POST':
         json = request.body

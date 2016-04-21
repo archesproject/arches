@@ -8,7 +8,8 @@ define([
             var self = this;
             this.size = 1000;
             this.currentOffset = [0,0];
-            this.currentScale = 1; 
+            this.currentScale = 1;
+            this.graphModel = options.graphModel;
             this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
             this.edges = options.graphModel.get('edges') || ko.observableArray([]);
 
@@ -169,3 +170,4 @@ define([
     });
     return GraphBase;
 });
+

@@ -12,9 +12,9 @@ define([
             this.editNode = this.graphModel.get('editNode');
             this.items = options.branches;
             this.items().forEach(function (branch) {
+                branch.ontology_property = ko.observable('');
                 branch.graphModel = new GraphModel({
-                    nodes: branch.graph.nodes,
-                    edges: branch.graph.edges
+                    data: branch.graph
                 })
             });
             this.selectedItem = ko.observable(null);
@@ -36,7 +36,7 @@ define([
 
         appendBranch: function(){
             if(this.editNode()){
-                this.graphModel.appendBranch(this.editNode().nodeid, 'P1', this.selectedItem().branchmetadataid, function(response){
+                this.graphModel.appendBranch(this.editNode().nodeid, this.selectedItem().ontology_property(), this.selectedItem().branchmetadataid, function(response){
                 }, this)
 
             }

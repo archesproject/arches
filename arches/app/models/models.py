@@ -66,12 +66,12 @@ class Card(models.Model):
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
-    card = models.ForeignKey(Card, db_column='cardid')
+    card = models.ForeignKey('Card', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
+    function = models.ForeignKey('Function', db_column='functionid')
     inputmask = models.TextField(blank=True, null=True)
     inputlabel = models.TextField(blank=True, null=True)
-
-
+    
     class Meta:
         managed = True
         db_table = 'cards_x_nodes_x_widgets'
@@ -191,6 +191,18 @@ class FormXCard(models.Model):
         managed = True
         db_table = 'forms_x_card'
         unique_together = (('form', 'card'),)
+
+
+class Function(models.Model):
+    functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    functiontype = models.TextField(blank=True, null=True)
+    function = models.TextField()
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        managed = True
+        db_table = 'functions'
 
 
 class NodeGroup(models.Model):

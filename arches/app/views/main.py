@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
@@ -30,7 +29,6 @@ def index(request):
 
 
 @never_cache
-@csrf_exempt
 def auth(request):
     auth_attempt_success = None
     # POST request is taken to mean user is logging in
