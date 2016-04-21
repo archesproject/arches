@@ -21,7 +21,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import ResourceGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 

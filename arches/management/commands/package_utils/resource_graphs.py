@@ -8,7 +8,7 @@ from django.core import management
 from django.db import connection, transaction
 import concepts
 from .. import utils
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import ResourceGraph
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 

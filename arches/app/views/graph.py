@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import ResourceGraph
 from arches.app.models import models
 
 
