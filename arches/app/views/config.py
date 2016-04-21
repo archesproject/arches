@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import copy
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from arches.app.models import models
 from arches.app.models.forms import Form
@@ -26,7 +25,6 @@ from django.utils.translation import ugettext as _
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-@csrf_exempt
 def manager(request):
     resourceinstanceid = '40000000-0000-0000-0000-000000000000'
 

@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -28,7 +27,6 @@ from arches.app.models.graph import Graph
 from arches.app.models import models
 
 
-@csrf_exempt
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         resources = models.Node.objects.filter(istopnode=True)
@@ -70,8 +68,6 @@ def manager(request, nodeid):
         }
     })
 
-
-@csrf_exempt
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -127,8 +123,6 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
-
-@csrf_exempt
 def append_branch(request, nodeid, property, branchmetadataid):
     if request.method == 'POST':
         graph = Graph(nodeid)
@@ -138,7 +132,6 @@ def append_branch(request, nodeid, property, branchmetadataid):
 
     return HttpResponseNotFound()
 
-@csrf_exempt
 def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
