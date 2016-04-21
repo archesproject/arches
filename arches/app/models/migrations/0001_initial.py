@@ -357,6 +357,8 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
+                ('isresource', models.BooleanField()),
+                ('isactive', models.BooleanField()),
                 ('ontologyclass', models.TextField()),
                 ('datatype', models.TextField()),
                 ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),

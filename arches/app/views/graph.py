@@ -84,10 +84,12 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
+                node.isresource = data.get('isresource', False)
+                node.isactive = data.get('isactive', False)
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
-                if node.nodegroup_id != new_nodegroup_id:
+                if unicode(node.nodegroup_id) != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
                     new_group = parent_group

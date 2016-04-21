@@ -51,6 +51,8 @@ class GraphTests(ArchesTestCase):
             name='ROOT NODE',
             description='Test Root Node',
             istopnode=True,
+            isresource=True,
+            isactive=False,
             ontologyclass='E1',
             datatype='semantic',
             nodegroup=newgroup
@@ -61,7 +63,7 @@ class GraphTests(ArchesTestCase):
 
     def test_graph_doesnt_polute_db(self):
         """
-        test that the mere act of creating a Graph instance 
+        test that the mere act of creating a Graph instance
         doesn't save anything to the database
 
         """
@@ -163,7 +165,7 @@ class GraphTests(ArchesTestCase):
             self.assertNotEqual(id(node), id(node_copy))
             if node.nodegroup != None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
-            
+
         for key, newedge in graph_copy.edges.iteritems():
             self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
             self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
@@ -224,7 +226,7 @@ class GraphTests(ArchesTestCase):
         """
 
         # test moving a single node to another branch
-        # this node should be grouped with it's new parent nodegroup 
+        # this node should be grouped with it's new parent nodegroup
         graph = Graph(self.rootNode)
         branch_one = graph.append_branch('P1', graphmetadataid=self.NODE_NODETYPE_GRAPHMETADATAID)
         branch_two = graph.append_branch('P1', graphmetadataid=self.NODE_NODETYPE_GRAPHMETADATAID)
@@ -248,7 +250,7 @@ class GraphTests(ArchesTestCase):
 
 
         # test moving a branch to another branch
-        # this branch should NOT be grouped with it's new parent nodegroup 
+        # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
         graph.move_node(branch_one_rootnodeid, 'P1', branch_two_rootnodeid)
 
@@ -272,7 +274,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertIsNotNone(updated_edge)
 
-        # save and retrieve the graph from the database and confirm that 
+        # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
         graph.save()
         graph = Graph(self.rootNode)
@@ -280,7 +282,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(tree['children']), 1)
         level_one_node = tree['children'][0]
-        
+
         self.assertEqual(branch_two_rootnodeid, level_one_node['node'].nodeid)
         self.assertEqual(len(level_one_node['children']), 2)
         for child in level_one_node['children']:
@@ -296,7 +298,7 @@ class GraphTests(ArchesTestCase):
 
 
 # Pressumed final graph shape
-# 
+#
 #                                                self.rootNode
 #                                                      |
 #                                            branch_two_rootnodeid (Node)

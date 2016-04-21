@@ -19,6 +19,8 @@ define([
             self.datatype = ko.observable('');
             self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
+            self.isresource = ko.observable(false);
+            self.isactive = ko.observable(false);
 
             self.parse(options.source);
 
@@ -32,7 +34,9 @@ define([
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
                     cardinality: self.cardinality(),
-                    validations: self.validations()
+                    validations: self.validations(),
+                    isresource: self.isresource(),
+                    isactive: self.isactive()
                 }))
             });
 
@@ -56,6 +60,8 @@ define([
             source.validations.forEach(function(validation) {
                 self.validations.push(validation);
             });
+            self.isresource(source.isresource);
+            self.isactive(source.isactive);
 
             self.nodeid = source.nodeid;
 

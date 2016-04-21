@@ -21,6 +21,8 @@ CREATE TABLE "nodes"(
  "name" Text NOT NULL,
  "description" Text NOT NULL,
  "istopnode" Boolean NOT NULL,
+ "isresource" Boolean NOT NULL,
+ "isactive" Boolean NOT NULL,
  "crmclass" Text NOT NULL,
  "datatype" Text NOT NULL,
  "validation" Text,
