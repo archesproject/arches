@@ -742,13 +742,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke: navy;
     cursor: pointer;
 }
-.target-node circle{
+.target-node circle {
     opacity: 0.2;
     fill: red;
     stroke: red;
     stroke-width: 32px;
 }
-
 #nodeCrud {
     position: absolute;
     width: 250px;
@@ -1605,6 +1604,22 @@ div.dropdown-menu.open {
 }
 .project-grid-item:hover {
     cursor: pointer;
+    opacity: 1.0;
+}
+.template-grid-item {
+    float: left;
+    margin: 8px;
+    max-width: 250px;
+    border: 1px solid #ddd;
+    opacity: .6;
+}
+.template-grid-item:hover {
+    cursor: pointer;
+    opacity: 1.0;
+    border: 1px solid steelblue;
+}
+.selected-template {
+    border: 1px solid steelblue;
     opacity: 1.0;
 }
 @media min-width 992px {
