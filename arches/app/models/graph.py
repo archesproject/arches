@@ -249,15 +249,18 @@ class Graph(object):
 
         copy_of_self = Graph(self.root.pk)
         for node_id, node in copy_of_self.nodes.iteritems():
-            node.pk = uuid.uuid1()
-
+            is_collector = False
             if node.nodegroup:
-                if node.nodegroup.pk not in new_nodegroups:
-                    new_nodegroups[node.nodegroup.pk] = node.nodegroup
-                    node.nodegroup_id = node.nodegroup.pk = node.pk
-                else:
-                    node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
-                    node.nodegroup = new_nodegroups[node.nodegroup.pk]
+                is_collector = (node.pk == node.nodegroup.pk)
+            node.pk = uuid.uuid1()
+            if is_collector:
+                new_nodegroups[node.nodegroup.pk] = node.nodegroup
+                node.nodegroup_id = node.nodegroup.pk = node.pk
+
+        for node_id, node in copy_of_self.nodes.iteritems():
+            if node.nodegroup and node.nodegroup.pk in new_nodegroups:
+                node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
+                node.nodegroup = new_nodegroups[node.nodegroup.pk]
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
 
@@ -267,6 +270,8 @@ class Graph(object):
             edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
+
+        copy_of_self.nodegroups = new_nodegroups
 
         return copy_of_self
 
