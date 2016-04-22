@@ -122,13 +122,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </ul>
                             </li>
 
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                </span>
+                                <div class="username hidden-xs">
+                                {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
+                            </a>
                             <li id="dropdown-user" class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
-                                    <span class="pull-right">
-                                        <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
-                                    </span>
-                                    <div class="username hidden-xs">John Doe</div>
-                                </a>
 
                                 <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
 
