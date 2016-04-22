@@ -185,6 +185,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </header>
             <div class="boxed">
 
+                <div class="loading-mask" data-bind="visible:loading()"></div>
+
                 <div id="content-container" style="padding-bottom: 20px;">
                     {% block content %}
                     {% endblock content %}
@@ -218,6 +220,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	{% block javascript %}
         {% include 'javascript.htm' %}
     {% endblock javascript %}
+    {% if main_script %}
+    <script>require(["{{ main_script }}"]);</script>
+    {% endif %}
 
     {% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
     <script>

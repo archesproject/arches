@@ -742,13 +742,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke: navy;
     cursor: pointer;
 }
-.target-node circle{
+.target-node circle {
     opacity: 0.2;
     fill: red;
     stroke: red;
     stroke-width: 32px;
 }
-
 #nodeCrud {
     position: absolute;
     width: 250px;
@@ -1596,15 +1595,60 @@ div.dropdown-menu.open {
     color: #139F78;
 }
 .project-grid-item {
-	float: left;
-  	margin: 2px;
-  	max-width: 250px;
-  	border: 1px solid #ddd;
-  	opacity: .79;
+    float: left;
+    margin: 2px;
+    max-width: 250px;
+    min-width: 200px;
+    border: 1px solid #ddd;
+    opacity: .79;
 }
 .project-grid-item:hover {
-	cursor: pointer;
-	opacity: 1.0;
+    cursor: pointer;
+    opacity: 1.0;
+}
+.template-grid-item {
+    float: left;
+    margin: 8px;
+    max-width: 250px;
+    border: 1px solid #ddd;
+    opacity: .6;
+}
+.template-grid-item:hover {
+    cursor: pointer;
+    opacity: 1.0;
+    border: 1px solid steelblue;
+}
+.selected-template {
+    border: 1px solid steelblue;
+    opacity: 1.0;
+}
+.loading-mask {
+    position: fixed;
+    opacity: .5;
+    background-color: #808080;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:100000000;
+}
+.loading-mask:after {
+    position: fixed;
+    opacity: .5;
+    color: #000000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 16vw;
+    margin-top: 42vh;
+    margin-left: 42vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index:100000001;
 }
 @media min-width 992px {
     #page-content {

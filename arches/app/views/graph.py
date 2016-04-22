@@ -20,7 +20,7 @@ from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, QueryDict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
@@ -29,23 +29,28 @@ from arches.app.models import models
 
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
-        resources = models.Node.objects.filter(istopnode=True)
-        branches = models.BranchMetadata.objects.all()
-        return render(request, 'resource-list.htm', {
-            'main_script': 'resource-list',
-            'resources': JSONSerializer().serialize(resources),
-            'branches': JSONSerializer().serialize(branches)
+        graphs = models.Node.objects.filter(istopnode=True)
+        metadata = models.GraphMetadata.objects.all()
+        return render(request, 'graph-list.htm', {
+            'main_script': 'graph-list',
+            'graphs': JSONSerializer().serialize(graphs),
+            'metadata': JSONSerializer().serialize(metadata)
         })
 
     graph = Graph(nodeid)
     validations = models.Validation.objects.all()
-    branches = JSONSerializer().serializeToPython(models.BranchMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(branchmetadata=None), istopnode=True)
+    metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
+    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True, isresource=False)
 
-    for branch in branches:
-        rootnode = branch_nodes.get(branchmetadata_id=branch['branchmetadataid'])
-        branch['graph'] = Graph(rootnode)
-        branch['relates_via'] = ['P1', 'P2', 'P3']
+    branches = []
+    for metadata_record in metadata_records:
+        try:
+            rootnode = branch_nodes.get(graphmetadata_id=metadata_record['graphmetadataid'])
+            metadata_record['graph'] = Graph(rootnode)
+            metadata_record['relates_via'] = ['P1', 'P2', 'P3']
+            branches.append(metadata_record)
+        except models.Node.DoesNotExist:
+            pass
 
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
@@ -84,10 +89,12 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
+                node.isresource = data.get('isresource', False)
+                node.isactive = data.get('isactive', False)
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
-                if node.nodegroup_id != new_nodegroup_id:
+                if unicode(node.nodegroup_id) != new_nodegroup_id:
                     edge = models.Edge.objects.get(rangenode_id=nodeid)
                     parent_group = edge.domainnode.nodegroup
                     new_group = parent_group
@@ -114,7 +121,8 @@ def node(request, nodeid):
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)
         nodes, edges = node.get_child_nodes_and_edges()
-        edges.append(models.Edge.objects.get(rangenode=node))
+        if not node.istopnode:
+            edges.append(models.Edge.objects.get(rangenode=node))
         nodes.append(node)
         with transaction.atomic():
             [edge.delete() for edge in edges]
@@ -123,10 +131,10 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
-def append_branch(request, nodeid, property, branchmetadataid):
+def append_branch(request, nodeid, property, graphmetadataid):
     if request.method == 'POST':
         graph = Graph(nodeid)
-        newBranch = graph.append_branch(property, branchmetadataid=branchmetadataid)
+        newBranch = graph.append_branch(property, graphmetadataid=graphmetadataid)
         graph.save()
         return JSONResponse(newBranch)
 
@@ -139,5 +147,18 @@ def move_node(request, nodeid):
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
+
+    return HttpResponseNotFound()
+
+def clone(request, nodeid):
+    if request.method == 'POST':
+        data = QueryDict(request.body)
+        graph = Graph(nodeid).copy()
+        if 'name' in data:
+            graph.root.name = data['name']
+        graph.root.graphmetadata = None
+        graph.populate_null_nodegroups()
+        graph.save()
+        return JSONResponse(graph)
 
     return HttpResponseNotFound()

@@ -36,7 +36,7 @@ define([
 
         appendBranch: function(){
             if(this.editNode()){
-                this.graphModel.appendBranch(this.editNode().nodeid, this.selectedItem().ontology_property(), this.selectedItem().branchmetadataid, function(response){
+                this.graphModel.appendBranch(this.editNode().nodeid, this.selectedItem().ontology_property(), this.selectedItem().graphmetadataid, function(response){
                 }, this)
 
             }

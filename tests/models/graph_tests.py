@@ -31,8 +31,8 @@ class GraphTests(ArchesTestCase):
     def setUpClass(cls):
         resource_graphs.load_graphs(os.path.join(test_settings.RESOURCE_GRAPH_LOCATIONS))
 
-        cls.NODE_NODETYPE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000001'
-        cls.SINGLE_NODE_BRANCHMETADATAID = '22000000-0000-0000-0000-000000000000'
+        cls.NODE_NODETYPE_GRAPHMETADATAID = '22000000-0000-0000-0000-000000000001'
+        cls.SINGLE_NODE_GRAPHMETADATAID = '22000000-0000-0000-0000-000000000000'
         cls.HERITAGE_RESOURCE_FIXTURE = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
 
     @classmethod
@@ -51,6 +51,8 @@ class GraphTests(ArchesTestCase):
             name='ROOT NODE',
             description='Test Root Node',
             istopnode=True,
+            isresource=True,
+            isactive=False,
             ontologyclass='E1',
             datatype='semantic',
             nodegroup=newgroup
@@ -61,7 +63,7 @@ class GraphTests(ArchesTestCase):
 
     def test_graph_doesnt_polute_db(self):
         """
-        test that the mere act of creating a Graph instance 
+        test that the mere act of creating a Graph instance
         doesn't save anything to the database
 
         """
@@ -69,7 +71,7 @@ class GraphTests(ArchesTestCase):
         graph_obj = {
             'nodes':[{
                 "status": None,
-                "branchmetadataid": None,
+                "graphmetadataid": None,
                 "description": "",
                 "name": "ROOT_NODE",
                 "istopnode": True,
@@ -80,7 +82,7 @@ class GraphTests(ArchesTestCase):
                 "cardinality": "1"
             },{
                 "status": None,
-                "branchmetadataid": None,
+                "graphmetadataid": None,
                 "description": "",
                 "name": "NODE_NAME",
                 "istopnode": False,
@@ -91,7 +93,7 @@ class GraphTests(ArchesTestCase):
                 "cardinality": "n"
             }],
             'edges':[{
-                "branchmetadataid": None,
+                "graphmetadataid": None,
                 "rangenodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
                 "name": "",
                 "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",
@@ -163,7 +165,7 @@ class GraphTests(ArchesTestCase):
             self.assertNotEqual(id(node), id(node_copy))
             if node.nodegroup != None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
-            
+
         for key, newedge in graph_copy.edges.iteritems():
             self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
             self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
@@ -183,7 +185,7 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph(self.rootNode)
-        graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
+        graph.append_branch('P1', graphmetadataid=self.NODE_NODETYPE_GRAPHMETADATAID)
         graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
@@ -205,7 +207,7 @@ class GraphTests(ArchesTestCase):
                 self.assertEqual(node, self.rootNode)
 
 
-        appended_branch = graph.append_branch('P1', branchmetadataid=self.SINGLE_NODE_BRANCHMETADATAID)
+        appended_branch = graph.append_branch('P1', graphmetadataid=self.SINGLE_NODE_GRAPHMETADATAID)
         graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
@@ -224,11 +226,11 @@ class GraphTests(ArchesTestCase):
         """
 
         # test moving a single node to another branch
-        # this node should be grouped with it's new parent nodegroup 
+        # this node should be grouped with it's new parent nodegroup
         graph = Graph(self.rootNode)
-        branch_one = graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
-        branch_two = graph.append_branch('P1', branchmetadataid=self.NODE_NODETYPE_BRANCHMETADATAID)
-        branch_three = graph.append_branch('P1', branchmetadataid=self.SINGLE_NODE_BRANCHMETADATAID)
+        branch_one = graph.append_branch('P1', graphmetadataid=self.NODE_NODETYPE_GRAPHMETADATAID)
+        branch_two = graph.append_branch('P1', graphmetadataid=self.NODE_NODETYPE_GRAPHMETADATAID)
+        branch_three = graph.append_branch('P1', graphmetadataid=self.SINGLE_NODE_GRAPHMETADATAID)
 
         branch_three_nodeid = branch_three.nodes.iterkeys().next()
         branch_one_rootnodeid = branch_one.root.nodeid
@@ -248,7 +250,7 @@ class GraphTests(ArchesTestCase):
 
 
         # test moving a branch to another branch
-        # this branch should NOT be grouped with it's new parent nodegroup 
+        # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
         graph.move_node(branch_one_rootnodeid, 'P1', branch_two_rootnodeid)
 
@@ -272,7 +274,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertIsNotNone(updated_edge)
 
-        # save and retrieve the graph from the database and confirm that 
+        # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
         graph.save()
         graph = Graph(self.rootNode)
@@ -280,7 +282,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(tree['children']), 1)
         level_one_node = tree['children'][0]
-        
+
         self.assertEqual(branch_two_rootnodeid, level_one_node['node'].nodeid)
         self.assertEqual(len(level_one_node['children']), 2)
         for child in level_one_node['children']:
@@ -296,7 +298,7 @@ class GraphTests(ArchesTestCase):
 
 
 # Pressumed final graph shape
-# 
+#
 #                                                self.rootNode
 #                                                      |
 #                                            branch_two_rootnodeid (Node)
