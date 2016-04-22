@@ -21,12 +21,14 @@ from django.shortcuts import render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound, QueryDict
+from django.contrib.auth.decorators import permission_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
 
 
+@permission_required('edit')
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         graphs = models.Node.objects.filter(istopnode=True)
