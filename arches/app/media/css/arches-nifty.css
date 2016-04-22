@@ -1622,6 +1622,34 @@ div.dropdown-menu.open {
     border: 1px solid steelblue;
     opacity: 1.0;
 }
+.loading-mask {
+    position: fixed;
+    opacity: .5;
+    background-color: #808080;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:100000000;
+}
+.loading-mask:after {
+    position: fixed;
+    opacity: .5;
+    color: #000000;
+    content: '\f110';
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 16vw;
+    margin-top: 42vh;
+    margin-left: 42vw;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    z-index:100000001;
+}
 @media min-width 992px {
     #page-content {
         padding: 15px 15px 25px;

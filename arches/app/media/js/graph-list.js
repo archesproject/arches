@@ -8,7 +8,6 @@ require([
 ], function($, _, ko, PageView, NodeModel) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
     var metadata = JSON.parse($('#metadata').val());
-    var loading = ko.observable(false);
     var selectedGraph = ko.observable(null);
     var newGraphName = ko.observable('');
 
@@ -17,6 +16,7 @@ require([
             return metadata.graphmetadataid === graph.graphmetadata_id;
         });
         graph.open = function() {
+            pageView.viewModel.loading(true);
             window.location = graph.nodeid;
         };
         graph.clone = function() {
@@ -24,6 +24,7 @@ require([
                 graph.select();
                 $('#graph-name-modal').modal('show');
             } else {
+                pageView.viewModel.loading(true);
                 $.ajax({
                     type: "POST",
                     url: 'clone/' + selectedGraph(),
@@ -32,6 +33,9 @@ require([
                     },
                     success: function(response) {
                         window.location = response.root.nodeid;
+                    },
+                    failure: function(response) {
+                        pageView.viewModel.loading(false);
                     },
                     datatype:'JSON'
                 });
@@ -49,10 +53,10 @@ require([
                 source: graph,
                 datatypelookup: {}
             });
-            loading(true);
+            pageView.viewModel.loading(true);
             node['delete'](function (request, status) {
                 var success = (status === 'success');
-                loading(false);
+                pageView.viewModel.loading(false);
                 if (success) {
                     if (graph.selected()) {
                         selectedGraph(null);
@@ -63,7 +67,7 @@ require([
         };
     });
 
-    new PageView({
+    var pageView = new PageView({
         viewModel: {
             graphs: graphs,
             selectedGraph: selectedGraph,
