@@ -75,6 +75,7 @@ def manager(request, nodeid):
         }
     })
 
+@permission_required('edit')
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -133,6 +134,7 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
+@permission_required('edit')
 def append_branch(request, nodeid, property, graphmetadataid):
     if request.method == 'POST':
         graph = Graph(nodeid)
@@ -142,6 +144,7 @@ def append_branch(request, nodeid, property, graphmetadataid):
 
     return HttpResponseNotFound()
 
+@permission_required('edit')
 def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -152,6 +155,7 @@ def move_node(request, nodeid):
 
     return HttpResponseNotFound()
 
+@permission_required('edit')
 def clone(request, nodeid):
     if request.method == 'POST':
         data = QueryDict(request.body)
