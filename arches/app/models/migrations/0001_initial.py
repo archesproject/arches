@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('version', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'branch_metadata',
+                'db_table': 'graph_metadata',
                 'managed': True,
             },
         ),
@@ -622,7 +622,7 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'card', 'widget')]),
         ),
 
-        CreateAutoPopulateUUIDField('branch_metadata', ['graphmetadataid']),
+        CreateAutoPopulateUUIDField('graph_metadata', ['graphmetadataid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),

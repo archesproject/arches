@@ -46,7 +46,7 @@ class GraphMetadata(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'branch_metadata'
+        db_table = 'graph_metadata'
 
 
 class Card(models.Model):
