@@ -62,6 +62,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test the graph manager view
 
         """
+        self.client.login(username='admin', password='admin')
         url = reverse('graph', kwargs={'nodeid':''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
@@ -82,7 +83,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test updating a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
-
+        self.client.login(username='admin', password='admin')
         url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
         node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
         node.name = "new node name"
@@ -106,7 +107,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
-
+        self.client.login(username='admin', password='admin')
         url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
@@ -125,7 +126,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
-
+        self.client.login(username='admin', password='admin')
         url = reverse('clone_graph', kwargs={'nodeid':self.ROOT_ID})
         post_data = JSONSerializer().serialize({'name': 'test cloned graph'})
         content_type = 'application/x-www-form-urlencoded'
