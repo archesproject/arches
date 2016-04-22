@@ -20,7 +20,7 @@ from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, QueryDict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
@@ -147,5 +147,18 @@ def move_node(request, nodeid):
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
+
+    return HttpResponseNotFound()
+
+def clone(request, nodeid):
+    if request.method == 'POST':
+        data = QueryDict(request.body)
+        graph = Graph(nodeid).copy()
+        if 'name' in data:
+            graph.root.name = data['name']
+        graph.root.graphmetadata = None
+        graph.populate_null_nodegroups()
+        graph.save()
+        return JSONResponse(graph)
 
     return HttpResponseNotFound()
