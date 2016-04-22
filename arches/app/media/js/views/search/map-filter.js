@@ -1,15 +1,15 @@
-define(['jquery', 
+define(['jquery',
     'jquery-ui',
     'underscore',
     'backbone',
     'bootstrap',
-    'arches', 
+    'arches',
     'views/map',
-    'openlayers', 
+    'openlayers',
     'knockout',
     'map/resource-layer-model',
     'utils',
-    'resource-types',], 
+    'resource-types',],
     function($, jqui, _, Backbone, bootstrap, arches, MapView, ol, ko, ResourceLayerModel, utils, resourceTypes) {
         var geoJSON = new ol.format.GeoJSON();
         return Backbone.View.extend({
@@ -20,7 +20,7 @@ define(['jquery',
                 'click .cluster-item-link': 'clusterItemClick'
             },
 
-            initialize: function(options) { 
+            initialize: function(options) {
                 var self = this;
 
                 //  Handle show/hide toggle ourselves
@@ -36,7 +36,7 @@ define(['jquery',
                 });
 
                 //  suppress default bahavior of the bootstrap menu to auto close
-                $('#map-tools-btn').on('hide.bs.dropdown', false);            
+                $('#map-tools-btn').on('hide.bs.dropdown', false);
                 $('#map-tools-btn').on('show.bs.dropdown', false);
 
 
@@ -58,13 +58,13 @@ define(['jquery',
                         inverted: ko.observable(false)
                     },
                     changed: ko.pureComputed(function(){
-                        return (ko.toJSON(this.query.filter.geometry.coordinates()) + 
-                            ko.toJSON(this.query.filter.buffer.width()) + 
+                        return (ko.toJSON(this.query.filter.geometry.coordinates()) +
+                            ko.toJSON(this.query.filter.buffer.width()) +
                             ko.toJSON(this.query.filter.inverted()));
                     }, this).extend({ rateLimit: 200 })
                 }
 
-                ko.applyBindings(this.query.filter, $('#map-tools-dropdown')[0]); 
+                ko.applyBindings(this.query.filter, $('#map-tools-dropdown')[0]);
 
                 this.query.filter.buffer.width.subscribe(function(){
                     self.applyBuffer();
@@ -86,7 +86,7 @@ define(['jquery',
                     if (!self.cancelFitBaseLayer){
                         setTimeout(function() {
                               self.zoomToExtent(self.vectorLayer.getSource().getExtent());
-                        }, 500);                        
+                        }, 500);
                     }
                 }).layer();
 
@@ -109,9 +109,9 @@ define(['jquery',
                             lineDash: [4,4]
                         })
                     })
-                }); 
-                // this.bufferFeatureSource.setMap(this.map.map);                   
-                
+                });
+                // this.bufferFeatureSource.setMap(this.map.map);
+
                 this.drawingFeatureOverlay = new ol.layer.Vector({
                     source: this.drawingFeatureSource,
                     style: new ol.style.Style({
@@ -131,7 +131,7 @@ define(['jquery',
                     el: $('#map'),
                     overlays: [this.bufferFeatureOverlay, this.drawingFeatureOverlay, this.vectorLayer]
                 });
-                
+
 
 
                 ko.applyBindings(this.map, $('#basemaps-panel')[0]);
@@ -161,20 +161,20 @@ define(['jquery',
                     }
                 });
 
-                $(".basemap").click(function (){ 
+                $(".basemap").click(function (){
                     var basemap = $(this).attr('id');
-                    _.each(self.map.baseLayers, function(baseLayer){ 
+                    _.each(self.map.baseLayers, function(baseLayer){
                         baseLayer.layer.setVisible(baseLayer.id == basemap);
                     });
                     hideAllPanels();
                 });
 
                 //Close Button
-                $(".close").click(function (){ 
+                $(".close").click(function (){
                     hideAllPanels();
                 });
 
-                
+
                 var mouseoverFeatureTooltip = $('#feature_tooltip');
                 var currentMousePx = null;
                 var archesFeaturesCache = {};
@@ -274,7 +274,7 @@ define(['jquery',
                     }
                 });
                 selectFeatureOverlay.setMap(self.map.map);
-                
+
                 $('.resource-info-closer').click(function() {
                     $('#resource-info').hide();
                     selectFeatureOverlay.getFeatures().clear();
@@ -307,7 +307,7 @@ define(['jquery',
                     _.each(feature.getKeys(), function (key) {
                         resourceData[key] = feature.get(key);
                     });
-                    
+
                     selectFeatureOverlay.getFeatures().clear();
                     selectFeatureOverlay.getFeatures().push(feature);
                     self.viewModel.selectedResource(resourceData);
@@ -460,13 +460,13 @@ define(['jquery',
                     var maxY = extent[3];
                     var polygon = new ol.geom.Polygon([[[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY], [minX, minY]]]);
                     //polygon.transform('EPSG:3857', 'EPSG:4326');
-                    this.map.map.getView().fitGeometry(polygon, this.map.map.getSize(), {maxZoom:16}); 
+                    this.map.map.getView().fitGeometry(polygon, this.map.map.getSize(), {maxZoom:16});
                     //this.zoomToExtent(feature.getGeometry().getExtent());
                 }else{
-                    this.map.map.getView().fitGeometry(feature.getGeometry().getGeometries()[0], this.map.map.getSize(), {maxZoom:16});                    
+                    this.map.map.getView().fitGeometry(feature.getGeometry().getGeometries()[0], this.map.map.getSize(), {maxZoom:16});
                 }
             },
-            
+
             zoomToExtent: function(extent){
                 var size = this.map.map.getSize();
                 var view = this.map.map.getView()
@@ -557,7 +557,7 @@ define(['jquery',
                 if(feature){
                     feature.set('highlight', true);
                     return feature;
-                } 
+                }
             },
 
             unselectAllFeatures: function(){
@@ -579,7 +579,7 @@ define(['jquery',
                 var link = $(evt.target).closest('a');
                 var data = link.data();
                 var item = link.find('i');
- 
+
                 if (!(item.hasClass("fa-check"))){
                     this.enableFilter(data.tooltype);
                 }else{
@@ -599,8 +599,8 @@ define(['jquery',
                         this.clearDrawingFeatures();
                         this.query.filter.geometry.type(tooltype);
                         this.changeDrawingTool(this.map.map, tooltype);
-                        this.map.map.un('moveend', this.onMoveEnd, this);     
-                    }                  
+                        this.map.map.un('moveend', this.onMoveEnd, this);
+                    }
                 }
             },
 
@@ -617,7 +617,7 @@ define(['jquery',
                                 ol.events.condition.singleClick(event);
                     }
                 });
-                map.addInteraction(this.modifyTool);                
+                map.addInteraction(this.modifyTool);
 
                 this.drawingtool = new ol.interaction.Draw({
                     features: this.drawingFeatures,
@@ -627,18 +627,19 @@ define(['jquery',
 
                 this.drawingtool.on('drawstart', function(){
                     if(this.drawingtool.get('type') !== 'Point'){
-                        this.clearDrawingFeatures();                       
+                        this.clearDrawingFeatures();
                     }
                 }, this);
 
                 this.drawingtool.on('drawend', function(evt){
                     var self = this;
                     var geometry = evt.feature.getGeometry().clone();
+                    this.drawingFeatureSource.addFeature(evt.feature);
                     geometry.transform('EPSG:3857', 'EPSG:4326');
                     this.query.filter.geometry.coordinates(geometry.getCoordinates());
 
                     //this.applyBuffer();
-                    
+
                     evt.feature.on('change', function(evt) {
                         var geometry = evt.target.getGeometry().clone();
                         geometry.transform('EPSG:3857', 'EPSG:4326');
@@ -669,7 +670,7 @@ define(['jquery',
 
             clearDrawingFeatures: function(){
                 if (this.bufferFeatureSource){
-                    this.bufferFeatureSource.clear();                 
+                    this.bufferFeatureSource.clear();
                 }
                 if (this.drawingFeatureSource){
                     this.drawingFeatureSource.clear();
@@ -680,7 +681,7 @@ define(['jquery',
                 var self = this;
                 var params = {
                     filter: ko.toJSON(this.query.filter)
-                }; 
+                };
                 if(this.query.filter.buffer.width() > 0 && this.drawingFeatureSource.getFeatures().length > 0){
                     $.ajax({
                         type: "GET",
@@ -691,15 +692,15 @@ define(['jquery',
                         success: function(results){
                             var source = new ol.source.GeoJSON(({object:{type: 'FeatureCollection', features: [{type:'Feature', geometry: JSON.parse(results)}]}}));
                             var feature = source.getFeatures()[0];
-                            
+
                             feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
-                            self.bufferFeatureSource.clear();  
+                            self.bufferFeatureSource.clear();
                             self.bufferFeatureSource.addFeature(feature);
                         },
                         error: function(){}
-                    });                    
+                    });
                 }else{
-                    this.bufferFeatureSource.clear();  
+                    this.bufferFeatureSource.clear();
                 }
             },
 
@@ -717,7 +718,7 @@ define(['jquery',
                 if(expand){
                     this.slideToggle(ele, 'show');
                 }else{
-                    this.slideToggle(ele, 'hide');               
+                    this.slideToggle(ele, 'hide');
                 }
             },
 
@@ -737,14 +738,14 @@ define(['jquery',
                 }
 
                 if (!showOrHide){
-                    ele.slideToggle('slow');                    
+                    ele.slideToggle('slow');
                 }
             },
 
             restoreState: function(filter, expanded){
                 this.map.map.once('change:size', function(){
                     if(typeof filter !== 'undefined' && 'geometry' in filter && filter.geometry.coordinates.length > 0){
-                        this.query.filter.inverted(ko.utils.unwrapObservable(filter.inverted));                        
+                        this.query.filter.inverted(ko.utils.unwrapObservable(filter.inverted));
                         this.query.filter.geometry.type(ko.utils.unwrapObservable(filter.geometry.type));
                         this.query.filter.geometry.coordinates(ko.utils.unwrapObservable(filter.geometry.coordinates));
                         this.query.filter.buffer.width(ko.utils.unwrapObservable(filter.buffer.width));
@@ -753,7 +754,7 @@ define(['jquery',
                         var coordinates = this.query.filter.geometry.coordinates();
                         var type = this.query.filter.geometry.type();
                         if(type === 'bbox'){
-                            this.map.map.on('moveend', this.onMoveEnd, this); 
+                            this.map.map.on('moveend', this.onMoveEnd, this);
 
                             var extent = ol.proj.transformExtent(coordinates, 'EPSG:4326', 'EPSG:3857');
                             this.zoomToExtent(extent);
