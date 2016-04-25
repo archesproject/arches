@@ -313,19 +313,19 @@ class Concept(object):
         relationtypes = ' or '.join(["d.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         sql = """WITH RECURSIVE children AS (
                 SELECT d.conceptidfrom, d.conceptidto, c2.value, c.value as valueto, c2.valueid, c.valueid as valueidto, c.valuetype, 1 AS depth       ---|NonRecursive Part
-                    FROM concepts.relations d
-                    JOIN concepts.values c ON(c.conceptid = d.conceptidto)
-                    JOIN concepts.values c2 ON(c2.conceptid = d.conceptidfrom)
+                    FROM relations d
+                    JOIN values c ON(c.conceptid = d.conceptidto)
+                    JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
                     WHERE d.conceptidfrom = '{0}'
                     and c2.valuetype = '{3}'
                     and c.valuetype in ('{2}')
                     and ({1})
                 UNION
                     SELECT d.conceptidfrom, d.conceptidto, v2.value, v.value as valueto, v2.valueid, v.valueid as valueidto, v.valuetype, depth+1      ---|RecursivePart
-                    FROM concepts.relations  d
+                    FROM relations  d
                     JOIN children b ON(b.conceptidto = d.conceptidfrom)
-                    JOIN concepts.values v ON(v.conceptid = d.conceptidto)
-                    JOIN concepts.values v2 ON(v2.conceptid = d.conceptidfrom)
+                    JOIN values v ON(v.conceptid = d.conceptidto)
+                    JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
                     WHERE v2.valuetype = '{3}'
                     and v.valuetype in ('{2}')
                     and ({1})
