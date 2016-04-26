@@ -6,7 +6,7 @@ from os import listdir
 from os.path import isfile, join
 from django.core import management
 from django.db import connection, transaction
-import concepts
+# import concepts
 from .. import utils
 from arches.app.models.resource_graphs import ResourceGraph
 import json
@@ -212,25 +212,25 @@ def get_root_node_id(edge_list):
         if edge['SOURCE'] not in target_nodes:
             return edge['SOURCE']
 
-def link_entitytypes_to_concepts(nodes):
-    """
-    Links entitytypes to their associated concepts
+# def link_entitytypes_to_concepts(nodes):
+#     """
+#     Links entitytypes to their associated concepts
 
-    """
+#     """
 
-    cursor = connection.cursor()
-    cursor.execute("""SELECT legacyoid FROM concepts.concepts 
-        WHERE conceptid = '00000000-0000-0000-0000-000000000003'
-        """)
-    domainlegacyid = cursor.fetchone()[0]
+#     cursor = connection.cursor()
+#     cursor.execute("""SELECT legacyoid FROM concepts.concepts 
+#         WHERE conceptid = '00000000-0000-0000-0000-000000000003'
+#         """)
+#     domainlegacyid = cursor.fetchone()[0]
 
-    cursor.execute("""SELECT legacyoid FROM concepts.concepts 
-        WHERE conceptid = '00000000-0000-0000-0000-000000000004'
-        """)
-    otherlegacyid = cursor.fetchone()[0]
+#     cursor.execute("""SELECT legacyoid FROM concepts.concepts 
+#         WHERE conceptid = '00000000-0000-0000-0000-000000000004'
+#         """)
+#     otherlegacyid = cursor.fetchone()[0]
 
-    for node in nodes:
-        if node['BUSINESSTABLE'] == 'domains':
-            concepts.insert_concept_relations(str(domainlegacyid), 'hasCollection', node["LABEL"])
-        else:
-            concepts.insert_concept_relations(str(otherlegacyid), 'hasEntity', node["LABEL"])
+#     for node in nodes:
+#         if node['BUSINESSTABLE'] == 'domains':
+#             concepts.insert_concept_relations(str(domainlegacyid), 'hasCollection', node["LABEL"])
+#         else:
+#             concepts.insert_concept_relations(str(otherlegacyid), 'hasEntity', node["LABEL"])
