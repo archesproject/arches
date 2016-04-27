@@ -102,7 +102,7 @@ class Concept(object):
         _cache[self.id] = self
 
         if semantic == True:
-            pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
+            pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties') | Q(relationtype__category = 'Ontology Relations')
         else:
             pathway_filter = Q(relationtype = 'member')
 
