@@ -764,12 +764,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     padding: 10px;
 }
-#nodeCrud p {
-    font-family: sans-serif;
-    font-size: 16px;
-    line-height: 20px;
-    margin: 0;
-}
 .morphsearch {
     width: 200px;
     min-height: 30px;
@@ -1263,37 +1257,6 @@ ul.nav.nav-tabs.nav-justified {
     overflow-x: scroll;
     padding: 0 0 10px 10px;
 }
-div.jqtree-element.jqtree_common:hover {
-    background-color: #49596A;
-}
-ul.jqtree-tree ul.jqtree_common {
-    list-style: none outside;
-    margin-left: 12px;
-    margin-right: 0;
-    margin-bottom: 2px;
-    display: block;
-}
-ul.jqtree-tree .jqtree-title {
-    color: #93a6b9;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    font-size: 13px;
-}
-ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
-    background: none;
-    background-color: #49596A;
-    text-shadow: none;
-}
-div.jqtree-element.jqtree_common {
-    text-overflow: ellipsis;
-    padding: 2px 0;
-}
-ul.jqtree-tree .jqtree-element {
-    color: #93a6b9;
-}
-ul.jqtree_common li.jqtree-folder {
-    margin-bottom: 4px;
-}
 #container .table-hover > tbody > tr:hover {
     background-color: #4682B4;
     color: #fff;
@@ -1565,9 +1528,6 @@ div.dropdown-menu.open {
 }
 .node .node-collected, .link.link-collected {
     stroke-width: 3px;
-}
-#nodeCrud.hidden, .morphsearch-input::-ms-clear {
-    display: none;
 }
 .morphsearch-close:hover.morphsearch-close::before, .morphsearch-close:hover.morphsearch-close::after, .morphsearch.open ~ .overlay {
     opacity: 1;
@@ -2220,7 +2180,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .relative, .slide, .relative {
     position: relative;
 }
-.help-close:hover, .library-close-btn:hover, .clear-selection-link:hover, #aside .nav-tabs a i:hover, .node-note, .jqtree-title.jqtree_common:hover, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover {
+.help-close:hover, .library-close-btn:hover, .clear-selection-link:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .btn-flat:focus, .help-close:hover {
     color: #fff;
 }
 .tile-record:hover, .note-editable, .note-editable, .tile-record:hover {
@@ -2242,6 +2202,189 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .btn-flat-trans, .btn-flat.right-border:hover, .btn-flat.right-border:focus {
     background: transparent;
     color: #777;
+}
+.concept_tree {
+    padding: 13px;
+}
+ul.jqtree-tree div.jqtree_common {
+    display: block;
+    color: #333;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    font-weight: 700;
+    background: linear-gradient(top, #fafafa0%, #eee100%);
+    -webkit-border-radius: 3px!important;
+    border-radius: 3px!important;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    margin: 5px 0;
+    padding: 5px 10px;
+}
+ul.jqtree-tree div.jqtree_common:hover {
+    color: #2ea8e5;
+    background: #fff;
+}
+ul.jqtree-tree .jqtree-toggler {
+    position: absolute;
+}
+.jqtree-tree li.jqtree-folder {
+    display: block;
+    position: relative;
+    font-size: 13px;
+    line-height: 20px;
+    margin: 0;
+    padding: 0;
+}
+.jqtree-tree .jqtree-title.jqtree-title-folder {
+    position: relative;
+    left: 1.5em;
+}
+.jqtree-tree .jqtree-title {
+    color: #1C4257;
+    vertical-align: middle;
+    margin-left: 0;
+}
+.jqtree-tree .jqtree-loading > div a {
+    content: url(../img/select2-spinner.gif);
+}
+ul.jqtree-tree li.jqtree-ghost {
+    margin: 0;
+}
+.jqtree-border {
+    border: dashed 1px #00f;
+    -webkit-border-radius: 3px!important;
+    border-radius: 3px!important;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding: 0 5px;
+}
+ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
+    background-color: #fff;
+    opacity: 0.6;
+    border: dashed 1px #00f;
+    height: 35px;
+    width: 100%;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+.concept_result {
+    font-weight: 700;
+}
+.concept_result_schemaname {
+    font-size: 11px;
+    padding-left: 10px;
+}
+.node-current {
+    stroke: #b3b3b3;
+    stroke-width: 2px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+.node-current-label {
+    stroke: #999;
+    font-size: 21px;
+    font-weight: 900;
+    fill: #fcfcfc;
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+.node-descendent {
+    stroke: #ededed;
+    fill: #fefefe;
+    opacity: 1.;
+    stroke-width: 4px;
+    cursor: pointer;
+}
+.node-descendent-label {
+    font-size: 12px;
+    font-weight: 400;
+    fill: #c2c2c2;
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+.node-ancestor {
+    stroke: #ededed;
+    fill: #fefefe;
+    opacity: 1.;
+    stroke-width: 1px;
+    cursor: pointer;
+}
+.node-ancestor-label {
+    font-size: 16px;
+    font-weight: 300;
+    fill: #a2a2a2;
+    opacity: 1.;
+    text-anchor: middle;
+    pointer-events: none;
+}
+.link-highlight {
+    stroke: #000;
+    stroke-width: 9px;
+}
+.relatedlink {
+    stroke: #E4E4E4;
+    stroke-width: 3px;
+    stroke-dasharray: 8, 5;
+}
+.linkMouseover {
+    stroke: #a1a1a1;
+    stroke-opacity: .6;
+    stroke-width: 5px;
+}
+.nodeLabels {
+    font-size: 11px;
+    fill: #454545;
+    text-anchor: middle;
+}
+.node_info {
+    width: 320px;
+    height: auto;
+    background-color: #FFF;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    padding: 15px;
+}
+.node-selected {
+    fill: #aacdec;
+    stroke: #115fa5;
+}
+.node-current-over, .node-ancestor-over {
+    stroke: #000;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+.node-current-neighbor, .node-ancestor-neighbor {
+    stroke: #115fa5;
+    stroke-width: 3px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+.node-descendent-over, .node-descendent-neighbor {
+    stroke: #115fa5;
+    stroke-width: 8px;
+    fill: #dcecfa;
+    opacity: 1.;
+    cursor: pointer;
+}
+#nodeCrud p, .node_info p {
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+    margin: 0;
+}
+#nodeCrud.hidden, .morphsearch-input::-ms-clear, ul.jqtree-tree li.jqtree-ghost span.jqtree-circle, .node_info.hidden {
+    display: none;
 }
 @media min-width 992px {
     #page-content {
