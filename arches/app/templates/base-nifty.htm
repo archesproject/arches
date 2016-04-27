@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% block header %}
                 <div id="navbar-container" class="boxed">
                     <div class="navbar-header">
-                        <a href="index.html" class="navbar-brand">
+                        <a href="{% url 'home' %}" class="navbar-brand">
                             <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
                             <div class="brand-title">
                                 <span class="brand-text">Arches</span>
@@ -196,6 +196,110 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
                     <div id="mainnav">
                         {% block navbar %}
+                        <ul id="mainnav-menu" class="list-group">
+
+                            <!-- Tools -->
+                            <li class="list-header">Tools</li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-tachometer"></i>
+                                    <span class="menu-title">
+                                        <strong>Dashboard</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-building-o"></i>
+                                    <span class="menu-title">
+                                        <strong>Add New Resource</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'config' %}">
+                                    <i class="ti-alarm-clock"></i>
+                                    <span class="menu-title">
+                                        <strong>System Settings</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'graph' '' %}">
+                                    <i class="fa fa-bookmark"></i>
+                                    <span class="menu-title">
+                                        <strong>Resource Designer</strong>
+                                    </span>
+                                </a>
+
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-server"></i>
+                                    <span class="menu-title">
+                                        <strong>Map Server Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="menu-title">
+                                        <strong>Field Project Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-cloud-upload"></i>
+                                    <span class="menu-title">
+                                        <strong>Import/Export Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-user-md"></i>
+                                    <span class="menu-title">
+                                        <strong>Profile Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li class="list-divider-dark"></li>
+
+                            <!-- Tools -->
+                            <li class="list-header">Modules</li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'rdm' '' %}">
+                                    <i class="fa fa-align-left"></i>
+                                    <span class="menu-title">
+                                        RDM
+
+                                    </span>
+                                </a>
+                            </li>
+
+                        </ul>
                         {% endblock navbar %}
                     </div>
                 </nav>
@@ -224,6 +328,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block javascript %}
 {% include 'javascript.htm' %}
 {% endblock javascript %}
+<script>
+require(["jquery"], function ($) {
+    window.jQuery = $;
+    require(["plugins/nifty"]);
+});
+</script>
 {% if main_script %}
 <script>require(["{{ main_script }}"]);</script>
 {% endif %}
