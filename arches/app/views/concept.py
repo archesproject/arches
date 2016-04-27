@@ -24,7 +24,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.views.decorators.csrf import csrf_exempt
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.contrib.auth.decorators import permission_required
+from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -46,7 +46,7 @@ def get_sparql_providers(endpoint=None):
     else:
         return sparql_providers
 
-@permission_required('edit')
+@group_required('edit')
 def rdm(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)    
     languages = models.DLanguages.objects.all()
@@ -66,7 +66,7 @@ def rdm(request, conceptid):
 
 
 
-@permission_required('edit')
+@group_required('edit')
 @csrf_exempt
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
