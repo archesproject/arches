@@ -10,8 +10,9 @@ require([
     'views/rdm/modals/export-scheme-form',
     'views/rdm/modals/delete-scheme-form',
     'views/rdm/modals/import-scheme-form',
+    'views/page-view',
     'jquery-validate',
-], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm) {
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch, AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, PageView) {
     $(document).ready(function() {
         window.onpopstate = function(event) {
           //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
@@ -36,10 +37,10 @@ require([
             model: concept,
             mode: ''
         });
-        var conceptsearch = new ConceptSearch({ 
+        var conceptsearch = new ConceptSearch({
             el: $('#rdm-concept-search-container')[0],
             model: concept
-        });       
+        });
 
         concept.on({
             'change': function(){
@@ -67,8 +68,8 @@ require([
             },
             'conceptSelected': function(conceptid){
                 concept.clear();
-                concept.set('id', conceptid);   
-                conceptReport.mode = '';                
+                concept.set('id', conceptid);
+                conceptReport.mode = '';
                 conceptReport.render();
             }
         });
@@ -152,31 +153,6 @@ require([
             })
         });
 
-        $(window).scroll(function() {
-            var topToFooterPx = $(".footer").offset().top - $(window).scrollTop();
-
-            if (window.scrollY >= topToHeaderPx) {
-                appHeader.addClass("fixed");
-                if (conceptReport.$el.height() > sidebar.height()) {
-                    sidebar.addClass("fixed-menu");
-                    sidebar.css("width", sidebarWidth);
-                    conceptReport.$el.css("margin-top", "95px");
-                    if (topToFooterPx < topToSidebarBottomPx) {
-                        sidebar.css("margin-top", topToFooterPx - topToSidebarBottomPx);
-                    } else {
-                        sidebar.css("margin-top", "10px");
-                    }
-                } else {
-                    sidebar.css("margin-top", "90px");
-                    conceptReport.$el.css("margin-top", "90px");
-                }
-            } else {
-                appHeader.removeClass("fixed");
-                sidebar.removeClass("fixed-menu");
-                sidebar.css("margin-top", "0px");
-                conceptReport.$el.removeClass("fixed-spacer");
-                conceptReport.$el.css("margin-top", "0px");
-            }
-        });
+        new PageView();
     });
 });
