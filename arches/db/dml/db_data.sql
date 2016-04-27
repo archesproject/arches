@@ -21,6 +21,13 @@ SET client_min_messages = warning;
 --
 
 INSERT INTO d_languages VALUES ('en-US', 'ENGLISH', true);
+INSERT INTO d_languages VALUES ('en', 'ENGLISH', true);
+INSERT INTO d_languages VALUES ('fr', 'FRENCH', true);
+INSERT INTO d_languages VALUES ('zh', 'CHINESE', true);
+INSERT INTO d_languages VALUES ('de', 'GERMAN', true);
+INSERT INTO d_languages VALUES ('pt', 'PORTUGUESE', true);
+INSERT INTO d_languages VALUES ('ru', 'RUSSIAN', true);
+INSERT INTO d_languages VALUES ('el', 'GREEK', true);
 
 
 --
@@ -84,12 +91,19 @@ INSERT INTO d_relation_types VALUES ('hasTopConcept', 'Properties', 'skos');
 INSERT INTO d_relation_types VALUES ('hasCollection', 'Entitytype Relations', 'arches');
 INSERT INTO d_relation_types VALUES ('hasEntity', 'Entitynode Relations', 'arches');
 
+
+--Arches ontology relations between to classes
+INSERT INTO d_relation_types VALUES ('subClassOf', 'Ontology Relations', 'arches');
+INSERT INTO d_relation_types VALUES ('subPropertyOf', 'Ontology Relations', 'arches');
+
+
 --OWL Class types and Arches specific types
 INSERT INTO d_node_types VALUES ('GroupingNode', 'arches');
 INSERT INTO d_node_types VALUES ('ConceptScheme', 'skos');
 INSERT INTO d_node_types VALUES ('Concept', 'skos');
 INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
+INSERT INTO d_node_types VALUES ('Ontology', 'arches');
 
 
 --Data types
@@ -104,6 +118,7 @@ INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
+INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ConceptScheme', 'ONTOLOGY');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'GroupingNode', 'ENTITY NODES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'Collection', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
@@ -113,6 +128,7 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'hasTopConcept');
 
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000002', 'prefLabel', 'Ontology', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000003', 'prefLabel', 'Dropdown Lists', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', 'prefLabel', 'Entity Nodes', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');

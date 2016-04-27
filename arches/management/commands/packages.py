@@ -35,6 +35,7 @@ from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models import models
 import csv
+from arches.app.utils.data_management.arches_file import ArchesFile
 
 class Command(BaseCommand):
     """
@@ -329,7 +330,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        resource_graphs.load_graphs(path=data_source)
+        ArchesFile(data_source).import_concepts()
 
     def start_livereload(self):
         from livereload import Server

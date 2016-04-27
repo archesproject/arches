@@ -41,7 +41,6 @@ class Command(BaseCommand):
         parser.add_argument('-i', '--index', action='store', dest='index', default='',
             choices=['concept', ''],
             help='Index Type; concept=Indexes just the concepts, ')
-    )
 
     def handle(self, *args, **options):
         if options['delete'] != '':
