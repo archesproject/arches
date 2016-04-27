@@ -3,7 +3,6 @@ import sys
 import uuid
 import traceback
 import unicodecsv
-import concepts
 import string
 from time import time
 from os import listdir
