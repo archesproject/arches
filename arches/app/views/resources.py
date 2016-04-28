@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import re
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import permission_required
+from arches.app.utils.decorators import group_required
 from django.conf import settings
 from django.db import transaction
 from arches.app.models import models
@@ -37,7 +37,7 @@ from django.db.models import Max, Min
 def report(request, resourceid):
     raise NotImplementedError('Reports are not yet implemented.')
 
-@permission_required('edit')
+@group_required('edit')
 @csrf_exempt
 def resource_manager(request, resourcetypeid='', form_id='default', resourceid=''):
 
