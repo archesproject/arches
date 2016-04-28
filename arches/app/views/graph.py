@@ -26,6 +26,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
+from arches.app.models.ontology import Ontology
 
 
 @permission_required('edit')
@@ -154,7 +155,7 @@ def move_node(request, nodeid):
         return JSONResponse(updated_nodes_and_edges)
 
     return HttpResponseNotFound()
-
+    
 @permission_required('edit')
 def clone(request, nodeid):
     if request.method == 'POST':
@@ -168,3 +169,6 @@ def clone(request, nodeid):
         return JSONResponse(graph)
 
     return HttpResponseNotFound()
+
+def get_related_nodes(request, ontology_concept_id):
+    properties = Ontology().get_related_properties(id=ontology_concept_id, lang=lang)

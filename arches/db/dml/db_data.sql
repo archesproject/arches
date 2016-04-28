@@ -95,7 +95,8 @@ INSERT INTO d_relation_types VALUES ('hasEntity', 'Entitynode Relations', 'arche
 --Arches ontology relations between to classes
 INSERT INTO d_relation_types VALUES ('subClassOf', 'Ontology Relations', 'arches');
 INSERT INTO d_relation_types VALUES ('subPropertyOf', 'Ontology Relations', 'arches');
-
+INSERT INTO d_relation_types VALUES ('hasDomainClass', 'Ontology Relations', 'arches');
+INSERT INTO d_relation_types VALUES ('hasRangeClass', 'Ontology Relations', 'arches');
 
 --OWL Class types and Arches specific types
 INSERT INTO d_node_types VALUES ('GroupingNode', 'arches');

@@ -92,7 +92,10 @@ class Concept(object):
             self.nodetype = value.nodetype_id
             self.legacyoid = value.legacyoid
 
-    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
+    def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, 
+        include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, 
+        lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
+
         if id != '':
             self.load(models.Concept.objects.get(pk=id))
         elif legacyoid != '':
