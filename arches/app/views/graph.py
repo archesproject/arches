@@ -158,7 +158,7 @@ def move_node(request, nodeid):
 @permission_required('edit')
 def clone(request, nodeid):
     if request.method == 'POST':
-        data = QueryDict(request.body)
+        data = JSONDeserializer().deserialize(request.body)
         graph = Graph(nodeid).copy()
         if 'name' in data:
             graph.root.name = data['name']

@@ -248,17 +248,16 @@ class Graph(object):
         new_nodegroups = {}
 
         copy_of_self = Graph(self.root.pk)
-        for node_id, node in copy_of_self.nodes.iteritems():
-            is_collector = False
-            if node.nodegroup:
-                is_collector = (node.pk == node.nodegroup.pk)
+        node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
+
+        for node_id in node_ids:
+            node = copy_of_self.nodes[node_id]
+            is_collector = node.is_collector()
             node.pk = uuid.uuid1()
             if is_collector:
                 new_nodegroups[node.nodegroup.pk] = node.nodegroup
                 node.nodegroup_id = node.nodegroup.pk = node.pk
-
-        for node_id, node in copy_of_self.nodes.iteritems():
-            if node.nodegroup and node.nodegroup.pk in new_nodegroups:
+            elif node.nodegroup and node.nodegroup.pk in new_nodegroups:
                 node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
                 node.nodegroup = new_nodegroups[node.nodegroup.pk]
 
