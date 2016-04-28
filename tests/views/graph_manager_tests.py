@@ -36,7 +36,6 @@ class GraphManagerViewTests(ArchesTestCase):
         cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
         cls.NODE_COUNT = 111
         cls.PLACE_NODE_COUNT = 17
-        cls.RESOURCE_COUNT = 111
         cls.client = Client()
 
     @classmethod
@@ -63,10 +62,11 @@ class GraphManagerViewTests(ArchesTestCase):
         Test the graph manager view
 
         """
+        self.client.login(username='admin', password='admin')
         url = reverse('graph', kwargs={'nodeid':''})
         response = self.client.get(url)
-        resources = json.loads(response.context['resources'])
-        self.assertEqual(len(resources), 4)
+        graphs = json.loads(response.context['graphs'])
+        self.assertEqual(len(graphs), 4)
 
         url = reverse('graph', kwargs={'nodeid':self.ROOT_ID})
         response = self.client.get(url)
@@ -83,7 +83,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test updating a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
-
+        self.client.login(username='admin', password='admin')
         url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
         node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
         node.name = "new node name"
@@ -107,7 +107,7 @@ class GraphManagerViewTests(ArchesTestCase):
         Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
 
         """
-
+        self.client.login(username='admin', password='admin')
         url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
@@ -120,3 +120,16 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.assertEqual(node_count, new_count)
         self.assertEqual(edge_count, new_count)
+
+    def test_node_clone(self):
+        """
+        Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
+
+        """
+        self.client.login(username='admin', password='admin')
+        url = reverse('clone_graph', kwargs={'nodeid':self.ROOT_ID})
+        post_data = JSONSerializer().serialize({'name': 'test cloned graph'})
+        content_type = 'application/x-www-form-urlencoded'
+        response = self.client.post(url, post_data, content_type)
+        response_json = json.loads(response.content)
+        self.assertEqual(len(response_json['nodes']), self.NODE_COUNT+1)

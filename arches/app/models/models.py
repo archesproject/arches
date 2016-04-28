@@ -35,8 +35,8 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class BranchMetadata(models.Model):
-    branchmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+class GraphMetadata(models.Model):
+    graphmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -46,7 +46,7 @@ class BranchMetadata(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'branch_metadata'
+        db_table = 'graph_metadata'
 
 
 class Card(models.Model):
@@ -66,11 +66,11 @@ class Card(models.Model):
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
-    card = models.ForeignKey(Card, db_column='cardid')
+    card = models.ForeignKey('Card', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
+    function = models.ForeignKey('Function', db_column='functionid')
     inputmask = models.TextField(blank=True, null=True)
     inputlabel = models.TextField(blank=True, null=True)
-
 
     class Meta:
         managed = True
@@ -143,7 +143,7 @@ class Edge(models.Model):
     ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -193,6 +193,18 @@ class FormXCard(models.Model):
         unique_together = (('form', 'card'),)
 
 
+class Function(models.Model):
+    functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    functiontype = models.TextField(blank=True, null=True)
+    function = models.TextField()
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'functions'
+
+
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     cardinality = models.TextField(blank=True, default='n')
@@ -214,10 +226,12 @@ class Node(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
+    isresource = models.BooleanField()
+    isactive = models.BooleanField()
     ontologyclass = models.TextField()
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    branchmetadata = models.ForeignKey(BranchMetadata, db_column='branchmetadataid', blank=True, null=True)
+    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
     def _traverse_graph(self):

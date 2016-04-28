@@ -8,9 +8,10 @@ define([
         el: $('body'),
 
         constructor: function (options) {
-            this.viewModel = options.viewModel ? options.viewModel : {};
+            this.viewModel = (options && options.viewModel) ? options.viewModel : {};
 
             _.defaults(this.viewModel, {
+                loading: ko.observable(false),
                 showTabs: ko.observable(true),
                 tabsActive: ko.observable(false)
             });

@@ -15,75 +15,70 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "base-nifty.htm" %}
 {% load staticfiles %}
-{% block content %}
- <!--=== Breadcrumbs ===-->
-<div class="breadcrumbs" style="padding-bottom: 0px; border-bottom-width: 0px;">
-    <div class="container">
+{% block body %}
+<body>
+   <div id="container" class="cls-container">
 
-        <!-- App Name -->
-        <h1 class="pull-left arches-breadcrumb-title">Login to Arches</h1>
-    </div>
-</div><!--/breadcrumbs-->
-<!--=== End Breadcrumbs ===-->
+       <!-- BACKGROUND IMAGE -->
+       <!--===================================================-->
+       <div id="bg-overlay" class="bg-img img-login"></div>
 
-<!-- row -->
-<div class="block-description padding-top-20" style="background: #f4f4f4;">
-    <div class="container content padding-top-0">
-        <div class="row">
 
-            <div class="col-sm-6 col-sm-offset-3">
+       <!-- HEADER -->
+       <div class="cls-header cls-header-lg">
+           <div class="cls-brand">
+               <a class="box-inline" href="index.html">
+                   <!-- <img alt="Arches Admin" src="img/logo.png" class="brand-icon"> -->
+                   <span class="brand-title">Arches <span class="text-thin">Account Login</span></span>
+               </a>
+           </div>
+       </div>
 
-                <div class="well">
 
-                    <div class="row">
-                        <div class="col-sm-4 col-sm-offset-4">
-                            <div class="">
-                                <h2 style="text-align: center;">Sign In</h2>
+       <!-- LOGIN FORM -->
+       <div class="cls-content">
+           <div class="cls-content-sm panel login-panel">
+               <div class="panel-body">
+                   <h3 class="login-panel-header">Sign In to your account</h3>
+                   <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                       {% csrf_token %}
+                       <div class="form-group">
+                           <div class="input-group">
+                               <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                               <input type="text" class="form-control input-lg" placeholder="Username" name='username'>
+                           </div>
+                       </div>
+                       <div class="form-group">
+                           <div class="input-group">
+                               <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                               <input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-xs-12">
+                               <div class="form-group text-right">
+                               <button class="btn btn-success text-uppercase" type="submit">Sign In</button>
+                               </div>
+                           </div>
+                       </div>
+                       <div class="row" style="padding-top:10px;">
+                            <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4>Login failed</h4>
+                                <span>Invalid username and/or password.</span>
                             </div>
                         </div>
-                    </div>
+                   </form>
+               </div>
+           </div>
+           <div class="pad-ver hidden">
+               <a href="arches_password_reminder.html" class="btn-link mar-rgt">Forgot password ?</a>
+               <a href="arches_register.html" class="btn-link mar-lft">Create a new account</a>
+           </div>
+       </div>
 
-                    <div class="row">
-                        <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
-                            <div class="col-xs-12 col-md-8 col-md-offset-2">
-
-                                <div class="input-group margin-bottom-20">
-                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                    <input type="text" class="form-control" placeholder="Username" name='username'>
-                                </div>
-
-                                <div class="input-group margin-bottom-20">
-                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                    <input type="password" class="form-control" placeholder="Password" name='password'>
-                                </div>
-                  
-                                <div class="row">
-                                    <div class="col-md-10 col-md-offset-1">
-                                        <button type="submit" class="btn-u btn-block margin-bottom-10" id="login-btn">Log In</button>
-                                        <!-- Uncomment the below when automated sign up is made available -->
-                                        <!-- <span>Don't Have Account? <a class="color-green margin-top-10 text-center" href="page_registration1.html">Sign Up!</a></span>  -->
-                                    </div>
-                                </div>
-
-                                <div class="row" style="padding-top:10px;">
-                                    <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-                                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                        <h4>Login failed</h4>
-                                        <span>Invalid username and/or password.</span>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <!-- end row -->
-     
-    </div> 
-</div>  
-{% endblock %}
+   </div>
+</body>
+{% endblock body %}

@@ -162,9 +162,9 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='BranchMetadata',
+            name='GraphMetadata',
             fields=[
-                ('branchmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('graphmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
                 ('deploymentfile', models.TextField(null=True, blank=True)),
@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('version', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'branch_metadata',
+                'db_table': 'graph_metadata',
                 'managed': True,
             },
         ),
@@ -282,7 +282,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('branchmetadata', models.ForeignKey(blank=True, db_column='branchmetadataid', null=True, to='models.BranchMetadata')),
+                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
             ],
             options={
                 'db_table': 'edges',
@@ -337,15 +337,31 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Function',
+            fields=[
+                ('functionid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('functiontype', models.TextField(blank=True, null=True)),
+                ('function', models.TextField()),
+                ('name', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'functions',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
+                ('isresource', models.BooleanField()),
+                ('isactive', models.BooleanField()),
                 ('ontologyclass', models.TextField()),
                 ('datatype', models.TextField()),
-                ('branchmetadata', models.ForeignKey(blank=True, db_column='branchmetadataid', null=True, to='models.BranchMetadata')),
+                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
             ],
             options={
                 'db_table': 'nodes',
@@ -561,6 +577,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
+            name='function',
+            field=models.ForeignKey(db_column='functionid', to='models.Function'),
+        ),
+        migrations.AddField(
+            model_name='cardxnodexwidget',
             name='node',
             field=models.ForeignKey(db_column='nodeid', to='models.Node'),
         ),
@@ -601,7 +622,7 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'card', 'widget')]),
         ),
 
-        CreateAutoPopulateUUIDField('branch_metadata', ['branchmetadataid']),
+        CreateAutoPopulateUUIDField('graph_metadata', ['graphmetadataid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),

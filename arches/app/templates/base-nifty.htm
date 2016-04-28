@@ -35,12 +35,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="author" content="">
 
 	{% block css %}
-        <link href="{% static 'css/arches-nifty.css' %}" rel="stylesheet">
+    <link href="{% static 'css/arches-nifty.css' %}" rel="stylesheet">
     {% endblock css%}
 
 </head>
 
-
+{% block body %}
 <body class="scroll-y">
 
     <div class="wrapper">
@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% block header %}
                 <div id="navbar-container" class="boxed">
                     <div class="navbar-header">
-                        <a href="index.html" class="navbar-brand">
+                        <a href="{% url 'home' %}" class="navbar-brand">
                             <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
                             <div class="brand-title">
                                 <span class="brand-text">Arches</span>
@@ -122,13 +122,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </ul>
                             </li>
 
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                </span>
+                                <div class="username hidden-xs">
+                                {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
+                            </a>
                             <li id="dropdown-user" class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
-                                    <span class="pull-right">
-                                        <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
-                                    </span>
-                                    <div class="username hidden-xs">John Doe</div>
-                                </a>
 
                                 <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
 
@@ -185,6 +186,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </header>
             <div class="boxed">
 
+                <div class="loading-mask" data-bind="visible:loading()"></div>
+
                 <div id="content-container" style="padding-bottom: 20px;">
                     {% block content %}
                     {% endblock content %}
@@ -193,6 +196,110 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
                     <div id="mainnav">
                         {% block navbar %}
+                        <ul id="mainnav-menu" class="list-group">
+
+                            <!-- Tools -->
+                            <li class="list-header">Tools</li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-tachometer"></i>
+                                    <span class="menu-title">
+                                        <strong>Dashboard</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-building-o"></i>
+                                    <span class="menu-title">
+                                        <strong>Add New Resource</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'config' %}">
+                                    <i class="ti-alarm-clock"></i>
+                                    <span class="menu-title">
+                                        <strong>System Settings</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'graph' '' %}">
+                                    <i class="fa fa-bookmark"></i>
+                                    <span class="menu-title">
+                                        <strong>Resource Designer</strong>
+                                    </span>
+                                </a>
+
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-server"></i>
+                                    <span class="menu-title">
+                                        <strong>Map Server Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="menu-title">
+                                        <strong>Field Project Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-cloud-upload"></i>
+                                    <span class="menu-title">
+                                        <strong>Import/Export Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-user-md"></i>
+                                    <span class="menu-title">
+                                        <strong>Profile Manager</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li class="list-divider-dark"></li>
+
+                            <!-- Tools -->
+                            <li class="list-header">Modules</li>
+
+                            <!--Menu list item-->
+                            <li>
+                                <a href="{% url 'rdm' '' %}">
+                                    <i class="fa fa-align-left"></i>
+                                    <span class="menu-title">
+                                        RDM
+
+                                    </span>
+                                </a>
+                            </li>
+
+                        </ul>
                         {% endblock navbar %}
                     </div>
                 </nav>
@@ -215,22 +322,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
-	{% block javascript %}
-        {% include 'javascript.htm' %}
-    {% endblock javascript %}
-
-    {% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
-      ga('send', 'pageview');
-
-    </script>
-    {% endif %}
 </body>
+{% endblock body %}
+
+{% block javascript %}
+{% include 'javascript.htm' %}
+{% endblock javascript %}
+<script>
+require(["jquery"], function ($) {
+    window.jQuery = $;
+    require(["plugins/nifty"]);
+});
+</script>
+{% if main_script %}
+<script>require(["{{ main_script }}"]);</script>
+{% endif %}
+
+{% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
+ga('send', 'pageview');
+
+</script>
+{% endif %}
 
 </html>
