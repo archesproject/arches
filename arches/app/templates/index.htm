@@ -88,7 +88,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         </li>
                         {% endif %}
                         <li class="page-scroll">
-                            <a id="auth-link" href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
+                            <a id="auth-link" href="{% url 'auth' %}?next={% url 'graph' '' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}</a>
                         </li>
                     </ul>
                 </div>
@@ -123,7 +123,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- LAYER -->
                         <div class="tp-caption rs-caption-3 sft" data-x="center" data-hoffset="0" data-y="360" data-speed="800" data-start="3500" data-easing="Power4.easeOut" data-endspeed="300" data-endeasing="Power1.easeIn" data-captionhidden="off" style="z-index: 6">
                             <span class="page-scroll"><a href="#about" class="btn-u btn-brd btn-brd-hover btn-u-light">Learn More</a></span>
-                            <span class="page-scroll"><a href="#portfolio" class="btn-u btn-brd btn-brd-hover btn-u-light">Login In</a></span>
+                            {% if user.username == 'anonymous' %}
+                            <span class="page-scroll"><a href="{% url 'auth' %}?next={% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Login</a></span>
+                            {% endif %}
+                            {% if user.username != 'anonymous' %}
+                            <span class="page-scroll"><a href="{% url 'graph' '' %}" class="btn-u btn-brd btn-brd-hover btn-u-light">Manage Data</a></span>
+                            {% endif %}
                         </div>
                     </li>
 
