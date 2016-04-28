@@ -28,18 +28,14 @@ require([
                 $.ajax({
                     type: "POST",
                     url: 'clone/' + selectedGraph(),
-                    data: {
-                        name: newGraphName()
-                    },
+                    data: JSON.stringify({name: newGraphName()}),
                     success: function(response) {
                         window.location = response.root.nodeid;
                     },
                     failure: function(response) {
                         pageView.viewModel.loading(false);
-                    },
-                    datatype:'JSON'
+                    }
                 });
-                console.log('clone the graph...');
             }
         };
         graph.select = function() {
