@@ -2386,6 +2386,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 #nodeCrud.hidden, .morphsearch-input::-ms-clear, ul.jqtree-tree li.jqtree-ghost span.jqtree-circle, .node_info.hidden {
     display: none;
 }
+.select2-container .select2-choice .select2-arrow b:before {
+    content: "";
+}
 @media min-width 992px {
     #page-content {
         padding: 15px 15px 25px;
