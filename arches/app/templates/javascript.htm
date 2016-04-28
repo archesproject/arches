@@ -9,6 +9,7 @@
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
+            'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '//cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
             'jquery': '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min',
             'js-cookie': '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.1/js.cookie.min',
@@ -39,6 +40,9 @@
         shim: {
             'openlayers': {
                 exports: 'ol'
+            },
+            'nifty': {
+                deps: ['jquery', 'jquery-ui']
             },
             'chosen': {
                 deps: ['jquery']
