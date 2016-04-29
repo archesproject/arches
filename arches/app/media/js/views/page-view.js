@@ -12,7 +12,7 @@ define([
 
             _.defaults(this.viewModel, {
                 loading: ko.observable(false),
-                showTabs: ko.observable(true),
+                showTabs: ko.observable(false),
                 tabsActive: ko.observable(false)
             });
 
