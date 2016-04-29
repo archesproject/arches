@@ -6,8 +6,23 @@ from arches.app.models.concept import Concept, ConceptValue
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Ontology(Concept):
+    """
+    A class with specific methods just for Ontologies
+
+    """
 
     def get_related_properties(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
+        """
+        gets the allowed connections between the given ontology concept class and other ontology classes
+
+        Arguments:
+        ontology_concept_id -- the id of the ontology concept
+
+        Keyword Arguments:
+        lang -- the language of the returned values
+
+        """
+
         ret = {
             'properties': [],
             'classes': []
@@ -39,6 +54,23 @@ class Ontology(Concept):
         return ret
 
     def get_subclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
+        """
+        populates self with just ontological subclasses of itself
+
+        Arguments:
+        id -- id of the ontology class to use as the root, defaults to self.id
+
+        Keyword Arguments:
+        exclude -- a list of value types to exclude from the result
+
+        include -- a list of value types to include in the result
+
+        depth_limit -- level to limit the depth to crawl the tree
+
+        lang -- the language of the returned values
+
+        """
+
         id = id if id != '' else self.id
         if id != '' and id != None:
             self.load(models.Concept.objects.get(pk=id))
