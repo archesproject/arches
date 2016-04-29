@@ -63,7 +63,7 @@ require([
         validations: validations
     });
 
-    viewModel.graphView.on('node-clicked', function (node) {
+    var editNode = function (node) {
         var editNode = graphModel.get('editNode');
         if (editNode() && editNode().dirty()) {
             viewModel.nodeForm.closeClicked(true);
@@ -73,7 +73,9 @@ require([
             node.editing(false);
         });
         node.editing(true);
-    });
+    };
+
+    viewModel.graphView.on('node-clicked', editNode);
 
     viewModel.branchList = new BranchListView({
         el: $('#branch-library'),
@@ -85,6 +87,8 @@ require([
         el: $('#node-listing'),
         graphModel: graphModel
     });
+
+    viewModel.nodeList.on('node-clicked', editNode);
 
     viewModel.permissionsList = new PermissionsListView({
         el: $('#node-permissions')
