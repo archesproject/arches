@@ -102,7 +102,12 @@ class Concept(object):
             self.load(models.Concept.objects.get(legacyoid=legacyoid))
 
         _cache = kwargs.pop('_cache', {})
-        _cache[self.id] = self
+        _cache[self.id] = Concept({
+            "id": self.id,
+            "nodetype": self.nodetype,
+            "legacyoid": self.legacyoid,
+            "relationshiptype": self.relationshiptype
+        })
 
         if semantic == True:
             pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties') | Q(relationtype__category = 'Ontology Relations')
@@ -140,7 +145,7 @@ class Concept(object):
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
                         #print 'relation.conceptto_id in _cache: %s' % (str(relation.conceptto_id) in _cache)
-                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else Concept().get(id=relation.conceptto_id, include_subconcepts=include_subconcepts,
+                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id, include_subconcepts=include_subconcepts,
                             include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit,
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic, _cache=_cache)
                         subconcept.relationshiptype = relation.relationtype.pk
@@ -155,7 +160,7 @@ class Concept(object):
                         uplevel = uplevel + 1
                     for relation in conceptrealations:
                         #print 'relation.conceptfrom_id in _cache: %s' % (str(relation.conceptfrom_id) in _cache)
-                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else Concept().get(id=relation.conceptfrom_id, include_subconcepts=False,
+                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id, include_subconcepts=False,
                             include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
                             exclude=exclude, include=include, depth_limit=depth_limit,
                             up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic, _cache=_cache)
@@ -166,11 +171,11 @@ class Concept(object):
                 conceptrealations = models.Relation.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptto = self.id) | Q(conceptfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptto_id != self.id:
-                        relatedconcept = Concept().get(relation.conceptto_id, include=['label'])
+                        relatedconcept = self.__class__().get(relation.conceptto_id, include=['label'])
                         relatedconcept.relationshiptype = relation.relationtype.pk
                         self.relatedconcepts.append(relatedconcept)
                     if relation.conceptfrom_id != self.id:
-                        relatedconcept = Concept().get(relation.conceptfrom_id, include=['label'])
+                        relatedconcept = self.__class__().get(relation.conceptfrom_id, include=['label'])
                         relatedconcept.relationshiptype = relation.relationtype.pk
                         self.relatedconcepts.append(relatedconcept)
 
