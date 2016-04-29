@@ -1775,12 +1775,13 @@ ul .collapse li:last-of-type {
 }
 .edit-panel-content {
     left: 250px;
-    width: calc(100%-250px);
+    margin: 0 250px 0 0;
     transition: all .25s ease;
 }
 .edit-panel-content-full {
     left: 0;
     width: 100%;
+    margin: 0;
     transition: all .25s ease;
 }
 .edit-menu-list {
