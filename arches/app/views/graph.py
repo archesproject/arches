@@ -29,7 +29,7 @@ from arches.app.models import models
 
 
 @group_required('edit')
-def manager(request, nodeid):
+def manager(request, nodeid, page='graph-manager'):
     if nodeid is None or nodeid == '':
         graphs = models.Node.objects.filter(istopnode=True)
         metadata = models.GraphMetadata.objects.all()
@@ -55,8 +55,9 @@ def manager(request, nodeid):
             pass
 
     datatypes = models.DDataType.objects.all()
-    return render(request, 'graph-manager.htm', {
-        'main_script': 'graph-manager',
+    return render(request, page+'.htm', {
+        'main_script': page,
+        'nodeid': nodeid,
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),

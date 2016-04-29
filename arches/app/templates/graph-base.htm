@@ -1,0 +1,140 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-nifty.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Graph Manager" %}
+{% endblock title %}
+
+{% block body %}
+<div class="loading-mask" data-bind="visible:loading()"></div>
+
+<div id="edit-panel" class="pt-page fade in">
+    <!-- Page Header -->
+    <div class="edit-page-toolbar relative">
+
+        <!-- Menu Panel Control -->
+        <div class="edit-menu-control">
+            <button id="menu-btn" class="text-semibold btn btn-flat btn-flat-sm"><i id="menu-back" class="ion-ios-arrow-back dismiss-panel"></i> Menu <i id="menu-forward" class="ion-ios-arrow-forward dismiss-panel hidden"></i></button>
+        </div>
+
+        <!-- Page Controls -->
+        <div>
+            <div class="dismiss-edit-panel">
+                <i class="ion-ios-browsers add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Copy"></i>
+                <i class="ion-ios-trash add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                <i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i>
+                <i class="ion-ios-checkmark add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Save"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Top Panel (title block) -->
+    <div class="relative edit-panel-content">
+        <div class="edit-panel">
+            <!-- Title -->
+            <div class="text-left edit-panel-top-bar">
+                <div class="center-div">
+                    <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-certificate icon-wrap bg-gray arches-panel-icon"></i> Resource Name Here</h1>
+                    <p class="arches-panel-subtitle">Resource subtitle here</p>
+                </div>
+            </div>
+
+            <!-- Page Alert -->
+            <div id="edit-page-alert"></div>
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock content %}
+
+    <!-- Edit Menu -->
+    <div id="edit-menu" class="edit-menu">
+        <ul class="list-group edit-menu-list">
+            <!-- Menu Title -->
+            <li>
+                <div class="edit-menu-title">
+                    <h1 class="page-header text-overflow"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> Arches Designer</h1>
+                    <p class="arches-panel-subtitle" style="padding-left: 45px;">Create Arches Resources</p>
+                </div>
+            </li>
+
+            <!-- Menu Item -->
+            <li id="settings-manager" class="edit-menu-item{% if main_script == "graph-settings" %} selected{% endif %}">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' nodeid %}' }">
+                    <div class="media-body">
+                        <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
+                        <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menu Item -->
+            <li class="edit-menu-item{% if main_script == "graph-manager" %} selected{% endif %}">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' nodeid %}' }">
+                    <div class="media-body">
+                        <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graph Manager</div>
+                        <span class="text-muted menu-item-subtitle">Define graph, permissions</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menu Item -->
+            <li id="card-manager" class="edit-menu-item">
+                <a href="#maps-form">
+                    <div class="media-body">
+                        <div class="menu-item-title"><i class="fa fa-file-o"></i> Card Manager</div>
+                        <span class="text-muted menu-item-subtitle">Configure data entry cards</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menu Item -->
+            <li id="form-manager" class="edit-menu-item">
+                <a href="#maps-form">
+                    <div class="media-body">
+                        <div class="menu-item-title"><i class="fa fa-files-o"></i> Form Manager</div>
+                        <span class="text-muted menu-item-subtitle">Group data entry cards</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menu Item -->
+            <li class="edit-menu-item">
+                <a href="#maps-form">
+                    <div class="media-body">
+                        <div class="menu-item-title"><i class="fa fa-book"></i> Report Manager</div>
+                        <span class="text-muted menu-item-subtitle">Configure resource reports </span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+<input id="graph-data" name="graph-data" type="hidden" value="{{graph}}" />
+<input id="validations" name="validations" type="hidden" value="{{validations}}" />
+<input id="datatypes" name="datatypes" type="hidden" value="{{datatypes}}" />
+<input id="branches" name="branches" type="hidden" value="{{branches}}" />
+{% endblock body %}
+
+{% block tabs %}{% endblock tabs %}
