@@ -13,7 +13,8 @@ define([
             _.defaults(this.viewModel, {
                 loading: ko.observable(false),
                 showTabs: ko.observable(false),
-                tabsActive: ko.observable(false)
+                tabsActive: ko.observable(false),
+                menuActive: ko.observable(true)
             });
 
             Backbone.View.apply(this, arguments);

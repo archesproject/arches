@@ -20,85 +20,79 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load i18n %}
 
 {% block content %}
-<!-- Edit Content -->
-<div class="relative edit-panel-content">
-    <div class="edit-content">
+<div id="graph-container">
 
-        <div id="graph-container" style="margin:0 250px 0 0;">
+	<div class="panel" style="border: 1px solid #ddd;">
+		<div class="eq-height clearfix">
+			<div class="row mar-no">
+				<div class="col-xs-12 eq-box-md eq-no-panel">
 
-    		<div class="panel" style="border: 1px solid #ddd;">
-    			<div class="eq-height clearfix">
-    				<div class="row mar-no">
-    					<div class="col-xs-12 eq-box-md eq-no-panel">
+					<!-- Graph -->
+					<div id="graph" style="padding-right:220px;"></div>
 
-    						<!-- Graph -->
-    						<div id="graph" style="padding-right:220px;"></div>
+					<!-- Library/Permissions/Search -->
+					<div class="library-wrapper">
+						<div id="library" class="library library-right library-narrow library-dark">
 
-    						<!-- Library/Permissions/Search -->
-    						<div class="library-wrapper">
-    							<div id="library" class="library library-right library-narrow library-dark">
+							<!-- nav bar -->
+							<ul class="nav nav-tabs nav-justified nav-library">
+								<li id="branches-tab" class="nav-library-tab active">
+									<a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-archive"></i>
+									</a>
+								</li>
+								<li id="permissions-tab" class="nav-library-tab">
+									<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-users"></i>
+									</a>
+								</li>
+								<li id="nodes-tab" class="nav-library-tab">
+									<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-sitemap"></i>
+									</a>
+								</li>
+							</ul>
 
-    								<!-- nav bar -->
-    								<ul class="nav nav-tabs nav-justified nav-library">
-    									<li id="branches-tab" class="nav-library-tab active">
-    										<a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
-    											<i class="fa fa-archive"></i>
-    										</a>
-    									</li>
-    									<li id="permissions-tab" class="nav-library-tab">
-    										<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
-    											<i class="fa fa-users"></i>
-    										</a>
-    									</li>
-    									<li id="nodes-tab" class="nav-library-tab">
-    										<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
-    											<i class="fa fa-sitemap"></i>
-    										</a>
-    									</li>
-    								</ul>
+							<!-- Tabs Content -->
+							<div class="tab-content">
 
-    								<!-- Tabs Content -->
-    								<div class="tab-content">
+								<!--Node Listing tab -->
+								<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
+                                    {% include 'views/graph-manager/node-list.htm' %}
+								</div>
 
-    									<!--Node Listing tab -->
-    									<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
-                                            {% include 'views/graph-manager/node-list.htm' %}
-    									</div>
+								<!--Permissions tab -->
+								<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
+                                    {% include 'views/graph-manager/permissions-list.htm' %}
+								</div>
 
-    									<!--Permissions tab -->
-    									<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
-                                            {% include 'views/graph-manager/permissions-list.htm' %}
-    									</div>
+								<!--Branch Library tab -->
+								<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
+                                    {% include 'views/graph-manager/branch-list.htm' %}
+								</div>
 
-    									<!--Branch Library tab -->
-    									<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
-                                            {% include 'views/graph-manager/branch-list.htm' %}
-    									</div>
+							</div>
+						</div>
+					</div>
 
-    								</div>
-    							</div>
-    						</div>
+					<!-- Node Editor -->
+					<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
+                        {% include 'views/graph-manager/node-form.htm' %}
+					</div>
 
-    						<!-- Node Editor -->
-    						<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
-                                {% include 'views/graph-manager/node-form.htm' %}
-    						</div>
+					<!-- Permissions Form -->
+					<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
+                        {% include 'views/graph-manager/permissions-form.htm' %}
+					</div>
 
-    						<!-- Permissions Form -->
-    						<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
-                                {% include 'views/graph-manager/permissions-form.htm' %}
-    						</div>
+					<!-- Graph Library -->
+					<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.selectedItem, with: branchList">
+                        {% include 'views/graph-manager/branch-info.htm' %}
+					</div>
 
-    						<!-- Graph Library -->
-    						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.selectedItem, with: branchList">
-                                {% include 'views/graph-manager/branch-info.htm' %}
-    						</div>
-
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-    </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock content %}

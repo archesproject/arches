@@ -32,23 +32,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="edit-page-toolbar relative">
 
         <!-- Menu Panel Control -->
-        <div class="edit-menu-control">
-            <button id="menu-btn" class="text-semibold btn btn-flat btn-flat-sm"><i id="menu-back" class="ion-ios-arrow-back dismiss-panel"></i> Menu <i id="menu-forward" class="ion-ios-arrow-forward dismiss-panel hidden"></i></button>
+        <div class="edit-menu-control" data-bind="css: {'edit-menu-control-out': !menuActive()}">
+            <button id="menu-btn" data-bind="click:function() { menuActive(!menuActive()); }" class="text-semibold btn btn-flat btn-flat-sm"><i id="menu-back" class="ion-ios-arrow-back dismiss-panel" data-bind="visible:menuActive()"></i> Menu <i id="menu-forward" class="ion-ios-arrow-forward dismiss-panel" data-bind="visible:!menuActive()"></i></button>
         </div>
 
         <!-- Page Controls -->
         <div>
             <div class="dismiss-edit-panel">
-                <i class="ion-ios-browsers add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Copy"></i>
-                <i class="ion-ios-trash add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
-                <i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i>
-                <i class="ion-ios-checkmark add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Save"></i>
+                <a href="{% url 'graph' '' %}"><i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i></a>
             </div>
         </div>
     </div>
 
     <!-- Page Top Panel (title block) -->
-    <div class="relative edit-panel-content">
+    <div class="relative edit-panel-content" data-bind="css: {'edit-panel-content-full': !menuActive()}">
         <div class="edit-panel">
             <!-- Title -->
             <div class="text-left edit-panel-top-bar">
@@ -60,14 +57,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Page Alert -->
             <div id="edit-page-alert"></div>
+
+            <div class="edit-content">
+            {% block content %}
+            {% endblock content %}
+            </div>
         </div>
     </div>
 
-    {% block content %}
-    {% endblock content %}
-
     <!-- Edit Menu -->
-    <div id="edit-menu" class="edit-menu">
+    <div id="edit-menu" class="edit-menu" data-bind="css: { 'edit-menu-out': !menuActive() }">
         <ul class="list-group edit-menu-list">
             <!-- Menu Title -->
             <li>
