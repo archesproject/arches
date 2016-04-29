@@ -40,7 +40,6 @@ class Ontology(Concept):
 
     def get_subclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
         id = id if id != '' else self.id
-        
         if id != '' and id != None:
             self.load(models.Concept.objects.get(pk=id))
 
@@ -49,6 +48,7 @@ class Ontology(Concept):
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
 
             if include != None:
+                self.values = []
                 if len(include) > 0 and len(exclude) > 0:
                     raise Exception('Only include values for include or exclude, but not both')
                 include = include if len(include) != 0 else models.DValueType.objects.distinct('category').values_list('category', flat=True)
