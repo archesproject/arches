@@ -7,7 +7,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class Ontology(Concept):
     """
-    A class with specific methods just for Ontologies
+    A subclass of the Concept class with specific methods just for Ontologies
 
     """
 
