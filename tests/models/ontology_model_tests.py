@@ -43,7 +43,7 @@ class OntologyModelTests(ArchesTestCase):
 
         """
 
-        result = Ontology().get_related_properties(ontology_concept_id=self.E39_Actor)
+        result = Ontology().get_related_properties(ontology_concept_id=self.E39_Actor, lang='en-US')
         self.assertEqual(len(result['properties']), 4)
 
         expected_results = [
@@ -99,6 +99,7 @@ class OntologyModelTests(ArchesTestCase):
             y['classes'] = sorted(y['classes'], key=itemgetter("id"))
             class_pairs = zip(x['classes'], y['classes'])
             self.assertFalse(any(x['id'] != y['id'] for x, y in class_pairs))
+            self.assertFalse(any(x['value'] != y['value'] for x, y in class_pairs))
 
 
     

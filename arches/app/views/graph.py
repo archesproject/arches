@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -171,4 +172,6 @@ def clone(request, nodeid):
     return HttpResponseNotFound()
 
 def get_related_nodes(request, ontology_concept_id):
-    properties = Ontology().get_related_properties(id=ontology_concept_id, lang=lang)
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    properties = Ontology().get_related_properties(ontology_concept_id, lang=lang)
+    return JSONResponse(properties, indent=4)

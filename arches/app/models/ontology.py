@@ -33,7 +33,7 @@ class Ontology(Concept):
         for subconcept in concept_graph.subconcepts:
             if subconcept.relationshiptype == "hasDomainClass":
                 prop = {
-                    'value': subconcept.get_preflabel().value,
+                    'value': subconcept.get_preflabel(lang=lang).value,
                     'id': subconcept.id
                 }
                 for ontology_class in subconcept.subconcepts:
@@ -43,7 +43,7 @@ class Ontology(Concept):
                     
                     def gather_subclasses(concept):
                         prop['classes'].append({
-                            'value': concept.get_preflabel().value,
+                            'value': concept.get_preflabel(lang=lang).value,
                             'id': concept.id
                         })
 
@@ -97,17 +97,14 @@ class Ontology(Concept):
             if len(hassubconcepts) > 0:
                 self.hassubconcepts = True
 
-            conceptrealations = models.Relation.objects.filter(conceptfrom=self.id, relationtype='subClassOf')
             if depth_limit == None or downlevel < depth_limit:
                 if depth_limit != None:
                     downlevel = downlevel + 1
-                for relation in conceptrealations:
-                    #print 'relation.conceptto_id in _cache: %s' % (str(relation.conceptto_id) in _cache)
+
+                for relation in models.Relation.objects.filter(conceptfrom=self.id, relationtype='subClassOf'):
                     subconcept = Ontology().get_subclasses(id=relation.conceptto_id, exclude=exclude, include=include, depth_limit=depth_limit,
                         downlevel=downlevel, nodetype=nodetype)
                     subconcept.relationshiptype = relation.relationtype.pk
                     self.subconcepts.append(subconcept)
-
-                self.subconcepts = sorted(self.subconcepts, key=methodcaller('get_sortkey', lang=lang), reverse=False)
 
         return self
