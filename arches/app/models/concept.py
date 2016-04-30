@@ -102,7 +102,7 @@ class Concept(object):
             self.load(models.Concept.objects.get(legacyoid=legacyoid))
 
         _cache = kwargs.pop('_cache', {})
-        _cache[self.id] = Concept({
+        _cache[self.id] = self.__class__({
             "id": self.id,
             "nodetype": self.nodetype,
             "legacyoid": self.legacyoid,
@@ -144,10 +144,11 @@ class Concept(object):
                     if depth_limit != None:
                         downlevel = downlevel + 1
                     for relation in conceptrealations:
-                        #print 'relation.conceptto_id in _cache: %s' % (str(relation.conceptto_id) in _cache)
-                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id, include_subconcepts=include_subconcepts,
-                            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, depth_limit=depth_limit,
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic, _cache=_cache)
+                        subconcept = _cache[str(relation.conceptto_id)] if str(relation.conceptto_id) in _cache else self.__class__().get(id=relation.conceptto_id, 
+                            include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts, 
+                            include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, 
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
+                            nodetype=nodetype, semantic=semantic, _cache=_cache, lang=lang)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
 
@@ -159,11 +160,11 @@ class Concept(object):
                     if up_depth_limit != None:
                         uplevel = uplevel + 1
                     for relation in conceptrealations:
-                        #print 'relation.conceptfrom_id in _cache: %s' % (str(relation.conceptfrom_id) in _cache)
-                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id, include_subconcepts=False,
-                            include_parentconcepts=include_parentconcepts, include_relatedconcepts=include_relatedconcepts,
-                            exclude=exclude, include=include, depth_limit=depth_limit,
-                            up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, nodetype=nodetype, semantic=semantic, _cache=_cache)
+                        parentconcept = _cache[str(relation.conceptfrom_id)] if str(relation.conceptfrom_id) in _cache else self.__class__().get(id=relation.conceptfrom_id, 
+                            include_subconcepts=False,include_parentconcepts=include_parentconcepts,
+                            include_relatedconcepts=include_relatedconcepts,exclude=exclude, include=include,
+                            depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
+                            nodetype=nodetype, semantic=semantic, _cache=_cache, lang=lang)
                         parentconcept.relationshiptype = relation.relationtype.pk
                         self.parentconcepts.append(parentconcept)
 
@@ -171,11 +172,11 @@ class Concept(object):
                 conceptrealations = models.Relation.objects.filter(Q(relationtype = 'related') | Q(relationtype__category = 'Mapping Properties'), Q(conceptto = self.id) | Q(conceptfrom = self.id))
                 for relation in conceptrealations:
                     if relation.conceptto_id != self.id:
-                        relatedconcept = self.__class__().get(relation.conceptto_id, include=['label'])
+                        relatedconcept = self.__class__().get(relation.conceptto_id, include=['label'], lang=lang)
                         relatedconcept.relationshiptype = relation.relationtype.pk
                         self.relatedconcepts.append(relatedconcept)
                     if relation.conceptfrom_id != self.id:
-                        relatedconcept = self.__class__().get(relation.conceptfrom_id, include=['label'])
+                        relatedconcept = self.__class__().get(relation.conceptfrom_id, include=['label'], lang=lang)
                         relatedconcept.relationshiptype = relation.relationtype.pk
                         self.relatedconcepts.append(relatedconcept)
 
@@ -349,7 +350,7 @@ class Concept(object):
         rows = cursor.fetchall()
         return rows
 
-    def traverse(self, func, direction='down', scope=None, _cache=[], **kwargs):
+    def traverse(self, func, direction='down', scope=None, **kwargs):
         """
         Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling
         the given function on each node, passes an optional scope to each function
@@ -358,6 +359,7 @@ class Concept(object):
 
         """
 
+        _cache = kwargs.pop('_cache', [])
         if self.id not in _cache:
             _cache.append(self.id)
 
@@ -372,12 +374,12 @@ class Concept(object):
 
             if direction == 'down':
                 for subconcept in self.subconcepts:
-                    ret = subconcept.traverse(func, direction, scope, _cache, **kwargs)
+                    ret = subconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
                     if ret != None:
                         return ret
             else:
                 for parentconcept in self.parentconcepts:
-                    ret = parentconcept.traverse(func, direction, scope, _cache, **kwargs)
+                    ret = parentconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
                     if ret != None:
                         return ret
 
@@ -389,6 +391,7 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
+        print lang
         score = 0
         ranked_labels = []
         #ret = ConceptValue()
