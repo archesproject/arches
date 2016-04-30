@@ -391,10 +391,8 @@ class Concept(object):
         return self.get_preflabel(lang=lang).value
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        print lang
         score = 0
         ranked_labels = []
-        #ret = ConceptValue()
         if self.values == []:
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=['label'])
         else:
