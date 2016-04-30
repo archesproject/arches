@@ -16,8 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import Graph
 
 def import_graph(graphs):
-	resource_graph = ResourceGraph(graphs)
-	resource_graph.save()
+	graph = Graph(graphs)
+	graph.save()
