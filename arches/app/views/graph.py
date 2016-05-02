@@ -42,7 +42,7 @@ def manager(request, nodeid):
     graph = Graph(nodeid)
     validations = models.Validation.objects.all()
     metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True, isresource=False)
+    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
 
     branches = []
     for metadata_record in metadata_records:
@@ -104,8 +104,6 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
-                node.isresource = data.get('isresource', False)
-                node.isactive = data.get('isactive', False)
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')

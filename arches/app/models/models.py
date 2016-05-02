@@ -43,6 +43,8 @@ class GraphMetadata(models.Model):
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
+    isresource = models.BooleanField()
+    isactive = models.BooleanField()
 
     class Meta:
         managed = True
@@ -236,8 +238,6 @@ class Node(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
-    isresource = models.BooleanField()
-    isactive = models.BooleanField()
     ontologyclass = models.TextField()
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)

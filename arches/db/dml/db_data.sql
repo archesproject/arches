@@ -146,28 +146,28 @@ INSERT INTO widgets(widgetid, name, template)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'datepicker.htm');
 
 -- Node branch
-INSERT INTO graph_metadata(graphmetadataid, name, author, version, description)
-    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph');
+INSERT INTO graph_metadata(graphmetadataid, name, author, version, description, isresource, isactive)
+    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype, graphmetadataid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'f', 'f', 'E1', 'string', '22000000-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphmetadataid)
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1', 'string', '22000000-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
 
 
 -- Node/NodeType branch
-INSERT INTO graph_metadata(graphmetadataid, name, author, version, description)
-    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing');
+INSERT INTO graph_metadata(graphmetadataid, name, author, version, description, isresource, isactive)
+    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  'f');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'E1', 'string',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'f', 'f', 'E55', 'domain',
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55', 'domain',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
@@ -177,28 +177,32 @@ INSERT INTO edges(domainnodeid, rangenodeid)
     VALUES ('20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002');
 
 
+INSERT INTO graph_metadata(graphmetadataid, name, author, version, description, isresource, isactive)
+    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 't', 'f', 'E1', 'semantic', '20000000-0000-0000-0000-000000000000');
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
+            graphmetadataid, nodegroupid)
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1', 'semantic', 
+        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'f', 'f', 'E1', 'semantic',
+    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E1', 'semantic',
             '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E1', 'string',
             '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'f', 'f', 'E55', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55', 'domain',
             '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
+INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E1', 'string',
             '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO edges(domainnodeid, rangenodeid)

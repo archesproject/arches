@@ -171,6 +171,8 @@ class Migration(migrations.Migration):
                 ('author', models.TextField(null=True, blank=True)),
                 ('deploymentdate', models.DateTimeField(null=True, blank=True)),
                 ('version', models.TextField(null=True, blank=True)),
+                ('isresource', models.BooleanField()),
+                ('isactive', models.BooleanField()),
             ],
             options={
                 'db_table': 'graph_metadata',
@@ -369,8 +371,6 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('isresource', models.BooleanField()),
-                ('isactive', models.BooleanField()),
                 ('ontologyclass', models.TextField()),
                 ('datatype', models.TextField()),
                 ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),

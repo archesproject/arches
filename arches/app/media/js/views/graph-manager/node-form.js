@@ -86,12 +86,6 @@ define([
         },
         toggleCardinality: function () {
             this.node().toggleCardinality();
-        },
-        toggleIsResource: function () {
-            this.node().isresource(!this.node().isresource());
-        },
-        toggleIsActive: function () {
-            this.node().isactive(!this.node().isactive());
         }
     });
     return NodeFormView;

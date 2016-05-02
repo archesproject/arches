@@ -21,8 +21,6 @@ CREATE TABLE "nodes"(
  "name" Text NOT NULL,
  "description" Text NOT NULL,
  "istopnode" Boolean NOT NULL,
- "isresource" Boolean NOT NULL,
- "isactive" Boolean NOT NULL,
  "crmclass" Text NOT NULL,
  "datatype" Text NOT NULL,
  "validation" Text,
@@ -796,7 +794,9 @@ CREATE TABLE "graphmetadata"(
  "deploymentfile" Text,
  "author" Text,
  "deploymentdate" Timestamp,
- "version" Text
+ "version" Text,
+ "isresource" Boolean NOT NULL,
+ "isactive" Boolean NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
