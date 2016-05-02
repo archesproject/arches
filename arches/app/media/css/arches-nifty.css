@@ -2138,13 +2138,13 @@ input.cmn-toggle-yes-no:checked + label:after {
     font-weight: 300;
 }
 .img-login {
-    background-image: url(../../../img/arches/backgrounds/easter_island.jpg);
+    background-image: url(../img/backgrounds/easter_island.jpg);
 }
 .img-register {
-    background-image: url(../../../img/arches/backgrounds/easter_island_night.jpg);
+    background-image: url(../img/backgrounds/easter_island_night.jpg);
 }
 .img-login-recover {
-    background-image: url(../../../img/arches/backgrounds/ganges_sunrise.jpg);
+    background-image: url(../img/backgrounds/ganges_sunrise.jpg);
 }
 .concept_tree {
     padding: 13px;
