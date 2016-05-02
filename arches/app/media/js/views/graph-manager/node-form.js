@@ -7,7 +7,7 @@ define([
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'validations'));
+            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branchListView'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = this.graphModel.get('editNode');
             this.closeClicked = ko.observable(false);

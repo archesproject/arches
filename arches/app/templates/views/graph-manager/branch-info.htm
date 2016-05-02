@@ -13,15 +13,6 @@
     <!-- Alert -->
     <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
 
-    <div class="node-widget-label">
-        <div class="control-label">
-            {% trans "Related By" %}
-        </div>
-        <div class="col-sm-12 pad-no node-attribute-label">
-            <select class="design" style="width:100%;" data-bind="value: ontology_property, options: relates_via, chosen: true"></select>
-        </div>
-    </div>
-
     <!-- Add Button -->
     <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;" data-bind="click: $parent.appendBranch.bind($parent)">{% trans "Append to current node" %}</button>
 

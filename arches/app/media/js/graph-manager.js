@@ -57,10 +57,17 @@ require([
         graphModel: graphModel
     });
 
+    viewModel.branchListView= new BranchListView({
+        el: $('#branch-library'),
+        branches: ko.observableArray(branches),
+        graphModel: graphModel
+    });
+
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         graphModel: graphModel,
-        validations: validations
+        validations: validations,
+        branchListView: viewModel.branchListView
     });
 
     viewModel.graphView.on('node-clicked', function (node) {
@@ -73,12 +80,6 @@ require([
             node.editing(false);
         });
         node.editing(true);
-    });
-
-    viewModel.branchList = new BranchListView({
-        el: $('#branch-library'),
-        branches: ko.observableArray(branches),
-        graphModel: graphModel
     });
 
     viewModel.nodeList = new NodeListView({

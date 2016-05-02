@@ -25,54 +25,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	<div class="panel" style="border: 1px solid #ddd;">
 		<div class="eq-height clearfix">
 			<div class="row mar-no">
-				<div class="col-xs-12 eq-box-md eq-no-panel">
-
-					<!-- Graph -->
-					<div id="graph" style="padding-right:220px;"></div>
-
-					<!-- Library/Permissions/Search -->
-					<div class="library-wrapper">
-						<div id="library" class="library library-right library-narrow library-dark">
-
-							<!-- nav bar -->
-							<ul class="nav nav-tabs nav-justified nav-library">
-								<li id="branches-tab" class="nav-library-tab active">
-									<a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
-										<i class="fa fa-archive"></i>
-									</a>
-								</li>
-								<li id="permissions-tab" class="nav-library-tab">
-									<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
-										<i class="fa fa-users"></i>
-									</a>
-								</li>
-								<li id="nodes-tab" class="nav-library-tab">
-									<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
-										<i class="fa fa-sitemap"></i>
-									</a>
-								</li>
-							</ul>
-
-							<!-- Tabs Content -->
-							<div class="tab-content">
-
-								<!--Node Listing tab -->
-								<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
-                                    {% include 'views/graph-manager/node-list.htm' %}
-								</div>
-
-								<!--Permissions tab -->
-								<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
-                                    {% include 'views/graph-manager/permissions-list.htm' %}
-								</div>
-
-								<!--Branch Library tab -->
-								<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
-                                    {% include 'views/graph-manager/branch-list.htm' %}
-								</div>
-
-							</div>
-						</div>
+				<div class="eq-box-md eq-no-panel">
+					<!--Node Listing -->
+					<div class="library library-medium library-dark" id="node-listing" data-bind="with: nodeList">
+                        {% include 'views/graph-manager/node-list.htm' %}
 					</div>
 
 					<!-- Node Editor -->
@@ -80,16 +36,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'views/graph-manager/node-form.htm' %}
 					</div>
 
-					<!-- Permissions Form -->
-					<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
-                        {% include 'views/graph-manager/permissions-form.htm' %}
-					</div>
-
-					<!-- Graph Library -->
-					<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.selectedItem, with: branchList">
+					<!-- Graph Metadata -->
+					<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.selectedItem, with: branchListView">
                         {% include 'views/graph-manager/branch-info.htm' %}
 					</div>
 
+					<!-- Graph -->
+					<div id="graph" style="margin-left:300px;"></div>
 				</div>
 			</div>
 		</div>

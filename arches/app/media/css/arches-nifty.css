@@ -750,7 +750,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 #nodeCrud {
     position: absolute;
     width: 250px;
-    right: 220px;
+    left: 300px;
     top: 0;
     bottom: 0;
     background-color: #37495b;
@@ -1518,7 +1518,7 @@ div.dropdown-menu.open {
 #branch-panel, #permissions-panel {
     position: absolute;
     top: 0;
-    right: 220px;
+    left: 550px;
     padding-left: 7px;
     padding-right: 5px;
     overflow-y: scroll;
