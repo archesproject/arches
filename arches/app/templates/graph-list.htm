@@ -25,88 +25,75 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock title %}
 
 {% block content %}
-<!-- Form Container -->
-<div class="slide">
+<div>
+    <div class="" style="height: 80px; background: #f8f8f8; border-bottom: 1px solid #ddd;">
+        <div class="center-div" style="padding-top: 0px; padding-left: 28px;">
+            <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> {% trans "Arches Designer" %}</h1>
+            <p class="arches-panel-subtitle">{% trans "Design new data types to include in your inventory" %}</p>
+        </div>
+    </div>
 
-	<!-- Page Title/Saerch -->
-	<div id="page-title">
-		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">{% trans "Graphs" %}</h1>
-	</div>
-	<!--End page title-->
+    <!-- Toolbar -->
+    <div class="relative" style="height: 60px; background: #f4f4f4; border-bottom: 1px solid #e4e4e4;">
 
-    <div style="padding: 10px 0px 30px 0px;display:none;" data-bind="visible:graphs().length>0">
+        <!-- Search -->
+        <div class="edit-panel-search-bar">
+            <!-- Toggle Button -->
+            <button class="btn btn-flat btn-flat-trans right-border"><i class="fa fa-search"></i> {% trans "Find" %} </button>
 
-    	<!-- Project Tools -->
-    	<div class="relative" style="height: 36px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+            <!-- Find widget -->
+            <div class="find-widget">
+                <input type="text" class="form-control" placeholder="{% trans "Type a resource or graph name..." %}">
+                <span class="clear-find"><i class="fa fa-times-circle"></i></span>
+            </div>
 
-    		<div>
+        </div>
 
-    			<!-- Summary -->
-    			<p style="padding-top: 5px; padding-left: 25px; font-size: 13px; color: #888;">
-    				{% trans "You have" %} <span style="color: #123; font-weight: 700;" data-bind="text:graphs().length"></span> {% trans "graphs" %}.
-    			</p><p>
-
-    		</div>
-    	</div>
+        <div style="position: absolute; right: 50px; top: 10px;">
+            <a class="btn btn-flat btn-flat-trans" href="#new-project-modal" data-toggle="modal"><i class="fa fa-plus-circle"></i> {% trans "New Resource" %}</a>
+        </div>
+    </div>
+</div>
 
 
-    	<!-- Card Report -->
-    	<div>
-    		<div class="row">
+<!-- Default Page content-->
+<div id="page-content" style="overflow: auto; padding: 0 50px 50px; margin-top: -1px;">
 
-    			<!-- Section Data -->
-    			<div class="col-xs-12" style="margin: 10px 10px 20px 40px; padding-right: 40px;">
+    <div id="report-image-grid" class="report-image-grid">
 
-    				<!-- Isotope Layout -->
-    				<div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: graphs -->
+        <div class="resource-grid-item relative">
+            <!-- Resource Type -->
+            <div class="resource-grid-main-container">
+                <div class="resource-grid-main">
+                    <h1 class="page-header text-overflow resource-grid-title"><i class="fa fa-th icon-wrap resource-grid-icon"></i> <span data-bind="text:name"></span></h1>
+                    <p class="resource-grid-subtitle" data-bind='text:description?description:"{% trans "No description available." %}"'></p>
+                </div>
+            </div>
 
-    					<!-- New Project Button -->
-    					<div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item">
-    						<a id="add-basemap" href="#new-project-modal" data-toggle="modal">
-    							<h3 class="text-thin" style="margin-top: 10px;"> {% trans "New Graph" %}</h3>
+            <!-- Resource Tools -->
+            <div class="resource-grid-tools-container">
+                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:open"><i class="fa fa-check-circle"></i> {% trans "Edit" %}</a>
+                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:clone"><i class="fa fa-copy"></i> {% trans "Copy" %}</a>
+                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:deleteGraph"><i class="fa fa-trash"></i> {% trans "Delete" %}</a>
+            </div>
 
-    							<span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
-    								<i class="fa fa-plus fa-2x" style="color: #fff;"></i>
-    							</span>
-
-    							<h5 style="font-weight: 200;"> {% trans "Create a new graph as part of your heritage inventory" %}</h5>
-    						</a>
-    					</div>
-                        <!-- ko foreach: graphs -->
-    					<div class="project-grid-item">
-    						<div class="panel mar-no">
-
-    							<!-- Resource Name -->
-    							<div class="panel-heading">
-    				                <h3 class="panel-title" style="padding-left: 10px;" data-bind="text:name, click:open"></h3>
-    				            </div>
-
-    							<!-- Abstract -->
-    							<div class="panel-body" style="padding: 15px 20px 25px 10px; height: 108px;" data-bind='text:description?description:"{% trans "No description available." %}", click:open'></div>
-
-    							<!-- Project Tools -->
-    							<div class="panel-footer" style="height: 40px;">
-                                    <span data-bind="if:isresource"><span><i class="fa fa-sitemap"></i> {% trans "resource" %}, </span> <i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "active" %}":"{% trans "inactive" %}"'></span></span>
-                                    <span data-bind="if:!isresource"><span><i class="fa fa-link"></i> {% trans "graph" %}</span></span>
-    								<a class="pull-right dropdown" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
-    									<ul class="dropdown-menu pull-right">
-    									<li><a href="#" data-bind="click:clone"><i class="fa fa-copy"></i> {% trans "Clone Resource" %}</a>
-    									</li>
-    									<li class="divider"></li>
-    									<li><a href="#" data-bind="click:deleteGraph"><i class="fa fa-trash"></i> {% trans "Delete Resource" %}</a>
-    									</li>
-    								</ul>
-    							</div>
-    						</div>
-    					</div>
-                        <!-- /ko -->
-    				</div>
-    			</div>
-    		</div>
-    	</div>
+            <!-- Resource Metadata -->
+            <div class="resource-grid-meta-container">
+                <ul class="list-inline resource-grid-meta">
+                    <li data-bind="if:!isresource">{% trans "Graph" %}</li>
+                    <li data-bind="if:isresource">{% trans "Resource" %}</li>
+                    <li class="text-semibold text-primary" data-bind="if: isactive">{% trans "Active" %}</li>
+                    <li class="text-semibold text-danger" data-bind="if: !isactive">{% trans "Inactive" %}</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /ko -->
 
     </div>
 </div>
+
+
 <div class="modal fade" id="new-project-modal" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -128,8 +115,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 						<input data-bind="value:newGraphName, valueUpdate: 'keyup'" placeholder="{% trans "Name your graph" %}" class="form-control input-lg widget-input" style="background: #f4f4f4; border: 1px solid #bbb;">
 					</div>
 					<div class="col-sm-6" style="margin-top: 10px;">
-						<a href="" class="pad-rgt pull-right" style="">
-							<h4 class="" style="font-size: 13px; font-weight: 700;">{% trans "Pick a template" %}</h4>
+						<a class="pad-rgt pull-right">
+							<h4 style="font-size: 13px; font-weight: 700;">{% trans "Pick a template" %}</h4>
 						</a>
 					</div>
 				</div>

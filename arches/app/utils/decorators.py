@@ -20,6 +20,7 @@ import warnings
 import functools
 import logging
 import datetime
+from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -43,3 +44,16 @@ def deprecated(func):
         logger.warn("%s - DeprecationWarning: Call to deprecated function %s. %s:%s" % (datetime.datetime.now(), func.__name__, func.func_code.co_filename, func.func_code.co_firstlineno + 1))
         return func(*args, **kwargs)
     return new_func
+
+def group_required(*group_names):
+    """
+    Requires user membership in at least one of the groups passed in.
+
+    """
+
+    def in_groups(u):
+        if u.is_authenticated():
+            if u.is_superuser or bool(u.groups.filter(name__in=group_names)):
+                return True
+        return False
+    return user_passes_test(in_groups)

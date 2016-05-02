@@ -22,7 +22,7 @@ from django.shortcuts import render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound, QueryDict
-from django.contrib.auth.decorators import permission_required
+from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
@@ -30,8 +30,8 @@ from arches.app.models import models
 from arches.app.models.ontology import Ontology
 
 
-@permission_required('edit')
-def manager(request, nodeid):
+@group_required('edit')
+def manager(request, nodeid, page='graph-manager'):
     if nodeid is None or nodeid == '':
         graphs = models.Node.objects.filter(istopnode=True)
         metadata = models.GraphMetadata.objects.all()
@@ -57,8 +57,9 @@ def manager(request, nodeid):
             pass
 
     datatypes = models.DDataType.objects.all()
-    return render(request, 'graph-manager.htm', {
-        'main_script': 'graph-manager',
+    return render(request, page+'.htm', {
+        'main_script': page,
+        'nodeid': nodeid,
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
@@ -77,7 +78,7 @@ def manager(request, nodeid):
         }
     })
 
-@permission_required('edit')
+@group_required('edit')
 def node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -136,7 +137,7 @@ def node(request, nodeid):
 
     return HttpResponseNotFound()
 
-@permission_required('edit')
+@group_required('edit')
 def append_branch(request, nodeid, property, graphmetadataid):
     if request.method == 'POST':
         graph = Graph(nodeid)
@@ -146,7 +147,7 @@ def append_branch(request, nodeid, property, graphmetadataid):
 
     return HttpResponseNotFound()
 
-@permission_required('edit')
+@group_required('edit')
 def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
@@ -156,11 +157,11 @@ def move_node(request, nodeid):
         return JSONResponse(updated_nodes_and_edges)
 
     return HttpResponseNotFound()
-    
-@permission_required('edit')
+
+@group_required('edit')
 def clone(request, nodeid):
     if request.method == 'POST':
-        data = QueryDict(request.body)
+        data = JSONDeserializer().deserialize(request.body)
         graph = Graph(nodeid).copy()
         if 'name' in data:
             graph.root.name = data['name']

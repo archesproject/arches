@@ -17,7 +17,7 @@ require([
         });
         graph.open = function() {
             pageView.viewModel.loading(true);
-            window.location = graph.nodeid;
+            window.location = graph.nodeid + '/settings';
         };
         graph.clone = function() {
             if (newGraphName() === '') {
@@ -28,18 +28,14 @@ require([
                 $.ajax({
                     type: "POST",
                     url: 'clone/' + selectedGraph(),
-                    data: {
-                        name: newGraphName()
-                    },
+                    data: JSON.stringify({name: newGraphName()}),
                     success: function(response) {
-                        window.location = response.root.nodeid;
+                        window.location = response.root.nodeid + '/settings';
                     },
                     failure: function(response) {
                         pageView.viewModel.loading(false);
-                    },
-                    datatype:'JSON'
+                    }
                 });
-                console.log('clone the graph...');
             }
         };
         graph.select = function() {

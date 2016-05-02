@@ -326,17 +326,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock body %}
 
 {% block javascript %}
+
 {% include 'javascript.htm' %}
-{% endblock javascript %}
+
 <script>
-require(["jquery"], function ($) {
-    window.jQuery = $;
-    require(["plugins/nifty"]);
-});
+require(["nifty"{% if main_script %},"{{ main_script }}"{% endif %}]);
 </script>
-{% if main_script %}
-<script>require(["{{ main_script }}"]);</script>
-{% endif %}
 
 {% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
 <script>
@@ -350,5 +345,7 @@ ga('send', 'pageview');
 
 </script>
 {% endif %}
+
+{% endblock javascript %}
 
 </html>

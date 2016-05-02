@@ -15,120 +15,84 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-nifty.htm" %}
+{% extends "graph-base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
-{% block title %}
-{{ block.super }}
-{% trans "Resource Graph Editor" %}
-{% endblock title %}
-
 {% block content %}
-<!-- Form Container -->
-<div class="slide" style="">
+<div id="graph-container">
 
-	<!-- Page Title/Saerch -->
-	<div id="page-title">
-		<h1 class="page-header text-overflow" style="font-size: 21px; padding-top: 7px; padding-bottom: 5px;">{% trans "Resource Graph Editor" %}</h1>
-	</div>
-	<!--End page title-->
+	<div class="panel" style="border: 1px solid #ddd;">
+		<div class="eq-height clearfix">
+			<div class="row mar-no">
+				<div class="col-xs-12 eq-box-md eq-no-panel">
 
-	<!--Breadcrumb-->
-	<ol class="breadcrumb" style="margin-top: -8px;">
-		<li><a href="#">{{ APP_NAME }}</a></li>
-		<li><a href="#">{% trans "Admin Tools" %}</a></li>
-		<li><a href="#">{% trans "Resource Manager" %}</a></li>
-		<li class="active">{% trans "New Resource" %}</li>
-	</ol>
-	<!--End breadcrumb-->
+					<!-- Graph -->
+					<div id="graph" style="padding-right:220px;"></div>
 
+					<!-- Library/Permissions/Search -->
+					<div class="library-wrapper">
+						<div id="library" class="library library-right library-narrow library-dark">
 
-	<!-- Page Content -->
-	<div id="graph-container" class="" style="padding: 0 25px 30px 25px;">
+							<!-- nav bar -->
+							<ul class="nav nav-tabs nav-justified nav-library">
+								<li id="branches-tab" class="nav-library-tab active">
+									<a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-archive"></i>
+									</a>
+								</li>
+								<li id="permissions-tab" class="nav-library-tab">
+									<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-users"></i>
+									</a>
+								</li>
+								<li id="nodes-tab" class="nav-library-tab">
+									<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
+										<i class="fa fa-sitemap"></i>
+									</a>
+								</li>
+							</ul>
 
-		<div id="" class="panel" style="border: 1px solid #ddd;">
-			<div class="eq-height clearfix">
-				<div class="row mar-no" style="">
-					<div id="" class="col-xs-12 eq-box-md eq-no-panel">
+							<!-- Tabs Content -->
+							<div class="tab-content">
 
-						<!-- Graph -->
-						<div id="graph" class="" style="padding-right:220px;"></div>
-
-						<!-- Library/Permissions/Search -->
-						<div class="library-wrapper">
-							<div id="library" class="library library-right library-narrow library-dark">
-
-								<!-- nav bar -->
-								<ul class="nav nav-tabs nav-justified nav-library" style="">
-									<li id="branches-tab" class="nav-library-tab active" style="">
-										<a href="#branch-library" class="nav-library-tab-link" style="" data-toggle="tab">
-											<i class="fa fa-archive"></i>
-										</a>
-									</li>
-									<li id="permissions-tab" class="nav-library-tab">
-										<a href="#node-permissions" class="nav-library-tab-link" data-toggle="tab">
-											<i class="fa fa-users"></i>
-										</a>
-									</li>
-									<li id="nodes-tab" class="nav-library-tab">
-										<a href="#node-listing" class="nav-library-tab-link" data-toggle="tab">
-											<i class="fa fa-sitemap"></i>
-										</a>
-									</li>
-								</ul>
-
-								<!-- Tabs Content -->
-								<div class="tab-content">
-
-									<!--Node Listing tab -->
-									<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
-                                        {% include 'views/graph-manager/node-list.htm' %}
-									</div>
-
-									<!--Permissions tab -->
-									<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
-                                        {% include 'views/graph-manager/permissions-list.htm' %}
-									</div>
-
-									<!--Branch Library tab -->
-									<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
-                                        {% include 'views/graph-manager/branch-list.htm' %}
-									</div>
-
+								<!--Node Listing tab -->
+								<div class="tab-pane fade" id="node-listing" data-bind="with: nodeList">
+                                    {% include 'views/graph-manager/node-list.htm' %}
 								</div>
+
+								<!--Permissions tab -->
+								<div class="tab-pane fade" id="node-permissions" data-bind="with: permissionsList">
+                                    {% include 'views/graph-manager/permissions-list.htm' %}
+								</div>
+
+								<!--Branch Library tab -->
+								<div class="tab-pane fade in active" id="branch-library" data-bind="with: branchList">
+                                    {% include 'views/graph-manager/branch-list.htm' %}
+								</div>
+
 							</div>
 						</div>
-
-						<!-- Node Editor -->
-						<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
-                            {% include 'views/graph-manager/node-form.htm' %}
-						</div>
-
-						<!-- Permissions Form -->
-						<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
-                            {% include 'views/graph-manager/permissions-form.htm' %}
-						</div>
-
-						<!-- Graph Library -->
-						<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.selectedItem, with: branchList">
-                            {% include 'views/graph-manager/branch-info.htm' %}
-						</div>
-
 					</div>
+
+					<!-- Node Editor -->
+					<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
+                        {% include 'views/graph-manager/node-form.htm' %}
+					</div>
+
+					<!-- Permissions Form -->
+					<div id="permissions-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="with: permissionsForm">
+                        {% include 'views/graph-manager/permissions-form.htm' %}
+					</div>
+
+					<!-- Graph Library -->
+					<div id="branch-panel" class="library-right library-medium library-dark" style="display: none;" data-bind="visible: branchList.selectedItem, with: branchList">
+                        {% include 'views/graph-manager/branch-info.htm' %}
+					</div>
+
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- End Page Content -->
-
 </div>
-
-<input id="graph-data" name="graph-data" type="hidden" value="{{graph}}"/>
-<input id="validations" name="validations" type="hidden" value="{{validations}}"/>
-<input id="datatypes" name="datatypes" type="hidden" value="{{datatypes}}"/>
-<input id="branches" name="branches" type="hidden" value="{{branches}}"/>
 {% endblock content %}
-
-{% block tabs %}
-{% endblock tabs %}
