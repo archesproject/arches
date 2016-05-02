@@ -29,7 +29,7 @@ from arches.app.models import models
 
 
 @group_required('edit')
-def manager(request, nodeid, page='graph-manager'):
+def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         graphs = models.Node.objects.filter(istopnode=True)
         metadata = models.GraphMetadata.objects.all()
@@ -55,8 +55,8 @@ def manager(request, nodeid, page='graph-manager'):
             pass
 
     datatypes = models.DDataType.objects.all()
-    return render(request, page+'.htm', {
-        'main_script': page,
+    return render(request, 'graph-manager.htm', {
+        'main_script': 'graph-manager',
         'nodeid': nodeid,
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
@@ -75,6 +75,17 @@ def manager(request, nodeid, page='graph-manager'):
             'search_placeholder': _('Find a graph branch')
         }
     })
+
+
+@group_required('edit')
+def settings(request, nodeid):
+    icons = models.Icon.objects.order_by('name')
+    return render(request, 'graph-settings.htm', {
+        'main_script': 'graph-settings',
+        'icons': JSONSerializer().serialize(icons),
+        'nodeid': nodeid,
+    })
+
 
 @group_required('edit')
 def node(request, nodeid):

@@ -78,6 +78,16 @@ class GraphManagerViewTests(ArchesTestCase):
         edge_count = len(graph['edges'])
         self.assertEqual(edge_count, self.NODE_COUNT)
 
+    def test_graph_settings(self):
+        """
+        Test the graph settings view
+
+        """
+        self.client.login(username='admin', password='admin')
+        url = reverse('graph_settings', kwargs={'nodeid':self.ROOT_ID})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     def test_node_update(self):
         """
         Test updating a node (HERITAGE_RESOURCE_PLACE) via node view
