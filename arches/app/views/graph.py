@@ -80,9 +80,12 @@ def manager(request, nodeid):
 @group_required('edit')
 def settings(request, nodeid):
     icons = models.Icon.objects.order_by('name')
+    node = models.Node.objects.get(nodeid=nodeid)
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
+        'node': JSONSerializer().serialize(node),
+        'metadata': JSONSerializer().serialize(node.graphmetadata),
         'nodeid': nodeid,
     })
 

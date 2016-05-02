@@ -1,9 +1,12 @@
 require([
     'underscore',
     'knockout',
+    'knockout-mapping',
     'views/page-view'
-], function(_, ko, PageView) {
+], function(_, ko, koMapping, PageView) {
     var icons = JSON.parse($('#icon-data').val());
+    var node = koMapping.fromJSON($('#node-data').val());
+    var metadata = koMapping.fromJSON($('#graph-metadata').val());
     var iconFilter = ko.observable('');
     var selectedIconClass = ko.observable('');
     var viewModel = {
@@ -13,7 +16,9 @@ require([
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
-        selectedIconClass: selectedIconClass
+        selectedIconClass: selectedIconClass,
+        node: node,
+        metadata: metadata
     };
 
     new PageView({

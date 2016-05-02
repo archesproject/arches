@@ -91,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input type="" placeholder="Name" id="" class="form-control input-lg widget-input">
+                                                        <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="value:metadata.name">
                                                     </div>
                                                 </div>
                                             </div>
@@ -320,4 +320,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 
 <input id="icon-data" name="icon-data" type="hidden" value="{{icons}}" />
+<input id="graph-metadata" name="graph-metadata" type="hidden" value="{{metadata}}" />
+<input id="node-data" name="node-data" type="hidden" value="{{node}}" />
 {% endblock content %}
