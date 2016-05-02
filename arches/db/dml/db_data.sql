@@ -249,6 +249,1785 @@ INSERT INTO validations(validationid, validation, validationtype, name, descript
 INSERT INTO validations_x_nodes(validation_id, node_id)
     VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
 
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc', 'fa fa-cc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bookmark', 'fa fa-bookmark');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('venus-mars', 'fa fa-venus-mars');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-o-down', 'fa fa-arrow-circle-o-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('comment-o', 'fa fa-comment-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('long-arrow-left', 'fa fa-long-arrow-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-right', 'fa fa-arrow-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('delicious', 'fa fa-delicious');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-circle-left', 'fa fa-chevron-circle-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bullhorn', 'fa fa-bullhorn');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('outdent', 'fa fa-outdent');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('jpy', 'fa fa-jpy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('drupal', 'fa fa-drupal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hdd-o', 'fa fa-hdd-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hand-o-left', 'fa fa-hand-o-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pinterest', 'fa fa-pinterest');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plane', 'fa fa-plane');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('question', 'fa fa-question');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('child', 'fa fa-child');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('circle-o', 'fa fa-circle-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('italic', 'fa fa-italic');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('meanpath', 'fa fa-meanpath');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('subway', 'fa fa-subway');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('google-plus', 'fa fa-google-plus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-up', 'fa fa-angle-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star', 'fa fa-star');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star-half-empty', 'fa fa-star-half-empty');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('facebook-official', 'fa fa-facebook-official');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('youtube-square', 'fa fa-youtube-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rss', 'fa fa-rss');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-off', 'fa fa-toggle-off');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('list-ol', 'fa fa-list-ol');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dot-circle-o', 'fa fa-dot-circle-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('copyright', 'fa fa-copyright');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('user', 'fa fa-user');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('key', 'fa fa-key');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('minus-square-o', 'fa fa-minus-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mobile', 'fa fa-mobile');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('table', 'fa fa-table');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('columns', 'fa fa-columns');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bolt', 'fa fa-bolt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fighter-jet', 'fa fa-fighter-jet');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('share-square-o', 'fa fa-share-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-archive-o', 'fa fa-file-archive-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('retweet', 'fa fa-retweet');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('level-up', 'fa fa-level-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-left', 'fa fa-caret-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-o-left', 'fa fa-arrow-circle-o-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('wrench', 'fa fa-wrench');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('shekel', 'fa fa-shekel');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eraser', 'fa fa-eraser');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-amount-asc', 'fa fa-sort-amount-asc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('vimeo-square', 'fa fa-vimeo-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gittip', 'fa fa-gittip');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cube', 'fa fa-cube');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('phone-square', 'fa fa-phone-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-asc', 'fa fa-sort-asc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('skyatlas', 'fa fa-skyatlas');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('beer', 'fa fa-beer');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('behance-square', 'fa fa-behance-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('binoculars', 'fa fa-binoculars');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('folder-open', 'fa fa-folder-open');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paint-brush', 'fa fa-paint-brush');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('whatsapp', 'fa fa-whatsapp');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('picture-o', 'fa fa-picture-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-down', 'fa fa-sort-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-circle-up', 'fa fa-chevron-circle-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bell-slash-o', 'fa fa-bell-slash-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('image', 'fa fa-image');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tumblr-square', 'fa fa-tumblr-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('repeat', 'fa fa-repeat');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('wheelchair', 'fa fa-wheelchair');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('underline', 'fa fa-underline');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('group', 'fa fa-group');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cab', 'fa fa-cab');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('thumbs-down', 'fa fa-thumbs-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('step-backward', 'fa fa-step-backward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('expand', 'fa fa-expand');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('th-list', 'fa fa-th-list');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('renren', 'fa fa-renren');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('list-ul', 'fa fa-list-ul');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flash', 'fa fa-flash');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('certificate', 'fa fa-certificate');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('thumbs-up', 'fa fa-thumbs-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-amex', 'fa fa-cc-amex');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('empire', 'fa fa-empire');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('random', 'fa fa-random');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('database', 'fa fa-database');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('check-square', 'fa fa-check-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('search-minus', 'fa fa-search-minus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('volume-off', 'fa fa-volume-off');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('legal', 'fa fa-legal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('slack', 'fa fa-slack');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gavel', 'fa fa-gavel');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('quote-right', 'fa fa-quote-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rebel', 'fa fa-rebel');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('external-link-square', 'fa fa-external-link-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('comments', 'fa fa-comments');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dashcube', 'fa fa-dashcube');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('btc', 'fa fa-btc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('terminal', 'fa fa-terminal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('align-justify', 'fa fa-align-justify');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('font', 'fa fa-font');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('unlink', 'fa fa-unlink');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-o-right', 'fa fa-arrow-circle-o-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-photo-o', 'fa fa-file-photo-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hotel', 'fa fa-hotel');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-double-left', 'fa fa-angle-double-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('map-marker', 'fa fa-map-marker');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('lightbulb-o', 'fa fa-lightbulb-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('buysellads', 'fa fa-buysellads');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort', 'fa fa-sort');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-sound-o', 'fa fa-file-sound-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('github', 'fa fa-github');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('comments-o', 'fa fa-comments-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('css3', 'fa fa-css3');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('instagram', 'fa fa-instagram');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('exclamation-circle', 'fa fa-exclamation-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('street-view', 'fa fa-street-view');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('book', 'fa fa-book');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('unlock-alt', 'fa fa-unlock-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('unlock', 'fa fa-unlock');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('facebook-f', 'fa fa-facebook-f');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-square-o-left', 'fa fa-caret-square-o-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flask', 'fa fa-flask');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('save', 'fa fa-save');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-excel-o', 'fa fa-file-excel-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('git', 'fa fa-git');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('headphones', 'fa fa-headphones');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('apple', 'fa fa-apple');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('th-large', 'fa fa-th-large');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('adjust', 'fa fa-adjust');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('minus-circle', 'fa fa-minus-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('undo', 'fa fa-undo');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-double-up', 'fa fa-angle-double-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('forward', 'fa fa-forward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-picture-o', 'fa fa-file-picture-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('xing', 'fa fa-xing');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('wifi', 'fa fa-wifi');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-o', 'fa fa-file-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ra', 'fa fa-ra');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('university', 'fa fa-university');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('truck', 'fa fa-truck');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cloud-upload', 'fa fa-cloud-upload');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('graduation-cap', 'fa fa-graduation-cap');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rotate-right', 'fa fa-rotate-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bank', 'fa fa-bank');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hand-o-up', 'fa fa-hand-o-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('soccer-ball-o', 'fa fa-soccer-ball-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paypal', 'fa fa-paypal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('behance', 'fa fa-behance');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bar-chart', 'fa fa-bar-chart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('institution', 'fa fa-institution');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('align-right', 'fa fa-align-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stack-exchange', 'fa fa-stack-exchange');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('windows', 'fa fa-windows');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('space-shuttle', 'fa fa-space-shuttle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('youtube-play', 'fa fa-youtube-play');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('phone', 'fa fa-phone');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ruble', 'fa fa-ruble');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('share-alt', 'fa fa-share-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('inbox', 'fa fa-inbox');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fire', 'fa fa-fire');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('steam-square', 'fa fa-steam-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('calendar-o', 'fa fa-calendar-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('comment', 'fa fa-comment');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('quote-left', 'fa fa-quote-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tencent-weibo', 'fa fa-tencent-weibo');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('git-square', 'fa fa-git-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sign-out', 'fa fa-sign-out');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('neuter', 'fa fa-neuter');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('newspaper-o', 'fa fa-newspaper-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('leanpub', 'fa fa-leanpub');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angellist', 'fa fa-angellist');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stop', 'fa fa-stop');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gratipay', 'fa fa-gratipay');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-numeric-desc', 'fa fa-sort-numeric-desc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('heart-o', 'fa fa-heart-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('calculator', 'fa fa-calculator');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mars-stroke-v', 'fa fa-mars-stroke-v');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('turkish-lira', 'fa fa-turkish-lira');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('search', 'fa fa-search');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('calendar', 'fa fa-calendar');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-stripe', 'fa fa-cc-stripe');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star-half-full', 'fa fa-star-half-full');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fast-backward', 'fa fa-fast-backward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stumbleupon-circle', 'fa fa-stumbleupon-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('check-circle', 'fa fa-check-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rub', 'fa fa-rub');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('edit', 'fa fa-edit');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('microphone', 'fa fa-microphone');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('html5', 'fa fa-html5');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('remove', 'fa fa-remove');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('signal', 'fa fa-signal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plus-square', 'fa fa-plus-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bold', 'fa fa-bold');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('wordpress', 'fa fa-wordpress');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('usd', 'fa fa-usd');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('facebook', 'fa fa-facebook');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('lock', 'fa fa-lock');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-down', 'fa fa-caret-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ioxhost', 'fa fa-ioxhost');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bell-slash', 'fa fa-bell-slash');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('long-arrow-down', 'fa fa-long-arrow-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('recycle', 'fa fa-recycle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('print', 'fa fa-print');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stumbleupon', 'fa fa-stumbleupon');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('filter', 'fa fa-filter');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('vine', 'fa fa-vine');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('share-alt-square', 'fa fa-share-alt-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-up', 'fa fa-arrow-circle-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('heartbeat', 'fa fa-heartbeat');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rupee', 'fa fa-rupee');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-on', 'fa fa-toggle-on');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-right', 'fa fa-toggle-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('play-circle-o', 'fa fa-play-circle-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('microphone-slash', 'fa fa-microphone-slash');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-numeric-asc', 'fa fa-sort-numeric-asc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-mastercard', 'fa fa-cc-mastercard');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('life-bouy', 'fa fa-life-bouy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-left', 'fa fa-chevron-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ellipsis-v', 'fa fa-ellipsis-v');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('folder-open-o', 'fa fa-folder-open-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pencil', 'fa fa-pencil');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-video-o', 'fa fa-file-video-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('server', 'fa fa-server');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('train', 'fa fa-train');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('spotify', 'fa fa-spotify');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('simplybuilt', 'fa fa-simplybuilt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('user-plus', 'fa fa-user-plus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-movie-o', 'fa fa-file-movie-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('maxcdn', 'fa fa-maxcdn');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('krw', 'fa fa-krw');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('navicon', 'fa fa-navicon');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-left', 'fa fa-angle-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-square-o-right', 'fa fa-caret-square-o-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mercury', 'fa fa-mercury');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('circle-thin', 'fa fa-circle-thin');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('text-width', 'fa fa-text-width');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('wechat', 'fa fa-wechat');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('reorder', 'fa fa-reorder');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('envelope-square', 'fa fa-envelope-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bitbucket-square', 'fa fa-bitbucket-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('frown-o', 'fa fa-frown-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('line-chart', 'fa fa-line-chart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mars', 'fa fa-mars');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-down', 'fa fa-arrow-circle-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-up', 'fa fa-caret-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tumblr', 'fa fa-tumblr');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star-o', 'fa fa-star-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cart-plus', 'fa fa-cart-plus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('check', 'fa fa-check');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('lastfm', 'fa fa-lastfm');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pencil-square', 'fa fa-pencil-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('trophy', 'fa fa-trophy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('external-link', 'fa fa-external-link');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('long-arrow-up', 'fa fa-long-arrow-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('envelope-o', 'fa fa-envelope-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('user-times', 'fa fa-user-times');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('trello', 'fa fa-trello');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-powerpoint-o', 'fa fa-file-powerpoint-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('circle', 'fa fa-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paper-plane', 'fa fa-paper-plane');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('google', 'fa fa-google');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bug', 'fa fa-bug');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bitcoin', 'fa fa-bitcoin');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('lastfm-square', 'fa fa-lastfm-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('umbrella', 'fa fa-umbrella');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('text-height', 'fa fa-text-height');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('send-o', 'fa fa-send-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('support', 'fa fa-support');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paw', 'fa fa-paw');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cart-arrow-down', 'fa fa-cart-arrow-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('twitch', 'fa fa-twitch');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('crop', 'fa fa-crop');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('trash-o', 'fa fa-trash-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file', 'fa fa-file');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('align-left', 'fa fa-align-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('user-md', 'fa fa-user-md');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sellsy', 'fa fa-sellsy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('github-alt', 'fa fa-github-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('desktop', 'fa fa-desktop');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('info-circle', 'fa fa-info-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-audio-o', 'fa fa-file-audio-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('compass', 'fa fa-compass');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dribbble', 'fa fa-dribbble');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fast-forward', 'fa fa-fast-forward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('weixin', 'fa fa-weixin');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('adn', 'fa fa-adn');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-o-up', 'fa fa-arrow-circle-o-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eye', 'fa fa-eye');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrows-h', 'fa fa-arrows-h');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('archive', 'fa fa-archive');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('try', 'fa fa-try');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('reply', 'fa fa-reply');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mail-reply-all', 'fa fa-mail-reply-all');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('backward', 'fa fa-backward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('spinner', 'fa fa-spinner');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-left', 'fa fa-arrow-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('level-down', 'fa fa-level-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('suitcase', 'fa fa-suitcase');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('asterisk', 'fa fa-asterisk');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-word-o', 'fa fa-file-word-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('meh-o', 'fa fa-meh-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('moon-o', 'fa fa-moon-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-right', 'fa fa-caret-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('smile-o', 'fa fa-smile-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('times-circle-o', 'fa fa-times-circle-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('play-circle', 'fa fa-play-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('trash', 'fa fa-trash');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('deviantart', 'fa fa-deviantart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rocket', 'fa fa-rocket');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('play', 'fa fa-play');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tasks', 'fa fa-tasks');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cny', 'fa fa-cny');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bars', 'fa fa-bars');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tachometer', 'fa fa-tachometer');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('heart', 'fa fa-heart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star-half', 'fa fa-star-half');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('camera', 'fa fa-camera');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('music', 'fa fa-music');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('share-square', 'fa fa-share-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('birthday-cake', 'fa fa-birthday-cake');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('puzzle-piece', 'fa fa-puzzle-piece');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-right', 'fa fa-arrow-circle-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('camera-retro', 'fa fa-camera-retro');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-desc', 'fa fa-sort-desc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('openid', 'fa fa-openid');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('language', 'fa fa-language');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-pdf-o', 'fa fa-file-pdf-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ban', 'fa fa-ban');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tree', 'fa fa-tree');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-double-down', 'fa fa-angle-double-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('connectdevelop', 'fa fa-connectdevelop');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-up', 'fa fa-toggle-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bell', 'fa fa-bell');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('magic', 'fa fa-magic');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('video-camera', 'fa fa-video-camera');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('jsfiddle', 'fa fa-jsfiddle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('vk', 'fa fa-vk');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tint', 'fa fa-tint');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('photo', 'fa fa-photo');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plus', 'fa fa-plus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bus', 'fa fa-bus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('venus-double', 'fa fa-venus-double');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('star-half-o', 'fa fa-star-half-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('download', 'fa fa-download');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('skype', 'fa fa-skype');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('credit-card', 'fa fa-credit-card');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-double-right', 'fa fa-angle-double-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('square', 'fa fa-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cog', 'fa fa-cog');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('list-alt', 'fa fa-list-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrows-alt', 'fa fa-arrows-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gbp', 'fa fa-gbp');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('minus-square', 'fa fa-minus-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bullseye', 'fa fa-bullseye');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('viacoin', 'fa fa-viacoin');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-square-o-down', 'fa fa-caret-square-o-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-right', 'fa fa-angle-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('money', 'fa fa-money');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-visa', 'fa fa-cc-visa');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('info', 'fa fa-info');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-left', 'fa fa-toggle-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flag-checkered', 'fa fa-flag-checkered');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('qq', 'fa fa-qq');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cloud', 'fa fa-cloud');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sliders', 'fa fa-sliders');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('envelope', 'fa fa-envelope');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('lemon-o', 'fa fa-lemon-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tty', 'fa fa-tty');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('anchor', 'fa fa-anchor');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eject', 'fa fa-eject');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('home', 'fa fa-home');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('life-saver', 'fa fa-life-saver');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rotate-left', 'fa fa-rotate-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('square-o', 'fa fa-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('location-arrow', 'fa fa-location-arrow');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('question-circle', 'fa fa-question-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('header', 'fa fa-header');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ge', 'fa fa-ge');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('briefcase', 'fa fa-briefcase');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('close', 'fa fa-close');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hand-o-down', 'fa fa-hand-o-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stethoscope', 'fa fa-stethoscope');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('xing-square', 'fa fa-xing-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mars-double', 'fa fa-mars-double');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rouble', 'fa fa-rouble');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mortar-board', 'fa fa-mortar-board');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('clipboard', 'fa fa-clipboard');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('male', 'fa fa-male');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('euro', 'fa fa-euro');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-image-o', 'fa fa-file-image-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('weibo', 'fa fa-weibo');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-alpha-desc', 'fa fa-sort-alpha-desc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('reddit', 'fa fa-reddit');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flag-o', 'fa fa-flag-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('automobile', 'fa fa-automobile');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('floppy-o', 'fa fa-floppy-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('magnet', 'fa fa-magnet');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('soundcloud', 'fa fa-soundcloud');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('copy', 'fa fa-copy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('reddit-square', 'fa fa-reddit-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flickr', 'fa fa-flickr');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('minus', 'fa fa-minus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cloud-download', 'fa fa-cloud-download');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('link', 'fa fa-link');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eye-slash', 'fa fa-eye-slash');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eyedropper', 'fa fa-eyedropper');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('thumbs-o-up', 'fa fa-thumbs-o-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tags', 'fa fa-tags');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('scissors', 'fa fa-scissors');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-right', 'fa fa-chevron-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('times', 'fa fa-times');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sun-o', 'fa fa-sun-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paperclip', 'fa fa-paperclip');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('unsorted', 'fa fa-unsorted');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('diamond', 'fa fa-diamond');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('google-plus-square', 'fa fa-google-plus-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('spoon', 'fa fa-spoon');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('digg', 'fa fa-digg');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bitbucket', 'fa fa-bitbucket');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('yahoo', 'fa fa-yahoo');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('building-o', 'fa fa-building-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('transgender', 'fa fa-transgender');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bomb', 'fa fa-bomb');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('glass', 'fa fa-glass');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gamepad', 'fa fa-gamepad');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('futbol-o', 'fa fa-futbol-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('youtube', 'fa fa-youtube');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paper-plane-o', 'fa fa-paper-plane-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hacker-news', 'fa fa-hacker-news');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('coffee', 'fa fa-coffee');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tablet', 'fa fa-tablet');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('yen', 'fa fa-yen');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('send', 'fa fa-send');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('exclamation-triangle', 'fa fa-exclamation-triangle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('upload', 'fa fa-upload');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('stack-overflow', 'fa fa-stack-overflow');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('tag', 'fa fa-tag');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('steam', 'fa fa-steam');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('at', 'fa fa-at');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ticket', 'fa fa-ticket');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('exclamation', 'fa fa-exclamation');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('life-ring', 'fa fa-life-ring');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dollar', 'fa fa-dollar');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-zip-o', 'fa fa-file-zip-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('eur', 'fa fa-eur');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cogs', 'fa fa-cogs');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('exchange', 'fa fa-exchange');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('barcode', 'fa fa-barcode');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('check-circle-o', 'fa fa-check-circle-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('code', 'fa fa-code');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fax', 'fa fa-fax');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mobile-phone', 'fa fa-mobile-phone');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hand-o-right', 'fa fa-hand-o-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('female', 'fa fa-female');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('search-plus', 'fa fa-search-plus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('caret-square-o-up', 'fa fa-caret-square-o-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sitemap', 'fa fa-sitemap');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-circle-down', 'fa fa-chevron-circle-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dropbox', 'fa fa-dropbox');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('thumbs-o-down', 'fa fa-thumbs-o-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plug', 'fa fa-plug');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('angle-down', 'fa fa-angle-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('power-off', 'fa fa-power-off');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gear', 'fa fa-gear');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('linkedin', 'fa fa-linkedin');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('forumbee', 'fa fa-forumbee');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('refresh', 'fa fa-refresh');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('shield', 'fa fa-shield');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-down', 'fa fa-chevron-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('user-secret', 'fa fa-user-secret');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('reply-all', 'fa fa-reply-all');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sign-in', 'fa fa-sign-in');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('won', 'fa fa-won');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('leaf', 'fa fa-leaf');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('foursquare', 'fa fa-foursquare');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('yelp', 'fa fa-yelp');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-up', 'fa fa-arrow-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-paypal', 'fa fa-cc-paypal');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sheqel', 'fa fa-sheqel');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('strikethrough', 'fa fa-strikethrough');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ship', 'fa fa-ship');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('twitter-square', 'fa fa-twitter-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('transgender-alt', 'fa fa-transgender-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('toggle-down', 'fa fa-toggle-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('long-arrow-right', 'fa fa-long-arrow-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('linux', 'fa fa-linux');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mail-reply', 'fa fa-mail-reply');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ils', 'fa fa-ils');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('clock-o', 'fa fa-clock-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gift', 'fa fa-gift');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pie-chart', 'fa fa-pie-chart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-up', 'fa fa-chevron-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('laptop', 'fa fa-laptop');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pied-piper-alt', 'fa fa-pied-piper-alt');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('qrcode', 'fa fa-qrcode');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dashboard', 'fa fa-dashboard');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('crosshairs', 'fa fa-crosshairs');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chain-broken', 'fa fa-chain-broken');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('hospital-o', 'fa fa-hospital-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('shirtsinbulk', 'fa fa-shirtsinbulk');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cc-discover', 'fa fa-cc-discover');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('indent', 'fa fa-indent');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-circle-left', 'fa fa-arrow-circle-left');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bar-chart-o', 'fa fa-bar-chart-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('motorcycle', 'fa fa-motorcycle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('flag', 'fa fa-flag');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('check-square-o', 'fa fa-check-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('road', 'fa fa-road');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('area-chart', 'fa fa-area-chart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-alpha-asc', 'fa fa-sort-alpha-asc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-amount-desc', 'fa fa-sort-amount-desc');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pencil-square-o', 'fa fa-pencil-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('volume-down', 'fa fa-volume-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('superscript', 'fa fa-superscript');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('warning', 'fa fa-warning');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('keyboard-o', 'fa fa-keyboard-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('genderless', 'fa fa-genderless');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('google-wallet', 'fa fa-google-wallet');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('volume-up', 'fa fa-volume-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('codepen', 'fa fa-codepen');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('th', 'fa fa-th');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-code-o', 'fa fa-file-code-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('facebook-square', 'fa fa-facebook-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plus-circle', 'fa fa-plus-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pinterest-p', 'fa fa-pinterest-p');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rmb', 'fa fa-rmb');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paste', 'fa fa-paste');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pagelines', 'fa fa-pagelines');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('plus-square-o', 'fa fa-plus-square-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('building', 'fa fa-building');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chain', 'fa fa-chain');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mars-stroke', 'fa fa-mars-stroke');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ambulance', 'fa fa-ambulance');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('step-forward', 'fa fa-step-forward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pied-piper', 'fa fa-pied-piper');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('github-square', 'fa fa-github-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bed', 'fa fa-bed');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('medkit', 'fa fa-medkit');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('sort-up', 'fa fa-sort-up');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('folder-o', 'fa fa-folder-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('dedent', 'fa fa-dedent');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('code-fork', 'fa fa-code-fork');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('life-buoy', 'fa fa-life-buoy');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('compress', 'fa fa-compress');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('folder', 'fa fa-folder');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cut', 'fa fa-cut');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('venus', 'fa fa-venus');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('circle-o-notch', 'fa fa-circle-o-notch');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('gears', 'fa fa-gears');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mars-stroke-h', 'fa fa-mars-stroke-h');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('film', 'fa fa-film');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('files-o', 'fa fa-files-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('align-center', 'fa fa-align-center');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrows', 'fa fa-arrows');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cubes', 'fa fa-cubes');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('inr', 'fa fa-inr');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('cutlery', 'fa fa-cutlery');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('users', 'fa fa-users');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('rss-square', 'fa fa-rss-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrow-down', 'fa fa-arrow-down');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('share', 'fa fa-share');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('history', 'fa fa-history');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('times-circle', 'fa fa-times-circle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('joomla', 'fa fa-joomla');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('arrows-v', 'fa fa-arrows-v');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('slideshare', 'fa fa-slideshare');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('list', 'fa fa-list');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-text', 'fa fa-file-text');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('linkedin-square', 'fa fa-linkedin-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('medium', 'fa fa-medium');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('android', 'fa fa-android');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('paragraph', 'fa fa-paragraph');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pinterest-square', 'fa fa-pinterest-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('ellipsis-h', 'fa fa-ellipsis-h');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bell-o', 'fa fa-bell-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('shopping-cart', 'fa fa-shopping-cart');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('thumb-tack', 'fa fa-thumb-tack');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('globe', 'fa fa-globe');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('subscript', 'fa fa-subscript');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bicycle', 'fa fa-bicycle');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('file-text-o', 'fa fa-file-text-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('pause', 'fa fa-pause');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('chevron-circle-right', 'fa fa-chevron-circle-right');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('car', 'fa fa-car');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('taxi', 'fa fa-taxi');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('twitter', 'fa fa-twitter');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('h-square', 'fa fa-h-square');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('mail-forward', 'fa fa-mail-forward');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('bookmark-o', 'fa fa-bookmark-o');
+
+INSERT INTO icons(name, cssclass)
+    VALUES ('fire-extinguisher', 'fa fa-fire-extinguisher');
+
 
 -- INSERT INTO tile_instances(tileinstanceid, tilegroupid, tileinstancedata, cardid,
 --             resourceclassid, resourceinstanceid)

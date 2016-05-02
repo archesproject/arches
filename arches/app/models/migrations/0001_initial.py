@@ -351,6 +351,18 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Icon',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=True)),
+                ('name', models.TextField(blank=True, null=True)),
+                ('cssclass', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'icons',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),

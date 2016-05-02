@@ -851,6 +851,21 @@ WITH (OIDS=FALSE)
 ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "validations_x_nodes_pk" PRIMARY KEY ("id")
 ;
 
+-- Table icons
+
+CREATE TABLE "icons"(
+ "id" serial NOT NULL,
+ "name" Text,
+ "cssclass" Text
+)
+WITH (OIDS=FALSE)
+;
+
+-- Add keys for table icons
+
+ALTER TABLE "icons" ADD CONSTRAINT "icons_pk" PRIMARY KEY ("id")
+;
+
 -- Create relationships section -------------------------------------------------
 
 ALTER TABLE "cardgroups" ADD CONSTRAINT "nodes_cardgroups_fk" FOREIGN KEY ("nodeid") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION

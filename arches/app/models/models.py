@@ -205,6 +205,16 @@ class Function(models.Model):
         db_table = 'functions'
 
 
+class Icon(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.TextField(blank=True, null=True)
+    cssclass = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'icons'
+
+
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     cardinality = models.TextField(blank=True, default='n')
