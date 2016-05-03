@@ -18,34 +18,39 @@ define([
                 })
             });
             this.selectedItem = ko.observable(null);
+            this.viewMetadata = ko.observable(false);
         },
 
         selectItem: function(item, evt){
+            ListView.prototype.selectItem.apply(this, arguments);
+            
             if(item.selected()){
-                this.selectedItem(null)
-            }else{
                 this.selectedItem(item);
                 this.graph = new GraphBase({
                     el: $('#branch-preview'),
                     graphModel: item.graphModel
                 });
-
+                this.viewMetadata(true);
+            }else{
+                this.selectedItem(null);
+                this.viewMetadata(false);
             }
-            ListView.prototype.selectItem.apply(this, arguments);
         },
 
-        appendBranch: function(){
+        appendBranch: function(item, evt){
             if(this.editNode()){
-                this.graphModel.appendBranch(this.editNode().nodeid, this.selectedItem().ontology_property(), this.selectedItem().graphmetadataid, function(response){
+                this.graphModel.appendBranch(this.editNode().nodeid, item.ontology_property(), item.graphmetadataid, function(response){
                 }, this)
-
             }
         },
 
         closeForm: function(){
             this.clearSelection();
             this.selectedItem(null);
-        }
+            this.viewMetadata(false);
+        },
+
+
 
     });
     return BranchList;

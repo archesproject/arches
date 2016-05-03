@@ -8,11 +8,11 @@
 
 {% block listitem %}
     <div class="library-icon" style="">
-        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
             <i class="fa fa-hand-o-left"></i>
         </span>
     </div>
-    <div class="library-card-main" style="">
+    <div class="library-card-main">
         <a class="listitem_name" data-bind="text: $data.name">
         </a>
     </div>

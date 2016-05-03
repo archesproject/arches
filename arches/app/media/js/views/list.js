@@ -24,18 +24,17 @@ define([
         },
 
         selectItem: function(item, evt){
+            var selectedStatus = item.selected();
             if(this.single_select){
                 this.clearSelection();
             }
-            item.selected(!item.selected());
-            $(evt.currentTarget).toggleClass('selected-card');
+            item.selected(!selectedStatus);
         },
 
         clearSelection: function(){
             this.items().forEach(function(item){
                 item.selected(false);
             }, this);
-            this.$el.find('.grid').children().removeClass('selected-card');
         },
 
         clearSearch: function(){
