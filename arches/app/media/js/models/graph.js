@@ -57,18 +57,26 @@ define(['arches',
                 url: this.url + 'append_branch/' + nodeid + '/' + property + '/' + branchmetadatid,
                 data: JSON.stringify(this.toJSON())
             }, function(response, status, self){
+                var branchroot = response.responseJSON.root;
                 response.responseJSON.nodes.forEach(function(node){
                     self.get('nodes').push(new NodeModel({
                         source: node,
                         datatypelookup: self.get('datatypelookup')
                     }));
                 }, this);
-                self.set('_nodes', self.get('nodes')()),
+                self.get('nodes')()
+                .forEach(function (node) {
+                    node.selected(false);
+                    node.editing(false);
+                    if (node.nodeid === branchroot.nodeid){
+                        node.editing(true);
+                        node.selected(true);
+                    }
+                });
 
                 response.responseJSON.edges.forEach(function(edge){
                     self.get('edges').push(edge);
                 }, this);
-                self.set('_edges', self.get('edges')()),
 
                 callback();
             }, scope, 'changed');
