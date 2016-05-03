@@ -19,6 +19,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block graph_header %}
+<!-- Title -->
+<div class="text-left edit-panel-top-bar">
+    <div class="center-div">
+        <h1 class="page-header text-overflow arches-panel-header"><i class="text-center {{metadata.iconclass}} icon-wrap bg-gray arches-panel-icon"  data-bind="css: metadata.iconclass() + ' text-center icon-wrap bg-gray arches-panel-icon'"></i> <span data-bind="text:metadata.name">{{metadata.name}}</span></h1>
+        <p class="arches-panel-subtitle" data-bind="text:metadata.subtitle">{{metadata.subtitle}}</p>
+    </div>
+</div>
+{% endblock graph_header %}
+
 {% block content %}
 <div id="external-page-content" class="">
     <div class="" style="padding: 12px;">

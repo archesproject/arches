@@ -73,7 +73,8 @@ def manager(request, nodeid):
         'branch_list': {
             'title': _('Branch Library'),
             'search_placeholder': _('Find a graph branch')
-        }
+        },
+        'metadata': graph.root.graphmetadata
     })
 
 
@@ -85,8 +86,9 @@ def settings(request, nodeid):
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
         'node': JSONSerializer().serialize(node),
-        'metadata': JSONSerializer().serialize(node.graphmetadata),
+        'metadata_json': JSONSerializer().serialize(node.graphmetadata),
         'nodeid': nodeid,
+        'metadata': node.graphmetadata
     })
 
 
