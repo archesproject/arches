@@ -66,8 +66,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Resource Type -->
             <div class="resource-grid-main-container">
                 <div class="resource-grid-main">
-                    <h1 class="page-header text-overflow resource-grid-title"><i class="fa fa-th icon-wrap resource-grid-icon"></i> <span data-bind="text:metadata.name"></span></h1>
-                    <p class="resource-grid-subtitle" data-bind='text:metadata.description?metadata.description:"{% trans "No description available." %}"'></p>
+                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (metadata.iconclass?metadata.iconclass:'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:metadata.name"></span></h1>
+                    <p class="resource-grid-subtitle" data-bind='text:metadata.subtitle'></p>
                 </div>
             </div>
 
