@@ -56,6 +56,9 @@ class ArchesFile(object):
 		resourceGraphImporter(self.graphs)
 
 	def import_concepts(self):
+		"""
+		Wrapper around arches.app.utils.data_management.concepts.importer method.
+		"""
 		conceptImporter(self.reference_data)
 
 	def import_business_data(self):

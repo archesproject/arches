@@ -228,7 +228,7 @@ class Node(models.Model):
     istopnode = models.BooleanField()
     isresource = models.BooleanField()
     isactive = models.BooleanField()
-    ontologyclass = models.TextField()
+    ontologyclass = models.ForeignKey(Concept, db_column='ontologyclass', blank=True, null=True)
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)

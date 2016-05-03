@@ -167,7 +167,7 @@ INSERT INTO graph_metadata(graphmetadataid, name, author, version, description)
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype, graphmetadataid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'f', 'f', 'E1', 'string', '22000000-0000-0000-0000-000000000000');
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'f', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string', '22000000-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
@@ -179,12 +179,12 @@ INSERT INTO graph_metadata(graphmetadataid, name, author, version, description)
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             graphmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'f', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             graphmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'f', 'f', 'E55', 'domain',
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'f', 'f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'domain',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
@@ -196,26 +196,26 @@ INSERT INTO edges(domainnodeid, rangenodeid)
 
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 't', 'f', 'E1', 'semantic', '20000000-0000-0000-0000-000000000000');
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 't', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic', '20000000-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'f', 'f', 'E1', 'semantic',
+    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'f', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic',
             '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'f', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
             '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'f', 'f', 'E55', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'f', 'f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'domain',
             '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, isresource, isactive, ontologyclass, datatype,
             nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'f', 'f', 'E1', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'f', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
             '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO edges(domainnodeid, rangenodeid)
