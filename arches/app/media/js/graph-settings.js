@@ -1,14 +1,14 @@
 require([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
     'views/page-view'
-], function(_, ko, koMapping, PageView) {
+], function($, _, ko, koMapping, PageView) {
     var icons = JSON.parse($('#icon-data').val());
-    var node = koMapping.fromJSON($('#node-data').val());
-    var metadata = koMapping.fromJSON($('#graph-metadata').val());
+    var srcJSON = $('#graph-metadata').val();
+    var metadata = koMapping.fromJSON(srcJSON);
     var iconFilter = ko.observable('');
-    var selectedIconClass = ko.observable('');
     var viewModel = {
         iconFilter: iconFilter,
         icons: ko.computed(function () {
@@ -16,12 +16,29 @@ require([
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
-        selectedIconClass: selectedIconClass,
-        node: node,
-        metadata: metadata
+        metadata: metadata,
+        save: function () {
+            pageView.viewModel.loading(true);
+            $.ajax({
+                type: "POST",
+                url: '',
+                data: koMapping.toJSON(metadata),
+                success: function(response) {
+                    pageView.viewModel.loading(false);
+                },
+                failure: function(response) {
+                    pageView.viewModel.loading(false);
+                }
+            });
+        },
+        reset: function () {
+            _.each(JSON.parse(srcJSON), function(value, key) {
+                metadata[key](value);
+            });
+        }
     };
 
-    new PageView({
+    var pageView = new PageView({
         viewModel: viewModel
     });
 });

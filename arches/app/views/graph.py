@@ -80,8 +80,14 @@ def manager(request, nodeid):
 
 @group_required('edit')
 def settings(request, nodeid):
-    icons = models.Icon.objects.order_by('name')
     node = models.Node.objects.get(nodeid=nodeid)
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        for key, value in data.iteritems():
+            setattr(node.graphmetadata, key, value)
+        node.graphmetadata.save()
+        return JSONResponse({'success': True, 'metadata': node.graphmetadata})
+    icons = models.Icon.objects.order_by('name')
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),

@@ -113,7 +113,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input">
+                                                        <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle">
                                                     </div>
                                                 </div>
                                             </div>
@@ -130,7 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <!-- Currently selected icon -->
                                                             <div class="" style="">
-                                                                Selected icon: <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + selectedIconClass(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                                Selected icon: <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + metadata.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
                                                             </div>
 
                                                             <div class="" style="position: absolute; left: 130px; top: 21px;">
@@ -148,7 +148,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="row">
 
                                                             <!-- ko foreach: icons -->
-                                                            <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selectedIconClass())}, click: function() { $root.selectedIconClass(cssclass) }">
+                                                            <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.metadata.iconclass())}, click: function() { $root.metadata.iconclass(cssclass) }">
                                                                 <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                             </div>
                                                             <!-- /ko -->
@@ -266,7 +266,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input type="" placeholder="Author name" id="" class="form-control input-lg widget-input">
+                                                        <input type="" placeholder="Author name" id="" class="form-control input-lg widget-input" data-bind="value:metadata.author">
                                                     </div>
                                                 </div>
                                             </div>
@@ -278,7 +278,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <textarea placeholder="Resource abstract/description" rows="6" class="form-control"></textarea>
+                                                        <textarea placeholder="Resource abstract/description" rows="6" class="form-control" data-bind="value:metadata.description"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -321,8 +321,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Save Input -->
                 <div class="wizard-buttons pull-right" style="">
-                    <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt btn-editable" style=""> Discard edits
-                    </button><button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check btn-editable" style=""> Save settings</button>
+                    <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt btn-editable" data-bind="click:reset"> Discard edits</button>
+                    <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check btn-editable" data-bind="click:save"> Save settings</button>
                 </div>
             </div>
         </div>
@@ -330,6 +330,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 
 <input id="icon-data" name="icon-data" type="hidden" value="{{icons}}" />
-<input id="graph-metadata" name="graph-metadata" type="hidden" value="{{metadata}}" />
+<input id="graph-metadata" name="graph-metadata" type="hidden" value="{{metadata_json}}" />
 <input id="node-data" name="node-data" type="hidden" value="{{node}}" />
 {% endblock content %}
