@@ -796,7 +796,9 @@ CREATE TABLE "graphmetadata"(
  "deploymentdate" Timestamp,
  "version" Text,
  "isresource" Boolean NOT NULL,
- "isactive" Boolean NOT NULL
+ "isactive" Boolean NOT NULL,
+ "iconclass" Text,
+ "subtitle" Text
 )
 WITH (OIDS=FALSE)
 ;

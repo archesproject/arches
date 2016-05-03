@@ -45,6 +45,8 @@ class GraphMetadata(models.Model):
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
     isactive = models.BooleanField()
+    iconclass = models.TextField(blank=True, null=True)
+    subtitle = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True

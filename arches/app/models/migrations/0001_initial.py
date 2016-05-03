@@ -173,6 +173,8 @@ class Migration(migrations.Migration):
                 ('version', models.TextField(null=True, blank=True)),
                 ('isresource', models.BooleanField()),
                 ('isactive', models.BooleanField()),
+                ('iconclass', models.TextField(null=True, blank=True)),
+                ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'graph_metadata',
