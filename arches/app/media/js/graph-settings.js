@@ -6,6 +6,10 @@ require([
     'views/page-view'
 ], function($, _, ko, koMapping, PageView) {
     var icons = JSON.parse($('#icon-data').val());
+    var resources = JSON.parse($('#resource-data').val());
+    resources.forEach(function(resource) {
+        resource.isRelatable = ko.observable(resource.is_relatable);
+    });
     var srcJSON = $('#graph-metadata').val();
     var metadata = koMapping.fromJSON(srcJSON);
     var iconFilter = ko.observable('');
@@ -17,12 +21,37 @@ require([
             });
         }),
         metadata: metadata,
+        resources: resources,
+        isResource: ko.computed({
+            read: function() {
+                return metadata.isresource().toString();
+            },
+            write: function(value) {
+                metadata.isresource(value === "true");
+            }
+        }),
+        isActive: ko.computed({
+            read: function() {
+                return metadata.isactive().toString();
+            },
+            write: function(value) {
+                metadata.isactive(value === "true");
+            }
+        }),
         save: function () {
             pageView.viewModel.loading(true);
+            var relatableResourceIds = _.filter(resources, function(resource){
+                return resource.isRelatable();
+            }).map(function(resource){
+                return resource.id
+            })
             $.ajax({
                 type: "POST",
                 url: '',
-                data: koMapping.toJSON(metadata),
+                data: JSON.stringify({
+                    metadata: koMapping.toJS(metadata),
+                    relatable_resource_ids: relatableResourceIds
+                }),
                 success: function(response) {
                     pageView.viewModel.loading(false);
                 },

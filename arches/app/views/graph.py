@@ -83,18 +83,32 @@ def settings(request, nodeid):
     node = models.Node.objects.get(nodeid=nodeid)
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.iteritems():
+        for key, value in data.get('metadata').iteritems():
             setattr(node.graphmetadata, key, value)
         node.graphmetadata.save()
-        return JSONResponse({'success': True, 'metadata': node.graphmetadata})
+        node.set_relatable_resources(data.get('relatable_resource_ids'))
+        return JSONResponse({
+            'success': True,
+            'metadata': node.graphmetadata,
+            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
+        })
     icons = models.Icon.objects.order_by('name')
+    resource_nodes = models.Node.objects.filter(Q(graphmetadata__isresource=True), ~Q(nodeid=nodeid))
+    resource_data = []
+    relatable_resources = node.get_relatable_resources()
+    for res in resource_nodes:
+        resource_data.append({
+            'id': res.nodeid,
+            'metadata': res.graphmetadata,
+            'is_relatable': (res in relatable_resources)
+        })
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
-        'node': JSONSerializer().serialize(node),
         'metadata_json': JSONSerializer().serialize(node.graphmetadata),
         'nodeid': nodeid,
-        'metadata': node.graphmetadata
+        'metadata': node.graphmetadata,
+        'resource_data': JSONSerializer().serialize(resource_data)
     })
 
 
