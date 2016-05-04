@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models import models
 
 def import_concepts(reference_data):
     concepts = reference_data[0]['concepts']
@@ -27,7 +28,7 @@ def import_concepts(reference_data):
     keys = []
     def validate_recursion(conceptid):
         if conceptid in keys:
-            print conceptid + ' has been referenced twice.'
+            # print conceptid + ' has been referenced twice.'
             return True
         else:
             keys.append(conceptid)
@@ -40,28 +41,31 @@ def import_concepts(reference_data):
     def get_concept_values(conceptid):
         related_values = []
         for value in values:
-            if 'i_' not in value['value']:
-                if value['conceptid'] == conceptid:
-                    conceptvalue_obj = ConceptValue()
-                    conceptvalue_obj.id = value['valueid']
-                    conceptvalue_obj.type = value['valuetype']
-                    conceptvalue_obj.value = value['value']
-                    conceptvalue_obj.language = value['languageid']
-                    related_values.append(conceptvalue_obj)
+            existing_valuetypes = [o.valuetype for o in models.DValueType.objects.all()]
+
+            if value['valuetype'] not in existing_valuetypes:
+                models.DValueType(valuetype = value['valuetype'], category = 'undefined', namespace = 'arches').save()
+
+            if value['conceptid'] == conceptid:
+                conceptvalue_obj = ConceptValue()
+                conceptvalue_obj.id = value['valueid']
+                conceptvalue_obj.type = value['valuetype']
+                conceptvalue_obj.value = value['value']
+                conceptvalue_obj.language = value['languageid']
+                related_values.append(conceptvalue_obj)
 
         return related_values
 
     concept_objs = {}
     for concept in concepts:
-        if 'i_' not in concept['legacyoid']:
-            concept_obj = Concept()
-            concept_obj.id = concept['conceptid']
-            concept_obj.nodetype = concept['nodetype']
-            concept_obj.legacyoid = concept['legacyoid']
-            concept_obj.values = get_concept_values(concept['conceptid'])
-            concept_obj.save()
+        concept_obj = Concept()
+        concept_obj.id = concept['conceptid']
+        concept_obj.nodetype = concept['nodetype']
+        concept_obj.legacyoid = concept['legacyoid']
+        concept_obj.values = get_concept_values(concept['conceptid'])
+        concept_obj.save()
 
-            concept_objs[concept_obj.id] = concept_obj
+        concept_objs[concept_obj.id] = concept_obj
 
 
     for relation in relations:
