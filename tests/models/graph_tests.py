@@ -46,6 +46,16 @@ class GraphTests(ArchesTestCase):
             pk=newid,
             cardinality='1'
         )
+        metadata = models.GraphMetadata.objects.create(
+            name="TEST GRAPH",
+            subtitle="ARCHES TEST GRAPH",
+            author="Arches",
+            description="ARCHES TEST GRAPH",
+            version="v1.0.0",
+            isresource=True,
+            isactive=False,
+            iconclass="fa fa-building"
+        )
         self.rootNode = models.Node.objects.create(
             pk=newid,
             name='ROOT NODE',
@@ -53,7 +63,8 @@ class GraphTests(ArchesTestCase):
             istopnode=True,
             ontologyclass_id='c03db431-4564-34eb-ba86-4c8169e4276c',
             datatype='semantic',
-            nodegroup=newgroup
+            nodegroup=newgroup,
+            graphmetadata=metadata
         )
 
     def tearDown(self):
@@ -67,6 +78,16 @@ class GraphTests(ArchesTestCase):
         """
 
         graph_obj = {
+            "metadata": {
+                "name": "TEST GRAPH",
+                "subtitle": "ARCHES TEST GRAPH",
+                "author": "Arches",
+                "description": "ARCHES TEST GRAPH",
+                "version": "v1.0.0",
+                "isresource": True,
+                "isactive": False,
+                "iconclass": "fa fa-building"
+            },
             'nodes':[{
                 "status": None,
                 "graphmetadataid": None,

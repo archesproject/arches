@@ -4687,6 +4687,16 @@
     ],
     "graph": [
         {
+            "metadata": {
+                "name": "Heritage Resource",
+                "subtitle": "Arches cultural heritage resource",
+                "author": "Arches",
+                "description": "Arches cultural heritage resource",
+                "version": "v1.0.0",
+                "isresource": true,
+                "isactive": false,
+                "iconclass": "fa fa-building"
+            },
             "nodes": [
                 {
                     "status": null,

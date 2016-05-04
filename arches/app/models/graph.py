@@ -53,6 +53,12 @@ class Graph(object):
 
                 self.populate_null_nodegroups()
 
+                metadata_dict = args[0]["metadata"]
+                metadata = models.GraphMetadata()
+                for key, value in metadata_dict.iteritems():
+                    setattr(metadata, key, value)
+                self.root.graphmetadata = metadata
+
     def add_node(self, node):
         """
         Adds a node to this graph
