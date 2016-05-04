@@ -6,16 +6,22 @@
 <div class="relative">
     <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
 </div>
+
 <!-- nav bar -->
-<ul class="nav nav-tabs nav-justified nav-library" style="">
-    <li id="nodes-tab" class="nav-library-tab active">
+<ul class="nav nav-tabs library-tools">
+    <li class="active">
         <a href="#node-form" class="nav-library-tab-link" data-toggle="tab">
-            <i class="fa fa-sitemap"></i>
+            <i class="ion-ios-cog add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
         </a>
     </li>
-    <li id="branches-tab" class="nav-library-tab" style="">
-        <a href="#branch-library" class="nav-library-tab-link" style="" data-toggle="tab">
-            <i class="fa fa-archive"></i>
+    <li>
+        <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
+            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
+        </a>
+    </li>
+     <li>
+        <a href="#" class="nav-library-tab-link" data-toggle="tab">
+            <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
         </a>
     </li>
 </ul>

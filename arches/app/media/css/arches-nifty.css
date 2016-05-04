@@ -1448,6 +1448,26 @@ div.dropdown-menu.open {
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
     border: 1px solid #fff;
 }
+.library-tools-icon {
+    font-size: 27px;
+    color: #123;
+    padding-right: 5px;
+}
+.nav-tabs.library-tools > li > a{
+    padding:2px;
+    height: 40px;
+    border: none;
+}
+.nav-tabs.library-tools > li > a:hover{
+    background-color: inherit;
+}
+.nav-tabs.library-tools > li.active > a {
+    background-color: inherit;
+    border: none;
+}
+.nav-tabs.library-tools > li.active > a > i{
+    color: #fff;
+}
 .grid-card {
     float: left;
     width: 250px;
