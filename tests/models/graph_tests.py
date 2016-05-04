@@ -53,7 +53,7 @@ class GraphTests(ArchesTestCase):
             istopnode=True,
             isresource=True,
             isactive=False,
-            ontologyclass='E1',
+            ontologyclass_id='c03db431-4564-34eb-ba86-4c8169e4276c',
             datatype='semantic',
             nodegroup=newgroup
         )
