@@ -1,15 +1,4 @@
-define(['backbone', 'jquery', 'js-cookie'], function (Backbone, $, Cookies) {
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", Cookies.get('csrftoken'));
-            }
-        }
-    });
+define(['backbone', 'jquery'], function (Backbone, $) {
     return Backbone.Model.extend({
         read: function (callback, scope) {
             this._doRequest({
@@ -46,7 +35,7 @@ define(['backbone', 'jquery', 'js-cookie'], function (Backbone, $, Cookies) {
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
-                    }                    
+                    }
                     if (status === 'success' &&  request.responseJSON) {
                         self.set(request.responseJSON);
                         self.trigger(eventname, self);

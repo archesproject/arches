@@ -19,18 +19,18 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
             this.items = options.graphModel.get('nodes');
+            this.graphModel = options.graphModel;
         },
 
         selectItem: function(item, evt){
-            ListView.prototype.selectItem.apply(this, arguments);
-            item.editing(!item.editing());
+            this.trigger('node-clicked', item);
+            if (item.editing()) {
+                ListView.prototype.selectItem.apply(this, arguments);
+            }
         },
 
         clearSelection: function(){
             ListView.prototype.clearSelection.apply(this, arguments);
-            this.items().forEach(function(item){
-                item.editing(false);
-            }, this);
         },
 
     });

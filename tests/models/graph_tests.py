@@ -51,8 +51,6 @@ class GraphTests(ArchesTestCase):
             name='ROOT NODE',
             description='Test Root Node',
             istopnode=True,
-            isresource=True,
-            isactive=False,
             ontologyclass='E1',
             datatype='semantic',
             nodegroup=newgroup
