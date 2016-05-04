@@ -1,5 +1,6 @@
 import os
 import sys 
+import codecs
 import traceback
 import unicodecsv
 from os import listdir
@@ -62,8 +63,8 @@ def load_resource_graph_file(path_to_file):
     if isfile(path_to_file) and path_to_file.endswith(suffix):
         basepath = path_to_file
         name = basepath.split(os.sep)[-1]
-
-        with open(basepath, 'rU') as f:
+        
+        with codecs.open(basepath, 'rU', encoding='utf-8') as f:
             file = json.load(f)
             resource_graph = Graph(file['graph'][0])
             resource_graph.save()
