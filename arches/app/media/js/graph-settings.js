@@ -6,7 +6,8 @@ require([
     'views/page-view'
 ], function($, _, ko, koMapping, PageView) {
     var icons = JSON.parse($('#icon-data').val());
-    var resources = JSON.parse($('#resource-data').val());
+    var resourceJSON = $('#resource-data').val();
+    var resources = JSON.parse(resourceJSON);
     resources.forEach(function(resource) {
         resource.isRelatable = ko.observable(resource.is_relatable);
     });
@@ -63,6 +64,12 @@ require([
         reset: function () {
             _.each(JSON.parse(srcJSON), function(value, key) {
                 metadata[key](value);
+            });
+            JSON.parse(resourceJSON).forEach(function(jsonResource) {
+                var resource = _.find(resources, function (resource) {
+                    return resource.id === jsonResource.id;
+                });
+                resource.isRelatable(jsonResource.is_relatable);
             });
         }
     };
