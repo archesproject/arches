@@ -52,6 +52,14 @@ class Graph(object):
                     self.add_edge(edge)
 
                 self.populate_null_nodegroups()
+                
+                metadata_dict = args[0]["metadata"]
+                metadata = models.GraphMetadata()
+                for key, value in metadata_dict.iteritems():
+                    setattr(metadata, key, value)
+                self.root.graphmetadata = metadata
+
+            self.metadata = self.root.graphmetadata
 
     def add_node(self, node):
         """
@@ -133,7 +141,7 @@ class Graph(object):
                 metadata = models.GraphMetadata.objects.create(name=self.root.name, isresource=False, isactive=False)
                 self.root.graphmetadata = metadata
                 self.root.save()
-            self.root.graphmetadata.save()
+            self.metadata.save()
 
     def get_tree(self, root=None):
         """
