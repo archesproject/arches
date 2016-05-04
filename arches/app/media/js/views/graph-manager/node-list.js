@@ -2,8 +2,13 @@ define([
     'views/list'
 ], function(ListView) {
     var NodeList = ListView.extend({
+        /**
+        * A backbone view to manage a list of graph nodes
+        * @augments ListView
+        * @constructor
+        * @name NodeList
+        */
 
-        single_select: true,
         filter_function: function(newValue){
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
@@ -20,6 +25,7 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
             this.items = options.graphModel.get('nodes');
         },
+
 
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
