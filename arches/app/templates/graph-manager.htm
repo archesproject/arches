@@ -32,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					</div>
 
 					<!-- Node Editor -->
-					<div id="nodeCrud" data-bind="visible: graphModel.get('editNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
+					<div id="nodeCrud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
                         {% include 'views/graph-manager/node-form.htm' %}
 					</div>
 

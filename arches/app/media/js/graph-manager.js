@@ -71,15 +71,12 @@ require([
     });
 
     viewModel.graphView.on('node-clicked', function (node) {
-        var editNode = graphModel.get('editNode');
-        if (editNode() && editNode().dirty()) {
+        var selectedNode = graphModel.get('selectedNode');
+        if (selectedNode() && selectedNode().dirty()) {
             viewModel.nodeForm.closeClicked(true);
             return;
         }
-        graphModel.get('nodes')().forEach(function (node) {
-            node.editing(false);
-        });
-        node.editing(true);
+        graphModel.selectNode(node);
     });
 
     viewModel.nodeList = new NodeListView({

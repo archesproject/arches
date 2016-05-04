@@ -9,7 +9,7 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
 
             this.graphModel = options.graphModel;
-            this.editNode = this.graphModel.get('editNode');
+            this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
             this.items().forEach(function (branch) {
                 branch.ontology_property = ko.observable('');
@@ -17,7 +17,7 @@ define([
                     data: branch.graph
                 })
             });
-            this.selectedItem = ko.observable(null);
+            this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
         },
 
@@ -25,28 +25,29 @@ define([
             ListView.prototype.selectItem.apply(this, arguments);
             
             if(item.selected()){
-                this.selectedItem(item);
+                this.selectedBranch(item);
                 this.graph = new GraphBase({
                     el: $('#branch-preview'),
                     graphModel: item.graphModel
                 });
                 this.viewMetadata(true);
             }else{
-                this.selectedItem(null);
+                this.selectedBranch(null);
                 this.viewMetadata(false);
             }
         },
 
         appendBranch: function(item, evt){
-            if(this.editNode()){
-                this.graphModel.appendBranch(this.editNode().nodeid, item.ontology_property(), item.graphmetadataid, function(response){
+            if(this.selectedNode()){
+                this.graphModel.appendBranch(this.selectedNode().nodeid, item.ontology_property(), item.graphmetadataid, function(response){
                 }, this)
             }
+            this.closeForm();
         },
 
         closeForm: function(){
             this.clearSelection();
-            this.selectedItem(null);
+            this.selectedBranch(null);
             this.viewMetadata(false);
         },
 
