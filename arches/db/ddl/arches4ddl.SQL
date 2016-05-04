@@ -21,8 +21,6 @@ CREATE TABLE "nodes"(
  "name" Text NOT NULL,
  "description" Text NOT NULL,
  "istopnode" Boolean NOT NULL,
- "isresource" Boolean NOT NULL,
- "isactive" Boolean NOT NULL,
  "crmclass" Text NOT NULL,
  "datatype" Text NOT NULL,
  "validation" Text,
@@ -796,7 +794,11 @@ CREATE TABLE "graphmetadata"(
  "deploymentfile" Text,
  "author" Text,
  "deploymentdate" Timestamp,
- "version" Text
+ "version" Text,
+ "isresource" Boolean NOT NULL,
+ "isactive" Boolean NOT NULL,
+ "iconclass" Text,
+ "subtitle" Text
 )
 WITH (OIDS=FALSE)
 ;
@@ -849,6 +851,21 @@ WITH (OIDS=FALSE)
 -- Add keys for table validations
 
 ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "validations_x_nodes_pk" PRIMARY KEY ("id")
+;
+
+-- Table icons
+
+CREATE TABLE "icons"(
+ "id" serial NOT NULL,
+ "name" Text,
+ "cssclass" Text
+)
+WITH (OIDS=FALSE)
+;
+
+-- Add keys for table icons
+
+ALTER TABLE "icons" ADD CONSTRAINT "icons_pk" PRIMARY KEY ("id")
 ;
 
 -- Create relationships section -------------------------------------------------

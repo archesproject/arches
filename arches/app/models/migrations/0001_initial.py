@@ -172,6 +172,10 @@ class Migration(migrations.Migration):
                 ('author', models.TextField(null=True, blank=True)),
                 ('deploymentdate', models.DateTimeField(null=True, blank=True)),
                 ('version', models.TextField(null=True, blank=True)),
+                ('isresource', models.BooleanField()),
+                ('isactive', models.BooleanField()),
+                ('iconclass', models.TextField(null=True, blank=True)),
+                ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'graph_metadata',
@@ -352,14 +356,24 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Icon',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=True)),
+                ('name', models.TextField(blank=True, null=True)),
+                ('cssclass', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'icons',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('isresource', models.BooleanField()),
-                ('isactive', models.BooleanField()),
                 ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
                 ('datatype', models.TextField()),
                 ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),

@@ -47,6 +47,9 @@ require([
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
+    graphModel.on('select-node', function(model, options){
+        viewModel.nodeForm.closeClicked(true);
+    });
 
     var viewModel = {
         graphModel: graphModel
@@ -68,15 +71,6 @@ require([
         graphModel: graphModel,
         validations: validations,
         branchListView: viewModel.branchListView
-    });
-
-    viewModel.graphView.on('node-clicked', function (node) {
-        var selectedNode = graphModel.get('selectedNode');
-        if (selectedNode() && selectedNode().dirty()) {
-            viewModel.nodeForm.closeClicked(true);
-            return;
-        }
-        graphModel.selectNode(node);
     });
 
     viewModel.nodeList = new NodeListView({

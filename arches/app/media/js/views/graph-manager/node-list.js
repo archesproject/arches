@@ -23,8 +23,18 @@ define([
 
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
+            this.graphModel = options.graphModel;
             this.items = options.graphModel.get('nodes');
-        }
+        },
+
+        /**
+        * Toggles the selected status of a single list item, if {@link ListView#single_select} is 
+        *   true clear the selected status of all other list items
+        * @memberof ListView.prototype
+        */
+        selectItem: function(item, evt){
+            this.graphModel.selectNode(item);
+        },
 
     });
     return NodeList;

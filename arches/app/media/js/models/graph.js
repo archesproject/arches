@@ -14,10 +14,17 @@ define(['arches',
         },
 
         selectNode: function(node){
-            this.get('nodes')().forEach(function (node) {
-                node.selected(false);
-            });
-            node.selected(true);
+            this.trigger('select-node', node);
+            var currentlySelectedNode = this.get('selectedNode');
+            if (currentlySelectedNode() && currentlySelectedNode().dirty()) {
+                return false;
+            }else{
+                this.get('nodes')().forEach(function (node) {
+                    node.selected(false);
+                });
+                node.selected(true);
+                return true;
+            }
         },
 
         deleteNode: function(node){

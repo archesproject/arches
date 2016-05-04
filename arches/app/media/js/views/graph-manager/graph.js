@@ -6,6 +6,7 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
+            this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
 
@@ -48,7 +49,7 @@ define([
                         })
                 })
                 .on("click", function (node) {
-                    self.trigger('node-clicked', node);
+                    self.graphModel.selectNode(node);
                 })
                 .on("mouseout", function(d) {
                     self.overNode = null;

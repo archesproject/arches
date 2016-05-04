@@ -69,8 +69,6 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.isresource = nodeobj.get('isresource','')
-            node.isactive = nodeobj.get('isactive','')
             node.ontologyclass_id = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
@@ -130,6 +128,12 @@ class Graph(object):
 
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
+
+            if self.root.graphmetadata is None:
+                metadata = models.GraphMetadata.objects.create(name=self.root.name, isresource=False, isactive=False)
+                self.root.graphmetadata = metadata
+                self.root.save()
+            self.root.graphmetadata.save()
 
     def get_tree(self, root=None):
         """

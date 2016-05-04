@@ -54,11 +54,13 @@ define([
         * @memberof ListView.prototype
         */
         selectItem: function(item, evt){
-            var selectedStatus = item.selected();
-            if(this.single_select){
-                this.clearSelection();
+            if(this.trigger('item-selected', item, evt)){
+                var selectedStatus = item.selected();
+                if(this.single_select){
+                    this.clearSelection();
+                }
+                item.selected(!selectedStatus);
             }
-            item.selected(!selectedStatus);
         },
 
         /**

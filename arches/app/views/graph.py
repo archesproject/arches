@@ -31,7 +31,7 @@ from arches.app.models.ontology import Ontology
 
 
 @group_required('edit')
-def manager(request, nodeid, page='graph-manager'):
+def manager(request, nodeid):
     if nodeid is None or nodeid == '':
         graphs = models.Node.objects.filter(istopnode=True)
         metadata = models.GraphMetadata.objects.all()
@@ -44,7 +44,7 @@ def manager(request, nodeid, page='graph-manager'):
     graph = Graph(nodeid)
     validations = models.Validation.objects.all()
     metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True, isresource=False)
+    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
 
     branches = []
     for metadata_record in metadata_records:
@@ -57,8 +57,8 @@ def manager(request, nodeid, page='graph-manager'):
             pass
 
     datatypes = models.DDataType.objects.all()
-    return render(request, page+'.htm', {
-        'main_script': page,
+    return render(request, 'graph-manager.htm', {
+        'main_script': 'graph-manager',
         'nodeid': nodeid,
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
@@ -75,8 +75,44 @@ def manager(request, nodeid, page='graph-manager'):
         'branch_list': {
             'title': _('Branch Library'),
             'search_placeholder': _('Find a graph branch')
-        }
+        },
+        'metadata': graph.root.graphmetadata
     })
+
+
+@group_required('edit')
+def settings(request, nodeid):
+    node = models.Node.objects.get(nodeid=nodeid)
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        for key, value in data.get('metadata').iteritems():
+            setattr(node.graphmetadata, key, value)
+        node.graphmetadata.save()
+        node.set_relatable_resources(data.get('relatable_resource_ids'))
+        return JSONResponse({
+            'success': True,
+            'metadata': node.graphmetadata,
+            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
+        })
+    icons = models.Icon.objects.order_by('name')
+    resource_nodes = models.Node.objects.filter(Q(graphmetadata__isresource=True), ~Q(nodeid=nodeid))
+    resource_data = []
+    relatable_resources = node.get_relatable_resources()
+    for res in resource_nodes:
+        resource_data.append({
+            'id': res.nodeid,
+            'metadata': res.graphmetadata,
+            'is_relatable': (res in relatable_resources)
+        })
+    return render(request, 'graph-settings.htm', {
+        'main_script': 'graph-settings',
+        'icons': JSONSerializer().serialize(icons),
+        'metadata_json': JSONSerializer().serialize(node.graphmetadata),
+        'nodeid': nodeid,
+        'metadata': node.graphmetadata,
+        'resource_data': JSONSerializer().serialize(resource_data)
+    })
+
 
 @group_required('edit')
 def node(request, nodeid):
@@ -95,8 +131,6 @@ def node(request, nodeid):
                 node.crmclass = data.get('crmclass', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
-                node.isresource = data.get('isresource', False)
-                node.isactive = data.get('isactive', False)
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 cardinality = data.get('cardinality', 'n')
