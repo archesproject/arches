@@ -456,8 +456,7 @@ ALTER TABLE "edit_log" ADD CONSTRAINT "pk_edit_log" PRIMARY KEY ("editlogid")
 CREATE TABLE "resource2resource_constraints"(
  "resource2resourceid" UUID NOT NULL,
  "resourceclassfrom" UUID,
- "resourceclassto" UUID,
- "cardinality" Text
+ "resourceclassto" UUID
 )
 WITH (OIDS=FALSE)
 ;
