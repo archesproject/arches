@@ -1,10 +1,15 @@
 {% load staticfiles %}
 {% load i18n %}
 <!-- ko if: node -->
-<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">{% trans "Unnamed node" %}</span></span</p>
+<h4>
+    <i class="ion-arrow-right-b"></i>
+    <span class="node-title" data-bind="text: title">
+        <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
+    </span>
+</h4>
 
 <div class="relative">
-    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
+    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: close"><i class="ion-ios-close"></i></a>
 </div>
 
 <!-- nav bar -->

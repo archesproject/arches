@@ -2,11 +2,11 @@
 {% load i18n %}
 <div class="ltr" data-bind="with: selectedBranch">
     <!-- Title -->
-    <h4 class="node-title" data-bind="text: name"></h4>
+    <h4><i class="ion-arrow-right-b"></i><span class="node-title" data-bind="text: name"></span></h4>
     <div class="relative">
-        <a id="branch-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: $parent.closeForm.bind($parent)"></a>
+        <a id="branch-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: $parent.closeForm.bind($parent)"><i class="ion-ios-close"></i></a>
     </div>
-    <div id="" class="" style="padding-top: 20px; position: relative;">
+    <div id="" class="" style="padding-left: 5px; position: relative;">
         <p class="library-instructions" data-bind="text: description"></p>
     </div>
 

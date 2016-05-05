@@ -32,13 +32,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					</div>
 
 					<!-- Node Editor -->
-					<div id="nodeCrud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ui-widget-content">
+					<div id="nodeCrud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="library library-dark">
                         {% include 'views/graph-manager/node-form.htm' %}
-					</div>
-
-					<!-- Graph Metadata -->
-					<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
-                        {% include 'views/graph-manager/branch-info.htm' %}
+						<!-- Graph Metadata -->
+						<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
+	                        {% include 'views/graph-manager/branch-info.htm' %}
+						</div>
 					</div>
 
 					<!-- Graph -->
