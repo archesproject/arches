@@ -1,71 +1,97 @@
 {% load staticfiles %}
 {% load i18n %}
 <!-- ko if: node -->
-<p><span id="nodeName"><span data-bind="text: title"></span><span data-bind="if: !title()">{% trans "Unnamed node" %}</span></span</p>
+<h4>
+    <i class="ion-arrow-right-b"></i>
+    <span class="node-title" data-bind="text: title">
+        <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
+    </span>
+</h4>
 
 <div class="relative">
-    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn fa fa-times fa-lg" data-bind="click: close"></a>
+    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: close"><i class="ion-ios-close"></i></a>
 </div>
 
-<div>
+<!-- nav bar -->
+<ul class="nav nav-tabs library-tools">
+    <li class="active">
+        <a href="#node-form" class="nav-library-tab-link" data-toggle="tab">
+            <i class="ion-ios-cog add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
+        </a>
+    </li>
+    <li>
+        <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
+            <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
+        </a>
+    </li>
+     <li>
+        <a href="#" class="nav-library-tab-link" data-toggle="tab">
+            <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
+        </a>
+    </li>
+</ul>
 
-    <hr class="section-division-dark node-section-division">
+<!-- Tabs Content -->
+<div class="tab-content">
 
-    <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
-        <i class="fa fa-spinner fa-spin"> </i> <span> {% trans "Loading..." %}</span>
-    </div>
+    <!--Node Listing tab -->
+    
+    <div id="node-form" class="tab-pane fade in active">
 
-    <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
-        <span>{% trans "You have pending edits. Please save or cancel your edits before closing." %}</span>
-    </div>
+        <hr class="section-division-dark node-section-division">
 
-    <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
-        <span>{% trans "We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}</span>
-    </div>
+        <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
+            <i class="fa fa-spinner fa-spin"> </i> <span> {% trans "Loading..." %}</span>
+        </div>
 
-    <div class="node-section">
+        <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
+            <span>{% trans "You have pending edits. Please save or cancel your edits before closing." %}</span>
+        </div>
 
-        <div style="padding-bottom: 25px;">
+        <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
+            <span>{% trans "We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}</span>
+        </div>
 
-            <div class="node-widget-label">
-                <div class="control-label">
-                    {% trans "Node Name" %}
+        <div class="node-section">
+
+            <div style="padding-bottom: 25px;">
+
+                <div class="node-widget-label">
+                    <div class="control-label">
+                        {% trans "Node Name" %}
+                    </div>
+                    <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
+                        <input type="text" placeholder="{% trans "Enter node name here..." %}``" class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
+                    </div>
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
-                    <input type="text" placeholder="{% trans "Enter node name here..." %}``" class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
-                </div>
-            </div>
 
-            <div class="node-widget-label">
-                <div class="control-label">
-                    {% trans "Data type" %}
+                <div class="node-widget-label">
+                    <div class="control-label">
+                        {% trans "Data type" %}
+                    </div>
+                    <div class="col-sm-12 pad-no node-attribute-label">
+                        <select class="design" style="width:100%;" data-bind="value: node().datatype, options: datatypes, chosen: true"></select>
+                    </div>
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select class="design" style="width:100%;" data-bind="value: node().datatype, options: datatypes, chosen: true"></select>
-                </div>
-            </div>
 
-            <div class="node-widget-label">
-                <div class="control-label">
-                    {% trans "Validations" %}
+                <div class="node-widget-label">
+                    <div class="control-label">
+                        {% trans "Validations" %}
+                    </div>
+                    <div class="col-sm-12 pad-no node-attribute-label">
+                        <select data-placeholder="{% trans "Select validations..." %}" class="design" style="width:100%;" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: true"></select>
+                    </div>
                 </div>
-                <div class="col-sm-12 pad-no node-attribute-label">
-                    <select data-placeholder="{% trans "Select validations..." %}" class="design" style="width:100%;" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: true"></select>
-                </div>
+
             </div>
 
         </div>
 
-    </div>
+        <hr class="section-division-dark node-section-division">
 
-    <hr class="section-division-dark node-section-division">
-
-    <div class="node-section">
-
-        <div>
+        <div class="node-section">
 
             <div style="padding-bottom: 15px;" data-bind="if: !node().istopnode">
-
 
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
 
@@ -80,7 +106,6 @@
 
             <div style="padding-bottom: 15px;" data-bind="if: node().isCollector">
 
-
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().cardinality()=='n'}, click: toggleCardinality"><small></small></span>
 
                 <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
@@ -94,18 +119,23 @@
 
         </div>
 
+
+        <div class="pull-right" data-bind="if: node().dirty()">
+            <hr>
+            <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> {% trans "Save" %}</button>
+            <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> {% trans "Cancel" %}</button>
+        </div>
+        <div class="pull-right">
+            <hr>
+            <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> {% trans "Delete" %}</button>
+        </div>
     </div>
 
-
-
-    <div class="pull-right" data-bind="if: node().dirty()">
-        <hr>
-        <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> {% trans "Save" %}</button>
-        <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> {% trans "Cancel" %}</button>
+    <!--Branch Library tab -->
+    <div id="branch-library" class="tab-pane fade" data-bind="with: branchListView">
+        {% include 'views/graph-manager/branch-list.htm' %}
     </div>
-    <div class="pull-right">
-        <hr>
-        <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> {% trans "Delete" %}</button>
-    </div>
+
 </div>
+
 <!-- /ko -->

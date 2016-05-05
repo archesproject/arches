@@ -13,7 +13,6 @@ define([
             self._node = ko.observable('');
             self.selected = ko.observable(false);
             self.filtered = ko.observable(false);
-            self.editing = ko.observable(false);
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
             self.datatype = ko.observable('');

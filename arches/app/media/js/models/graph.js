@@ -13,6 +13,20 @@ define(['arches',
             AbstractModel.prototype.constructor.call(this, attributes, options);
         },
 
+        selectNode: function(node){
+            this.trigger('select-node', node);
+            var currentlySelectedNode = this.get('selectedNode');
+            if (currentlySelectedNode() && currentlySelectedNode().dirty()) {
+                return false;
+            }else{
+                this.get('nodes')().forEach(function (node) {
+                    node.selected(false);
+                });
+                node.selected(true);
+                return true;
+            }
+        },
+
         deleteNode: function(node){
             var getEdges = function (node) {
                 var edges = this.get('edges')()
@@ -57,18 +71,23 @@ define(['arches',
                 url: this.url + 'append_branch/' + nodeid + '/' + property + '/' + branchmetadatid,
                 data: JSON.stringify(this.toJSON())
             }, function(response, status, self){
+                var branchroot = response.responseJSON.root;
                 response.responseJSON.nodes.forEach(function(node){
                     self.get('nodes').push(new NodeModel({
                         source: node,
                         datatypelookup: self.get('datatypelookup')
                     }));
                 }, this);
-                self.set('_nodes', self.get('nodes')()),
+                self.get('nodes')().forEach(function (node) {
+                    node.selected(false);
+                    if (node.nodeid === branchroot.nodeid){
+                        node.selected(true);
+                    }
+                });
 
                 response.responseJSON.edges.forEach(function(edge){
                     self.get('edges').push(edge);
                 }, this);
-                self.set('_edges', self.get('edges')()),
 
                 callback();
             }, scope, 'changed');
@@ -80,16 +99,14 @@ define(['arches',
                 url: this.url + 'move_node/' + this.get('root').nodeid,
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
-                self.get('edges')()
-                .find(function (edge) {
+                self.get('edges')().find(function (edge) {
                     if(edge.edgeid === response.responseJSON.edges[0].edgeid){
                         edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
                         return true;
                     }
                     return false;
                 });
-                self.get('nodes')()
-                .forEach(function (node) {
+                self.get('nodes')().forEach(function (node) {
                     found_node = response.responseJSON.nodes.find(function(response_node){
                         return response_node.nodeid === node.nodeid;
                     });
@@ -122,18 +139,11 @@ define(['arches',
             this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('root', attributes.data.root);
 
-            this.set('editNode', ko.computed(function() {
-                var editNode = _.find(self.get('nodes')(), function(node){
-                    return node.editing();
-                }, this);
-                return editNode;
-            }));
-
-            this.set('selectedNodes', ko.computed(function() {
-                var selectedNodes = _.filter(self.get('nodes')(), function(node){
+            this.set('selectedNode', ko.computed(function() {
+                var selectedNode = _.find(self.get('nodes')(), function(node){
                     return node.selected();
                 }, this);
-                return selectedNodes;
+                return selectedNode;
             }));
         },
 

@@ -7,9 +7,9 @@ define([
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'validations'));
+            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branchListView'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
-            this.node = this.graphModel.get('editNode');
+            this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = ko.observable(false);
             this.failed = ko.observable(false);
@@ -34,7 +34,7 @@ define([
             this.failed(false);
             this.closeClicked(true);
             if (this.node() && !this.node().dirty()) {
-                this.node().editing(false);
+                this.node().selected(false);
             }
         },
         cancel: function () {

@@ -1,14 +1,12 @@
 {% load staticfiles %}
 {% load i18n %}
 
-<div class="tab-pane fade active in">
+<div class="">
     <!-- Title -->
-    <div class="">
-        <h4 class="node-title" style="">{% block title %}{% endblock %}</h4>
-    </div>
+    <h4><span class="node-title">{% block title %}{% endblock %}</span></h4>
     
     <!-- Group/User Search -->
-    <div class="" style="">
+    <div class="list-filter" style="">
         <input type="text" class="form-control library-search" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'"> 
 
         <!-- Remove Search -->
@@ -29,7 +27,7 @@
 
             <!-- Card -->
             <!-- ko foreach: $data.items -->
-                <div class="library-card graph-library" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent)">
+                <div class="library-card graph-library" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected-card': $data.selected }">
                     {% block listitem %}{% endblock %}
                 </div>
 

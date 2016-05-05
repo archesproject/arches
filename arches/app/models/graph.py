@@ -75,7 +75,7 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.ontologyclass = nodeobj.get('ontologyclass','')
+            node.ontologyclass_id = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
             node.graphmetadata_id = nodeobj.get('graphmetadataid','')

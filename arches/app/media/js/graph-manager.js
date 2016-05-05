@@ -47,6 +47,9 @@ require([
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
+    graphModel.on('select-node', function(model, options){
+        viewModel.nodeForm.closeClicked(true);
+    });
 
     var viewModel = {
         graphModel: graphModel
@@ -57,38 +60,23 @@ require([
         graphModel: graphModel
     });
 
-    viewModel.nodeForm = new NodeFormView({
-        el: $('#nodeCrud'),
-        graphModel: graphModel,
-        validations: validations
-    });
-
-    var editNode = function (node) {
-        var editNode = graphModel.get('editNode');
-        if (editNode() && editNode().dirty()) {
-            viewModel.nodeForm.closeClicked(true);
-            return;
-        }
-        graphModel.get('nodes')().forEach(function (node) {
-            node.editing(false);
-        });
-        node.editing(true);
-    };
-
-    viewModel.graphView.on('node-clicked', editNode);
-
-    viewModel.branchList = new BranchListView({
+    viewModel.branchListView= new BranchListView({
         el: $('#branch-library'),
         branches: ko.observableArray(branches),
         graphModel: graphModel
+    });
+
+    viewModel.nodeForm = new NodeFormView({
+        el: $('#nodeCrud'),
+        graphModel: graphModel,
+        validations: validations,
+        branchListView: viewModel.branchListView
     });
 
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
         graphModel: graphModel
     });
-
-    viewModel.nodeList.on('node-clicked', editNode);
 
     viewModel.permissionsList = new PermissionsListView({
         el: $('#node-permissions')

@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
@@ -26,6 +27,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
+from arches.app.models.ontology import Ontology
 
 
 @group_required('edit')
@@ -203,3 +205,8 @@ def clone(request, nodeid):
         return JSONResponse(graph)
 
     return HttpResponseNotFound()
+
+def get_related_nodes(request, ontology_concept_id):
+    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+    properties = Ontology().get_related_properties(ontology_concept_id, lang=lang)
+    return JSONResponse(properties, indent=4)

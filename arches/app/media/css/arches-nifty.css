@@ -398,7 +398,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     margin-right: -10px;
 }
 .grid-container {
-    margin-left: 5px;
     overflow: scroll;
 }
 .grid {
@@ -491,7 +490,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     bottom: 0;
     opacity: .95;
     z-index: 200;
-    padding: 0 20px 20px 10px;
+    padding: 0 10px 20px 10px;
 }
 .library-right {
     position: absolute;
@@ -513,7 +512,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .library-dark {
     background: #37495b;
-    border-left: 1px solid #1E3143;
     color: #ddd;
 }
 .library-bright {
@@ -529,7 +527,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .clear-search {
     position: absolute;
     right: 15px;
-    top: 97px;
+    top: 3px;
     color: #123;
     font-size: 19px;
 }
@@ -537,13 +535,17 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     cursor: pointer;
     color: rgba(0, 0, 0, 0.95);
 }
+.list-filter{
+    position: relative;
+    background-color: #314151;
+}
 .key {
     margin-top: 98px;
 }
 .library-close-btn {
     position: absolute;
-    right: 15px;
-    top: -20px;
+    right: 0px;
+    top: -27px;
     color: #ddd;
 }
 .alert {
@@ -551,13 +553,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .library-card {
     float: left;
-    width: 220px;
+    width: 100%;
     height: 58px;
     position: relative;
     color: #eee;
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-    margin: 0 0 0 -5px;
-    padding: 5px;
 }
 .library-card:first-of-type {
     border-top: 1px solid rgba(0, 0, 0, 0.25);
@@ -604,7 +604,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     margin-top: -5px;
 }
 .library-search {
-    background: #314151;
+    background-color: inherit;
     border: 1px solid #314151;
     color: #fff;
     height: 32px;
@@ -697,9 +697,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     font: 10px sans-serif;
 }
 .node .node-selected {
-    fill: #FF0;
-}
-.node .node-editing {
     fill: #4682B4;
 }
 .node .node-filtered {
@@ -732,19 +729,20 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 #nodeCrud {
     position: absolute;
     width: 250px;
-    right: 220px;
+    left: 300px;
     top: 0;
     bottom: 0;
-    background-color: #37495b;
     color: #fff;
     z-index: 200;
+    border-left: 1px solid #1E3143;
+    border-right: 1px solid #1E3143;
     -webkit-border-radius: 12px;
     -moz-border-radius: 2px;
-    border-radius: 2px;
+    border-radius: 0px;
     -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-    padding: 10px;
+    padding: 0px 10px;
 }
 .morphsearch {
     width: 200px;
@@ -1450,6 +1448,26 @@ div.dropdown-menu.open {
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
     border: 1px solid #fff;
 }
+.library-tools-icon {
+    font-size: 27px;
+    color: #123;
+    padding-right: 5px;
+}
+.nav-tabs.library-tools > li > a{
+    padding:2px;
+    height: 40px;
+    border: none;
+}
+.nav-tabs.library-tools > li > a:hover{
+    background-color: inherit;
+}
+.nav-tabs.library-tools > li.active > a {
+    background-color: inherit;
+    border: none;
+}
+.nav-tabs.library-tools > li.active > a > i{
+    color: #fff;
+}
 .grid-card {
     float: left;
     width: 250px;
@@ -1500,10 +1518,9 @@ div.dropdown-menu.open {
 #branch-panel, #permissions-panel {
     position: absolute;
     top: 0;
-    right: 220px;
-    padding-left: 7px;
-    padding-right: 5px;
+    left: 249px;
     overflow-y: scroll;
+    opacity: 1;
 }
 .ltr, .wizard-buttons * {
     direction: ltr;
@@ -2322,7 +2339,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 #nodeCrud p, .node_info p {
     font-family: sans-serif;
-    font-size: 16px;
     line-height: 20px;
     margin: 0;
 }

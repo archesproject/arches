@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import codecs
 from django.conf import settings
 from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
@@ -11,7 +12,7 @@ from arches.db.migration_operations.extras import CreateExtension, CreateAutoPop
 
 def get_sql_string_from_file(pathtofile):
     ret = []
-    with open(pathtofile) as f:
+    with codecs.open(pathtofile, encoding='utf-8') as f:
         ret = f.read()
         #print sqlparse.split(sqlparse.format(ret,strip_comments=True))
         # for stmt in sqlparse.split(sqlparse.format(f.read(),strip_comments=True)):
@@ -373,7 +374,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('ontologyclass', models.TextField()),
+                ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
                 ('datatype', models.TextField()),
                 ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
             ],
@@ -651,6 +652,7 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 
+        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'arches_ontology_602.sql')), ''),
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
     ]
