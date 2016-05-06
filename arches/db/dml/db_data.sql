@@ -190,8 +190,8 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000001', 'n', '');
 
-INSERT INTO edges(domainnodeid, rangenodeid)
-    VALUES ('20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002');
+INSERT INTO edges(graphmetadataid, domainnodeid, rangenodeid)
+    VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002');
 
 
 INSERT INTO graph_metadata(graphmetadataid, name, author, version, description, isresource, isactive)
@@ -199,40 +199,40 @@ INSERT INTO graph_metadata(graphmetadataid, name, author, version, description, 
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphmetadataid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic', 
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic',
         '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            nodegroupid)
+            graphmetadataid, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic',
-            '20000000-0000-0000-0000-000000000001');
+            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            nodegroupid)
+            graphmetadataid, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
-            '20000000-0000-0000-0000-000000000001');
+            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            nodegroupid)
+            graphmetadataid, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'domain',
-            '20000000-0000-0000-0000-000000000001');
+            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            nodegroupid)
+            graphmetadataid, nodegroupid)
     VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
-            '20000000-0000-0000-0000-000000000001');
+            '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO edges(domainnodeid, rangenodeid)
-    VALUES ('20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001');
+INSERT INTO edges(graphmetadataid, domainnodeid, rangenodeid)
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO edges(domainnodeid, rangenodeid)
-    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002');
+INSERT INTO edges(graphmetadataid, domainnodeid, rangenodeid)
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002');
 
-INSERT INTO edges(domainnodeid, rangenodeid)
-    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003');
+INSERT INTO edges(graphmetadataid, domainnodeid, rangenodeid)
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003');
 
-INSERT INTO edges(domainnodeid, rangenodeid)
-    VALUES ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004');
+INSERT INTO edges(graphmetadataid, domainnodeid, rangenodeid)
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-000000000000', 'n', '');

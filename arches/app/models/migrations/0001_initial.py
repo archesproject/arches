@@ -287,7 +287,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graphmetadata', models.ForeignKey(blank=False, db_column='graphmetadataid', null=False, to='models.GraphMetadata')),
             ],
             options={
                 'db_table': 'edges',
@@ -376,7 +376,7 @@ class Migration(migrations.Migration):
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
                 ('datatype', models.TextField()),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graphmetadata', models.ForeignKey(blank=False, db_column='graphmetadataid', null=False, to='models.GraphMetadata')),
             ],
             options={
                 'db_table': 'nodes',

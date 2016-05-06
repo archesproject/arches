@@ -199,7 +199,7 @@ def clone(request, nodeid):
         graph = Graph(nodeid).copy()
         if 'name' in data:
             graph.root.name = data['name']
-        graph.root.graphmetadata = None
+            graph.metadata.name = data['name']
         graph.populate_null_nodegroups()
         graph.save()
         return JSONResponse(graph)

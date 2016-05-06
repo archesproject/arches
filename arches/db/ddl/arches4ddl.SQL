@@ -28,7 +28,7 @@ CREATE TABLE "nodes"(
  "inputmask" Text,
  "status" Bigint,
  "nodegroupid" UUID,
- "graphmetadataid" UUID
+ "graphmetadataid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -196,7 +196,7 @@ CREATE TABLE "edges"(
  "crmproperty" Text NOT NULL,
  "domainnodeid" UUID NOT NULL,
  "rangenodeid" UUID NOT NULL,
- "graphmetadataid" UUID
+ "graphmetadataid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
