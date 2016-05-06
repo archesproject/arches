@@ -132,7 +132,8 @@ define(['arches',
             attributes.data.nodes.forEach(function (node, i) {
                 attributes.data.nodes[i] = new NodeModel({
                     source: node,
-                    datatypelookup: datatypelookup
+                    datatypelookup: datatypelookup,
+                    graph: self
                 });
             });
             this.set('nodes', ko.observableArray(attributes.data.nodes));
@@ -145,6 +146,24 @@ define(['arches',
                 }, this);
                 return selectedNode;
             }));
+        },
+
+        getParentPath: function(node){
+            var ret = {
+                'edge': null,
+                'node': null
+            }
+            this.get('edges')().forEach(function (edge) {
+                if (edge.rangenode_id === node.nodeid){
+                    ret.edge = edge;
+                }
+            });
+            this.get('nodes')().forEach(function (node) {
+                if (node.nodeid === ret.edge.domainnode_id){
+                    ret.node = node;
+                }
+            });
+            return ret
         },
 
         _doRequest: function (config, callback, scope, eventname) {

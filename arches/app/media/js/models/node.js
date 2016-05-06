@@ -18,8 +18,11 @@ define([
             self.datatype = ko.observable('');
             self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
+            self.relatableclasses = ko.observableArray();
+            self.relatableproperties = ko.observableArray();
 
             self.parse(options.source);
+            self.graph = options.graph;
 
             self.iconclass = ko.computed(function() {
                 return self.datatypelookup[self.datatype()];
@@ -42,6 +45,12 @@ define([
             self.isCollector = ko.computed(function () {
                 return self.nodeid === self.nodeGroupId();
             });
+
+            self.selected.subscribe(function(selected){
+                if (selected){
+                    self.getRelatableNodesEdges();
+                }
+            })
         },
 
         parse: function(source) {
@@ -57,9 +66,8 @@ define([
             });
 
             self.nodeid = source.nodeid;
-
             self.istopnode = source.istopnode;
-            self.ontologyclass = source.ontologyclass;
+            self.ontologyclass_id = source.ontologyclass_id;
 
             self.set('id', self.nodeid);
         },
@@ -84,6 +92,33 @@ define([
         toggleCardinality: function () {
             var cardinality = (this.cardinality()==='n')?'1':'n';
             this.cardinality(cardinality);
+        },
+
+        getRelatableNodesEdges: function(){
+            var path = this.graph.getParentPath(this);
+            this.relatableproperties.removeAll();
+            this.relatableclasses.removeAll();
+            this._doRequest({
+                type: "POST",
+                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes/' + path.node.ontologyclass_id
+            }, function(response, status, self){
+                response.responseJSON.properties.forEach(function(property){
+                    if(property.classes){
+                        property.classes.forEach(function(ontologyclass){
+                            self.relatableproperties.push({
+                                'id': property.id,
+                                'value': property.value,
+                                'classid': ontologyclass.id
+                            })
+                            self.relatableclasses.push({
+                                'id': ontologyclass.id,
+                                'value': ontologyclass.value,
+                                'propertyid': property.id
+                            })
+                        });
+                    }
+                }, this);
+            }, this, 'changed');
         }
     });
 });

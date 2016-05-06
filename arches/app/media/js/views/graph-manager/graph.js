@@ -107,11 +107,13 @@ define([
             var dragging = false;
             var draggingNode = null;
 
-            var getTargetNodes = function(ontologyclass){
+            var getTargetNodes = function(relatableclasses){
                 var allowed_target_ontologies = ['E1', 'E2'];
                 self.allNodes.property('canDrop', false);
                 return self.allNodes.filter(function(node){
-                    return _.indexOf(allowed_target_ontologies, node.ontologyclass) !== -1
+                    return _.find(relatableclasses, function(ontologyclass){
+                        return ontologyclass.id === node.ontologyclass_id;
+                    })
                 }, self);
             };
 
@@ -120,7 +122,7 @@ define([
                 draggingNode = d;
 
                 // style possible drop targets
-                getTargetNodes(d.ontologyclass)[0].forEach(function(node){
+                getTargetNodes(d.relatableclasses)[0].forEach(function(node){
                     var d3node = d3.select(node);
                     if (d3node.data()[0].id != draggingNode.id){
                         d3node.attr('class', 'target-node')
