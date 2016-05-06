@@ -330,6 +330,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
+        ArchesFile(data_source).import_concepts()        
         ArchesFile(data_source).import_graphs()
 
     def start_livereload(self):
