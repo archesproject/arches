@@ -200,12 +200,8 @@ class Graph(object):
         """
 
         self.root = node
-        if self.root.istopnode:
-            child_nodes = self.metadata.node_set.all()
-            child_edges = self.metadata.edge_set.all()
-        else:
-            self.add_node(node)
-            child_nodes, child_edges = node.get_child_nodes_and_edges()
+        child_nodes = self.metadata.node_set.all()
+        child_edges = self.metadata.edge_set.all()
 
         for node in child_nodes:
             self.add_node(node)
