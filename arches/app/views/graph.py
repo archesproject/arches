@@ -41,7 +41,8 @@ def manager(request, nodeid):
             'metadata': JSONSerializer().serialize(metadata)
         })
 
-    graph = Graph(nodeid)
+    root = models.Node.objects.get(pk=nodeid)
+    graph = Graph(root)
     validations = models.Validation.objects.all()
     metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
@@ -174,7 +175,8 @@ def node(request, nodeid):
 @group_required('edit')
 def append_branch(request, nodeid, property, graphmetadataid):
     if request.method == 'POST':
-        graph = Graph(nodeid)
+        root = models.Node.objects.get(pk=nodeid)
+        graph = Graph(root)
         newBranch = graph.append_branch(property, graphmetadataid=graphmetadataid)
         graph.save()
         return JSONResponse(newBranch)
@@ -185,7 +187,8 @@ def append_branch(request, nodeid, property, graphmetadataid):
 def move_node(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(nodeid)
+        root = models.Node.objects.get(pk=nodeid)
+        graph = Graph(root)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
@@ -196,7 +199,8 @@ def move_node(request, nodeid):
 def clone(request, nodeid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(nodeid).copy()
+        root = models.Node.objects.get(pk=nodeid)
+        graph = Graph(root).copy()
         if 'name' in data:
             graph.root.name = data['name']
             graph.metadata.name = data['name']

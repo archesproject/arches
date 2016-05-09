@@ -135,8 +135,8 @@ class GraphTests(ArchesTestCase):
         the nodes as opposed to a node with the same attribute values
 
         """
-
-        graph = Graph(self.HERITAGE_RESOURCE_FIXTURE)
+        root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
+        graph = Graph(root)
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
 
@@ -160,8 +160,8 @@ class GraphTests(ArchesTestCase):
         and that the actual node references are different
 
         """
-
-        graph = Graph(self.HERITAGE_RESOURCE_FIXTURE)
+        root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
+        graph = Graph(root)
         graph_copy = graph.copy()
 
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))

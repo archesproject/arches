@@ -55,10 +55,12 @@ class Graph(object):
             else:
                 if (isinstance(args[0], basestring) or
                    isinstance(args[0], uuid.UUID)):
-                    self.root = models.Node.objects.get(pk=args[0])
+                    self.metadata = models.GraphMetadata.objects.get(pk=args[0])
+                elif isinstance(args[0], models.GraphMetadata):
+                    self.metadata = args[0]
                 elif isinstance(args[0], models.Node):
-                    self.root = args[0]
-                self.metadata = self.root.graphmetadata
+                    self.metadata = args[0].graphmetadata
+                self.root = self.metadata.node_set.get(istopnode=True)
                 self.get_nodes_and_edges(self.root)
 
 
@@ -261,7 +263,7 @@ class Graph(object):
 
         new_nodegroups = {}
 
-        copy_of_self = Graph(self.root.pk)
+        copy_of_self = Graph(self.metadata.pk)
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
 
         copy_of_self.metadata.pk = uuid.uuid1()
