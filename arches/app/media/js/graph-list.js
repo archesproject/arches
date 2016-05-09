@@ -13,7 +13,7 @@ require([
     graphs().forEach(function(graph) {
         graph.open = function() {
             pageView.viewModel.loading(true);
-            window.location = graph.nodeid + '/settings';
+            window.location = graph.graphid + '/settings';
         };
         graph.clone = function() {
             if (newGraphName() === '') {
@@ -26,7 +26,7 @@ require([
                     url: 'clone/' + selectedGraph(),
                     data: JSON.stringify({name: newGraphName()}),
                     success: function(response) {
-                        window.location = response.root.nodeid + '/settings';
+                        window.location = response.metadata.graphid + '/settings';
                     },
                     failure: function(response) {
                         pageView.viewModel.loading(false);
@@ -35,10 +35,10 @@ require([
             }
         };
         graph.select = function() {
-            selectedGraph(graph.nodeid);
+            selectedGraph(graph.graphid);
         };
         graph.selected = ko.computed(function() {
-            return graph.nodeid === selectedGraph();
+            return graph.graphid === selectedGraph();
         });
         graph.deleteGraph = function () {
             var node = new NodeModel({
