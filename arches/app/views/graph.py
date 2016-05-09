@@ -205,8 +205,16 @@ def clone(request, nodeid):
         return JSONResponse(graph)
 
     return HttpResponseNotFound()
-    
-def get_related_nodes(request, ontology_concept_id):
+
+def get_related_nodes(request):
+    ret = {
+        'properties': [],
+        'classes': []
+    }
     lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-    properties = Ontology().get_related_properties(ontology_concept_id, lang=lang)
-    return JSONResponse(properties, indent=4)
+    data = JSONDeserializer().deserialize(request.body)
+    for node in data['nodes']: 
+        related_properties = Ontology().get_related_properties(node['ontologyclass_id'], lang=lang)
+        ret['properties'].extend(related_properties['properties'])
+        ret['classes'].extend(related_properties['classes'])
+    return JSONResponse(ret, indent=4)

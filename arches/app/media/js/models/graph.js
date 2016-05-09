@@ -148,21 +148,29 @@ define(['arches',
             }));
         },
 
-        getParentPath: function(node){
+        getRelatedNodesEdges: function(node){
             var ret = {
-                'edge': null,
-                'node': null
+                'edges': [],
+                'nodes': []
             }
             this.get('edges')().forEach(function (edge) {
                 if (edge.rangenode_id === node.nodeid){
-                    ret.edge = edge;
+                    ret.edges.push(edge);
+                    this.get('nodes')().forEach(function (node) {
+                        if (node.nodeid === edge.domainnode_id){
+                            ret.nodes.push(node);
+                        }
+                    });
                 }
-            });
-            this.get('nodes')().forEach(function (node) {
-                if (node.nodeid === ret.edge.domainnode_id){
-                    ret.node = node;
+                if (edge.domainnode_id === node.nodeid){
+                    ret.edges.push(edge);
+                    this.get('nodes')().forEach(function (node) {
+                        if (node.nodeid === edge.rangenode_id){
+                            ret.nodes.push(node);
+                        }
+                    });
                 }
-            });
+            }, this);
             return ret
         },
 

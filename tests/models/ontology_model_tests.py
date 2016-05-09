@@ -32,6 +32,7 @@ class OntologyModelTests(ArchesTestCase):
     def setUpClass(cls):
         management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json') 
         cls.E39_Actor = "af051b0a-be2f-39da-8f46-429a714e242c"
+        cls.E1_CRM_Entity = "c03db431-4564-34eb-ba86-4c8169e4276c"
 
     @classmethod
     def tearDownClass(cls):
@@ -87,6 +88,62 @@ class OntologyModelTests(ArchesTestCase):
         # comparing lists of dictionaries
         # from http://stackoverflow.com/questions/9845369/comparing-2-lists-consisting-of-dictionaries-with-unique-keys-in-python
 
+        self.assertResults(result, expected_results)
+
+        result = Ontology().get_related_properties(ontology_concept_id=self.E1_CRM_Entity, lang='en-US')
+        self.assertEqual(len(result['properties']), 5)
+
+        print JSONSerializer().serialize(result)
+
+        expected_results = [
+            {
+                "id": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
+                "value": "P1_is_identified_by",
+                "classes": [{
+                    "id": "b43d4537-6674-37cb-af6e-834b5d63c978",
+                    "value": "E41_Appellation"
+                }]
+            },
+            {
+                "id": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
+                "value": "P2_has_type",
+                "classes": [{
+                    "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
+                    "value": "E55_Type"
+                }]
+            },
+            {
+                "id": "fd06e07d-057b-38aa-99ac-1add45f9f217",
+                "value": "P3_has_note",
+                "classes": [{
+                    "id": "8471e471-3045-3269-a9b8-86d0e6065176",
+                    "value": "E59_Primitive_Value"
+                }]
+            },
+            {
+                "id": "356c8ba7-0114-32c3-861f-8432bc46e963",
+                "value": "P48_has_preferred_identifier",
+                "classes": [{
+                    "id": "fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c",
+                    "value": "E42_Identifier"
+                },]
+            },
+            {
+                "id": "ada26737-46ff-3a34-8aed-7b70117c34aa",
+                "value": "P137_exemplifies",
+                "classes": [{
+                    "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
+                    "value": "E55_Type"
+                },]
+            }
+        ]
+
+        # comparing lists of dictionaries
+        # from http://stackoverflow.com/questions/9845369/comparing-2-lists-consisting-of-dictionaries-with-unique-keys-in-python
+
+        self.assertResults(result, expected_results)
+
+    def assertResults(self, result, expected_results):
         result['properties'] = sorted(result['properties'], key=itemgetter("id"))
         expected_results = sorted(expected_results, key=itemgetter("id"))
 
@@ -100,6 +157,5 @@ class OntologyModelTests(ArchesTestCase):
             class_pairs = zip(x['classes'], y['classes'])
             self.assertFalse(any(x['id'] != y['id'] for x, y in class_pairs))
             self.assertFalse(any(x['value'] != y['value'] for x, y in class_pairs))
-
 
     

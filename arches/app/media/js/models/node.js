@@ -95,12 +95,13 @@ define([
         },
 
         getRelatableNodesEdges: function(){
-            var path = this.graph.getParentPath(this);
+            var relatedNodesEdges = this.graph.getRelatedNodesEdges(this);
             this.relatableproperties.removeAll();
             this.relatableclasses.removeAll();
             this._doRequest({
                 type: "POST",
-                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes/' + path.node.ontologyclass_id
+                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
+                data: JSON.stringify(relatedNodesEdges)
             }, function(response, status, self){
                 response.responseJSON.properties.forEach(function(property){
                     if(property.classes){
