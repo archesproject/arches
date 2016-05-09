@@ -90,7 +90,6 @@ class GraphTests(ArchesTestCase):
             },
             'nodes':[{
                 "status": None,
-                "graphmetadataid": None,
                 "description": "",
                 "name": "ROOT_NODE",
                 "istopnode": True,
@@ -101,7 +100,6 @@ class GraphTests(ArchesTestCase):
                 "cardinality": "1"
             },{
                 "status": None,
-                "graphmetadataid": None,
                 "description": "",
                 "name": "NODE_NAME",
                 "istopnode": False,
@@ -112,7 +110,6 @@ class GraphTests(ArchesTestCase):
                 "cardinality": "n"
             }],
             'edges':[{
-                "graphmetadataid": None,
                 "rangenodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
                 "name": "",
                 "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",

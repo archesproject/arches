@@ -66,7 +66,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Resource Type -->
             <div class="resource-grid-main-container">
                 <div class="resource-grid-main">
-                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (metadata.iconclass?metadata.iconclass:'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:metadata.name"></span></h1>
+                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (metadata.iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:metadata.name"></span></h1>
                     <p class="resource-grid-subtitle" data-bind='text:metadata.subtitle'></p>
                 </div>
             </div>
@@ -131,7 +131,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 							<!-- Project Name, Abstract -->
 							<div class="panel-body" style="padding: 15px 20px 25px 20px; height: 125px;">
 								<h4 class="mar-no" data-bind="text:metadata.name"></h4>
-                                <span data-bind='text:metadata.description?metadata.description:"{% trans "No description available." %}"'></span>
+                                <span data-bind='text: metadata.description || "{% trans "No description available." %}"'></span>
 							</div>
 
 							<!-- Project Tools -->

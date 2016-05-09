@@ -247,42 +247,22 @@ class Node(models.Model):
     graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
-    def _traverse_graph(self):
+    def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
 
         returns a tuple of nodes and edges
 
         """
-
         nodes = []
         edges = []
         for edge in Edge.objects.filter(domainnode=self):
             nodes.append(edge.rangenode)
             edges.append(edge)
 
-            child_nodes, child_edges = edge.rangenode._traverse_graph()
+            child_nodes, child_edges = edge.rangenode.get_child_nodes_and_edges()
             nodes.extend(child_nodes)
             edges.extend(child_edges)
-        return (nodes, edges)
-
-    def get_child_nodes_and_edges(self):
-        """
-        _traverse_graph does the bulk of the work in gathering up the child nodes and edges
-
-        what we do here is make sure that the common node referenced by two or more edges is the same node reference in memory
-        that way if a user updates a node attribute that update is reflected accross all edges that reference that node
-
-        """
-
-        nodes, edges = self._traverse_graph()
-        node_mapping = {node.pk:node for node in nodes}
-        for edge in edges:
-            if edge.domainnode.pk == self.pk:
-                edge.domainnode = self
-            else:
-                edge.domainnode = node_mapping[edge.domainnode.pk]
-            edge.rangenode = node_mapping[edge.rangenode.pk]
         return (nodes, edges)
 
     def is_collector(self):
@@ -348,7 +328,6 @@ class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
     resourceclassto = models.ForeignKey(Node, db_column='resourceclassto', blank=True, null=True, related_name='resxres_contstraint_classes_to')
-    cardinality = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True

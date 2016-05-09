@@ -28,7 +28,7 @@ CREATE TABLE "nodes"(
  "inputmask" Text,
  "status" Bigint,
  "nodegroupid" UUID,
- "graphmetadataid" UUID
+ "graphmetadataid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -196,7 +196,7 @@ CREATE TABLE "edges"(
  "crmproperty" Text NOT NULL,
  "domainnodeid" UUID NOT NULL,
  "rangenodeid" UUID NOT NULL,
- "graphmetadataid" UUID
+ "graphmetadataid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -456,8 +456,7 @@ ALTER TABLE "edit_log" ADD CONSTRAINT "pk_edit_log" PRIMARY KEY ("editlogid")
 CREATE TABLE "resource2resource_constraints"(
  "resource2resourceid" UUID NOT NULL,
  "resourceclassfrom" UUID,
- "resourceclassto" UUID,
- "cardinality" Text
+ "resourceclassto" UUID
 )
 WITH (OIDS=FALSE)
 ;
