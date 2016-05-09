@@ -36,8 +36,8 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class GraphMetadata(models.Model):
-    graphmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+class Graph(models.Model):
+    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -51,7 +51,7 @@ class GraphMetadata(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'graph_metadata'
+        db_table = 'graphs'
 
 
 class Card(models.Model):
@@ -148,7 +148,7 @@ class Edge(models.Model):
     ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
+    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -244,7 +244,7 @@ class Node(models.Model):
     ontologyclass = models.ForeignKey(Concept, db_column='ontologyclass', blank=True, null=True)
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
+    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
     def get_child_nodes_and_edges(self):

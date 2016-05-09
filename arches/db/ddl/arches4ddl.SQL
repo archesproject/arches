@@ -28,7 +28,7 @@ CREATE TABLE "nodes"(
  "inputmask" Text,
  "status" Bigint,
  "nodegroupid" UUID,
- "graphmetadataid" UUID NOT NULL
+ "graphid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -196,7 +196,7 @@ CREATE TABLE "edges"(
  "crmproperty" Text NOT NULL,
  "domainnodeid" UUID NOT NULL,
  "rangenodeid" UUID NOT NULL,
- "graphmetadataid" UUID NOT NULL
+ "graphid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -785,10 +785,10 @@ COMMENT ON TABLE "nodegroups" IS '0:1
 ALTER TABLE "nodegroups" ADD CONSTRAINT "nodegroups_pk" PRIMARY KEY ("nodegroupid")
 ;
 
--- Table graphmetadata
+-- Table graph
 
-CREATE TABLE "graphmetadata"(
- "graphmetadataid" UUID NOT NULL,
+CREATE TABLE "graph"(
+ "graphid" UUID NOT NULL,
  "name" Bigint,
  "deploymentfile" Text,
  "author" Text,
@@ -802,9 +802,9 @@ CREATE TABLE "graphmetadata"(
 WITH (OIDS=FALSE)
 ;
 
--- Add keys for table graphmetadata
+-- Add keys for table graph
 
-ALTER TABLE "graphmetadata" ADD CONSTRAINT "deploymentmetadata_pk" PRIMARY KEY ("graphmetadataid")
+ALTER TABLE "graph" ADD CONSTRAINT "deploymentmetadata_pk" PRIMARY KEY ("graphid")
 ;
 
 -- Table resourceinstances
@@ -971,7 +971,7 @@ ALTER TABLE "public"."auth_permission" ADD CONSTRAINT "content_type_id_refs_id_7
 ALTER TABLE "nodes" ADD CONSTRAINT "nodegroups_x_nodes_fk" FOREIGN KEY ("nodegroupid") REFERENCES "nodegroups" ("nodegroupid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
-ALTER TABLE "nodes" ADD CONSTRAINT "deploymentmetadata_x_nodes_fk" FOREIGN KEY ("graphmetadataid") REFERENCES "graphmetadata" ("graphmetadataid") ON DELETE NO ACTION ON UPDATE NO ACTION
+ALTER TABLE "nodes" ADD CONSTRAINT "deploymentmetadata_x_nodes_fk" FOREIGN KEY ("graphid") REFERENCES "graph" ("graphid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
 ALTER TABLE "tileinstances" ADD CONSTRAINT "resourceinstances_tileinstances_fk" FOREIGN KEY ("resourceinstanceid") REFERENCES "resourceinstances" ("resourceinstanceid") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -989,7 +989,7 @@ ALTER TABLE "resource2resource_constraints" ADD CONSTRAINT "nodes_rscr2rsrc_cons
 ALTER TABLE "resource2resource_constraints" ADD CONSTRAINT "nodes_rscr2rsrc_constraints_fk2" FOREIGN KEY ("resourceclassto") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
-ALTER TABLE "edges" ADD CONSTRAINT "graphmetadata_edges_fk" FOREIGN KEY ("graphmetadataid") REFERENCES "graphmetadata" ("graphmetadataid") ON DELETE NO ACTION ON UPDATE NO ACTION
+ALTER TABLE "edges" ADD CONSTRAINT "graph_edges_fk" FOREIGN KEY ("graphid") REFERENCES "graph" ("graphid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
 ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "nodes_validations_x_nodes_fk" FOREIGN KEY ("nodeid") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION

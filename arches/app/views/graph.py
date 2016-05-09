@@ -31,25 +31,23 @@ from arches.app.models.ontology import Ontology
 
 
 @group_required('edit')
-def manager(request, nodeid):
-    if nodeid is None or nodeid == '':
-        graphs = models.Node.objects.filter(istopnode=True)
-        metadata = models.GraphMetadata.objects.all()
+def manager(request, graphid):
+    if graphid is None or graphid == '':
+        graphs = models.Graph.objects.all()
         return render(request, 'graph-list.htm', {
             'main_script': 'graph-list',
-            'graphs': JSONSerializer().serialize(graphs),
-            'metadata': JSONSerializer().serialize(metadata)
+            'graphs': JSONSerializer().serialize(graphs)
         })
 
-    graph = Graph(nodeid)
+    graph = Graph(graphid)
     validations = models.Validation.objects.all()
-    metadata_records = JSONSerializer().serializeToPython(models.GraphMetadata.objects.all())
-    branch_nodes = models.Node.objects.filter(~Q(graphmetadata=None), istopnode=True)
+    metadata_records = JSONSerializer().serializeToPython(models.Graph.objects.all())
+    branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
 
     branches = []
     for metadata_record in metadata_records:
         try:
-            rootnode = branch_nodes.get(graphmetadata_id=metadata_record['graphmetadataid'])
+            rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
             metadata_record['graph'] = Graph(rootnode)
             metadata_record['relates_via'] = ['P1', 'P2', 'P3']
             branches.append(metadata_record)
@@ -59,7 +57,7 @@ def manager(request, nodeid):
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
-        'nodeid': nodeid,
+        'graphid': graphid,
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
@@ -76,40 +74,43 @@ def manager(request, nodeid):
             'title': _('Branch Library'),
             'search_placeholder': _('Find a graph branch')
         },
-        'metadata': graph.root.graphmetadata
+        'metadata': graph.root.graph
     })
 
 
 @group_required('edit')
-def settings(request, nodeid):
-    node = models.Node.objects.get(nodeid=nodeid)
+def settings(request, graphid):
+    node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+    graph = node.graph
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('metadata').iteritems():
-            setattr(node.graphmetadata, key, value)
-        node.graphmetadata.save()
+            setattr(graph, key, value)
+        graph.save()
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         return JSONResponse({
             'success': True,
-            'metadata': node.graphmetadata,
+            'metadata': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
     icons = models.Icon.objects.order_by('name')
-    resource_nodes = models.Node.objects.filter(Q(graphmetadata__isresource=True), ~Q(nodeid=nodeid))
+    resource_graphs = models.Graph.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
     resource_data = []
     relatable_resources = node.get_relatable_resources()
-    for res in resource_nodes:
-        resource_data.append({
-            'id': res.nodeid,
-            'metadata': res.graphmetadata,
-            'is_relatable': (res in relatable_resources)
-        })
+    for res in resource_graphs:
+        if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
+            node = models.Node.objects.get(graph=res, istopnode=True)
+            resource_data.append({
+                'id': node.nodeid,
+                'metadata': res,
+                'is_relatable': (node in relatable_resources)
+            })
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
-        'metadata_json': JSONSerializer().serialize(node.graphmetadata),
-        'nodeid': nodeid,
-        'metadata': node.graphmetadata,
+        'metadata_json': JSONSerializer().serialize(graph),
+        'graphid': graphid,
+        'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data)
     })
 
@@ -172,20 +173,20 @@ def node(request, nodeid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def append_branch(request, nodeid, property, graphmetadataid):
+def append_branch(request, nodeid, property, graphid):
     if request.method == 'POST':
-        graph = Graph(nodeid)
-        newBranch = graph.append_branch(property, graphmetadataid=graphmetadataid)
+        graph = Graph(models.Node.objects.get(pk=nodeid))
+        new_branch = graph.append_branch(property, nodeid=nodeid, graphid=graphid)
         graph.save()
-        return JSONResponse(newBranch)
+        return JSONResponse(new_branch)
 
     return HttpResponseNotFound()
 
 @group_required('edit')
-def move_node(request, nodeid):
+def move_node(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(nodeid)
+        graph = Graph(graphid)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
@@ -193,10 +194,10 @@ def move_node(request, nodeid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def clone(request, nodeid):
+def clone(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(nodeid).copy()
+        graph = Graph(graphid).copy()
         if 'name' in data:
             graph.root.name = data['name']
             graph.metadata.name = data['name']

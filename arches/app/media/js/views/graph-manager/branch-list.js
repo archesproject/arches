@@ -39,7 +39,7 @@ define([
 
         appendBranch: function(item, evt){
             if(this.selectedNode()){
-                this.graphModel.appendBranch(this.selectedNode().nodeid, item.ontology_property(), item.graphmetadataid, function(response){
+                this.graphModel.appendBranch(this.selectedNode().nodeid, item.ontology_property(), item.graphid, function(response){
                 }, this)
             }
             this.closeForm();

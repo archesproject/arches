@@ -38,7 +38,7 @@ class Graph(object):
 
         if args:
             if isinstance(args[0], dict):
-                self.metadata = models.GraphMetadata()
+                self.metadata = models.Graph()
                 for node in args[0]["nodes"]:
                     newNode = self.add_node(node)
                     if node['istopnode']:
@@ -55,10 +55,12 @@ class Graph(object):
             else:
                 if (isinstance(args[0], basestring) or
                    isinstance(args[0], uuid.UUID)):
-                    self.root = models.Node.objects.get(pk=args[0])
+                    self.metadata = models.Graph.objects.get(pk=args[0])
+                elif isinstance(args[0], models.Graph):
+                    self.metadata = args[0]
                 elif isinstance(args[0], models.Node):
-                    self.root = args[0]
-                self.metadata = self.root.graphmetadata
+                    self.metadata = args[0].graph
+                self.root = self.metadata.node_set.get(istopnode=True)
                 self.get_nodes_and_edges(self.root)
 
 
@@ -87,7 +89,7 @@ class Graph(object):
                     cardinality=nodeobj.get('cardinality', '')
                 )
 
-        node.graphmetadata = self.metadata
+        node.graph = self.metadata
 
         if node.pk == None:
             node.pk = uuid.uuid1()
@@ -115,7 +117,7 @@ class Graph(object):
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
-        edge.graphmetadata = self.metadata
+        edge.graph = self.metadata
 
         if edge.pk == None:
             edge.pk = uuid.uuid1()
@@ -210,7 +212,7 @@ class Graph(object):
             edge.rangenode = self.nodes[edge.rangenode.pk]
             self.add_edge(edge)
 
-    def append_branch(self, property, nodeid=None, branch_root=None, graphmetadataid=None):
+    def append_branch(self, property, nodeid=None, branch_root=None, graphid=None):
         """
         Appends a branch onto this graph
 
@@ -223,13 +225,13 @@ class Graph(object):
 
         branch_root -- the root node of the branch you want to append
 
-        graphmetadataid -- get the branch to append based on the graphmetadataid,
+        graphid -- get the branch to append based on the graphid,
         if given, branch_root takes precedence
 
         """
 
         if not branch_root:
-            branch_root = models.Node.objects.get(graphmetadata_id=graphmetadataid, istopnode=True)
+            branch_root = models.Node.objects.get(graph_id=graphid, istopnode=True)
         branch_graph = Graph(branch_root)
 
         branch_copy = branch_graph.copy()
@@ -240,7 +242,7 @@ class Graph(object):
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
                 ontologyproperty = property,
-                graphmetadata = self.metadata
+                graph = self.metadata
             )
             branch_copy.add_edge(newEdge)
         for key, node in branch_copy.nodes.iteritems():
@@ -261,7 +263,7 @@ class Graph(object):
 
         new_nodegroups = {}
 
-        copy_of_self = Graph(self.root.pk)
+        copy_of_self = Graph(self.metadata.pk)
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
 
         copy_of_self.metadata.pk = uuid.uuid1()
@@ -269,7 +271,7 @@ class Graph(object):
             node = copy_of_self.nodes[node_id]
             if node == self.root:
                 copy_of_self.root = node
-            node.graphmetadata = copy_of_self.metadata
+            node.graph = copy_of_self.metadata
             is_collector = node.is_collector()
             node.pk = uuid.uuid1()
             if is_collector:
@@ -283,7 +285,7 @@ class Graph(object):
 
         for edge_id, edge in copy_of_self.edges.iteritems():
             edge.pk = uuid.uuid1()
-            edge.graphmetadata = copy_of_self.metadata
+            edge.graph = copy_of_self.metadata
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
 
