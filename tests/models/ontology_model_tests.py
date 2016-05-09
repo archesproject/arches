@@ -99,42 +99,124 @@ class OntologyModelTests(ArchesTestCase):
             {
                 "id": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
                 "value": "P1_is_identified_by",
-                "classes": [{
-                    "id": "b43d4537-6674-37cb-af6e-834b5d63c978",
-                    "value": "E41_Appellation"
-                }]
+                "classes": [
+                    {
+                        "id": "b43d4537-6674-37cb-af6e-834b5d63c978",
+                        "value": "E41_Appellation"
+                    },
+                    {
+                        "id": "48a1d09d-dc16-3903-9ad0-f2eba8b79b20",
+                        "value": "E35_Title"
+                    },
+                    {
+                        "id": "fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c",
+                        "value": "E42_Identifier"
+                    },
+                    {
+                        "id": "19e2c4fb-70b7-3913-be69-1c824a0bf23f",
+                        "value": "E44_Place_Appellation"
+                    },
+                    {
+                        "id": "ac777d6e-452a-3a10-80c9-5190b5d9f6f2",
+                        "value": "E45_Address"
+                    },
+                    {
+                        "id": "4e3d11b3-c6a8-3838-9a62-0571b84914fa",
+                        "value": "E46_Section_Definition"
+                    },
+                    {
+                        "id": "35bfed01-08dc-34b9-94a0-42facd1291ac",
+                        "value": "E47_Spatial_Coordinates"
+                    },
+                    {
+                        "id": "e276711d-008c-3380-934b-e048a6a0d665",
+                        "value": "E48_Place_Name"
+                    },
+                    {
+                        "id": "9ca9a75f-0eca-378a-a095-91574ad77a30",
+                        "value": "E49_Time_Appellation"
+                    },
+                    {
+                        "id": "c8b36269-f507-32fc-8624-2a9404390719",
+                        "value": "E50_Date"
+                    },
+                    {
+                        "id": "7cee80d2-87e9-3a29-9d1e-f61d46d892ca",
+                        "value": "E51_Contact_Point"
+                    },
+                    {
+                        "id": "ae27d5a7-abfc-32e3-9927-99795abc53a4",
+                        "value": "E75_Conceptual_Object_Appellation"
+                    },
+                    {
+                        "id": "6f38d2ca-e114-33a0-b4db-4f298e53be3d",
+                        "value": "E82_Actor_Appellation"
+                    }
+                ],
             },
             {
                 "id": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
                 "value": "P2_has_type",
-                "classes": [{
-                    "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
-                    "value": "E55_Type"
-                }]
+                "classes": [
+                    {
+                        "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
+                        "value": "E55_Type"
+                    },
+                    {
+                        "id": "4e75b119-d77b-3c1e-acf8-fbdfd197c9f1",
+                        "value": "E56_Language"
+                    },
+                    {
+                        "id": "15afdb47-2e96-3076-8a28-ec86a8fe4674",
+                        "value": "E57_Material"
+                    },
+                    {
+                        "id": "c1f0e36c-770f-30f9-8241-30d44921c6c8",
+                        "value": "E58_Measurement_Unit"
+                    }
+                ]
             },
             {
                 "id": "fd06e07d-057b-38aa-99ac-1add45f9f217",
                 "value": "P3_has_note",
-                "classes": [{
-                    "id": "8471e471-3045-3269-a9b8-86d0e6065176",
-                    "value": "E59_Primitive_Value"
-                }]
+                "classes": [
+                    {
+                        "id": "6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39",
+                        "value": "E62_String"
+                    }
+                ]
             },
             {
                 "id": "356c8ba7-0114-32c3-861f-8432bc46e963",
                 "value": "P48_has_preferred_identifier",
-                "classes": [{
-                    "id": "fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c",
-                    "value": "E42_Identifier"
-                },]
+                "classes": [
+                    {
+                        "id": "fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c",
+                        "value": "E42_Identifier"
+                    }
+                ]
             },
             {
                 "id": "ada26737-46ff-3a34-8aed-7b70117c34aa",
                 "value": "P137_exemplifies",
-                "classes": [{
-                    "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
-                    "value": "E55_Type"
-                },]
+                "classes": [
+                    {
+                        "id": "a8f7cd0b-8771-3b91-a827-422ff7a15250",
+                        "value": "E55_Type"
+                    },
+                    {
+                        "id": "4e75b119-d77b-3c1e-acf8-fbdfd197c9f1",
+                        "value": "E56_Language"
+                    },
+                    {
+                        "id": "15afdb47-2e96-3076-8a28-ec86a8fe4674",
+                        "value": "E57_Material"
+                    },
+                    {
+                        "id": "c1f0e36c-770f-30f9-8241-30d44921c6c8",
+                        "value": "E58_Measurement_Unit"
+                    }
+                ]
             }
         ]
 
