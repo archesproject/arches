@@ -37,17 +37,18 @@ class Ontology(Concept):
                     'id': subconcept.id
                 }
                 for ontology_class in subconcept.subconcepts:
-                    prop['classes'] = []
+                    if ontology_class.relationshiptype == "hasRangeClass":
+                        prop['classes'] = []
 
-                    subclasses = ontology_class.get_subclasses(include=['label'], lang=lang)
-                    
-                    def gather_subclasses(concept):
-                        prop['classes'].append({
-                            'value': concept.get_preflabel(lang=lang).value,
-                            'id': concept.id
-                        })
+                        subclasses = ontology_class.get_subclasses(include=['label'], lang=lang)
+                        
+                        def gather_subclasses(concept):
+                            prop['classes'].append({
+                                'value': concept.get_preflabel(lang=lang).value,
+                                'id': concept.id
+                            })
 
-                    subclasses.traverse(gather_subclasses)
+                        subclasses.traverse(gather_subclasses)
 
                 ret['properties'].append(prop)
 
