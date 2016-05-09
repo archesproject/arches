@@ -148,7 +148,7 @@ class Concept(object):
                             include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts, 
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, 
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
-                            nodetype=nodetype, semantic=semantic, _cache=_cache, lang=lang)
+                            nodetype=nodetype, semantic=semantic, _cache=_cache.copy(), lang=lang)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
 
@@ -164,7 +164,7 @@ class Concept(object):
                             include_subconcepts=False,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts,exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
-                            nodetype=nodetype, semantic=semantic, _cache=_cache, lang=lang)
+                            nodetype=nodetype, semantic=semantic, _cache=_cache.copy(), lang=lang)
                         parentconcept.relationshiptype = relation.relationtype.pk
                         self.parentconcepts.append(parentconcept)
 
