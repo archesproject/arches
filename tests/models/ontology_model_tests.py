@@ -49,37 +49,37 @@ class OntologyModelTests(ArchesTestCase):
         expected_results = [
             {
                 "id": "68dd1374-d854-3b4e-bca3-95d41675fb2f",
-                "value": "P131_is_identified_by",
+                "value": "P131 is identified by",
                 "classes": [{
                     "id": "6f38d2ca-e114-33a0-b4db-4f298e53be3d",
-                    "value": "E82_Actor_Appellation"
+                    "value": "E82 Actor Appellation"
                 }]
             },
             {
                 "id": "5869a9ed-ebe5-3613-acc2-29c184737885",
-                "value": "P74_has_current_or_former_residence",
+                "value": "P74 has current or former residence",
                 "classes": [{
                     "id": "12f08da7-e25c-3e10-8179-62ed76da5da0",
-                    "value": "E53_Place"
+                    "value": "E53 Place"
                 }]
             },
             {
                 "id": "44813770-321a-370d-bb8f-ba619bcb4334",
-                "value": "P75_possesses",
+                "value": "P75 possesses",
                 "classes": [{
                     "id": "e02834c9-ae10-3659-a8e5-ccfdc1866e87",
-                    "value": "E30_Right"
+                    "value": "E30 Right"
                 }]
             },
             {
                 "id": "e39e863c-0b62-39ae-8db7-e49b56fcbd1e",
-                "value": "P76_has_contact_point",
+                "value": "P76 has contact point",
                 "classes": [{
                     "id": "7cee80d2-87e9-3a29-9d1e-f61d46d892ca",
-                    "value": "E51_Contact_Point"
+                    "value": "E51 Contact Point"
                 },{
                     "id": "ac777d6e-452a-3a10-80c9-5190b5d9f6f2",
-                    "value": "E45_Address"
+                    "value": "E45 Address"
                 }]
             }
         ]
