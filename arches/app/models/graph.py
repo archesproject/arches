@@ -200,13 +200,18 @@ class Graph(object):
         """
 
         self.root = node
-        self.add_node(node)
-
-        child_nodes, child_edges = node.get_child_nodes_and_edges()
+        if self.root.istopnode:
+            child_nodes = self.metadata.node_set.all()
+            child_edges = self.metadata.edge_set.all()
+        else:
+            self.add_node(node)
+            child_nodes, child_edges = node.get_child_nodes_and_edges()
 
         for node in child_nodes:
             self.add_node(node)
         for edge in child_edges:
+            edge.domainnode = self.nodes[edge.domainnode.pk]
+            edge.rangenode = self.nodes[edge.rangenode.pk]
             self.add_edge(edge)
 
     def append_branch(self, property, nodeid=None, branch_root=None, graphmetadataid=None):
@@ -245,6 +250,8 @@ class Graph(object):
         for key, node in branch_copy.nodes.iteritems():
             self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
+            edge.domainnode = self.nodes[edge.domainnode.pk]
+            edge.rangenode = self.nodes[edge.rangenode.pk]
             self.add_edge(edge)
 
         self.populate_null_nodegroups()
@@ -264,6 +271,8 @@ class Graph(object):
         copy_of_self.metadata.pk = uuid.uuid1()
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
+            if node == self.root:
+                copy_of_self.root = node
             node.graphmetadata = copy_of_self.metadata
             is_collector = node.is_collector()
             node.pk = uuid.uuid1()
@@ -307,12 +316,12 @@ class Graph(object):
         if not node.is_collector():
             nodegroup = node.nodegroup
 
-            # make a graph of node, so that we can easily get all the child nodes
-            graph = Graph(node)
-            for node_id, node in graph.nodes.iteritems():
-                if node.nodegroup == nodegroup:
-                    self.nodes[node_id].nodegroup = None
-                    ret['nodes'].append(self.nodes[node_id])
+            child_nodes, child_edges = node.get_child_nodes_and_edges()
+            child_nodes.append(node)
+            for child_node in child_nodes:
+                if child_node.nodegroup == nodegroup:
+                    self.nodes[child_node.pk].nodegroup = None
+                    ret['nodes'].append(child_node)
 
         for edge_id, edge in self.edges.iteritems():
             if edge.rangenode == node:
