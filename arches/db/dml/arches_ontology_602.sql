@@ -261,7 +261,7 @@ INSERT INTO concepts VALUES ('a5a812b2-d786-38db-928f-1df9f416ab59', 'P165_incor
 INSERT INTO concepts VALUES ('6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'P166_was_a_presence_of', 'Concept');
 INSERT INTO concepts VALUES ('da115774-50f3-3292-97dc-da1cbb527ca5', 'P167_was_at', 'Concept');
 INSERT INTO concepts VALUES ('81fd2793-2d69-37fe-8027-ff705a54ce3d', 'P168_place_is_defined_by', 'Concept');
-INSERT INTO concepts VALUES ('7cd91c49-743e-3eed-ad91-d993b09af867', 'BM.PX.is_related_to', 'Concept');
+INSERT INTO concepts VALUES ('7cd91c49-743e-3eed-ad91-d993b09af867', 'BM.PX_is_related_to', 'Concept');
 
 
 -- Completed on 2016-05-09 13:31:44 PDT
@@ -4095,7 +4095,7 @@ INSERT INTO "values" VALUES ('a508f2c0-0872-34d3-8a78-bba28b8e0cc1', 'P168 place
 INSERT INTO "values" VALUES ('57cf497e-5f7e-3b9b-b093-1d354fddf9a3', 'place is defined by ', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('33411498-5d7b-31f3-89e6-d1a3419ad0d5', 'This property associates an instance of E53 Place with an instance of E94 Space Primitive that defines it. Syntactic variants or use of different scripts may result in multiple instances of E94 Space Primitive defining exactly the same place. Transformations between different reference systems in general result in new definitions of places approximating each other and not in alternative definitions. Note that it is possible for a place to be defined by phenomena causal to it or other forms of identification rather than by an instance of E94 Space Primitive. In this case, this property must not be used for approximating the respective instance of E53 Place with an instance of E94 Space Primitive. 
 	', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'en-US', 'scopeNote');
-INSERT INTO "values" VALUES ('b1c551f4-95ab-319e-b044-854dbaac0cc6', 'BM.PX.is is related to', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('b1c551f4-95ab-319e-b044-854dbaac0cc6', 'BM.PX is related to', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('8b06ab46-deb0-304c-a9b3-8e7039d4f0f8', 'is related to', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c6ae539a-c840-3ee7-aa47-301ecba86dfd', 'Relates E18 to E1', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en-US', 'scopeNote');
 
