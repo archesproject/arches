@@ -96,7 +96,7 @@ define(['arches',
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + this.get('root').nodeid,
+                url: this.url + 'move_node/' + this.get('metadata').graphid,
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 self.get('edges')().find(function (edge) {

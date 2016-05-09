@@ -183,10 +183,10 @@ def append_branch(request, nodeid, property, graphid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def move_node(request, nodeid):
+def move_node(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(models.Node.objects.get(pk=nodeid))
+        graph = Graph(graphid)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
