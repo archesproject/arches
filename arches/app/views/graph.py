@@ -33,12 +33,10 @@ from arches.app.models.ontology import Ontology
 @group_required('edit')
 def manager(request, nodeid):
     if nodeid is None or nodeid == '':
-        graphs = models.Node.objects.filter(istopnode=True)
-        metadata = models.GraphMetadata.objects.all()
+        graphs = models.GraphMetadata.objects.all()
         return render(request, 'graph-list.htm', {
             'main_script': 'graph-list',
-            'graphs': JSONSerializer().serialize(graphs),
-            'metadata': JSONSerializer().serialize(metadata)
+            'graphs': JSONSerializer().serialize(graphs)
         })
 
     root = models.Node.objects.get(pk=nodeid)

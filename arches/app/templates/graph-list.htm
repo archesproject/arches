@@ -66,8 +66,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Resource Type -->
             <div class="resource-grid-main-container">
                 <div class="resource-grid-main">
-                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (metadata.iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:metadata.name"></span></h1>
-                    <p class="resource-grid-subtitle" data-bind='text:metadata.subtitle'></p>
+                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:name"></span></h1>
+                    <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
                 </div>
             </div>
 
@@ -81,10 +81,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Resource Metadata -->
             <div class="resource-grid-meta-container">
                 <ul class="list-inline resource-grid-meta">
-                    <li data-bind="if:!metadata.isresource">{% trans "Graph" %}</li>
-                    <li data-bind="if:metadata.isresource">{% trans "Resource" %}</li>
-                    <li class="text-semibold text-primary" data-bind="if: metadata.isactive">{% trans "Active" %}</li>
-                    <li class="text-semibold text-danger" data-bind="if: !metadata.isactive">{% trans "Inactive" %}</li>
+                    <li data-bind="if:!isresource">{% trans "Graph" %}</li>
+                    <li data-bind="if:isresource">{% trans "Resource" %}</li>
+                    <li class="text-semibold text-primary" data-bind="if: isactive">{% trans "Active" %}</li>
+                    <li class="text-semibold text-danger" data-bind="if: !isactive">{% trans "Inactive" %}</li>
                 </ul>
             </div>
         </div>
@@ -130,14 +130,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 						<div class="panel mar-no">
 							<!-- Project Name, Abstract -->
 							<div class="panel-body" style="padding: 15px 20px 25px 20px; height: 125px;">
-								<h4 class="mar-no" data-bind="text:metadata.name"></h4>
-                                <span data-bind='text: metadata.description || "{% trans "No description available." %}"'></span>
+								<h4 class="mar-no" data-bind="text:name"></h4>
+                                <span data-bind='text: description || "{% trans "No description available." %}"'></span>
 							</div>
 
 							<!-- Project Tools -->
 							<div class="panel-footer" style="height: 40px;">
-                                <span data-bind="if:metadata.isresource"><span><i class="fa fa-sitemap"></i> {% trans "resource" %}, </span> <i class="fa" data-bind="css: {'fa-check-circle': metadata.isactive, 'fa-minus-circle': !metadata.isactive}"></i> <span data-bind='text:metadata.isactive?"{% trans "active" %}":"{% trans "inactive" %}"'></span></span>
-                                <span data-bind="if:!metadata.isresource"><span><i class="fa fa-link"></i> {% trans "graph" %}</span></span>
+                                <span data-bind="if:isresource"><span><i class="fa fa-sitemap"></i> {% trans "resource" %}, </span> <i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "active" %}":"{% trans "inactive" %}"'></span></span>
+                                <span data-bind="if:!isresource"><span><i class="fa fa-link"></i> {% trans "graph" %}</span></span>
 							</div>
 						</div>
 					</div>
@@ -190,5 +190,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 <input id="graphs" name="graphs" type="hidden" value="{{graphs}}"/>
-<input id="metadata" name="metadata" type="hidden" value="{{metadata}}"/>
 {% endblock content %}

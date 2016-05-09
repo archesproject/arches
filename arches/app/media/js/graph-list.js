@@ -7,14 +7,10 @@ require([
     'bootstrap-nifty'
 ], function($, _, ko, PageView, NodeModel) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
-    var metadata = JSON.parse($('#metadata').val());
     var selectedGraph = ko.observable(null);
     var newGraphName = ko.observable('');
 
     graphs().forEach(function(graph) {
-        graph.metadata = _.find(metadata, function(metadata) {
-            return metadata.graphmetadataid === graph.graphmetadata_id;
-        });
         graph.open = function() {
             pageView.viewModel.loading(true);
             window.location = graph.nodeid + '/settings';
