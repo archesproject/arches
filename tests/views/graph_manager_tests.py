@@ -22,7 +22,7 @@ from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
-from arches.app.models.models import Node, NodeGroup
+from arches.app.models.models import Node, NodeGroup, GraphMetadata
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -67,7 +67,7 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse('graph', kwargs={'nodeid':''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
-        self.assertEqual(len(graphs), 4)
+        self.assertEqual(len(graphs), GraphMetadata.objects.count())
 
         url = reverse('graph', kwargs={'nodeid':self.ROOT_ID})
         response = self.client.get(url)
