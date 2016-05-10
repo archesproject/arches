@@ -150,25 +150,20 @@ define(['arches',
 
         getRelatedNodesEdges: function(node){
             var ret = {
-                'edges': [],
-                'nodes': []
+                'childedges': [],
+                'parentnode': []
             }
             this.get('edges')().forEach(function (edge) {
                 if (edge.rangenode_id === node.nodeid){
-                    ret.edges.push(edge);
-                    this.get('nodes')().forEach(function (node) {
-                        if (node.nodeid === edge.domainnode_id){
-                            ret.nodes.push(node);
-                        }
-                    });
+                    ret.parentnode.push(node);
                 }
                 if (edge.domainnode_id === node.nodeid){
-                    ret.edges.push(edge);
-                    this.get('nodes')().forEach(function (node) {
-                        if (node.nodeid === edge.rangenode_id){
-                            ret.nodes.push(node);
-                        }
-                    });
+                    ret.childedges.push(edge);
+                    // this.get('nodes')().forEach(function (node) {
+                    //     if (node.nodeid === edge.rangenode_id){
+                    //         ret.nodes.push(node);
+                    //     }
+                    // });
                 }
             }, this);
             return ret

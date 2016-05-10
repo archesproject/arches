@@ -11,6 +11,35 @@ class Ontology(Concept):
 
     """
 
+    def get_valid_ontology_concepts(self, parent_node, child_properties=[], lang=settings.LANGUAGE_CODE):
+        
+        ret = set()
+        for child_property in child_properties:
+            edge = models.Edge.objects.get(child_property['id'])
+            subclasses = edge.domainclass.get_subclasses(include=['label'], lang=lang)
+
+            classes = set()
+            def gather_subclasses(concept):
+                classes.add({
+                    'id': concept.id,
+                    'value': concept.get_preflabel(lang=lang).value,
+                })
+
+            subclasses.traverse(gather_subclasses)
+
+            if len(ret) == 0:
+                ret = classes
+            else:
+                ret = ret.intersection(classes)
+
+            if len(ret) == 0:
+                break
+
+        #for ontology_class in ret:
+
+
+    #get_valid_ontology_concepts_from_parent
+
     def get_related_properties(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
         """
         gets the allowed connections between the given ontology concept class and other ontology classes
@@ -103,9 +132,61 @@ class Ontology(Concept):
                     downlevel = downlevel + 1
 
                 for relation in models.Relation.objects.filter(conceptfrom=self.id, relationtype='subClassOf'):
-                    subconcept = Ontology().get_subclasses(id=relation.conceptto_id, exclude=exclude, include=include, depth_limit=depth_limit,
-                        downlevel=downlevel, nodetype=nodetype)
+                    subconcept = Ontology().get_subclasses(id=relation.conceptto_id, exclude=exclude, 
+                        include=include, depth_limit=depth_limit, downlevel=downlevel, nodetype=nodetype)
                     subconcept.relationshiptype = relation.relationtype.pk
                     self.subconcepts.append(subconcept)
 
         return self
+
+def get_superclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
+        """
+        populates self with just ontological subclasses of itself
+
+        Arguments:
+        id -- id of the ontology class to use as the root, defaults to self.id
+
+        Keyword Arguments:
+        exclude -- a list of value types to exclude from the result
+
+        include -- a list of value types to include in the result
+
+        depth_limit -- level to limit the depth to crawl the tree
+
+        lang -- the language of the returned values
+
+        """
+
+        id = id if id != '' else self.id
+        if id != '' and id != None:
+            self.load(models.Concept.objects.get(pk=id))
+
+            ret = kwargs.pop('ret', [])
+            downlevel = kwargs.pop('downlevel', 0)
+            depth_limit = depth_limit if depth_limit == None else int(depth_limit)
+
+            if include != None:
+                self.values = []
+                if len(include) > 0 and len(exclude) > 0:
+                    raise Exception('Only include values for include or exclude, but not both')
+                include = include if len(include) != 0 else models.DValueType.objects.distinct('category').values_list('category', flat=True)
+                include = set(include).difference(exclude)
+                exclude = []
+
+                if len(include) > 0:
+                    values = models.Value.objects.filter(concept = self.id)
+                    for value in values:
+                        if value.valuetype.category in include:
+                            self.values.append(ConceptValue(value))
+
+            if depth_limit == None or downlevel < depth_limit:
+                if depth_limit != None:
+                    downlevel = downlevel + 1
+
+                for relation in models.Relation.objects.filter(conceptto=self.id, relationtype='subClassOf'):
+                    parentconcept = Ontology().get_superclasses(id=relation.conceptfrom_id, exclude=exclude, 
+                        include=include, depth_limit=depth_limit, downlevel=downlevel, ret=ret)
+                    parentconcept.relationshiptype = relation.relationtype.pk
+                    ret.append(parentconcept)
+            return self
+        return ret

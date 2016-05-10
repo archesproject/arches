@@ -215,6 +215,8 @@ def get_related_nodes(request):
     data = JSONDeserializer().deserialize(request.body)
     for node in data['nodes']: 
         related_properties = Ontology().get_related_properties(node['ontologyclass_id'], lang=lang)
+        #if ret['properties'] == []:
+
         ret['properties'].extend(related_properties['properties'])
         ret['classes'].extend(related_properties['classes'])
     return JSONResponse(ret, indent=4)
