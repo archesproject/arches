@@ -61,7 +61,15 @@ class Graph(object):
                 elif isinstance(args[0], models.Node):
                     self.metadata = args[0].graph
                 self.root = self.metadata.node_set.get(istopnode=True)
-                self.get_nodes_and_edges(self.root)
+                child_nodes = self.metadata.node_set.all()
+                child_edges = self.metadata.edge_set.all()
+
+                for node in child_nodes:
+                    self.add_node(node)
+                for edge in child_edges:
+                    edge.domainnode = self.nodes[edge.domainnode.pk]
+                    edge.rangenode = self.nodes[edge.rangenode.pk]
+                    self.add_edge(edge)
 
 
     def add_node(self, node):
@@ -192,27 +200,7 @@ class Graph(object):
 
         return traverse_tree(tree)
 
-    def get_nodes_and_edges(self, node):
-        """
-        Populate a Graph from the database with the child nodes and edges of parameter: 'node'
-
-        Arguments:
-        node -- the root node from which to gather all the child nodes and edges
-
-        """
-
-        self.root = node
-        child_nodes = self.metadata.node_set.all()
-        child_edges = self.metadata.edge_set.all()
-
-        for node in child_nodes:
-            self.add_node(node)
-        for edge in child_edges:
-            edge.domainnode = self.nodes[edge.domainnode.pk]
-            edge.rangenode = self.nodes[edge.rangenode.pk]
-            self.add_edge(edge)
-
-    def append_branch(self, property, nodeid=None, branch_root=None, graphid=None):
+    def append_branch(self, property, nodeid=None, graphid=None):
         """
         Appends a branch onto this graph
 
@@ -223,16 +211,9 @@ class Graph(object):
         nodeid -- if given will append the branch to this node, if not supplied will
         append the branch to the root of this graph
 
-        branch_root -- the root node of the branch you want to append
-
-        graphid -- get the branch to append based on the graphid,
-        if given, branch_root takes precedence
-
+        graphid -- get the branch to append based on the graphid
         """
-
-        if not branch_root:
-            branch_root = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        branch_graph = Graph(branch_root)
+        branch_graph = Graph(graphid)
 
         branch_copy = branch_graph.copy()
         branch_copy.root.istopnode = False
@@ -248,8 +229,6 @@ class Graph(object):
         for key, node in branch_copy.nodes.iteritems():
             self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
-            edge.domainnode = self.nodes[edge.domainnode.pk]
-            edge.rangenode = self.nodes[edge.rangenode.pk]
             self.add_edge(edge)
 
         self.populate_null_nodegroups()
