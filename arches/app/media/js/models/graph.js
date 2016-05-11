@@ -68,8 +68,8 @@ define(['arches',
         appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'append_branch/' + nodeid + '/' + property + '/' + branchmetadatid,
-                data: JSON.stringify(this.toJSON())
+                url: this.url + 'append_branch/' + this.get('metadata').graphid,
+                data: JSON.stringify({nodeid:nodeid, property: property, graphid: branchmetadatid})
             }, function(response, status, self){
                 var branchroot = response.responseJSON.root;
                 response.responseJSON.nodes.forEach(function(node){

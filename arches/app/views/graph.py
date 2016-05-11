@@ -154,10 +154,11 @@ def node(request, nodeid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def append_branch(request, nodeid, property, graphid):
+def append_branch(request, graphid):
     if request.method == 'POST':
-        graph = Graph(models.Node.objects.get(pk=nodeid))
-        new_branch = graph.append_branch(property, nodeid=nodeid, graphid=graphid)
+        data = JSONDeserializer().deserialize(request.body)
+        graph = Graph(graphid)
+        new_branch = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
         graph.save()
         return JSONResponse(new_branch)
 
