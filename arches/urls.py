@@ -57,12 +57,12 @@ urlpatterns = [
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
-    url(r'^graph/(?P<nodeid>%s|())$' % uuid_regex, graph.manager, name='graph'),
-    url(r'^graph/(?P<nodeid>%s)/settings$' % (uuid_regex), graph.settings, name='graph_settings'),
-    url(r'^graph/append_branch/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<graphmetadataid>%s)$' % (uuid_regex, uuid_regex), graph.append_branch, name='append_branch'),
-    url(r'^graph/move_node/(?P<nodeid>%s)$' % (uuid_regex), graph.move_node, name='move_node'),
-    url(r'^graph/clone/(?P<nodeid>%s)$' % (uuid_regex), graph.clone, name='clone_graph'),
-    url(r'^node/get_related_nodes$', graph.get_related_nodes, name='get_related_nodes'),
+    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, graph.manager, name='graph'),
+    url(r'^graph/(?P<graphid>%s)/settings$' % (uuid_regex), graph.settings, name='graph_settings'),
+    url(r'^graph/append_branch/(?P<nodeid>%s)/(?P<property>[0-9a-zA-Z_-]*)/(?P<graphid>%s)$' % (uuid_regex, uuid_regex), graph.append_branch, name='append_branch'),
+    url(r'^graph/move_node/(?P<graphid>%s)$' % (uuid_regex), graph.move_node, name='move_node'),
+    url(r'^graph/clone/(?P<graphid>%s)$' % (uuid_regex), graph.clone, name='clone_graph'),
+    url(r'^graph/get_related_nodes/(?P<ontology_concept_id>%s)$' % (uuid_regex), graph.get_related_nodes, name='get_related_nodes'),
     url(r'^node/(?P<nodeid>%s)$' % uuid_regex, graph.node, name='node'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

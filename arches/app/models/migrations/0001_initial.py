@@ -163,9 +163,9 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='GraphMetadata',
+            name='Graph',
             fields=[
-                ('graphmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('graphid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
                 ('deploymentfile', models.TextField(null=True, blank=True)),
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
                 ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'graph_metadata',
+                'db_table': 'graphs',
                 'managed': True,
             },
         ),
@@ -287,7 +287,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
                 'db_table': 'edges',
@@ -376,7 +376,7 @@ class Migration(migrations.Migration):
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
                 ('datatype', models.TextField()),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
                 'db_table': 'nodes',
@@ -439,7 +439,6 @@ class Migration(migrations.Migration):
             name='Resource2ResourceConstraint',
             fields=[
                 ('resource2resourceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('cardinality', models.TextField(blank=True, null=True)),
                 ('resourceclassfrom', models.ForeignKey(blank=True, db_column='resourceclassfrom', null=True, related_name='resxres_contstraint_classes_from', to='models.Node')),
                 ('resourceclassto', models.ForeignKey(blank=True, db_column='resourceclassto', null=True, related_name='resxres_contstraint_classes_to', to='models.Node')),
             ],
@@ -637,7 +636,7 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'card', 'widget')]),
         ),
 
-        CreateAutoPopulateUUIDField('graph_metadata', ['graphmetadataid']),
+        CreateAutoPopulateUUIDField('graphs', ['graphid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),
