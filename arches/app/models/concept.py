@@ -68,6 +68,13 @@ class Concept(object):
     def __unicode__(self):
         return ('%s - %s') % (self.get_preflabel().value, self.id)
 
+    def __hash__(self): 
+        return hash(self.id)
+    def __eq__(self, x): 
+        return hash(self) == hash(x)
+    def __ne__(self, x): 
+        return hash(self) != hash(x)
+        
     def load(self, value):
         if isinstance(value, dict):
             self.id = str(value['id']) if 'id' in value else ''
