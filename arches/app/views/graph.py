@@ -131,10 +131,11 @@ def node(request, nodeid):
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 if unicode(node.nodegroup_id) != new_nodegroup_id:
-                    cardinality = data.get('cardinality', 'n')
-                    for model in node.set_nodegroup(new_nodegroup_id, cardinality):
+                    for model in node.set_nodegroup(new_nodegroup_id):
                         model.save()
-
+                cardinality = data.get('cardinality', 'n')
+                node.nodegroup.cardinality = cardinality
+                node.nodegroup.save()
                 node.save()
                 group_nodes = node.nodegroup.node_set.all()
                 return JSONResponse({'node': node, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
