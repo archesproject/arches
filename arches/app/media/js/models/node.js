@@ -18,6 +18,8 @@ define([
             self.datatype = ko.observable('');
             self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
+            self.ontologyclass_id = ko.observable('');
+            self.parentproperty_id = ko.observable('');
             self.relatableclasses = ko.observableArray();
             self.relatableproperties = ko.observableArray();
 
@@ -60,6 +62,8 @@ define([
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.cardinality(source.cardinality);
+            self.ontologyclass_id(source.ontologyclass_id);
+            self.parentproperty_id(source.parentproperty_id);
             self.validations.removeAll();
             source.validations.forEach(function(validation) {
                 self.validations.push(validation);
@@ -67,7 +71,6 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
-            self.ontologyclass_id = source.ontologyclass_id;
 
             self.set('id', self.nodeid);
         },
@@ -103,21 +106,19 @@ define([
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
                 data: JSON.stringify(relatedNodesEdges)
             }, function(response, status, self){
-                response.responseJSON.properties.forEach(function(property){
-                    if(property.classes){
-                        property.classes.forEach(function(ontologyclass){
-                            self.relatableproperties.push({
-                                'id': property.id,
-                                'value': property.value,
-                                'classid': ontologyclass.id
-                            })
-                            self.relatableclasses.push({
-                                'id': ontologyclass.id,
-                                'value': ontologyclass.value,
-                                'propertyid': property.id
-                            })
-                        });
-                    }
+                response.responseJSON.forEach(function(item){
+                    item.ontology_classes.forEach(function(ontologyclass){
+                        self.relatableproperties.push({
+                            'id': item.ontology_property.id,
+                            'value': item.ontology_property.value,
+                            'classid': ontologyclass.id
+                        })
+                        self.relatableclasses.push({
+                            'id': ontologyclass.id,
+                            'value': ontologyclass.value,
+                            'propertyid': item.ontology_property.id
+                        })
+                    });
                 }, this);
             }, this, 'changed');
         }

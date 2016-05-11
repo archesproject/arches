@@ -79,7 +79,7 @@
                         {% trans "Relation to parent" %}
                     </div>
                     <div class="col-sm-12 pad-no node-attribute-label">
-                        <select class="design" data-bind="value: node().datatype, options: datatypes, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().parentproperty_id, options: node().relatableproperties, optionsText: 'value', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
