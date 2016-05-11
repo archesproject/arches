@@ -61,12 +61,11 @@ class Graph(object):
                 elif isinstance(args[0], models.Node):
                     self.metadata = args[0].graph
                 self.root = self.metadata.node_set.get(istopnode=True)
-                child_nodes = self.metadata.node_set.all()
-                child_edges = self.metadata.edge_set.all()
-
-                for node in child_nodes:
+                nodes = self.metadata.node_set.all()
+                edges = self.metadata.edge_set.all()
+                for node in nodes:
                     self.add_node(node)
-                for edge in child_edges:
+                for edge in edges:
                     edge.domainnode = self.nodes[edge.domainnode.pk]
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
