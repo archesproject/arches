@@ -1,7 +1,8 @@
 import uuid
+import operator
 from django.conf import settings
-from operator import methodcaller
 from arches.app.models import models
+from django.db.models import Q
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -12,30 +13,42 @@ class Ontology(Concept):
     """
 
     def get_valid_ontology_concepts(self, parent_node, child_properties=[], lang=settings.LANGUAGE_CODE):
-        
-        ret = set()
+        ret = []
+        ontology_classes = set()
         for child_property in child_properties:
-            edge = models.Edge.objects.get(child_property['id'])
-            subclasses = edge.domainclass.get_subclasses(include=['label'], lang=lang)
+            #print child_property['ontologyclass_id']
+            ontology_property = models.Relation.objects.get(conceptto_id=child_property['ontologyclass_id'])
+            #print JSONSerializer().serialize(ontology_property.conceptfrom)
+            subclasses = Ontology().get_subclasses(id=ontology_property.conceptfrom_id, include=['label'], lang=lang)
 
-            classes = set()
-            def gather_subclasses(concept):
-                classes.add({
-                    'id': concept.id,
-                    'value': concept.get_preflabel(lang=lang).value,
-                })
-
-            subclasses.traverse(gather_subclasses)
-
-            if len(ret) == 0:
-                ret = classes
+            if len(ontology_classes) == 0:
+                ontology_classes = subclasses
             else:
-                ret = ret.intersection(classes)
+                ontology_classes = ontology_classes.intersection(subclasses)
 
-            if len(ret) == 0:
+            if len(ontology_classes) == 0:
                 break
 
-        #for ontology_class in ret:
+        related_properties = self.get_related_properties(parent_node['ontologyclass_id'], lang=lang)
+        for related_property in related_properties:
+            related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
+
+            if len(related_property['ontology_classes']) > 0:
+                item = {
+                    'ontology_property':{
+                        'value': related_property['ontology_property'].get_preflabel(lang=lang).value,
+                        'id': related_property['ontology_property'].id
+                    },
+                    'ontology_classes':[]
+                }
+                for ontology_class in related_property['ontology_classes']:
+                    item['ontology_classes'].append({
+                        'value': ontology_class.get_preflabel(lang=lang).value,
+                        'id': ontology_class.id
+                    })
+                ret.append(item)
+
+        return ret
 
 
     #get_valid_ontology_concepts_from_parent
@@ -52,40 +65,28 @@ class Ontology(Concept):
 
         """
 
-        ret = {
-            'properties': [],
-            'classes': []
-        }
+        ret = []
         concept_graph = Ontology().get(id=ontology_concept_id, include_subconcepts=True, 
             include=['label'], depth_limit=2, lang=lang)
 
         for subconcept in concept_graph.subconcepts:
             if subconcept.relationshiptype == "hasDomainClass":
-                prop = {
-                    'value': subconcept.get_preflabel(lang=lang).value,
-                    'id': subconcept.id
+                item = {
+                    'ontology_property': subconcept,
+                    'ontology_classes': []
                 }
                 for ontology_class in subconcept.subconcepts:
                     if ontology_class.relationshiptype == "hasRangeClass":
-                        prop['classes'] = []
+                        for subclass in ontology_class.get_subclasses(include=['label'], lang=lang):
+                            item['ontology_classes'].append(subclass)
 
-                        subclasses = ontology_class.get_subclasses(include=['label'], lang=lang)
-                        
-                        def gather_subclasses(concept):
-                            prop['classes'].append({
-                                'value': concept.get_preflabel(lang=lang).value,
-                                'id': concept.id
-                            })
-
-                        subclasses.traverse(gather_subclasses)
-
-                ret['properties'].append(prop)
+                ret.append(item)
 
         return ret
 
     def get_subclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
         """
-        populates self with just ontological subclasses of itself
+        reutrns a set of subclasses of self including self
 
         Arguments:
         id -- id of the ontology class to use as the root, defaults to self.id
@@ -105,7 +106,8 @@ class Ontology(Concept):
         if id != '' and id != None:
             self.load(models.Concept.objects.get(pk=id))
 
-            nodetype = kwargs.pop('nodetype', self.nodetype)
+            ret = kwargs.pop('ret', set())
+            ret.add(self)
             downlevel = kwargs.pop('downlevel', 0)
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
 
@@ -123,25 +125,20 @@ class Ontology(Concept):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.Relation.objects.filter(conceptfrom=self.id, relationtype='subClassOf')[0:1]
-            if len(hassubconcepts) > 0:
-                self.hassubconcepts = True
-
             if depth_limit == None or downlevel < depth_limit:
                 if depth_limit != None:
                     downlevel = downlevel + 1
 
                 for relation in models.Relation.objects.filter(conceptfrom=self.id, relationtype='subClassOf'):
                     subconcept = Ontology().get_subclasses(id=relation.conceptto_id, exclude=exclude, 
-                        include=include, depth_limit=depth_limit, downlevel=downlevel, nodetype=nodetype)
-                    subconcept.relationshiptype = relation.relationtype.pk
-                    self.subconcepts.append(subconcept)
+                        include=include, depth_limit=depth_limit, downlevel=downlevel, ret=ret)
+                    self.relationshiptype = relation.relationtype.pk
 
-        return self
+        return ret
 
-def get_superclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
+    def get_superclasses(self, id='', exclude=[], include=[], depth_limit=None, lang=settings.LANGUAGE_CODE, **kwargs):
         """
-        populates self with just ontological subclasses of itself
+        reutrns a set of superclasses of self including self
 
         Arguments:
         id -- id of the ontology class to use as the root, defaults to self.id
@@ -161,7 +158,8 @@ def get_superclasses(self, id='', exclude=[], include=[], depth_limit=None, lang
         if id != '' and id != None:
             self.load(models.Concept.objects.get(pk=id))
 
-            ret = kwargs.pop('ret', [])
+            ret = kwargs.pop('ret', set())
+            ret.add(self)
             downlevel = kwargs.pop('downlevel', 0)
             depth_limit = depth_limit if depth_limit == None else int(depth_limit)
 
@@ -184,9 +182,8 @@ def get_superclasses(self, id='', exclude=[], include=[], depth_limit=None, lang
                     downlevel = downlevel + 1
 
                 for relation in models.Relation.objects.filter(conceptto=self.id, relationtype='subClassOf'):
-                    parentconcept = Ontology().get_superclasses(id=relation.conceptfrom_id, exclude=exclude, 
+                    parentconcepts = Ontology().get_superclasses(id=relation.conceptfrom_id, exclude=exclude, 
                         include=include, depth_limit=depth_limit, downlevel=downlevel, ret=ret)
-                    parentconcept.relationshiptype = relation.relationtype.pk
-                    ret.append(parentconcept)
-            return self
+                    self.relationshiptype = relation.relationtype.pk
+                    #ret.append(parentconcepts[-1])
         return ret
