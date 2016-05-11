@@ -120,7 +120,7 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
 
-        self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT-1)
+        self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT)
         self.assertEqual(response_json['node']['name'], 'new node name')
 
         node_ = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
