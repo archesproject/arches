@@ -121,10 +121,6 @@ def node(request, nodeid):
         data = JSONDeserializer().deserialize(request.body)
         if data:
             node = models.Node.objects.get(nodeid=nodeid)
-            nodes, edges = node.get_child_nodes_and_edges()
-            collectors = [node_ for node_ in nodes if node_.is_collector()]
-            node_ids = [id_node.nodeid for id_node in nodes]
-            nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
             with transaction.atomic():
                 node.name = data.get('name', '')
                 node.description = data.get('description', '')
@@ -134,30 +130,15 @@ def node(request, nodeid):
                 node.status = data.get('status', '')
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
-                cardinality = data.get('cardinality', 'n')
                 if unicode(node.nodegroup_id) != new_nodegroup_id:
-                    edge = models.Edge.objects.get(rangenode_id=nodeid)
-                    parent_group = edge.domainnode.nodegroup
-                    new_group = parent_group
-                    if new_nodegroup_id == nodeid:
-                        new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=nodeid, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
-                        new_group.parentnodegroup = parent_group
-                        new_group.cardinality = cardinality
-                        new_group.save()
-                        parent_group = new_group
-
-                    for collector in collectors:
-                        collector.nodegroup.parentnodegroup = parent_group
-                        collector.nodegroup.save()
-
-                    for group_node in nodes:
-                        group_node.nodegroup = new_group
-                        group_node.save()
-
-                    node.nodegroup = new_group
-
+                    for model in node.set_nodegroup(new_nodegroup_id):
+                        model.save()
+                cardinality = data.get('cardinality', 'n')
+                node.nodegroup.cardinality = cardinality
+                node.nodegroup.save()
                 node.save()
-                return JSONResponse({'node': node, 'group_nodes': nodes, 'collectors': collectors, 'nodegroup': node.nodegroup})
+                group_nodes = node.nodegroup.node_set.all()
+                return JSONResponse({'node': node, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)

@@ -283,6 +283,30 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
+    def set_nodegroup(self, nodegroupid):
+        nodes, edges = self.get_child_nodes_and_edges()
+        collectors = [node_ for node_ in nodes if node_.is_collector()]
+        node_ids = [id_node.nodeid for id_node in nodes]
+        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
+        edge = Edge.objects.get(rangenode_id=self.pk)
+        parent_group = edge.domainnode.nodegroup
+        new_group = parent_group
+
+        if nodegroupid == str(self.pk):
+            new_group, created = NodeGroup.objects.get_or_create(nodegroupid=self.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+            new_group.parentnodegroup = parent_group
+            parent_group = new_group
+
+        for collector in collectors:
+            collector.nodegroup.parentnodegroup = parent_group
+
+        for group_node in group_nodes:
+            group_node.nodegroup = new_group
+
+        self.nodegroup = new_group
+
+        updated_models = [c.nodegroup for c in collectors] + group_nodes + [new_group]
+        return updated_models
 
     class Meta:
         managed = True
