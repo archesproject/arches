@@ -131,7 +131,7 @@ def node(request, nodeid):
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 if unicode(node.nodegroup_id) != new_nodegroup_id:
-                    for model in node.set_nodegroup(new_nodegroup_id):
+                    for model in node.toggle_is_collector():
                         model.save()
                 cardinality = data.get('cardinality', 'n')
                 node.nodegroup.cardinality = cardinality

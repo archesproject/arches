@@ -283,7 +283,7 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
-    def set_nodegroup(self, nodegroupid):
+    def toggle_is_collector(self):
         nodes, edges = self.get_child_nodes_and_edges()
         collectors = [node_ for node_ in nodes if node_.is_collector()]
         node_ids = [id_node.nodeid for id_node in nodes]
@@ -292,7 +292,7 @@ class Node(models.Model):
         parent_group = edge.domainnode.nodegroup
         new_group = parent_group
 
-        if nodegroupid == str(self.pk):
+        if not self.is_collector():
             new_group, created = NodeGroup.objects.get_or_create(nodegroupid=self.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
             new_group.parentnodegroup = parent_group
             parent_group = new_group
