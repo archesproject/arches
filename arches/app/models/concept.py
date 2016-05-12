@@ -101,7 +101,7 @@ class Concept(object):
 
     def get(self, id='', legacyoid='', include_subconcepts=False, include_parentconcepts=False, 
         include_relatedconcepts=False, exclude=[], include=[], depth_limit=None, up_depth_limit=None, 
-        lang=settings.LANGUAGE_CODE, semantic=True, **kwargs):
+        lang=settings.LANGUAGE_CODE, semantic=True, pathway_filter=None, **kwargs):
 
         if id != '':
             self.load(models.Concept.objects.get(pk=id))
@@ -117,9 +117,9 @@ class Concept(object):
         })
 
         if semantic == True:
-            pathway_filter = Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties') | Q(relationtype__category = 'Ontology Relations')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties') | Q(relationtype__category = 'Ontology Relations')
         else:
-            pathway_filter = Q(relationtype = 'member')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member')
 
         if self.id != '':
             nodetype = kwargs.pop('nodetype', self.nodetype)
@@ -155,7 +155,7 @@ class Concept(object):
                             include_subconcepts=include_subconcepts,nclude_parentconcepts=include_parentconcepts, 
                             include_relatedconcepts=include_relatedconcepts, exclude=exclude, include=include, 
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
-                            nodetype=nodetype, semantic=semantic, _cache=_cache.copy(), lang=lang)
+                            nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         subconcept.relationshiptype = relation.relationtype.pk
                         self.subconcepts.append(subconcept)
 
@@ -171,7 +171,7 @@ class Concept(object):
                             include_subconcepts=False,include_parentconcepts=include_parentconcepts,
                             include_relatedconcepts=include_relatedconcepts,exclude=exclude, include=include,
                             depth_limit=depth_limit, up_depth_limit=up_depth_limit, downlevel=downlevel, uplevel=uplevel, 
-                            nodetype=nodetype, semantic=semantic, _cache=_cache.copy(), lang=lang)
+                            nodetype=nodetype, semantic=semantic, pathway_filter=pathway_filter, _cache=_cache.copy(), lang=lang)
                         parentconcept.relationshiptype = relation.relationtype.pk
                         self.parentconcepts.append(parentconcept)
 
