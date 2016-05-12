@@ -131,7 +131,7 @@ def node(request, nodeid):
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 if unicode(node.nodegroup_id) != new_nodegroup_id:
-                    for model in node.set_nodegroup(new_nodegroup_id):
+                    for model in node.toggle_is_collector():
                         model.save()
                 cardinality = data.get('cardinality', 'n')
                 node.nodegroup.cardinality = cardinality
@@ -154,10 +154,11 @@ def node(request, nodeid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def append_branch(request, nodeid, property, graphid):
+def append_branch(request, graphid):
     if request.method == 'POST':
-        graph = Graph(models.Node.objects.get(pk=nodeid))
-        new_branch = graph.append_branch(property, nodeid=nodeid, graphid=graphid)
+        data = JSONDeserializer().deserialize(request.body)
+        graph = Graph(graphid)
+        new_branch = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
         graph.save()
         return JSONResponse(new_branch)
 
