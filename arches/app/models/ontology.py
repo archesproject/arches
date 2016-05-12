@@ -12,13 +12,24 @@ class Ontology(Concept):
 
     """
 
-    def get_valid_ontology_concepts(self, parent_node, child_properties=[], lang=settings.LANGUAGE_CODE):
+    def get_valid_ontology_concepts(self, parent_node=None, child_properties=[], lang=settings.LANGUAGE_CODE):
+        """
+        given the constraints of parent_node and/or child_properties return the list of valid properties a 
+        node can have with a parent node and the associated classes that that node could have
+
+        Keyword Arguments:
+        parent_node (optional - required if child_properties is empty) -- a parent node(dictionary) object
+
+        child_properties (optional - required if parent_node is empty) -- a list of edge(dictionary) objects
+
+        lang -- the language of the returned values
+
+        """
+
         ret = []
         ontology_classes = set()
-        for child_property in child_properties:
-            #print child_property['ontologyclass_id']
-            ontology_property = models.Relation.objects.get(conceptto_id=child_property['ontologyclass_id'])
-            #print JSONSerializer().serialize(ontology_property.conceptfrom)
+        q_list = [Q(conceptto_id=child_property['ontologyclass_id']) for child_property in child_properties]
+        for ontology_property in models.Relation.objects.filter(reduce(operator.or_, q_list)).distinct('conceptfrom_id'):
             subclasses = Ontology().get_subclasses(id=ontology_property.conceptfrom_id, include=['label'], lang=lang)
 
             if len(ontology_classes) == 0:
@@ -29,33 +40,36 @@ class Ontology(Concept):
             if len(ontology_classes) == 0:
                 break
 
-        related_properties = self.get_related_properties(parent_node['ontologyclass_id'], lang=lang)
-        for related_property in related_properties:
-            related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
+        if parent_node:
+            related_properties = self.get_related_properties(parent_node['ontologyclass_id'], lang=lang)
+            for related_property in related_properties:
+                if len(child_properties) > 0:
+                    related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
 
-            if len(related_property['ontology_classes']) > 0:
                 item = {
-                    'ontology_property':{
-                        'value': related_property['ontology_property'].get_preflabel(lang=lang).value,
-                        'id': related_property['ontology_property'].id
-                    },
+                    'ontology_property':related_property['ontology_property'].simplify(lang=lang),
                     'ontology_classes':[]
                 }
                 for ontology_class in related_property['ontology_classes']:
-                    item['ontology_classes'].append({
-                        'value': ontology_class.get_preflabel(lang=lang).value,
-                        'id': ontology_class.id
-                    })
+                    item['ontology_classes'].append(ontology_class.simplify(lang=lang))
                 ret.append(item)
+
+        else:
+            item = {
+                'ontology_property':None,
+                'ontology_classes':[]
+            }
+            for ontology_class in ontology_classes:
+                item['ontology_classes'].append(ontology_class.simplify(lang=lang))
+
+            ret.append(item)
 
         return ret
 
-
-    #get_valid_ontology_concepts_from_parent
-
     def get_related_properties(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
         """
-        gets the allowed connections between the given ontology concept class and other ontology classes
+        gets the ontology properties that are allowed between the given ontology class and other ontology classes
+        returned ontology properties include their related classes
 
         Arguments:
         ontology_concept_id -- the id of the ontology concept
@@ -67,7 +81,7 @@ class Ontology(Concept):
 
         ret = []
         concept_graph = Ontology().get(id=ontology_concept_id, include_subconcepts=True, 
-            include=['label'], depth_limit=2, lang=lang)
+            include=None, depth_limit=2, pathway_filter=(Q(relationtype='hasDomainClass') | Q(relationtype='hasRangeClass')), lang=lang)
 
         for subconcept in concept_graph.subconcepts:
             if subconcept.relationshiptype == "hasDomainClass":
@@ -187,3 +201,11 @@ class Ontology(Concept):
                     self.relationshiptype = relation.relationtype.pk
                     #ret.append(parentconcepts[-1])
         return ret
+
+
+
+    def simplify(self, lang=settings.LANGUAGE_CODE):
+        return {
+            'value': self.get_preflabel(lang=lang).value,
+            'id': self.id
+        }
