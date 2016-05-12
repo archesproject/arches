@@ -8,6 +8,7 @@ define([
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
+            this.loading = options.loading || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
@@ -23,7 +24,7 @@ define([
 
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
-            
+
             if(item.selected()){
                 this.selectedBranch(item);
                 this.graph = new GraphBase({
@@ -38,8 +39,11 @@ define([
         },
 
         appendBranch: function(item, evt){
+            var self = this;
             if(this.selectedNode()){
+                this.loading(true);
                 this.graphModel.appendBranch(this.selectedNode().nodeid, item.ontology_property(), item.graphid, function(response){
+                    self.loading(false);
                 }, this)
             }
             this.closeForm();
