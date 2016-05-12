@@ -51,8 +51,10 @@ require([
         viewModel.nodeForm.closeClicked(true);
     });
 
+    var loading = ko.observable(false);
     var viewModel = {
-        graphModel: graphModel
+        graphModel: graphModel,
+        loading: loading
     };
 
     viewModel.graphView = new GraphView({
@@ -63,7 +65,8 @@ require([
     viewModel.branchListView= new BranchListView({
         el: $('#branch-library'),
         branches: ko.observableArray(branches),
-        graphModel: graphModel
+        graphModel: graphModel,
+        loading: loading
     });
 
     viewModel.nodeForm = new NodeFormView({
