@@ -73,7 +73,8 @@ require([
         el: $('#nodeCrud'),
         graphModel: graphModel,
         validations: validations,
-        branchListView: viewModel.branchListView
+        branchListView: viewModel.branchListView,
+        loading: loading
     });
 
     viewModel.nodeList = new NodeListView({

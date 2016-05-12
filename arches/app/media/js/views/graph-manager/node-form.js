@@ -11,7 +11,7 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
-            this.loading = ko.observable(false);
+            this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
 
             this.title = ko.computed(function () {
