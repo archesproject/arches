@@ -1,3 +1,4 @@
+
 '''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
@@ -111,7 +112,7 @@ class Graph(object):
             edge.edgeid = egdeobj.get('edgeid', None)
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
-            edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
+            edge.ontologyproperty_id = egdeobj.get('ontologyproperty', '')
             edge.graphmetadataid = egdeobj.get('graphmetadataid', '')
 
         if edge.pk == None:
@@ -238,7 +239,7 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty = property
+                ontologyproperty_id = property
             )
             branch_copy.add_edge(newEdge)
         for key, node in branch_copy.nodes.iteritems():

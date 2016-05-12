@@ -286,7 +286,7 @@ class Migration(migrations.Migration):
                 ('edgeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('ontologyproperty', models.TextField(blank=True, null=True)),
+                ('ontologyproperty', models.ForeignKey(blank=True, db_column='ontologyproperty', null=True, to='models.Concept')),
                 ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
             ],
             options={
