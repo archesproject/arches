@@ -20,8 +20,54 @@ define([
             self.validations = ko.observableArray();
             self.ontologyclass_id = ko.observable('');
             self.parentproperty_id = ko.observable('');
-            self.relatableclasses = ko.observableArray();
-            self.relatableproperties = ko.observableArray();
+            self.ontology_cache = ko.observableArray();
+
+            self.validclasses = ko.computed(function() {
+                if (!self.parentproperty_id()) {
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.class.value;
+                        })
+                        .uniq(function(item){
+                            return item.class.id;
+                        })
+                        .pluck('class')
+                        .value();
+                }else{
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.class.value;
+                        })
+                        .filter(function(item){
+                            return item.property.id === self.parentproperty_id();
+                        })
+                        .pluck('class')
+                        .value();
+                }
+            }, this),
+            self.validproperties = ko.computed(function() {
+                if (!self.ontologyclass_id()) {
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.property.value;
+                        })
+                        .uniq(function(item){
+                            return item.property.id;
+                        })
+                        .pluck('property')
+                        .value();
+                }else{
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.property.value;
+                        })
+                        .filter(function(item){
+                            return item.class.id === self.ontologyclass_id();
+                        })
+                        .pluck('property')
+                        .value();
+                }
+            }, this);        
 
             self.parse(options.source);
             self.graph = options.graph;
@@ -50,7 +96,7 @@ define([
 
             self.selected.subscribe(function(selected){
                 if (selected){
-                    self.getRelatableNodesEdges();
+                    self.getValidNodesEdges();
                 }
             })
         },
@@ -97,10 +143,9 @@ define([
             this.cardinality(cardinality);
         },
 
-        getRelatableNodesEdges: function(){
+        getValidNodesEdges: function(){
             var relatedNodesEdges = this.graph.getRelatedNodesEdges(this);
-            this.relatableproperties.removeAll();
-            this.relatableclasses.removeAll();
+            this.ontology_cache.removeAll();
             this._doRequest({
                 type: "POST",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
@@ -108,15 +153,9 @@ define([
             }, function(response, status, self){
                 response.responseJSON.forEach(function(item){
                     item.ontology_classes.forEach(function(ontologyclass){
-                        self.relatableproperties.push({
-                            'id': item.ontology_property.id,
-                            'value': item.ontology_property.value,
-                            'classid': ontologyclass.id
-                        })
-                        self.relatableclasses.push({
-                            'id': ontologyclass.id,
-                            'value': ontologyclass.value,
-                            'propertyid': item.ontology_property.id
+                        self.ontology_cache.push({
+                            'property': item.ontology_property,
+                            'class': ontologyclass
                         })
                     });
                 }, this);

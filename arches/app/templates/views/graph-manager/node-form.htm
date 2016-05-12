@@ -70,7 +70,7 @@
                         {% trans "CRM Class" %}
                     </div>
                     <div class="col-sm-12 pad-no node-attribute-label">
-                        <select class="design" data-bind="value: node().ontologyclass_id, options: node().relatableclasses, optionsText: 'value', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().ontologyclass_id, options: node().validclasses, optionsText: 'value', optionsValue: 'id', optionsCaption: 'Choose a class', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@
                         {% trans "Relation to parent" %}
                     </div>
                     <div class="col-sm-12 pad-no node-attribute-label">
-                        <select class="design" data-bind="value: node().parentproperty_id, options: node().relatableproperties, optionsText: 'value', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="value: node().parentproperty_id, options: node().validproperties, optionsText: 'value', optionsValue: 'id', optionsCaption: 'Choose a property', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
