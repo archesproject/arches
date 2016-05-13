@@ -6057,7 +6057,7 @@
           "name": "",
           "edgeid": "05ed7d63-d50f-11e5-a888-80e6500ee4e4",
           "domainnodeid": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6066,7 +6066,7 @@
           "name": "",
           "edgeid": "05edffa8-d50f-11e5-aca1-80e6500ee4e4",
           "domainnodeid": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6075,7 +6075,7 @@
           "name": "",
           "edgeid": "05eeb0ee-d50f-11e5-9e20-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P1",
+          "ontologyproperty": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
           "description": ""
         },
         {
@@ -6084,7 +6084,7 @@
           "name": "",
           "edgeid": "05efffba-d50f-11e5-ba6c-80e6500ee4e4",
           "domainnodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6093,7 +6093,7 @@
           "name": "",
           "edgeid": "05f08978-d50f-11e5-b195-80e6500ee4e4",
           "domainnodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6102,7 +6102,7 @@
           "name": "",
           "edgeid": "05f0d6a6-d50f-11e5-9a52-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -6111,7 +6111,7 @@
           "name": "",
           "edgeid": "05f194a6-d50f-11e5-b4bb-80e6500ee4e4",
           "domainnodeid": "612d3407-e679-486b-a119-a9d87558aef8",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6120,7 +6120,7 @@
           "name": "",
           "edgeid": "05f1da78-d50f-11e5-a59a-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6129,7 +6129,7 @@
           "name": "",
           "edgeid": "05f292f3-d50f-11e5-94c3-80e6500ee4e4",
           "domainnodeid": "d6d6e299-a42d-4424-9069-af2e5a647907",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6138,7 +6138,7 @@
           "name": "",
           "edgeid": "05f2da5c-d50f-11e5-be98-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6147,7 +6147,7 @@
           "name": "",
           "edgeid": "05f38b3a-d50f-11e5-b096-80e6500ee4e4",
           "domainnodeid": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6156,7 +6156,7 @@
           "name": "",
           "edgeid": "05f3d05e-d50f-11e5-b94a-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6165,7 +6165,7 @@
           "name": "",
           "edgeid": "05f48140-d50f-11e5-9c46-80e6500ee4e4",
           "domainnodeid": "8b1dc471-bf24-421c-a02e-a830bd2158de",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6174,7 +6174,7 @@
           "name": "",
           "edgeid": "05f4c89e-d50f-11e5-a11c-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6183,7 +6183,7 @@
           "name": "",
           "edgeid": "05f57f82-d50f-11e5-abd0-80e6500ee4e4",
           "domainnodeid": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6192,7 +6192,7 @@
           "name": "",
           "edgeid": "05f5c5b3-d50f-11e5-8754-80e6500ee4e4",
           "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6201,7 +6201,7 @@
           "name": "",
           "edgeid": "05f60b8a-d50f-11e5-bde2-80e6500ee4e4",
           "domainnodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
-          "ontologyproperty": "-P41",
+          "ontologyproperty": "a34323b2-3e7d-3cf6-9c74-6677ed44effb",
           "description": ""
         },
         {
@@ -6210,7 +6210,7 @@
           "name": "",
           "edgeid": "05f6f7a3-d50f-11e5-a836-80e6500ee4e4",
           "domainnodeid": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6219,7 +6219,7 @@
           "name": "",
           "edgeid": "05f7427d-d50f-11e5-937d-80e6500ee4e4",
           "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6228,7 +6228,7 @@
           "name": "",
           "edgeid": "05f7f7ba-d50f-11e5-905b-80e6500ee4e4",
           "domainnodeid": "9505a004-f327-471b-ace3-f549f895a6e6",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6237,7 +6237,7 @@
           "name": "",
           "edgeid": "05f83f0f-d50f-11e5-9e64-80e6500ee4e4",
           "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
-          "ontologyproperty": "P45",
+          "ontologyproperty": "c4f5c11a-77fa-3601-825f-e7cac6c29d73",
           "description": ""
         },
         {
@@ -6246,7 +6246,7 @@
           "name": "",
           "edgeid": "05f95c2e-d50f-11e5-a65a-80e6500ee4e4",
           "domainnodeid": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6255,7 +6255,7 @@
           "name": "",
           "edgeid": "05f9a205-d50f-11e5-bfd8-80e6500ee4e4",
           "domainnodeid": "179c4a57-0547-425c-bf54-f5d92f4db89e",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6264,7 +6264,7 @@
           "name": "",
           "edgeid": "05f9ea87-d50f-11e5-b701-80e6500ee4e4",
           "domainnodeid": "1a113bf2-e066-41f3-a670-8f44995ac849",
-          "ontologyproperty": "P33",
+          "ontologyproperty": "f370e85a-d4e4-35bb-89dd-737c57eef9d5",
           "description": ""
         },
         {
@@ -6273,7 +6273,7 @@
           "name": "",
           "edgeid": "05fa3270-d50f-11e5-acf5-80e6500ee4e4",
           "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
-          "ontologyproperty": "-P108",
+          "ontologyproperty": "c4297d36-8af0-3a9a-9dcf-0cfb6095341c",
           "description": ""
         },
         {
@@ -6282,7 +6282,7 @@
           "name": "",
           "edgeid": "05fa7a63-d50f-11e5-9b4e-80e6500ee4e4",
           "domainnodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
-          "ontologyproperty": "P108",
+          "ontologyproperty": "632197f8-15a2-32b6-9886-c93e587f5b64",
           "description": ""
         },
         {
@@ -6291,7 +6291,7 @@
           "name": "",
           "edgeid": "05fac5e6-d50f-11e5-a867-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P108",
+          "ontologyproperty": "c4297d36-8af0-3a9a-9dcf-0cfb6095341c",
           "description": ""
         },
         {
@@ -6300,7 +6300,7 @@
           "name": "",
           "edgeid": "05fbb140-d50f-11e5-b260-80e6500ee4e4",
           "domainnodeid": "7802f774-ee02-4964-81a3-756680f5c572",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6309,7 +6309,7 @@
           "name": "",
           "edgeid": "05fc2fd9-d50f-11e5-a8b8-80e6500ee4e4",
           "domainnodeid": "7802f774-ee02-4964-81a3-756680f5c572",
-          "ontologyproperty": "P90",
+          "ontologyproperty": "26af9ec1-e169-3486-9bb5-3c8187784c8e",
           "description": ""
         },
         {
@@ -6318,7 +6318,7 @@
           "name": "",
           "edgeid": "05fc7580-d50f-11e5-8d18-80e6500ee4e4",
           "domainnodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
-          "ontologyproperty": "P91",
+          "ontologyproperty": "166f17e8-15b8-3abc-bba7-7a56c364bf42",
           "description": ""
         },
         {
@@ -6327,7 +6327,7 @@
           "name": "",
           "edgeid": "05fcee8f-d50f-11e5-9966-80e6500ee4e4",
           "domainnodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6336,7 +6336,7 @@
           "name": "",
           "edgeid": "05fd361e-d50f-11e5-b357-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P43",
+          "ontologyproperty": "167c0167-35fd-3c57-b90e-20715fd2c200",
           "description": ""
         },
         {
@@ -6345,7 +6345,7 @@
           "name": "",
           "edgeid": "05fe227a-d50f-11e5-a552-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -6354,7 +6354,7 @@
           "name": "",
           "edgeid": "05fed64a-d50f-11e5-86d3-80e6500ee4e4",
           "domainnodeid": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6363,7 +6363,7 @@
           "name": "",
           "edgeid": "05ff1be6-d50f-11e5-b205-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6372,7 +6372,7 @@
           "name": "",
           "edgeid": "05ffd126-d50f-11e5-ab97-80e6500ee4e4",
           "domainnodeid": "6aa4d889-157b-40a6-be96-1e52846517c9",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6381,7 +6381,7 @@
           "name": "",
           "edgeid": "06001699-d50f-11e5-bb85-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6390,7 +6390,7 @@
           "name": "",
           "edgeid": "0600c8c2-d50f-11e5-b067-80e6500ee4e4",
           "domainnodeid": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6399,7 +6399,7 @@
           "name": "",
           "edgeid": "06010f8a-d50f-11e5-a52f-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6408,7 +6408,7 @@
           "name": "",
           "edgeid": "06020111-d50f-11e5-a20a-80e6500ee4e4",
           "domainnodeid": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6417,7 +6417,7 @@
           "name": "",
           "edgeid": "06024635-d50f-11e5-9b5c-80e6500ee4e4",
           "domainnodeid": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6426,7 +6426,7 @@
           "name": "",
           "edgeid": "06028a7d-d50f-11e5-ad2f-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "-P67",
+          "ontologyproperty": "501d59a2-21cc-3c94-b043-7071cb9551d5",
           "description": ""
         },
         {
@@ -6435,7 +6435,7 @@
           "name": "",
           "edgeid": "060304f5-d50f-11e5-9472-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6444,7 +6444,7 @@
           "name": "",
           "edgeid": "0603bf21-d50f-11e5-9059-80e6500ee4e4",
           "domainnodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6453,7 +6453,7 @@
           "name": "",
           "edgeid": "06043e6e-d50f-11e5-8d94-80e6500ee4e4",
           "domainnodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6462,7 +6462,7 @@
           "name": "",
           "edgeid": "060484e6-d50f-11e5-b573-80e6500ee4e4",
           "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
-          "ontologyproperty": "-P138",
+          "ontologyproperty": "c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c",
           "description": ""
         },
         {
@@ -6471,7 +6471,7 @@
           "name": "",
           "edgeid": "0604ca51-d50f-11e5-813c-80e6500ee4e4",
           "domainnodeid": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
-          "ontologyproperty": "P35",
+          "ontologyproperty": "79183fdd-7275-32a2-a48d-bb70fe683efd",
           "description": ""
         },
         {
@@ -6480,7 +6480,7 @@
           "name": "",
           "edgeid": "06051000-d50f-11e5-addc-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P34",
+          "ontologyproperty": "b2537adc-c1d9-3ed3-8c43-b38b741c7948",
           "description": ""
         },
         {
@@ -6489,7 +6489,7 @@
           "name": "",
           "edgeid": "0605bfb3-d50f-11e5-9c54-80e6500ee4e4",
           "domainnodeid": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6498,7 +6498,7 @@
           "name": "",
           "edgeid": "060605e3-d50f-11e5-932d-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6507,7 +6507,7 @@
           "name": "",
           "edgeid": "060723d7-d50f-11e5-a5bf-80e6500ee4e4",
           "domainnodeid": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6516,7 +6516,7 @@
           "name": "",
           "edgeid": "060768dc-d50f-11e5-96da-80e6500ee4e4",
           "domainnodeid": "f55061bc-2371-41ab-8f90-45219e604499",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6525,7 +6525,7 @@
           "name": "",
           "edgeid": "06081c0a-d50f-11e5-a99c-80e6500ee4e4",
           "domainnodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6534,7 +6534,7 @@
           "name": "",
           "edgeid": "0608a378-d50f-11e5-a71d-80e6500ee4e4",
           "domainnodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6543,7 +6543,7 @@
           "name": "",
           "edgeid": "061ea1dc-d50f-11e5-b659-80e6500ee4e4",
           "domainnodeid": "9324ab23-2896-463a-9fcb-04a1447fc279",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6552,7 +6552,7 @@
           "name": "",
           "edgeid": "0608eb07-d50f-11e5-b9e5-80e6500ee4e4",
           "domainnodeid": "f55061bc-2371-41ab-8f90-45219e604499",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -6561,7 +6561,7 @@
           "name": "",
           "edgeid": "06093414-d50f-11e5-a92e-80e6500ee4e4",
           "domainnodeid": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
-          "ontologyproperty": "-P94",
+          "ontologyproperty": "0bc86b34-c3bf-31b5-8bf5-d3f3199635de",
           "description": ""
         },
         {
@@ -6570,7 +6570,7 @@
           "name": "",
           "edgeid": "06097e57-d50f-11e5-b2c2-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P104",
+          "ontologyproperty": "e091bc5e-86c9-328a-8c1c-deabe778c821",
           "description": ""
         },
         {
@@ -6579,7 +6579,7 @@
           "name": "",
           "edgeid": "060ade4a-d50f-11e5-aaaf-80e6500ee4e4",
           "domainnodeid": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6588,7 +6588,7 @@
           "name": "",
           "edgeid": "060b2917-d50f-11e5-bd14-80e6500ee4e4",
           "domainnodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6597,7 +6597,7 @@
           "name": "",
           "edgeid": "060b704f-d50f-11e5-aed1-80e6500ee4e4",
           "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
-          "ontologyproperty": "P87",
+          "ontologyproperty": "697dc6cc-0da6-301c-9703-78edbf812fac",
           "description": ""
         },
         {
@@ -6606,7 +6606,7 @@
           "name": "",
           "edgeid": "060c57ca-d50f-11e5-9d40-80e6500ee4e4",
           "domainnodeid": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6615,7 +6615,7 @@
           "name": "",
           "edgeid": "060c9ba3-d50f-11e5-9a9a-80e6500ee4e4",
           "domainnodeid": "d72362cb-3c6d-450f-9da8-3bb894073333",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6624,7 +6624,7 @@
           "name": "",
           "edgeid": "060ce0d1-d50f-11e5-922f-80e6500ee4e4",
           "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
-          "ontologyproperty": "P87",
+          "ontologyproperty": "697dc6cc-0da6-301c-9703-78edbf812fac",
           "description": ""
         },
         {
@@ -6633,7 +6633,7 @@
           "name": "",
           "edgeid": "060dc39e-d50f-11e5-82fd-80e6500ee4e4",
           "domainnodeid": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6642,7 +6642,7 @@
           "name": "",
           "edgeid": "060e08de-d50f-11e5-ae1a-80e6500ee4e4",
           "domainnodeid": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6651,7 +6651,7 @@
           "name": "",
           "edgeid": "060e4d1e-d50f-11e5-8c24-80e6500ee4e4",
           "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
-          "ontologyproperty": "P45",
+          "ontologyproperty": "c4f5c11a-77fa-3601-825f-e7cac6c29d73",
           "description": ""
         },
         {
@@ -6660,7 +6660,7 @@
           "name": "",
           "edgeid": "060f082e-d50f-11e5-967a-80e6500ee4e4",
           "domainnodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6669,7 +6669,7 @@
           "name": "",
           "edgeid": "060fbb85-d50f-11e5-b418-80e6500ee4e4",
           "domainnodeid": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6678,7 +6678,7 @@
           "name": "",
           "edgeid": "061004c5-d50f-11e5-8e7e-80e6500ee4e4",
           "domainnodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6687,7 +6687,7 @@
           "name": "",
           "edgeid": "06104a68-d50f-11e5-99e8-80e6500ee4e4",
           "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
-          "ontologyproperty": "P87",
+          "ontologyproperty": "697dc6cc-0da6-301c-9703-78edbf812fac",
           "description": ""
         },
         {
@@ -6696,7 +6696,7 @@
           "name": "",
           "edgeid": "061137a3-d50f-11e5-a2ad-80e6500ee4e4",
           "domainnodeid": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
-          "ontologyproperty": "P87",
+          "ontologyproperty": "697dc6cc-0da6-301c-9703-78edbf812fac",
           "description": ""
         },
         {
@@ -6705,7 +6705,7 @@
           "name": "",
           "edgeid": "06117f97-d50f-11e5-8e34-80e6500ee4e4",
           "domainnodeid": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
-          "ontologyproperty": "P89",
+          "ontologyproperty": "900165c3-a630-3b9c-bb0b-572df34ea3e6",
           "description": ""
         },
         {
@@ -6714,7 +6714,7 @@
           "name": "",
           "edgeid": "0611c5b5-d50f-11e5-8a42-80e6500ee4e4",
           "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
-          "ontologyproperty": "P87",
+          "ontologyproperty": "697dc6cc-0da6-301c-9703-78edbf812fac",
           "description": ""
         },
         {
@@ -6723,7 +6723,7 @@
           "name": "",
           "edgeid": "06120a07-d50f-11e5-947f-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P53",
+          "ontologyproperty": "a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1",
           "description": ""
         },
         {
@@ -6732,7 +6732,7 @@
           "name": "",
           "edgeid": "06132c30-d50f-11e5-8d7d-80e6500ee4e4",
           "domainnodeid": "28979130-7500-42f5-98ee-977b6cb1caba",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6741,7 +6741,7 @@
           "name": "",
           "edgeid": "06137230-d50f-11e5-9405-80e6500ee4e4",
           "domainnodeid": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6750,7 +6750,7 @@
           "name": "",
           "edgeid": "0613b7e8-d50f-11e5-92da-80e6500ee4e4",
           "domainnodeid": "0656d4cc-bb98-4187-9485-9f49950a18b3",
-          "ontologyproperty": "P1",
+          "ontologyproperty": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
           "description": ""
         },
         {
@@ -6759,7 +6759,7 @@
           "name": "",
           "edgeid": "06140007-d50f-11e5-99a7-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "BM.PX.IS_RELATED_TO",
+          "ontologyproperty": "208c9b27-1418-3691-8edf-b86d3f3db3e9",
           "description": ""
         },
         {
@@ -6768,7 +6768,7 @@
           "name": "",
           "edgeid": "061761cc-d50f-11e5-9e16-80e6500ee4e4",
           "domainnodeid": "d2788b73-9485-462a-abcb-79f8afdb511d",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6777,7 +6777,7 @@
           "name": "",
           "edgeid": "0617b8b8-d50f-11e5-b770-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6786,7 +6786,7 @@
           "name": "",
           "edgeid": "06187bcc-d50f-11e5-b2fc-80e6500ee4e4",
           "domainnodeid": "17beaae7-5635-4073-86ca-0fc00877d9a6",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6795,7 +6795,7 @@
           "name": "",
           "edgeid": "0618c461-d50f-11e5-947f-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6804,7 +6804,7 @@
           "name": "",
           "edgeid": "061943d7-d50f-11e5-bda3-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6813,7 +6813,7 @@
           "name": "",
           "edgeid": "0619facc-d50f-11e5-9d39-80e6500ee4e4",
           "domainnodeid": "10988901-c874-4bcd-a86f-e8dde8841341",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6822,7 +6822,7 @@
           "name": "",
           "edgeid": "061a40d7-d50f-11e5-a050-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6831,7 +6831,7 @@
           "name": "",
           "edgeid": "061af5ab-d50f-11e5-9b25-80e6500ee4e4",
           "domainnodeid": "1f99e703-5adc-4145-9df8-cc523311d9d3",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6840,7 +6840,7 @@
           "name": "",
           "edgeid": "061b3c51-d50f-11e5-b10d-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P42",
+          "ontologyproperty": "f7e7d2db-6b00-3f32-9337-ae46982ed7a5",
           "description": ""
         },
         {
@@ -6849,7 +6849,7 @@
           "name": "",
           "edgeid": "061bee9c-d50f-11e5-b51d-80e6500ee4e4",
           "domainnodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6858,7 +6858,7 @@
           "name": "",
           "edgeid": "061c6aca-d50f-11e5-bdfb-80e6500ee4e4",
           "domainnodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6867,7 +6867,7 @@
           "name": "",
           "edgeid": "061cb1ae-d50f-11e5-9bd6-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -6876,7 +6876,7 @@
           "name": "",
           "edgeid": "061d3005-d50f-11e5-876b-80e6500ee4e4",
           "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -6885,7 +6885,7 @@
           "name": "",
           "edgeid": "061d75bd-d50f-11e5-9620-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P140",
+          "ontologyproperty": "8dc78a68-fde8-34d1-a86e-40d2187fe316",
           "description": ""
         },
         {
@@ -6894,7 +6894,7 @@
           "name": "",
           "edgeid": "061e5c70-d50f-11e5-8da2-80e6500ee4e4",
           "domainnodeid": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6903,7 +6903,7 @@
           "name": "",
           "edgeid": "061ee80f-d50f-11e5-97bc-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6912,7 +6912,7 @@
           "name": "",
           "edgeid": "061f9a91-d50f-11e5-a8e1-80e6500ee4e4",
           "domainnodeid": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6921,7 +6921,7 @@
           "name": "",
           "edgeid": "061fe073-d50f-11e5-86b2-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6930,7 +6930,7 @@
           "name": "",
           "edgeid": "0620c85e-d50f-11e5-bf17-80e6500ee4e4",
           "domainnodeid": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6939,7 +6939,7 @@
           "name": "",
           "edgeid": "06212145-d50f-11e5-9fcb-80e6500ee4e4",
           "domainnodeid": "d6586394-3124-4657-bfd7-07fad3788083",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6948,7 +6948,7 @@
           "name": "",
           "edgeid": "0621a8e6-d50f-11e5-b230-80e6500ee4e4",
           "domainnodeid": "d6586394-3124-4657-bfd7-07fad3788083",
-          "ontologyproperty": "P3",
+          "ontologyproperty": "fd06e07d-057b-38aa-99ac-1add45f9f217",
           "description": ""
         },
         {
@@ -6957,7 +6957,7 @@
           "name": "",
           "edgeid": "0621f454-d50f-11e5-8165-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P31",
+          "ontologyproperty": "935d5751-75c2-3a9d-8af4-981ff3cf9e6e",
           "description": ""
         },
         {
@@ -6966,7 +6966,7 @@
           "name": "",
           "edgeid": "0622e268-d50f-11e5-b121-80e6500ee4e4",
           "domainnodeid": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -6975,7 +6975,7 @@
           "name": "",
           "edgeid": "06232d38-d50f-11e5-8967-80e6500ee4e4",
           "domainnodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -6984,7 +6984,7 @@
           "name": "",
           "edgeid": "0623e74f-d50f-11e5-93df-80e6500ee4e4",
           "domainnodeid": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -6993,7 +6993,7 @@
           "name": "",
           "edgeid": "06242b28-d50f-11e5-b402-80e6500ee4e4",
           "domainnodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -7002,7 +7002,7 @@
           "name": "",
           "edgeid": "06247026-d50f-11e5-9921-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P92",
+          "ontologyproperty": "92388748-e308-3295-9140-6974beab1611",
           "description": ""
         },
         {
@@ -7011,7 +7011,7 @@
           "name": "",
           "edgeid": "062562a6-d50f-11e5-b9a1-80e6500ee4e4",
           "domainnodeid": "a3c20479-fcce-4bf5-9517-5b3df4780429",
-          "ontologyproperty": "-P71",
+          "ontologyproperty": "9e71dec5-05a7-3e87-8b69-8852fdbaa241",
           "description": ""
         },
         {
@@ -7020,7 +7020,7 @@
           "name": "",
           "edgeid": "0625a82e-d50f-11e5-ba24-80e6500ee4e4",
           "domainnodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
-          "ontologyproperty": "P2",
+          "ontologyproperty": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
           "description": ""
         },
         {
@@ -7029,7 +7029,7 @@
           "name": "",
           "edgeid": "06266442-d50f-11e5-8a55-80e6500ee4e4",
           "domainnodeid": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
-          "ontologyproperty": "P78",
+          "ontologyproperty": "5f425a21-ce2e-3ec6-b434-38ada47bc29c",
           "description": ""
         },
         {
@@ -7038,7 +7038,7 @@
           "name": "",
           "edgeid": "0626b29e-d50f-11e5-84ee-80e6500ee4e4",
           "domainnodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
-          "ontologyproperty": "P4",
+          "ontologyproperty": "fc174f36-37ef-3f45-aec4-5b8ebe0e7729",
           "description": ""
         },
         {
@@ -7047,7 +7047,7 @@
           "name": "",
           "edgeid": "0626fcc5-d50f-11e5-af78-80e6500ee4e4",
           "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-          "ontologyproperty": "-P93",
+          "ontologyproperty": "28bd339b-43e4-3671-add8-6a48fad8593e",
           "description": ""
         }
       ]

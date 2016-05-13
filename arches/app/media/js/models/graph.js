@@ -1,6 +1,6 @@
-define(['arches',
+define(['arches', 
     'models/abstract',
-    'models/node',
+    'models/node', 
     'knockout',
     'underscore'
 ], function (arches, AbstractModel, NodeModel, ko, _) {
@@ -96,7 +96,7 @@ define(['arches',
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + this.get('metadata').graphid,
+                url: this.url + 'move_node/' + this.get('root').nodeid,
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 self.get('edges')().find(function (edge) {
@@ -139,7 +139,6 @@ define(['arches',
             this.set('nodes', ko.observableArray(attributes.data.nodes));
             this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('root', attributes.data.root);
-            this.set('metadata', attributes.data.metadata);
 
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
@@ -179,7 +178,7 @@ define(['arches',
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
-                    }
+                    }                    
                     if (status === 'success' &&  request.responseJSON) {
                         self.trigger(eventname, self);
                     }

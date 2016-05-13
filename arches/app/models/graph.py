@@ -122,7 +122,7 @@ class Graph(object):
             edge.edgeid = egdeobj.get('edgeid', None)
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
-            edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
+            edge.ontologyproperty_id = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self.metadata
 
@@ -221,7 +221,7 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty = property,
+                ontologyproperty_id = property,
                 graph = self.metadata
             )
             branch_copy.add_edge(newEdge)

@@ -241,5 +241,5 @@ def get_related_nodes(request):
     #     ]
     # }
 
-    related_properties = Ontology().get_valid_ontology_concepts(data['parentnode'][0], child_properties=data['childedges'], lang=lang)
+    related_properties = Ontology().get_valid_ontology_concepts(data['parentnode'], child_properties=data['childedges'], lang=lang)
     return JSONResponse(related_properties, indent=4)

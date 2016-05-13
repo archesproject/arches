@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-05-09 13:31:44 PDT
+-- Started on 2016-05-12 15:08:45 PDT
 
 -- SET statement_timeout = 0;
 -- SET lock_timeout = 0;
@@ -18,9 +18,9 @@
 -- SET search_path = public, pg_catalog;
 
 --
--- TOC entry 3855 (class 0 OID 491493)
+-- TOC entry 3855 (class 0 OID 532735)
 -- Dependencies: 221
--- Data for Name: concepts; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: concepts; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO concepts VALUES ('c03db431-4564-34eb-ba86-4c8169e4276c', 'E1_CRM_Entity', 'Concept');
@@ -113,164 +113,296 @@ INSERT INTO concepts VALUES ('94ffd715-18f7-310a-bee2-010d800be058', 'E92_Spacet
 INSERT INTO concepts VALUES ('b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'E93_Presence', 'Concept');
 INSERT INTO concepts VALUES ('1036c7f1-ea95-3ad8-886f-849ca10f9584', 'E94_Space', 'Concept');
 INSERT INTO concepts VALUES ('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'P1_is_identified_by', 'Concept');
+INSERT INTO concepts VALUES ('89403c67-0097-311d-b3f4-eeb45e98020f', 'P1i_identifies', 'Concept');
 INSERT INTO concepts VALUES ('2f8fd82d-2679-3d69-b697-7efe545e76ab', 'P2_has_type', 'Concept');
+INSERT INTO concepts VALUES ('b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'P2i_is_type_of', 'Concept');
 INSERT INTO concepts VALUES ('fd06e07d-057b-38aa-99ac-1add45f9f217', 'P3_has_note', 'Concept');
 INSERT INTO concepts VALUES ('fc174f36-37ef-3f45-aec4-5b8ebe0e7729', 'P4_has_time-span', 'Concept');
+INSERT INTO concepts VALUES ('d0580517-738e-3601-b5f0-5c64c845ea8c', 'P4i_is_time-span_of', 'Concept');
 INSERT INTO concepts VALUES ('e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'P5_consists_of', 'Concept');
+INSERT INTO concepts VALUES ('d631ab44-05a4-332d-bf95-747391c40405', 'P5i_forms_part_of', 'Concept');
 INSERT INTO concepts VALUES ('d2a09554-6718-3230-8f6f-10ff2daab9b3', 'P7_took_place_at', 'Concept');
+INSERT INTO concepts VALUES ('a3268d4d-058c-30a5-b630-5b45c8644070', 'P7i_witnessed', 'Concept');
 INSERT INTO concepts VALUES ('9f10aa95-ba46-3601-bac2-3ea828c154e6', 'P8_took_place_on_or_within', 'Concept');
+INSERT INTO concepts VALUES ('9625fbb7-9930-3406-be4e-ecb8a536e876', 'P8i_witnessed', 'Concept');
 INSERT INTO concepts VALUES ('6909b643-03f7-3606-b276-2be0e8773207', 'P9_consists_of', 'Concept');
+INSERT INTO concepts VALUES ('135ff5ff-c172-33fc-bf86-d46750007e95', 'P9i_forms_part_of', 'Concept');
 INSERT INTO concepts VALUES ('b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'P10_falls_within', 'Concept');
+INSERT INTO concepts VALUES ('4913d287-3538-30ca-9f27-feb3b082321b', 'P10i_contains', 'Concept');
 INSERT INTO concepts VALUES ('338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'P11_had_participant', 'Concept');
+INSERT INTO concepts VALUES ('0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'P11i_participated_in', 'Concept');
 INSERT INTO concepts VALUES ('99e8de0f-fa06-381d-8406-9d467d3f96b5', 'P12_occurred_in_the_presence_of', 'Concept');
+INSERT INTO concepts VALUES ('2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'P12i_was_present_at', 'Concept');
 INSERT INTO concepts VALUES ('0d61e94e-8834-3ba5-b51b-d55951a84fae', 'P13_destroyed', 'Concept');
+INSERT INTO concepts VALUES ('1b4e719b-b6e3-39e3-882d-0090a501c42f', 'P13i_was_destroyed_by', 'Concept');
 INSERT INTO concepts VALUES ('f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'P14_carried_out_by', 'Concept');
+INSERT INTO concepts VALUES ('2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'P14i_performed', 'Concept');
 INSERT INTO concepts VALUES ('b9ec13a4-02ec-39f2-892d-970762c3f25d', 'P15_was_influenced_by', 'Concept');
+INSERT INTO concepts VALUES ('f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'P15i_influenced', 'Concept');
 INSERT INTO concepts VALUES ('b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'P16_used_specific_object', 'Concept');
+INSERT INTO concepts VALUES ('526049ea-951e-39ba-87f9-749bea349fe5', 'P16i_was_used_for', 'Concept');
 INSERT INTO concepts VALUES ('2e24daa3-5793-30a8-a96e-3710c3862af4', 'P17_was_motivated_by', 'Concept');
+INSERT INTO concepts VALUES ('10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'P17i_motivated', 'Concept');
 INSERT INTO concepts VALUES ('8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'P19_was_intended_use_of', 'Concept');
+INSERT INTO concepts VALUES ('07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'P19i_was_made_for', 'Concept');
 INSERT INTO concepts VALUES ('50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'P20_had_specific_purpose', 'Concept');
+INSERT INTO concepts VALUES ('2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'P20i_was_purpose_of', 'Concept');
 INSERT INTO concepts VALUES ('9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'P21_had_general_purpose', 'Concept');
+INSERT INTO concepts VALUES ('f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'P21i_was_purpose_of', 'Concept');
 INSERT INTO concepts VALUES ('5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'P22_transferred_title_to', 'Concept');
+INSERT INTO concepts VALUES ('b246f449-73f0-36f1-930e-7055a99805bb', 'P22i_acquired_title_through', 'Concept');
 INSERT INTO concepts VALUES ('345681a7-8324-331c-94d4-1777c36538b5', 'P23_transferred_title_from', 'Concept');
+INSERT INTO concepts VALUES ('82e03de1-76b0-3340-b892-35b25e0c9c11', 'P23i_surrendered_title_through', 'Concept');
 INSERT INTO concepts VALUES ('3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'P24_transferred_title_of', 'Concept');
+INSERT INTO concepts VALUES ('d25f0c41-927b-3951-8c08-d09ade624ea6', 'P24i_changed_ownership_through', 'Concept');
 INSERT INTO concepts VALUES ('f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'P25_moved', 'Concept');
+INSERT INTO concepts VALUES ('1b5077d8-0704-3cff-a5ae-9e807fd78095', 'P25i_moved_by', 'Concept');
 INSERT INTO concepts VALUES ('fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'P26_moved_to', 'Concept');
+INSERT INTO concepts VALUES ('1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'P26i_was_destination_of', 'Concept');
 INSERT INTO concepts VALUES ('e94e9966-e05b-3b5a-a5f0-893166474b80', 'P27_moved_from', 'Concept');
+INSERT INTO concepts VALUES ('7cf91853-4423-3f39-974f-c72e89ccc1d3', 'P27i_was_origin_of', 'Concept');
 INSERT INTO concepts VALUES ('aad29816-af79-36cf-919e-80980f7c41a3', 'P28_custody_surrendered_by', 'Concept');
+INSERT INTO concepts VALUES ('53983b68-30b1-3818-b952-e04f6b5a038f', 'P28i_surrendered_custody_through', 'Concept');
 INSERT INTO concepts VALUES ('8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'P29_custody_received_by', 'Concept');
+INSERT INTO concepts VALUES ('9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'P29i_received_custody_through', 'Concept');
 INSERT INTO concepts VALUES ('f24070b3-fc3b-3838-8765-87350b40ba84', 'P30_transferred_custody_of', 'Concept');
+INSERT INTO concepts VALUES ('cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'P30i_custody_transferred_through', 'Concept');
 INSERT INTO concepts VALUES ('439f0684-5ebc-3227-93a5-ae9ebca7e015', 'P31_has_modified', 'Concept');
+INSERT INTO concepts VALUES ('935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'P31i_was_modified_by', 'Concept');
 INSERT INTO concepts VALUES ('1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'P32_used_general_technique', 'Concept');
+INSERT INTO concepts VALUES ('c1d1943d-d502-39ca-b7c3-cf954112484a', 'P32i_was_technique_of', 'Concept');
 INSERT INTO concepts VALUES ('f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'P33_used_specific_technique', 'Concept');
+INSERT INTO concepts VALUES ('070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'P33i_was_used_by', 'Concept');
 INSERT INTO concepts VALUES ('d9f02df8-6676-371e-8114-1f37700639b5', 'P34_concerned', 'Concept');
+INSERT INTO concepts VALUES ('b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'P34i_was_assessed_by', 'Concept');
 INSERT INTO concepts VALUES ('79183fdd-7275-32a2-a48d-bb70fe683efd', 'P35_has_identified', 'Concept');
+INSERT INTO concepts VALUES ('f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'P35i_was_identified_by', 'Concept');
 INSERT INTO concepts VALUES ('d35815f0-0426-3ac0-b396-7ce2959ebf77', 'P37_assigned', 'Concept');
+INSERT INTO concepts VALUES ('4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'P37i_was_assigned_by', 'Concept');
 INSERT INTO concepts VALUES ('caf4c608-3653-397c-a26e-6cc5135274f8', 'P38_deassigned', 'Concept');
+INSERT INTO concepts VALUES ('c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'P38i_was_deassigned_by', 'Concept');
 INSERT INTO concepts VALUES ('736d6bff-30b8-34d9-aeb7-24f012968ecc', 'P39_measured', 'Concept');
+INSERT INTO concepts VALUES ('e74bd69e-a07d-3292-933a-46d31cbd354e', 'P39i_was_measured_by', 'Concept');
 INSERT INTO concepts VALUES ('5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'P40_observed_dimension', 'Concept');
+INSERT INTO concepts VALUES ('e68adc8c-1abc-3503-a261-11c542b43cde', 'P40i_was_observed_in', 'Concept');
 INSERT INTO concepts VALUES ('8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'P41_classified', 'Concept');
+INSERT INTO concepts VALUES ('a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'P41i_was_classified_by', 'Concept');
 INSERT INTO concepts VALUES ('f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'P42_assigned', 'Concept');
+INSERT INTO concepts VALUES ('d1e640c1-247a-3ce0-84b4-551d730fac4a', 'P42i_was_assigned_by', 'Concept');
 INSERT INTO concepts VALUES ('167c0167-35fd-3c57-b90e-20715fd2c200', 'P43_has_dimension', 'Concept');
+INSERT INTO concepts VALUES ('2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'P43i_is_dimension_of', 'Concept');
 INSERT INTO concepts VALUES ('ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'P44_has_condition', 'Concept');
+INSERT INTO concepts VALUES ('bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'P44i_is_condition_of', 'Concept');
 INSERT INTO concepts VALUES ('c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'P45_consists_of', 'Concept');
+INSERT INTO concepts VALUES ('366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'P45i_is_incorporated_in', 'Concept');
 INSERT INTO concepts VALUES ('e37e8cfe-e1b7-3335-818b-d56090f2974e', 'P46_is_composed_of', 'Concept');
+INSERT INTO concepts VALUES ('63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'P46i_forms_part_of', 'Concept');
 INSERT INTO concepts VALUES ('356c8ba7-0114-32c3-861f-8432bc46e963', 'P48_has_preferred_identifier', 'Concept');
+INSERT INTO concepts VALUES ('63221473-4f24-3feb-a536-acb76f2f1b94', 'P48i_is_preferred_identifier_of', 'Concept');
 INSERT INTO concepts VALUES ('7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'P49_has_former_or_current_keeper', 'Concept');
+INSERT INTO concepts VALUES ('c97f21db-5aed-3dea-9209-a800985c0aa5', 'P49i_is_former_or_current_keeper_of', 'Concept');
 INSERT INTO concepts VALUES ('2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'P50_has_current_keeper', 'Concept');
+INSERT INTO concepts VALUES ('653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'P50i_is_current_keeper_of', 'Concept');
 INSERT INTO concepts VALUES ('6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'P51_has_former_or_current_owner', 'Concept');
+INSERT INTO concepts VALUES ('5cab4232-9297-318b-806a-263f2287713d', 'P51i_is_former_or_current_owner_of', 'Concept');
 INSERT INTO concepts VALUES ('954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'P52_has_current_owner', 'Concept');
+INSERT INTO concepts VALUES ('36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'P52i_is_current_owner_of', 'Concept');
 INSERT INTO concepts VALUES ('a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'P53_has_former_or_current_location', 'Concept');
+INSERT INTO concepts VALUES ('b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'P53i_is_former_or_current_location_of', 'Concept');
 INSERT INTO concepts VALUES ('e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'P54_has_current_permanent_location', 'Concept');
+INSERT INTO concepts VALUES ('d50067c9-6a89-3c10-8644-91d068c1f5c0', 'P54i_is_current_permanent_location_of', 'Concept');
 INSERT INTO concepts VALUES ('f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'P55_has_current_location', 'Concept');
+INSERT INTO concepts VALUES ('560925df-0b2b-36b2-9b4f-9652b38a6da2', 'P55i_currently_holds', 'Concept');
 INSERT INTO concepts VALUES ('e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'P56_bears_feature', 'Concept');
+INSERT INTO concepts VALUES ('118e3917-94ae-3339-a738-a05540f6a087', 'P56i_is_found_on', 'Concept');
 INSERT INTO concepts VALUES ('5afb86ba-c943-367b-857c-d7aaec92b5e3', 'P57_has_number_of_parts', 'Concept');
 INSERT INTO concepts VALUES ('89cad4c1-914c-3675-9d66-83eed1c61e3e', 'P58_has_section_definition', 'Concept');
+INSERT INTO concepts VALUES ('af0950ae-298d-33e6-9dff-db7a9cce0769', 'P58i_defines_section', 'Concept');
 INSERT INTO concepts VALUES ('21f8fc78-e937-3048-95e9-e69404b1d3f1', 'P59_has_section', 'Concept');
+INSERT INTO concepts VALUES ('b77952c3-1145-3340-964f-6212caf1c63f', 'P59i_is_located_on_or_within', 'Concept');
 INSERT INTO concepts VALUES ('05804845-b0d6-3634-a977-a5c7785d2dde', 'P62_depicts', 'Concept');
+INSERT INTO concepts VALUES ('e218d84c-7bef-348b-a571-621c6237b4d0', 'P62i_is_depicted_by', 'Concept');
 INSERT INTO concepts VALUES ('15f83f67-48e0-3afd-b693-605172ea3fd2', 'P65_shows_visual_item', 'Concept');
+INSERT INTO concepts VALUES ('7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'P65i_is_shown_by', 'Concept');
 INSERT INTO concepts VALUES ('629ed771-13e7-397e-8345-69f6cfb3db30', 'P67_refers_to', 'Concept');
+INSERT INTO concepts VALUES ('501d59a2-21cc-3c94-b043-7071cb9551d5', 'P67i_is_referred_to_by', 'Concept');
 INSERT INTO concepts VALUES ('037c3de7-65ae-3002-8328-18cc33572501', 'P68_foresees_use_of', 'Concept');
+INSERT INTO concepts VALUES ('426216f3-fa37-32c7-88e7-be709f0f7182', 'P68i_use_foreseen_by', 'Concept');
 INSERT INTO concepts VALUES ('b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'P69_is_associated_with', 'Concept');
 INSERT INTO concepts VALUES ('3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'P70_documents', 'Concept');
+INSERT INTO concepts VALUES ('b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'P70i_is_documented_in', 'Concept');
 INSERT INTO concepts VALUES ('549c04f2-465b-3af6-ba22-8d21aacfe0af', 'P71_lists', 'Concept');
+INSERT INTO concepts VALUES ('9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'P71i_is_listed_in', 'Concept');
 INSERT INTO concepts VALUES ('e4096768-5cad-36ca-8ee7-d5b928a0045a', 'P72_has_language', 'Concept');
+INSERT INTO concepts VALUES ('2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'P72i_is_language_of', 'Concept');
 INSERT INTO concepts VALUES ('8a9489d3-6c67-3b70-9b4d-64980efa0879', 'P73_has_translation', 'Concept');
+INSERT INTO concepts VALUES ('c185435d-2391-302f-b892-687406865462', 'P73i_is_translation_of', 'Concept');
 INSERT INTO concepts VALUES ('5869a9ed-ebe5-3613-acc2-29c184737885', 'P74_has_current_or_former_residence', 'Concept');
+INSERT INTO concepts VALUES ('b8b3baaf-161f-3234-8239-21d64232a602', 'P74i_is_current_or_former_residence_of', 'Concept');
 INSERT INTO concepts VALUES ('44813770-321a-370d-bb8f-ba619bcb4334', 'P75_possesses', 'Concept');
+INSERT INTO concepts VALUES ('99d57bf5-f645-37c0-82fd-592f32a457ea', 'P75i_is_possessed_by', 'Concept');
 INSERT INTO concepts VALUES ('e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'P76_has_contact_point', 'Concept');
+INSERT INTO concepts VALUES ('d18864b3-7463-34d1-92c4-9655ddcef018', 'P76i_provides_access_to', 'Concept');
 INSERT INTO concepts VALUES ('5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'P78_is_identified_by', 'Concept');
+INSERT INTO concepts VALUES ('804a34c3-4d1b-382e-af15-787c0dacc71c', 'P78i_identifies', 'Concept');
 INSERT INTO concepts VALUES ('2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'P79_beginning_is_qualified_by', 'Concept');
 INSERT INTO concepts VALUES ('b1c4e551-2f6e-327b-8905-191228330e2f', 'P80_end_is_qualified_by', 'Concept');
 INSERT INTO concepts VALUES ('6a998971-7a85-3615-9929-d613fe90391c', 'P81_ongoing_throughout', 'Concept');
 INSERT INTO concepts VALUES ('890ddf47-6e5e-32f7-b3a8-ecd251002877', 'P82_at_some_time_within', 'Concept');
 INSERT INTO concepts VALUES ('b38666a2-59fd-3154-85c3-90edaa812979', 'P83_had_at_least_duration', 'Concept');
+INSERT INTO concepts VALUES ('dfed4f9a-1166-3713-99d9-ba0a6073790e', 'P83i_was_minimum_duration_of', 'Concept');
 INSERT INTO concepts VALUES ('86caed02-d112-3cd7-8f21-4836e4997850', 'P84_had_at_most_duration', 'Concept');
+INSERT INTO concepts VALUES ('cb739b74-45d4-37be-98b6-b25ea041218a', 'P84i_was_maximum_duration_of', 'Concept');
 INSERT INTO concepts VALUES ('014fefdb-ddad-368b-b69c-951a0763824d', 'P86_falls_within', 'Concept');
+INSERT INTO concepts VALUES ('a00b04f9-5853-3359-90cd-e863df4c4d68', 'P86i_contains', 'Concept');
 INSERT INTO concepts VALUES ('697dc6cc-0da6-301c-9703-78edbf812fac', 'P87_is_identified_by', 'Concept');
+INSERT INTO concepts VALUES ('1bad9598-520c-36c3-9116-44e24129f3e0', 'P87i_identifies', 'Concept');
 INSERT INTO concepts VALUES ('900165c3-a630-3b9c-bb0b-572df34ea3e6', 'P89_falls_within', 'Concept');
+INSERT INTO concepts VALUES ('b16ef45e-a699-3d18-9a14-75c743895d14', 'P89i_contains', 'Concept');
 INSERT INTO concepts VALUES ('26af9ec1-e169-3486-9bb5-3c8187784c8e', 'P90_has_value', 'Concept');
 INSERT INTO concepts VALUES ('166f17e8-15b8-3abc-bba7-7a56c364bf42', 'P91_has_unit', 'Concept');
+INSERT INTO concepts VALUES ('4beb6f38-12e5-35b5-99b2-283c924db270', 'P91i_is_unit_of', 'Concept');
 INSERT INTO concepts VALUES ('c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'P92_brought_into_existence', 'Concept');
+INSERT INTO concepts VALUES ('92388748-e308-3295-9140-6974beab1611', 'P92i_was_brought_into_existence_by', 'Concept');
 INSERT INTO concepts VALUES ('f865c72a-09dd-386f-a9eb-385176727d94', 'P93_took_out_of_existence', 'Concept');
+INSERT INTO concepts VALUES ('28bd339b-43e4-3671-add8-6a48fad8593e', 'P93i_was_taken_out_of_existence_by', 'Concept');
 INSERT INTO concepts VALUES ('3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'P94_has_created', 'Concept');
+INSERT INTO concepts VALUES ('0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'P94i_was_created_by', 'Concept');
 INSERT INTO concepts VALUES ('9623a310-4d14-33dc-ae6e-10fb48062af5', 'P95_has_formed', 'Concept');
+INSERT INTO concepts VALUES ('7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'P95i_was_formed_by', 'Concept');
 INSERT INTO concepts VALUES ('9e806e49-e728-32cf-821e-504ca9916afc', 'P96_by_mother', 'Concept');
+INSERT INTO concepts VALUES ('cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'P96i_gave_birth', 'Concept');
 INSERT INTO concepts VALUES ('19c3c1bf-e443-3f89-a366-d3e8c645a546', 'P97_from_father', 'Concept');
+INSERT INTO concepts VALUES ('381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'P97i_was_father_for', 'Concept');
 INSERT INTO concepts VALUES ('c511a177-3e0b-3a90-babe-e951f56f18d1', 'P98_brought_into_life', 'Concept');
+INSERT INTO concepts VALUES ('f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'P98i_was_born', 'Concept');
 INSERT INTO concepts VALUES ('9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'P99_dissolved', 'Concept');
+INSERT INTO concepts VALUES ('78d02711-1e0a-3448-9bef-518d6039f63f', 'P99i_was_dissolved_by', 'Concept');
 INSERT INTO concepts VALUES ('b0ed382c-8dcc-3b98-845b-c22620d5633f', 'P100_was_death_of', 'Concept');
+INSERT INTO concepts VALUES ('72248902-0df0-3571-a980-203a75528b5e', 'P100i_died_in', 'Concept');
 INSERT INTO concepts VALUES ('f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'P101_had_as_general_use', 'Concept');
+INSERT INTO concepts VALUES ('efa1ef96-7d50-3d2f-8395-a401a64934d3', 'P101i_was_use_of', 'Concept');
 INSERT INTO concepts VALUES ('8c69765e-7827-371f-9db3-fea290f87739', 'P102_has_title', 'Concept');
+INSERT INTO concepts VALUES ('a35c0d79-ac31-3778-8614-a11f0419d131', 'P102i_is_title_of', 'Concept');
 INSERT INTO concepts VALUES ('0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'P103_was_intended_for', 'Concept');
+INSERT INTO concepts VALUES ('151b036f-ded8-3b43-898e-e4008bdad1e2', 'P103i_was_intention_of', 'Concept');
 INSERT INTO concepts VALUES ('e091bc5e-86c9-328a-8c1c-deabe778c821', 'P104_is_subject_to', 'Concept');
+INSERT INTO concepts VALUES ('c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'P104i_applies_to', 'Concept');
 INSERT INTO concepts VALUES ('140073c4-60b5-352d-a5f7-244072fc4086', 'P105_right_held_by', 'Concept');
+INSERT INTO concepts VALUES ('049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'P105i_has_right_on', 'Concept');
 INSERT INTO concepts VALUES ('f677091c-aa91-3851-8aa1-1225980d5e02', 'P106_is_composed_of', 'Concept');
+INSERT INTO concepts VALUES ('818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'P106i_forms_part_of', 'Concept');
 INSERT INTO concepts VALUES ('f24003c3-0d20-3703-b044-9ed3ee42da07', 'P107_has_current_or_former_member', 'Concept');
+INSERT INTO concepts VALUES ('340b1b73-f4b7-3350-95fe-b037454ae21c', 'P107i_is_current_or_former_member_of', 'Concept');
 INSERT INTO concepts VALUES ('632197f8-15a2-32b6-9886-c93e587f5b64', 'P108_has_produced', 'Concept');
+INSERT INTO concepts VALUES ('c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'P108i_was_produced_by', 'Concept');
 INSERT INTO concepts VALUES ('4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'P109_has_current_or_former_curator', 'Concept');
+INSERT INTO concepts VALUES ('6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'P109i_is_current_or_former_curator_of', 'Concept');
 INSERT INTO concepts VALUES ('41f65567-9d44-371a-8806-03e08d332918', 'P110_augmented', 'Concept');
+INSERT INTO concepts VALUES ('c2182fd6-f019-3144-99a8-9d7f475f7388', 'P110i_was_augmented_by', 'Concept');
 INSERT INTO concepts VALUES ('a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'P111_added', 'Concept');
+INSERT INTO concepts VALUES ('c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'P111i_was_added_by', 'Concept');
 INSERT INTO concepts VALUES ('87e930ce-8aef-3700-af96-dd4d420fdc0f', 'P112_diminished', 'Concept');
+INSERT INTO concepts VALUES ('34359201-a879-316c-ae02-94f36ef88720', 'P112i_was_diminished_by', 'Concept');
 INSERT INTO concepts VALUES ('f887076f-2375-38bd-b11c-e2511a59e0a2', 'P113_removed', 'Concept');
+INSERT INTO concepts VALUES ('501b9466-760d-31b7-8c39-50fe0d4553b3', 'P113i_was_removed_by', 'Concept');
 INSERT INTO concepts VALUES ('a9837ed9-5ff8-34ae-907d-2dba6012e877', 'P114_is_equal_in_time_to', 'Concept');
 INSERT INTO concepts VALUES ('8687cd99-3201-3f8f-bb1c-241732242a8f', 'P115_finishes', 'Concept');
+INSERT INTO concepts VALUES ('0d28bdef-9003-370d-9d95-9c28865c133e', 'P115i_is_finished_by', 'Concept');
 INSERT INTO concepts VALUES ('61861fca-6102-3151-af0c-599e14e7a93a', 'P116_starts', 'Concept');
+INSERT INTO concepts VALUES ('dab5e797-c679-397a-90a0-e10979c1346f', 'P116i_is_started_by', 'Concept');
 INSERT INTO concepts VALUES ('740ab790-feb0-3700-8922-f152320272a5', 'P117_occurs_during', 'Concept');
+INSERT INTO concepts VALUES ('154ea871-9290-35a3-bf75-9a4029c78721', 'P117i_includes', 'Concept');
 INSERT INTO concepts VALUES ('b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'P118_overlaps_in_time_with', 'Concept');
+INSERT INTO concepts VALUES ('715dd995-2c63-3432-a195-845a3d19abed', 'P118i_is_overlapped_in_time_by', 'Concept');
 INSERT INTO concepts VALUES ('8b7a9392-ce48-360e-b28a-c01d70eaf672', 'P119_meets_in_time_with', 'Concept');
+INSERT INTO concepts VALUES ('b36aa92e-1648-3945-8ff7-2a742dc309e6', 'P119i_is_met_in_time_by', 'Concept');
 INSERT INTO concepts VALUES ('911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'P120_occurs_before', 'Concept');
+INSERT INTO concepts VALUES ('781d59a3-2a3a-36cb-be4f-516b2331ba85', 'P120i_occurs_after', 'Concept');
 INSERT INTO concepts VALUES ('74e69af6-6a10-32be-91d3-50dd33b7876b', 'P121_overlaps_with', 'Concept');
 INSERT INTO concepts VALUES ('da6e698d-cb4e-31ae-8ef4-c0a219a35673', 'P122_borders_with', 'Concept');
 INSERT INTO concepts VALUES ('50bbc81a-fe17-3469-a055-6c821ed66db1', 'P123_resulted_in', 'Concept');
+INSERT INTO concepts VALUES ('fa94fd3f-0d86-3b51-a330-9d9560478c19', 'P123i_resulted_from', 'Concept');
 INSERT INTO concepts VALUES ('98e3e69e-6101-3510-9a8c-7c11e279fd95', 'P124_transformed', 'Concept');
+INSERT INTO concepts VALUES ('7c4e440c-c11a-3805-8b96-f7e8f4659252', 'P124i_was_transformed_by', 'Concept');
 INSERT INTO concepts VALUES ('c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'P125_used_object_of_type', 'Concept');
+INSERT INTO concepts VALUES ('3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'P125i_was_type_of_object_used_in', 'Concept');
 INSERT INTO concepts VALUES ('8bfff662-9024-325a-a23a-b3c9bf509031', 'P126_employed', 'Concept');
+INSERT INTO concepts VALUES ('47e28679-c612-3f90-b494-61b97c407f20', 'P126i_was_employed_in', 'Concept');
 INSERT INTO concepts VALUES ('7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'P127_has_broader_term', 'Concept');
+INSERT INTO concepts VALUES ('100d559e-7503-3a21-bd2a-2d959e8a5115', 'P127i_has_narrower_term', 'Concept');
 INSERT INTO concepts VALUES ('007dac32-df80-366b-88ce-02f4c1928537', 'P128_carries', 'Concept');
+INSERT INTO concepts VALUES ('d6827900-cff1-30d3-b661-3e97fe79ff2d', 'P128i_is_carried_by', 'Concept');
 INSERT INTO concepts VALUES ('c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'P129_is_about', 'Concept');
+INSERT INTO concepts VALUES ('ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'P129i_is_subject_of', 'Concept');
 INSERT INTO concepts VALUES ('d6d729ca-ad20-3897-afaa-8427d5771c3f', 'P130_shows_features_of', 'Concept');
+INSERT INTO concepts VALUES ('658d04df-450c-3044-82f1-8f47cc5eecb2', 'P130i_features_are_also_found_on', 'Concept');
 INSERT INTO concepts VALUES ('68dd1374-d854-3b4e-bca3-95d41675fb2f', 'P131_is_identified_by', 'Concept');
+INSERT INTO concepts VALUES ('6431b808-3267-360f-b592-38eff1ad552f', 'P131i_identifies', 'Concept');
 INSERT INTO concepts VALUES ('50060723-772d-3974-864e-8f8c326f169d', 'P132_overlaps_with', 'Concept');
 INSERT INTO concepts VALUES ('95473150-07f2-3967-88f3-20b803dd239d', 'P133_is_separated_from', 'Concept');
 INSERT INTO concepts VALUES ('1051349b-b0bf-3d88-8ab7-302c5c969197', 'P134_continued', 'Concept');
+INSERT INTO concepts VALUES ('669d3c80-b736-3563-afd1-66c9a445754e', 'P134i_was_continued_by', 'Concept');
 INSERT INTO concepts VALUES ('a84f68c6-b6c4-3a37-b069-e85b0b286489', 'P135_created_type', 'Concept');
+INSERT INTO concepts VALUES ('939b25e8-e272-312a-9803-cb1152535f68', 'P135i_was_created_by', 'Concept');
 INSERT INTO concepts VALUES ('ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'P136_was_based_on', 'Concept');
+INSERT INTO concepts VALUES ('4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'P136i_supported_type_creation', 'Concept');
 INSERT INTO concepts VALUES ('ada26737-46ff-3a34-8aed-7b70117c34aa', 'P137_exemplifies', 'Concept');
+INSERT INTO concepts VALUES ('b5cb150a-8663-359b-9f0b-e088f334e862', 'P137i_is_exemplified_by', 'Concept');
 INSERT INTO concepts VALUES ('bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'P138_represents', 'Concept');
+INSERT INTO concepts VALUES ('c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'P138i_has_representation', 'Concept');
 INSERT INTO concepts VALUES ('b13335f9-b208-3363-af5a-2e79fb56f7cc', 'P139_has_alternative_form', 'Concept');
 INSERT INTO concepts VALUES ('839c9e24-c1ab-34b4-94da-2efb1d32af01', 'P140_assigned_attribute_to', 'Concept');
+INSERT INTO concepts VALUES ('8dc78a68-fde8-34d1-a86e-40d2187fe316', 'P140i_was_attributed_by', 'Concept');
 INSERT INTO concepts VALUES ('90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'P141_assigned', 'Concept');
+INSERT INTO concepts VALUES ('936cd63c-8307-3de9-a507-0f796fe07542', 'P141i_was_assigned_by', 'Concept');
 INSERT INTO concepts VALUES ('f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'P142_used_constituent', 'Concept');
+INSERT INTO concepts VALUES ('1185b7bf-33f3-3451-b7b9-2d3caba52257', 'P142i_was_used_in', 'Concept');
 INSERT INTO concepts VALUES ('aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'P143_joined', 'Concept');
+INSERT INTO concepts VALUES ('4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'P143i_was_joined_by', 'Concept');
 INSERT INTO concepts VALUES ('406ee11a-a430-386f-9087-30c28c677da6', 'P144_joined_with', 'Concept');
+INSERT INTO concepts VALUES ('55e212ca-8ccb-3269-bf57-047a7927e388', 'P144i_gained_member_by', 'Concept');
 INSERT INTO concepts VALUES ('7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'P145_separated', 'Concept');
+INSERT INTO concepts VALUES ('0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'P145i_left_by', 'Concept');
 INSERT INTO concepts VALUES ('5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'P146_separated_from', 'Concept');
+INSERT INTO concepts VALUES ('0d9d0f81-5038-355c-a836-36374e32df2c', 'P146i_lost_member_by', 'Concept');
 INSERT INTO concepts VALUES ('9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'P147_curated', 'Concept');
+INSERT INTO concepts VALUES ('d48721f7-f462-3183-be01-a5e0bfc49a4c', 'P147i_was_curated_by', 'Concept');
 INSERT INTO concepts VALUES ('df779f07-03dd-3ed7-91aa-025a71c95957', 'P148_has_component', 'Concept');
+INSERT INTO concepts VALUES ('2093d28a-ae1a-3621-a251-7bf59478b67a', 'P148i_is_component_of', 'Concept');
 INSERT INTO concepts VALUES ('c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'P149_is_identified_by', 'Concept');
+INSERT INTO concepts VALUES ('8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', 'P149i_identifies', 'Concept');
 INSERT INTO concepts VALUES ('75825fa7-ab9a-3b62-b7e8-250712914631', 'P150_defines_typical_parts_of', 'Concept');
+INSERT INTO concepts VALUES ('75893825-da4f-370f-aaf7-0f9055fb822f', 'P150i_defines_typical_wholes_for', 'Concept');
 INSERT INTO concepts VALUES ('63c5d303-2789-3999-8496-297343edf6dc', 'P151_was_formed_from', 'Concept');
+INSERT INTO concepts VALUES ('b07d00db-77cc-3fcd-8a77-00640ea7a4b4', 'P151i_participated_in', 'Concept');
 INSERT INTO concepts VALUES ('e28841b2-0d53-3f91-afbf-3694a6236a5d', 'P152_has_parent', 'Concept');
+INSERT INTO concepts VALUES ('8892bafe-d1eb-3729-aae7-11b84d33fe4f', 'P152i_is_parent_of', 'Concept');
 INSERT INTO concepts VALUES ('222f5899-aa3f-3d52-a784-e5a0a68722f2', 'P156_occupies', 'Concept');
+INSERT INTO concepts VALUES ('fea70b78-1787-3af8-abbe-9ce28ff2938d', 'P156i_is_occupied_by', 'Concept');
 INSERT INTO concepts VALUES ('be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'P157_is_at_rest_relative_to', 'Concept');
+INSERT INTO concepts VALUES ('1be49423-63ef-3cb1-884a-4fd252df9a40', 'P157i_provides_reference_space_for', 'Concept');
 INSERT INTO concepts VALUES ('6f3ce351-dc26-30bf-8c50-9392f873968d', 'P160_has_temporal_projection', 'Concept');
+INSERT INTO concepts VALUES ('d5340d69-ae62-3784-a09f-4265441bc799', 'P160i_is_temporal_projection_of', 'Concept');
 INSERT INTO concepts VALUES ('db25f50b-28f3-3041-b091-8bb7d2557856', 'P161_has_spatial_projection', 'Concept');
+INSERT INTO concepts VALUES ('1cea6134-b1e4-328d-9f42-2b05ef652051', 'P161i_is_spatial_projection_of', 'Concept');
 INSERT INTO concepts VALUES ('68633428-a835-3af2-9e8e-ac1ba713d4c8', 'P164_during', 'Concept');
+INSERT INTO concepts VALUES ('4d0347cf-bb90-39ec-b1ce-62cde88563c5', 'P164i_was_time-span_of', 'Concept');
 INSERT INTO concepts VALUES ('a5a812b2-d786-38db-928f-1df9f416ab59', 'P165_incorporates', 'Concept');
+INSERT INTO concepts VALUES ('737107d1-0987-399a-acc9-ad999343883d', 'P165i_is_incorporated_in', 'Concept');
 INSERT INTO concepts VALUES ('6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'P166_was_a_presence_of', 'Concept');
+INSERT INTO concepts VALUES ('10d74c25-d701-39f0-b392-3d14ce53e777', 'P166i_had_presence', 'Concept');
 INSERT INTO concepts VALUES ('da115774-50f3-3292-97dc-da1cbb527ca5', 'P167_was_at', 'Concept');
+INSERT INTO concepts VALUES ('3cdc8241-3fe5-30a9-be46-c4de963ec173', 'P167i_was_place_of', 'Concept');
 INSERT INTO concepts VALUES ('81fd2793-2d69-37fe-8027-ff705a54ce3d', 'P168_place_is_defined_by', 'Concept');
-INSERT INTO concepts VALUES ('7cd91c49-743e-3eed-ad91-d993b09af867', 'BM.PX_is_related_to', 'Concept');
+INSERT INTO concepts VALUES ('208c9b27-1418-3691-8edf-b86d3f3db3e9', 'BM.PX_is_related_to', 'Concept');
 
 
--- Completed on 2016-05-09 13:31:44 PDT
+-- Completed on 2016-05-12 15:08:45 PDT
 
 --
 -- PostgreSQL database dump complete
 --
-
-
 
 --
 -- PostgreSQL database dump
@@ -279,7 +411,7 @@ INSERT INTO concepts VALUES ('7cd91c49-743e-3eed-ad91-d993b09af867', 'BM.PX_is_r
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-05-09 13:33:50 PDT
+-- Started on 2016-05-12 15:09:39 PDT
 
 -- SET statement_timeout = 0;
 -- SET lock_timeout = 0;
@@ -292,9 +424,9 @@ INSERT INTO concepts VALUES ('7cd91c49-743e-3eed-ad91-d993b09af867', 'BM.PX_is_r
 -- SET search_path = public, pg_catalog;
 
 --
--- TOC entry 3858 (class 0 OID 491690)
+-- TOC entry 3858 (class 0 OID 532932)
 -- Dependencies: 248
--- Data for Name: values; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: values; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO "values" VALUES ('94cb14a1-b729-30a1-89ac-be47bb7916ae', 'E1 Οντότητα CIDOC CRM', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'el', 'prefLabel');
@@ -1685,11 +1817,11 @@ INSERT INTO "values" VALUES ('1a09dd82-3d36-32d2-8b13-4394df614476', 'E84 Suport
 INSERT INTO "values" VALUES ('24af5c04-f7a2-35b0-bda3-735457a3863d', 'Suporte de Informação', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('f2ae4e90-e12b-3f26-9df3-7d63f0169040', 'E84 信息载体', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('35436247-010d-3dc7-b71f-cb961e2ba118', '信息载体', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('3c7366a6-d81e-3504-ac23-7d9309b28b31', '有说明', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('f80e0ceb-e895-3921-baf5-7407b86b4f4a', 'P13 a détruit', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'fr', 'prefLabel');
-INSERT INTO "values" VALUES ('cb96133f-c382-30dc-9ca3-99a820ae9706', 'a détruit', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'fr', 'altLabel');
-INSERT INTO "values" VALUES ('6ebfff6f-545d-3014-b14f-890212b71094', 'P13 уничтожил', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'ru', 'prefLabel');
-INSERT INTO "values" VALUES ('4dc784fc-a818-35d3-a290-46426ef335ce', 'уничтожил', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a8f982b0-8f2f-34b9-8976-b5110b8a7a1c', 'P4i 开始并完成了', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('e84c2d19-7f60-3a70-8caa-65370330aa0b', '开始并完成了', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('5d970207-5a9a-3253-8206-49c0d7e9df15', 'P5 consists of', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('1f8ea007-6977-328f-8ffd-ed5136f30557', 'consists of', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ebf105ef-4b03-3d10-93fa-b74d8ec7431e', 'P5 consiste en', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('574899af-45fa-3a06-be8e-2ded1ac7e1c1', 'This class comprises all instances of E22 Man-Made Object that are explicitly designed to act as persistent physical carriers for instances of E73 Information Object.
 An E84 Information Carrier may or may not contain information, e.g., a diskette. Note that any E18 Physical Thing may carry information, such as an E34 Inscription. However, unless it was specifically designed for this purpose, it is not an Information Carrier. Therefore the property P128 carries (is carried by) applies to E18 Physical Thing in general.
 	', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'en-US', 'scopeNote');
@@ -1743,14 +1875,15 @@ INSERT INTO "values" VALUES ('e0aa2cb9-c84d-3b77-b416-8ea0f67d4321', 'This class
 ', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'en-US', 'scopeNote');
 INSERT INTO "values" VALUES ('c775aa3d-c091-3d7a-889f-487c4df32955', 'E92 Spacetime Volume', '94ffd715-18f7-310a-bee2-010d800be058', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('66384838-41f7-3ae7-8275-68e0409c03c0', 'Spacetime Volume', '94ffd715-18f7-310a-bee2-010d800be058', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('96353b48-4028-32da-a164-3b3657833b44', 'a eu lieu sur ou dans', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'fr', 'altLabel');
-INSERT INTO "values" VALUES ('fc153c42-c309-32bd-a187-d92851ec3f03', 'P8 ocorreu em ou dentro', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'pt', 'prefLabel');
-INSERT INTO "values" VALUES ('54e8be29-5d43-350b-b76f-f39b5db4c5ca', 'ocorreu em ou dentro', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'pt', 'altLabel');
-INSERT INTO "values" VALUES ('7e597788-0dd8-39be-b3f2-ff8b6bff559c', 'P8 发生所在物件是', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'zh', 'prefLabel');
-INSERT INTO "values" VALUES ('93d3693e-c08b-380d-bbea-f7b305c36542', '发生所在物件是', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('f4a0e013-dc0b-3795-b05b-859349d4f936', 'P13 κατέστρεψε', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'el', 'prefLabel');
-INSERT INTO "values" VALUES ('e306b46f-ae55-3c19-b54e-cd5e8c0dd0d6', 'κατέστρεψε', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'el', 'altLabel');
-INSERT INTO "values" VALUES ('43f91225-d025-366e-bedd-517cbef46019', 'P13 destroyed', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6b307d11-a60a-345f-93ed-582f7fb3c4f7', 'consiste en', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('9b95b60c-84c5-346d-8f31-58ac99596ae8', 'P5 αποτελείται από', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('72f2290b-8794-360b-a59d-7e235cbbb12c', 'αποτελείται από', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('df75465f-f0c8-3cea-a7ea-02fe53e44263', 'P5 besteht aus', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e871a7a9-745a-3fb9-8f7d-ef47219548f4', 'besteht aus', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('7d6f89dc-656b-35b5-b7a3-d931f74104a4', 'P5 состоит из', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('73d0e60e-6a47-352c-aefc-6203a651cdcd', 'состоит из', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('70b953ff-a5cf-34aa-9748-d81275db922b', 'P5 consiste de', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('fbfab37c-dd80-3dd6-8b5b-9c0c4138d0f4', 'consiste de', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('6bf62c1b-37c2-3354-9ee6-f9ae96954818', 'This class comprises 4 dimensional point sets (volumes) in physical spacetime regardless its true geometric form. They may derive their identity from being the extent of a material phenomenon or from being the interpretation of an expression defining an extent in spacetime. 
 	Intersections of instances of E92 Spacetime Volume, Place and Timespan are also regarded as instances of E92 Spacetime Volume.  An instance of E92 Spacetime Volume is either contiguous or composed of a finite number of contiguous subsets. 
 	Its boundaries may be fuzzy due to the properties of the phenomena it derives from or due to the limited precision up to which defining expression can be identified with a real extent in spacetime. The duration of existence of an instance of a spacetime volume is trivially its projection on time.
@@ -1784,6 +1917,20 @@ INSERT INTO "values" VALUES ('309ba400-613e-31a1-a30b-6822cb896d80', '有识别�
 INSERT INTO "values" VALUES ('70a10c48-a2d3-3d02-9488-161772d5a507', 'This property describes the naming or identification of any real world item by a name or any other identifier. 
 This property is intended for identifiers in general use, which form part of the world the model intends to describe, and not merely for internal database identifiers which are specific to a technical system, unless these latter also have a more general use outside the technical context. This property includes in particular identification by mathematical expressions such as coordinate systems used for the identification of instances of E53 Place. The property does not reveal anything about when, where and by whom this identifier was used. A more detailed representation can be made using the fully developed (i.e. indirect) path through E15 Identifier Assignment.
 ', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('1e0cdd9d-b502-3f43-9096-a74e32f1fbbb', 'P1i bezeichnet', '89403c67-0097-311d-b3f4-eeb45e98020f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('bb842442-a278-338d-8e94-4d0da580f85a', 'bezeichnet', '89403c67-0097-311d-b3f4-eeb45e98020f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('0f937a47-96e6-3370-aae1-815ee2e3a847', 'P1i идентифицирует', '89403c67-0097-311d-b3f4-eeb45e98020f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('1e8a1b6e-4757-3a39-a343-218c6acc0eb3', 'идентифицирует', '89403c67-0097-311d-b3f4-eeb45e98020f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b7ea6e94-792d-35c7-b512-9ea11b2bb39a', 'P1i identifie', '89403c67-0097-311d-b3f4-eeb45e98020f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('5c9af53f-9564-342e-8b13-c2f809ebee14', 'identifie', '89403c67-0097-311d-b3f4-eeb45e98020f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a0dc95cd-b5fb-370d-8385-acc0b16aff7f', 'P1i είναι αναγνωριστικό', '89403c67-0097-311d-b3f4-eeb45e98020f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('1fc2eaba-1ab7-36a0-8276-51a535efc614', 'είναι αναγνωριστικό', '89403c67-0097-311d-b3f4-eeb45e98020f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('14683f4b-38bd-3970-a81f-a4ec8e3c029f', 'P1i identifies', '89403c67-0097-311d-b3f4-eeb45e98020f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3320e694-1cce-3505-933f-aae90fd0b5a8', 'identifies', '89403c67-0097-311d-b3f4-eeb45e98020f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('3ff0b49d-bd4e-3a6f-8de7-5ca27448e26e', 'P1i identifica', '89403c67-0097-311d-b3f4-eeb45e98020f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b4492777-04a5-3249-ade2-1c2291705075', 'identifica', '89403c67-0097-311d-b3f4-eeb45e98020f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('2947addb-0c0a-3c68-be31-2e3567c3207d', 'P1i 被用来识别', '89403c67-0097-311d-b3f4-eeb45e98020f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ae716fa3-2764-3ba3-8243-3bf7f80bfe84', '被用来识别', '89403c67-0097-311d-b3f4-eeb45e98020f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('af2d9b8c-a6fc-3437-a893-1f3198bfd0d7', 'P2 hat den Typus', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('b2685470-5086-3cda-b0e0-f926f2681d02', 'hat den Typus', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('00bd0506-7340-37b9-a74c-b0014876acb8', 'P2 has type', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'en', 'prefLabel');
@@ -1798,9 +1945,28 @@ INSERT INTO "values" VALUES ('3ae38f86-2435-3f36-9ab8-a69e91b15897', 'P2 é do t
 INSERT INTO "values" VALUES ('f04615aa-4359-3983-868a-ca3b9647c597', 'é do tipo', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('cd9a8b70-2503-31aa-9046-787643bf14f0', 'P2 有类型', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('0966ca12-2762-31a4-a73f-7589272bd366', '有类型', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('3f78b270-c64b-3c09-bd38-80e0944f2c63', 'P5 包含', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('d2d23a1b-8f14-34ad-8a80-9fd36794af04', '包含', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('1ff0aab7-ba51-330a-b240-b16651b1a364', 'This property describes the decomposition of an E3 Condition State into discrete, subsidiary states. 
+It is assumed that the sub-states into which the condition state is analysed form a logical whole - although the entire story may not be completely known – and that the sub-states are in fact constitutive of the general condition state. For example, a general condition state of “in ruins” may be decomposed into the individual stages of decay', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('fa2f226e-6f6d-3f1c-9ff3-03324b54032e', 'P5i bildet Teil von', 'd631ab44-05a4-332d-bf95-747391c40405', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('5999aaa4-65d6-3523-b7be-d0a040e611f7', 'This property allows sub typing of CRM entities - a form of specialisation – through the use of a terminological hierarchy, or thesaurus. 
 The CRM is intended to focus on the high-level entities and relationships needed to describe data structures. Consequently, it does not specialise entities any further than is required for this immediate purpose. However, entities in the isA hierarchy of the CRM may by specialised into any number of sub entities, which can be defined in the E55 Type hierarchy. E51 Contact Point, for example, may be specialised into “e-mail address”, “telephone number”, “post office box”, “URL” etc. none of which figures explicitly in the CRM hierarchy. Sub typing obviously requires consistency between the meaning of the terms assigned and the more general intent of the CRM entity in question.
 ', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a08e6d31-2d8a-32d0-ad49-2e604d070fd7', 'P2i является типом для', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b8793f0d-33c3-3999-9eb3-8e026819b870', 'является типом для', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('0ac93a3b-587a-3f76-92c3-e2a368d7b6fb', 'P2i est le type de', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('478b2978-7798-389c-8206-e2eb6f58a468', 'est le type de', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('459c1cd2-193d-3693-8f9b-5c231250c7dc', 'P2i είναι ο τύπος του/της', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('2adce215-7c29-3f17-bcc4-dbba4837da22', 'είναι ο τύπος του/της', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('988c2374-c307-398b-a8d4-c8931f4fc626', 'P2i ist Typus von', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('7d174879-07a2-3bdc-a01b-fc0f50e5968c', 'ist Typus von', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('eaa3692d-6d7c-38a3-ab4c-194709f1e77c', 'P2i is type of', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f7756b17-bc2e-3e88-8c2d-9ccefb274139', 'is type of', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0f6b4ff0-cf75-300e-9213-4d940a9f2aae', 'P2i é o tipo de', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f4d7a74d-8913-38d4-ac51-1f4f83a1d5fb', 'é o tipo de', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b58a1dfd-dd32-3a82-95b7-26f1a67a52b2', 'P2i 被用来分类', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('99c767f8-08b1-3eac-ae07-5664f0342fe7', '被用来分类', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('e970850b-c008-3205-81a2-16ac9013d5dc', 'P3 hat Anmerkung', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('f7702b89-17f0-3da4-a724-3bce3fc4020c', 'hat Anmerkung', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('e057dc7b-258b-3c07-8c02-c0dddae4f74b', 'P3 имеет примечание', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'ru', 'prefLabel');
@@ -1814,6 +1980,7 @@ INSERT INTO "values" VALUES ('160bfa82-ffba-33bd-962c-60502a44d473', 'έχει �
 INSERT INTO "values" VALUES ('e8f37772-eb1f-311b-a62c-5941f30cf6e0', 'P3 tem nota', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'pt', 'prefLabel');
 INSERT INTO "values" VALUES ('dc67440f-e701-346d-ba19-46194c4eb0be', 'tem nota', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('a85ff5de-f70c-34df-8b8a-689eb6db1ccc', 'P3 有说明', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('3c7366a6-d81e-3504-ac23-7d9309b28b31', '有说明', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8a61cc51-2999-3e67-8eb1-c53d8442d34d', 'This property is a container for all informal descriptions about an object that have not been expressed in terms of CRM constructs. 
 In particular it captures the characterisation of the item itself, its internal structures, appearance etc.
 Like property P2 has type (is type of), this property is a consequence of the restricted focus of the CRM. The aim is not to capture, in a structured form, everything that can be said about an item; indeed, the CRM formalism is not regarded as sufficient to express everything that can be said. Good practice requires use of distinct note fields for different aspects of a characterisation. The P3.1 has type property of P3 has note allows differentiation of specific notes, e.g. “construction”, “decoration” etc. 
@@ -1836,22 +2003,31 @@ INSERT INTO "values" VALUES ('56addd7f-f57e-3b27-ad11-ae6d3ec91786', '发生时�
 INSERT INTO "values" VALUES ('08d9132f-b2c4-30e8-9f12-848888bc17a8', 'This property describes the temporal confinement of an instance of an E2 Temporal Entity.
 The related E52 Time-Span is understood as the real Time-Span during which the phenomena were active, which make up the temporal entity instance. It does not convey any other meaning than a positioning on the “time-line” of chronology. The Time-Span in turn is approximated by a set of dates (E61 Time Primitive). A temporal entity can have in reality only one Time-Span, but there may exist alternative opinions about it, which we would express by assigning multiple Time-Spans. Related temporal entities may share a Time-Span. Time-Spans may have completely unknown dates but other descriptions by which we can infer knowledge.
 ', 'fc174f36-37ef-3f45-aec4-5b8ebe0e7729', 'en-US', 'scopeNote');
-INSERT INTO "values" VALUES ('5d970207-5a9a-3253-8206-49c0d7e9df15', 'P5 consists of', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en', 'prefLabel');
-INSERT INTO "values" VALUES ('1f8ea007-6977-328f-8ffd-ed5136f30557', 'consists of', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('ebf105ef-4b03-3d10-93fa-b74d8ec7431e', 'P5 consiste en', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'fr', 'prefLabel');
-INSERT INTO "values" VALUES ('6b307d11-a60a-345f-93ed-582f7fb3c4f7', 'consiste en', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'fr', 'altLabel');
-INSERT INTO "values" VALUES ('9b95b60c-84c5-346d-8f31-58ac99596ae8', 'P5 αποτελείται από', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'el', 'prefLabel');
-INSERT INTO "values" VALUES ('72f2290b-8794-360b-a59d-7e235cbbb12c', 'αποτελείται από', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'el', 'altLabel');
-INSERT INTO "values" VALUES ('df75465f-f0c8-3cea-a7ea-02fe53e44263', 'P5 besteht aus', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'de', 'prefLabel');
-INSERT INTO "values" VALUES ('e871a7a9-745a-3fb9-8f7d-ef47219548f4', 'besteht aus', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'de', 'altLabel');
-INSERT INTO "values" VALUES ('7d6f89dc-656b-35b5-b7a3-d931f74104a4', 'P5 состоит из', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'ru', 'prefLabel');
-INSERT INTO "values" VALUES ('73d0e60e-6a47-352c-aefc-6203a651cdcd', 'состоит из', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'ru', 'altLabel');
-INSERT INTO "values" VALUES ('70b953ff-a5cf-34aa-9748-d81275db922b', 'P5 consiste de', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'pt', 'prefLabel');
-INSERT INTO "values" VALUES ('fbfab37c-dd80-3dd6-8b5b-9c0c4138d0f4', 'consiste de', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'pt', 'altLabel');
-INSERT INTO "values" VALUES ('3f78b270-c64b-3c09-bd38-80e0944f2c63', 'P5 包含', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'zh', 'prefLabel');
-INSERT INTO "values" VALUES ('d2d23a1b-8f14-34ad-8a80-9fd36794af04', '包含', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('1ff0aab7-ba51-330a-b240-b16651b1a364', 'This property describes the decomposition of an E3 Condition State into discrete, subsidiary states. 
-It is assumed that the sub-states into which the condition state is analysed form a logical whole - although the entire story may not be completely known – and that the sub-states are in fact constitutive of the general condition state. For example, a general condition state of “in ruins” may be decomposed into the individual stages of decay', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('7d1c3070-1546-37a1-a5c7-23c713661876', 'P4i is time-span of', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('641bd430-088e-3dc5-a955-2f36d4546135', 'is time-span of', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('9c26c183-3ba5-3521-9058-d639a4d21b56', 'P4i είναι χρονικό διάστημα του/της', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f590a290-77c2-30ee-8838-7de57615dfc1', 'είναι χρονικό διάστημα του/της', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('1a282eb5-5499-3e15-8336-05f8e6316587', 'P4i est la durée de', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('e0551a99-ceec-32f6-b24e-0087b14b2ff6', 'est la durée de', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('715df38c-4d45-3d35-b390-a32487043d25', 'P4i является временным отрезком для', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('2cebd90f-99c1-3987-8c15-f113db87e8ba', 'является временным отрезком для', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('0f2a42fa-2566-3348-8698-fcd5d0fd180b', 'P4i ist Zeitspanne von', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('b65dfdaa-0e66-35c6-8206-94ca3ded23cb', 'ist Zeitspanne von', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('05c43ff2-3215-30ac-b2c4-89218bd937d9', 'P4i é o período de tempo de', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('a5118ae8-68d7-3f74-993c-bef38e98def5', 'é o período de tempo de', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('39daff1e-fa80-3a63-b3cd-af6beffdfbef', 'bildet Teil von', 'd631ab44-05a4-332d-bf95-747391c40405', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('d529dddb-40c9-3822-886d-8cbc35cc3036', 'P5i fait partie de', 'd631ab44-05a4-332d-bf95-747391c40405', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('bbf79872-f155-3aa8-aa3c-669dee05d658', 'fait partie de', 'd631ab44-05a4-332d-bf95-747391c40405', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a755987f-a3a7-3412-99fa-d54b9ec62ebc', 'P5i формирует часть', 'd631ab44-05a4-332d-bf95-747391c40405', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4c4ed8a4-2b70-3f72-a547-42e8ee3f3656', 'формирует часть', 'd631ab44-05a4-332d-bf95-747391c40405', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('0ed5b611-b289-3a4f-b204-09c2d799d6fa', 'P5i forms part of', 'd631ab44-05a4-332d-bf95-747391c40405', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('72c3001e-d082-365d-8d1f-daff68daf40c', 'forms part of', 'd631ab44-05a4-332d-bf95-747391c40405', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('b8a79c08-51b2-3253-b48f-7aadbdc7ead4', 'P5i αποτελεί μέρος του/της', 'd631ab44-05a4-332d-bf95-747391c40405', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('a32caa2c-2fd5-301f-9625-f6f50308c7ad', 'αποτελεί μέρος του/της', 'd631ab44-05a4-332d-bf95-747391c40405', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('064a6c0f-3bea-37c8-a7d0-51e9b7ee3720', 'P5i faz parte de', 'd631ab44-05a4-332d-bf95-747391c40405', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('afdaeca0-71d9-38ec-a73d-20f2c312cf43', 'faz parte de', 'd631ab44-05a4-332d-bf95-747391c40405', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('5ab85e10-1ace-3924-9fbd-bab7d1241b4a', 'P5i 组成了', 'd631ab44-05a4-332d-bf95-747391c40405', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('322f0f74-1381-39c7-a259-1f1706cc552b', '组成了', 'd631ab44-05a4-332d-bf95-747391c40405', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('350f2374-d67f-3a14-a852-d65fc8e2cae2', 'P7 a eu lieu dans', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('53bbfb28-da10-3bc4-b772-ead4dec220d1', 'a eu lieu dans', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('1be85580-91b7-35e7-87a3-fdbe67c1f026', 'P7 совершался на', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'ru', 'prefLabel');
@@ -1872,6 +2048,20 @@ The related E53 Place should be seen as an approximation of the geographical are
 A period can take place at multiple locations.
 It is a shortcut of the more fully developed path from E4 Period through P161 has spatial projection, E53 Place, P89 falls within (contains) to E53 Place. 
 ', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('72cdd3ef-923a-3ec1-b27b-41fd39d9eb0a', 'P7i a été témoin de', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('e0db3db9-4f98-35f1-acad-860d43efdfc0', 'a été témoin de', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e764d853-5c99-32ca-9d9e-ec62d77a73a2', 'P7i witnessed', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d0057194-990e-3a4f-871d-d34926e695a7', 'witnessed', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('6f27b968-3d1d-3489-a4dd-477c65c24141', 'P7i bezeugte', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('88ae38a6-596a-3899-8646-3d7503693576', 'bezeugte', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('2ead905b-b6d7-34f0-a087-63899306b435', 'P7i был местом совершения', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('9617877a-be13-30d1-b190-9c72d6dc57bc', 'был местом совершения', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('c450ae2c-5c41-35e3-9a87-9e0be7449885', 'P7i υπήρξε τόπος του', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('847468f6-5e1e-38ce-991d-f69086400b12', 'υπήρξε τόπος του', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7b9e7fea-2903-314e-a94f-ff542e04a0eb', 'P7i testemunhou', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b2b46ed2-53e8-3896-8e35-f48b0934745e', 'testemunhou', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('ac9cb152-2ded-3eb6-9ef6-8363aecf000e', 'P7i 发生过', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('9d87d236-5edc-3fb7-9956-551517cb1f3f', '发生过', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f74544ad-f143-3f4c-adcd-79a02cc3f0ec', 'P8 имел место на или в', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('6eba00e9-39da-33ba-9d51-caf9dc749472', 'имел место на или в', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('15eda132-10a3-315f-9ef2-98ac2959219a', 'P8 έλαβε χώρα σε ή εντός', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'el', 'prefLabel');
@@ -1881,12 +2071,31 @@ INSERT INTO "values" VALUES ('ee6ca9c0-6239-3242-8252-53d5280b70fa', 'fand statt
 INSERT INTO "values" VALUES ('645a3607-07e0-363a-bca9-7db1963eb749', 'P8 took place on or within', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('7630b64c-df74-3a44-9a22-a83700a892de', 'took place on or within', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('98f94b06-7cf5-33dd-b557-3f82dd664497', 'P8 a eu lieu sur ou dans', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('96353b48-4028-32da-a164-3b3657833b44', 'a eu lieu sur ou dans', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('fc153c42-c309-32bd-a187-d92851ec3f03', 'P8 ocorreu em ou dentro', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('54e8be29-5d43-350b-b76f-f39b5db4c5ca', 'ocorreu em ou dentro', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('7e597788-0dd8-39be-b3f2-ff8b6bff559c', 'P8 发生所在物件是', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('93d3693e-c08b-380d-bbea-f7b305c36542', '发生所在物件是', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9b0d3a38-9a45-3486-9912-d2898fb05342', 'This property describes the location of an instance of E4 Period with respect to an E19 Physical Object. 
 P8 took place on or within (witnessed) is a shortcut of the more fully developed path from E4 Period through P7 took place at, E53 Place, P156 occupies (is occupied by) to E18 Physical Thing.
 
 It describes a period that can be located with respect to the space defined by an E19 Physical Object such as a ship or a building. The precise geographical location of the object during the period in question may be unknown or unimportant. 
 For example, the French and German armistice of 22 June 1940 was signed in the same railway carriage as the armistice of 11 November 1918.
 ', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('20cf676b-1180-3875-a23d-eece90d2d32e', 'P8i являлся местом для', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('9579fb89-38df-3462-b600-475bbac050ba', 'являлся местом для', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('c392ea0c-751f-350e-a837-411ef7db45b2', 'P8i bezeugte', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('31b5be88-4288-3b84-b5eb-1434dc1d8880', 'bezeugte', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('70dfd05a-7c94-3cb1-bf42-1c37cdf6839f', 'P8i witnessed', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3622fa84-9545-357c-bb37-1b0a0dc668a9', 'witnessed', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('5f297dc2-3537-3d81-8e68-b9385b2ad0b4', 'P8i a été témoin de', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('09f9f640-aa97-3bed-839f-aca6b13cbb66', 'a été témoin de', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d1a77d9d-cf39-3b21-a70c-856ab0ed4150', 'P8i υπήρξε τόπος του', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('c873c4cd-bbed-34a7-95ec-67005b651bf4', 'υπήρξε τόπος του', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('bd3f1ff5-a8f8-393e-a96a-9df123b0e483', 'P8i testemunhou', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('01c8ef48-9984-33b0-9a60-b28637754ee4', 'testemunhou', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('0cc2a022-3574-3eb6-962c-84036e2730fe', 'P8i 发生过', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ff9b2c2f-dd79-3640-8979-79843c716998', '发生过', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9ae74c88-ad73-3854-bf9e-b8097f23541a', 'P9 αποτελείται από', '6909b643-03f7-3606-b276-2be0e8773207', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('a21dad2d-b0a4-3735-8690-a45fbb54eeb7', 'αποτελείται από', '6909b643-03f7-3606-b276-2be0e8773207', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('5741ffea-7ed1-3b17-b895-ea37e6452e1d', 'P9 consists of', '6909b643-03f7-3606-b276-2be0e8773207', 'en', 'prefLabel');
@@ -1903,6 +2112,20 @@ INSERT INTO "values" VALUES ('36ded9f6-bb29-3df9-bcf2-e343a3059460', 'P9 包含�
 INSERT INTO "values" VALUES ('10cb6e50-a22b-325b-a165-d2b9dba51d33', '包含子时期', '6909b643-03f7-3606-b276-2be0e8773207', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('0b973e61-60f1-323a-ba1b-d8cce661b76f', 'This property associates an instance of E4 Period with another instance of E4 Period that is defined by a subset of the phenomena that define the former. Therefore the spacetime volume of the latter must fall within the spacetime volume of the former.
 ', '6909b643-03f7-3606-b276-2be0e8773207', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('0a972b7a-73fd-3b16-9d65-0d86de735022', 'P9i αποτελεί μέρος του/της', '135ff5ff-c172-33fc-bf86-d46750007e95', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('b7be4bc0-ced5-3977-a8e6-820b8e6140c3', 'αποτελεί μέρος του/της', '135ff5ff-c172-33fc-bf86-d46750007e95', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('cafb48a6-4623-3e3e-a7c8-1e86ae3cd01d', 'P9i формирует часть', '135ff5ff-c172-33fc-bf86-d46750007e95', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('bd5daf85-cd49-33bc-bbbe-3deb5e9e1921', 'формирует часть', '135ff5ff-c172-33fc-bf86-d46750007e95', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b2a5d3a7-caba-38a8-8871-81debdfdaa88', 'P9i bildet Teil von', '135ff5ff-c172-33fc-bf86-d46750007e95', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('2caf2525-ba28-3b09-ade5-df72f4d15638', 'bildet Teil von', '135ff5ff-c172-33fc-bf86-d46750007e95', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('cdb7b030-e6d4-355e-ac1f-0cdea374e658', 'P9i fait partie de', '135ff5ff-c172-33fc-bf86-d46750007e95', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('a8a8587c-3700-30b5-a4a4-b8dee599b4b7', 'fait partie de', '135ff5ff-c172-33fc-bf86-d46750007e95', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('6dbc3254-e12f-3bfe-9cee-33ba75e879b0', 'P9i forms part of', '135ff5ff-c172-33fc-bf86-d46750007e95', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d521942f-838d-3357-8b22-2db21a0bce05', 'forms part of', '135ff5ff-c172-33fc-bf86-d46750007e95', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('7721d847-1efc-32ae-8a62-8034d1f4ded7', 'P9i faz parte de', '135ff5ff-c172-33fc-bf86-d46750007e95', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('62d1d0b4-470b-3dc5-a7ec-e0f65cd8de64', 'faz parte de', '135ff5ff-c172-33fc-bf86-d46750007e95', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b575284d-48c1-3398-bd4a-50d6ade939e1', 'P9i 附属於', '135ff5ff-c172-33fc-bf86-d46750007e95', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('f4ad5c9f-5754-3123-8d6f-1b5f95d04dac', '附属於', '135ff5ff-c172-33fc-bf86-d46750007e95', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3b203c3c-510d-3d1b-8a2b-3250e37dc55d', 'P10 находится в пределах', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('97523901-ecf2-33c0-9643-e74e3ed1d528', 'находится в пределах', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('03ec78b5-0255-3443-a21c-cd8de815d95f', 'P10 εμπίπτει', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'el', 'prefLabel');
@@ -1919,6 +2142,20 @@ INSERT INTO "values" VALUES ('554687fc-05b5-30bb-afc8-76709089332e', 'P10 发生
 INSERT INTO "values" VALUES ('29572f5d-2226-3779-b0cf-0fae531c51a0', '发生时间涵盖於', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('79c4f04c-42e8-3c1f-81b5-37a30a251eee', 'This property associates an instance of E92 Spacetime Volume with another instance of E92 Spacetime Volume that falls within the latter. In other words, all points in the former are also points in the latter.
 ', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('78fb7960-0a81-32a1-ba52-794256cae033', 'P10i περιλαμβάνει', '4913d287-3538-30ca-9f27-feb3b082321b', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d5a80c0a-f034-36af-8dee-9aa1d5da4ab4', 'περιλαμβάνει', '4913d287-3538-30ca-9f27-feb3b082321b', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('5337cd9a-d81a-37e1-aeb2-0508b21309f1', 'P10i содержит', '4913d287-3538-30ca-9f27-feb3b082321b', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('bd69fefe-3065-3d95-8c64-837ca3cb126f', 'содержит', '4913d287-3538-30ca-9f27-feb3b082321b', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('24e42172-de83-39bf-8a84-e2de14414153', 'P10i contains', '4913d287-3538-30ca-9f27-feb3b082321b', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d087f302-11ac-35d1-b5d0-856af0b4bce8', 'contains', '4913d287-3538-30ca-9f27-feb3b082321b', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('60a48366-325a-3e85-8976-b7a1e8ca3cfc', 'P10i contient', '4913d287-3538-30ca-9f27-feb3b082321b', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('c7e58834-2b69-3027-a987-081f4285a423', 'contient', '4913d287-3538-30ca-9f27-feb3b082321b', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('97bc3841-92ea-3653-9a51-47c7f5eeea0a', 'P10i enthält', '4913d287-3538-30ca-9f27-feb3b082321b', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('252598a9-d56f-3c32-afd2-d23e42a520be', 'enthält', '4913d287-3538-30ca-9f27-feb3b082321b', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('09484c12-e1ca-3c26-b020-ada4e64bbb3f', 'P10i contém', '4913d287-3538-30ca-9f27-feb3b082321b', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c773fd2b-b1e6-3b30-b224-c77b86ba214c', 'contém', '4913d287-3538-30ca-9f27-feb3b082321b', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4a60c02a-49ba-3b2a-8386-b02abe8d0e81', 'P10i 时间上涵盖', '4913d287-3538-30ca-9f27-feb3b082321b', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7282278a-3e46-310f-b765-adc75fcb83bb', '时间上涵盖', '4913d287-3538-30ca-9f27-feb3b082321b', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ee126e85-6620-3f0d-9e64-7eaa14f8a81c', 'P11 a eu pour participant', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('ced6177c-d298-33c4-8ab1-e8fcda7fd33b', 'a eu pour participant', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('f394c5c3-f560-3e04-911e-7e5a92f72aca', 'P11 имел участника', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'ru', 'prefLabel');
@@ -1933,9 +2170,27 @@ INSERT INTO "values" VALUES ('3da8ab28-01d6-31b8-b61e-c66c360239c5', 'P11 tem pa
 INSERT INTO "values" VALUES ('b54e3661-defa-38e6-919c-73ce146ac02d', 'tem participante', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('b1d6f7d2-7e8c-3ddd-8672-576f6b7a5314', 'P11 有参与者', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('64558ba9-e9d9-3da6-81cd-3b4c83cc24cc', '有参与者', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('eff2e783-b8eb-38f2-aca3-9752e9b39e47', 'P13i foi destruído por', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('7247c1be-321b-34de-ab62-1ab104af25bf', 'foi destruído por', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('7f9d9932-8db1-345d-991c-d47ddf0873cc', 'P13i 被毁灭於', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ab475bbf-2ca5-315a-8b59-507d7183c766', '被毁灭於', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9a5d662f-7217-388d-b842-a799b4906d74', 'This property describes the active or passive participation of instances of E39 Actors in an E5 Event. 
 It connects the life-line of the related E39 Actor with the E53 Place and E50 Date of the event. The property implies that the Actor was involved in the event but does not imply any causal relationship. The subject of a portrait can be said to have participated in the creation of the portrait.
 ', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8efaf7e1-9018-3eb5-920c-975fc23e58e1', 'P11i συμμετείχε σε', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('842694b0-98d1-3ced-bc9e-beb4590e2e92', 'συμμετείχε σε', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('48630738-ab43-3d72-a834-55e5f6d70930', 'P11i nahm Teil an', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('9a9f19a3-4a40-373f-86a2-81b538be31ca', 'nahm Teil an', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('6862528c-17a2-35ce-92d6-97a83bf7aa40', 'P11i участвовал в', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('67c8b0af-8ee0-3abe-b5a0-eab6a85cdb30', 'участвовал в', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e568dcbd-6352-30fc-a989-d591d9ffc947', 'P11i participated in', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f69d46d2-5d59-3697-bfa8-1df564ca8d23', 'participated in', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2a3bd615-720a-395b-b4f4-3817d1f2d29e', 'P11i a participé à', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('f26c3654-acd5-351a-ba19-4a775abb8640', 'a participé à', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d1deab39-74ec-33d9-8245-0472addb863d', 'P11i participa em', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('aeac3be1-847d-3216-9dc3-5ca7fe8b49c0', 'participa em', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('bf2814fb-51e5-34b5-8efe-3c9081064f55', 'P11i 参与了', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('bfd97509-79e5-3522-b87e-c4aa87c6119e', '参与了', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('21e94ffb-0c69-33f0-8a1f-1c971186b3cc', 'P12 occurred in the presence of', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('2611ea9e-15ce-38c9-840f-c3ed8fdc6b35', 'occurred in the presence of', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('ef3438a3-8fb3-3d71-acbf-e21f0c70c225', 'P12 появился в присутствии', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'ru', 'prefLabel');
@@ -1953,8 +2208,29 @@ INSERT INTO "values" VALUES ('e5e1acc4-e09e-3e0b-9174-2e1dcc176c02', '发生现�
 INSERT INTO "values" VALUES ('ddfc46bf-9891-3e1d-9112-8ad8b12efbec', 'This property describes the active or passive presence of an E77 Persistent Item in an E5 Event without implying any specific role. 
 It connects the history of a thing with the E53 Place and E50 Date of an event. For example, an object may be the desk, now in a museum on which a treaty was signed. The presence of an immaterial thing implies the presence of at least one of its carriers.
 ', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('01576311-3db4-37c9-b11a-6024bc7ef28f', 'P12i was present at', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('c75b8cb8-eb89-3fd3-8d56-0f1d46232895', 'was present at', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('1fc5b33e-e07c-3327-b067-c9e8ff99db07', 'P12i ήταν παρών/παρούσα/παρόν σε', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d37da2d5-55a2-3cfd-8845-4e8f415d732c', 'ήταν παρών/παρούσα/παρόν σε', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('f6623baa-5654-3c08-85a7-b6537687008d', 'P12i war anwesend bei', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('61b1e703-1ce1-3171-8c85-12911068d45b', 'war anwesend bei', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('290cc5c5-195c-3f73-9913-449b247d3267', 'P12i était présent à', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('543f0eaa-9a19-30b9-9815-37aade291a87', 'était présent à', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('3a5ba966-ed46-367d-93b3-2be69279ec88', 'P12i присутствовал при', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('33a17dcb-d090-38b4-b589-c93ffbce1cb0', 'присутствовал при', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('862a2bb4-868b-3dfa-91dd-12fbcc809203', 'P12i estava presente no', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4215bc36-116f-3a02-b049-268155b605f3', 'estava presente no', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('14baa2aa-13fd-320c-ae02-a4f8cb9a356b', 'P12i 当时在场於', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('dd0d949d-e510-3bf0-916d-c64e252b40c1', '当时在场於', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('95505d7d-c308-3979-aad1-2dfb022c4a36', 'P13 zerstörte', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('e85d422b-4879-3127-aecb-3907be4102d8', 'zerstörte', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('f80e0ceb-e895-3921-baf5-7407b86b4f4a', 'P13 a détruit', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('cb96133f-c382-30dc-9ca3-99a820ae9706', 'a détruit', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('6ebfff6f-545d-3014-b14f-890212b71094', 'P13 уничтожил', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4dc784fc-a818-35d3-a290-46426ef335ce', 'уничтожил', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('f4a0e013-dc0b-3795-b05b-859349d4f936', 'P13 κατέστρεψε', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('e306b46f-ae55-3c19-b54e-cd5e8c0dd0d6', 'κατέστρεψε', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('43f91225-d025-366e-bedd-517cbef46019', 'P13 destroyed', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('ffc2dae6-491c-3e71-91fe-bba124228d40', 'destroyed', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('ffbf2b26-84cf-3037-a167-4615036361de', 'P13 destruiu', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'pt', 'prefLabel');
 INSERT INTO "values" VALUES ('3700f3a4-7699-389e-927b-63fe67e7d7f2', 'destruiu', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'pt', 'altLabel');
@@ -1963,6 +2239,16 @@ INSERT INTO "values" VALUES ('1dbed35d-ee9c-3062-87f8-5e9c697144dd', '毁灭了'
 INSERT INTO "values" VALUES ('8c4ecad0-98ed-319b-bef7-d97ee4d9bba1', 'This property allows specific instances of E18 Physical Thing that have been destroyed to be related to a destruction event. 
 Destruction implies the end of an item’s life as a subject of cultural documentation – the physical matter of which the item was composed may in fact continue to exist. A destruction event may be contiguous with a Production that brings into existence a derived object composed partly of matter from the destroyed object.
 ', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3e043d12-fa51-3722-9a0a-d719a15005ba', 'P13i wurde zerstört durch', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('6c31c39a-9c5c-3b0a-9d85-89a9dd3eb984', 'wurde zerstört durch', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5bd0f054-fdf1-3a87-a5b2-7dacceef4d57', 'P13i was destroyed by', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('86d93e16-47ee-33a8-a257-5c0863f03d27', 'was destroyed by', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8df58771-5500-3bf8-b625-9ccdc61314da', 'P13i καταστράφηκε από', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('e799848e-677c-3e96-b8e7-150c98c6fd54', 'καταστράφηκε από', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7becd565-e8fd-3f79-8349-f456e29726d9', 'P13i a été détruite par', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('cbae7dda-ef6e-30cb-a537-b8a6c80c0671', 'a été détruite par', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('b7004fd7-7d04-3945-89d3-1e4c7a3efb29', 'P13i был уничтожен посредством', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('8be54a73-c986-356b-b9d9-3086006d6a4e', 'был уничтожен посредством', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('53ceb476-8025-30a3-8783-f90a0f96637d', 'P14 wurde ausgeführt von', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('a3d3571a-9e7b-3af6-8fed-4f304a2db768', 'wurde ausgeführt von', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('700f1298-e20f-3b8e-a92b-b05130b58732', 'P14 réalisée par', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'fr', 'prefLabel');
@@ -1980,6 +2266,20 @@ INSERT INTO "values" VALUES ('06dc92cc-6564-3ee5-9ba3-3fe1e0ab0374', '有执行�
 INSERT INTO "values" VALUES ('60fef912-ca6a-32b2-907b-a223c3ad605e', 'This property describes the active participation of an E39 Actor in an E7 Activity. 
 It implies causal or legal responsibility. The P14.1 in the role of property of the property allows the nature of an Actor’s participation to be specified.
 ', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('e27efffa-ea5c-3612-b992-40cbc1f01a0a', 'P14i выполнял', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('78472c54-6a7a-3c72-8c82-690f70858edd', 'выполнял', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('4257b5f4-fff0-3693-ba3c-038cdb84a59e', 'P14i πραγματοποίησε', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('6f6fd2d1-3abe-3644-882c-3a7e0cc6dbe1', 'πραγματοποίησε', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('171ff34d-f485-357e-a9d3-d174ccaa1734', 'P14i führte aus', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('57aabbbe-c267-321e-8cd9-d6b29af49420', 'führte aus', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('a0ca8452-5f58-3044-a1cf-5805ab1e4084', 'P14i performed', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('2cc57cf9-2173-32b5-baab-1c1794d35600', 'performed', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0807a3f4-4b81-3a95-ba23-1e2a2be77bb3', 'P14i a exécuté', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('68e29cde-ffe6-3922-85ce-8c7f147a79f2', 'a exécuté', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('170f9abc-e8eb-3405-89ea-3c4848d1a2d9', 'P14i executou', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4a4526a4-691c-3cf5-ae1e-1cf8e5242096', 'executou', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('055d5a4a-a57d-3b28-85ce-3a9a1b0da38d', 'P14i 执行了', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4084022a-b82b-33c7-b382-570a8b23e6a4', '执行了', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('b47c57eb-cb7f-3f37-9b24-9ae0f2617302', 'P15 wurde beeinflußt durch', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('e0c58f5a-8323-3888-af78-90e5f3e817d7', 'wurde beeinflußt durch', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('bf209447-ba65-399d-841a-a98c3601293b', 'P15 a été influencée par', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'fr', 'prefLabel');
@@ -1997,6 +2297,20 @@ INSERT INTO "values" VALUES ('be9d4b58-ec05-31ea-b13e-9e59a42226be', '有影响�
 INSERT INTO "values" VALUES ('922a40e4-6226-3e2f-843d-d5e276d4451c', 'This is a high level property, which captures the relationship between an E7 Activity and anything that may have had some bearing upon it.
 The property has more specific sub properties.
 ', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('f1c50f60-3c0f-3094-a93d-daa35374983a', 'P15i оказал влияние на', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('0158ed0b-b569-3c02-8a37-8e301e12f414', 'оказал влияние на', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('cc58a18b-0db7-35b3-9121-d6db3bcdd619', 'P15i επηρέασε', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f9811204-fb32-3558-96b4-0125d903922c', 'επηρέασε', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7f508ea0-cc34-3696-b7ad-5dc63f49176b', 'P15i a influencé', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('090e26df-ddd8-3100-a9c7-ec178e0a47f1', 'a influencé', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('90df7197-2624-39da-850d-0faafd8add8f', 'P15i beeinflußte', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('7c993697-de46-3743-aca3-b1f95ef08af5', 'beeinflußte', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('302d1bef-5389-3929-88ab-37b9fad9c499', 'P15i influenced', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('a23524a3-0e60-3881-877d-481d55ccb6fc', 'influenced', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('f97d5afa-9a52-3935-9655-2ba3b838ba3f', 'P15i influenciou', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('cb78aede-10e6-3e98-a027-4e8a5550ccfc', 'influenciou', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('f9c80248-da00-3d69-a9b5-06868c1b5fcc', 'P15i 影响了', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('d4db51c0-c81e-3fce-8705-74b4c9b4f11c', '影响了', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('d74b4ffe-6450-37ff-8632-adb4261e5149', 'P16 a utilisé l''objet spécifique', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('e4d2f805-bb9d-3786-9496-98ecd9ff54ea', 'a utilisé l''objet spécifique', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('cb337acf-18a2-3f20-90c0-d390f165da24', 'P16 χρησιμοποίησε αντικείμενο', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'el', 'prefLabel');
@@ -2011,10 +2325,30 @@ INSERT INTO "values" VALUES ('4cbdbef0-e737-3fa2-8a7b-e1067dd41f2d', 'P16 usou o
 INSERT INTO "values" VALUES ('bfc436d0-59a9-3052-b312-857353397ba5', 'usou objeto específico', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('0080200d-f95d-3b76-ac81-c9fd8c824090', 'P16 使用特定物', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('1b9e0a5d-f5ae-3c26-a7e8-f27e06e3b40c', '使用特定物', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('28f90787-5372-3fdd-b256-bbe71a974294', 'P19i was made for', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('784212f2-3f38-3fe5-afb2-1e9084d0a909', 'was made for', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('23f0f8aa-f3fd-3943-b2b1-01b243217abe', 'P19i foi feito para', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('37a30c53-3e6b-3862-b65d-288dee23cbf0', 'foi feito para', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('175b5a0e-3bf8-3922-aa84-a1bcc2be871a', 'P19i 被制造来用於', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('999d95e1-ba1d-3b73-9837-96f8bdbe285b', '被制造来用於', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('81a44bd6-2874-3fe4-b9f2-4d7986113d7c', 'This property describes the use of material or immaterial things in a way essential to the performance or the outcome of an E7 Activity. 
 This property typically applies to tools, instruments, moulds, raw materials and items embedded in a product. It implies that the presence of the object in question was a necessary condition for the action. For example, the activity of writing this text required the use of a computer. An immaterial thing can be used if at least one of its carriers is present. For example, the software tools on a computer.
 Another example is the use of a particular name by a particular group of people over some span to identify a thing, such as a settlement. In this case, the physical carriers of this name are at least the people understanding its use.
 ', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a7362d70-3346-3fcd-b856-ed4fb5abeeb9', 'P16i a été utilisé pour', '526049ea-951e-39ba-87f9-749bea349fe5', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('6f613844-0dc8-3e71-a55e-b04f579f24e9', 'a été utilisé pour', '526049ea-951e-39ba-87f9-749bea349fe5', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('9cf3e544-56a5-3d31-be64-f25278319125', 'P16i wurde benutzt für', '526049ea-951e-39ba-87f9-749bea349fe5', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0811d570-7e3b-3160-8746-e757989a1c1b', 'wurde benutzt für', '526049ea-951e-39ba-87f9-749bea349fe5', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('aa4fdfb9-3649-3e0c-a508-bc9bc6a5b42b', 'P16i был использован для', '526049ea-951e-39ba-87f9-749bea349fe5', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('9f0cb8a2-e606-3ba0-b2a3-2042ec2466d0', 'был использован для', '526049ea-951e-39ba-87f9-749bea349fe5', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('de510f6f-2db0-3f0b-ae35-04f262dba6d2', 'P16i was used for', '526049ea-951e-39ba-87f9-749bea349fe5', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('4077a27e-ed00-3c54-865c-30a8396e4b96', 'was used for', '526049ea-951e-39ba-87f9-749bea349fe5', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('71c091e9-ef0c-3681-a436-c815f3765be6', 'P16i χρησιμοποιήθηκε για', '526049ea-951e-39ba-87f9-749bea349fe5', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('99fc0d16-d305-3786-a83a-a53770eb7cdd', 'χρησιμοποιήθηκε για', '526049ea-951e-39ba-87f9-749bea349fe5', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8cf24ada-87c1-366e-b502-efa46f88092e', 'P16i foi usado por', '526049ea-951e-39ba-87f9-749bea349fe5', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('5ac92ddb-190b-30c1-a333-9a0cff0457fe', 'foi usado por', '526049ea-951e-39ba-87f9-749bea349fe5', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('d3d08340-e3a5-3166-9479-4fdfde9e13fa', 'P16i 被用於', '526049ea-951e-39ba-87f9-749bea349fe5', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('592c823f-fb3b-3ce5-a44d-84dced902fd6', '被用於', '526049ea-951e-39ba-87f9-749bea349fe5', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6f9df05d-c021-39da-88d2-e73ad0dd0d3d', 'P17 был обусловлен посредством', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('42ce269d-2f18-3eec-ac69-1270d74674c0', 'был обусловлен посредством', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('0f2d70f4-504d-31b9-9c15-8bd9e50a8a73', 'P17 wurde angeregt durch', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'de', 'prefLabel');
@@ -2032,6 +2366,20 @@ INSERT INTO "values" VALUES ('a9bd9c86-5c62-362c-bd1f-e2ed7db9a14f', '有促动�
 INSERT INTO "values" VALUES ('2edd5b1e-2893-3c76-a9b2-25ba73bdbe63', 'This property describes an item or items that are regarded as a reason for carrying out the E7 Activity. 
 For example, the discovery of a large hoard of treasure may call for a celebration, an order from head quarters can start a military manoeuvre. 
 ', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('728ed64d-5b91-3c2e-b1df-d7e4258e7459', 'P17i ήταν αφορμή', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('6b79eeab-30ab-3657-a577-e14beb7fcc06', 'ήταν αφορμή', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('5f76183b-9934-3752-8a02-960a5110ce02', 'P17i motivated', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3b224b86-66cc-3f3d-9793-e1252d93e4b7', 'motivated', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('eb2792e8-2b00-3095-8de8-8d8538ca69f2', 'P17i regte an', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('49606e80-fef2-35bb-abfe-05104c24cb68', 'regte an', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('dd867953-43fc-37ae-8ff0-0b42e72cb8f3', 'P17i обусловил', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('e9ca7fae-65e9-3849-b732-c1fa11a68c3f', 'обусловил', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('f9362b34-a118-38b7-bece-5cd827522ecd', 'P17i a motivé', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('65d5a306-250d-316e-accf-76b77bc4c1a3', 'a motivé', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f98ee9ec-8e6f-3945-bafe-fdabb881ee9d', 'P17i motivou', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4d90cc8c-2d0e-3a9e-80cf-a258b63692b2', 'motivou', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('d388cb2f-962f-3487-86fe-89a4c5636629', 'P17i 促动了', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('99792966-27ca-3ab0-8b82-afe34819531c', '促动了', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a1bb6c81-c57d-39b7-a7aa-bbae189c586b', 'P19 был предполагаемым использованием для', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('0c532ab8-cdd3-391d-92ba-2af3b8ca01dd', 'был предполагаемым использованием для', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('f8cbda12-99d5-3be4-ad09-4545c2b763b4', 'P19 était l''utilisation prévue de', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'fr', 'prefLabel');
@@ -2048,6 +2396,14 @@ INSERT INTO "values" VALUES ('9b6a613e-d5ef-3e6a-9b79-81cf4d8d57ca', 'P19 特别
 INSERT INTO "values" VALUES ('3dec2b78-abda-3f57-8afa-4ac3c24deba3', '特别使用了', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('cf026136-ec23-30af-ad1e-303fdaf03bc2', 'This property relates an E7 Activity with objects created specifically for use in the activity. 
 This is distinct from the intended use of an item in some general type of activity such as the book of common prayer which was intended for use in Church of England services (see P101 had as general use (was use of)).', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('22f7552e-a5a0-3e64-b85f-2d29850c5367', 'P19i a été fabriquée pour', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ee997255-c8a7-3e2e-bf00-54ceb68db868', 'a été fabriquée pour', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ae5223cf-e50f-3fd3-b525-720838da9be2', 'P19i έγινε για', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('b0f59f68-0b36-38d9-a5bd-4409badd80cd', 'έγινε για', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('88edd977-4e82-30cc-ba91-2abf61dbe404', 'P19i был создан для', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4332507e-27d1-3352-8510-697dbff13c49', 'был создан для', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('16a17ffb-0267-3e86-b107-afb4e5192758', 'P19i wurde hergestellt für', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('32a87fc4-4dc8-3a1f-ae13-49158f4e0168', 'wurde hergestellt für', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('e25457b2-6c66-38ea-8a10-b751964ffcd7', 'P20 hatte den bestimmten Zweck', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('ea1c2ccd-be72-3dd7-be60-91322b6e68d0', 'hatte den bestimmten Zweck', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('acb1fbb1-7f47-30db-b66c-305d0c4a4f0d', 'P20 avait pour but spécifique', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'fr', 'prefLabel');
@@ -2065,6 +2421,20 @@ INSERT INTO "values" VALUES ('b0a8c8de-55f4-384e-b5b3-acab6dc1f849', '有特定�
 INSERT INTO "values" VALUES ('767543b0-a809-32c6-935d-7e54aae1b9e8', 'This property identifies the relationship between a preparatory activity and the event it is intended to be preparation for.
 This includes activities, orders and other organisational actions, taken in preparation for other activities or events. 
 P20 had specific purpose (was purpose of) implies that an activity succeeded in achieving its aim. If it does not succeed, such as the setting of a trap that did not catch anything, one may document the unrealized intention using P21 had general purpose (was purpose of):E55 Type and/or  P33 used specific technique (was used by): E29 Design or Procedure.', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('db958e19-37cf-3cf8-a388-dbefc4d071f1', 'P20i war Zweck von', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e01ac4dc-b5cd-3c0e-8d01-bc197b57aa15', 'war Zweck von', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('23905474-fccc-34f2-b905-2653bd261cf3', 'P20i был целью для', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('eab68ec3-0f14-386e-a167-2b354daba36e', 'был целью для', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('6e6cf1f3-1673-3f84-8fd4-76b0ac23a96c', 'P20i ήταν σκοπός του/της', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7823dd76-cc9c-3f35-ab0c-a7ef982b25c0', 'ήταν σκοπός του/της', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('73b7841d-0137-3a0e-a360-ff73efa01800', 'P20i était le but de', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8d6f3c51-8dae-3a3d-aeab-b1676928a0fe', 'était le but de', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('8b81263e-dbe7-3d90-8c1f-f467488afd8e', 'P20i was purpose of', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3b996e60-25d8-37d5-80d2-23bed741873d', 'was purpose of', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('4510de23-9fba-3cbd-9626-c3b731857891', 'P20i era o propósito de', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b4df7dc6-fc43-34c4-bd6e-a38e836a95a8', 'era o propósito de', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('a724f69f-636c-3747-85ce-7b9ee22471c0', 'P20i 之準備活動是', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7b467073-b640-357a-877d-945bcd65f1a7', '之準備活動是', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5ed69fdb-8fe8-3f9f-8776-21165f278324', 'P21 είχε γενικό σκοπό', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('ab63044f-5c41-3e8f-b33b-02d8d6689f93', 'είχε γενικό σκοπό', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('abd8c33c-0a6c-3ea4-84d4-da29c645b22a', 'P21 hatte den allgemeinen Zweck', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'de', 'prefLabel');
@@ -2082,6 +2452,20 @@ INSERT INTO "values" VALUES ('2cf0896e-caab-30b3-9037-1f25c58b4fe8', '有通用�
 INSERT INTO "values" VALUES ('f04d73b3-f469-307c-b5a0-b32871c94e18', 'This property describes an intentional relationship between an E7 Activity and some general goal or purpose. 
 This may involve activities intended as preparation for some type of activity or event. P21had general purpose (was purpose of) differs from P20 had specific purpose (was purpose of) in that no occurrence of an event is implied as the purpose. 
 ', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('5e2cae07-af4a-3777-8724-886310dc7163', 'P21i был целью для', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('964e6a4d-f0ec-360e-94ae-cd9f8b4840e0', 'был целью для', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('6294e664-6bd4-3e29-a8f6-947ad0a3e757', 'P21i était le but de', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('80599ef1-3118-39f0-8e29-facdb0992150', 'était le but de', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('35bd756b-6873-3a75-806a-fb79bf82954d', 'P21i ήταν σκοπός του/της', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('71794245-fd55-35c1-8749-952bf9d18b80', 'ήταν σκοπός του/της', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('740123e3-4d4d-36a5-bf2e-bd22dcbc6eee', 'P21i war Zweck von', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('d7ae627f-585b-3fc7-9307-39e098216a30', 'war Zweck von', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('64f7c2d5-db18-35fe-b7e0-406a8807733c', 'P21i was purpose of', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('04f8836d-b3a4-33a9-aa50-9b2806f2257a', 'was purpose of', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('09f80700-dabd-3bc1-8d5f-bf531e5683eb', 'P21i era o propósito de', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('bc88523a-26dd-3db6-aa2f-18de12f820c3', 'era o propósito de', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('97f74f99-3098-3a64-b800-6b4697928195', 'P21i 可利用', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4ad9add5-8b79-3d6b-9262-3bd55d96a0e9', '可利用', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('1ff75133-3c35-32c7-9a8e-b2257eb047c4', 'P22 μετεβίβασε τον τίτλο σε', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('cd75d8d7-64d3-3ff0-a27c-cde9fe9124e6', 'μετεβίβασε τον τίτλο σε', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('db6d5ac2-a653-32cf-ada8-09cc9cb7b261', 'P22 a fait passer le droit de propriété à', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'fr', 'prefLabel');
@@ -2100,6 +2484,20 @@ INSERT INTO "values" VALUES ('9f112c50-60e3-37bc-a821-34b5bc80e48a', 'This prope
 The property will typically describe an Actor purchasing or otherwise acquiring an object from another Actor. However, title may also be acquired, without any corresponding loss of title by another Actor, through legal fieldwork such as hunting, shooting or fishing.
 In reality the title is either transferred to or from someone, or both.
 ', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3e785d7c-4517-3521-8e84-2aec69324c44', 'P22i απέκτησε τον τίτλο μέσω', 'b246f449-73f0-36f1-930e-7055a99805bb', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('40a4539c-ecfc-3698-8bd8-04630092390d', 'απέκτησε τον τίτλο μέσω', 'b246f449-73f0-36f1-930e-7055a99805bb', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ae591c88-d099-35b1-b9fe-29489bec5db8', 'P22i acquired title through', 'b246f449-73f0-36f1-930e-7055a99805bb', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('63405a63-8c8c-3148-8d82-07a7b51d805f', 'acquired title through', 'b246f449-73f0-36f1-930e-7055a99805bb', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2682bb6b-afdf-3509-b139-f92520f81054', 'P22i erwarb Besitztitel durch', 'b246f449-73f0-36f1-930e-7055a99805bb', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('d7b36d02-c339-3aab-bff2-c06615af85f8', 'erwarb Besitztitel durch', 'b246f449-73f0-36f1-930e-7055a99805bb', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('be736cc6-7c63-3965-88c2-9a4a7d1dd0aa', 'P22i a acquis le droit de propriété du fait de', 'b246f449-73f0-36f1-930e-7055a99805bb', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('4c72be4c-931f-3959-a600-c1c0c55cc10a', 'a acquis le droit de propriété du fait de', 'b246f449-73f0-36f1-930e-7055a99805bb', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('25d3b74c-d5b9-3128-87c7-7acfc1a47a07', 'P22i получил право собственности через', 'b246f449-73f0-36f1-930e-7055a99805bb', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('44f884c0-ff7c-385e-ab09-461275e8cd49', 'получил право собственности через', 'b246f449-73f0-36f1-930e-7055a99805bb', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('3af4b407-9fb9-3a16-ba7b-e2e5159736ae', 'P22i adquiriu os direitos de propriedade por meio da', 'b246f449-73f0-36f1-930e-7055a99805bb', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('0dcb6ce7-e0f6-318f-b882-f56787e53f0c', 'adquiriu os direitos de propriedade por meio da', 'b246f449-73f0-36f1-930e-7055a99805bb', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('1f824dbd-7428-399f-864c-a9b18c4ec465', 'P22i 获取所有权於', 'b246f449-73f0-36f1-930e-7055a99805bb', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('47ccd63d-78bb-3ab5-83ea-0a7d506fa74d', '获取所有权於', 'b246f449-73f0-36f1-930e-7055a99805bb', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('13aad2bf-2727-35e7-9747-b1c17f5738d1', 'P23 μετεβίβασε τον τίτλο από', '345681a7-8324-331c-94d4-1777c36538b5', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('1ac41846-f2e6-3986-9c29-16493991c2ab', 'μετεβίβασε τον τίτλο από', '345681a7-8324-331c-94d4-1777c36538b5', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('3f164142-7085-336a-b6a0-b8df13dee82e', 'P23 a fait passer le droit de propriété de', '345681a7-8324-331c-94d4-1777c36538b5', 'fr', 'prefLabel');
@@ -2117,6 +2515,20 @@ INSERT INTO "values" VALUES ('0daf0aac-ad87-329c-800a-110f9098feab', '原所有�
 INSERT INTO "values" VALUES ('bbb0e987-de06-34ac-bc08-22dd7c8ec561', 'This property identifies the E39 Actor or Actors who relinquish legal ownership as the result of an E8 Acquisition.
 The property will typically be used to describe a person donating or selling an object to a museum. In reality title is either transferred to or from someone, or both.
 ', '345681a7-8324-331c-94d4-1777c36538b5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('46a1b1fd-3268-376c-a362-b5063e6ce53d', 'P23i a perdu le droit de propriété du fait de', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('97283a33-69bd-3e0c-9f87-6479dc5a1850', 'a perdu le droit de propriété du fait de', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('c3718008-85f4-3fda-bf15-1b8c21697f85', 'P23i trat Besitztitel ab in', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('797cfaf5-9940-3f9b-a4b5-e6c0f96e17b1', 'trat Besitztitel ab in', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b791fc01-8c0a-3caa-bca7-ab3516add38c', 'P23i право собственности отдано через', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('7c90564d-99e7-3237-b87b-b44bc1e37bff', 'право собственности отдано через', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('923dad47-9248-3658-93d8-c62527506117', 'P23i surrendered title through', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('33859f71-c7f2-35aa-b4c0-583161c60591', 'surrendered title through', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ed73cc1b-d397-3583-8ceb-55f0e62e07c5', 'P23i παρέδωσε τον τίτλο μέσω', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('045c72c9-7cf0-3941-9df2-052d9566e38b', 'παρέδωσε τον τίτλο μέσω', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('d207c404-3fc9-3b7e-b0a3-1f7598582fcc', 'P23i perdeu os direitos de propriedade por meio da', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('59e0a200-89c5-3252-b544-59f794487cb6', 'perdeu os direitos de propriedade por meio da', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('9a2b509d-8ee8-3cc7-8247-c4c1957b0ed9', 'P23i 交出所有权於', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4e99f8b5-4c3f-3176-9ff9-f253de065906', '交出所有权於', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('0ff1887c-ff24-38fa-9a18-ff0c8cefa9f4', 'P24 übertrug Besitz über', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('65f5dc50-9d9e-3263-9326-99ebc5c6815d', 'übertrug Besitz über', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('bbdea559-28bf-3f35-8093-1de6e144eb8b', 'P24 передал право собственности на', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'ru', 'prefLabel');
@@ -2134,6 +2546,21 @@ INSERT INTO "values" VALUES ('14a9f636-7dd9-3377-b473-da4d634bf604', '转移所�
 INSERT INTO "values" VALUES ('6cc8d08f-22a8-3988-8701-539329ddbdf9', 'This property identifies the E18 Physical Thing or things involved in an E8 Acquisition. 
 In reality, an acquisition must refer to at least one transferred item.
 ', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('6389913d-aae1-3dbf-9309-859981ef9a93', 'P24i сменил владельца через', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('8f5b0e11-2133-3ac2-a66a-b76c9895bad4', 'P27 moved from', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d45c1d29-d9a6-3fee-8d46-babf64ff2962', 'сменил владельца через', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('981c3739-df7a-3742-9b35-36f0e31139e0', 'P24i changed ownership through', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('24ee2a53-4ffc-3422-8864-9bd08b0aa935', 'changed ownership through', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('13543f67-d3bf-32d1-ae97-e49069fc97dc', 'P24i ging über in Besitz durch', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('bfe8b44a-99dc-32df-a82c-5ff8960f3f52', 'ging über in Besitz durch', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('62e3d8a6-291a-3ddd-a4ff-fadc1e3a7f1e', 'P24i άλλαξε ιδιοκτησία μέσω', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('059cefa4-27bf-3737-9c80-9a9d9d8f650b', 'άλλαξε ιδιοκτησία μέσω', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c38d4ca9-bd93-36a8-9965-f1986f4ad803', 'P24i a changé de mains du fait de', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('396ef7bf-f70f-3155-b82b-75d702cd2572', 'a changé de mains du fait de', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('8143b491-c7ae-349d-8e9c-23956d06d45e', 'P24i mudou de proprietário por meio de', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4eca1695-6fd7-305c-a9ac-4d88471bd7cb', 'mudou de proprietário por meio de', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e69585c8-6cb7-3b28-8160-04bd39eb256f', 'P24i 转移了所有权於', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ca203451-d3da-33a5-b00c-de6da6dd04fd', '转移了所有权於', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8a94ded4-737a-34e5-8d13-50d1af3abf22', 'P25 moved', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('59a81cd3-de78-3681-a6b0-c8acdd9f9059', 'moved', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('474f0f22-c0fa-3808-b75a-9e361d0dca9f', 'P25 μετεκίνησε', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'el', 'prefLabel');
@@ -2152,6 +2579,20 @@ INSERT INTO "values" VALUES ('9925c1b2-2781-3888-85b7-2330f0b1c31f', 'This prope
 
 The property implies the object''s passive participation. For example, Monet''s painting "Impression sunrise" was moved for the first Impressionist exhibition in 1874. 
 ', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d2945bae-2f76-35e7-b78d-a7cf90c1b50f', 'P25i перемещен посредством', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('051c4ba4-da64-326e-822f-1912e456228f', 'перемещен посредством', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8248be54-3ace-384f-853a-d7089df481cc', 'P25i moved by', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('93d997ce-61ab-3cad-9dd6-053651feedeb', 'moved by', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('eb7aaa9d-41f1-3aa1-8560-d32e8f516a6c', 'P25i μετακινήθηκε από', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('48013ddb-86da-375a-9f95-cc0daefb51cc', 'μετακινήθηκε από', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('b930e61a-d39a-317b-ae1d-75fe40729ce4', 'P25i a été déplacé par', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('13af5145-2a4c-362f-b5e2-a474b5d01fd1', 'a été déplacé par', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d04f3eaa-adb6-39d2-97fc-08f34b4c693a', 'P25i wurde bewegt durch', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('19333fe3-e89c-3428-8f12-56e5e76421ec', 'wurde bewegt durch', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('540bab84-d1bd-3a70-9774-7dcceeb2f1ea', 'P25i foi locomovido por', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('31a403ba-cc68-35e2-adb7-5eb2ca45bf83', 'foi locomovido por', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('1cb1c12a-41ae-3ab4-94f0-06e43438d6e8', 'P25i 被移动於', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('90c676fb-adcb-39c0-86d8-f0aa850a6d5d', '被移动於', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f729313f-93a1-331e-a650-ab2bace3b792', 'P26 μετακινήθηκε προς', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('5a2eb785-27cc-3f76-a92b-2890622dc2f5', 'μετακινήθηκε προς', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('c88787bd-c50a-3a26-bb50-1c2dbcb3eb08', 'P26 moved to', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'en', 'prefLabel');
@@ -2170,9 +2611,22 @@ INSERT INTO "values" VALUES ('52f77aed-a640-36ed-961a-f86a4f73d118', 'This prope
 A move will be linked to a destination, such as the move of an artefact from storage to display. A move may be linked to many terminal instances of E53 Place by multiple instances of this property. In this case the move describes a distribution of a set of objects. The area of the move includes the origin(s), route and destination(s).
 Therefore the described destination is an instance of E53 Place which P89 falls within (contains) the instance of E53 Place the move P7 took place at.
 ', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('be2b4509-cf7d-3b04-98f1-7aa76b1a8d13', 'P26i was destination of', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('b8b2a12d-ef17-3675-8ee2-6b945e68e602', 'was destination of', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('4e97b246-29b2-3629-8b00-30f706321977', 'P26i war Zielort von', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('8f783fab-40c7-31e9-913d-920916f7ba09', 'war Zielort von', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5fdb6bec-1455-3e69-8179-4b24f0b0429f', 'P26i ήταν προορισμός του/της', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7d27a54a-0b60-30b1-8fb7-820fd2ab51f8', 'ήταν προορισμός του/της', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('e06a610a-fc07-388b-bec4-ce2e0e9a1f68', 'P26i был пунктом назначения для', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('81cab61f-37d3-31b8-a998-7901a3021abd', 'был пунктом назначения для', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('7048b150-5469-3133-aa8e-5b5fcbc539db', 'P26i a été la destination de', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ac4f93b4-f53c-3c7c-8591-8f7a68d00d5f', 'a été la destination de', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ca447e84-c0fb-3a69-8386-35967a58cceb', 'P26i era destinação de', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('83243696-0ce0-3ba7-8b74-2c8770abbaaf', 'era destinação de', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('269b06f9-2549-3708-a231-85f25a871ed8', 'P26i 被作为移入地於', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('50d2fd04-f39c-3eeb-92f6-11a4776c35be', '被作为移入地於', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a7380710-82e8-3e5f-ad38-5f6e3577e990', 'P27 μετακινήθηκε από', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('73dec8c5-51ee-37b1-9382-db404a8dd00e', 'μετακινήθηκε από', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'el', 'altLabel');
-INSERT INTO "values" VALUES ('8f5b0e11-2133-3ac2-a66a-b76c9895bad4', 'P27 moved from', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('ecdf82c5-430e-3e0c-a1b7-fb41e25e0a3a', 'moved from', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('afa1f031-3a03-3c45-8c9f-f2d450207dad', 'P27 a retiré de', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('2166133f-7d70-39d4-90c3-5377f3f7ab37', 'a retiré de', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'fr', 'altLabel');
@@ -2189,6 +2643,20 @@ INSERT INTO "values" VALUES ('c639759e-fd80-3439-b50d-81530aae36ba', 'This prope
 A move will be linked to an origin, such as the move of an artefact from storage to display. A move may be linked to many starting instances of E53 Place by multiple instances of this property. In this case the move describes the picking up of a set of objects. The area of the move includes the origin(s), route and destination(s).
 Therefore the described origin is an instance of E53 Place which P89 falls within (contains) the instance of E53 Place the move P7 took place at.
 ', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('75fcebf5-5091-3964-b601-bce227718e3c', 'P27i was origin of', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('cc7a3b7b-c66d-3d85-b506-41ebbcc55159', 'was origin of', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('97c3561d-7a8c-3be7-9820-f44f60726500', 'P27i war Ausgangsort von', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('23caa252-8425-3058-97e3-321185c82028', 'war Ausgangsort von', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b1f3e952-1f91-3533-8fb2-a9b3b429021b', 'P27i был исходной точкой для', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('fb8bf2ff-3d75-3c59-a4a1-0a4ec03ebab0', 'был исходной точкой для', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a1576fa4-ef7b-3457-b36b-7f1089eab368', 'P27i a été l''origine de', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('3170b373-075e-3401-baf9-5342259f7a1e', 'a été l''origine de', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('8e646b0c-c859-37da-8a8f-ba7afca29fb3', 'P27i ήταν αφετηρία του/της', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('cc87c032-cb3f-3cec-895b-ad194cad59cc', 'ήταν αφετηρία του/της', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('64d7cad5-fbe9-35a5-a770-988156c65b85', 'P27i era origem de', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('2e8d1f50-ad9e-36ef-811d-29cc0316f71f', 'era origem de', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('aa7bfa23-90a4-3a7c-8cd0-ecf1d32133a9', 'P27i 被作为移出地於', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4ba02fe3-b1b6-3b17-9b8a-2ef0ac856886', '被作为移出地於', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6a3bc4dc-a402-3369-894e-fff062b5c256', 'P28 changement de détenteur au détriment de', 'aad29816-af79-36cf-919e-80980f7c41a3', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('fe28de61-8ffe-3ba5-a9ca-e2ff02ace460', 'changement de détenteur au détriment de', 'aad29816-af79-36cf-919e-80980f7c41a3', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('1c552b1e-342b-3d9c-9681-74f47aa5ef36', 'P28 übergab Gewahrsam an', 'aad29816-af79-36cf-919e-80980f7c41a3', 'de', 'prefLabel');
@@ -2207,6 +2675,20 @@ INSERT INTO "values" VALUES ('f80b488d-8a02-3f46-b2ec-3090f26ea457', 'This prope
 The property will typically describe an Actor surrendering custody of an object when it is handed over to someone else’s care. On occasion, physical custody may be surrendered involuntarily – through accident, loss or theft.
 In reality, custody is either transferred to someone or from someone, or both.
 ', 'aad29816-af79-36cf-919e-80980f7c41a3', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('18751367-26cd-3799-9147-647d3f2f3b01', 'P28i surrendered custody through', '53983b68-30b1-3818-b952-e04f6b5a038f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('31eddc40-9cf5-3e0e-90c7-9c3c7150d94b', 'surrendered custody through', '53983b68-30b1-3818-b952-e04f6b5a038f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('736c0ce3-6ada-3f40-9226-f07e88fde9d0', 'P28i опека отдана через', '53983b68-30b1-3818-b952-e04f6b5a038f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('2b623925-2de0-3517-98eb-441ea72221c6', 'опека отдана через', '53983b68-30b1-3818-b952-e04f6b5a038f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8bbc8f19-e888-3849-80a6-72f68f9cc1f7', 'P28i a cessé d’être détenteur à cause de', '53983b68-30b1-3818-b952-e04f6b5a038f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('9f3c55ab-8263-3c2a-b740-f82d5042e026', 'a cessé d’être détenteur à cause de', '53983b68-30b1-3818-b952-e04f6b5a038f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('118be16e-7e09-32a3-90c5-002610026b3e', 'P28i παρέδωσε κατοχή μέσω', '53983b68-30b1-3818-b952-e04f6b5a038f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('54a38b3c-bb03-3b21-8715-7c6e39b8294d', 'παρέδωσε κατοχή μέσω', '53983b68-30b1-3818-b952-e04f6b5a038f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('9ddc0da1-f869-3b97-b86e-46dca9cc8e62', 'P28i wurde Gewahrsam übergeben durch', '53983b68-30b1-3818-b952-e04f6b5a038f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('74d6b93d-ad30-3bf7-8997-381b9f9e3842', 'wurde Gewahrsam übergeben durch', '53983b68-30b1-3818-b952-e04f6b5a038f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('dd7989ac-2c84-3f20-84b0-410aaf52f5a8', 'P28i final da custódia por meio de', '53983b68-30b1-3818-b952-e04f6b5a038f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b7c1c6bd-80c6-3437-966b-e47dc9f15a1b', 'final da custódia por meio de', '53983b68-30b1-3818-b952-e04f6b5a038f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('f5b66c8a-0a98-3e1d-950e-761a44085b32', 'P28i 交出保管作业於', '53983b68-30b1-3818-b952-e04f6b5a038f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('34a8b883-1358-301b-9b7e-7bd37ad230cb', '交出保管作业於', '53983b68-30b1-3818-b952-e04f6b5a038f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('01e19168-2161-3dc6-9a84-b30c7227b14a', 'P29 μετεβίβασε κατοχή σε', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('bb2cc100-33c4-32db-bde6-954055fac27c', 'μετεβίβασε κατοχή σε', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('e9811341-5894-32de-aea2-b17bf1c653f4', 'P29 опека получена', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'ru', 'prefLabel');
@@ -2225,6 +2707,20 @@ INSERT INTO "values" VALUES ('445182a4-0164-38d9-a23e-7e4733e7bf4d', 'This prope
 The property will typically describe Actors receiving custody of an object when it is handed over from another Actor’s care. On occasion, physical custody may be received involuntarily or illegally – through accident, unsolicited donation, or theft.
 In reality, custody is either transferred to someone or from someone, or both.
 ', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('bec1f542-9598-35ff-a3e6-eb9b9006eb0d', 'P29i παρέλαβε κατοχή μέσω', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('98cdcf8c-1755-328f-9cfc-c02b8c936b42', 'παρέλαβε κατοχή μέσω', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('70eb802b-94e6-3fad-b6b4-9db34b963c2e', 'P29i received custody through', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('c345589f-4c54-3b20-978e-2f53e8418693', 'received custody through', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('5b619b6b-8144-3c58-b2e5-aa0da4ee8dde', 'P29i получил опеку через', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('d0eea36d-a025-3166-84fd-8070e7b569ff', 'получил опеку через', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('db65d5a2-8a28-3d3c-a975-4bb40b6df931', 'P29i est devenu détenteur grâce à', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('d9af80cd-3325-3a0b-88f9-4d70bf7a415d', 'est devenu détenteur grâce à', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a4db1b47-d6dd-3e9c-991a-4539cffd2781', 'P29i erhielt Gewahrsam durch', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('b66c65b6-4619-3b07-8b9e-cf5ee77bc9f4', 'erhielt Gewahrsam durch', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('1020ca17-a889-36d1-bf7c-494fd0ad16e7', 'P29i início da custódia por meio de', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('a2298d0c-d900-3de7-a180-b3796ea66a5c', 'início da custódia por meio de', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e8373b6a-33b5-3ab8-a024-e6530a4fee79', 'P29i 取得保管作业於', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('408e93b6-10e7-31d4-bec8-e434d5fe7398', '取得保管作业於', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('36ee6c7f-46a5-3b91-8e6a-b7df177c6518', 'P30 передало опеку на', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('4a58646d-6896-3456-a553-8fe13ef0a8d0', 'передало опеку на', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('861ea03f-e39d-37d0-80ca-cc946ab0ebd0', 'P30 transferred custody of', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'en', 'prefLabel');
@@ -2242,6 +2738,20 @@ INSERT INTO "values" VALUES ('6a6ee66e-1032-3e98-86cc-a3780c18feaa', '有保管�
 INSERT INTO "values" VALUES ('5ff7be30-9e0a-3088-b6a4-29a2c975d96f', 'This property identifies an item or items of E18 Physical Thing concerned in an E10 Transfer of Custody activity. 
 The property will typically describe the object that is handed over by an E39 Actor to another Actor’s custody. On occasion, physical custody may be transferred involuntarily or illegally – through accident, unsolicited donation, or theft.
 ', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('412b9c76-c1a0-340e-aa4b-ee2cb069e33d', 'P30i custody transferred through', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('db4cdd99-8b5c-3f7b-b7f7-25575d666d03', 'custody transferred through', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0c440808-5c78-3925-8d81-408b8b8ee4a6', 'P30i άλλαξε κατοχή μέσω', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('9253c022-c057-3b27-af17-5f0bbae27c66', 'άλλαξε κατοχή μέσω', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('a4126355-0c03-3b3a-993a-9dbaa1dd72da', 'P30i a changé de détenteur du fait de', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('33844158-8441-3290-8d9e-6572c93fd412', 'a changé de détenteur du fait de', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('30e49727-c028-33c4-9271-25778b45aa6d', 'P30i wechselte Gewahrsam durch', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('82cac49e-0eca-3419-a057-d91865007a6c', 'wechselte Gewahrsam durch', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('29c3e3a0-f1c3-3fd6-a831-febc542502b4', 'P30i опека передана через', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('cd5c7676-b332-331c-98bf-c21e47c239e7', 'опека передана через', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8557267c-f55c-3d4d-8b3d-4fd4dc1d2f09', 'P30i custódia transferida por meio de', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('30698571-0ed6-351c-856f-87f6f210e3f1', 'custódia transferida por meio de', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('219f0629-ba88-3cbc-a963-923d08132614', 'P30i 被移转了保管作业於', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('3d66319b-eb2d-35a5-aaed-2182066aa6e0', '被移转了保管作业於', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('d9757901-b082-360d-b51a-119a5c380367', 'P31 veränderte', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('791ec07c-be84-3d38-9385-acc4a3b0dca2', 'veränderte', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('3284eb6f-3364-324d-924f-5fd247692d70', 'P31 a modifié', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'fr', 'prefLabel');
@@ -2259,6 +2769,20 @@ INSERT INTO "values" VALUES ('e6fb1f68-198b-3f93-81c3-5c13f265a82b', '修改了'
 INSERT INTO "values" VALUES ('72fedba5-7615-3299-a4e3-58cc950f7650', 'This property identifies the E24 Physical Man-Made Thing modified in an E11 Modification.
 If a modification is applied to a non-man-made object, it is regarded as an E22 Man-Made Object from that time onwards. 
 ', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8856cf8b-531e-3daa-8d34-9c4e9c1ea272', 'P31i a été modifié par', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('d42b3f3b-3fcd-3520-ad41-8cc395f74ab7', 'a été modifié par', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e81e7da5-0305-3ea6-b5cf-6bd55587ff0b', 'P31i wurde verändert durch', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('36319185-7041-37e6-8cf8-dba6f6af1e8c', 'wurde verändert durch', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('173ec937-c50b-3788-85a7-482ceb7538e1', 'P31i τροποποιήθηκε από', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('867c3b26-7634-34d8-8fa1-736c4ed3a204', 'τροποποιήθηκε από', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8b80f665-0da7-31fe-b0bb-0d368888f595', 'P31i был изменен посредством', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('41bec221-b3ee-3388-a55e-a55fbca1c379', 'был изменен посредством', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('7fbd636f-ea1f-3d36-a944-606fcce323cd', 'P31i was modified by', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('5d8d75f7-fb1b-33fe-9acc-5091632dd4d7', 'was modified by', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('61dcb52c-8556-322a-8d36-16451a7cce72', 'P31i foi modificada por', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b9e011d5-bb2e-30a3-a264-e1fad0b3bcd3', 'foi modificada por', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4bb85748-69de-38d2-836b-1a8a7c6fc78e', 'P31i 被修改於', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('0ef6d905-f176-3bef-90e0-06b28a3f4161', '被修改於', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6c23b25d-2d70-3ae1-a17e-8e75bde27cb3', 'P32 χρησιμοποίησε γενική τεχνική', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('e93cde79-9e80-3a39-b7fb-a692c6d0b140', 'χρησιμοποίησε γενική τεχνική', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('b6d106ee-b71b-3686-8da3-9d7fc3e4de4a', 'P32 benutzte das allgemeine Verfahren', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'de', 'prefLabel');
@@ -2276,6 +2800,20 @@ INSERT INTO "values" VALUES ('0ebdfe2b-84d0-3ff8-a0fd-612ddb3ce8a0', '使用通�
 INSERT INTO "values" VALUES ('f80df094-bfbb-33e6-b290-76688f174f4c', 'This property identifies the technique or method that was employed in an activity.
 These techniques should be drawn from an external E55 Type hierarchy of consistent terminology of general techniques or methods such as embroidery, oil-painting, carbon dating, etc. Specific documented techniques should be described as instances of E29 Design or Procedure. This property identifies the technique that was employed in an act of modification.
 ', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('9c231beb-51c4-34aa-85a0-15070cef8ced', 'P32i был техникой для', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c0aca11c-f1ff-39ce-9421-c0e9342245e0', 'был техникой для', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('d4037f45-2768-326c-8963-2351b0ccd440', 'P32i ήταν τεχνική του/της', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('62dc897b-e31b-31e8-9e52-1b87f7aa65a0', 'ήταν τεχνική του/της', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('f04b521b-9aed-3081-aec3-0a88e0d274ba', 'P32i war Verfahren von', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('a94f3292-d319-3a69-8548-0ecb20708878', 'war Verfahren von', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('4147ee2d-4379-35aa-90b0-2b4c079e252e', 'P32i was technique of', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('baacddd2-b831-3e0f-8155-6dd87739ae19', 'was technique of', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('58510fab-bef7-39fa-aa63-cfc82e2059ec', 'P32i a été la technique mise en œuvre dans', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('7a306784-be45-3559-89d8-b535a01622e3', 'a été la technique mise en œuvre dans', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('dc8fb9da-f332-3315-a239-63565499dffa', 'P32i foi técnica da', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('1b8372b7-a6f9-35b6-8f0e-c93ea70b2385', 'foi técnica da', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('02ace1b6-b320-39a8-bc71-652b43659d9e', 'P32i 被使用於', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('3eed8b6f-e9a4-33d2-b6a3-5ec887c65a67', '被使用於', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3c03d82f-137d-3128-8717-4f20c19553e6', 'P33 χρησιμοποίησε συγκεκριμένη τεχνική', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('c28822fb-d874-326b-86e1-50a4db8a3b72', 'χρησιμοποίησε συγκεκριμένη τεχνική', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('c71ab98f-b093-32fa-b130-cbaa8aec7d71', 'P33 used specific technique', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'en', 'prefLabel');
@@ -2294,6 +2832,20 @@ INSERT INTO "values" VALUES ('3f96cacd-0c2a-3fd9-b0c4-2aef53bb54ac', 'This prope
 The property differs from P32 used general technique (was technique of) in that P33 refers to an instance of E29 Design or Procedure, which is a concrete information object in its own right rather than simply being a term or a method known by tradition. 
 Typical examples would include intervention plans for conservation or the construction plans of a building.
 ', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8aa4e066-5f54-30e9-9b30-95fb3beaf7b5', 'P33i was used by', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('16666299-7483-3503-9807-a40cd5151015', 'was used by', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8aefb0d4-2e9d-3b31-b512-2af4584a7ca4', 'P33i a été employée par', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('b1d77aa0-7b1a-312a-a703-6ad2de366384', 'a été employée par', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('09f43a86-cf18-34ce-ac41-5550a1f03286', 'P33i был использован посредством', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('d097b087-0778-3bcd-9f8f-b1179ae33e2d', 'был использован посредством', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a174e10a-0a6d-3580-bcf2-64a07c9335c2', 'P33i wurde benutzt von', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('573f887e-4afb-3d3c-88b0-0f24f806baae', 'wurde benutzt von', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('747eac45-8fb9-3b58-8dc6-431b2a3cdb92', 'P33i χρησιμοποιήθηκε για', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d1c809fc-5c58-368e-83c7-f273a0a85f8d', 'χρησιμοποιήθηκε για', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('05122c9d-c56b-3d08-b521-ded48dd3f1f8', 'P33i foi usada por', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('3031adca-5af5-3028-9483-65735145b065', 'foi usada por', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('9944e035-e9c4-343e-a0ce-f7e377b11482', 'P33i 被特别使用於', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('54644145-917f-3d12-b8f2-c8311b0fa8ad', '被特别使用於', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('68534fa8-ccea-337a-b631-3d6f5224d255', 'P34 αφορούσε σε', 'd9f02df8-6676-371e-8114-1f37700639b5', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('f364e709-2cb0-3c00-beea-314537c7f319', 'αφορούσε σε', 'd9f02df8-6676-371e-8114-1f37700639b5', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('f3c7c05d-9c84-318d-8dcb-12855ac5bf6c', 'P34 имел дело с', 'd9f02df8-6676-371e-8114-1f37700639b5', 'ru', 'prefLabel');
@@ -2311,6 +2863,20 @@ INSERT INTO "values" VALUES ('a1d8bfb6-3d72-3da7-87e2-0e56b093e082', '评估了'
 INSERT INTO "values" VALUES ('a31a80a8-fe24-3637-85f0-f21fbe181bef', 'This property identifies the E18 Physical Thing that was assessed during an E14 Condition Assessment activity. 
 Conditions may be assessed either by direct observation or using recorded evidence. In the latter case the E18 Physical Thing does not need to be present or extant.
 ', 'd9f02df8-6676-371e-8114-1f37700639b5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a288ea27-f6e4-3406-a847-fb33925df8b1', 'P34i wurde beurteilt durch', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('4d80d8a9-2d90-3923-bbff-b8566fb52f52', 'wurde beurteilt durch', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('26c4c52a-18c2-3bf8-83cb-281ce94001cb', 'P34i εκτιμήθηκε από', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('93e1a729-82ad-3ed1-abe4-075c92b64e1e', 'εκτιμήθηκε από', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8c0297f0-b78e-353e-9c3a-e625d16869dc', 'P34i expertisé par le biais de', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('3893d183-e80b-3380-91f1-6ca2e1e19739', 'expertisé par le biais de', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('c04c6634-f49c-3739-8c4c-06695808e94c', 'P34i was assessed by', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('e450f6f9-d01f-37d9-8cf6-51dcb9ab7b40', 'was assessed by', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('de33ec71-a5c4-34db-9dcd-79c99f2b817b', 'P34i был оценен посредством', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('bdec78d7-7362-3ad1-a49a-7d0c7e26b70d', 'был оценен посредством', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('87861851-a4ac-34fa-a913-5674271fda6b', 'P34i foi avaliada por', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('d1b24c38-dfe8-38a9-ac0c-8c12aceb7a0b', 'foi avaliada por', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('9545393e-efc5-3300-8ca9-a9415b7917eb', 'P34i 被评估於', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('2fa0163a-a302-3e3d-8c3b-3aa8c4df1a94', '被评估於', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('b867861e-4641-35d9-8f95-998df9b552c1', 'P35 идентифицировал', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('5832b33d-97dd-3296-93da-d933224df352', 'идентифицировал', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('ef04b15b-0fa3-3552-99e2-1c9557e5e3d3', 'P35 hat identifiziert', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'de', 'prefLabel');
@@ -2326,6 +2892,20 @@ INSERT INTO "values" VALUES ('3d962a3b-c6cf-3e3a-acbb-76890906b0c3', 'identifico
 INSERT INTO "values" VALUES ('afcf5dd3-b049-3142-a185-8e54d3808ab0', 'P35 评估认定了', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('7b92ee57-e714-3f88-a087-eca1ce0251de', '评估认定了', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('eb732032-6c4c-3198-b779-2e83eac1ac38', 'This property identifies the E3 Condition State that was observed in an E14 Condition Assessment activity.', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d877472e-a435-39b8-bb33-e4c9fa197df6', 'P35i идентифицирован посредством', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('66617b3e-bcb8-3d7e-9eb9-88b85961ab78', 'идентифицирован посредством', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('1f84fd35-a643-3411-b82d-ffc33bfa79c5', 'P35i wurde identifiziert durch', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('26287299-94a4-3dd9-aa82-e48b4c2f2f81', 'wurde identifiziert durch', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('9f6192e8-0a60-3eba-b549-d78fa8e3abdd', 'P35i est identifié par', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('af99f809-e24f-39c7-832d-a866195f97a4', 'est identifié par', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f706c1ce-a3e2-367f-ae16-e3e01cbfcb2f', 'P35i έχει διαπιστωθεί από', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7a32ee8d-fdaf-33c8-a99c-12b4d86f39fc', 'έχει διαπιστωθεί από', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('6a4f07f1-bfa5-3a77-999c-2b396606c2ab', 'P35i was identified by', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6ceb6993-ab50-3c30-a0b1-bc35834fe459', 'was identified by', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('f6cc628d-324c-3159-9cb8-5b37da7cd7aa', 'P35i foi identificado por', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('426765d9-684c-36a0-867a-596d5fea005c', 'foi identificado por', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('5c91514c-0e75-3067-890e-25a4c93dd877', 'P35i 被评估认定於', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7ec9d0e6-64c2-3988-a5be-3671c20a0fd2', '被评估认定於', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('e4ffc8d2-2064-30c0-a391-61072201a4be', 'P37 a attribué', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('6e93303a-2624-3143-bf01-ec8ccab9c2e1', 'a attribué', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('4ff801e3-d0ec-33b7-aa4d-5590dd36f4ff', 'P37 απέδωσε', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'el', 'prefLabel');
@@ -2344,6 +2924,20 @@ INSERT INTO "values" VALUES ('4ff6d606-52aa-321a-a225-e982432f68e8', 'This prope
 The same identifier may be assigned on more than one occasion.
 An Identifier might be created prior to an assignment.
 ', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a11481f5-9eb4-316f-b0f5-2082b3382b1c', 'P37i wurde zugewiesen durch', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('bcb2d6ff-3749-3162-9bd8-1a0b4b4bad31', 'wurde zugewiesen durch', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e5e8a6fa-c8e0-300c-8b54-eef9c4a52e86', 'P37i αποδόθηκε ως ιδιότητα από', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('e86b7733-1004-3d1d-8716-7ab0a09bafc0', 'αποδόθηκε ως ιδιότητα από', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('d4446f80-486e-3d7c-85de-ff1851da2c7d', 'P37i was assigned by', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d160bc39-f537-3611-b93a-c4f768a81144', 'was assigned by', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8317ca26-e5eb-3c59-a3fd-841084188b1d', 'P37i был присвоен посредством', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('8da0bd9e-bcbb-391e-ac6c-e394eb11b92e', 'был присвоен посредством', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('70db5225-6c8f-3fda-a851-2a9bdf58d9d6', 'P37i a été attribuée par', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('34fdb85c-26aa-3c28-a34c-241b47f2b412', 'a été attribuée par', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('fb68b9ec-3a97-3446-b6b8-2574e3a6825e', 'P37i foi atribuído por', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b709273d-e037-330e-b4d4-0d290286495a', 'foi atribuído por', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e7ffae23-488c-3730-8ef2-7995091cb114', 'P37i 被指定为标识符於', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('b331869a-36e8-3ba8-9933-d2cdb35a5332', '被指定为标识符於', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4db11b9c-106e-360e-8cd8-a9868160f5b8', 'P38 ακύρωσε', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('1f609195-8052-3900-ac13-8d39c13d6b1e', 'ακύρωσε', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('7855733a-99a0-31c4-8da5-75c3f55bb6d7', 'P38 отменил назначение', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'ru', 'prefLabel');
@@ -2362,6 +2956,20 @@ INSERT INTO "values" VALUES ('6a1ca6f9-17e5-3423-b7b4-0427134ac1bc', 'This prope
 Deassignment of an identifier may be necessary when an item is taken out of an inventory, a new numbering system is introduced or items are merged or split up. 
 The same identifier may be deassigned on more than one occasion.
 ', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('f869fe21-99a3-3ed7-a0d0-e63973ae3ebb', 'P38i был отменен посредством', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('2c08fe9d-9c78-3556-9b2e-6e08b2514555', 'был отменен посредством', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b62798c3-b119-304f-9e8f-d20663a5275f', 'P38i a été désattribué par', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0c4219b4-5171-36cf-9d7c-13a4407a1426', 'a été désattribué par', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('6d75b65d-cc45-312d-8c7a-b072390edb8e', 'P38i wurde aufgehoben durch', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('702fc241-7d37-33ef-aefc-6cda5ab2085e', 'wurde aufgehoben durch', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('bbdeea94-94f9-3a9a-a5f9-277663a41752', 'P38i ακυρώθηκε από', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('83bdd69e-8aa3-3729-8f2f-71d20e6e36c3', 'ακυρώθηκε από', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('d17b8d14-8f24-3a0c-a929-9fd9d0017032', 'P38i was deassigned by', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('ef36355d-acc7-3ce1-a248-9e02bed8d181', 'was deassigned by', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('45b0b7ad-4096-3727-8c1e-c95c7cbfa7a9', 'P38i foi retirada a atribuição por', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('36daf764-e914-349b-99fc-eca0d782ce5e', 'foi retirada a atribuição por', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('c6a841ba-3a59-3fd0-ad95-6059d591384a', 'P38i 被取消标识符於', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('77a22e82-8564-37f9-9d41-f1deb04074f1', '被取消标识符於', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('cb51fb8c-c09c-30c2-83eb-2fafa3b1ff45', 'P39 a mesuré', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('5e314b70-c272-3056-b39f-8d6fafc42ac2', 'a mesuré', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('27d46877-cbd6-333e-b9bb-50469282f031', 'P39 vermaß', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'de', 'prefLabel');
@@ -2378,6 +2986,20 @@ INSERT INTO "values" VALUES ('7e5cdd49-d1a1-3440-ad39-78429c6833f6', 'P39 测量
 INSERT INTO "values" VALUES ('937acbb6-74d9-3157-8af8-c83078aaa1b6', '测量了', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4ffb02c2-8236-3715-bfdf-f4d393c31125', 'This property associates an instance of E16 Measurement with the instance of E1 CRM Entity to which it applied. An instance of E1 CRM Entity may be measured more than once. Material and immaterial things and processes may be measured, e.g. the number of words in a text, or the duration of an event.
 ', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('75199e03-47ef-33d2-83a5-e04c4e7228f9', 'P39i wurde vermessen durch', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c826a2b0-d881-3083-b8ab-613473e83018', 'wurde vermessen durch', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('6f778426-5a77-3154-a28e-39ae0f8f0f9f', 'P39i был измерен посредством', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('d6c8b081-0d33-3d5c-994b-2247e1ae4b4c', 'был измерен посредством', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('66b83cbc-d18b-32ac-a547-d5a94b701a03', 'P39i was measured by', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('676af010-87c3-352d-a765-edf57ef68182', 'was measured by', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('5e920d6d-3977-3f73-aa44-f4c59c49986d', 'P39i μετρήθηκε από', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('5073418b-55a5-35df-9331-3b60754034cc', 'μετρήθηκε από', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('e06e729f-61a1-3af8-83f9-cebadb4bad14', 'P39i a été mesuré par', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('bd0c6b0f-4fb2-304b-9a53-f248ebf639e4', 'a été mesuré par', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('65ffcb76-5f47-355f-8cbe-c340d1f5d500', 'P39i foi medida por', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('335633c4-7188-31b2-b361-99467b755a0f', 'foi medida por', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('d7202a42-fc39-3d45-a6f7-f1116b534524', 'P39i 被测量於', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('dac4b823-9228-3477-ada9-bcf317ef416f', '被测量於', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6b857d7f-7139-3ed8-9da1-f28f2195fbed', 'P40 observed dimension', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('eb47b170-1158-3378-97fb-b40c51201b10', 'observed dimension', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('69dd4b64-5748-38f1-9c39-5ad845d7645d', 'P40 παρατήρησε', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'el', 'prefLabel');
@@ -2397,6 +3019,20 @@ E54 Dimension can be any quantifiable aspect of E70 Thing. Weight, image colour 
 Dimensions may be determined either by direct observation or using recorded evidence. In the latter case the measured Thing does not need to be present or extant.
 Even though knowledge of the value of a dimension requires measurement, the dimension may be an object of discourse prior to, or even without, any measurement being made.
 ', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('9668b48a-053a-3f09-be0c-61d16b6effe2', 'P40i наблюдался в', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('096bb014-09f5-36e6-9ce5-af90aed659c8', 'наблюдался в', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('f4b362b3-1658-30ec-974d-595fee30faaa', 'P40i παρατηρήθηκε από', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7386594b-0839-307c-8ed5-eee9780f3ad4', 'παρατηρήθηκε από', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('9f784a3d-f8c6-3477-bc0b-63cec5f46253', 'P40i was observed in', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f7739737-156d-396f-95c8-eb3ea77ab393', 'was observed in', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('d8952997-38e8-3261-851d-0a607c180f65', 'P40i wurde beobachtet in', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f60be821-4dca-3f3e-967b-d38426d7fc3e', 'wurde beobachtet in', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e105dcd1-ef59-3570-8a30-ac936f533d91', 'P40i a été relevée au cours de', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('b7529f05-78e4-34b5-ae8b-a4408f75c965', 'a été relevée au cours de', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('2392fd8e-909e-32b9-b674-a63c823d16a8', 'P40i foi verificada durante', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f2fddf6c-3d88-3d2a-8269-023fcd48e321', 'foi verificada durante', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('ae471eae-0f82-3308-9cb8-85066a52da1b', 'P40i 被观察认定於', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5a8002ea-49c1-3c6d-85c9-3de4745c9079', '被观察认定於', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('781b9da3-7edb-3057-a756-3fc23b4b9753', 'P41 классифицировал', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('e86dc8da-0b1c-3612-a11c-df89403900c0', 'классифицировал', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('3c8e42ce-f8da-38a6-a77e-2375a0e95ad9', 'P41 classified', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'en', 'prefLabel');
@@ -2414,6 +3050,20 @@ INSERT INTO "values" VALUES ('6035204a-9331-3ffd-a041-425bd0c1e1c8', '分类了'
 INSERT INTO "values" VALUES ('57422f52-b52e-306c-a3a6-4fb8f0e80912', 'This property records the item to which a type was assigned in an E17 Type Assignment activity.
 Any instance of a CRM entity may be assigned a type through type assignment. Type assignment events allow a more detailed path from E1 CRM Entity through P41 classified (was classified), E17 Type Assignment, P42 assigned (was assigned by) to E55 Type for assigning types to objects compared to the shortcut offered by P2 has type (is type of).
 ', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('63888a4e-826b-30e2-b78f-eea2a1f10e67', 'P41i a été classifiée par le biais de', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('b71575e0-1671-34e9-98b0-2c96e8d8f20d', 'a été classifiée par le biais de', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('717a521f-c3f9-33e0-a001-0c92d81da326', 'P41i was classified by', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('680d42ba-deb3-3591-ab1c-c3ec2cf8366f', 'was classified by', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('74838985-798c-38b2-a535-94c9bbef6435', 'P41i был классифицирован посредством', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('44150781-8360-3340-b6eb-f4d548d39393', 'был классифицирован посредством', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8530864e-4767-3dad-be26-2ecd53d0a072', 'P41i χαρακτηρίσθηκε από', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('df698dba-6759-325f-8090-08e120246818', 'χαρακτηρίσθηκε από', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('3e60feb5-59c6-3047-9941-66adaf2c87d4', 'P41i wurde klassifiziert durch', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('8801ec6d-c9c0-3f1f-b213-f64d7ed8ebab', 'wurde klassifiziert durch', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('ac98c2ad-50d5-3db1-8861-c57757105e7d', 'P41i foi classificada por', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('82fdb5fb-a103-35ce-b957-58950fa50840', 'foi classificada por', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4c60c909-6876-3de2-852a-700bbce5ef19', 'P41i 被分类於', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('b4a1cf3e-aae3-3489-b91d-a91f7a509e1e', '被分类於', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8623350f-88a3-3f45-a177-907c3585f6fd', 'P42 απέδωσε ως ιδιότητα', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('be3f5e64-55fe-3e27-b14e-ecf3218b736f', 'απέδωσε ως ιδιότητα', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('25fc695d-c2bb-3590-9671-af24de4ecfd9', 'P42 assigned', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'en', 'prefLabel');
@@ -2433,6 +3083,20 @@ Type assignment events allow a more detailed path from E1 CRM Entity through P41
 For example, a fragment of an antique vessel could be assigned the type “attic red figured belly handled amphora” by expert A. The same fragment could be assigned the type “shoulder handled amphora” by expert B.
 A Type may be intellectually constructed independent from assigning an instance of it.
 ', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('79fe4f5c-a67f-3f4a-8d2f-4d0443e739cf', 'P42i был присвоен посредством', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('111a1407-cdf9-3026-a045-dad9dea8cea1', 'был присвоен посредством', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('d2beab07-44cb-3d8f-8d3f-17e909041f0e', 'P42i αποδόθηκε από', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('6034bc17-7c9f-3aba-9e56-3107ed980fac', 'αποδόθηκε από', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('890b2743-afb2-3380-a0f0-f99342fd287d', 'P42i was assigned by', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6b2e861d-4c43-36d2-9ee2-85c6f34eb55d', 'was assigned by', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('12dc3c28-f2da-32e8-aa79-1c2c920d6591', 'P42i wurde zugewiesen durch', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('22570790-bfb1-382c-aee0-3d895f723ca7', 'wurde zugewiesen durch', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b20a20ec-5382-31c1-ac93-49403d78ebdf', 'P42i a été attribué par', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('4f9146bd-25cb-3424-a2f0-c14daca29b26', 'a été attribué par', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a3c80b6f-abd4-362d-9d5d-7b3de40f2cd2', 'P42i foi atribuído por', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('fd1e1a56-f93c-3679-bb94-44b4fcd0cca2', 'foi atribuído por', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('7d6ae452-eff6-380e-a3b7-78c17e86641f', 'P42i 被指定类型於', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('613856cc-8e26-34d6-83fb-0dcf878d754f', '被指定类型於', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('1c21d7ef-9cc8-3319-bb0f-751d22618b86', 'P43 hat Dimension', '167c0167-35fd-3c57-b90e-20715fd2c200', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('59e2b383-bb10-3ac1-b67b-60705f0f1c12', 'hat Dimension', '167c0167-35fd-3c57-b90e-20715fd2c200', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('aebda5b7-ed5b-323a-9258-58c44b01804c', 'P43 a pour dimension', '167c0167-35fd-3c57-b90e-20715fd2c200', 'fr', 'prefLabel');
@@ -2451,6 +3115,20 @@ INSERT INTO "values" VALUES ('d7ad19b7-8067-3c5e-8fba-e85239f70eee', 'This prope
 It is a shortcut of the more fully developed path from E70 Thing through P39 measured (was measured by), E16 Measurement P40 observed dimension (was observed in) to E54 Dimension. It offers no information about how and when an E54 Dimension was established, nor by whom.
 An instance of E54 Dimension is specific to an instance of E70 Thing.
 ', '167c0167-35fd-3c57-b90e-20715fd2c200', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('1bb18413-9b8a-3ba2-92ea-6d0f057bf7b6', 'P43i ist Dimension von', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('890932cb-a810-3a69-ba62-9a18e82b8f57', 'ist Dimension von', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e8d381fb-a0cb-34a6-a757-3654b4e1d697', 'P43i is dimension of', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('325f5bb8-9c7c-3f11-a245-4daf092b6f24', 'is dimension of', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('d959eeed-f999-32b6-8837-aa7769858737', 'P43i является величиной для', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('823def95-52ed-3e41-abd6-0d787cbefded', 'является величиной для', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8c4b90a0-9bbe-35d9-9dee-df63c97cc0f0', 'P43i est dimension de', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('7c998ed6-218f-33c6-ad77-972380759df9', 'est dimension de', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('5d864f48-dbed-3776-8a0f-b7ad57e90b47', 'P43i είναι μέγεθος του', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f5aa2a83-57f5-38a6-8a45-863230e42e13', 'είναι μέγεθος του', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8df81617-5795-3d90-9fb9-63ee272ce8ac', 'P43i é dimensão de', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b83bc91d-01b9-3382-9508-d49813b0dce5', 'é dimensão de', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('aeaadea9-cb3f-3e77-98d3-4e21b7c145ee', 'P43i 估量的标的物是', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('05c76894-2f43-37b7-adc4-2cccd9f25ad8', '估量的标的物是', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ab72d7d8-63fe-312a-a886-857f6e03fd4c', 'P44 имеет условие', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('2d954163-7f6d-3083-a7eb-ebc725068347', 'имеет условие', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('92a47a8b-ce77-311e-9522-6212ce6c0ca1', 'P44 hat Zustand', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'de', 'prefLabel');
@@ -2469,6 +3147,20 @@ INSERT INTO "values" VALUES ('ee5061b8-0f6d-3890-b3c1-f46fd2e3d4a1', 'This prope
 It is a shortcut of the more fully developed path from E18 Physical Thing through P34 concerned (was assessed by), E14 Condition Assessment P35 has identified (was identified by) to E3 Condition State. It offers no information about how and when the E3 Condition State was established, nor by whom. 
 An instance of Condition State is specific to an instance of Physical Thing.
 ', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a98eef57-27e9-3486-905c-4dc87cb0cf6a', 'P44i ist Zustand von', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('29f22a41-9aa2-3ff6-bd59-331098d8d2a5', 'ist Zustand von', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('55cecaba-dd23-32e3-a49b-dc608ece0086', 'P44i état matériel de', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('a2df697f-726e-3c94-995e-d06a45991208', 'état matériel de', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('3a0e5d50-7ada-3ca3-afa3-a861d909fbb5', 'P44i είναι κατάσταση του', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('673377ce-a043-3e8d-a005-a009855ce238', 'είναι κατάσταση του', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('b24ffe98-bb44-38da-8cdd-8c82bd9f48ec', 'P44i является условием для', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c3a1c9a0-545d-3bef-986c-2d8d0378d484', 'является условием для', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e45d2ff6-06f8-365f-93f5-24dce014ee37', 'P44i is condition of', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('5312f5f7-c996-3057-92fd-b5a32d454ea4', 'is condition of', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('e707624d-7f7e-30b9-8328-e0a653492dd6', 'P44i estado material de', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b6c55f8e-dc07-3f7a-a5da-6822b6a7cbc0', 'estado material de', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('3a665aa7-6a49-3813-881b-6ee015e57318', 'P44i 描述的标的物是', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('246a90ea-10ce-3b55-aab9-98b283a7a463', '描述的标的物是', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('d3d03c78-b794-3a5b-800e-2e158c72252d', 'P45 consiste en', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('084e33c5-c8fc-3717-ae5e-1effd1d09904', 'consiste en', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('a75ac323-6ee6-31fc-ba7e-612a6b1d4e9c', 'P45 αποτελείται από', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'el', 'prefLabel');
@@ -2486,6 +3178,20 @@ INSERT INTO "values" VALUES ('21af7564-e774-3489-ae4e-92a34ceb94d9', '有构成�
 INSERT INTO "values" VALUES ('d7e1fe14-6962-36e0-9ac2-302e3041025c', 'This property identifies the instances of E57 Materials of which an instance of E18 Physical Thing is composed.
 All physical things consist of physical materials. P45 consists of (is incorporated in) allows the different Materials to be recorded. P45 consists of (is incorporated in) refers here to observed Material as opposed to the consumed raw material.
 A Material, such as a theoretical alloy, may not have any physical instances', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('fa4eaff5-5c09-37e2-ae44-d6b74cb375f0', 'P45i ist enthalten in', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('466bf53c-a27d-3330-81c5-61f7dab5949a', 'ist enthalten in', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b1400cfe-4dd2-3d67-b818-8420040e673b', 'P45i είναι ενσωματωμένος/η/ο σε', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('ff0b6b66-5bb7-349a-bad8-2b4d2342d2ed', 'είναι ενσωματωμένος/η/ο σε', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('2a86f8a5-8ed7-3790-b722-de1e1e1dae2a', 'P45i is incorporated in', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('9e8569a3-2863-335c-a449-fe4e53655f40', 'is incorporated in', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('6628af32-6592-33e6-90ac-2872cf339a56', 'P45i входит в состав', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('aa166fe6-44e7-37ac-8301-12711bd0f91c', 'входит в состав', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('25c63380-c7b5-3559-8ba5-841ac618232f', 'P45i est présent dans', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('08a5900c-6049-3fce-9f76-1a586b29c550', 'est présent dans', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('fa9e9983-3618-3365-89c2-04b72f7c83e3', 'P45i está presente em', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c12e01ea-f4f3-37a3-bfab-63b2ed474aa6', 'está presente em', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('2fcb825e-ed02-3e7b-b62f-00cf79fcbc22', 'P45i 被用来构成', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('8e0d4690-48e2-346f-9945-8d51283af968', '被用来构成', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6c648f70-fed9-3e12-b1aa-fd6ce7474786', 'P46 is composed of', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('162340fc-248a-3bec-a107-c30c5c57cbe1', 'is composed of', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('9e8da40b-88b2-3678-8686-baab1a0afe6d', 'P46 est composée de', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'fr', 'prefLabel');
@@ -2508,6 +3214,20 @@ This property is intended to describe specific components that are individually 
 
 The instances of E57 Material of which an item of E18 Physical Thing is composed should be documented using P45 consists of (is incorporated in).
 ', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('73118740-228d-3b7b-9ddf-c285b6e8a31b', 'P46i формирует часть', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('23e5bdc2-a2fe-3f5e-8a14-8f25e5bfb2c8', 'формирует часть', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('55eba61d-4f8a-366d-882f-addc61981c12', 'P46i fait partie de', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0463611a-f68c-373a-9514-78e9c38c91b5', 'fait partie de', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('409b849c-449e-3106-a382-d3ac187fced2', 'P46i αποτελεί μέρος του/της', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('1c3ac24d-3758-3404-8a7f-577d63a2ad0a', 'αποτελεί μέρος του/της', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8ca92fba-d326-3c7c-aecb-5556fb85a97b', 'P46i bildet Teil von', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('108fc770-1739-30d6-b339-f7d99b838d27', 'bildet Teil von', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('8ad62898-423a-39dc-86aa-028d4b90f890', 'P46i forms part of', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('cd41efb0-a1cf-3661-8aaf-ecd7825b20eb', 'forms part of', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('75a94856-ca00-322a-a5ca-a5aab6fec2fd', 'P46i faz parte de', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('ad31da9d-0df1-32f4-9cf7-92a4a1244655', 'faz parte de', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('2cd4bca7-b3b9-32e7-b142-c0c4a7ddf822', 'P46i 被用来组成', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4e19c399-f8c0-3f81-9d9c-9e0f4d0b27bc', '被用来组成', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6207a0e5-7746-3a60-b8ee-1feb2da5596f', 'P48 has preferred identifier', '356c8ba7-0114-32c3-861f-8432bc46e963', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('6704778c-6fd9-3032-baa2-b32ce82a7623', 'has preferred identifier', '356c8ba7-0114-32c3-861f-8432bc46e963', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c1e2b3f7-5396-3f32-ab59-7fd3b6ad3fe4', 'P48 a pour identificateur retenu', '356c8ba7-0114-32c3-861f-8432bc46e963', 'fr', 'prefLabel');
@@ -2527,6 +3247,20 @@ More than one preferred identifier may have been assigned to an item over time.
 Use of this property requires an external mechanism for assigning temporal validity to the respective CRM instance.
 P48 has preferred identifier (is preferred identifier of), is a shortcut for the path from E1 CRM Entity through P140 assigned attribute to (was attributed by), E15 Identifier Assignment, P37 assigned (was assigned by) to E42 Identifier. The fact that an identifier is a preferred one for an organisation can be better expressed in a context independent form by assigning a suitable E55 Type to the respective instance of E15 Identifier Assignment using the P2 has type property.
 ', '356c8ba7-0114-32c3-861f-8432bc46e963', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('460a5e1e-a07d-30a0-95f4-27c58c7f47dc', 'P48i is preferred identifier of', '63221473-4f24-3feb-a536-acb76f2f1b94', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('8a9db152-c819-30cf-86f8-e324741cffd3', 'is preferred identifier of', '63221473-4f24-3feb-a536-acb76f2f1b94', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ce901c92-70c2-384e-8f9f-c7ff117db130', 'P48i является предпочтительным идентификатором для', '63221473-4f24-3feb-a536-acb76f2f1b94', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('1cd33fa2-0fa9-3441-a0d1-a079173afb2e', 'является предпочтительным идентификатором для', '63221473-4f24-3feb-a536-acb76f2f1b94', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('752e7997-856a-3675-8b97-08511f7c242a', 'P48i ist bevorzugtes Kennzeichen für', '63221473-4f24-3feb-a536-acb76f2f1b94', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('51112806-87ac-3692-abef-3097b8162309', 'ist bevorzugtes Kennzeichen für', '63221473-4f24-3feb-a536-acb76f2f1b94', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('64a94ac2-d4b8-337c-bb4f-2f68e539f661', 'P48i είναι προτιμώμενο αναγνωριστικό', '63221473-4f24-3feb-a536-acb76f2f1b94', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('8dffa050-cf78-3c67-9011-32ddb9d44f3d', 'είναι προτιμώμενο αναγνωριστικό', '63221473-4f24-3feb-a536-acb76f2f1b94', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('b7216cc0-36e2-3f66-8cf3-f7cd4ac2afcb', 'P48i est l’identificateur retenu de', '63221473-4f24-3feb-a536-acb76f2f1b94', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('527006b4-ae69-35a1-822c-2a6520f262ed', 'est l’identificateur retenu de', '63221473-4f24-3feb-a536-acb76f2f1b94', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('6900ac9b-e5e3-3c46-8bd9-44d7cb61a5c1', 'P48i é o identificador preferido de', '63221473-4f24-3feb-a536-acb76f2f1b94', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('15eb6f7d-0080-3fd6-bbc2-3bae35d3a661', 'é o identificador preferido de', '63221473-4f24-3feb-a536-acb76f2f1b94', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('47335561-ef92-3497-9670-85daee90ea1b', 'P48i 首选标识符的标的物是', '63221473-4f24-3feb-a536-acb76f2f1b94', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1fcf8c80-12db-3629-84bd-76b254a61191', '首选标识符的标的物是', '63221473-4f24-3feb-a536-acb76f2f1b94', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('cbf0691e-c2ec-302c-a23b-0cb9b59c07fb', 'P49 имеет бывшего или текущего смотрителя', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('fb494756-d953-34f0-ab5d-82769e3def0e', 'имеет бывшего или текущего смотрителя', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('a758f7cb-3c47-3ee4-91ba-d5a7e8fe5d83', 'P49 είναι ή ήταν στην κατοχή του', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'el', 'prefLabel');
@@ -2541,12 +3275,24 @@ INSERT INTO "values" VALUES ('e9bd9014-f45b-3bb0-9a65-8f6743f0b6e6', 'P49 é ou 
 INSERT INTO "values" VALUES ('f5b2ece8-7c1e-300c-8839-5c4dde2d917d', 'é ou foi guardada por', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('35c941c1-3a2f-31a8-be43-0552ebfdaed1', 'P49 有前任或现任保管者', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('c8d16606-b19d-3719-9da7-2145f117cb50', '有前任或现任保管者', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('94212c69-e737-3cad-8ebb-292f5e61f263', 'has former or current location', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('2f224d3b-3cd1-3721-92c6-a29f71a14621', 'P53 hat früheren oder derzeitigen Standort', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('652e7a3c-0c5f-3c55-b48c-fbc54e0b0365', 'This property identifies the E39 Actor or Actors who have or have had custody of an instance of E18 Physical Thing at some time. 
 The distinction with P50 has current keeper (is current keeper of) is that P49 has former or current keeper (is former or current keeper of) leaves open the question as to whether the specified keepers are current. 
 P49 has former or current keeper (is former or current keeper of) is a shortcut for the more detailed path from E18 Physical Thing through P30 transferred custody of (custody transferred through), E10 Transfer of Custody, P28 custody surrendered by (surrendered custody through) or P29 custody received by (received custody through) to E39 Actor.
 ', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('18ad65e3-0453-38eb-8a9a-c5cd0ffa55f7', 'P49i is former or current keeper of', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('70def4b5-25d9-347c-ae8f-8b78330f6ddb', 'is former or current keeper of', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('863a4a93-5d49-393a-be6c-dd4a300d5afa', 'P49i κατέχει ή κατείχε', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('9ccbf7cd-1ee1-3695-87c3-f0d4508fb706', 'κατέχει ή κατείχε', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ef1b4759-5510-3174-aa11-9ad41cef7087', 'P49i est ou a été détenteur de', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0e015c75-cbb2-3ed9-aade-2545d08a1e00', 'est ou a été détenteur de', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a5f9d21f-4380-34a4-ad61-4da572669bb0', 'P49i ist früherer oder derzeitiger Betreuer von', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c0e2dceb-535f-3dc6-bef0-ebb383c394e8', 'ist früherer oder derzeitiger Betreuer von', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('aba4bdc2-f7ab-35af-ae71-94c0ea759499', 'P49i является бывшим или текущим смотрителем для', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('db32af67-137a-37cd-b7a4-9342f6d1d427', 'является бывшим или текущим смотрителем для', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('05fc47d9-08c6-3cb9-a8e8-63ea4fcbbe21', 'P49i é ou foi guardador de', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4b900c15-0c4d-332b-8fd4-189ad8895c2f', 'é ou foi guardador de', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4970f519-a8a3-3dee-8922-de000b42c0a2', 'P49i 目前或曾经保管', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('55c49d18-87aa-36ff-857a-5b74e0690e96', '目前或曾经保管', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5717dd75-107b-3a24-885e-cf2eaa7f5e64', 'P50 hat derzeitigen Betreuer', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('925f10d6-ad35-3c6c-aa59-d8b06406195a', 'hat derzeitigen Betreuer', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('d9435f4b-4e56-3e2b-b393-18765f077151', 'P50 has current keeper', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'en', 'prefLabel');
@@ -2556,6 +3302,7 @@ INSERT INTO "values" VALUES ('f18148ff-c83f-3114-8e18-a6952cb7e478', 'είναι
 INSERT INTO "values" VALUES ('e366b6e9-b974-3b91-9c36-af196b527f9c', 'P50 est actuellement détenu par', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('35631eac-010d-3dd5-b648-65b29f5fbf2b', 'est actuellement détenu par', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('162421fd-9c03-3b16-b4e8-4e5b18629851', 'P50 имеет текущего смотрителя', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('f82a8afc-ccf1-3764-b512-bdec5a3c7b4e', 'P58i 界定了区域於', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('331e602b-f634-3a8f-8c75-80df05a11ffa', 'имеет текущего смотрителя', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('712baf0e-1a19-32cc-bd01-c14eb875b976', 'P50 é guardada por', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'pt', 'prefLabel');
 INSERT INTO "values" VALUES ('f19d5534-1d80-3742-aec6-de2cc0ea1093', 'é guardada por', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'pt', 'altLabel');
@@ -2564,6 +3311,20 @@ INSERT INTO "values" VALUES ('26154d3d-0161-35bb-ae9a-36b7cb17eb17', '有现任�
 INSERT INTO "values" VALUES ('98211d35-5e29-343f-8859-e44b8ecc090c', 'This property identifies the E39 Actor or Actors who had custody of an instance of E18 Physical Thing at the time of validity of the record or database containing the statement that uses this property.
 	P50 has current keeper (is current keeper of) is a shortcut for the more detailed path from E18 Physical Thing through P30 transferred custody of (custody transferred through), E10 Transfer of Custody, P29 custody received by (received custody through) to E39 Actor.
 ', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('e77aa0d9-9c57-3e5b-aa59-45cb73ce041c', 'P50i является текущим смотрителем для', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('1f1de0bf-43b1-3efa-a666-d2435684a8d7', 'является текущим смотрителем для', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a0b9ee0f-cd16-39c1-bf3e-a2b801983f66', 'P50i is current keeper of', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('dccd507f-516d-392a-99af-5fabbc5e0cc6', 'is current keeper of', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('9435dd8b-754a-3ed5-89ea-7fe4b9ac3212', 'P50i ist derzeitiger Betreuer von', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e3a1d0cb-0b20-34e3-82dd-1a863b7231b0', 'ist derzeitiger Betreuer von', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('1755bc73-1e24-32f3-9736-5ff0e619f87a', 'P50i est actuel détenteur de', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('6620769b-cc76-3428-af9a-c024e02829f0', 'est actuel détenteur de', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('7b5fe623-7cab-3992-9bbd-bde27553b963', 'P50i κατέχει', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('2a394029-dff4-3084-9518-b2df4f7dee6a', 'κατέχει', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8c21cb19-f3e5-3d65-a35e-114228187132', 'P50i é guardador de', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('02c5ee38-3b4c-3722-a3a4-34ca68a59615', 'é guardador de', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b26e7b26-b183-3652-99ac-d51734379f8b', 'P50i 目前保管', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('748ca5aa-8056-3bb3-9a77-09ad949e4405', '目前保管', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f01f0c56-5683-3342-9db9-601c32c199c0', 'P51 hat früheren oder derzeitigen Besitzer ', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('a319c8a0-0d45-3fa7-9d5a-223c61527efc', 'hat früheren oder derzeitigen Besitzer ', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('caf8ec28-bc97-3edc-b91c-7808eb4aa956', 'P51 имеет бывшего или текущего владельца', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'ru', 'prefLabel');
@@ -2581,6 +3342,20 @@ INSERT INTO "values" VALUES ('952c27eb-2cd8-3345-bea7-3ac59625dbb5', '有前任�
 INSERT INTO "values" VALUES ('7fbce49b-a9ad-30dd-a8f2-1bf3b942bce3', 'This property identifies the E39 Actor that is or has been the legal owner (i.e. title holder) of an instance of E18 Physical Thing at some time.
 The distinction with P52 has current owner (is current owner of) is that P51 has former or current owner (is former or current owner of) does not indicate whether the specified owners are current. P51 has former or current owner (is former or current owner of) is a shortcut for the more detailed path from E18 Physical Thing through P24 transferred title of (changed ownership through), E8 Acquisition, P23 transferred title from (surrendered title through), or P22 transferred title to (acquired title through) to E39 Actor.
 ', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('9ebca50a-e427-3f51-9821-81f1d655377d', 'P51i является бывшим или текущим владельцем для', '5cab4232-9297-318b-806a-263f2287713d', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ffd7cd1b-b91c-33e1-b693-52e7fb5ac23e', 'является бывшим или текущим владельцем для', '5cab4232-9297-318b-806a-263f2287713d', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('fd318e2d-d5a1-3296-9083-97a726597f43', 'P51i είναι ή ήταν ιδιοκτήτης του/της', '5cab4232-9297-318b-806a-263f2287713d', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('c994eb42-def4-3c0b-b61f-bb4b05efb538', 'είναι ή ήταν ιδιοκτήτης του/της', '5cab4232-9297-318b-806a-263f2287713d', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8d0d9825-3147-3c01-b2f9-461d675f9cce', 'P51i est ou a été propriétaire de', '5cab4232-9297-318b-806a-263f2287713d', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('201524c2-6f7a-37af-a313-b7710802541a', 'est ou a été propriétaire de', '5cab4232-9297-318b-806a-263f2287713d', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('28c44d29-fc5d-3132-9c61-0d30bd115a99', 'P51i is former or current owner of', '5cab4232-9297-318b-806a-263f2287713d', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('7dc46928-b54c-3577-81db-d0565241585f', 'is former or current owner of', '5cab4232-9297-318b-806a-263f2287713d', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('e7d678d4-ca04-3a62-bc39-816b7311f115', 'P51i ist früherer oder derzeitiger Besitzer von', '5cab4232-9297-318b-806a-263f2287713d', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c8dd6988-8b8b-3977-abd4-295e59c39c0f', 'ist früherer oder derzeitiger Besitzer von', '5cab4232-9297-318b-806a-263f2287713d', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('fd0dfda5-e06d-31c4-8042-6c619dc27fcb', 'P51i é ou foi proprietário de', '5cab4232-9297-318b-806a-263f2287713d', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('9d95b709-9863-3e09-a395-7cf574ad60a0', 'é ou foi proprietário de', '5cab4232-9297-318b-806a-263f2287713d', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('23e6ac2f-b0dd-3043-aea7-8ad80c27ed1e', 'P51i 目前或曾经拥有', '5cab4232-9297-318b-806a-263f2287713d', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('02da38fb-ab92-34b5-b6d0-5dc40dde9f63', '目前或曾经拥有', '5cab4232-9297-318b-806a-263f2287713d', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4fff1897-d739-36e5-8f53-20ca6c32c3ba', 'P52 has current owner', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('443a7650-5524-3c23-9d94-67cbfeabc6f3', 'has current owner', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('49b828e0-ae36-38e3-86e9-0c6512245f01', 'P52 hat derzeitigen Besitzer', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'de', 'prefLabel');
@@ -2595,9 +3370,24 @@ INSERT INTO "values" VALUES ('52ae5aa5-fc3a-3cff-8b31-4e98b7cdb90e', 'P52 é pro
 INSERT INTO "values" VALUES ('8785be95-8c92-350b-a8ab-76b56903de3d', 'é propriedade de', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('0bd5d35e-0e1a-3952-b584-489c56cdc6dd', 'P52 有现任物主', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('5cf8b202-c587-3f32-b5b7-84883b01a8f1', '有现任物主', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('1e629121-c2dc-34be-9229-ff508b217313', '界定了区域於', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('47044ec2-a32c-34b1-9a02-fa9712c9edc2', 'This property identifies the E21 Person, E74 Group or E40 Legal Body that was the owner of an instance of E18 Physical Thing at the time of validity of the record or database containing the statement that uses this property.
 P52 has current owner (is current owner of) is a shortcut for the more detailed path from E18 Physical Thing through P24 transferred title of (changed ownership through), E8 Acquisition, P22 transferred title to (acquired title through) to E39 Actor, if and only if this acquisition event is the most recent.
 ', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d800028a-73d3-3dde-846e-b42ac2e11cb8', 'P52i ist derzeitiger Besitzer von', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('ecbee820-9936-3aa7-b1d2-6e6e6bace0a8', 'ist derzeitiger Besitzer von', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e1121db3-eda8-3db4-b3ee-3f05a3d99399', 'P52i est le propriétaire actuel de', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('2f16a6c8-5898-3a13-86e4-6fc4593ed060', 'est le propriétaire actuel de', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('27c9cb0d-880c-30e8-8507-31fa6c7522e9', 'P52i is current owner of', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('1e345312-864a-3be0-b156-e7e70f0750cd', 'is current owner of', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('9a2e2ac3-6215-377c-be75-0dea1f6d1f27', 'P52i является текущим владельцем для', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('05a7221b-3b40-3bfb-be68-2be06ea15b60', 'является текущим владельцем для', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('33e0d820-a730-3ad8-808f-d1320ebcba1c', 'P52i είναι ιδιοκτήτης του', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('388e8676-90a4-320a-866d-e24a02099c56', 'είναι ιδιοκτήτης του', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('fc132ddb-d1c5-372a-a2a7-5dfbbc8d227e', 'P52i é proprietário de', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b2350100-24db-30eb-b8af-b8401c1808a2', 'é proprietário de', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('d088fa66-ec5f-3f73-8679-ca64350004d5', 'P52i 目前拥有', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('379152db-65dc-3655-ba96-d9a99bfcade7', '目前拥有', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('7cd4a78f-b039-39f7-b687-03bc4382b1ca', 'P53 a ou a eu pour localisation', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('f7632af7-6952-344b-81e0-063c4bc8cfa4', 'a ou a eu pour localisation', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('0d6a5fdb-ad64-322b-b97d-5edd6105b12a', 'P53 βρίσκεται ή βρισκόταν σε', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'el', 'prefLabel');
@@ -2605,6 +3395,8 @@ INSERT INTO "values" VALUES ('5aa976b5-1c9c-3e89-8376-5e66c067d185', 'βρίσκ
 INSERT INTO "values" VALUES ('fbdfee35-65e7-3f5d-8180-75d3b8692d0c', 'P53 имеет текущее или бывшее местоположение', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('39573e29-cd0b-369b-a271-4782c88247f0', 'имеет текущее или бывшее местоположение', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('6246ca19-822f-386c-b0c8-75b71c037c20', 'P53 has former or current location', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('94212c69-e737-3cad-8ebb-292f5e61f263', 'has former or current location', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2f224d3b-3cd1-3721-92c6-a29f71a14621', 'P53 hat früheren oder derzeitigen Standort', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('ccb33cbb-3a0a-3b2f-a9ee-a5b05f6a8422', 'hat früheren oder derzeitigen Standort', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('48c11176-9d76-39d3-bc8c-4a886038fc36', 'P53 é ou foi localizada em', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'pt', 'prefLabel');
 INSERT INTO "values" VALUES ('197eddd2-d109-394c-8907-e619cd6b2448', 'é ou foi localizada em', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'pt', 'altLabel');
@@ -2615,6 +3407,20 @@ In the case of E19 Physical Objects, the property does not allow any indication 
 In the case of immobile objects, the Place would normally correspond to the Place of creation.
 P53 has former or current location (is former or current location of) is a shortcut. A more detailed representation can make use of the fully developed (i.e. indirect) path from E19 Physical Object through P25 moved (moved by), E9 Move, P26 moved to (was destination of) or P27 moved from (was origin of) to E53 Place.
 ', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('fd5b58a4-84ce-3f1b-ad2e-35501c48103a', 'P53i является текущим или бывшим местоположением для', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ca7d05df-643f-37a3-b94c-8dfc06c64e97', 'является текущим или бывшим местоположением для', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('98747b71-cb5a-3c24-ad6a-89b640f7c44b', 'P53i is former or current location of', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('c40f59ec-9bbd-3829-a572-fead50359723', 'is former or current location of', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('be4e9ce7-9c6d-3c2c-aa7c-fab7d735247a', 'P53i είναι ή ήταν θέση του', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f78172db-c99b-3815-bda2-0f697fed18a1', 'είναι ή ήταν θέση του', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('e46421c2-896d-3f9f-86aa-df5db77eef51', 'P53i ist früherer oder derzeitiger Standort von', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0f0cad21-5c0d-38c7-b03a-c7d9118bd820', 'ist früherer oder derzeitiger Standort von', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('7e2a5ff4-6d53-389a-b22b-ff2ed6e162ea', 'P53i est ou a été localisation de', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('d248ad27-2c9d-3429-bc50-533222c9bc66', 'est ou a été localisation de', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f0211ca7-f55e-3c7f-8383-2ebd971117aa', 'P53i é ou foi localização de', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b276c4b8-d132-361a-ba40-b24278e0f6f8', 'é ou foi localização de', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('244e2cf3-8be2-3fb6-8941-ea4ee6a76901', 'P53i 目前或曾经被置放了', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('39598d5a-6f42-3034-be8d-078de003cf49', '目前或曾经被置放了', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('77ba0526-5037-38bc-bfa6-a2c590cb5068', 'P54 a actuellement pour localisation à demeure', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('cfaa8991-e676-3a56-832a-8864a1344511', 'a actuellement pour localisation à demeure', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('9d1f20f7-3d78-3d97-842b-94e8f1e31b8a', 'P54 hat derzeitigen permanenten Standort', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'de', 'prefLabel');
@@ -2629,9 +3435,25 @@ INSERT INTO "values" VALUES ('21930aad-86fe-3931-9ed5-afc8432c903a', 'P54 é loc
 INSERT INTO "values" VALUES ('c9ccff2e-f4a1-3208-afc4-f8c9381ee295', 'é localizado permanentemente em', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('d571614f-dd65-34c5-8fbc-9a35d6847847', 'P54 目前的永久位置位於', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('d8749326-19e3-318e-a2c2-b71a29303de9', '目前的永久位置位於', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('9c194820-0b92-31dc-9c89-a531f9caf3d0', 'P59 has section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('a39e731d-ebf3-316d-8623-b696c927c5ba', 'has section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('05d7410a-78d3-3d94-9a7b-2a9d2ed0d77a', 'This property records the foreseen permanent location of an instance of E19 Physical Object at the time of validity of the record or database containing the statement that uses this property.
 P54 has current permanent location (is current permanent location of) is similar to P55 has current location (currently holds). However, it indicates the E53 Place currently reserved for an object, such as the permanent storage location or a permanent exhibit location. The object may be temporarily removed from the permanent location, for example when used in temporary exhibitions or loaned to another institution. The object may never actually be located at its permanent location.
 ', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('07dc9d39-1070-3096-80d3-2942c4ffa1ae', 'P54i είναι μόνιμη θέση του/της', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d20c7777-8645-377f-a340-1bd46011cde3', 'είναι μόνιμη θέση του/της', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('359b4341-e31c-3a45-b82f-302b22b188b2', 'P54i ist derzeitiger permanenter Standort von', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('414bd3ea-9797-339e-bc93-c8f9c80171c7', 'ist derzeitiger permanenter Standort von', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('85feb831-e01c-3a87-b344-0a25f8229187', 'P54i est actuellement localisation à demeure de', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('bfbdddcf-31ec-3a72-8570-b7fdc4987610', 'est actuellement localisation à demeure de', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('241794cb-0119-3da3-9a0f-a99b0947eb46', 'P54i is current permanent location of', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('2057d61b-2ea5-3522-9a4c-4d2775ea890b', 'is current permanent location of', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('1b031ffc-5493-32f6-975d-d43f02dc7024', 'P54i является текущим постоянным местоположением для', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('a0e68d51-2dc6-37ad-a6cf-18a9d02417ba', 'является текущим постоянным местоположением для', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b2923672-dc43-31e9-a16c-f7a364d00901', 'P54i é localização permanente de', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('437c0450-de90-31d2-985b-38187700a0de', 'é localização permanente de', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b5e2707d-f22d-3d25-9f89-5f620c446215', 'P54i 目前被用来永久置放', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ebbc6fa7-93cf-3149-b8b1-d072688193a8', '目前被用来永久置放', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('41cfa239-8395-3749-99e5-cbdd0b2a88b6', 'P55 βρίσκεται σε', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('900c3d08-4bdb-3303-ae20-d6e12946b6df', 'βρίσκεται σε', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('4f7ba484-d3ca-3b3a-9924-c407c51b62cf', 'P55 has current location', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'en', 'prefLabel');
@@ -2650,6 +3472,20 @@ INSERT INTO "values" VALUES ('822a124a-f5c9-355c-b1e0-e677e4189f93', 'This prope
 	This property is a specialisation of P53 has former or current location (is former or current location of). It indicates that the E53 Place associated with the E19 Physical Object is the current location of the object. The property does not allow any indication of how long the Object has been at the current location. 
 P55 has current location (currently holds) is a shortcut. A more detailed representation can make use of the fully developed (i.e. indirect) path from E19 Physical Object through P25 moved (moved by), E9 Move P26 moved to (was destination of) to E53 Place if and only if this Move is the most recent.
 ', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('e31757a6-dd4c-3cfe-a586-c1e9685a00a5', 'P55i hält derzeitig', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('adce8902-890a-3357-989e-81e59c7fe929', 'hält derzeitig', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('91d912b8-88b8-3246-9adf-f380965af566', 'P55i είναι θέση του', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('cd10e1dc-30ac-39eb-add2-680f49fe7835', 'είναι θέση του', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('cfdebc2d-42dc-34e9-a63a-dbc9e86ee974', 'P55i в данный момент содержит', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ecc11a26-3b86-30a4-a07b-c00d1a616f4f', 'в данный момент содержит', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a4ebef7b-d79a-37fb-a0ef-3077b9c957e5', 'P55i est localisation actuelle de', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0f236ffa-3ac8-3ad7-a804-8ffebb019029', 'est localisation actuelle de', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('bc758ac5-0037-3db3-9f06-23ae33530f2a', 'P55i currently holds', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('4b1984c2-36de-3c10-88f4-336692f23aec', 'currently holds', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ce3eef9e-7c38-3090-87ea-0d330a7517c5', 'P55i é localização atual de', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('bf87e981-6a03-3b8d-9614-f0c92f7b3cd2', 'é localização atual de', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('5e72ece1-6832-3f73-87a3-6e0b30ca11c8', 'P55i 目前置放了', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5b14e2d4-b4b3-3b29-ae7e-2e25f4b25e82', '目前置放了', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('b7a0c09a-4202-33aa-a496-7270edc892d9', 'P56 несет признак', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('7e595149-e874-3814-964c-27a132f1c348', 'несет признак', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('18d4d7b0-a737-373c-8687-a8ee52ae61c2', 'P56 trägt Merkmal', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'de', 'prefLabel');
@@ -2664,19 +3500,31 @@ INSERT INTO "values" VALUES ('8d12c632-e0e5-36fa-91fa-0c7fdb317c1d', 'P56 possui
 INSERT INTO "values" VALUES ('5512d342-ec2c-387b-81d5-ef81a45e49a4', 'possui característica', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('8b8c8997-c071-3fa0-8206-0886c5e76bef', 'P56 有外貌表征', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('93a0634c-7fc3-3cbf-a39d-89022e4a3c9d', '有外貌表征', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('e5cf0b87-c6b1-320c-80fb-99dc8356bcdc', 'απεικονίζει', '05804845-b0d6-3634-a977-a5c7785d2dde', 'el', 'altLabel');
-INSERT INTO "values" VALUES ('fa728981-5fdc-3cda-98ce-59a2d286d552', 'P62 figure', '05804845-b0d6-3634-a977-a5c7785d2dde', 'fr', 'prefLabel');
-INSERT INTO "values" VALUES ('6fca1cf3-f89b-3ef7-9473-56965fab2f84', 'figure', '05804845-b0d6-3634-a977-a5c7785d2dde', 'fr', 'altLabel');
-INSERT INTO "values" VALUES ('b73335b0-c619-3ec0-b094-7e0883b8ad6b', 'P62 retrata', '05804845-b0d6-3634-a977-a5c7785d2dde', 'pt', 'prefLabel');
-INSERT INTO "values" VALUES ('560f6ea5-9a6a-393b-9855-d019d8e98eb1', 'retrata', '05804845-b0d6-3634-a977-a5c7785d2dde', 'pt', 'altLabel');
-INSERT INTO "values" VALUES ('b9d6832b-17f3-3541-9b93-ec0451a8d1fa', 'P62 描绘', '05804845-b0d6-3634-a977-a5c7785d2dde', 'zh', 'prefLabel');
-INSERT INTO "values" VALUES ('59cd26d3-76da-3fd9-96e1-d7701665f358', '描绘', '05804845-b0d6-3634-a977-a5c7785d2dde', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('c91bf862-fc3d-34a8-ac5f-848667c77089', 'P59 έχει τομέα', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('78d76d07-fd07-3aaf-9591-5fb5f6f53508', 'έχει τομέα', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('67209c73-89d8-3efe-bfec-af19d363cef5', 'P59 hat Bereich', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('411dc18e-17d3-3e31-869a-e493a095752e', 'hat Bereich', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5439a380-304c-385f-938e-781b4818b736', 'P59 имеет район', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('b18a0074-5bd5-3403-9051-38521d6e08a8', 'This property links an instance of E19 Physical Object to an instance of E26 Physical Feature that it bears.
 An E26 Physical Feature can only exist on one object. One object may bear more than one E26 Physical Feature. An E27 Site should be considered as an E26 Physical Feature on the surface of the Earth.
 An instance B of E26 Physical Feature being a detail of the structure of another instance A of E26 Physical Feature can be linked to B by use of the property P46 is composed of (forms part of). This implies that the subfeature B is P56i found on the same E19 Physical Object as A.
 P56 bears feature (is found on) is a shortcut. A more detailed representation can make use of the fully developed (i.e. indirect) path from E19 Physical Object through P59 has section (is located on or
 Definition of the CIDOC Conceptual Reference Model 149 within), E53 Place, P53 has former or current location (is former or current location of) to E26 Physical Feature.
 ', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3b93171e-00af-3815-99b2-e440f360ae8e', 'P56i βρίσκεται σε', '118e3917-94ae-3339-a738-a05540f6a087', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('57a02752-97a1-326b-a8ff-7f89d770bcb8', 'βρίσκεται σε', '118e3917-94ae-3339-a738-a05540f6a087', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7772d2b8-d091-3080-a8bc-818e66efa4c5', 'P56i se trouve sur', '118e3917-94ae-3339-a738-a05540f6a087', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('4445ae3a-d64c-3514-8e5c-2b4b22c9ef20', 'se trouve sur', '118e3917-94ae-3339-a738-a05540f6a087', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('44eec981-ea0e-337e-909f-be5faee7a70f', 'P56i wird gefunden auf', '118e3917-94ae-3339-a738-a05540f6a087', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('4c53b16c-7dd4-3d42-b6dc-de1c38d91ab7', 'wird gefunden auf', '118e3917-94ae-3339-a738-a05540f6a087', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e611517e-7af2-3001-be8c-37b79bcfc701', 'P56i is found on', '118e3917-94ae-3339-a738-a05540f6a087', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('381631bb-516a-39a1-bb8e-04e5d186d448', 'is found on', '118e3917-94ae-3339-a738-a05540f6a087', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8bb16991-f0d1-34f9-886d-09921629b26a', 'P56i найден на', '118e3917-94ae-3339-a738-a05540f6a087', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('9c746936-9960-32de-90e5-9aa66fa122d5', 'найден на', '118e3917-94ae-3339-a738-a05540f6a087', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('779de020-3deb-320f-9587-e4c8d836c0ae', 'P56i é encontrada em', '118e3917-94ae-3339-a738-a05540f6a087', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('37af59b8-b369-33b2-ac8d-cb13d5a48a1a', 'é encontrada em', '118e3917-94ae-3339-a738-a05540f6a087', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('54ead987-e148-31da-81f8-f12aacca2088', 'P56i 被见於', '118e3917-94ae-3339-a738-a05540f6a087', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('46f1c803-d1a0-3faa-b8fe-64d225cab989', '被见於', '118e3917-94ae-3339-a738-a05540f6a087', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('2598263f-a6d2-397e-8e13-7a843505cbbb', 'P57 has number of parts', '5afb86ba-c943-367b-857c-d7aaec92b5e3', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('8527fcaa-e5ad-3756-bdc1-12b33ee028a3', 'has number of parts', '5afb86ba-c943-367b-857c-d7aaec92b5e3', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('51758214-eb44-3f5b-973f-49f60022d429', 'P57 имеет число частей', '5afb86ba-c943-367b-857c-d7aaec92b5e3', 'ru', 'prefLabel');
@@ -2713,13 +3561,18 @@ INSERT INTO "values" VALUES ('0f2ec8ce-7730-3e77-a18e-a4652d2db8b6', 'This prope
 The CRM handles sections as locations (instances of E53 Place) within or on E18 Physical Thing that are identified by E46 Section Definitions. Sections need not be discrete and separable components or parts of an object.
 This is part of a more developed path from E18 Physical Thing through P58, E46 Section Definition, P87 is identified by (identifies) that allows a more precise definition of a location found on an object than the shortcut P59 has section (is located on or within).
 A particular instance of a Section Definition only applies to one instance of Physical Thing.', '89cad4c1-914c-3675-9d66-83eed1c61e3e', 'en-US', 'scopeNote');
-INSERT INTO "values" VALUES ('9c194820-0b92-31dc-9c89-a531f9caf3d0', 'P59 has section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'en', 'prefLabel');
-INSERT INTO "values" VALUES ('a39e731d-ebf3-316d-8623-b696c927c5ba', 'has section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('c91bf862-fc3d-34a8-ac5f-848667c77089', 'P59 έχει τομέα', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'el', 'prefLabel');
-INSERT INTO "values" VALUES ('78d76d07-fd07-3aaf-9591-5fb5f6f53508', 'έχει τομέα', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'el', 'altLabel');
-INSERT INTO "values" VALUES ('67209c73-89d8-3efe-bfec-af19d363cef5', 'P59 hat Bereich', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'de', 'prefLabel');
-INSERT INTO "values" VALUES ('411dc18e-17d3-3e31-869a-e493a095752e', 'hat Bereich', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'de', 'altLabel');
-INSERT INTO "values" VALUES ('5439a380-304c-385f-938e-781b4818b736', 'P59 имеет район', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('51c8751e-6538-3114-892c-4aade56e07eb', 'P58i определяет район', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b47295a9-6541-30d0-85d8-95422cf01f2b', 'определяет район', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8c7a3aa4-99ca-3533-b56f-8f6c8e5de80f', 'P58i defines section', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6cf37340-0e05-3b82-9989-4f106882a667', 'defines section', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('1bddded3-1bd1-36e5-aee7-d7c4177a2e14', 'P58i definiert Abschitt auf oder von', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e44e0645-bd66-37ec-8402-08eabc3cd8f6', 'definiert Abschitt auf oder von', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('933b92dd-94d2-354e-bb19-86baabb1e911', 'P58i définit une section de', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ce23d373-31b2-3bad-a280-5df4a453cdb1', 'définit une section de', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f3654221-4e1a-32ef-8589-f41c77660baf', 'P58i ορίζει τμήμα σε', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('8a401679-8e61-38dc-8af6-5ebf911fe40f', 'ορίζει τμήμα σε', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('525fd2c2-e820-3a84-b462-03365b01896a', 'P58i define uma seção de', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('18393252-031b-3c82-a0f0-fce5e4e57272', 'define uma seção de', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('10e4875c-55a2-365b-aac3-1ed6bb92eb98', 'имеет район', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('325a71df-a8d5-31b8-bee3-e7b6f6fe6e6d', 'P59 a pour section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('6a4229f1-bceb-3fe0-b7ab-4ee09f82ad47', 'a pour section', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'fr', 'altLabel');
@@ -2732,6 +3585,20 @@ It is typically used when a named E46 Section Definition is not appropriate.
 E18 Physical Thing may be subdivided into arbitrary regions. 
 P59 has section (is located on or within) is a shortcut. If the E53 Place is identified by a Section Definition, a more detailed representation can make use of the fully developed (i.e. indirect) path from E18 Physical Thing through P58 has section definition (defines section), E46 Section Definition, P87 is identified by (identifies) to E53 Place. A Place can only be located on or within one Physical Object.
 ', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('7031870c-f735-3b53-9fde-95e12cd4019d', 'P59i находится на или внутри', 'b77952c3-1145-3340-964f-6212caf1c63f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5199dadf-4b47-36fb-9951-799b93449e80', 'находится на или внутри', 'b77952c3-1145-3340-964f-6212caf1c63f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('400a7b78-1141-3a72-8fd4-bc82356fd629', 'P59i befindet sich auf oder in', 'b77952c3-1145-3340-964f-6212caf1c63f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f3a64f61-c4ed-38b0-8fd3-b50b973de8b3', 'befindet sich auf oder in', 'b77952c3-1145-3340-964f-6212caf1c63f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('89daaa3e-169e-3583-8c04-5586b5437a0b', 'P59i βρίσκεται σε ή εντός', 'b77952c3-1145-3340-964f-6212caf1c63f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('97b610a7-b6c9-3e35-abbe-96c7770758f5', 'βρίσκεται σε ή εντός', 'b77952c3-1145-3340-964f-6212caf1c63f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('534ac58e-017e-3fd1-a7a8-07a29bd1afb7', 'P59i se situe sur ou dans', 'b77952c3-1145-3340-964f-6212caf1c63f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('9ebb864b-c36a-37e7-a586-f020dbcf8b2e', 'se situe sur ou dans', 'b77952c3-1145-3340-964f-6212caf1c63f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f4ed35dd-6cc6-3da1-b7d1-55629b6fd85c', 'P59i is located on or within', 'b77952c3-1145-3340-964f-6212caf1c63f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('840fc969-81d7-38a7-8533-a6fdfa4f15a1', 'is located on or within', 'b77952c3-1145-3340-964f-6212caf1c63f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('e09be110-6a52-3e9f-8dbc-be4370a1ffe4', 'P59i está localizada sobre ou dentro de', 'b77952c3-1145-3340-964f-6212caf1c63f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('34ed9d13-8025-36a7-b19e-459003d547c6', 'está localizada sobre ou dentro de', 'b77952c3-1145-3340-964f-6212caf1c63f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b409d7e6-bb30-39cb-8f29-41f7599b66da', 'P59i 位於', 'b77952c3-1145-3340-964f-6212caf1c63f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1a67adc9-c87b-39ad-9564-d49a486f3a75', '位於', 'b77952c3-1145-3340-964f-6212caf1c63f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('cb1b6335-4d08-3a21-8abe-77acce75b52c', 'P62 bildet ab', '05804845-b0d6-3634-a977-a5c7785d2dde', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('a7e77f7c-d150-3395-8adf-da4cb5bd0429', 'bildet ab', '05804845-b0d6-3634-a977-a5c7785d2dde', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('67eb0358-8420-39e8-88f1-40534839defe', 'P62 описывает', '05804845-b0d6-3634-a977-a5c7785d2dde', 'ru', 'prefLabel');
@@ -2739,10 +3606,31 @@ INSERT INTO "values" VALUES ('85902387-9e75-3e8e-a099-e7689069cf78', 'описы
 INSERT INTO "values" VALUES ('de1b4c90-70cd-3b2c-94cf-4263dcc2f053', 'P62 depicts', '05804845-b0d6-3634-a977-a5c7785d2dde', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('29129a44-dddd-350d-a6bb-2dac720e8a53', 'depicts', '05804845-b0d6-3634-a977-a5c7785d2dde', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c9095164-c465-3fc2-83ce-d96851387e41', 'P62 απεικονίζει', '05804845-b0d6-3634-a977-a5c7785d2dde', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('e5cf0b87-c6b1-320c-80fb-99dc8356bcdc', 'απεικονίζει', '05804845-b0d6-3634-a977-a5c7785d2dde', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('fa728981-5fdc-3cda-98ce-59a2d286d552', 'P62 figure', '05804845-b0d6-3634-a977-a5c7785d2dde', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('6fca1cf3-f89b-3ef7-9473-56965fab2f84', 'figure', '05804845-b0d6-3634-a977-a5c7785d2dde', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('b73335b0-c619-3ec0-b094-7e0883b8ad6b', 'P62 retrata', '05804845-b0d6-3634-a977-a5c7785d2dde', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('560f6ea5-9a6a-393b-9855-d019d8e98eb1', 'retrata', '05804845-b0d6-3634-a977-a5c7785d2dde', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b9d6832b-17f3-3541-9b93-ec0451a8d1fa', 'P62 描绘', '05804845-b0d6-3634-a977-a5c7785d2dde', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('59cd26d3-76da-3fd9-96e1-d7701665f358', '描绘', '05804845-b0d6-3634-a977-a5c7785d2dde', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('55aa360d-e2f7-30d6-93be-eaa7aa063211', 'This property identifies something that is depicted by an instance of E24 Physical Man-Made Thing. Depicting is meant in the sense that the surface of the E24 Physical Man-Made Thing shows, through its passive optical qualities or form, a representation of the entity depicted. It does not pertain to inscriptions or any other information encoding.
 
 This property is a shortcut of the more fully developed path from E24 Physical Man-Made Thing through P65 shows visual item (is shown by), E36 Visual Item, P138 represents (has representation) to E1 CRM Entity. P62.1 mode of depiction allows the nature of the depiction to be refined.
 ', '05804845-b0d6-3634-a977-a5c7785d2dde', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('4838d210-322c-375c-909a-bdd49eff1ec0', 'P62i απεικονίζεται σε', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('888b854e-906b-3e63-9f35-3851bdf351d5', 'απεικονίζεται σε', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('8e9aa4ab-4cde-30b9-bdaf-e7be51cfdf5c', 'P62i wird abgebildet durch', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f76f3da7-4f73-3d10-ab19-9cc6d701a6f5', 'wird abgebildet durch', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('36901254-3e9e-33c7-95a2-138548e337ab', 'P62i is depicted by', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('ef8e40af-f1f8-34af-bacf-f7e29994f9e1', 'is depicted by', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('246dd9dd-b804-3729-a547-ade4901feb05', 'P62i описан посредством', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ea26aa41-2d27-365d-a2fa-8113152b5374', 'описан посредством', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('25efa7a8-be72-3265-bee4-40ecb99375fa', 'P62i est figurée sur', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('91445ce8-b983-3a0c-80ae-70116aa20864', 'est figurée sur', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e870767f-9949-39c2-b9d1-b87d5d1893d3', 'P62i é retratada por', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('1378e195-c409-3386-9974-bd96ced57005', 'é retratada por', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('f84bdabc-0cd1-3fd9-a64c-80c11cef000a', 'P62i 被描绘於', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('9ba325a0-e8e4-3c50-9a73-b436111ae4b7', '被描绘於', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('683b157f-3af5-3e50-b689-0d333ce9446d', 'P65 présente l''item visuel', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('97faf578-a76c-3f76-8205-113b7e8d2c10', 'présente l''item visuel', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('46e69af0-811e-3952-be43-6785c7067370', 'P65 shows visual item', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'en', 'prefLabel');
@@ -2757,12 +3645,29 @@ INSERT INTO "values" VALUES ('6fe22b1c-f1b0-3add-81ae-9c2ef0318c00', 'P65 aprese
 INSERT INTO "values" VALUES ('4dcfaf4e-5a8d-38f1-92e3-6c42e9572ea7', 'apresenta item visual', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('017296e9-4e4c-366d-a03d-5c48266afb11', 'P65 显示视觉项目', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('dcadf4de-94e3-3d27-90e6-294799f0a232', '显示视觉项目', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('5a7dacdd-045f-321f-bb19-981f888c82a5', 'συνήθως χρησιμοποιείται από', '426216f3-fa37-32c7-88e7-be709f0f7182', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('47687458-d5a3-36d3-955d-59ee0c002ea4', 'P68i vorgesehen für Gebrauch durch defined', '426216f3-fa37-32c7-88e7-be709f0f7182', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e2226b16-68da-3f03-84d9-3136414cfc67', 'vorgesehen für Gebrauch durch defined', '426216f3-fa37-32c7-88e7-be709f0f7182', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('779ae6a9-61e6-3379-a60c-1d7d26209aef', 'This property documents an E36 Visual Item shown by an instance of E24 Physical Man-Made Thing.
 This property is similar to P62 depicts (is depicted by) in that it associates an item of E24 Physical Man-Made Thing with a visual representation. However, P65 shows visual item (is shown by) differs from the P62 depicts (is depicted by) property in that it makes no claims about what the E36 Visual Item is deemed to represent. E36 Visual Item identifies a recognisable image or visual symbol, regardless of what this image may or may not represent.
 For example, all recent British coins bear a portrait of Queen Elizabeth II, a fact that is correctly documented using P62 depicts (is depicted by). Different portraits have been used at different periods, however. P65 shows visual item (is shown by) can be used to refer to a particular portrait.
 P65 shows visual item (is shown by) may also be used for Visual Items such as signs, marks and symbols, for example the ''Maltese Cross'' or the ''copyright symbol’ that have no particular representational content. 
 This property is part of the fully developed path from E24 Physical Man-Made Thing through P65 shows visual item (is shown by), E36 Visual Item, P138 represents (has representation) to E1 CRM Entity which is shortcut by, P62 depicts (is depicted by).
 ', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8a789560-126d-3940-9d6d-14fd52c73a0b', 'P65i wird gezeigt durch', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0e7ecfe9-526b-30ba-8994-136252784176', 'wird gezeigt durch', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('4cf67b5f-ceff-366c-a638-9b7df3a4d15e', 'P65i est présenté par', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8c7ad083-ca53-3c7c-bfae-0d65b4aefb12', 'est présenté par', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('4fe1d8e7-caca-3a1b-8469-bf85d8980d4a', 'P65i is shown by', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('adf51386-bb21-367f-a696-6e5a905b9425', 'is shown by', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('b2796861-49c0-3c6f-be32-f11fdba1f5f5', 'P65i εμφανίζεται σε', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('3b8e7e05-b0a3-3f30-90b3-aa7a07b414d9', 'εμφανίζεται σε', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ac579a19-e418-3b1e-afb9-82657d7dc94f', 'P65i показан посредством', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('080bf7e6-62f3-3c41-839c-5af970548d5d', 'показан посредством', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('2783447c-4487-365a-9c03-ffaa70dd3e17', 'P65i é apresentado por', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('661fb1e8-261b-3dd8-9e4c-d255d221e4e1', 'é apresentado por', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('92d8b7cf-a4e1-3076-a2f6-d9414ae65792', 'P65i 被显示於', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7a835744-490f-3b00-8964-4617f755ba71', '被显示於', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('0abaff88-4053-3c1b-88a7-25766e98e2f5', 'P67 αναφέρεται σε', '629ed771-13e7-397e-8345-69f6cfb3db30', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('675a3d8e-ebcf-31ab-8b04-5d884f91469e', 'αναφέρεται σε', '629ed771-13e7-397e-8345-69f6cfb3db30', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('e24b73fc-2efa-30fe-8127-de0aa6ff4bf8', 'P67 refers to', '629ed771-13e7-397e-8345-69f6cfb3db30', 'en', 'prefLabel');
@@ -2779,6 +3684,20 @@ INSERT INTO "values" VALUES ('5c69cfac-75d2-3789-9ecf-6407c0db1c5c', 'P67 论及
 INSERT INTO "values" VALUES ('66c48c2d-9054-329c-97ac-18f85d8a792f', '论及', '629ed771-13e7-397e-8345-69f6cfb3db30', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a474334b-64bc-3524-b75c-c27ead2d6d22', 'This property documents that an E89 Propositional Object makes a statement about an instance of E1 CRM Entity. P67 refers to (is referred to by) has the P67.1 has type link to an instance of E55 Type. This is intended to allow a more detailed description of the type of reference. This differs from P129 is about (is subject of), which describes the primary subject or subjects of the E89 Propositional Object.
 ', '629ed771-13e7-397e-8345-69f6cfb3db30', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('c31efbb2-1caa-3207-a6c3-a6d340910611', 'P67i est référencé par', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('28ce307b-509d-30a2-bdbc-5faf83f8ddc2', 'est référencé par', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('10e74128-56b7-32ea-ab18-fbf50858b896', 'P67i αναφέρεται από', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f1c5f09f-96fc-31b2-a356-1b126285f525', 'αναφέρεται από', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('af5c943c-a9b0-3f4d-9c23-9f48f113c513', 'P67i wird angeführt von', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c94dea3c-1ee2-3390-ab24-cc08550b388b', 'wird angeführt von', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('107c5f9c-58dc-3cc1-8ea8-6997d2cd9baf', 'P67i is referred to by', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('5838e5dc-6b86-3341-8817-7f03ecace84b', 'is referred to by', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('fae7d850-913f-3fcb-a3c6-27190266f584', 'P67i имеет ссылку на себя от', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5622e552-3eb8-35bf-9bb1-76ac1ba03a3d', 'имеет ссылку на себя от', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('28fdf0ef-937f-3441-87bc-a15aadfa99fa', 'P67i é referenciado por', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f7c9d63c-48bd-33b1-8e42-b3a157796504', 'é referenciado por', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('11e5f1b1-68ab-3197-9f52-e5c4c1f968e2', 'P67i 被论及於', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('14001959-5320-3a1b-b34a-ff7ef3d956ff', '被论及於', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('02a73222-535c-328c-9416-83ce468b4459', 'P68 foresees use of', '037c3de7-65ae-3002-8328-18cc33572501', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('5e6c427c-fa43-334a-92e7-20da9547bb80', 'foresees use of', '037c3de7-65ae-3002-8328-18cc33572501', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('299bd659-b34d-31d2-99cf-961804f0fd6c', 'P68  sieht den Gebrauch vor von', '037c3de7-65ae-3002-8328-18cc33572501', 'de', 'prefLabel');
@@ -2797,6 +3716,17 @@ INSERT INTO "values" VALUES ('dce18a1b-3a79-3914-8f79-c7def47454f7', 'This prope
 E29 Designs and procedures commonly foresee the use of particular E57 Materials. The fabrication of adobe bricks, for example, requires straw, clay and water. This property enables this to be documented.
 This property is not intended for the documentation of E57 Materials that were used on a particular occasion when an instance of E29 Design or Procedure was executed.
 ', '037c3de7-65ae-3002-8328-18cc33572501', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('cd826d17-ddaa-392b-85a6-668b8fb0b51d', 'P68i συνήθως χρησιμοποιείται από', '426216f3-fa37-32c7-88e7-be709f0f7182', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('73568ee1-34ac-383b-a4a6-7e4df03323cc', 'P68i est habituellement utilisé par', '426216f3-fa37-32c7-88e7-be709f0f7182', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8e8a7cba-b074-30d2-b5b1-53c66c1f3bc3', 'est habituellement utilisé par', '426216f3-fa37-32c7-88e7-be709f0f7182', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e508478d-f12b-3781-9ad3-17c4f740572e', 'P68i обычно используется посредством', '426216f3-fa37-32c7-88e7-be709f0f7182', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('16c5a0ac-e4ca-3006-b3ef-27496c3a5ad8', 'обычно используется посредством', '426216f3-fa37-32c7-88e7-be709f0f7182', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b5829ccf-7c89-3675-ac2b-d70ca81fc05f', 'P68i use foreseen by', '426216f3-fa37-32c7-88e7-be709f0f7182', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('5bc9c672-d7dc-386f-ac43-2f4b9cbb00f3', 'use foreseen by', '426216f3-fa37-32c7-88e7-be709f0f7182', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('f1906758-e2a7-3be8-850a-f11c62fb1912', 'P68i é empregado por', '426216f3-fa37-32c7-88e7-be709f0f7182', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4ee0d1d7-e42e-32f4-894b-03dbb3053421', 'é empregado por', '426216f3-fa37-32c7-88e7-be709f0f7182', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4d603530-f060-3914-b099-6f86582fa67f', 'P68i 被指定使用於', '426216f3-fa37-32c7-88e7-be709f0f7182', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7e6a229a-b67b-3e8c-804e-fbe7b9c4c589', '被指定使用於', '426216f3-fa37-32c7-88e7-be709f0f7182', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('26c54af5-2a77-31a0-9e0c-24a24e64f8ca', 'P69 est associée à', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('e80d929a-8013-381d-a016-5f5fb79b6e06', 'est associée à', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('ab9abd2f-87ab-3312-9a8e-0f61010e8bbb', 'P69 σχετίζεται με', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'el', 'prefLabel');
@@ -2832,6 +3762,20 @@ INSERT INTO "values" VALUES ('8bbfa840-047a-3c2e-a0d4-d889f3644149', '记录了'
 INSERT INTO "values" VALUES ('586ddc14-0cae-3c67-a6d1-a1f1c91a0698', 'This property describes the CRM Entities documented by instances of E31 Document.
 Documents may describe any conceivable entity, hence the link to the highest-level entity in the CRM hierarchy. This property is intended for cases where a reference is regarded as being of a documentary character, in the scholarly or scientific sense.
 ', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d54de7ce-b5d7-31b3-9b08-4a414d23284b', 'P70i is documented in', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('8702c47f-662f-318b-bec5-fe46c5b9440d', 'is documented in', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ffb78946-b969-36b1-9275-9bbe7e60bcae', 'P70i τεκμηριώνεται σε', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('391aae79-f426-3aa6-a02b-17417ec14a67', 'τεκμηριώνεται σε', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('f6de9152-9ce0-36da-9317-6496da640fbb', 'P70i wird belegt in', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('4ae91fe5-f4ff-3232-92b6-33685a3bcb56', 'wird belegt in', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('28178883-fdc0-3e27-9e4b-12b462d7589f', 'P70i est mentionnée dans', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('e16796c8-432c-39c2-bdad-2e417cc41c26', 'est mentionnée dans', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('b4ab8801-a6b5-3e1e-877f-379b421a03cb', 'P70i документирован в', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b02b3ed5-cd12-3f65-a0f8-bcf4088805b3', 'документирован в', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('f35650d4-b25d-3d2e-9cf0-b863d498af12', 'P70i é documentado em', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('348f8050-1168-3ccd-9c0e-f86020dfdcaa', 'é documentado em', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('f83b9caa-a6ea-3798-b0dc-c71eea7515b4', 'P70i 被记录於', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('54aa8c5e-c342-3e66-bdb5-7253a4a971c8', '被记录於', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ee78ce00-ce32-37eb-9bd3-90dcf5c24b58', 'P71 listet', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('70b60826-8156-3ab9-9917-626c456ed2d6', 'listet', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('89af3e11-5882-389f-be67-194452cf3965', 'P71 перечисляет', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'ru', 'prefLabel');
@@ -2848,6 +3792,20 @@ INSERT INTO "values" VALUES ('b74f40d5-b32a-3557-8426-407c8647022b', 'P71 条列
 INSERT INTO "values" VALUES ('d5a1ecc2-ce6d-3493-b23d-c9ed8d4ec9ed', '条列出', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9f46de08-1240-3356-8fa4-d907b53a3df5', 'This property documents a source E32 Authority Document for an instance of an E1 CRM Entity.
 ', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('32827d86-868b-38f8-a5dd-7a9e1112d8a1', 'P71i περιλαμβάνεται σε', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('68c83bdb-7fe7-3108-a1b5-f68382d12f07', 'περιλαμβάνεται σε', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ffc2d46b-77d7-3f22-95ae-ca351144d847', 'P71i wird aufgelistet in', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('905b41a9-3cf8-33e4-a715-5afdf65ab3c4', 'wird aufgelistet in', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('4e0109a4-aa19-319e-a82a-8022bf0da818', 'P71i is listed in', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('85f31cb0-4732-3c93-800e-120bec33a9f3', 'is listed in', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('75569f46-8532-3676-90c1-5f801f2ab942', 'P71i перечислен в', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5be3dd5c-e793-347d-9353-ade803bd5cd2', 'перечислен в', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('433834cc-9575-3805-a9cf-f1ade29e5bc9', 'P71i est défini par', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('a61afb8f-c8d0-3646-b6a3-a3cd98178c1f', 'est défini par', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('6dfe7742-bb38-3bdc-8a57-6da2ddaafa9e', 'P71i é definido por', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('9f0a4195-1e3d-3db4-90f1-273524e1e6f6', 'é definido por', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4a127dda-55d6-36e6-bf2d-415c4cb057b4', 'P71i 被条列於', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('30418ac8-7f72-3acc-bbab-7e6791d1e92e', '被条列於', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('c8dfc10b-dd8e-381f-9e4f-81bb95733dd8', 'P72 est en langue', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('2a13c2ec-28f4-363f-a3b4-e9a57b03195f', 'est en langue', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('9874fceb-4606-3052-8d89-f5bf02244bf7', 'P72 имеет язык', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'ru', 'prefLabel');
@@ -2865,6 +3823,20 @@ INSERT INTO "values" VALUES ('970f2f82-34bb-3796-9e97-5b9805d35730', '使用语�
 INSERT INTO "values" VALUES ('3aa2be29-9af1-37c5-b2d9-6b532f192898', 'This property describes the E56 Language of an E33 Linguistic Object. 
 Linguistic Objects are composed in one or more human Languages. This property allows these languages to be documented.
 ', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3e60564b-bdc9-3a4d-9496-2f4e2e1bdc0d', 'P72i ist Sprache von', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('7a8f41c4-6ef6-33f1-87e8-ee75ed24afca', 'ist Sprache von', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('e94b0c26-1949-3868-a433-da0f38947d09', 'P72i είναι γλώσσα του/της', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('ed8d2aa9-297e-3864-8552-796dfe9660b3', 'είναι γλώσσα του/της', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('50ab8ac8-247f-3c9c-84ef-bde8b230d48c', 'P72i est la langue de', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('f972aa7a-b2ec-3596-a9ee-56cb476646eb', 'est la langue de', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('c35d5513-a34d-3681-bc62-b628d011283d', 'P72i является языком для', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('655d18e4-90b7-32a9-82b2-53010dc7825c', 'является языком для', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('abacc479-10b2-3d81-a184-bfa510dc13dd', 'P72i is language of', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('601af0c9-1167-36db-891a-3287a87ad900', 'is language of', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('83fdd19e-1de9-3a85-bf80-6471e9c56d71', 'P72i é a língua de', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('5679da68-1467-36d0-8801-a127047c50c3', 'é a língua de', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('a2f8d480-e5b2-31db-af60-648300e28288', 'P72i 被用来撰写', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('51d7add5-7aaa-32b7-ab42-49bae43b0baa', '被用来撰写', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('95d5442a-d532-3fb6-ad47-fbdf3e4c295d', 'P73 έχει μετάφραση', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('c5aec3fc-dc59-30b3-ba29-f7c96bf85aaf', 'έχει μετάφραση', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('68c5f91b-fde0-31b3-99ba-9f005cf648cf', 'P73 hat Übersetzung', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'de', 'prefLabel');
@@ -2882,14 +3854,28 @@ INSERT INTO "values" VALUES ('c3c9cc4e-7bcf-3ae5-ae3c-c38be7e46fae', '有译文'
 INSERT INTO "values" VALUES ('7c6c5bd1-ffb6-334b-8a47-a6db9d9c1490', 'This property describes the source and target of instances of E33Linguistic Object involved in a translation.
 When a Linguistic Object is translated into a new language it becomes a new Linguistic Object, despite being conceptually similar to the source object.
 ', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('1539fde0-2055-3440-967e-cd6528159c76', 'P73i est la traduction de', 'c185435d-2391-302f-b892-687406865462', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('87a5d5e6-5c75-3c93-9298-d4f1e9d68647', 'est la traduction de', 'c185435d-2391-302f-b892-687406865462', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d6398547-cb12-3202-a4f2-2e89fc594c10', 'P73i является переводом', 'c185435d-2391-302f-b892-687406865462', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ac589122-a4f5-3d4d-a8ad-0ec27b56d9b6', 'является переводом', 'c185435d-2391-302f-b892-687406865462', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('ebf216a1-f2cd-340d-a1d3-a92bf034169f', 'P73i είναι μετάφραση του/της', 'c185435d-2391-302f-b892-687406865462', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('3845e1c1-81ea-3348-8ce6-a973c185db18', 'είναι μετάφραση του/της', 'c185435d-2391-302f-b892-687406865462', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('87384a38-fcfb-36a3-917e-505249cf8567', 'P73i ist Übersetzung von', 'c185435d-2391-302f-b892-687406865462', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('09371f56-3ae9-3fd6-bc54-5f7327fd1019', 'ist Übersetzung von', 'c185435d-2391-302f-b892-687406865462', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b6255089-cb87-3550-ba8d-59b5a72f6605', 'P73i is translation of', 'c185435d-2391-302f-b892-687406865462', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('4811f075-9bcb-3341-9bbc-716d43f165f3', 'is translation of', 'c185435d-2391-302f-b892-687406865462', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2068bb10-5b00-3cd0-a3ec-6f10a28bc446', 'P73i é tradução de', 'c185435d-2391-302f-b892-687406865462', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b0b2160d-4aef-3953-856e-efa8b79293d8', 'é tradução de', 'c185435d-2391-302f-b892-687406865462', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('196db1d3-7a32-3373-965f-2280b3e489fa', 'P73i 翻译自', 'c185435d-2391-302f-b892-687406865462', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1b5658e7-9697-3cd3-b764-5127265cb6af', '翻译自', 'c185435d-2391-302f-b892-687406865462', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('396796d5-84f7-39cf-b170-54665aa666db', 'P74 имеет текущее или бывшее местожительства', '5869a9ed-ebe5-3613-acc2-29c184737885', 'ru', 'prefLabel');
-INSERT INTO "values" VALUES ('7d9aca35-3826-3793-bf6e-9725d85cde6a', 'P84 had at most duration', '86caed02-d112-3cd7-8f21-4836e4997850', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('52571f60-45cd-328c-be52-ea50cc44f84b', 'имеет текущее или бывшее местожительства', '5869a9ed-ebe5-3613-acc2-29c184737885', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('dbb90e76-64e3-382a-8a63-1db573859aec', 'P74 has current or former residence', '5869a9ed-ebe5-3613-acc2-29c184737885', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('b88b31cc-88b1-38f0-bc68-42501d162a3c', 'has current or former residence', '5869a9ed-ebe5-3613-acc2-29c184737885', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('fb89bcae-3fcb-3336-97c3-cf6abd14e91f', 'P74 hat derzeitigen oder früheren Sitz', '5869a9ed-ebe5-3613-acc2-29c184737885', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('13e7defa-aba4-3cd2-ba92-8420be4bb53c', 'hat derzeitigen oder früheren Sitz', '5869a9ed-ebe5-3613-acc2-29c184737885', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('9753f691-62e2-3c8a-bc27-03f6674bc4d2', 'P74 έχει ή είχε κατοικία', '5869a9ed-ebe5-3613-acc2-29c184737885', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('3800f21a-f17f-37cd-9bb8-eb5492611fe3', 'was created by', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('fff4f4b4-2b61-3c89-af25-ce8dc3df33e1', 'έχει ή είχε κατοικία', '5869a9ed-ebe5-3613-acc2-29c184737885', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('5ffdcd02-1af6-39d0-b144-5e51f782e4aa', 'P74 réside ou a résidé à', '5869a9ed-ebe5-3613-acc2-29c184737885', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('6f8963c6-a558-3183-8486-e0dbbcccd731', 'réside ou a résidé à', '5869a9ed-ebe5-3613-acc2-29c184737885', 'fr', 'altLabel');
@@ -2900,6 +3886,20 @@ INSERT INTO "values" VALUES ('ab5a6b1d-6262-3e7f-9ad4-db221e9e3c77', '目前或�
 INSERT INTO "values" VALUES ('78c948f6-a21c-3ed2-8c96-f4a48403bf5c', 'This property describes the current or former E53 Place of residence of an E39 Actor. 
 The residence may be either the Place where the Actor resides, or a legally registered address of any kind.
 ', '5869a9ed-ebe5-3613-acc2-29c184737885', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a6198cf5-0999-3643-be78-33b98800eb89', 'P74i είναι ή ήταν κατοικία του/της', 'b8b3baaf-161f-3234-8239-21d64232a602', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('4abdb006-a483-35ef-bec7-9b3a8e9da51c', 'είναι ή ήταν κατοικία του/της', 'b8b3baaf-161f-3234-8239-21d64232a602', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('cb89c2fc-82b5-3404-8515-62f8563beb81', 'P74i ist derzeitiger oder früherer Sitz von', 'b8b3baaf-161f-3234-8239-21d64232a602', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('7c37d1d1-0fce-3364-bdd1-3b144dc30fde', 'ist derzeitiger oder früherer Sitz von', 'b8b3baaf-161f-3234-8239-21d64232a602', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('351e753a-ce71-3971-91c3-cae4b9a80e13', 'P74i est ou a été la résidence de', 'b8b3baaf-161f-3234-8239-21d64232a602', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('81af5247-a069-3b96-8eda-289ca79cc6e5', 'est ou a été la résidence de', 'b8b3baaf-161f-3234-8239-21d64232a602', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('73ef59e8-81fe-356f-b05f-0c75141c01ee', 'P74i является текущим или бывшим местом жительства для', 'b8b3baaf-161f-3234-8239-21d64232a602', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4834e4f0-8f2e-3f78-96dc-c48640074fa0', 'является текущим или бывшим местом жительства для', 'b8b3baaf-161f-3234-8239-21d64232a602', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('d4191ea6-7947-390c-93bc-a6e5f5c68563', 'P74i is current or former residence of', 'b8b3baaf-161f-3234-8239-21d64232a602', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('68559e40-a490-3184-b24c-f59948ab65d7', 'is current or former residence of', 'b8b3baaf-161f-3234-8239-21d64232a602', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('c3ac074a-4ee7-3bcf-8689-455320df09ca', 'P74i é ou foi residência de', 'b8b3baaf-161f-3234-8239-21d64232a602', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('7e7cfe35-c2df-396d-bb2e-774568fa5b2b', 'é ou foi residência de', 'b8b3baaf-161f-3234-8239-21d64232a602', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e94b260c-d11a-3fba-9699-6ed2bb795dab', 'P74i 历年来的居住者包括', 'b8b3baaf-161f-3234-8239-21d64232a602', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('edf5a556-d867-37fc-a490-05889287a331', '历年来的居住者包括', 'b8b3baaf-161f-3234-8239-21d64232a602', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3197e903-f5af-35ac-a88a-434602d52803', 'P75 владеет', '44813770-321a-370d-bb8f-ba619bcb4334', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('d794f42f-f990-3d56-8c28-c686de1eba94', 'владеет', '44813770-321a-370d-bb8f-ba619bcb4334', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('bc092be0-d52a-3049-858d-92bc732b6ac0', 'P75 κατέχει', '44813770-321a-370d-bb8f-ba619bcb4334', 'el', 'prefLabel');
@@ -2915,6 +3915,20 @@ INSERT INTO "values" VALUES ('336cedc5-5ddb-3bf0-84b9-bf11ee36b3a7', 'é detento
 INSERT INTO "values" VALUES ('cab39f02-3b3d-3dc6-b8fc-b2f2b3e66369', 'P75 拥有', '44813770-321a-370d-bb8f-ba619bcb4334', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('42705d27-396a-3d9e-ba14-41993f609176', '拥有', '44813770-321a-370d-bb8f-ba619bcb4334', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3bf4af73-3103-3915-85ac-75144ff09b84', 'This property identifies former or current instances of E30 Rights held by an E39 Actor.', '44813770-321a-370d-bb8f-ba619bcb4334', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8b1fe1d1-d403-30a4-befe-708af19a9c59', 'P75i κατέχεται από', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('794e8af0-f03f-31a7-809d-ddca78590933', 'κατέχεται από', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('b9d0325d-d247-386f-b155-d4c163ba75e0', 'P75i принадлежит', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('eb582708-2e4e-3641-9686-b5cf979dfc3e', 'принадлежит', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('006cd201-2454-3491-b7f7-98b12175ebb8', 'P75i sind im Besitz von', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('345902f3-4d59-3005-84ba-55dd3ee39b5a', 'sind im Besitz von', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('321dbca1-7959-31dc-94b6-4bda98551e35', 'P75i est détenu par', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('93f72029-9da9-3953-83a1-12e6660f53d6', 'est détenu par', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('65d51da0-f1c7-3676-8d4c-32e879c2fd70', 'P75i is possessed by', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('45a7fa3e-8522-3037-b309-4c7aae980db4', 'is possessed by', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('3d4d1250-2f01-3b20-af09-e0eebd139bb4', 'P75i são detidos por', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('ff14c2df-fbb7-3306-b1e5-bf893bc1ebaf', 'são detidos por', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('63aeaa24-c508-35e6-9690-5aab1d48a038', 'P75i 有拥有者', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('45bd15ce-70a1-3b32-bfdc-c4b4763ea8e3', '有拥有者', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ccbbb3b8-9e79-3489-9d64-083d3202fe90', 'P76 has contact point', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('eb2a73c5-ea59-3939-9ffa-e354aa732e57', 'has contact point', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c6bd4438-a706-3f2e-9d33-265f66208e8b', 'P76 имеет контакт', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'ru', 'prefLabel');
@@ -2931,6 +3945,20 @@ INSERT INTO "values" VALUES ('2377a7fe-719f-3bc0-86fb-27c903c4d1dc', 'P76 有联
 INSERT INTO "values" VALUES ('1a7116ca-a9fb-30bd-8bdd-fb66219b05d6', '有联系方式', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('c5cc433c-0166-3e8e-be46-ae5fa183430f', 'This property identifies an E51 Contact Point of any type that provides access to an E39 Actor by any communication method, such as e-mail or fax.
 ', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('69a1103e-ab3c-37a7-bad3-dc7d62a021ce', 'P76i permettent de contacter', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('da3142b7-b33e-34be-804e-d57127f8f9f8', 'permettent de contacter', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('4ea96dd6-7c36-3299-a5c9-013e71eb348a', 'P76i bietet Zugang zu', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0363285a-09cb-3b89-80b9-4176dc9026a7', 'bietet Zugang zu', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('6a5e3d54-d8d6-3004-889c-e8aa4b433552', 'P76i provides access to', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('50dc2fd8-39fb-38d2-93c5-9dd02d660fb7', 'provides access to', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('63092db5-aafe-3c37-af20-b342a608d03c', 'P76i παρέχει πρόσβαση σε', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('c829830a-2cdc-31ef-baae-6f4c3fd20a40', 'παρέχει πρόσβαση σε', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('06696fad-db9d-3dcd-9f1e-d0d81ca20618', 'P76i предоставляет доступ к', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b4896d88-8256-3b38-8aa3-2705b7a13312', 'предоставляет доступ к', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('27256eb8-652b-3e6d-9460-47736514d299', 'P76i é ponto de contado de', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('2b832776-9d0a-37f1-8658-43d358505531', 'é ponto de contado de', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('accc94b5-0d40-33d8-9c47-6be7bd04146c', 'P76i 被用来联系', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ed6d7197-0b8a-3e51-a956-e9ab2bb218f6', '被用来联系', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('32232d2b-ddcc-3557-908d-f8b57bc79f8c', 'P78 αναγνωρίζεται ως', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('50faeab4-6de3-30ff-baa7-b2d6684cad2a', 'αναγνωρίζεται ως', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('bc31e96b-5988-3b84-abce-d99ea75cc807', 'P78 est identifiée par', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'fr', 'prefLabel');
@@ -2946,6 +3974,20 @@ INSERT INTO "values" VALUES ('2a5fd7a4-4e82-3107-9aa3-934ddd6b39bb', 'é identif
 INSERT INTO "values" VALUES ('4adf84ea-b1b8-315e-8d7e-d252ec8da0ab', 'P78 有识别称号', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('7275404b-9adf-3b7b-9e5d-32e876cc91bd', '有识别称号', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('c2e6321d-a98f-3fe6-99a2-5859854fd1ba', 'This property identifies an E52 Time-Span using an E49Time Appellation.', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('cc5764d5-8a80-3b8f-bf46-da9aaa9123f3', 'P78i identifies', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('b76e723c-6c3d-380a-9479-cccc0d6f94e0', 'identifies', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('3ef8ccdd-403c-3c3f-abf8-f486433fcf22', 'P78i bezeichnet', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('cfc4f606-cbe8-3dbe-89ad-a7635130ba72', 'bezeichnet', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('ef08922a-1a99-3413-a01a-2d3833d7d5b8', 'P78i identifie', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('eaf24be7-b949-3957-b477-24ee09bdde0a', 'identifie', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('07476aaf-b068-3af1-974b-9b4146b624fd', 'P78i είναι αναγνωριστικό', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('11d4bf23-8279-3fd6-bc13-7a2269152b64', 'είναι αναγνωριστικό', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('99a28eaf-72e4-3d6b-9cf0-7ff37572ff96', 'P78i идентифицирует', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('e29927e5-f16e-3514-a427-2fd4335bb357', 'идентифицирует', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('9904aba2-61e3-3568-8b5b-beaaec1e04ff', 'P78i identifica', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f0d7f918-9e0f-369a-bccc-07591c9ed828', 'identifica', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('5f58fe4d-9ac0-3ce1-9ebe-714169d32815', 'P78i 被用来识别', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('40e73768-1a0e-3548-b251-0f3f39d5db82', '被用来识别', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9b44248e-d39f-3099-99eb-d8486b191566', 'P79 αρχή προσδιορίζεται από', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('ef7126ce-8517-321b-a48d-650687ff492a', 'αρχή προσδιορίζεται από', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('a927345d-75c5-3e87-bd2d-946b60611230', 'P79 начало ограничено', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'ru', 'prefLabel');
@@ -2960,7 +4002,6 @@ INSERT INTO "values" VALUES ('d595f30f-1d8c-347d-a0bf-b05bb72682e0', 'P79 iníci
 INSERT INTO "values" VALUES ('d48ec4e1-26bb-3190-827e-644225fec054', 'início é qualificado por', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('fa9f4573-42a2-35ad-9598-550019f05347', 'P79 起点认定的性质是', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('a0c99409-c497-3f51-8e59-5d8608fb2aa9', '起点认定的性质是', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'zh', 'altLabel');
-INSERT INTO "values" VALUES ('ae275574-460c-361f-9083-85a5441fcd83', 'had at most duration', '86caed02-d112-3cd7-8f21-4836e4997850', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('154068aa-6e28-3de2-b97b-c3717253a837', 'This property qualifies the beginning of an E52 Time-Span in some way. 
 The nature of the qualification may be certainty, precision, source etc.
 ', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'en-US', 'scopeNote');
@@ -3032,8 +4073,22 @@ INSERT INTO "values" VALUES ('403a3042-8bdc-3ebc-8dce-6a754a936b72', '时间最�
 INSERT INTO "values" VALUES ('44048ecc-83ac-3f85-acb9-33d3d352886d', 'This property describes the minimum length of time covered by an E52 Time-Span. 
 It allows an E52 Time-Span to be associated with an E54 Dimension representing it’s minimum duration (i.e. it’s inner boundary) independent from the actual beginning and end.
 ', 'b38666a2-59fd-3154-85c3-90edaa812979', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8dfe91f7-1b53-304e-800e-e063fd540719', 'P83i είναι ελάχιστη διάρκεια του/της', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('2e20e14b-a3bb-3fa7-b253-1361766dc235', 'είναι ελάχιστη διάρκεια του/της', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c32fec1b-5781-3710-84ea-e9b4a4ce53a6', 'P83i a été la durée minimum de', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ed36565f-ffdf-3ac1-9f87-5cc287722ed3', 'a été la durée minimum de', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('629e1297-90b4-3983-b098-42dc16b3ff74', 'P83i был минимальной длительностью для', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b9cf96c2-9e82-334f-9675-2a4ab3416f1c', 'был минимальной длительностью для', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('0e558104-5de1-32cd-b83d-754867af9e62', 'P83i was minimum duration of', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('ff2a19af-9e3a-3195-888d-a43fda669942', 'was minimum duration of', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0180540d-bf44-3320-a3b1-8dc4199ea26e', 'P83i war Mindestdauer von', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('ad0f0a83-0fe7-3f47-b7eb-7ae87d6c0bdd', 'war Mindestdauer von', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b2390488-0341-3d86-84c5-a23dd176c090', 'P83i foi a duração mínima de', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('e6e55b52-8390-3b7a-ba14-eeb4a3d06b6c', 'foi a duração mínima de', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('2f52e9dd-70a3-3e90-8857-88ca187a391c', 'P84 είχε μέγιστη διάρκεια', '86caed02-d112-3cd7-8f21-4836e4997850', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('279eba9c-a08a-3cbc-ac35-b44601b5383d', 'είχε μέγιστη διάρκεια', '86caed02-d112-3cd7-8f21-4836e4997850', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7d9aca35-3826-3793-bf6e-9725d85cde6a', 'P84 had at most duration', '86caed02-d112-3cd7-8f21-4836e4997850', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('ae275574-460c-361f-9083-85a5441fcd83', 'had at most duration', '86caed02-d112-3cd7-8f21-4836e4997850', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('0f264dd4-4d05-3c63-84ca-35a9a5ea413c', 'P84 hatte Höchstdauer', '86caed02-d112-3cd7-8f21-4836e4997850', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('e75121c0-ce52-34f1-8e68-d1dbb73f527f', 'hatte Höchstdauer', '86caed02-d112-3cd7-8f21-4836e4997850', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('a63e04df-9364-31b5-812e-977143112703', 'P84 имеет длительность меньше чем', '86caed02-d112-3cd7-8f21-4836e4997850', 'ru', 'prefLabel');
@@ -3047,6 +4102,19 @@ INSERT INTO "values" VALUES ('6296a87e-5b65-3f3b-b45c-67da016fccab', '时间最�
 INSERT INTO "values" VALUES ('cda3e89c-1f1a-39a8-aecd-d4103b78418f', 'This property describes the maximum length of time covered by an E52 Time-Span. 
 It allows an E52 Time-Span to be associated with an E54 Dimension representing it’s maximum duration (i.e. it’s outer boundary) independent from the actual beginning and end.
 ', '86caed02-d112-3cd7-8f21-4836e4997850', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('04575960-e908-3d6d-a41c-9abab1269af9', 'P84i был максимальной длительностью для', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c8992c94-15b9-3d43-a0d4-c1299ce3d3bb', 'P94i foi criado por', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b6c0d077-bdc7-31f7-becc-80244e68ab73', 'был максимальной длительностью для', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e2e45816-738f-3c39-b5e1-26f755228b29', 'P84i war längste Dauer von', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('1e79a669-4656-30a0-8327-c324650932df', 'war längste Dauer von', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('f6403948-16aa-3fab-af02-9188d187a6d0', 'P84i was maximum duration of', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('ef0d40ba-5b0d-30a2-8454-a7e67476da19', 'was maximum duration of', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0848c29c-0cc9-3962-9b6a-d8ef431e09ed', 'P84i είναι μέγιστη διάρκεια του/της', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('c09b7ad6-a9e6-3ddd-a3b1-044d3fb1282c', 'είναι μέγιστη διάρκεια του/της', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('0918c605-3686-32b5-9329-eda3f3ee9b70', 'P84i a été la durée maximum de', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('50f8189f-24e8-3fd4-8180-772bcca8f445', 'a été la durée maximum de', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('9359ce95-50ab-365d-9cd8-ef6543b41ebf', 'P84i foi a duração máxima de', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('2c771f51-84b4-3b01-93db-23129aa68c76', 'foi a duração máxima de', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('96db18a9-05b0-3124-9de8-0e0e61fefc6d', 'P86 falls within', '014fefdb-ddad-368b-b69c-951a0763824d', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('62088079-bb5a-3ff4-b23b-1c532a6edb06', 'falls within', '014fefdb-ddad-368b-b69c-951a0763824d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('e5a7602f-93b6-3a89-b305-0d26947aab41', 'P86 содержится в', '014fefdb-ddad-368b-b69c-951a0763824d', 'ru', 'prefLabel');
@@ -3064,6 +4132,20 @@ INSERT INTO "values" VALUES ('9c7f5bbb-5582-39e3-9e55-c2b4f91d1ba9', '时间上�
 INSERT INTO "values" VALUES ('114289f9-5aef-394b-be10-f6c66bf73369', 'This property describes the inclusion relationship between two instances of E52 Time-Span.
 This property supports the notion that a Time-Span’s temporal extent falls within the temporal extent of another Time-Span. It addresses temporal containment only, and no contextual link between the two instances of Time-Span is implied.
 ', '014fefdb-ddad-368b-b69c-951a0763824d', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('f9a69e54-c09e-3f00-aefa-1999aa6de09b', 'P86i inclut', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('6f4f2e29-984f-3c08-a428-24b2a12ef8e4', 'inclut', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('5fbf46fd-9216-39d5-b0cf-4e993bb68ee0', 'P86i enthält', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('df0b529b-6cb3-3a75-be64-37cbd78772e0', 'enthält', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5cbe6906-2b20-39c4-9823-85a456df079e', 'P86i contains', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('25c5e06d-a627-30db-a97b-d184d39d3003', 'contains', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('317e085a-cc73-3f7c-9519-f9fa4c5e7075', 'P86i περιέχει', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('18b9daa0-c6c7-3967-b444-ff99049a353e', 'περιέχει', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('36668e63-5390-3869-9d8a-e0e303ae7d37', 'P86i содержит', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('2089d677-13d8-3246-a11b-5204beec131c', 'содержит', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('82991d5f-69e6-3761-b536-0dd1c3263ab7', 'P86i contém', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('519ab2d4-a7ef-3ae6-a84c-c58faf0b9629', 'contém', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('944c0735-c3c9-3a18-ae4b-686432e1fd7e', 'P86i 时间上涵盖了', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5b8cdaa4-5143-35ee-a6e7-14d1c8f0a9ea', '时间上涵盖了', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('bc4133b2-c598-3b3d-94c6-63fd21d896f7', 'P87 αναγνωρίζεται ως', '697dc6cc-0da6-301c-9703-78edbf812fac', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('b73cf29b-4434-3595-b16c-91f28403ef62', 'αναγνωρίζεται ως', '697dc6cc-0da6-301c-9703-78edbf812fac', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('3b5b9ddc-2f75-35f1-85fe-80175d0cf2a2', 'P87 is identified by', '697dc6cc-0da6-301c-9703-78edbf812fac', 'en', 'prefLabel');
@@ -3081,6 +4163,20 @@ INSERT INTO "values" VALUES ('8f0aea04-2f85-3397-b18f-bbc58b9403de', '有辨认�
 INSERT INTO "values" VALUES ('35574042-f04a-3c08-8a63-7145df896176', 'This property identifies an E53 Place using an E44 Place Appellation. 
 Examples of Place Appellations used to identify Places include instances of E48 Place Name, addresses, E47 Spatial Coordinates etc.
 ', '697dc6cc-0da6-301c-9703-78edbf812fac', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a36adfae-0455-33bb-90af-15a25cbb9625', 'P87i bezeichnet', '1bad9598-520c-36c3-9116-44e24129f3e0', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('126690a1-4306-33b9-8a4e-ffde527a098f', 'bezeichnet', '1bad9598-520c-36c3-9116-44e24129f3e0', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('2a439c5f-d3af-36b8-a20e-c72abbb24856', 'P87i είναι αναγνωριστικό', '1bad9598-520c-36c3-9116-44e24129f3e0', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('1fcdb4d1-6f06-346b-8205-e7a17e420231', 'είναι αναγνωριστικό', '1bad9598-520c-36c3-9116-44e24129f3e0', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('fcc25fee-3401-3188-b54f-517bc647b8fd', 'P87i идентифицирует', '1bad9598-520c-36c3-9116-44e24129f3e0', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c92802c8-11ee-3956-b929-778946f0d3de', 'идентифицирует', '1bad9598-520c-36c3-9116-44e24129f3e0', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('3a700b4b-cd91-3c7d-a512-eff6f5142a48', 'P87i identifie', '1bad9598-520c-36c3-9116-44e24129f3e0', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('cfaf3e15-6a06-364a-9856-3081b2c92dbd', 'identifie', '1bad9598-520c-36c3-9116-44e24129f3e0', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('990d0169-1058-31f5-965c-f5e1fadd73be', 'P87i identifies', '1bad9598-520c-36c3-9116-44e24129f3e0', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('c413abf2-65e5-3c6c-a195-847da3f422e7', 'identifies', '1bad9598-520c-36c3-9116-44e24129f3e0', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('77f2826f-7466-3eb3-a564-a209c3b84722', 'P87i identifica', '1bad9598-520c-36c3-9116-44e24129f3e0', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('2cd01b98-61df-3ae8-bce9-e21a5556e1bd', 'identifica', '1bad9598-520c-36c3-9116-44e24129f3e0', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('18fdf0df-7aab-30b4-b3f2-f9e6a507714e', 'P87i 被用来辨认', '1bad9598-520c-36c3-9116-44e24129f3e0', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('6bacc0fa-69ed-379c-aa65-226b15faa866', '被用来辨认', '1bad9598-520c-36c3-9116-44e24129f3e0', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('eed691b0-6e75-3b95-a9c6-f0a9670f976e', 'P89 s’insère dans', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('6bea8594-c0e5-382e-a433-31caee285cda', 's’insère dans', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('1edd8956-0e60-34af-92ca-6c406921e2f5', 'P89 falls within', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'en', 'prefLabel');
@@ -3098,6 +4194,20 @@ INSERT INTO "values" VALUES ('c442b1d2-ec15-3ee1-a81b-d0b1dd45c173', '空间上�
 INSERT INTO "values" VALUES ('53d573c6-c553-3cb4-8999-a34c0918fff6', 'This property identifies an instance of E53 Place that falls wholly within the extent of another E53 Place.
 It addresses spatial containment only, and does not imply any relationship between things or phenomena occupying these places.
 ', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('85c94b45-987a-368a-b605-dbf04b723090', 'P89i inclut', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('9111c27f-20a5-38fd-b01d-f78f0191f4f1', 'inclut', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a5dd2fe4-0358-3b4a-b8bc-a85a7a109778', 'P89i содержит', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b0cc3770-05e6-3cbd-be14-3094813367da', 'содержит', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('b567cb29-1e0d-3bfc-ab0e-0ed3db269e34', 'P89i περιέχει', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('785f5b7e-51ff-39bc-ba85-27eeb515574d', 'περιέχει', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('dfafed9f-1738-3554-98ad-590c47ac1bf8', 'P89i enthält', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('3a8a1221-e7db-3861-b9c7-f5b12fd708bf', 'enthält', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('6c706c53-5697-3e24-ae6d-cdfc6a7ebd17', 'P89i contains', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('7e8114f7-3dab-3712-885d-0de531b16e56', 'contains', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ab012be8-5f0e-32a7-9ba1-c1a3a4e1ebad', 'P89i contém', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('1dad2c04-5c72-3cd9-a342-e96cdf617bcc', 'contém', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('bcdc4685-c215-3311-81c0-8095bbfdbdf0', 'P89i 空间上包含了', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a3d7f20f-1d18-3ff3-afc1-d3a211181bcf', '空间上包含了', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('e548873f-11c2-3472-a4c5-adf2d242d360', 'P90 hat Wert', '26af9ec1-e169-3486-9bb5-3c8187784c8e', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('307d333c-417a-3473-abae-99219bf35e41', 'hat Wert', '26af9ec1-e169-3486-9bb5-3c8187784c8e', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('04fd225a-3112-3e98-b78a-d7a053f23c78', 'P90 έχει τιμή', '26af9ec1-e169-3486-9bb5-3c8187784c8e', 'el', 'prefLabel');
@@ -3128,6 +4238,20 @@ INSERT INTO "values" VALUES ('0d52695a-9cf2-3728-8153-73b4d54d940e', 'tem unidad
 INSERT INTO "values" VALUES ('7b45ed58-fd81-30e7-be15-dd98914ea6af', 'P91 有单位', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('74e021e3-63b4-303f-9861-5b1e9e8b57f1', '有单位', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('539998fd-3594-38d3-a07f-1f95406f9009', 'This property shows the type of unit an E54 Dimension was expressed in.', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('6653b0e1-9463-3465-a0e7-b0c9c27f039e', 'P91i является единицей для', '4beb6f38-12e5-35b5-99b2-283c924db270', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('f22d06a9-2197-3d48-a26d-95f680ee3555', 'является единицей для', '4beb6f38-12e5-35b5-99b2-283c924db270', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('3ffb0b50-ad51-3c3d-9de5-7e6f5ef7c11b', 'P91i est l''unité de', '4beb6f38-12e5-35b5-99b2-283c924db270', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('897f7b6d-16d5-390a-98ed-1ce399b9a493', 'est l''unité de', '4beb6f38-12e5-35b5-99b2-283c924db270', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('469fe10e-6a18-3877-963b-d46efd96827c', 'P91i ist Einheit von', '4beb6f38-12e5-35b5-99b2-283c924db270', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('92081118-b227-3add-a81d-4d2bac4a825f', 'ist Einheit von', '4beb6f38-12e5-35b5-99b2-283c924db270', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('c29b0002-df31-3f33-aca0-e32041ce9522', 'P91i αποτελεί μονάδα μέτρησης του/της', '4beb6f38-12e5-35b5-99b2-283c924db270', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('dab78f6d-e32c-3deb-9286-a0143f2936b8', 'αποτελεί μονάδα μέτρησης του/της', '4beb6f38-12e5-35b5-99b2-283c924db270', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('788ac27b-464b-301a-9d8f-503f6f911cb2', 'P91i is unit of', '4beb6f38-12e5-35b5-99b2-283c924db270', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('40e01345-8678-3520-9539-beca72ae499d', 'is unit of', '4beb6f38-12e5-35b5-99b2-283c924db270', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('46658be1-1345-3b54-9477-c5f57d846723', 'P91i é unidade de', '4beb6f38-12e5-35b5-99b2-283c924db270', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('039f13e9-bbd2-38d7-a69a-354e703c0cc6', 'é unidade de', '4beb6f38-12e5-35b5-99b2-283c924db270', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('883a957e-93ce-3922-99cd-43b78e903cf9', 'P91i 被当做单位来表示', '4beb6f38-12e5-35b5-99b2-283c924db270', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4f2ea56a-77be-330f-a35a-63b16e094194', '被当做单位来表示', '4beb6f38-12e5-35b5-99b2-283c924db270', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ccfe2797-112d-32f5-bc16-d0c5432e81bf', 'P92 a fait exister', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('82170e31-f50a-373e-82e9-b3b77d0290de', 'a fait exister', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('03f333c1-c846-329a-838c-4a14c989f421', 'P92 brought into existence', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'en', 'prefLabel');
@@ -3142,8 +4266,24 @@ INSERT INTO "values" VALUES ('d08944cb-503d-3ba1-8a39-b2b341c8c9c0', 'P92 trouxe
 INSERT INTO "values" VALUES ('615e1455-00e2-350c-83ba-57876f287471', 'trouxe à existência', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('6e98ca00-7fe1-3c07-af76-24c47034f0b9', 'P92 开始了', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('8c45b18f-ec07-37a0-be18-79c8f05d81b1', '开始了', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('321cae88-1013-37d0-87d9-3ced913872cd', 'P94i wurde erschaffen durch', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('878f127b-540e-3b91-8cf1-4f67e77a9928', 'wurde erschaffen durch', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('aa85b241-aa33-31cf-b376-f136f5f85f14', 'This property allows an E63 Beginning of Existence event to be linked to the E77 Persistent Item brought into existence by it.
 It allows a “start” to be attached to any Persistent Item being documented i.e. E70 Thing, E72 Legal Object, E39 Actor, E41 Appellation, E51 Contact Point and E55 Type', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a7668c50-0a35-3a7f-a3b1-66dd84a553e1', 'P92i was brought into existence by', '92388748-e308-3295-9140-6974beab1611', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('835e0443-deb1-3a12-912a-2469719c637a', 'was brought into existence by', '92388748-e308-3295-9140-6974beab1611', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2170c4ca-c972-3639-8b50-3cef05b23b21', 'P92i γεννήθηκε από', '92388748-e308-3295-9140-6974beab1611', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('8aa42b37-c09d-3fff-8dd0-d3f4ca13c4a4', 'γεννήθηκε από', '92388748-e308-3295-9140-6974beab1611', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c04fb796-de2d-37a2-9f73-cc2d16ec82c0', 'P92i wurde in Existenz gebracht durch', '92388748-e308-3295-9140-6974beab1611', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('2520900a-ff21-3906-aa72-759e02263d31', 'wurde in Existenz gebracht durch', '92388748-e308-3295-9140-6974beab1611', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('790f2125-5c63-3b8f-aced-188583bcbe44', 'P92i a commencé à exister du fait de', '92388748-e308-3295-9140-6974beab1611', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('d4dc3945-9e65-3506-98a4-3135c71f4880', 'a commencé à exister du fait de', '92388748-e308-3295-9140-6974beab1611', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('35b2c761-b118-34e3-ad80-859ed33fef93', 'P92i был создан посредством', '92388748-e308-3295-9140-6974beab1611', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('58cd21c9-7fd8-38b6-8136-50601cf82362', 'был создан посредством', '92388748-e308-3295-9140-6974beab1611', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('ad50de2b-027e-3886-9b1e-ee05cbee1972', 'P92i passou a existir por', '92388748-e308-3295-9140-6974beab1611', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('88ad8fef-906b-32ff-a38a-df965240a558', 'passou a existir por', '92388748-e308-3295-9140-6974beab1611', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('008443df-7384-304b-8d6e-0e21b49576ef', 'P92i 被开始於', '92388748-e308-3295-9140-6974beab1611', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ccaf53d1-d1e4-3746-a086-6eb117fb53ef', '被开始於', '92388748-e308-3295-9140-6974beab1611', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('335bf55c-c8e9-3161-b3ff-7f9d6d9b7f6d', 'P93 a fait cesser d’exister', 'f865c72a-09dd-386f-a9eb-385176727d94', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('5106b289-dbb0-3d60-8b48-d6da4cc78b10', 'a fait cesser d’exister', 'f865c72a-09dd-386f-a9eb-385176727d94', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('d44963b4-8def-3d5d-bfa9-be818380e26b', 'P93 положил конец существованию', 'f865c72a-09dd-386f-a9eb-385176727d94', 'ru', 'prefLabel');
@@ -3162,6 +4302,20 @@ INSERT INTO "values" VALUES ('4d8b767f-cbaa-328d-bfa1-3e33fc9d12ff', 'This prope
 In the case of immaterial things, the E64 End of Existence is considered to take place with the destruction of the last physical carrier.
 This allows an “end” to be attached to any Persistent Item being documented i.e. E70 Thing, E72 Legal Object, E39 Actor, E41 Appellation, E51 Contact Point and E55 Type. For many Persistent Items we know the maximum life-span and can infer, that they must have ended to exist. We assume in that case an End of Existence, which may be as unnoticeable as forgetting the secret knowledge by the last representative of some indigenous nation.
 ', 'f865c72a-09dd-386f-a9eb-385176727d94', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('f21e01b2-8c86-3795-aadd-e9cb85c903ad', 'P93i прекратил существование посредством', '28bd339b-43e4-3671-add8-6a48fad8593e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('f8301633-e7d0-3787-89d7-acd2e2cc828e', 'прекратил существование посредством', '28bd339b-43e4-3671-add8-6a48fad8593e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('ed25f70e-c292-3665-a8d6-1c4956dc4df0', 'P93i a cessé d’exister du fait de', '28bd339b-43e4-3671-add8-6a48fad8593e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('04a9542a-84f3-3c72-85ad-5cbec102e654', 'a cessé d’exister du fait de', '28bd339b-43e4-3671-add8-6a48fad8593e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d7d550d5-bd90-3a89-9eec-f7df654251fc', 'P93i was taken out of existence by', '28bd339b-43e4-3671-add8-6a48fad8593e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('a26f52fd-2b24-32f3-badb-4f64455176dc', 'was taken out of existence by', '28bd339b-43e4-3671-add8-6a48fad8593e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('30d7d90f-59c9-364c-9766-0d1e62fd6ed7', 'P93i αναιρέθηκε από', '28bd339b-43e4-3671-add8-6a48fad8593e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('cf86c42f-ec86-3bfe-aab3-0bdb0ecd7e65', 'αναιρέθηκε από', '28bd339b-43e4-3671-add8-6a48fad8593e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('f158bae1-4af7-317f-b711-a4099862ff52', 'P93i wurde seiner Existenz beraubt durch', '28bd339b-43e4-3671-add8-6a48fad8593e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e87e4724-5e73-304f-b67c-524cf7db7369', 'wurde seiner Existenz beraubt durch', '28bd339b-43e4-3671-add8-6a48fad8593e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('1b91a9eb-39e5-3f8c-b38e-41741596ebcb', 'P93i deixou de existir', '28bd339b-43e4-3671-add8-6a48fad8593e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c622e370-7f9d-3310-9e7b-c5a750864069', 'deixou de existir', '28bd339b-43e4-3671-add8-6a48fad8593e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('2f2349b3-6481-3c27-a370-565e21c139c1', 'P93i 被结束於', '28bd339b-43e4-3671-add8-6a48fad8593e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5d8aeec9-b6d5-3e1d-a50c-f1fc725dbd4c', '被结束於', '28bd339b-43e4-3671-add8-6a48fad8593e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('46f44dd4-0fff-31c0-bed3-f7dc4b3047e4', 'P94 δημιούργησε', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('20da3da4-fbdc-3702-9335-5ef9261df7a1', 'δημιούργησε', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('4d23b6e0-37f0-33c8-9b4e-48ee3648551e', 'P94 создал', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'ru', 'prefLabel');
@@ -3179,6 +4333,16 @@ INSERT INTO "values" VALUES ('dbdc46c0-c794-30f4-84ec-c9454fe5588a', '创造了'
 INSERT INTO "values" VALUES ('267be108-8527-3051-bcaf-f2683683851e', 'This property allows a conceptual E65 Creation to be linked to the E28 Conceptual Object created by it. 
 It represents the act of conceiving the intellectual content of the E28 Conceptual Object. It does not represent the act of creating the first physical carrier of the E28 Conceptual Object. As an example, this is the composition of a poem, not its commitment to paper.
 ', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('66858039-ae92-3079-adeb-41085aec8162', 'P94i δημιουργήθηκε από', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('ba0c3111-42f6-3be8-b0fc-2f21aac6a92c', 'δημιουργήθηκε από', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7674d187-3b6a-304a-8098-8d6bfc3900e6', 'P94i a été créé par', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('e01d2cf1-764a-35d2-9b91-c66bb357a34c', 'a été créé par', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('c1c754f5-f057-3b10-950a-7e76cc035992', 'P94i был создан посредством', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('8be2a8fc-6796-39a3-badd-edaaa484d115', 'был создан посредством', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('03819804-1104-3bdc-877f-51a84c03935b', 'P94i was created by', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('0e2db07b-9e3b-33b0-954e-659e9d290c98', 'foi criado por', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('03c2dee9-c711-3555-9677-726a9b2c2b1c', 'P94i 被创造於', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a38ce04b-f9f7-3919-8826-5b8cdb9c4e8a', '被创造於', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('699bcb75-8f6d-3e96-ad16-d94b1d5e4dbe', 'P95 a fondé', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('a73ca5a4-0da1-3712-ac24-be4670a2b18f', 'a fondé', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('44b97cef-b60f-3e76-9119-28b7310ada88', 'P95 сформировал', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'ru', 'prefLabel');
@@ -3194,6 +4358,20 @@ INSERT INTO "values" VALUES ('95aca1c9-3fd3-37a2-b6ff-72238c718d51', 'formou', '
 INSERT INTO "values" VALUES ('ee9207b9-3568-3ee1-a9c8-0168c96b4493', 'P95 组成了', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('4d25a736-a5b0-3add-ba01-ef1602714fda', '组成了', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6f87a62a-3312-36d0-b404-30d437126fc9', 'This property links the founding or E66 Formation for an E74 Group with the Group itself.', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('18036dc1-2a85-3c0e-a9c2-e98f4988edb2', 'P95i a été fondé par', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('fc34688c-c626-35c6-8bb5-a281b3191ea7', 'a été fondé par', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('3743a3bd-0de0-3a33-8c59-ae37d81fc8d0', 'P95i wurde gebildet von', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('bc86a422-d4d6-3514-a7b3-87113ebaaa43', 'wurde gebildet von', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('80d49e59-66ba-3f6d-bbef-08d88e673fb9', 'P95i σχηματίστηκε από', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f4bfd17d-79b3-3548-9d34-0d238e1db3d4', 'σχηματίστηκε από', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('73a2e4ed-fd2e-398d-acff-31bdef01dbf1', 'P95i was formed by', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d0b028b3-9fa3-31de-b128-dd86bcb7a760', 'was formed by', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('7828e86f-1886-3b48-84fb-22b11d78f282', 'P95i была сформирована посредством', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('f40294cb-7470-3ba0-b415-f67442b8c6dc', 'была сформирована посредством', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('4b0fc2f7-4bf7-3281-a377-97adf9e4025f', 'P95i foi formado por', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('20add2e0-f774-3b25-8251-b58a47fc4a81', 'foi formado por', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('40da7e9d-e8af-3dbb-8138-9c00db44d1b9', 'P95i 被组成於', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('b6c75b3d-2c23-3c0c-9f83-4f74febae0e9', '被组成於', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('9cbb2fd3-f9cf-3503-bed3-03e8e9104081', 'P96 посредством матери', '9e806e49-e728-32cf-821e-504ca9916afc', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('8f167019-0927-3943-b521-062ac6e4e9d8', 'посредством матери', '9e806e49-e728-32cf-821e-504ca9916afc', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('392cf877-015e-362d-a1e0-256f414e13ae', 'P96 durch Mutter', '9e806e49-e728-32cf-821e-504ca9916afc', 'de', 'prefLabel');
@@ -3212,6 +4390,20 @@ INSERT INTO "values" VALUES ('5502a5c7-d43d-32f2-b0bb-e7ab80691eb5', 'This prope
 
 Note that biological fathers are not necessarily participants in the Birth (see P97 from father (was father for)). The Person being born is linked to the Birth with the property P98 brought into life (was born). This is not intended for use with general natural history material, only people. There is no explicit method for modelling conception and gestation except by using extensions. This is a sub-property of P11 had participant (participated in).
 ', '9e806e49-e728-32cf-821e-504ca9916afc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('e102eba0-4db9-3f94-8d3b-275ca3bf990f', 'P96i ήταν μητέρα του/της', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('a8402365-95ce-36bc-9a24-6ee9eba58d69', 'ήταν μητέρα του/της', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('46082bad-f69b-3d34-9ef5-cda51be4c630', 'P96i a donné naissance à', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('b4a1c489-ac77-3857-a219-665cdc30387f', 'a donné naissance à', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e2c5d8c6-c184-3b83-a1e2-900d645449f9', 'P96i gave birth', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('1a728469-dba9-3b84-b7e0-995569d4a03e', 'gave birth', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('af0ff3fe-b5b7-393e-836f-a809a333d3cb', 'P96i дал рождение', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('cc564526-64d1-3968-a92b-e2b070114407', 'дал рождение', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('148a705e-80e3-3288-8d5a-3744e2acd691', 'P96i gebar', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('edb2bb54-e800-30c3-b9da-d9f5a277f6be', 'gebar', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('ef99837f-be18-3793-b71b-53f451c3476c', 'P96i deu nascimento', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('58bba0fd-3309-3f8f-9ba5-02b126279f06', 'deu nascimento', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('fb56ec97-2032-31dd-90c8-61416d4f5574', 'P96i 成为生母於', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('875cd988-be12-300f-8d7d-321d6ee1af47', '成为生母於', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('79ed041d-d48b-3210-843d-55470756077a', 'P97 gab Vaterschaft', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('22206a12-3035-3fa0-ac26-14656718faab', 'gab Vaterschaft', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('8e854b64-84e2-3533-8848-f99280fe0d61', 'P97 от отца', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'ru', 'prefLabel');
@@ -3226,11 +4418,28 @@ INSERT INTO "values" VALUES ('5eb8083e-4e82-3b7d-b74d-e0ea17a4fd8d', 'P97 pelo p
 INSERT INTO "values" VALUES ('b6fc9ef5-1155-3ce2-afe9-88af34c4b6c2', 'pelo pai', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('7aab5549-7cc9-3c08-a812-44ff483d3d2d', 'P97 来自父亲', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('4f441be0-f057-3cb4-b95f-8c1020d55205', '来自父亲', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'zh', 'altLabel');
+INSERT INTO "values" VALUES ('5c14acbb-009f-34f1-9924-016a9b4956af', 'P100 a été la mort de', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0e992c54-1621-3ddf-b850-f0d726d97514', 'a été la mort de', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('f18e40e7-532f-3e26-b958-75e33e135f03', 'P100 ήταν θάνατος του/της', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('5ca58d11-386f-3e52-8519-7ca4c773f4cf', 'This property links an E67 Birth event to an E21 Person in the role of biological father.
 Note that biological fathers are not seen as necessary participants in the Birth, whereas birth-giving mothers are (see P96 by mother (gave birth)). The Person being born is linked to the Birth with the property P98 brought into life (was born).
 This is not intended for use with general natural history material, only people. There is no explicit method for modelling conception and gestation except by using extensions. 
 A Birth event is normally (but not always) associated with one biological father.
 ', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('7d5da6f0-0bac-3ccb-ac18-5ec2f6c14a5c', 'P97i was father for', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('51d0c267-8d23-3851-9ac1-ef2cefef6097', 'was father for', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8bb69b64-eb0c-374c-924e-fbdb44171bf2', 'P97i ήταν πατέρας του/της', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('aa0afa54-4941-3ab8-9bd3-317f0de7a6d0', 'ήταν πατέρας του/της', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('aa00a2bc-7743-309f-b7b2-c728bbd68f62', 'P97i a été père dans', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('3fdb188a-48a7-3a54-82b7-3695687713ff', 'a été père dans', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e7fdd875-a39a-3f81-bf37-14aa01d6a2a5', 'P97i war Vater für', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f3d7cb61-97d6-30e2-b183-7eb6c5fd43bc', 'war Vater für', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('ab047b74-235c-3872-8941-5bf2bafcd1db', 'P97i был отцом для', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5c07b690-fe0f-3a7b-b9e6-5c5b47b70711', 'был отцом для', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('6e4859cd-f3bb-3dee-b66c-ad4752380c3e', 'P97i foi pai para', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('e0381f64-9ddf-3f9e-846a-906382647f18', 'foi pai para', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('78aee56a-4133-3504-8561-40091d21bbd2', 'P97i 成为生父於', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('f227f8c5-1400-3c39-8c23-3be6b684a387', '成为生父於', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f323bdac-0612-3ca6-8d0f-b649c7021b2c', 'P98 a donné vie à', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('e2e947f4-61ba-3659-a6ba-97387093c851', 'a donné vie à', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('c6f820c4-82f8-3c13-82b2-50a6d24830c7', 'P98 brachte zur Welt', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'de', 'prefLabel');
@@ -3248,6 +4457,20 @@ INSERT INTO "values" VALUES ('53d13abe-d52c-38c2-82e8-d464b56f1d63', '诞生了'
 INSERT INTO "values" VALUES ('ee18575d-e8e6-3168-ba7f-2787e1a94f29', 'This property links an E67Birth event to an E21 Person in the role of offspring.
 Twins, triplets etc. are brought into life by the same Birth event. This is not intended for use with general Natural History material, only people. There is no explicit method for modelling conception and gestation except by using extensions.
 ', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('898b52fd-2d13-321b-b77e-4375269ea6bf', 'P98i est né', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('25ce7243-7972-3f65-81ff-287ece248253', 'est né', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('da2a6b8e-56e3-3818-a470-681406649e3b', 'P98i γεννήθηκε', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d3badcf6-74bb-30d0-8af1-4d9b5e289f9d', 'γεννήθηκε', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('5e021ce0-3320-3ea4-8a8b-a6b96a115fbf', 'P98i wurde geboren durch', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f8e51be5-3e84-382e-8d12-dbde7b9f69ed', 'wurde geboren durch', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('8f92793a-aab9-3793-a666-831c0be08823', 'P98i was born', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('c32edc3e-7778-3da6-97e7-d84312059c06', 'was born', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('db834512-e6a2-378e-af0f-f9abeeb70187', 'P98i был рожден', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('302e5af2-2a82-3ea3-91b7-3c0df64db982', 'был рожден', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('2beb1323-99d0-3dc2-b7d4-f85c94819304', 'P98i veio à vida pelo', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('e8ea7d2e-fa43-303d-8df2-b930f0f806bc', 'veio à vida pelo', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('849b7f29-55b9-3c53-ba39-ef1f345c2314', 'P98i 诞生於', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('92102309-ffeb-3a1f-883f-80426e8bea8b', '诞生於', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5e0c2135-acc7-3d23-b8e2-860f965a64e2', 'P99 διέλυσε', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('894b1463-b302-3533-bcb1-e816ab26672f', 'διέλυσε', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('d062381d-990f-3fab-99f7-20ccbff818aa', 'P99 распустил', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'ru', 'prefLabel');
@@ -3263,11 +4486,22 @@ INSERT INTO "values" VALUES ('72441abb-5b9a-3e99-ae79-6d446a548272', 'dissolveu'
 INSERT INTO "values" VALUES ('1eb32448-5825-36a4-b50e-38bd162b7ce2', 'P99 解散了', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('87d15be7-b9f2-365d-8a10-24a079795b53', '解散了', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('57b0f50f-c44f-3b6f-bcbd-b5639ab6d4b9', 'This property links the disbanding or E68 Dissolution of an E74 Group to the Group itself.', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('816a5ae4-044d-39ec-9698-3de3c3393cc6', 'P99i wurde aufgelöst durch', '78d02711-1e0a-3448-9bef-518d6039f63f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('5b1b95f3-0289-327a-8385-4b44a84ffe69', 'wurde aufgelöst durch', '78d02711-1e0a-3448-9bef-518d6039f63f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('da0e6a5e-99e6-32e5-aadc-cacf3fefd92e', 'P99i был распущен посредством', '78d02711-1e0a-3448-9bef-518d6039f63f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5224bb7f-c5f8-3743-9615-bd50026f4565', 'был распущен посредством', '78d02711-1e0a-3448-9bef-518d6039f63f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('c31e7a54-1b7a-3e1d-908b-1816786357f4', 'P99i a été dissous par', '78d02711-1e0a-3448-9bef-518d6039f63f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('9ee25faa-13bc-39ea-808f-05ba1c815245', 'a été dissous par', '78d02711-1e0a-3448-9bef-518d6039f63f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e89e8fbe-122d-345a-8c0b-73196c58bb93', 'P99i διαλύθηκε από', '78d02711-1e0a-3448-9bef-518d6039f63f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('87e081b8-b343-3d2c-a874-710a47390c4b', 'διαλύθηκε από', '78d02711-1e0a-3448-9bef-518d6039f63f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7de181ef-e872-3c55-afb4-1b2bace181c5', 'P99i was dissolved by', '78d02711-1e0a-3448-9bef-518d6039f63f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3418015d-adde-3305-87dc-ec10565fb740', 'was dissolved by', '78d02711-1e0a-3448-9bef-518d6039f63f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('bbdd7acd-b253-3597-ac11-7214089f055b', 'P99i foi dissolvido por', '78d02711-1e0a-3448-9bef-518d6039f63f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('dd5117bd-0d96-3de0-99b7-676096818fba', 'foi dissolvido por', '78d02711-1e0a-3448-9bef-518d6039f63f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('13ade868-808c-39d4-9b7e-b2f51affd654', 'P99i 被解散於', '78d02711-1e0a-3448-9bef-518d6039f63f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('23aab71d-6b24-310d-a6a1-bd155db8f6d8', '被解散於', '78d02711-1e0a-3448-9bef-518d6039f63f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('b3cecc5f-0472-3e6f-9c5e-7d3fc8c70e49', 'P100 was death of', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('c9383a32-ec43-35d0-bada-bd084bd33b0f', 'was death of', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('5c14acbb-009f-34f1-9924-016a9b4956af', 'P100 a été la mort de', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'fr', 'prefLabel');
-INSERT INTO "values" VALUES ('0e992c54-1621-3ddf-b850-f0d726d97514', 'a été la mort de', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'fr', 'altLabel');
-INSERT INTO "values" VALUES ('f18e40e7-532f-3e26-b958-75e33e135f03', 'P100 ήταν θάνατος του/της', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('3aad5b92-db8e-3c16-9f40-f93c93c8cf18', 'ήταν θάνατος του/της', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('aad026f4-ba79-3c16-9876-88bb847ef4dd', 'P100 Tod von', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('b41994e8-c353-3a09-94b1-49a0304f45d8', 'Tod von', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'de', 'altLabel');
@@ -3278,6 +4512,20 @@ INSERT INTO "values" VALUES ('67a7dad9-9215-3ec7-8797-173f01451b5b', 'foi a mort
 INSERT INTO "values" VALUES ('927503a7-c6d9-31ef-8453-3ab1aeeb703c', 'P100 灭亡了', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('13fab27e-26c4-3f32-8e4c-5ea216a6ed8d', '灭亡了', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('fc8d071f-6dc4-31a6-afc9-7537fe29f2cd', 'This property property links an E69 Death event to the E21 Person that died.', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('675bcea3-f730-37f8-8b91-e354363fc1e4', 'P100i starb in', '72248902-0df0-3571-a980-203a75528b5e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('d5e39fad-d0e5-3115-aa87-0ecf3d3320f7', 'starb in', '72248902-0df0-3571-a980-203a75528b5e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('c40baa13-b705-3ada-b6ab-30faf70628a8', 'P100i est mort par', '72248902-0df0-3571-a980-203a75528b5e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('cdd269f5-c608-3889-81f5-a43b693c9557', 'est mort par', '72248902-0df0-3571-a980-203a75528b5e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('c743db0f-5d36-3fde-bbdd-09e349ba2f3b', 'P100i died in', '72248902-0df0-3571-a980-203a75528b5e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('08e354cb-dc16-320c-b050-3e2a0a2c4b46', 'died in', '72248902-0df0-3571-a980-203a75528b5e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('a8454c45-b3b1-3680-9344-2e80a5fc293a', 'P100i πέθανε σε', '72248902-0df0-3571-a980-203a75528b5e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('e3be39b8-f21b-3c7b-bbaa-68f25206e63e', 'πέθανε σε', '72248902-0df0-3571-a980-203a75528b5e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('13a0b533-eaee-39f4-9207-522bdceb48b3', 'P100i умер в', '72248902-0df0-3571-a980-203a75528b5e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('e96d02ff-1cef-340b-9c81-647f37e3e24b', 'умер в', '72248902-0df0-3571-a980-203a75528b5e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('7ae31972-7f46-38d8-a925-2c49ffb23459', 'P100i morreu em', '72248902-0df0-3571-a980-203a75528b5e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('219bbfe6-8018-39d4-9c39-34337aaebfcc', 'morreu em', '72248902-0df0-3571-a980-203a75528b5e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('ec51e095-6ebd-30cf-b026-a8b1f86633bd', 'P100i 死亡於', '72248902-0df0-3571-a980-203a75528b5e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('bc010021-262a-31ae-a58a-a6d280bf3a0d', '死亡於', '72248902-0df0-3571-a980-203a75528b5e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('db2dee54-c0b6-39f7-b091-1a33cae6161c', 'P101 had as general use', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('db034df6-7877-332b-b1e0-dc6fb49c8b60', 'had as general use', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('8e250c6a-7b54-3a94-932a-8d9841c2060f', 'P101 avait comme utilisation générale', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'fr', 'prefLabel');
@@ -3295,6 +4543,20 @@ INSERT INTO "values" VALUES ('0081d711-6f4d-3a6e-92f0-a8265bc7da9b', '被惯用�
 INSERT INTO "values" VALUES ('84506975-fb19-3786-85be-e91aa63a5399', 'This property links an instance of E70 Thing to an E55 Type of usage.
 It allows the relationship between particular things, both physical and immaterial, and general methods and techniques of use to be documented. Thus it can be asserted that a baseball bat had a general use for sport and a specific use for threatening people during the Great Train Robbery.
 ', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('34cf786b-056f-363a-9baa-fc38d67ba84e', 'P101i war die Verwendung von', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c92974c3-1b12-36e4-aa82-7cfcab92eb5f', 'war die Verwendung von', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('f7f4ed58-a90f-3606-993a-b5bc5c17c238', 'P101i was use of', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f120c805-18ab-30a7-b029-5e30f258a10e', 'was use of', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2a2ef2dd-6a96-3091-a053-d4db86fe8570', 'P101i était l’utilisation de', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('e92e5a86-bd5f-3f3d-b264-f54421faaaaa', 'était l’utilisation de', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('cb6a1b54-4c90-3884-aed5-4be28fd68994', 'P101i был применением для', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('ad9bdb78-3e5a-3a28-834c-a6e11ec00b2c', 'был применением для', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('53f8a893-d53d-34c4-9472-98da8b37430f', 'P101i ήταν χρήση του/της', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('0d195bb3-f4b7-3471-b081-ff023a667342', 'ήταν χρήση του/της', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('4d8a6b6a-68d5-34fb-83db-55716e108f67', 'P101i foi uso de', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('2a3d04fe-8982-3fab-92d3-ce017836e485', 'foi uso de', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('3db94203-af57-3292-b85c-e96d4662e025', 'P101i 可使用', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('842835e1-da1f-39d6-9979-31c494685f8f', '可使用', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8d284ba3-c0b1-3794-8297-d51b4f53e137', 'P102 has title', '8c69765e-7827-371f-9db3-fea290f87739', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('37e55bdc-e3d5-39d6-a1c5-dc09e0da2987', 'has title', '8c69765e-7827-371f-9db3-fea290f87739', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('b6426bea-0b75-3d88-a6e6-823ad8455894', 'P102 имеет заголовок', '8c69765e-7827-371f-9db3-fea290f87739', 'ru', 'prefLabel');
@@ -3313,6 +4575,20 @@ INSERT INTO "values" VALUES ('c89c35b8-c539-3ca3-b2d2-a2f27b758689', 'This prope
 The P102.1 has type property of the P102 has title (is title of) property enables the relationship between the Title and the thing to be further clarified, for example, if the Title was a given Title, a supplied Title etc.
 It allows any man-made material or immaterial thing to be given a Title. It is possible to imagine a Title being created without a specific object in mind.
 ', '8c69765e-7827-371f-9db3-fea290f87739', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3c22c102-2357-3e2a-8f5c-859c137634a3', 'P102i is title of', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6386389e-5290-3cbd-8f67-b3fd8b8199c4', 'is title of', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('a13d92e2-c850-3a73-a469-9b5af068563e', 'P102i ist der Titel von', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('b993a447-3508-3949-86fc-259e2d962d1c', 'ist der Titel von', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5bd8da3a-50f2-310e-a348-818a8508f2fb', 'P102i είναι τίτλος του/της', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('938535c7-da0c-30ff-b70d-58bda354e9c0', 'είναι τίτλος του/της', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('59e63306-fd96-3b0f-80ea-f5593b996686', 'P102i est le titre de', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('449c02df-b1fb-3590-8932-13cedbf0778f', 'est le titre de', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('15ea3837-e0eb-337c-91ce-7f6bff3f8f1e', 'P102i является заголовком для', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('da753948-d0d9-3d1e-9e33-5832f73df037', 'является заголовком для', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('94fbf65b-2fb8-3d1e-965b-5191bd12cc8c', 'P102i é título de', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('275e8220-4ff3-3356-a706-5180858b1ecd', 'é título de', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('6e4fafa2-ed31-30ff-9f19-7428029ccce2', 'P102i 被用为标题来称呼', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('c1e56a4e-de3a-327b-b47e-eee94b88a2dc', '被用为标题来称呼', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6012c827-e2ff-3ae2-acb8-bff8ea30ae8b', 'P103 était destiné à', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('eeba9e17-9ba3-3e95-9fb8-5fc6048e8941', 'était destiné à', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('5372ddef-2175-32f3-938b-6dc016608441', 'P103 was intended for', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'en', 'prefLabel');
@@ -3329,6 +4605,18 @@ INSERT INTO "values" VALUES ('e3e80718-905c-3a88-b06f-dee301281eec', 'P103 被�
 INSERT INTO "values" VALUES ('49084fc1-8180-3e1e-bf69-c1a9887c5c5a', '被制作来用於', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('359a8d4c-6cd7-382d-b8b9-3ae15bcb61d4', 'This property links an instance of E71 Man-Made Thing to an E55 Type of usage. 
 It creates a property between specific man-made things, both physical and immaterial, to Types of intended methods and techniques of use. Note: A link between specific man-made things and a specific use activity should be expressed using P19 was intended use of (was made for).', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('439c53a8-6bca-3676-848e-a4bf392f21ce', 'P103i war Bestimmung von', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('b60c6eee-496d-395b-a804-553078d04e6e', 'war Bestimmung von', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('690066fa-9c0d-387b-8c37-e8c496caf58a', 'P103i was intention of', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('6c504d67-e0fe-3c68-aae0-69679f9a385f', 'was intention of', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('551f061d-ed4c-3d27-bf85-441721fecbc8', 'P103i был интенцией для', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('210d04b2-45d2-39d0-9e7e-4495e475f868', 'был интенцией для', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('ae1fe30c-0258-31f9-af4b-85dc17c49b2b', 'P103i ήταν προορισμός του', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('309fe0e5-09be-3dd8-9bb1-afaece4b96c5', 'ήταν προορισμός του', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('0cef9abc-0871-3ce7-9e7b-21c1ea03789d', 'P103i était la raison d''être de', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('2b566908-0366-3bf3-9139-ca8a21cce62c', 'était la raison d''être de', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ef164ee8-b50b-30a3-8f6a-f56c8232d017', 'P103i era a destinação de', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b4dfc2ad-0fc3-3370-afe5-e7e77ed89918', 'era a destinação de', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'pt', 'altLabel');
 INSERT INTO "values" VALUES ('d067f779-ade5-393a-867a-619c7d5e40c8', 'P104 est sujet à', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('c3ff2b26-b6f3-3f8f-8ff0-885537ede766', 'est sujet à', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('a4d4be46-21d3-3934-9017-93cea7333e3c', 'P104 is subject to', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'en', 'prefLabel');
@@ -3346,6 +4634,20 @@ INSERT INTO "values" VALUES ('3d228bd5-da42-3157-85c9-009141926384', '受制於'
 INSERT INTO "values" VALUES ('1994bba8-3416-3d16-aae6-bba714672942', 'This property links a particular E72 Legal Object to the instances of E30 Right to which it is subject.
 The Right is held by an E39 Actor as described by P75 possesses (is possessed by).
 ', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('2a753cd9-1a05-3914-8405-51859e9a296f', 'P104i ισχύει για', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('06b53b20-dbaf-376a-a160-0ce86983d2b1', 'ισχύει για', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('a7818447-59be-3533-ae93-0697830b283f', 'P104i s’applique à', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('7c6fc566-f8d9-3de9-bd9f-436968ce1e42', 's’applique à', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('bdb92417-6a89-3660-85dc-c04f0f845b75', 'P104i findet Anwendung auf', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('ae746f6d-9109-3713-8754-6377a1d78440', 'findet Anwendung auf', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('302183fa-954f-329b-86ca-7d87bd31ef52', 'P104i применяется к', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4db49a9d-b90e-320f-b44b-2bba570752bb', 'применяется к', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('9342dcbe-c151-3b54-91c5-b06080138180', 'P104i applies to', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('a37d2f6e-ed6b-34e5-8417-8cdcd6ff6e8d', 'applies to', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('52b1094f-d699-32a2-97d2-b9fa458be55d', 'P104i se aplicam à', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c88efb27-9568-34d4-bdf5-1c8af3b4fa8d', 'se aplicam à', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('4e6e6c89-95d6-379c-87e8-9a336117b2bc', 'P104i 被应用於', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('b37478b2-3317-3686-9ff6-62e6508a08e2', '被应用於', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('2fa89dac-accc-3a4f-830f-47c65bcb0a0c', 'P105 право принадлежит', '140073c4-60b5-352d-a5f7-244072fc4086', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('eaac5d8d-c55f-34ea-a82d-9b52e5876d01', 'право принадлежит', '140073c4-60b5-352d-a5f7-244072fc4086', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('65f0303e-f2fc-37ab-8c78-b89f8bd5a056', 'P105 droit détenu par', '140073c4-60b5-352d-a5f7-244072fc4086', 'fr', 'prefLabel');
@@ -3364,6 +4666,20 @@ INSERT INTO "values" VALUES ('be0dd0d5-3e08-3749-a660-f988076c0be1', 'This prope
 	It is a superproperty of P52 has current owner (is current owner of) because ownership is a right that is held on the owned object.
 P105 right held by (has right on) is a shortcut of the fully developed path from E72 Legal Object through P104 is subject to (applies to), E30 Right, P75 possesses (is possessed by) to E39 Actor.
 ', '140073c4-60b5-352d-a5f7-244072fc4086', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('4dd774e8-7f60-327f-89d3-fa03323407d2', 'P105i hat Rechte an', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('09b88aed-54e1-38c4-ad68-461ce0bc95d5', 'hat Rechte an', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('44e8ae33-eef1-3eb5-8174-ebe74bae3f0a', 'P105i владеет правом на', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('9ad89b71-5849-3829-b124-668c00b2c013', 'владеет правом на', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('7a41275d-21d1-369e-b991-25b4ae74098a', 'P105i has right on', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('73e8c536-1953-3778-822d-f428f077797c', 'has right on', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8e3a9d67-9227-380a-aa00-df1626dcdcfa', 'P105i détient un droit sur', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ba23e55d-4401-3f05-9785-fd2ca3c45039', 'détient un droit sur', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ef130e3d-dae3-3503-9e25-ebf47462afd9', 'P105i έχει δικαίωμα σε', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('4388417b-f632-31de-9bc9-2ddeb7bdef07', 'έχει δικαίωμα σε', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('23674bc5-d411-3cce-8e1a-7564ed3d008d', 'P105i possui direitos sobre', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('6c3c08e2-d3e2-30b7-8d71-c2baa5dcb866', 'possui direitos sobre', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('966ae224-e61d-357e-b2dd-33fcc9f24390', 'P105i 持有权限来管制', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('63134a1a-4141-3bc5-8b8f-f8be0479e106', '持有权限来管制', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('6259a29f-f55a-3c9a-9914-f86f7a37545b', 'P106  ist zusammengesetzt aus', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('cda6ead4-163b-3b9b-90bb-c329f2073fed', ' ist zusammengesetzt aus', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('f49ce88d-2c68-35ff-82ff-15b8585affc4', 'P106 составлен из', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'ru', 'prefLabel');
@@ -3380,6 +4696,20 @@ INSERT INTO "values" VALUES ('a91732b3-ef98-3fc6-899e-6ac7f0bbc5de', 'P106 有�
 INSERT INTO "values" VALUES ('1d7e68d7-f080-3b2d-a8e1-a9dfa41444aa', '有组成元素', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f89fd368-cc9f-3f23-a3a5-05531a59dd17', 'This property associates an instance of E90 Symbolic Object with a part of it that is by itself an instance of E90 Symbolic Object, such as fragments of texts or clippings from an image.
 ', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3ed78a19-6287-3868-95f2-c5b22e98cc17', 'P106i формирует часть', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('f7cb50b4-d6f5-3687-9b6d-1f893af8282f', 'формирует часть', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('74a87d95-d1c3-3572-8648-d084aae79ef5', 'P106i αποτελεί μέρος του/της', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('2cd013f0-dca7-3493-9515-5896ccc297ee', 'αποτελεί μέρος του/της', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('48ffb8ef-100c-37d3-9bbd-23d29a47ee2c', 'P106i bildet Teil von', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c70f2b10-65ff-3b61-b06e-273ed49f24aa', 'bildet Teil von', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('78383c6c-01ba-3986-9d8a-96d41116d7f9', 'P106i fait partie de', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('1d1b7e8c-cc84-38a4-8781-167cd4570693', 'fait partie de', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('b293931a-bc92-3c71-8165-8e617021b080', 'P106i forms part of', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('64415131-13dd-3733-8f9a-33793af8ad1f', 'forms part of', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('6fc801d8-31ff-3c88-90ca-cf320c920fda', 'P106i faz parte de', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('cddb852e-f0ae-368d-871d-284929d5b0cf', 'faz parte de', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('04e76de7-5a95-3f84-b492-cf2d8707c853', 'P106i 组成了', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('8edc32a3-5aaf-3a23-9dbf-bd0185fa63da', '组成了', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f0f9ed03-0cf3-38bd-965e-61f85511a586', 'P107 a pour membre actuel ou ancien', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('da26a5cd-edf2-3974-9891-cd95c03ebdea', 'a pour membre actuel ou ancien', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('05825f9e-bc09-38ed-b846-4420386a22bb', 'P107 has current or former member', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'en', 'prefLabel');
@@ -3399,6 +4729,20 @@ Groups, Legal Bodies and Persons, may all be members of Groups. A Group necessar
 This property is a shortcut of the more fully developed path from E74 Group through P144 joined with (gained member by), E85 Joining, P143 joined (was joined by) to E39 Actor
 The property P107.1 kind of member can be used to specify the type of membership or the role the member has in the group. 
 ', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('703c6145-dc94-31c2-8fee-aa021f25a889', 'P107i είναι ή ήταν μέλος του/της', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('8f0ac720-3d46-3b98-8185-bfd6b2b19f2a', 'είναι ή ήταν μέλος του/της', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('29a118b4-7dc8-3c79-bc42-381c72d557a0', 'P107i is current or former member of', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('66ca1143-d5d6-3427-8b1b-38acb8faf0ed', 'is current or former member of', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('18afc0f1-748f-3ee4-b716-4d7cf397ea50', 'P107i ist derzeitiges oder früheres Mitglied von', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('6ccc66ed-161d-30ae-99e1-f558188d02b8', 'ist derzeitiges oder früheres Mitglied von', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('c238381d-03de-3815-9bfd-449ed2196e63', 'P107i является действующим или бывшим членом', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('95e9b32c-0014-383c-966a-c605bd43a17d', 'является действующим или бывшим членом', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e8eafacd-e4be-3654-aca4-64e1f5525feb', 'P107i est actuel ou ancien membre de', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('df7edc0e-26cb-32a2-8785-ec19fbd827f0', 'est actuel ou ancien membre de', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('d423315a-c94f-3407-927c-56fe18a38d94', 'P107i é ou foi membro de', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('d59f5748-5cf0-3d25-a8c9-ab390dcfc942', 'é ou foi membro de', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('3a542c0c-0dac-3e93-ac60-d3a1b8e5f352', 'P107i 目前或曾经加入群组', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a1640233-4040-354d-97ed-4bc932004070', '目前或曾经加入群组', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8c94c677-1797-3785-aabd-72f71d87d248', 'P108 παρήγαγε', '632197f8-15a2-32b6-9886-c93e587f5b64', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('f8d8be98-9d7d-3630-a20f-d88dab47defa', 'παρήγαγε', '632197f8-15a2-32b6-9886-c93e587f5b64', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('42c1d8d8-9950-3618-8633-1d2b79cb3ef5', 'P108 a produit', '632197f8-15a2-32b6-9886-c93e587f5b64', 'fr', 'prefLabel');
@@ -3416,6 +4760,20 @@ INSERT INTO "values" VALUES ('54f2eaa2-5cac-33c1-adb3-3fd25e0cdd3a', '有产出�
 INSERT INTO "values" VALUES ('89b83ac8-2959-30db-9374-8329d02fef03', 'This property identifies the E24 Physical Man-Made Thing that came into existence as a result of an E12 Production.
 The identity of an instance of E24 Physical Man-Made Thing is not defined by its matter, but by its existence as a subject of documentation. An E12 Production can result in the creation of multiple instances of E24 Physical Man-Made Thing.
 ', '632197f8-15a2-32b6-9886-c93e587f5b64', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a8a579eb-ea90-3caf-b5c3-118afc065459', 'P108i παρήχθη από', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('ac52228f-f8cd-3bf5-ab6b-f5ec63595969', 'παρήχθη από', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('efc027ff-56d9-3fc0-a57e-96542967af11', 'P108i a été produit par', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0eb9bc09-7712-31df-bae0-508e5dd0dcc1', 'a été produit par', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('02b63aa1-1a53-3c65-b7f4-dc8db27d443b', 'P108i wurde hergestellt durch', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('480b045e-fbbf-36ad-8c8a-5a831ebf8039', 'wurde hergestellt durch', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('1095fd91-16aa-3b16-ae12-1818eaf45967', 'P108i был произведен посредством', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('fda36087-7389-3ab4-aa4a-73dd5daf264d', 'был произведен посредством', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('ffdf01f4-3eb0-3869-b0c8-b2170cdcded7', 'P108i was produced by', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('67a81731-b723-3986-9439-1a489933dc70', 'was produced by', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('2718e9cc-aa88-3794-8faa-fbc76fa07673', 'P108i foi produzido por', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('29d077fe-8299-3cef-b398-cd67cf6dd05d', 'foi produzido por', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('022c0130-67c6-3fde-afb6-c697f1102d72', 'P108i 被制作於', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4df4cd0c-70ea-351d-a7fa-48e4f83e7f4f', '被制作於', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ad07ff13-12fc-3265-8ae1-5fbe156a9430', 'P109 a pour conservateur actuel ou ancien', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('62dd7ffb-5c8f-3cde-92c0-2fd9570f4189', 'a pour conservateur actuel ou ancien', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('d73d2827-08c7-334c-ad82-486f00e77325', 'P109 hat derzeitigen oder früheren Kurator', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'de', 'prefLabel');
@@ -3434,6 +4792,20 @@ INSERT INTO "values" VALUES ('4406a0cb-8c2d-37b7-8fdf-e34649d84286', 'This prope
 
 It does not allow a history of curation to be recorded. This would require use of an Event initiating a curator being responsible for  a Collection.
 ', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('59259570-d777-37eb-b810-9ff16917d5e0', 'P109i является действующим или бывшим хранителем', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c4f56fd9-1e4f-364d-bdde-e54251c555c4', 'является действующим или бывшим хранителем', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('548a4357-f1e8-32a4-b804-7aa2336fd00c', 'P109i είναι ή ήταν επιμελητής του/της', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('13d4380d-d85a-349a-b8cd-6a97daef59ba', 'είναι ή ήταν επιμελητής του/της', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c8b8fdd4-dd78-37e0-a80e-03b60f5dce32', 'P109i est ou a été le conservateur de', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('b4d8a30a-8397-3a9e-b0a8-42fb218cf837', 'est ou a été le conservateur de', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('4590d2c5-18b2-3457-9cba-9cf7c92929f8', 'P109i ist derzeitiger oder früherer Kurator von', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('c50de68d-d590-32bd-9a23-63ac17322648', 'ist derzeitiger oder früherer Kurator von', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('8e091199-c4c1-308b-8410-2035071922ea', 'P109i is current or former curator of', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('9b5fc85e-473d-3fef-83ea-5f1948fd08a7', 'is current or former curator of', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('45e657d7-354f-3b34-8194-a12431630e87', 'P109i é ou foi curador de', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('b40d1a2a-d9dd-31b6-a779-37bc16c1740d', 'é ou foi curador de', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('6a08a3d1-7dec-3c41-ba1b-10ca357981b5', 'P109i 目前或曾经典藏管理', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('6c654450-3874-3f05-9e57-a9169ba1e6ed', '目前或曾经典藏管理', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('0d637760-0b2e-3e59-9997-feaefe58b578', 'P110 увеличил', '41f65567-9d44-371a-8806-03e08d332918', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('5d718bc3-b4b2-3785-a819-f7440be5e185', 'увеличил', '41f65567-9d44-371a-8806-03e08d332918', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('b6a0b2f7-dcdd-34de-b282-137c305f737f', 'P110 a augmenté', '41f65567-9d44-371a-8806-03e08d332918', 'fr', 'prefLabel');
@@ -3451,6 +4823,20 @@ INSERT INTO "values" VALUES ('bda5b180-8538-3894-9c50-d9ef9cd4f9b2', '扩增了'
 INSERT INTO "values" VALUES ('db038dbc-71bb-341f-bcab-ff4af8d3d685', 'This property identifies the E24 Physical Man-Made Thing that is added to (augmented) in an E79 Part Addition.
 Although a Part Addition event normally concerns only one item of Physical Man-Made Thing, it is possible to imagine circumstances under which more than one item might be added to (augmented). For example, the artist Jackson Pollock trailing paint onto multiple canvasses.
 ', '41f65567-9d44-371a-8806-03e08d332918', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('23e9accc-ec1d-3817-b2fd-0f509b8c229f', 'P110i a été augmenté par', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8122dbcc-019b-38f1-934b-6b78db3972e9', 'a été augmenté par', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('2877829c-2546-39cf-9f33-a7fd02f5a8e3', 'P110i was augmented by', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('bfce53b0-73ff-3348-b360-b28e3a09c68b', 'was augmented by', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0b6b4452-2736-360a-a8a6-c2b0d5a7b5e2', 'P110i был увеличен посредством', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4ef66b83-43fe-39f9-8de2-31e6be82c399', 'был увеличен посредством', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a3438baf-61b6-30cf-bedc-33ed2a060a35', 'P110i επαυξήθηκε από', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('4ba459c9-09fa-333b-98ef-84634db3f391', 'επαυξήθηκε από', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('bb755b8a-fd3a-353a-84cb-474f5953bd35', 'P110i wurde erweitert durch', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('b4fe8d00-8e45-3a8e-9db5-61331d11a4da', 'wurde erweitert durch', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('0e7ac556-b8fb-3648-be59-2ed27aad41e3', 'P110i foi aumentada por', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('a1bba3c1-fed3-380b-a2ef-d08abb45c24e', 'foi aumentada por', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('ab6be07f-f013-3dc4-b205-4f9e7da1f234', 'P110i 被扩增於', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('bb7fadb5-cd17-3771-bb8e-0019ba565a75', '被扩增於', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('702bf684-0f23-305d-be26-6c504af96d42', 'P111 fügte hinzu', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('bcccbba7-24c1-37e9-b8a1-2ce7cd555207', 'fügte hinzu', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('b7d8904a-8d14-3a3d-9b2e-4b4474e1acd9', 'P111 προσέθεσε', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'el', 'prefLabel');
@@ -3467,6 +4853,20 @@ INSERT INTO "values" VALUES ('f87f69aa-242d-3c0c-ace5-484cfdd0f5a1', 'P111 附�
 INSERT INTO "values" VALUES ('c493d353-8c3b-3518-b442-7709c21d46fd', '附加上部件', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('21117745-544f-3719-8ae3-fbceecc2ffdf', 'This property identifies the E18 Physical Thing that is added during an E79 Part Addition activity
 ', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('537ae8c2-d89f-3248-8c88-42cb9482f2cf', 'P111i a été ajouté par', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('5f5e998e-0e50-318d-ac54-b93dcd2923e9', 'a été ajouté par', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ad6fd2ab-88b9-3f83-a998-799207a5c945', 'P111i wurde hinzugefügt durch', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('f10ea909-9764-3937-860c-c040a2ac7443', 'wurde hinzugefügt durch', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('c65fd6d2-d3db-3372-8655-38268d488872', 'P111i was added by', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('cc8405c2-476d-3232-8b45-c24c6f923814', 'was added by', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('84e9b8e5-3bef-3f7d-b66b-27ccf5c5d38a', 'P111i προστέθηκε από', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('5468d88e-4dab-30e3-9f1c-ce850222953b', 'προστέθηκε από', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('b55bf2db-5c3c-31e0-b733-585bb2fdddbb', 'P111i был добавлен посредством', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('a64eb70f-3504-33d5-8396-794081051910', 'был добавлен посредством', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e32ea3ef-e910-32ae-8163-d07090744058', 'P111i foi adicionado por', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c783f912-817c-3f97-8668-845064cd5418', 'foi adicionado por', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('8c6b6886-a83f-3d12-9ef4-2ac5ec936b66', 'P111i 被附加於', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('eacae3a7-af44-3fa0-bb0f-d0cbede0674f', '被附加於', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('756f29eb-b6ae-3a07-873b-06bad1aa6d11', 'P112 уменьшил', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('fecd8de3-8f3d-35e1-bd44-35476682ad1a', 'уменьшил', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('d1977581-2be4-36b6-828d-4793fad49c65', 'P112 diminished', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'en', 'prefLabel');
@@ -3484,6 +4884,20 @@ INSERT INTO "values" VALUES ('2ffc79b4-ef4f-351e-b91d-4aecc772126f', '缩减了'
 INSERT INTO "values" VALUES ('01dc3c4b-01ed-3eae-a368-31def961c7df', 'This property identifies the E24 Physical Man-Made Thing that was diminished by E80 Part Removal.
 Although a Part removal activity normally concerns only one item of Physical Man-Made Thing, it is possible to imagine circumstances under which more than one item might be diminished by a single Part Removal activity. 
 ', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('675cb1bb-a451-3e86-b253-2e004ff9b4cb', 'P112i was diminished by', '34359201-a879-316c-ae02-94f36ef88720', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('37bd5338-6afe-3175-8b3b-7f12b042a21f', 'was diminished by', '34359201-a879-316c-ae02-94f36ef88720', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('533a734a-8566-3cd0-b47f-f85274ee25b1', 'P112i εξαλείφθηκε από', '34359201-a879-316c-ae02-94f36ef88720', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('c6ea156f-4ea2-3f9c-a19c-a42555e2c11b', 'εξαλείφθηκε από', '34359201-a879-316c-ae02-94f36ef88720', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ba54712d-a9f9-35e4-bb68-833dd20c7d91', 'P112i a été diminué par', '34359201-a879-316c-ae02-94f36ef88720', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('c0500fe4-8898-3d61-8b78-f68cc624c433', 'a été diminué par', '34359201-a879-316c-ae02-94f36ef88720', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('25962826-3574-3265-a855-2ebabcabc6a1', 'P112i был уменьшен посредством', '34359201-a879-316c-ae02-94f36ef88720', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('45868695-afe4-3bc8-9911-41e473dd09b9', 'был уменьшен посредством', '34359201-a879-316c-ae02-94f36ef88720', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('9aff2fbf-09c5-3662-977b-f97ea8795094', 'P112i wurde vermindert durch', '34359201-a879-316c-ae02-94f36ef88720', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('892072df-fc9d-3d10-b01c-ebfa3d41da31', 'wurde vermindert durch', '34359201-a879-316c-ae02-94f36ef88720', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('294b3d1f-65cb-38d8-80f0-ab25c8dc16d8', 'P112i foi diminuído por', '34359201-a879-316c-ae02-94f36ef88720', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f7daaf35-ee10-353b-b38b-ab7386170a43', 'foi diminuído por', '34359201-a879-316c-ae02-94f36ef88720', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('3151d82d-2bec-37b1-9e01-555a85d60ac4', 'P112i 被缩减於', '34359201-a879-316c-ae02-94f36ef88720', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1a928691-661c-39c4-899c-26a64de83492', '被缩减於', '34359201-a879-316c-ae02-94f36ef88720', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a63fac3f-4941-3c09-8bbf-0a44600bf3bc', 'P113 удален', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('10c6fbed-326d-34a9-9459-bf300da26554', 'удален', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('6e432482-518c-317c-a852-4533650056d0', 'P113 entfernte', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'de', 'prefLabel');
@@ -3499,6 +4913,20 @@ INSERT INTO "values" VALUES ('539863f4-0aa0-393e-b16c-e35fc0d513af', 'removeu', 
 INSERT INTO "values" VALUES ('eae52066-253e-39c4-a8ea-65093ded23f6', 'P113 移除了', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('6a6f967d-3d92-3c68-8e22-77263e236a43', '移除了', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4382a087-ea98-355d-a715-f6d16066438e', 'This property identifies the E18 Physical Thing that is removed during an E80 Part Removal activity.', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('db52c344-789a-393d-a8ab-015d5cb691b9', 'P113i αφαιρέθηκε από', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('514d7159-314a-30a0-b284-1a1ca78355e9', 'αφαιρέθηκε από', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('a57d3ea5-1566-37ce-8cba-9f7daab6be70', 'P113i wurde entfernt durch', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('4a7ae723-0ddc-3c3c-8e9b-2230136dac5f', 'wurde entfernt durch', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('8fe178df-19fe-3012-815d-c5180547eb1f', 'P113i was removed by', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f5c6fdb0-a6f6-3c27-800c-d5e8637a9d5f', 'was removed by', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ce8370f4-17f3-3443-9745-151223850d90', 'P113i a été enlevée par', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('1d7468e7-1ed5-334d-84f5-f93319749229', 'a été enlevée par', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('05a35394-8a03-3f48-87af-e8c838f71a16', 'P113i был удален посредством', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('b5a584a8-3e20-3ebc-8389-b0dc20e76045', 'был удален посредством', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('cd3651c3-334a-358b-a6c4-6df0c862c525', 'P113i foi removido por', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('beeeeff4-ddb1-3383-a5e1-1ebd70c08da6', 'foi removido por', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('1c989df5-6b19-374d-a354-585a65306224', 'P113i 被移除於', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('76caba4e-9fcd-3ea9-92d4-a4d0b51112f7', '被移除於', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('e2d0ca70-90bf-3662-9c20-e3e26b93b089', 'P114 est temporellement égale à', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('1c5296e3-4739-3e82-86f7-f731b7519eec', 'est temporellement égale à', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('670283b6-3801-3ff5-9f05-2d4f6904ac26', 'P114 zeitgleich zu', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', 'de', 'prefLabel');
@@ -3534,6 +4962,20 @@ INSERT INTO "values" VALUES ('5d4f0543-c271-378d-8564-65c2e74747b2', '结束了'
 INSERT INTO "values" VALUES ('98cb7727-bd37-3c16-8a98-caf99a462b73', 'This property allows the ending point for a E2 Temporal Entity to be situated by reference to the ending point of another temporal entity of longer duration.  
 This property is only necessary if the time span is unknown (otherwise the relationship can be calculated). This property is the same as the "finishes / finished-by" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', '8687cd99-3201-3f8f-bb1c-241732242a8f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d5df4d0d-0679-357b-9188-0b31d5202331', 'P115i est terminée par', '0d28bdef-9003-370d-9d95-9c28865c133e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('6541b416-21e8-3a59-8af2-e5545a3077e4', 'est terminée par', '0d28bdef-9003-370d-9d95-9c28865c133e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('e2408346-d73a-3e2a-9c03-93c9eee5f5ac', 'P115i заканчивается', '0d28bdef-9003-370d-9d95-9c28865c133e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('02e1fb5b-46e8-3929-acec-32c4fc9b8128', 'заканчивается', '0d28bdef-9003-370d-9d95-9c28865c133e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('24163cf5-25d1-37ee-9dbb-10191a339b03', 'P115i περατώνεται με', '0d28bdef-9003-370d-9d95-9c28865c133e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('5c52722c-2469-3506-8786-24ad7b4b761f', 'περατώνεται με', '0d28bdef-9003-370d-9d95-9c28865c133e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('fff1b97e-b9a4-3bc9-baa9-f01ee3d84806', 'P115i wurde beendet mit', '0d28bdef-9003-370d-9d95-9c28865c133e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0d42bef9-2fec-3371-a025-d76728fcbd0b', 'wurde beendet mit', '0d28bdef-9003-370d-9d95-9c28865c133e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('9dc00e91-3196-3b91-a6d2-add06f3d7372', 'P115i is finished by', '0d28bdef-9003-370d-9d95-9c28865c133e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('b555fb69-3192-3189-bdca-caf29dc9de48', 'is finished by', '0d28bdef-9003-370d-9d95-9c28865c133e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('40e73a9d-2eb7-3dd8-95e8-6ecbf9d7d931', 'P115i é finalizada por', '0d28bdef-9003-370d-9d95-9c28865c133e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('a11b79ab-fd23-31d4-89eb-0acef9df36d9', 'é finalizada por', '0d28bdef-9003-370d-9d95-9c28865c133e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e6a8fa52-1d5e-301c-b43e-0d98acfa231f', 'P115i 被结束于', '0d28bdef-9003-370d-9d95-9c28865c133e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a81ead16-2ca6-3b76-9749-f244149989e1', '被结束于', '0d28bdef-9003-370d-9d95-9c28865c133e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('bc1d5626-3c4f-3cac-87b2-07deef89764e', 'P116 commence', '61861fca-6102-3151-af0c-599e14e7a93a', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('8b65e030-2ad9-3643-a86d-6fa6d7251bc8', 'commence', '61861fca-6102-3151-af0c-599e14e7a93a', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('4c42dbd8-c1f9-3849-be7b-3d36003c65c3', 'P116 starts', '61861fca-6102-3151-af0c-599e14e7a93a', 'en', 'prefLabel');
@@ -3551,6 +4993,20 @@ INSERT INTO "values" VALUES ('81e24b4d-7ad5-36e0-b8e6-ae15597e7e7f', '开始了'
 INSERT INTO "values" VALUES ('ae8fd38a-1977-3546-aa29-a868e1d4c01f', 'This property allows the starting point for a E2 Temporal Entity to be situated by reference to the starting point of another temporal entity of longer duration.  
 This property is only necessary if the time span is unknown (otherwise the relationship can be calculated). This property is the same as the "starts / started-by" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', '61861fca-6102-3151-af0c-599e14e7a93a', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('4ded37b1-886e-39ad-9ca2-421f9dfc4ab9', 'P116i est commencée par', 'dab5e797-c679-397a-90a0-e10979c1346f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('7ae19446-ff54-38e7-a40a-85cee8f05b0f', 'est commencée par', 'dab5e797-c679-397a-90a0-e10979c1346f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('ca13e05b-d718-34bb-b57c-cd3547832189', 'P116i wurde begonnen mit', 'dab5e797-c679-397a-90a0-e10979c1346f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('612af82f-9b79-3737-9170-e68fe3b659e2', 'wurde begonnen mit', 'dab5e797-c679-397a-90a0-e10979c1346f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('32d5a073-d549-37e2-a6ba-ccc7c2ad323c', 'P116i αρχίζει με', 'dab5e797-c679-397a-90a0-e10979c1346f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('833d1280-131a-3f27-b28d-39ef7a20aeca', 'αρχίζει με', 'dab5e797-c679-397a-90a0-e10979c1346f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('35386d9f-ec16-3e2b-824d-f45f96f77611', 'P116i начинается', 'dab5e797-c679-397a-90a0-e10979c1346f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('26b91b19-ade0-37ce-8dd1-de80a00acdc7', 'начинается', 'dab5e797-c679-397a-90a0-e10979c1346f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('6abac297-56f7-3709-a74d-eb0f79f8ec4c', 'P116i is started by', 'dab5e797-c679-397a-90a0-e10979c1346f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('fad52ca6-1e51-3299-ad20-ef339be06e0a', 'is started by', 'dab5e797-c679-397a-90a0-e10979c1346f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('92eeef3f-1bc1-3438-bab9-09d8fdf116bc', 'P116i é iniciada por', 'dab5e797-c679-397a-90a0-e10979c1346f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('8d0431c2-6a34-3b9d-b935-e3979549909e', 'é iniciada por', 'dab5e797-c679-397a-90a0-e10979c1346f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('5851ce24-7a85-3c6f-93a8-235108391a18', 'P116i 被开始于', 'dab5e797-c679-397a-90a0-e10979c1346f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('9c689857-4abc-3864-9ff2-72a14bb63586', '被开始于', 'dab5e797-c679-397a-90a0-e10979c1346f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('2ee14c44-33c2-3b6b-a8c7-e4fc9424649a', 'P117 fällt in', '740ab790-feb0-3700-8922-f152320272a5', 'de', 'prefLabel');
 INSERT INTO "values" VALUES ('f6c6c8e5-6fcd-3590-89b2-add07a7e5e69', 'fällt in', '740ab790-feb0-3700-8922-f152320272a5', 'de', 'altLabel');
 INSERT INTO "values" VALUES ('609b0a0e-5e1d-3afb-80bb-6c17e9708c83', 'P117 εμφανίζεται κατά τη διάρκεια', '740ab790-feb0-3700-8922-f152320272a5', 'el', 'prefLabel');
@@ -3568,6 +5024,20 @@ INSERT INTO "values" VALUES ('3ba58369-ef20-355d-b91a-a7900e48e75b', '时段被�
 INSERT INTO "values" VALUES ('8ebf6429-22fe-3679-a6b1-5563461ea65a', 'This property allows the entire E52 Time-Span of an E2 Temporal Entity to be situated within the Time-Span of another temporal entity that starts before and ends after the included temporal entity.   
 This property is only necessary if the time span is unknown (otherwise the relationship can be calculated). This property is the same as the "during / includes" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', '740ab790-feb0-3700-8922-f152320272a5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('48c45ae5-8d6e-3a81-839e-83e152c837e9', 'P117i περιλαμβάνει', '154ea871-9290-35a3-bf75-9a4029c78721', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('ad754fb1-da62-33c9-8874-46a88d95d058', 'περιλαμβάνει', '154ea871-9290-35a3-bf75-9a4029c78721', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c55a655f-1fa2-354b-be0d-6a9c2a87ee60', 'P117i включает', '154ea871-9290-35a3-bf75-9a4029c78721', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('059fc829-fc74-38f4-817e-8c211d41f0c2', 'включает', '154ea871-9290-35a3-bf75-9a4029c78721', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('e274bbd1-304b-375f-acbc-f7c54a001be5', 'P117i comporte', '154ea871-9290-35a3-bf75-9a4029c78721', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('4a382cc8-9e16-3691-9e2f-0c632d4cd426', 'comporte', '154ea871-9290-35a3-bf75-9a4029c78721', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('4dce54f4-380d-303f-a061-401d12ad731c', 'P117i includes', '154ea871-9290-35a3-bf75-9a4029c78721', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('36c18ea0-554e-3c5f-8739-17da6fd87418', 'includes', '154ea871-9290-35a3-bf75-9a4029c78721', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('7379339b-f5e1-30b4-a202-047e76841f24', 'P117i beinhaltet', '154ea871-9290-35a3-bf75-9a4029c78721', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('5d6ec227-2b2d-33fe-b895-7364104c93e7', 'beinhaltet', '154ea871-9290-35a3-bf75-9a4029c78721', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('31755374-9587-3e3d-a9be-4df0d0bd4dc6', 'P117i inclui', '154ea871-9290-35a3-bf75-9a4029c78721', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('bdfba343-80f8-3cb2-925a-aaea8ac72583', 'inclui', '154ea871-9290-35a3-bf75-9a4029c78721', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('551f8085-9fe7-310a-861c-5407f2fd66b8', 'P117i 时段涵盖了', '154ea871-9290-35a3-bf75-9a4029c78721', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('ec0df292-73be-3c51-8a39-c200386ccece', '时段涵盖了', '154ea871-9290-35a3-bf75-9a4029c78721', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('da500475-5b76-3d76-9ab4-d6d09025e3c2', 'P118 overlaps in time with', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('b143a205-a8a3-3c84-a3f3-4e711ce1cd88', 'overlaps in time with', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('3f84f7a8-c96f-3c3e-8783-2c4e0750699f', 'P118 перекрывает во времени', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'ru', 'prefLabel');
@@ -3586,6 +5056,20 @@ INSERT INTO "values" VALUES ('333b67a2-4764-348d-8cf2-730a5ee6b2aa', 'This prope
 It implies a temporal order between the two entities: if A overlaps in time B, then A must start before B, and B must end after A. This property is only necessary if the relevant time spans are unknown (otherwise the relationship can be calculated).
 This property is the same as the "overlaps / overlapped-by" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('e39eca2e-0d9f-3d05-a07b-53349cac8425', 'P118i wird zeitlich überlappt von', '715dd995-2c63-3432-a195-845a3d19abed', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('a9a3cd95-dae2-3565-aeb1-035cf004d08b', 'wird zeitlich überlappt von', '715dd995-2c63-3432-a195-845a3d19abed', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('ed17c2d7-b3ea-33c1-9fe4-1aa7ed29223b', 'P118i перекрывается во времени', '715dd995-2c63-3432-a195-845a3d19abed', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('16cb50a3-513d-36ad-aba8-07db56c679bd', 'перекрывается во времени', '715dd995-2c63-3432-a195-845a3d19abed', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('f519098f-fa6b-3dc4-b538-ea141fe9c674', 'P118i recouvre partiellement dans le temps', '715dd995-2c63-3432-a195-845a3d19abed', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('0d0d48f4-b116-3efe-a84e-8f3f34eaa34d', 'recouvre partiellement dans le temps', '715dd995-2c63-3432-a195-845a3d19abed', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('12024c0d-e81f-37c6-956a-3a526f8fba4b', 'P118i is overlapped in time by', '715dd995-2c63-3432-a195-845a3d19abed', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f526c281-12fe-341c-8e79-e01bf02f45d2', 'is overlapped in time by', '715dd995-2c63-3432-a195-845a3d19abed', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('96b8452c-8eba-38ad-8f02-d473b3bb0071', 'P118i έπεται μερικώς επικαλυπτόμενο', '715dd995-2c63-3432-a195-845a3d19abed', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f9981e9e-3b1b-3575-a5b2-e703ee4d07a3', 'έπεται μερικώς επικαλυπτόμενο', '715dd995-2c63-3432-a195-845a3d19abed', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ac6ea074-537c-335c-b4ed-f396d90db61c', 'P118i é sobreposto temporalmente por', '715dd995-2c63-3432-a195-845a3d19abed', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('8acb71e3-cc25-3a75-a947-c7973cce5a0e', 'é sobreposto temporalmente por', '715dd995-2c63-3432-a195-845a3d19abed', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('0c7c1ad4-cd09-3da3-afa6-b3159bfecb06', 'P118i 时段被重叠于', '715dd995-2c63-3432-a195-845a3d19abed', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5190b0d3-edea-3f89-a368-87ed97b4800a', '时段被重叠于', '715dd995-2c63-3432-a195-845a3d19abed', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('c05deba0-1b0a-31df-86a4-15bb2d71496b', 'P119 meets in time with', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('ca5c984b-fc7e-3850-aea2-e1bdf019b374', 'meets in time with', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('e3fb72b6-a5fc-376d-b226-c5fa7f4425dd', 'P119 προηγείται', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'el', 'prefLabel');
@@ -3604,6 +5088,20 @@ INSERT INTO "values" VALUES ('f192cecd-1e9f-386f-875b-9c5d521944a5', 'This prope
 It implies a particular order between the two entities: if A meets in time with B, then A must precede B. This property is only necessary if the relevant time spans are unknown (otherwise the relationship can be calculated). 
 This property is the same as the "meets / met-by" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('2c02ea46-b2f1-302a-9b04-85df03bba908', 'P119i est immédiatement précédé par', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('5d33cfe8-313d-3054-92a8-4f5a1273fa27', 'est immédiatement précédé par', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('43fea1cf-c720-3e09-aa2c-da0d4f6b0404', 'P119i έπεται', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('74ec1533-9cd8-37b0-9bca-105ae808e7c6', 'έπεται', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('52216aa1-8713-3735-bcd9-24af6a78967e', 'P119i is met in time by', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('82b767c6-874a-3485-8ec4-71de785b5aee', 'is met in time by', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('cf297ea9-3658-38ab-8094-199640330c2a', 'P119i wird zeitlich getroffen von', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('15825f58-5de6-3e8e-a6c7-dc0eea72e76b', 'wird zeitlich getroffen von', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('31d1b517-66e7-39ff-b481-ae8f171ba2ee', 'P119i предшествует во времени', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('229d9ecb-0a9d-3c10-9dcd-b17beebf910c', 'предшествует во времени', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('1e911579-23d6-325c-b0d8-841d07604ae6', 'P119i é imediatamente precedido por', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('7d3c094b-b088-3968-b412-723832406aea', 'é imediatamente precedido por', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('0fb1b72f-f22b-3369-a88f-962a19c8d002', 'P119i 紧接续於', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7074f2dc-76f7-3c6d-837c-f3c05fd9e87c', '紧接续於', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('ab16a133-aa08-3c33-a9de-1773cc869966', 'P120 появляется до', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'ru', 'prefLabel');
 INSERT INTO "values" VALUES ('88808537-f657-3df8-a6eb-d18d31b0c435', 'появляется до', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'ru', 'altLabel');
 INSERT INTO "values" VALUES ('d84f64a2-4cc0-3865-9a0d-aabd0f8c27a0', 'P120 a lieu avant', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'fr', 'prefLabel');
@@ -3622,6 +5120,20 @@ INSERT INTO "values" VALUES ('3e234d69-941f-39d4-86b0-57f9b4e892b2', 'This prope
 It implies that a temporal gap exists between the end of A and the start of B. This property is only necessary if the relevant time spans are unknown (otherwise the relationship can be calculated).
 This property is the same as the "before / after" relationships of Allen’s temporal logic (Allen, 1983, pp. 832-843).
 ', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('befc4b14-2885-3939-8e7a-2320e3b4e37e', 'P120i a lieu après', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('ce5074e6-faba-39d4-af38-63a93b8b4e0a', 'a lieu après', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('19b22741-fb83-3c30-942a-abe3c427ae93', 'P120i εμφανίζεται μετά', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('b984ef80-2c83-36c7-b53c-1201731a2fdb', 'εμφανίζεται μετά', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('ac685007-a53e-33e5-801c-124d21445437', 'P120i появляется после', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('48311e5f-dbcc-378c-8dcc-cc75ea49cfa7', 'появляется после', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('a54d63e8-ed71-3706-b08e-136f4fdfdbe9', 'P120i kommt nach', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('5bd541ec-c422-371c-8615-21e6f4ea5d7f', 'kommt nach', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5ee48fb2-81ed-3677-af3d-a39e2abb22f0', 'P120i occurs after', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f5065c28-cfe0-376b-8420-e4b4262f871f', 'occurs after', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('800a820f-ee89-391f-8dd7-bd7e5909186b', 'P120i ocorre depois', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c44684f3-8a72-3098-9415-e7cae3d52646', 'ocorre depois', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('40c11b5e-1c5f-3b17-b830-9be847dbba8a', 'P120i 发生时段后於', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('cad4e0f5-409c-3988-86ba-e48dc92e28a5', '发生时段后於', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('e436e968-8542-3d72-8475-54b82261bcad', 'P121 επικαλύπτεται με', '74e69af6-6a10-32be-91d3-50dd33b7876b', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('0e07fe17-0dde-3d72-b35f-e9014e18ed65', 'επικαλύπτεται με', '74e69af6-6a10-32be-91d3-50dd33b7876b', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('1e3520a4-996f-3f87-9b26-a04b352f5eb8', 'P121 überlappt mit', '74e69af6-6a10-32be-91d3-50dd33b7876b', 'de', 'prefLabel');
@@ -3673,6 +5185,20 @@ INSERT INTO "values" VALUES ('3910aad6-e0b4-334e-bf0b-18f7ab3c23d6', '转变出'
 INSERT INTO "values" VALUES ('e9eb9059-b96a-39ff-83bd-cb39d0072737', 'This property identifies the E77 Persistent Item or items that are the result of an E81 Transformation. 
 New items replace the transformed item or items, which cease to exist as units of documentation. The physical continuity between the old and the new is expressed by the link to the common Transformation.
 ', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a839432e-5326-3f8f-b578-2786749e4eb4', 'P123i est le résultat de', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('06911009-5e48-3e36-bc6a-36dba9c2adbf', 'est le résultat de', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('2e2ce246-36a4-33c1-a08c-f9de45309238', 'P123i προέκυψε από', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('89376e55-d2ef-3565-bbe1-c86e6d40a8ca', 'προέκυψε από', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('daf291fd-ec4d-3f59-9053-d600115e731c', 'P123i был результатом', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('2a313e7a-5653-30b2-b58f-6c4732f96681', 'был результатом', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('fbe544cc-8d1c-30af-91a4-2190ab7897b9', 'P123i ergab sich aus', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e57b59fd-4623-3f15-bbe9-20aa15bda5a7', 'ergab sich aus', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b295de0f-967c-300b-bb6e-c474841f45e8', 'P123i resulted from', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('2589807a-f2bc-3ec6-b872-f65842b8f62b', 'resulted from', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('eb536359-4b4e-300f-b4db-102f7bec5b82', 'P123i resultado de', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f8d5f0dd-8105-381f-b224-b7c56c5a6dcb', 'resultado de', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('0a89b06d-c518-3bb8-a1a1-060fff4bbcec', 'P123i 肇因於', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('4b962407-bb04-31e7-aca0-59cd89594b35', '肇因於', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('77bcde41-d8f5-3a55-8c9a-2df1e08b8f79', 'P124 transformed', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('8398457d-e3b9-3f2f-b311-9183022fc12e', 'transformed', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('2e37ad58-ed47-3b1c-b12f-2c1727cec938', 'P124 wandelte um', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'de', 'prefLabel');
@@ -3690,6 +5216,20 @@ INSERT INTO "values" VALUES ('841c319a-1ed0-3f4a-9b9e-335061dea8cb', '转变了'
 INSERT INTO "values" VALUES ('41338bc7-776f-3d5f-8f62-4ef1091b8766', 'This property identifies the E77 Persistent Item or items that cease to exist due to a E81 Transformation. 
 It is replaced by the result of the Transformation, which becomes a new unit of documentation. The continuity between both items, the new and the old, is expressed by the link to the common Transformation.
 ', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8ab4e4bb-5ceb-362c-8ede-794ce814f6cd', 'P124i a été transformé par', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('3d61b075-0317-3647-8068-1877d7444db7', 'a été transformé par', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('7ed46028-f669-3123-b67d-f1bca7901ee1', 'P124i был трансформирован посредством', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('62398858-680f-39bd-9203-0280aed160ed', 'был трансформирован посредством', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('83d75aff-5d83-33b5-b198-066703021941', 'P124i μετατράπηκε από', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('9fcd2397-adc7-3d1d-b20c-577b4818771c', 'μετατράπηκε από', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('42fc8a02-a7b8-3c41-8d5e-fcc8b95f4b4d', 'P124i was transformed by', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('2ea03c21-728b-309d-b17e-fdd0df72da1b', 'was transformed by', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('261bb439-61c2-3dc9-a8cf-260fb237cad6', 'P124i wurde umgewandelt durch', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('14aea2a7-af81-3c21-b154-94b1b1ff3ebb', 'wurde umgewandelt durch', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('b14bdae8-ae69-35a9-b54a-9d7b708e125c', 'P124i foi transformado por', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('ce26411c-f624-3a6d-80e5-84a3554f3352', 'foi transformado por', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('0947a60f-11a4-3c61-bae3-fb73b47534a0', 'P124i 被转变於', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('c203fb14-25fe-3369-a7b0-606d3365c55e', '被转变於', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('1323d77a-776b-34d8-9929-1b65db21a704', 'P125 used object of type', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('58eed855-c9f8-3c7f-a688-10a09b70255f', 'used object of type', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c223261c-1cac-32a0-a6e2-bd2fdb3e7b60', 'P125 a employé un objet du type', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'fr', 'prefLabel');
@@ -3706,6 +5246,20 @@ INSERT INTO "values" VALUES ('2223ced1-60d8-3170-b92b-579dda8ae927', 'P125 有�
 INSERT INTO "values" VALUES ('8b2420e5-f41a-38df-933c-faedd87910c0', '有使用物件类型', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('1936ea85-2329-3236-8fc4-99f5436d1e4c', 'This property defines the kind of objects used in an E7 Activity, when the specific instance is either unknown or not of interest, such as use of "a hammer".
 ', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('daf5cd87-1c00-3fa9-9464-f64970cf10bf', 'P125i был типом объекта использованного в', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('4a28b691-c0b1-3b56-be3d-277dcc8fac9d', 'был типом объекта использованного в', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('d1ff31ac-4f57-340c-b8bf-9d7489ed6bcf', 'P125i was type of object used in', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('2fefbe40-9e51-3c8e-aba4-ff261fe4f237', 'was type of object used in', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('f59c172b-03cb-379a-89f0-9d428a65fad6', 'P125i Objekt des Typus ... wurde benutzt in', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('8b7d2ceb-ed41-3508-b8f5-60602eaa0a5c', 'Objekt des Typus ... wurde benutzt in', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('4b34ec09-7a2e-3766-a091-9fa526d0eb5a', 'P125i était le type d’objet employé par', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('1948bb4e-314f-315b-823a-c21a51b7be0c', 'était le type d’objet employé par', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('7a1966f7-bdf1-3777-93e9-5744ed75194d', 'P125i ήταν o τύπος αντικείμενου που χρησιμοποιήθηκε σε', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('aa72e8e9-1bdb-3805-86f6-83c7dcfcc4cd', 'ήταν o τύπος αντικείμενου που χρησιμοποιήθηκε σε', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('e1d0a115-b363-3acd-8389-b66b6be01bdb', 'P125i foi tipo do objeto usado em', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('bb6ecbaf-fa83-3d7c-b6f7-052c56298bd9', 'foi tipo do objeto usado em', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('430a8a65-6aca-31fb-8af1-0f80e744f77b', 'P125i 被使用於', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('da9ced9c-0653-34ab-9a28-444e8b33bc87', '被使用於', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('d197fdec-cc20-3baf-b7b1-41938c61f2b3', 'P126 a employé', '8bfff662-9024-325a-a23a-b3c9bf509031', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('e3fd02c5-d803-3ff6-baa4-03adca7fd38c', 'a employé', '8bfff662-9024-325a-a23a-b3c9bf509031', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('0c05903d-934f-3916-98a9-5551e0311fcc', 'P126 verwendete', '8bfff662-9024-325a-a23a-b3c9bf509031', 'de', 'prefLabel');
@@ -3723,6 +5277,20 @@ INSERT INTO "values" VALUES ('c0814089-285e-36e7-8d5f-a78801560af2', '采用了�
 INSERT INTO "values" VALUES ('4b447189-10e3-3347-b7a7-ce6fb99852ba', 'This property identifies E57 Material employed in an E11 Modification.
 The E57 Material used during the E11 Modification does not necessarily become incorporated into the E24 Physical Man-Made Thing that forms the subject of the E11 Modification.
 ', '8bfff662-9024-325a-a23a-b3c9bf509031', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('2745a6fd-5b74-3ca6-b111-c31fdee20ffb', 'P126i was employed in', '47e28679-c612-3f90-b494-61b97c407f20', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('623a4258-50ba-341b-8975-7e43abb4ed41', 'was employed in', '47e28679-c612-3f90-b494-61b97c407f20', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('3678bba0-117d-3f23-ab9d-898d218159fb', 'P126i wurde verwendet bei', '47e28679-c612-3f90-b494-61b97c407f20', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('faab3a41-de9d-3e0a-bd55-837c745d448f', 'wurde verwendet bei', '47e28679-c612-3f90-b494-61b97c407f20', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('f8803116-2f5a-3165-a079-d661348cceb6', 'P126i использовался в', '47e28679-c612-3f90-b494-61b97c407f20', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('1225ccd2-ab21-3c07-a57e-1105728fe3f0', 'использовался в', '47e28679-c612-3f90-b494-61b97c407f20', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('71f06246-cd8b-3bf8-82d7-8136c5c04867', 'P126i χρησιμοποιήθηκε σε', '47e28679-c612-3f90-b494-61b97c407f20', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('d801a115-7c1f-36ba-bb8e-ddcd1aa3ecee', 'χρησιμοποιήθηκε σε', '47e28679-c612-3f90-b494-61b97c407f20', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('1212324a-8168-3aff-83a9-846d94f04737', 'P126i a été employé dans', '47e28679-c612-3f90-b494-61b97c407f20', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('2d726a00-23b6-3ecc-8165-5f75e22461f5', 'a été employé dans', '47e28679-c612-3f90-b494-61b97c407f20', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('41a9d006-7c47-3f47-a99c-02685c25dc91', 'P126i foi empregado em', '47e28679-c612-3f90-b494-61b97c407f20', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('489a6d3d-27bc-37c7-8649-be2fba904c8c', 'foi empregado em', '47e28679-c612-3f90-b494-61b97c407f20', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('915d086c-4720-3965-8b5f-3ff4e392ac28', 'P126i 被使用於', '47e28679-c612-3f90-b494-61b97c407f20', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('2cbda02b-613d-3c48-b2c5-bbdfb8e1db8b', '被使用於', '47e28679-c612-3f90-b494-61b97c407f20', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8f806d85-03ee-3570-b5c8-7a7702f4f3ec', 'P127 έχει ευρύτερο όρο', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('f5e0605e-2070-381d-b02c-3186e8ceef9f', 'έχει ευρύτερο όρο', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('46256b68-9287-37e0-985d-c16af6b6f5c5', 'P127 a pour terme générique', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'fr', 'prefLabel');
@@ -3740,6 +5308,18 @@ INSERT INTO "values" VALUES ('2db6b9ce-341b-3f43-939b-36fdb224a675', '有广义�
 INSERT INTO "values" VALUES ('1a00d5a9-c2cc-32cf-bdba-ae15bc8249ea', 'This property identifies a super-Type to which an E55 Type is related. 
 		It allows Types to be organised into hierarchies. This is the sense of "broader term generic  		(BTG)" as defined in ISO 2788
 ', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('2b510cee-f70b-3758-8664-4c151003a548', 'P127i a pour terme spécifique', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('1136435f-38b9-3c5b-9aff-44ca3ebe6864', 'a pour terme spécifique', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('cff755c1-8472-3692-b2d5-f196161e827f', 'P127i hat den Unterbegriff', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('0d9afd7a-ed1d-3259-a247-d3a68111ba6f', 'hat den Unterbegriff', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('0f02c545-4c2f-3bea-9a26-0fa16bc03fe8', 'P127i has narrower term', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('97554c6b-9df9-31b2-839a-157e6510f89f', 'has narrower term', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8e0864c7-5382-3729-bd74-f67d541594da', 'P127i έχει στενότερο όρο', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('82c7bfa3-4fef-3ed0-b5c9-d39cf743bdca', 'έχει στενότερο όρο', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('4d1701ea-d5a2-3f31-8e01-0c914b36332b', 'P127i tem termo específico', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c3c5245e-d503-385c-9148-2208868fab2e', 'tem termo específico', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('c9a09f3f-65a2-3d9e-8f1f-eade962c8d4c', 'P127i 有狭义术语', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('5764f9d9-f713-36bf-8180-6b8559912748', '有狭义术语', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('17faf861-c561-39a5-ad20-53048c76ffd3', 'P128 carries', '007dac32-df80-366b-88ce-02f4c1928537', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('20e03283-8b0c-34c9-8d18-35240b3e6df6', 'carries', '007dac32-df80-366b-88ce-02f4c1928537', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('8a597a37-584a-3ae3-91d3-8e948153e976', 'P128 est le support de', '007dac32-df80-366b-88ce-02f4c1928537', 'fr', 'prefLabel');
@@ -3756,6 +5336,20 @@ INSERT INTO "values" VALUES ('b81d4682-e8c8-3659-88e6-7c761ac53c74', 'P128 承�
 INSERT INTO "values" VALUES ('4eb2d960-81fb-3dfb-962b-8aee3df79581', '承载信息', '007dac32-df80-366b-88ce-02f4c1928537', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4d8193f5-cf81-3bfa-b553-9f5feb773df3', 'This property identifies an E90 Symbolic Object carried by an instance of E18 Physical Thing.
 ', '007dac32-df80-366b-88ce-02f4c1928537', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('00b28adb-ea51-33df-8cbc-3413797fba86', 'P128i φέρεται από', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('1bf01100-453e-3a90-b89a-78a1af6844f0', 'φέρεται από', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('c7428f49-acf4-3b99-8e2f-082dec0f4512', 'P128i is carried by', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('130093b7-3ba4-3d19-82d7-a48d9cd271c1', 'is carried by', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('6b8f58fa-02ef-3748-bd38-d352f228469c', 'P128i переносится посредством', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('20855b74-3e38-30eb-b676-b2007476add0', 'переносится посредством', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('8330d4ed-2b72-3c7d-a53e-cff16138c902', 'P128i a pour support', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8ca5b0e7-1511-3283-b537-abcd4eae656e', 'a pour support', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('3d9820b9-d6ec-385d-9166-0088ae11b80a', 'P128i wird getragen von', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('cea332ed-060c-3712-a151-cd3b2e2a1146', 'wird getragen von', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('66941830-dc60-34d7-b5f8-e726bfa108be', 'P128i é suportado por', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('8ddf2b41-5664-3f3c-8bac-2e3f91ebf097', 'é suportado por', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('b091b1ff-a4d7-39fd-b7bc-0105f0f4f7a9', 'P128i 被承载于', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('becb2902-4605-3a51-a3e9-2b128b869db2', '被承载于', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('eca77f90-ba2c-35f0-9c79-88e3ad838f3e', 'P129 est au sujet de', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('66b6c1a1-d13a-3e93-a8c6-e0988be0a844', 'est au sujet de', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('b5323003-178b-3d66-8360-a58a8dd7a1f4', 'P129 is about', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'en', 'prefLabel');
@@ -3772,6 +5366,20 @@ INSERT INTO "values" VALUES ('0ee05410-90d9-3024-8791-0e0e1213b78f', 'P129 陈�
 INSERT INTO "values" VALUES ('57676448-7b86-3a1c-afcc-69c348ae8685', '陈述关於', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('4b029823-901a-38ac-9027-e88f3a259223', 'This property documents that an E89 Propositional Object has as subject an instance of E1 CRM Entity. 
 ', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a8683597-f091-33f7-b48a-9f7c45a5c26b', 'P129i est le sujet de', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('c14831b1-2a77-37b3-9980-e74bee3aa77b', 'est le sujet de', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a11159f6-a8d6-3ee0-b8ea-b576d47b78ef', 'P129i wird behandelt in', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('3944919b-8af4-38de-a822-05fd6dfcbfb8', 'wird behandelt in', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('828e7b0a-572b-3789-bab7-564a6a66e519', 'P129i является предметом для', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('652e2cce-f554-3402-9340-5d7ce095df76', 'является предметом для', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('2409cd57-28dc-3c81-b26d-cc736974053a', 'P129i είναι θέμα  του/της', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7da0f878-bd08-312e-87bb-ae04aa58e825', 'είναι θέμα  του/της', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('3c065688-3870-3552-af29-f7efd9dff605', 'P129i is subject of', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('1ed85b53-28ab-380a-a825-02875c0b9469', 'is subject of', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('bd76bd21-158b-3fc8-9ce3-8d8a687eae05', 'P129i é assunto de', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4a62bb65-cf49-3725-86f7-8ca2cc5361e6', 'é assunto de', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('9dc3e1ec-c564-38d5-9838-78300f931e9d', 'P129i 被陈述於', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a37f68ba-28ab-3024-8e54-389ba7007ed0', '被陈述於', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('871de612-9916-369e-a864-10fda93b2031', 'P130 παρουσιάζει χαρακτηριστικά του/της', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('832b2fbb-9401-3309-8ad9-0f4d06e1d08b', 'παρουσιάζει χαρακτηριστικά του/της', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('731bf8c2-c4c4-3128-9f74-0af33b5f0cd2', 'P130 shows features of', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'en', 'prefLabel');
@@ -3789,6 +5397,20 @@ INSERT INTO "values" VALUES ('89163b74-d317-3f4d-ae1e-ac2fa019b4f8', '外观特�
 INSERT INTO "values" VALUES ('42a8db97-8828-3d5c-903d-617fbf27eac9', 'This property generalises the notions of  "copy of" and "similar to" into a dynamic, asymmetric relationship, where the domain expresses the derivative, if such a direction can be established.
 Otherwise, the relationship is symmetric. It is a short-cut of P15 was influenced by (influenced) in a creation or production, if such a reason for the similarity can be verified. Moreover it expresses similarity in cases that can be stated between two objects only, without historical knowledge about its reasons.
 ', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8ed5fb00-c70c-3e1a-9659-2f66a5ce56aa', 'P130i χαρακτηριστικά του βρίσκονται επίσης σε', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('f26ae762-03e4-3409-a5aa-df959a558fd1', 'χαρακτηριστικά του βρίσκονται επίσης σε', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('77f1cbbf-d507-3042-876d-f24ef39c2fec', 'P130i a des caractéristiques se trouvant aussi sur', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('c40fb36e-3975-3bc9-b22c-e9911bd7110b', 'a des caractéristiques se trouvant aussi sur', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('26f9c2f8-627c-3e87-8fb7-501782b31eac', 'P130i Merkmale auch auf', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('2e0fd677-225d-34ce-afff-7573c3a7122a', 'Merkmale auch auf', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('fcae1e76-d612-3b8c-bbbd-7d73fc3e200e', 'P130i признаки также найдены на', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('c94d851e-a5e5-3624-ae89-9646c5e04370', 'признаки также найдены на', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('eca1a023-2933-3799-b7f2-50412ec45fa2', 'P130i features are also found on', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('9fc24b1a-1b8a-39b2-a06c-cd9763063d8d', 'features are also found on', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('e16802e8-00cf-347c-ab21-98f70a693ed6', 'P130i características são também encontradas em', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('1945cd7a-f56e-3277-ab08-b5a42064c549', 'características são também encontradas em', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('acdd4d0c-5912-3047-8087-8a5996faa127', 'P130i 外观特征被复制於', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('eea31d79-46cf-35b6-a1f4-dbcbe71f360c', '外观特征被复制於', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5e58b165-7e19-3861-9ae8-dc01f0853c16', 'P131 αναγνωρίζεται ως', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('5495d33a-32ad-39cd-bb3d-1bc24a6e0fe6', 'αναγνωρίζεται ως', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('948fb8e0-bbf5-37df-b0a8-cf58b98d8e19', 'P131 wird identifziert durch', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'de', 'prefLabel');
@@ -3806,6 +5428,20 @@ INSERT INTO "values" VALUES ('117f6547-d471-36e6-b573-a40620dc55a4', '有称号'
 INSERT INTO "values" VALUES ('ea8b2b0d-14b7-389d-846c-b675f46cc0d4', 'This property identifies a name used specifically to identify an E39 Actor. 
 This property is a specialisation of P1 is identified by (identifies) is identified by.
 ', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d3307c2e-4815-3659-a3c4-2691f5d84112', 'P131i identifie', '6431b808-3267-360f-b592-38eff1ad552f', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('13ceaf7f-546c-35dd-bf93-427cc733e4e5', 'identifie', '6431b808-3267-360f-b592-38eff1ad552f', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('24de8110-98bd-306f-9ce2-aa7bda891f09', 'P131i identifies', '6431b808-3267-360f-b592-38eff1ad552f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('f33397cc-6245-357c-a0b5-fc982596d354', 'identifies', '6431b808-3267-360f-b592-38eff1ad552f', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('cb913c0d-42e6-338d-ba45-ee685713d048', 'P131i είναι αναγνωριστικό', '6431b808-3267-360f-b592-38eff1ad552f', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('052ddbd7-8f35-3bf7-9745-40ef98cad0b8', 'είναι αναγνωριστικό', '6431b808-3267-360f-b592-38eff1ad552f', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('7e2ccdff-6d9b-3445-93d8-2cf837b154b1', 'P131i идентифицирует', '6431b808-3267-360f-b592-38eff1ad552f', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('a561b7aa-85e3-34a3-94b5-f2581eb82e20', 'идентифицирует', '6431b808-3267-360f-b592-38eff1ad552f', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('338c6f7e-6e69-3a01-b08f-cae3bc0d7da2', 'P131i identifiziert', '6431b808-3267-360f-b592-38eff1ad552f', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('61403d49-7c28-3cc4-9537-4271b9d97a16', 'identifiziert', '6431b808-3267-360f-b592-38eff1ad552f', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('bc871761-a932-3146-abbe-ef1e284eebd1', 'P131i identifica', '6431b808-3267-360f-b592-38eff1ad552f', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('5b4338a2-ffae-30b4-b3b6-35340baff20b', 'identifica', '6431b808-3267-360f-b592-38eff1ad552f', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('1f58e71c-d618-397f-b8b4-cbfe8dce90fe', 'P131i 被用来识别', '6431b808-3267-360f-b592-38eff1ad552f', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('a3582db9-32ae-3796-afeb-f311732a5c27', '被用来识别', '6431b808-3267-360f-b592-38eff1ad552f', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('8780e6c2-4286-3036-a9b3-ba99e07bd310', 'P132 επικαλύπτεται με', '50060723-772d-3974-864e-8f8c326f169d', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('ba7cdc90-2c72-3147-a7a1-1238d2b08583', 'επικαλύπτεται με', '50060723-772d-3974-864e-8f8c326f169d', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('57e3d51d-50e5-37e2-ba02-5cc452623619', 'P132 überlappt mit', '50060723-772d-3974-864e-8f8c326f169d', 'de', 'prefLabel');
@@ -3856,6 +5492,20 @@ INSERT INTO "values" VALUES ('87b78fb5-a970-3d53-81fb-51aa2cf31513', 'P134 延�
 INSERT INTO "values" VALUES ('c87bdf58-50c2-3a93-9c77-ac7844a5a584', '延续了', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('24409add-4f3a-3ad3-ba2f-8a05bb21e9f2', 'This property associates two instances of E7 Activity, where the domain is considered as an intentional continuation of the range. A continuation of an activity may happen when the continued activity is still ongoing or after the continued activity has completely ended. The continuing activity may have started already before it decided to continue the other one. Continuation implies a coherence of intentions and outcomes of the involved activities.
 ', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8f3c1321-f9c4-3b4b-b58f-2ca4472b04d7', 'P134i wurde fortgesetzt durch', '669d3c80-b736-3563-afd1-66c9a445754e', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('d212105b-f806-30d5-9b5d-b3a4fb3373a4', 'wurde fortgesetzt durch', '669d3c80-b736-3563-afd1-66c9a445754e', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('d490b93f-b82f-3a3c-8ede-d5396b077ffa', 'P134i был продолжен', '669d3c80-b736-3563-afd1-66c9a445754e', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('a80fe458-8152-3c54-b75d-4740eeda0c8e', 'был продолжен', '669d3c80-b736-3563-afd1-66c9a445754e', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('3c224132-2c78-3e7e-9999-30d541fa6f38', 'P134i a été continuée par', '669d3c80-b736-3563-afd1-66c9a445754e', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('525c7169-c365-33dc-86c7-088db6d654ed', 'a été continuée par', '669d3c80-b736-3563-afd1-66c9a445754e', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('41a57112-1620-37f9-89af-9463c9c82bbd', 'P134i was continued by', '669d3c80-b736-3563-afd1-66c9a445754e', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('3d0c3aa9-faef-3bc3-b5e9-367563e6476c', 'was continued by', '669d3c80-b736-3563-afd1-66c9a445754e', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ae16ee80-b143-32ad-a1f9-79a79d491e7f', 'P134i συνεχίστηκε από', '669d3c80-b736-3563-afd1-66c9a445754e', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('79142dbd-2a45-3ab2-b007-91dec0d761d5', 'συνεχίστηκε από', '669d3c80-b736-3563-afd1-66c9a445754e', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('4d921ca8-91cf-3d2d-83d0-dbb4e6eb8f74', 'P134i foi continuada por', '669d3c80-b736-3563-afd1-66c9a445754e', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('f5a167fc-04d1-3543-bba1-5d10a0021573', 'foi continuada por', '669d3c80-b736-3563-afd1-66c9a445754e', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('6fd134eb-1395-3092-85d6-d80d335e2a6b', 'P134i 有延续活动', '669d3c80-b736-3563-afd1-66c9a445754e', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1f7d3b0e-d947-3dce-90ba-459913c2c747', '有延续活动', '669d3c80-b736-3563-afd1-66c9a445754e', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a0bee057-d7b4-3de1-9843-d9342324dc32', 'P135 created type', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('430f70eb-ff8a-318f-91d5-dea1434c5cd4', 'created type', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('01bda5eb-f7c4-3921-83a5-4741abb27b97', 'P135 erschuf Typus', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'de', 'prefLabel');
@@ -3871,6 +5521,20 @@ INSERT INTO "values" VALUES ('18ce0536-e7aa-3abc-bf14-8d6e48a8d39b', 'criou tipo
 INSERT INTO "values" VALUES ('2c2b40c7-c587-30b1-a7f7-63ee3dc03c84', 'P135 创造了类型', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('c25dd777-8d51-320b-b1fb-e701936be32f', '创造了类型', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('d0491e50-55db-36b5-95a6-354a9ce872fa', 'This property identifies the E55 Type, which is created in an E83Type Creation activity.', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('7917c486-bd7c-3fb2-85a0-ee7ce2c686ac', 'P135i was created by', '939b25e8-e272-312a-9803-cb1152535f68', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('dca2f850-a6f7-3f5b-8c28-aee4f6faaf23', 'was created by', '939b25e8-e272-312a-9803-cb1152535f68', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('a26edb82-9131-3bf7-8520-d3500038c43d', 'P135i wurde geschaffen durch', '939b25e8-e272-312a-9803-cb1152535f68', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('91e1a604-1054-39d2-b532-7462f63c2ac3', 'wurde geschaffen durch', '939b25e8-e272-312a-9803-cb1152535f68', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('5c816802-9ebe-37ee-a442-3d6dff8b2c1a', 'P135i a été créé par', '939b25e8-e272-312a-9803-cb1152535f68', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('a0829aef-f3f6-3039-bf83-a1453fb5619c', 'a été créé par', '939b25e8-e272-312a-9803-cb1152535f68', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('de9a14ef-915b-373a-b78f-e09a6917bc47', 'P135i δημιουργήθηκε από', '939b25e8-e272-312a-9803-cb1152535f68', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('9a814bf0-c539-329f-b5ba-5fd7c9d24060', 'δημιουργήθηκε από', '939b25e8-e272-312a-9803-cb1152535f68', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('d9107284-bbdb-3c02-b236-e882fbdecdc1', 'P135i был создан посредством', '939b25e8-e272-312a-9803-cb1152535f68', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('173102a4-0fdc-324b-a9eb-8e274892727d', 'был создан посредством', '939b25e8-e272-312a-9803-cb1152535f68', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('d35f38cd-c2b8-34ee-a757-4e6eb115bd2b', 'P135i foi criado por', '939b25e8-e272-312a-9803-cb1152535f68', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('9ae3f5ab-6bb4-3967-8197-ee64d53b058d', 'foi criado por', '939b25e8-e272-312a-9803-cb1152535f68', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e5b64c7d-7fce-39fc-abf6-1e80b7210099', 'P135i 被创造於', '939b25e8-e272-312a-9803-cb1152535f68', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('6fc503f8-d432-3e1b-9bad-442a8e2f51bf', '被创造於', '939b25e8-e272-312a-9803-cb1152535f68', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3d449fe0-8b16-3b50-91cf-29333839fb9e', 'P136 s’est fondée sur', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('c992a6a1-c281-36c6-84dc-b7dd9930e1cb', 's’est fondée sur', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('a5efd6db-b7dc-325f-be9e-3fdacca0f436', 'P136 был основан на', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'ru', 'prefLabel');
@@ -3888,6 +5552,20 @@ INSERT INTO "values" VALUES ('d5f72a2f-3452-3cbd-a976-a779cc5f7075', '根据了'
 INSERT INTO "values" VALUES ('076f5208-4b0f-35b7-b51c-4bfc61c634c9', 'This property identifies one or more items that were used as evidence to declare a new E55 Type.
 The examination of these items is often the only objective way to understand the precise characteristics of a new Type. Such items should be deposited in a museum or similar institution for that reason. The taxonomic role renders the specific relationship of each item to the Type, such as "holotype" or "original element".
 ', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('53db1512-7438-364f-b616-fbf9b52e2ac8', 'P136i supported type creation', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('7f49f1c8-1770-38bf-8f2b-d5a26033df88', 'supported type creation', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('d61cd5bb-6f55-336f-9c52-2a63531687e9', 'P136i υποστήριξε τη δημιουργία τύπου', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('17b2c5f5-9ac0-398d-986a-1520713d2383', 'υποστήριξε τη δημιουργία τύπου', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('03257760-33d5-32d0-83e7-56e337eeab76', 'P136i a justifié la création de type', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('22591ff3-8476-3e39-bb91-fb105e3f07cb', 'a justifié la création de type', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('aad143ed-6c77-3bc7-9eb4-174d05ddd13d', 'P136i belegte', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('74a3d695-8d6b-36eb-9ac9-dbc6f4589ac7', 'belegte', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('1ef52176-49f5-3fb4-a20f-0df88d3d1e12', 'P136i поддержал создание типа', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('47c359ea-eb52-3ee2-a170-9ad16414e9cf', 'поддержал создание типа', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('27d3a170-f1cb-36ad-8de3-d248c00b3470', 'P136i suportou a criação de tipo', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('6f4539ee-e18b-3ad9-8cab-4dfb4cc18cf9', 'suportou a criação de tipo', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('d3e9c942-885e-3341-be78-bf1493759c63', 'P136i 提供證據给类型创造', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('04a9b447-bab4-3b42-8aaf-b25dcf3d1955', '提供證據给类型创造', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('0cba8ef2-0db9-36ba-be9e-e42ae1c7cfac', 'P137 exemplifies', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('3821c6eb-2861-365b-aab0-29c77ce0ea42', 'exemplifies', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('ddd61571-4abd-3957-87ea-24315b7966e9', 'P137 exemplifie', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'fr', 'prefLabel');
@@ -3905,6 +5583,20 @@ INSERT INTO "values" VALUES ('57c3e908-d0ed-3772-89f9-68f9caf4caa6', '例示了'
 INSERT INTO "values" VALUES ('2572c8d7-e7e3-38fd-87a8-afee1264b13e', 'This property allows an item to be declared as a particular example of an E55 Type or taxon
 	The P137.1 in the taxonomic role property of P137 exemplifies (is exemplified by) allows differentiation of taxonomic roles. The taxonomic role renders the specific relationship of this example to the Type, such as "prototypical", "archetypical", "lectotype", etc. The taxonomic role "lectotype" is not associated with the Type Creation (E83) itself, but selected in a later phase.
 ', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('756749b9-eaa4-3d35-977a-ce6f6a429696', 'P137i поясняется посредством', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('65f298cb-058d-3149-9f6c-76f9da0496c2', 'поясняется посредством', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('2d882ceb-f915-3e20-baac-ae3bbfe03e9c', 'P137i erläutert durch Beispiel', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('283b2b07-ac97-37fe-a373-951c8e34fd37', 'erläutert durch Beispiel', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('7ee56e42-3e62-36d0-b2f3-3752a3a2ba57', 'P137i is exemplified by', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('0f289a70-25d6-39da-9149-e65f9ce54f25', 'is exemplified by', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('0e34b0b7-a7ce-32f5-9d73-cc45c83b9279', 'P137i δειγματίζεται από', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('9e79eefa-47e5-3983-ad46-1e8a2ef1d271', 'δειγματίζεται από', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('667bc827-131c-368c-858c-efd72871038b', 'P137i est exemplifié par', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('9e23e568-0c57-3c59-bd50-b0e92788b1a7', 'est exemplifié par', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('43bccddc-df57-341b-a58f-a476caecbccd', 'P137i exemplifica', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('4571164b-9f02-3efe-b8bb-068b045dd25d', 'exemplifica', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('488c6505-c71a-3c8d-ae76-5035f4da5d2d', 'P137i 有例示', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('e97b050f-b283-327e-9e0b-2338204996fc', '有例示', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('a5cd1d01-4366-3037-b0f7-ac99c27a0528', 'P138 παριστάνει', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'el', 'prefLabel');
 INSERT INTO "values" VALUES ('e0584ff9-9e45-348c-827a-e494fec0cb5d', 'παριστάνει', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'el', 'altLabel');
 INSERT INTO "values" VALUES ('e2bc1763-fb80-369f-adc0-4bb90bbd6ce8', 'P138 represents', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'en', 'prefLabel');
@@ -3923,6 +5615,20 @@ INSERT INTO "values" VALUES ('e57ca4eb-183b-34f3-a725-2524927615e1', 'This prope
 Any entity may be represented visually. This property is part of the fully developed path from E24 Physical Man-Made Thing through P65 shows visual item (is shown by), E36 Visual Item, P138 represents (has representation) to E1 CRM Entity, which is shortcut by P62depicts (is depicted by). P138.1 mode of representation allows the nature of the representation to be refined.
 This property is also used for the relationship between an original and a digitisation of the original by the use of techniques such as digital photography, flatbed or infrared scanning. Digitisation is here seen as a process with a mechanical, causal component rendering the spatial distribution of structural and optical properties of the original and does not necessarily include any visual similarity identifiable by human observation.
 ', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('a4952b92-b820-3593-a85b-255de480afcd', 'P138i has representation', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('37f72992-1992-35b8-909f-62da8f522891', 'has representation', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('db4b1fbd-62f0-3d08-861d-0df5e8c145b8', 'P138i имеет представление', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('e60822a0-01d1-3ce9-bc6a-6b6e353c02fd', 'имеет представление', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('0b9bb398-b36e-361f-a51a-74850bcddb47', 'P138i est représentée par', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('3e667a80-67e3-3272-ae8b-e3a562356964', 'est représentée par', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('829d9e67-9774-38d7-917b-3900c1a6c87f', 'P138i παριστάνεται από', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('85d44d40-e21b-38ca-b72f-29f2a586e803', 'παριστάνεται από', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('768b5f19-0ca3-3c2b-be8c-00cfe0f31cee', 'P138i wird dargestellt durch', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('d4598eb5-1147-3392-bd11-c3bc1c40003b', 'wird dargestellt durch', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('63416e42-e42d-34e3-b940-22523a8d5370', 'P138i tem representação', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('ddf55c70-eb58-39b7-9362-633a9f3b93d2', 'tem representação', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('50e85a04-e358-3fac-836e-045ae4c908d9', 'P138i 有图像描绘', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('8dbf9771-5fcb-3913-b170-fddc53209883', '有图像描绘', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('dde0b854-6190-3de3-983e-c90939865381', 'P139 a pour autre forme', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'fr', 'prefLabel');
 INSERT INTO "values" VALUES ('5195c552-c162-3aa5-b234-432705d54db1', 'a pour autre forme', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'fr', 'altLabel');
 INSERT INTO "values" VALUES ('bedd615e-1cea-33ce-afc9-2d06f2606c4f', 'P139 имеет альтернативную форму', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'ru', 'prefLabel');
@@ -3956,6 +5662,20 @@ INSERT INTO "values" VALUES ('2f0a5754-edcc-3290-9679-47451650e43c', 'atribuiu a
 INSERT INTO "values" VALUES ('96a065e1-0726-3434-9d6d-bd1b6134540a', 'P140 指定属性给', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('533bd973-07b1-3164-973b-85fbf846295e', '指定属性给', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('b795d8fc-77cb-398b-a22a-521b1390ec47', 'This property indicates the item to which an attribute or relation is assigned. ', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('bfd9f3e2-946d-3b83-8fff-d45f7bf8c0c1', 'P140i was attributed by', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('da0595cf-6ae6-3ef6-9df4-f9d97cec6c24', 'was attributed by', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('8014faca-3746-3328-a31e-9425d858daa3', 'P140i a reçu un attribut par', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('50a7a9a8-d561-3b0e-880f-119afff14b2b', 'a reçu un attribut par', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('a22327e9-9dce-364e-a73c-b5832e6b7747', 'P140i получил атрибут посредством', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('3e8af05b-b464-36d7-98ee-5e00eef1a70f', 'получил атрибут посредством', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('1a71fe08-dcfa-3337-9b4a-7c0942a0de5f', 'P140i bekam Merkmal zugewiesen durch', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e62db590-d37a-3aca-9116-6598a5eb0d20', 'bekam Merkmal zugewiesen durch', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('bb80ba1c-6d6d-394f-b243-76972ded00f7', 'P140i χαρακτηρίστηκε από', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7269f4c4-4c3d-3212-a772-861c6f7994f2', 'χαρακτηρίστηκε από', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('526044db-42b8-3cf0-8669-07c24ba2b889', 'P140i foi atribuído por', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('c9cc7679-b300-3801-8cac-68a32a031c5c', 'foi atribuído por', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('e31eb238-351b-31fc-a4c4-1eef2f9ab348', 'P140i 被指定属性於', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('79a781db-cf0f-3706-a565-564fa25b0c35', '被指定属性於', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('18d90d02-4b25-391d-89b6-474798b6e763', 'P141 assigned', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('de634100-4c32-3bb6-b700-27ab8fa0165f', 'assigned', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('88725af7-80f7-3a0c-b1c4-3553c309a1f3', 'P141 присвоил', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'ru', 'prefLabel');
@@ -3972,6 +5692,20 @@ INSERT INTO "values" VALUES ('96a6fbe3-ebee-3b30-a912-570b956d8fb5', 'P141 指�
 INSERT INTO "values" VALUES ('2e197433-9644-3588-8ab7-6f9e119de9e6', '指定了属性值', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('224b4cb3-e0cc-3c33-be48-3a1a800f60ea', 'This property indicates the attribute that was assigned or the item that was related to the item denoted by a property P140 assigned attribute to in an Attribute assignment action.
 ', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('4738647f-365f-335a-812c-487ce256077f', 'P141i был присвоен посредством', '936cd63c-8307-3de9-a507-0f796fe07542', 'ru', 'prefLabel');
+INSERT INTO "values" VALUES ('5ec58599-8dd6-30d7-85f8-648b190e59dd', 'был присвоен посредством', '936cd63c-8307-3de9-a507-0f796fe07542', 'ru', 'altLabel');
+INSERT INTO "values" VALUES ('bf246f94-3ae3-3ff0-8602-71654683d263', 'P141i wurde zugewiesen durch', '936cd63c-8307-3de9-a507-0f796fe07542', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('e5e76c6f-49d5-31ca-996d-9486567fa5ef', 'wurde zugewiesen durch', '936cd63c-8307-3de9-a507-0f796fe07542', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('363a2da9-d654-3c1f-8b0d-8d3392c173a0', 'P141i a été attribué par', '936cd63c-8307-3de9-a507-0f796fe07542', 'fr', 'prefLabel');
+INSERT INTO "values" VALUES ('8e8b241d-ca2d-3cc8-8eac-110821cbf357', 'a été attribué par', '936cd63c-8307-3de9-a507-0f796fe07542', 'fr', 'altLabel');
+INSERT INTO "values" VALUES ('657645cc-7801-3bfc-b08e-5b849a464e56', 'P141i was assigned by', '936cd63c-8307-3de9-a507-0f796fe07542', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('453543a9-4372-3399-b6f0-87a36577cd05', 'was assigned by', '936cd63c-8307-3de9-a507-0f796fe07542', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('f5bbb199-d65d-3935-9044-ad856470f9b5', 'P141i αποδόθηκε από', '936cd63c-8307-3de9-a507-0f796fe07542', 'el', 'prefLabel');
+INSERT INTO "values" VALUES ('7f982672-4229-39d8-b8f6-1ad15f44fac8', 'αποδόθηκε από', '936cd63c-8307-3de9-a507-0f796fe07542', 'el', 'altLabel');
+INSERT INTO "values" VALUES ('aee8d238-6130-32ce-8115-582be1711c28', 'P141i foi atribuído por', '936cd63c-8307-3de9-a507-0f796fe07542', 'pt', 'prefLabel');
+INSERT INTO "values" VALUES ('d2164b9d-e4c8-3544-a7eb-db48f07b6096', 'foi atribuído por', '936cd63c-8307-3de9-a507-0f796fe07542', 'pt', 'altLabel');
+INSERT INTO "values" VALUES ('7d37fd3d-ce7f-385b-92be-5283b573e7d7', 'P141i 被指定了属性值於', '936cd63c-8307-3de9-a507-0f796fe07542', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('3b305915-7fa2-34a4-ba8a-0e962adf940d', '被指定了属性值於', '936cd63c-8307-3de9-a507-0f796fe07542', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5bd6726d-c43c-3200-bb4e-e849ab1a5642', 'P142 used constituent', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('31d41817-e9a8-30e1-a2e3-7b953db964a7', 'used constituent', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('4cfd02d2-4204-3e93-b47e-33c42c2a2d07', 'P142 benutzte Bestandteil', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'de', 'prefLabel');
@@ -3980,6 +5714,12 @@ INSERT INTO "values" VALUES ('a25ca450-7b95-3bcd-8e3e-81112c77b218', 'P142 使�
 INSERT INTO "values" VALUES ('312aaee1-1a94-3740-928e-5f56a5e4c0a7', '使用称号构成部分', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f91b71ac-d7aa-31aa-b284-b477f0f15207', 'This property associates the event of assigning an instance of E42 Identifier to an entity, with  the instances of E41 Appellation that were used as elements of the identifier.
 ', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('75ae83dc-8588-3e21-a9b4-5e58ea0fe77b', 'P142i wurde benutzt in', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('ac8287db-fa6a-3da9-aca0-885a0f4043c7', 'wurde benutzt in', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('f89b86c9-db61-3754-befc-a86e71656bc9', 'P142i was used in', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('bc545cc8-ecf3-332d-8d89-29087698e7cc', 'was used in', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('adf5ae94-ed58-3d2e-a1ff-2e3c2a0a09ce', 'P142i 被用来构成称号於', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('76d67fd3-eec0-3949-8c4d-61da7bb05e9c', '被用来构成称号於', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('09be84ba-6e99-3f31-8209-6a8a42fbe22d', 'P143 joined', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('8608fb22-1b91-392a-98ce-b3b435913847', 'joined', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('8b0ef780-098f-31ef-b5e9-9fd6917e2761', 'P143 verband', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'de', 'prefLabel');
@@ -3989,6 +5729,12 @@ INSERT INTO "values" VALUES ('fc676d72-e4c1-32b4-844f-2322690f3415', '加入了�
 INSERT INTO "values" VALUES ('403990a1-d91b-3efe-8ef6-02b079b37858', 'This property identifies the instance of E39 Actor that becomes member of a E74 Group in an E85 Joining.
  	Joining events allow for describing people becoming members of a group with a more detailed path from E74 Group through P144 joined with (gained member by), E85 Joining, P143 joined (was joined by) to E39 Actor, compared to the shortcut offered by P107 has current or former member (is current or former member of).
 ', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('8285da50-d74d-3761-bd80-418d9cfa37ae', 'P143i was joined by', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('fcc2fc35-3e1a-3b32-a2a3-a512b729035f', 'was joined by', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('ee76d77a-ce1a-352b-a2b8-2cd817b6b808', 'P143i wurde verbunden durch', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('05d87f2f-846d-36c5-997b-ca07a52333e5', 'wurde verbunden durch', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('c5d02546-804f-30d1-a22e-383465df4683', 'P143i 被加入为成员於', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('1c9b2f45-3016-3c26-88b3-459c41cb5081', '被加入为成员於', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('c3fdac4d-7dbd-3f3e-be97-c16679b784f2', 'P144 joined with', '406ee11a-a430-386f-9087-30c28c677da6', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('1cfe9e87-aa69-3629-a234-3857a99c40c5', 'joined with', '406ee11a-a430-386f-9087-30c28c677da6', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c17fa818-0923-3810-8fe9-b84db069459b', 'P144 verband mit', '406ee11a-a430-386f-9087-30c28c677da6', 'de', 'prefLabel');
@@ -4000,6 +5746,12 @@ Although a Joining activity normally concerns only one instance of E74 Group, it
 Joining events allow for describing people becoming members of a group with a more detailed path from E74 Group through P144 joined with (gained member by), E85 Joining, P143 joined (was joined by) to E39 Actor, compared to the shortcut offered by P107 has current or former member (is current or former member of).
 The property P144.1 kind of member can be used to specify the type of membership or the role the member has in the group. 
 ', '406ee11a-a430-386f-9087-30c28c677da6', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('d4615d03-ae1f-3ffe-b4bc-224e365211f8', 'P144i gained member by', '55e212ca-8ccb-3269-bf57-047a7927e388', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('098e5b4e-aefe-3c7c-b939-50af4a525661', 'gained member by', '55e212ca-8ccb-3269-bf57-047a7927e388', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('3501bed2-3ddb-39e3-aac3-8f7bdca9a896', 'P144i erwarb Mitglied durch', '55e212ca-8ccb-3269-bf57-047a7927e388', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('ace9765a-dd33-3d48-b301-5f192a903b3b', 'erwarb Mitglied durch', '55e212ca-8ccb-3269-bf57-047a7927e388', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('9ce22f4d-1473-355b-adaf-3fa9f03459ee', 'P144i 获得成员於', '55e212ca-8ccb-3269-bf57-047a7927e388', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('6c4f6038-7ce9-3639-8d2a-8361a5df5ad7', '获得成员於', '55e212ca-8ccb-3269-bf57-047a7927e388', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('5c433751-8689-372b-8beb-b524d0583b11', 'P145 separated', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('a994c395-4cfa-3c8a-8af8-92494652c87a', 'separated', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('bfa78f7e-b313-326a-a264-ae6a76ef9837', 'P145 entließ', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'de', 'prefLabel');
@@ -4007,6 +5759,12 @@ INSERT INTO "values" VALUES ('2a8cd213-bc46-3568-b4ec-7b1ec53b64bb', 'entließ',
 INSERT INTO "values" VALUES ('82ea6c5c-44e9-3a5d-b6a8-fc465280bb79', 'P145 分离了成员', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('4ce44adc-4c4a-39fe-a42d-28243563b7e3', '分离了成员', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('653aeaba-91a5-3041-8001-1bfd5b019c80', 'This property identifies the instance of E39 Actor that leaves an instance of E74 Group through an instance of E86 Leaving.', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('c7eca79a-2abc-36ef-bfa3-8a9e6de1eca7', 'P145i left by', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d46cdd7f-91f7-3ef0-86aa-d04f74d4f8f5', 'left by', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('520c2905-5a32-3ab8-8173-a366c348eb51', 'P145i wurde entlassen durch', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('de436259-c751-3542-b321-3e85a0b60d08', 'wurde entlassen durch', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('45e153ea-5cfe-3728-8d89-70df9e286997', 'P145i 脱离群组於', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('f4799f3c-b1bf-32b6-b7e9-22b733ee4474', '脱离群组於', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('3a59e687-44d1-3ea9-9d32-43bb2ec0cd71', 'P146 separated from', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('4e293738-9ddb-326c-9f5f-54b0c8e13e36', 'separated from', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('dc06e3be-4a2c-3dba-9010-c65f54d17405', 'P146 entließ von', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'de', 'prefLabel');
@@ -4016,6 +5774,12 @@ INSERT INTO "values" VALUES ('31eea279-0e1e-3394-9267-258480456f5f', '脱离了�
 INSERT INTO "values" VALUES ('fe116b98-c0f0-3dd9-967c-5f66bfb518fb', 'This property identifies the instance of E74 Group an instance of E39 Actor leaves through an instance of E86 Leaving.
 Although a Leaving activity normally concerns only one instance of E74 Group, it is possible to imagine circumstances under which leaving one E74 Group implies leaving another E74 Group as well.
 ', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('161f7778-5fb1-3412-af2f-e8f4b0538f4f', 'P146i lost member by', '0d9d0f81-5038-355c-a836-36374e32df2c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('754bf210-3739-3cd5-8cff-e53d2f391a8f', 'lost member by', '0d9d0f81-5038-355c-a836-36374e32df2c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('d5eaf83b-fb36-3bec-a85c-bfafbb8efa09', 'P146i verlor Mitglied durch', '0d9d0f81-5038-355c-a836-36374e32df2c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('48facafc-bad1-36bd-a02b-c0697c8ca8ac', 'verlor Mitglied durch', '0d9d0f81-5038-355c-a836-36374e32df2c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('cc916306-47f9-3a94-9e47-bb9c542b9d31', 'P146i 失去成员於', '0d9d0f81-5038-355c-a836-36374e32df2c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('cc21ec53-d339-3d31-bba4-c66afcce0de9', '失去成员於', '0d9d0f81-5038-355c-a836-36374e32df2c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('850e3327-b142-39e4-b1ed-292a1c83840f', 'P147 curated', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('4a499ddd-92b7-3707-ae87-07b0d4d5d161', 'curated', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('a64a6610-e4a1-322a-8cc1-88bbc2bb5f02', 'P147 betreute kuratorisch', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'de', 'prefLabel');
@@ -4024,6 +5788,12 @@ INSERT INTO "values" VALUES ('a1b5f009-b3e8-36d0-8b50-efc0650df539', 'P147 典�
 INSERT INTO "values" VALUES ('fca71f64-8078-3edd-94a8-49aa78163589', '典藏管理了', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('bddbc386-3a39-3a79-bcf7-55d3621babfb', 'This property associates an instance of E87 Curation Activity with the instance of E78 Collection that is subject of that  curation activity.
 ', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('aeec5c56-ca10-315c-9f70-fe3402aea056', 'P147i was curated by', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('d8d8bd3a-6d92-35db-bc46-ef12a712340a', 'was curated by', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('09d36ffd-ce2d-3b5e-8292-9e2ff093b75d', 'P147i wurde kuratorisch betreut durch', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('1638fa9e-4d72-319e-a4d3-a1d84e3f47bd', 'wurde kuratorisch betreut durch', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('42d4d40f-95c3-320d-bfdb-57a89a864fb6', 'P147i 被典藏管理於', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('7cab9690-7289-3a1a-91e9-f7ae66f30c28', '被典藏管理於', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('f7825a94-39a9-3280-ba2d-6e150cd57d93', 'P148 has component', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('2b909a2e-5dc4-310d-8f28-6d51ee561bba', 'has component', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('374e11a3-8e53-37b8-b4b6-d04fe9fd898e', 'P148 hat Bestandteil', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'de', 'prefLabel');
@@ -4031,23 +5801,37 @@ INSERT INTO "values" VALUES ('3409a493-954a-3a16-a2b0-3dd04edf4482', 'hat Bestan
 INSERT INTO "values" VALUES ('5a57e1d0-b984-3305-b48f-5f0bb5bd6d80', 'P148 有组件', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'zh', 'prefLabel');
 INSERT INTO "values" VALUES ('f54529f5-9f3b-3afa-8a72-6b817490a087', '有组件', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('43b8b9c0-3b2a-3ed9-a76b-f657cdc6a0f1', 'This property associates an instance of E89 Propositional Object with a structural part of it that is by itself an instance of E89 Propositional Object.', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('ad929acc-4dd1-3361-8c2f-6bccae3e3d01', 'P148i is component of', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('abc78c92-a681-3887-9a8a-ce315878707e', 'is component of', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('85ecdbe2-c440-3962-b34a-b239935f74c9', 'P148i ist Bestandteil von', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'de', 'prefLabel');
+INSERT INTO "values" VALUES ('16e10c3c-d462-3453-b9d1-5ec3debfc99f', 'ist Bestandteil von', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'de', 'altLabel');
+INSERT INTO "values" VALUES ('695259bd-ee1b-33b0-ad36-384bfa9b9942', 'P148i 被用来组成', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'zh', 'prefLabel');
+INSERT INTO "values" VALUES ('b61922c0-3fd7-3660-afdb-1070d0df155a', '被用来组成', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'zh', 'altLabel');
 INSERT INTO "values" VALUES ('36e35c1c-39a6-3be1-91af-52ecc5365425', 'P149 is identified by', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('609abb23-bd80-3cfa-b3ea-d50e0aec8536', 'is identified by', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('71bd5632-9f0a-3689-af44-319a8d974678', 'This property identifies an instance of E28 Conceptual Object using an instance of E75 Conceptual Object Appellation.', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('744ba893-789b-3b47-aa08-cc7eb6f04ef5', 'P149i identifies', '8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('33275b5a-f671-36e6-91e7-2a376e3c390e', 'identifies', '8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('a71ba302-8fd5-3661-a3bb-6bc84273994f', 'P150 defines typical parts of', '75825fa7-ab9a-3b62-b7e8-250712914631', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('7a86065f-1ab8-3c1a-a582-db3e9a971f9e', 'defines typical parts of', '75825fa7-ab9a-3b62-b7e8-250712914631', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('77998e48-1d36-313d-ba5a-52c7f0ab8082', 'The property "broaderPartitive" associates an instance of E55 Type “A” with an instance of E55 Type “B”, when items of type “A” typically form part of items of type “B”, such as “car motors” and “cars”.
 It allows Types to be organised into hierarchies. This is the sense of "broader term partitive (BTP)" as defined in ISO 2788 and “broaderPartitive” in SKOS.
 ', '75825fa7-ab9a-3b62-b7e8-250712914631', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('472358f0-bb8a-3214-84e5-2114d37f651d', 'P150i defines typical wholes for', '75893825-da4f-370f-aaf7-0f9055fb822f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('8cd0d9eb-6b4d-3d9d-b8cc-a978768a58e8', 'defines typical wholes for', '75893825-da4f-370f-aaf7-0f9055fb822f', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('840a1724-7412-31e6-83bd-913e3f23f4d0', 'P151 was formed from', '63c5d303-2789-3999-8496-297343edf6dc', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('5b9b7f67-618e-38aa-9a91-1e44f37aa2a3', 'was formed from', '63c5d303-2789-3999-8496-297343edf6dc', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('b2d75857-8317-321b-96ef-ab6a79f2628c', 'This property associates an instance of E66 Formation with an instance of E74 Group from which the new group was formed preserving a sense of continuity such as in mission, membership or tradition.
 	', '63c5d303-2789-3999-8496-297343edf6dc', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('b1e4a577-660a-3301-83be-605fc30e2534', 'P151i participated in', 'b07d00db-77cc-3fcd-8a77-00640ea7a4b4', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('54872d14-caf5-3427-836e-cb73aa61645c', 'participated in', 'b07d00db-77cc-3fcd-8a77-00640ea7a4b4', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('362937eb-ceaa-3517-8805-172179695bc3', 'P152 has parent', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('c14ba6c8-7352-3ac3-a4b3-0c57d9905779', 'has parent', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('27bbdc37-157a-3828-a5e5-b8919cec72da', 'This property associates an instance of E21 Person with another instance of E21 Person who plays the role of the first instance’s parent, regardless of whether the relationship is biological parenthood, assumed or pretended biological parenthood or an equivalent legal status of rights and obligations obtained by a social or legal act. 
 	This property is, among others, a shortcut of the fully developed paths from ‘E21Person’ through ‘P98i was born’, ‘E67 Birth’, ‘P96 by mother’ to ‘E21 Person’, and from ‘E21Person’ through ‘P98i was born’, ‘E67 Birth’, ‘P97 from father’ to ‘E21 Person’.
 	', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('827e2b62-9618-3e1b-bcb2-a6d20673d569', 'P152i is parent of', '8892bafe-d1eb-3729-aae7-11b84d33fe4f', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('dc6b0edc-11b6-34da-9f71-130c4b06c484', 'is parent of', '8892bafe-d1eb-3729-aae7-11b84d33fe4f', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('08b934b5-b943-35fa-b3ed-0a4205237f5b', 'P156 occupies', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('495f2b19-77c7-378e-8b90-3dfebf6bcf73', 'occupies', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('9ae67291-3b9d-317b-8a07-0e04feacda62', 'This property describes the largest volume in space that an instance of E18 Physical Thing has occupied at any time during its existence, with respect to the reference space relative to itself. This allows you to describe the thing itself as a place that may contain other things, such as a box that may contain coins. In other words, it is the volume that contains all the points which the thing has covered at some time during its existence. In the case of an E26 Physical Feature the default reference space is the one in which the object that bears the feature or at least the surrounding matter of the feature is at rest. In this case there is a 1:1 relation of E26 Feature and E53 Place. For simplicity of implementation multiple inheritance (E26 Feature IsA E53 Place) may be a practical approach.
@@ -4058,23 +5842,33 @@ This property is a subproperty of P161 has spatial projection because it refers 
 
 In contrast to P156  occupies, the property P53 has former or current location identifies an instance of E53 Place at which a thing is or has been for some unspecified time span.  Further it does not constrain the reference space of the referred instance of P53 Place.
 	', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('71e661f9-909c-3b6d-afb6-141d359962e4', 'P156i is occupied by', 'fea70b78-1787-3af8-abbe-9ce28ff2938d', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('da834880-8141-3bca-b9fa-0a26d8296348', 'is occupied by', 'fea70b78-1787-3af8-abbe-9ce28ff2938d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('282ee3f8-b9be-3afd-abaa-5365a354c00f', 'P157 is at rest relative to', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('8864e85d-8518-36d0-b6ab-ef968e883c30', 'is at rest relative to', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('8c862475-90bd-3dfe-aca7-34c86360871d', 'This property associates an instance of P53 Place with the instance of E18 Physical Thing that determines a reference space for this instance of P53 Place by being at rest with respect to this reference space. The relative stability of form of an E18 Physical Thing defines its default reference space. The reference space is not spatially limited to the referred thing. For example, a ship determines a reference space in terms of which other ships in its neighbourhood may be described. Larger constellations of matter, such as continental plates, may comprise many physical features that are at rest with them and define the same reference space.
 	', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('4d1fd3ca-fa71-303c-b918-6ac35974c4dd', 'P157i provides reference space for', '1be49423-63ef-3cb1-884a-4fd252df9a40', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('0c15ff03-718a-3733-ad81-df0aa1df1f10', 'provides reference space for', '1be49423-63ef-3cb1-884a-4fd252df9a40', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('7e1b2072-c2a0-3371-8b92-224159980665', 'P160 has temporal projection', '6f3ce351-dc26-30bf-8c50-9392f873968d', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('1258f1c5-d5b5-3ec8-bbf7-135cd16dfd34', 'has temporal projection', '6f3ce351-dc26-30bf-8c50-9392f873968d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('62ca2d31-c17f-3353-a76b-7900d3b1f86a', 'This property describes the temporal projection of an instance of an E92 Spacetime Volume. The property P4 has time-span is the same as P160 has temporal projection if it is used to document an instance of E4 Period or any subclass of it. 
 	', '6f3ce351-dc26-30bf-8c50-9392f873968d', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('5e43f2e4-5c72-3a35-b821-5c029e7a3eee', 'P160i is temporal projection of', 'd5340d69-ae62-3784-a09f-4265441bc799', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('89097d15-2644-302c-9b2d-e1e87c86bfc3', 'is temporal projection of', 'd5340d69-ae62-3784-a09f-4265441bc799', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('f02bf8c5-b4ed-3235-acb1-78b5ab7def3f', 'P161 has spatial projection', 'db25f50b-28f3-3041-b091-8bb7d2557856', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('32e7ccd4-e243-3708-afa7-3560bfb88fbf', 'has spatial projection', 'db25f50b-28f3-3041-b091-8bb7d2557856', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('584854e5-18d6-34f9-accc-46f99f60e832', 'This property associates an instance of a E92 Spacetime Volume with an instance of E53 Place that is the result of the spatial projection of the instance of a E92 Spacetime Volume on a reference space. In general there can be more than one useful reference space to describe the spatial projection of a spacetime volume, such as that of a battle ship versus that of the seafloor. Therefore the projection is not unique.
 This is part of the fully developed path that is shortcut by P7took place at (witnessed).The more fully developed path from E4 Period through P161 has spatial projection, E53 Place, P89 falls within (contains) to E53 Place. 
 	', 'db25f50b-28f3-3041-b091-8bb7d2557856', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('58ffa8e5-fad4-3d25-8f82-d2b69eabb71f', 'P161i is spatial projection of', '1cea6134-b1e4-328d-9f42-2b05ef652051', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('621f66e5-2cf1-3eef-b989-89bd5d33f173', 'is spatial projection of', '1cea6134-b1e4-328d-9f42-2b05ef652051', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('59a076d3-0df2-3ae2-888e-9fe70d150437', 'P164 during', '68633428-a835-3af2-9e8e-ac1ba713d4c8', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('a88b070c-a43c-3237-b2a5-d34b3f9d727c', 'during', '68633428-a835-3af2-9e8e-ac1ba713d4c8', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('6e1ab909-8ef0-3460-b7fc-aca549a1d918', 'This property relates an E93 Presence with an arbitrary E52 Time-Span that defines the section of the spacetime volume that this instance of E93 Presence is related to by P166 was a presence of (had presence) that is concerned by this instance of E93 Presence. 
 	', '68633428-a835-3af2-9e8e-ac1ba713d4c8', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('3f94dd74-1601-36d0-b0b3-121089388653', 'P164i was time-span of', '4d0347cf-bb90-39ec-b1ce-62cde88563c5', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('cbe5bf4b-17d7-3a1d-93ba-31967bc3b7b8', 'was time-span of', '4d0347cf-bb90-39ec-b1ce-62cde88563c5', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('93324fc4-6b4c-3e12-9875-19ee22c70ef7', 'P165 incorporates', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('13e9a6ff-bb58-310f-b423-f9439a5c3f39', 'incorporates', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('fc3c9006-24db-3070-a62b-5c0c0bbc0ed8', 'This property associates an instance of E73 Information Object with an instance of E90 Symbolic Object (or any of its subclasses) that was included in it.
@@ -4083,29 +5877,34 @@ It accounts for many cultural facts that are quite frequent and significant: the
 In particular, this property allows for modelling relationships of different levels of symbolic specificity, such as the natural language words making up a particular text, the characters making up the words and punctuation, the choice of fonts and page layout for the characters.
 A digital photograph of a manuscript page incorporates the text of the manuscript page.
 	', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('cde9f53c-6080-3d6c-bd9e-ace86865c59e', 'P165i is incorporated in', '737107d1-0987-399a-acc9-ad999343883d', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('cb6133df-ea48-3fc1-99e6-41021a28ef05', 'is incorporated in', '737107d1-0987-399a-acc9-ad999343883d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('78eb2649-56d2-30e1-95e8-e1c6257fd605', 'P166 was a presence of', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('80352e08-6d4c-3f87-b57c-c65622996565', 'was a presence of', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('31a625a6-af66-3de4-9189-94097df07528', 'This property relates an E93 Presence with the STV it is part of… 
 	', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('813cbc48-d4e1-3043-8cdd-760fab41059c', 'P166i had presence', '10d74c25-d701-39f0-b392-3d14ce53e777', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('9ade07cc-2a66-36e1-9989-991b9cfecd47', 'had presence', '10d74c25-d701-39f0-b392-3d14ce53e777', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('5430949d-789a-3b8f-b41a-4b95905d21cc', 'P167 was at', 'da115774-50f3-3292-97dc-da1cbb527ca5', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('b22ff3ee-b4b2-3247-8ef3-41f1471a0347', 'was at', 'da115774-50f3-3292-97dc-da1cbb527ca5', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('c1d0df03-010b-35ff-9513-d54d4084b043', 'This property points to a wider area in which my thing /event was… 
 	', 'da115774-50f3-3292-97dc-da1cbb527ca5', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('c9582773-ccc1-3cea-9597-045469864067', 'P167i was place of', '3cdc8241-3fe5-30a9-be46-c4de963ec173', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('7161393b-c2e9-387f-9b03-d073ff2ac515', 'was place of', '3cdc8241-3fe5-30a9-be46-c4de963ec173', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('a508f2c0-0872-34d3-8a78-bba28b8e0cc1', 'P168 place is defined by ', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'en', 'prefLabel');
 INSERT INTO "values" VALUES ('57cf497e-5f7e-3b9b-b093-1d354fddf9a3', 'place is defined by ', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'en', 'altLabel');
 INSERT INTO "values" VALUES ('33411498-5d7b-31f3-89e6-d1a3419ad0d5', 'This property associates an instance of E53 Place with an instance of E94 Space Primitive that defines it. Syntactic variants or use of different scripts may result in multiple instances of E94 Space Primitive defining exactly the same place. Transformations between different reference systems in general result in new definitions of places approximating each other and not in alternative definitions. Note that it is possible for a place to be defined by phenomena causal to it or other forms of identification rather than by an instance of E94 Space Primitive. In this case, this property must not be used for approximating the respective instance of E53 Place with an instance of E94 Space Primitive. 
 	', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'en-US', 'scopeNote');
-INSERT INTO "values" VALUES ('b1c551f4-95ab-319e-b044-854dbaac0cc6', 'BM.PX is related to', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en', 'prefLabel');
-INSERT INTO "values" VALUES ('8b06ab46-deb0-304c-a9b3-8e7039d4f0f8', 'is related to', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en', 'altLabel');
-INSERT INTO "values" VALUES ('c6ae539a-c840-3ee7-aa47-301ecba86dfd', 'Relates E18 to E1', '7cd91c49-743e-3eed-ad91-d993b09af867', 'en-US', 'scopeNote');
+INSERT INTO "values" VALUES ('b4510871-7413-3edc-a0a0-e0ac88470384', 'BM.PX is related to', '208c9b27-1418-3691-8edf-b86d3f3db3e9', 'en', 'prefLabel');
+INSERT INTO "values" VALUES ('b4128865-a2e4-32c9-856b-138851ed8ff7', 'is related to', '208c9b27-1418-3691-8edf-b86d3f3db3e9', 'en', 'altLabel');
+INSERT INTO "values" VALUES ('c6ae539a-c840-3ee7-aa47-301ecba86dfd', 'Relates E18 to E1', '208c9b27-1418-3691-8edf-b86d3f3db3e9', 'en-US', 'scopeNote');
 
 
--- Completed on 2016-05-09 13:33:50 PDT
+-- Completed on 2016-05-12 15:09:39 PDT
 
 --
 -- PostgreSQL database dump complete
 --
-
 
 --
 -- PostgreSQL database dump
@@ -4114,7 +5913,7 @@ INSERT INTO "values" VALUES ('c6ae539a-c840-3ee7-aa47-301ecba86dfd', 'Relates E1
 -- Dumped from database version 9.5.1
 -- Dumped by pg_dump version 9.5.1
 
--- Started on 2016-05-09 13:34:44 PDT
+-- Started on 2016-05-12 15:09:13 PDT
 
 -- SET statement_timeout = 0;
 -- SET lock_timeout = 0;
@@ -4127,491 +5926,838 @@ INSERT INTO "values" VALUES ('c6ae539a-c840-3ee7-aa47-301ecba86dfd', 'Relates E1
 -- SET search_path = public, pg_catalog;
 
 --
--- TOC entry 3857 (class 0 OID 491631)
+-- TOC entry 3857 (class 0 OID 532873)
 -- Dependencies: 240
--- Data for Name: relations; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: relations; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO relations VALUES ('884e96c0-95b5-4698-9e93-15ef43917309', 'c03db431-4564-34eb-ba86-4c8169e4276c', '70064b58-4490-3d09-b463-fd18defae21f', 'subClassOf');
-INSERT INTO relations VALUES ('e5ac53c2-fd99-4aac-82d5-94e25ec37e4a', '70064b58-4490-3d09-b463-fd18defae21f', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'subClassOf');
-INSERT INTO relations VALUES ('326c827c-121d-465b-a2a2-bd12087d7c25', '70064b58-4490-3d09-b463-fd18defae21f', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'subClassOf');
-INSERT INTO relations VALUES ('e2c6109e-d1fb-4de1-ada2-d5652e8b6aef', '94ffd715-18f7-310a-bee2-010d800be058', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'subClassOf');
-INSERT INTO relations VALUES ('c630c086-ad5d-40b3-9b4e-682c4d1df7c8', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'subClassOf');
-INSERT INTO relations VALUES ('03e3fa57-d50e-4a25-9cad-8c5cd6d9564a', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '94b5ce18-d4ca-3ac6-b903-d68c86258f95', 'subClassOf');
-INSERT INTO relations VALUES ('f2cbe1f3-22b6-4310-83d4-8c9ebe1edaa6', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'subClassOf');
-INSERT INTO relations VALUES ('a63c1fb5-3b74-4043-897d-34a153a226b4', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', 'subClassOf');
-INSERT INTO relations VALUES ('25b8f0ac-1d68-4969-ac07-982cdd433e37', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'subClassOf');
-INSERT INTO relations VALUES ('5c3a9c48-503b-44bf-8481-901344f41c38', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'subClassOf');
-INSERT INTO relations VALUES ('26bc283f-0fe6-4aee-b41d-79f609eaaedd', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'subClassOf');
-INSERT INTO relations VALUES ('3101b90c-2ff7-4deb-8e2d-b1ee9b18c8ea', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'f27afcc0-7657-3c5e-8314-b913c562759e', 'subClassOf');
-INSERT INTO relations VALUES ('88f9f8a7-963b-4c22-a3d6-4291c0990ea3', '255bba42-8ffb-3796-9caa-807179a20d9a', 'f27afcc0-7657-3c5e-8314-b913c562759e', 'subClassOf');
-INSERT INTO relations VALUES ('502049b1-0e84-44db-bb34-0e048edda27a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'subClassOf');
-INSERT INTO relations VALUES ('44489f96-4c2b-4360-a6ce-63f556b35bee', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'subClassOf');
-INSERT INTO relations VALUES ('28fb6684-9651-4a1e-b12d-e5c6797ea7ed', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'subClassOf');
-INSERT INTO relations VALUES ('ed9702fe-8eee-4f8d-bb77-8fccacbf9708', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', 'subClassOf');
-INSERT INTO relations VALUES ('2364d170-36ba-4948-bb7c-533040c6521d', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'subClassOf');
-INSERT INTO relations VALUES ('d19add68-ae3a-419f-ae0f-c9c10823fa06', '78b224a2-9271-3716-8c2e-c82302cdae9c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'subClassOf');
-INSERT INTO relations VALUES ('9089266d-06fd-4de6-b58a-5b7d0a621f3c', '94ffd715-18f7-310a-bee2-010d800be058', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'subClassOf');
-INSERT INTO relations VALUES ('cf72528c-fcf8-47c0-b119-f5ce01aadb6a', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'subClassOf');
-INSERT INTO relations VALUES ('f96f8fc1-3f3b-4e40-b88e-2ceee1e02af6', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', '2c287084-c289-36b2-8328-853e381f0ed4', 'subClassOf');
-INSERT INTO relations VALUES ('c061b8a5-0d44-44e2-aa0a-58a61e647400', '2c287084-c289-36b2-8328-853e381f0ed4', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'subClassOf');
-INSERT INTO relations VALUES ('eb5ff719-7187-448c-841e-9d005fb87750', 'af051b0a-be2f-39da-8f46-429a714e242c', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'subClassOf');
-INSERT INTO relations VALUES ('4c679593-9894-4af7-b485-1ab0eca50ec9', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'subClassOf');
-INSERT INTO relations VALUES ('d7edf5e5-147a-46db-944f-35becd5e04c4', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'subClassOf');
-INSERT INTO relations VALUES ('b34466dc-1b1b-4135-a636-9e75519c7cf9', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'subClassOf');
-INSERT INTO relations VALUES ('ba6b541f-6b58-4be8-ac82-d0f18246de25', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'subClassOf');
-INSERT INTO relations VALUES ('307b4075-5f71-4011-b027-39ce12533469', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '4bb246c3-e51e-32f9-a466-3003a17493c5', 'subClassOf');
-INSERT INTO relations VALUES ('f7103c84-63d7-42fe-b3a8-6d081b797e3a', '2bc61bb4-384d-3427-bc89-2320be9896f2', '4bb246c3-e51e-32f9-a466-3003a17493c5', 'subClassOf');
-INSERT INTO relations VALUES ('18d9f7c9-8ae2-441f-8471-1c8586ceac2c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'subClassOf');
-INSERT INTO relations VALUES ('be5fb91f-5f34-409f-a74d-6ca8b04f16a4', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'a89d6e8b-6f86-33cd-9084-b6c77165bed1', 'subClassOf');
-INSERT INTO relations VALUES ('c4835c89-ab3f-4e8e-9d3b-58d20c6c8291', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'subClassOf');
-INSERT INTO relations VALUES ('b3418727-0f43-4f4e-bbb6-3c5698223427', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'subClassOf');
-INSERT INTO relations VALUES ('f2b30b07-34c3-4b1f-ac2f-617932996bd1', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'subClassOf');
-INSERT INTO relations VALUES ('5f687b6b-0f3c-49fc-b0be-451d35f4a139', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '84a17c0c-78f2-3607-ba85-da1fc47def5a', 'subClassOf');
-INSERT INTO relations VALUES ('79bd6789-1bf1-4633-a11c-45ce5c88e97e', '84a17c0c-78f2-3607-ba85-da1fc47def5a', '0df9cb10-1203-3efd-8d9e-448f5b02506b', 'subClassOf');
-INSERT INTO relations VALUES ('06e2ba3e-e354-45f3-9a18-2c1d40f38322', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'subClassOf');
-INSERT INTO relations VALUES ('33972aef-5f0e-41ca-b171-ae1cf3157e10', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '21fa6d60-095b-3044-9ca3-088e2cdab1f0', 'subClassOf');
-INSERT INTO relations VALUES ('3c5d7f4c-5454-49bd-a550-89a1a61749bf', '7e62fc5e-947d-3806-bcd7-ce6bb716b6fe', '21fa6d60-095b-3044-9ca3-088e2cdab1f0', 'subClassOf');
-INSERT INTO relations VALUES ('e1854bfc-c2c0-471c-ab56-2a51b61cdf28', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'subClassOf');
-INSERT INTO relations VALUES ('8b3db4e3-7457-4e9f-9054-c9fa0747b170', 'b43d4537-6674-37cb-af6e-834b5d63c978', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'subClassOf');
-INSERT INTO relations VALUES ('abd0cfe6-46fb-4c57-b3a0-2245758808ba', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'subClassOf');
-INSERT INTO relations VALUES ('5a627798-7843-4be0-9631-90317e839bc8', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', '7e62fc5e-947d-3806-bcd7-ce6bb716b6fe', 'subClassOf');
-INSERT INTO relations VALUES ('f00518f9-ab2f-4dab-89f9-9146a7e4f9b2', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', '9cc69985-2a19-3fa6-abf5-addf02a52b90', 'subClassOf');
-INSERT INTO relations VALUES ('fcd96a74-89e1-4e23-bcf2-84921d8a3293', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'af051b0a-be2f-39da-8f46-429a714e242c', 'subClassOf');
-INSERT INTO relations VALUES ('3629f592-2a16-41e4-9be1-f29f757c41e6', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '40a8beed-541b-35cd-b287-b7c345f998fe', 'subClassOf');
-INSERT INTO relations VALUES ('2d338cc9-03fa-4fd7-ad1c-97a60fac49fe', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'subClassOf');
-INSERT INTO relations VALUES ('009d9eb4-e623-4404-bc6b-7ecba0c38467', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'subClassOf');
-INSERT INTO relations VALUES ('088e4a2a-1363-4d65-a7b7-ff39b51ee266', 'b43d4537-6674-37cb-af6e-834b5d63c978', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'subClassOf');
-INSERT INTO relations VALUES ('a5a63d11-08b6-41f5-be41-2f07c863bd4a', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'ac777d6e-452a-3a10-80c9-5190b5d9f6f2', 'subClassOf');
-INSERT INTO relations VALUES ('d20f0d16-4615-4456-b5b5-8ebf19eea03e', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'ac777d6e-452a-3a10-80c9-5190b5d9f6f2', 'subClassOf');
-INSERT INTO relations VALUES ('68e37f9c-acf1-4e7b-9a9a-641707604c4a', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', '4e3d11b3-c6a8-3838-9a62-0571b84914fa', 'subClassOf');
-INSERT INTO relations VALUES ('b759e8c0-3993-425a-aa85-f29a370581b6', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', '35bfed01-08dc-34b9-94a0-42facd1291ac', 'subClassOf');
-INSERT INTO relations VALUES ('94f86512-0c35-4070-87b7-97e34265e4f1', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'e276711d-008c-3380-934b-e048a6a0d665', 'subClassOf');
-INSERT INTO relations VALUES ('7f45af9f-ff4e-4860-8bc2-08c2f17cec94', 'b43d4537-6674-37cb-af6e-834b5d63c978', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'subClassOf');
-INSERT INTO relations VALUES ('40953ef2-1889-488d-88ff-d4125455a3f6', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'c8b36269-f507-32fc-8624-2a9404390719', 'subClassOf');
-INSERT INTO relations VALUES ('eb4bf9c2-2dad-48a0-88d4-02eb605518bf', 'b43d4537-6674-37cb-af6e-834b5d63c978', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'subClassOf');
-INSERT INTO relations VALUES ('2dcfc69b-2734-40fa-9492-2c8b51c1eb56', 'c03db431-4564-34eb-ba86-4c8169e4276c', '9d55628a-0085-3b88-a939-b7a327263f53', 'subClassOf');
-INSERT INTO relations VALUES ('2ab790ba-5470-4055-86a2-0473e3062649', 'c03db431-4564-34eb-ba86-4c8169e4276c', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'subClassOf');
-INSERT INTO relations VALUES ('64923d59-5379-4451-b3a3-005546546b1f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'subClassOf');
-INSERT INTO relations VALUES ('e289128e-dfb2-4629-b664-d1a8143d63f5', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'subClassOf');
-INSERT INTO relations VALUES ('8023688e-7c7f-4fc0-98e6-2d02e73d2bed', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '4e75b119-d77b-3c1e-acf8-fbdfd197c9f1', 'subClassOf');
-INSERT INTO relations VALUES ('6c0cc4a2-de2c-4c3c-a802-6b8fd0951ff7', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'subClassOf');
-INSERT INTO relations VALUES ('c33e1942-9b96-4e62-8620-768e2fa975f4', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'c1f0e36c-770f-30f9-8241-30d44921c6c8', 'subClassOf');
-INSERT INTO relations VALUES ('324af9b3-fc9e-4f28-a528-5de41e422e20', '8471e471-3045-3269-a9b8-86d0e6065176', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'subClassOf');
-INSERT INTO relations VALUES ('3e6042d9-26d1-495e-a58c-63b3ff813e1d', '8471e471-3045-3269-a9b8-86d0e6065176', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'subClassOf');
-INSERT INTO relations VALUES ('00cd8daa-9e6e-4a84-a939-a08d1fe0776f', '8471e471-3045-3269-a9b8-86d0e6065176', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'subClassOf');
-INSERT INTO relations VALUES ('815073d7-f600-428c-bc49-0aecca6b42d3', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '255bba42-8ffb-3796-9caa-807179a20d9a', 'subClassOf');
-INSERT INTO relations VALUES ('f1389353-c63c-42a9-a383-5a0140d9edb0', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', 'subClassOf');
-INSERT INTO relations VALUES ('abb9993d-79b0-4391-8340-78e3bd446303', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', 'subClassOf');
-INSERT INTO relations VALUES ('49882509-e64d-4682-a03f-9f63646964d1', '255bba42-8ffb-3796-9caa-807179a20d9a', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', 'subClassOf');
-INSERT INTO relations VALUES ('8d89c98d-0bcc-4b28-b1df-2a4d55df606d', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'subClassOf');
-INSERT INTO relations VALUES ('9800acc7-871e-44d1-b1e8-ce855de898d9', '255bba42-8ffb-3796-9caa-807179a20d9a', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'subClassOf');
-INSERT INTO relations VALUES ('8ee76e08-cfb1-4cf8-b9fe-16d9d9e2d49c', '255bba42-8ffb-3796-9caa-807179a20d9a', '07fcf604-d28f-3993-90fa-d301c4004913', 'subClassOf');
-INSERT INTO relations VALUES ('d32f225e-687b-4460-8ea2-adae1bdac592', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '8bba5cfd-675d-3899-8c95-03b2de2a0a31', 'subClassOf');
-INSERT INTO relations VALUES ('abcdca48-83e6-4f4e-9d48-3cb88f45285e', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '725afd13-ebc5-38a8-815b-d3a1e5510698', 'subClassOf');
-INSERT INTO relations VALUES ('4b5d19f8-81fc-4789-b608-e71142fe084d', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'subClassOf');
-INSERT INTO relations VALUES ('64d77c23-96e6-482a-8b8c-bcc3347bbacb', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'subClassOf');
-INSERT INTO relations VALUES ('a1e24f13-22e5-47a1-b3d2-c0c90f97bd2e', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'subClassOf');
-INSERT INTO relations VALUES ('e92c8954-9556-432d-95ca-9aba2bb7ad53', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'subClassOf');
-INSERT INTO relations VALUES ('454e53e3-46b1-4add-b3c1-da2f759ec0b0', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'subClassOf');
-INSERT INTO relations VALUES ('bd1bfc73-bf27-476c-b98d-5109024a44df', 'af051b0a-be2f-39da-8f46-429a714e242c', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'subClassOf');
-INSERT INTO relations VALUES ('4daafba3-daf8-49ba-bb5c-87cb55113416', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'ae27d5a7-abfc-32e3-9927-99795abc53a4', 'subClassOf');
-INSERT INTO relations VALUES ('ba97cb15-baca-4d2c-816c-5891b4f2bb0a', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'subClassOf');
-INSERT INTO relations VALUES ('971bb1b8-8863-4a62-b540-6ac6ad9bf8d6', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'subClassOf');
-INSERT INTO relations VALUES ('2379d676-34e7-48d8-82e6-b069446f3b7d', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '048fe43e-349a-3dda-9524-7046dcbf7287', 'subClassOf');
-INSERT INTO relations VALUES ('65b32a9d-4fbe-4a09-a42a-2243b48a0719', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'subClassOf');
-INSERT INTO relations VALUES ('434a0452-38fd-48c4-9824-cbc81f83c8ec', '255bba42-8ffb-3796-9caa-807179a20d9a', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'subClassOf');
-INSERT INTO relations VALUES ('1534319d-44e4-4b6d-9ce1-c19afacd657b', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'subClassOf');
-INSERT INTO relations VALUES ('89bb178a-983c-4414-aaff-3e61445b761f', 'b43d4537-6674-37cb-af6e-834b5d63c978', '6f38d2ca-e114-33a0-b4db-4f298e53be3d', 'subClassOf');
-INSERT INTO relations VALUES ('b0f8bb90-22eb-4499-b5ae-249e898a27c4', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'subClassOf');
-INSERT INTO relations VALUES ('938cb685-0fa9-43b8-9397-f12b2cc210c6', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'subClassOf');
-INSERT INTO relations VALUES ('3d0b1e02-aabc-463e-9be1-e613bb211312', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'subClassOf');
-INSERT INTO relations VALUES ('38c562e3-0600-490a-b0d5-8e007d0f09cf', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', 'subClassOf');
-INSERT INTO relations VALUES ('846217fd-ed79-44b0-9574-91f321c0e6d7', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'de74c0db-a5fa-3f45-8684-344c379e6b0d', 'subClassOf');
-INSERT INTO relations VALUES ('cdfc91f5-1987-4b9a-8283-d719b4e9921d', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'subClassOf');
-INSERT INTO relations VALUES ('9609147a-cee2-4548-a10d-62691c9e894c', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'subClassOf');
-INSERT INTO relations VALUES ('83c91ae3-51a3-465b-b69a-2103e2eb0d07', '78b224a2-9271-3716-8c2e-c82302cdae9c', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'subClassOf');
-INSERT INTO relations VALUES ('c3cc090c-970f-4301-ab61-3aa99e30ec70', 'c03db431-4564-34eb-ba86-4c8169e4276c', '94ffd715-18f7-310a-bee2-010d800be058', 'subClassOf');
-INSERT INTO relations VALUES ('262ea4a3-0124-4b7c-a49b-2f99e462d07a', '94ffd715-18f7-310a-bee2-010d800be058', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'subClassOf');
-INSERT INTO relations VALUES ('3c3067d0-d887-41d6-958e-cad78a7ab249', '94ffd715-18f7-310a-bee2-010d800be058', '1036c7f1-ea95-3ad8-886f-849ca10f9584', 'subClassOf');
-INSERT INTO relations VALUES ('fd0a96f2-07d8-44dd-9f30-f90b40088987', 'c03db431-4564-34eb-ba86-4c8169e4276c', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'hasDomainClass');
-INSERT INTO relations VALUES ('c3253cb2-6ba6-48ba-8d7f-cbeaacba1d83', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'hasRangeClass');
-INSERT INTO relations VALUES ('532466ac-179f-46af-a3bb-6f13297d090e', 'c03db431-4564-34eb-ba86-4c8169e4276c', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'hasDomainClass');
-INSERT INTO relations VALUES ('9b13a363-a132-4290-8f3d-b405681957a1', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('aadfa9b7-a5ed-4cec-807b-2a5b7939ec22', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'hasDomainClass');
-INSERT INTO relations VALUES ('8801789e-3448-4c84-abbd-b2c2a890c4af', 'fd06e07d-057b-38aa-99ac-1add45f9f217', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
-INSERT INTO relations VALUES ('d3fc0d31-741d-432b-b45b-a27e401cb28f', '70064b58-4490-3d09-b463-fd18defae21f', 'fc174f36-37ef-3f45-aec4-5b8ebe0e7729', 'hasDomainClass');
-INSERT INTO relations VALUES ('5ec9286f-6fcc-4de6-b74f-d8aaecbde3e1', 'fc174f36-37ef-3f45-aec4-5b8ebe0e7729', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
-INSERT INTO relations VALUES ('c68e6bbd-f4c2-4e96-8040-3e28e577f509', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'hasDomainClass');
-INSERT INTO relations VALUES ('a2954103-894a-4e11-9fc8-8c56f95059db', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
-INSERT INTO relations VALUES ('90cf0e08-109a-4b36-9971-152ad1dfa9f2', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'hasDomainClass');
-INSERT INTO relations VALUES ('f62f5cc9-d32c-4b54-88c8-5975933d6445', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('bd6bf9dc-f013-4d2b-8b44-620ab277185d', '0cc20557-978d-31ae-bee8-b3939398b1c8', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'hasDomainClass');
-INSERT INTO relations VALUES ('2a086a82-e24e-473e-b9da-a8211e833119', '9f10aa95-ba46-3601-bac2-3ea828c154e6', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('d3482e20-7ae7-4662-93ae-a5e95402c74c', '0cc20557-978d-31ae-bee8-b3939398b1c8', '6909b643-03f7-3606-b276-2be0e8773207', 'hasDomainClass');
-INSERT INTO relations VALUES ('059345c5-84aa-449b-8bfa-1e951e8a5660', '6909b643-03f7-3606-b276-2be0e8773207', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'hasRangeClass');
-INSERT INTO relations VALUES ('9ae5d1b0-9120-4fc0-9a58-d77ae445d17b', '94ffd715-18f7-310a-bee2-010d800be058', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'hasDomainClass');
-INSERT INTO relations VALUES ('0d795119-c337-4559-b127-c12ac7ba9b13', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
-INSERT INTO relations VALUES ('58fd985c-c1db-4ade-aaf2-30a9e92447c2', '99e8de0f-fa06-381d-8406-9d467d3f96b5', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'subPropertyOf');
-INSERT INTO relations VALUES ('2dcea919-39c1-4d28-b461-958955d459c1', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'hasDomainClass');
-INSERT INTO relations VALUES ('b3342c5c-9012-4368-8517-7abd5d60f784', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('cca2c61d-e486-4117-8de6-57c2143a1dcd', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'hasDomainClass');
-INSERT INTO relations VALUES ('87417849-54c0-41c7-b8e3-26bfeed870a5', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
-INSERT INTO relations VALUES ('9e9881db-a463-4951-9456-3b9f5caaefe1', 'f865c72a-09dd-386f-a9eb-385176727d94', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'subPropertyOf');
-INSERT INTO relations VALUES ('48d310dd-64a0-4a03-843a-7b384554d701', '94b5ce18-d4ca-3ac6-b903-d68c86258f95', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'hasDomainClass');
-INSERT INTO relations VALUES ('b1654533-49cc-411d-b186-a63b119cc192', '0d61e94e-8834-3ba5-b51b-d55951a84fae', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('7723be4f-3608-49e1-94a2-0972d17bb193', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'subPropertyOf');
-INSERT INTO relations VALUES ('8310786f-12b1-4785-9bf3-b23db5d5e8bc', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'hasDomainClass');
-INSERT INTO relations VALUES ('a45e63ba-3a67-4e21-8490-fa9a689ccbe0', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('6e911b54-113c-4558-bab8-402575970e56', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'hasDomainClass');
-INSERT INTO relations VALUES ('1cba6b3c-d7bf-4370-9132-53499294cacb', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('f29a03cb-e1be-47e1-b173-9912d89b8db0', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'subPropertyOf');
-INSERT INTO relations VALUES ('682be8e8-92c7-4c48-8ea5-f6e901fa0f4e', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'subPropertyOf');
-INSERT INTO relations VALUES ('5808b299-4a92-4a76-af43-3e62c00b129a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'hasDomainClass');
-INSERT INTO relations VALUES ('38360c0c-8b7f-41fd-ba07-19f49062e81b', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
-INSERT INTO relations VALUES ('87446b57-7c6e-4476-b297-ddb7a6de8a90', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'subPropertyOf');
-INSERT INTO relations VALUES ('96b17295-e297-4d0e-a868-4e08c176e75b', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'hasDomainClass');
-INSERT INTO relations VALUES ('7bbd2819-ef34-4ef1-a15e-0ad1dfd8d7d8', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('bb319e4e-8851-42a9-9377-3ed7264ee7c2', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'hasDomainClass');
-INSERT INTO relations VALUES ('8431fd14-2b84-4156-8c85-944006fab058', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'hasRangeClass');
-INSERT INTO relations VALUES ('1b3234dc-3804-4ca3-97c3-bb3e8c76e1f2', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'hasDomainClass');
-INSERT INTO relations VALUES ('222379e7-1b53-4c68-aca5-319063f7ddd0', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'hasRangeClass');
-INSERT INTO relations VALUES ('e787bd40-5876-43d9-99ad-76afce8d8e16', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'hasDomainClass');
-INSERT INTO relations VALUES ('fb20b76e-73f3-4871-a209-975d2a48d4aa', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('c250790f-3137-4e3b-9d85-93b7facee5ec', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'subPropertyOf');
-INSERT INTO relations VALUES ('09c1fd78-a84d-4463-853c-7c6a4eb4acd0', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'hasDomainClass');
-INSERT INTO relations VALUES ('a4d31a29-0653-4eb3-bc31-1ae52058f117', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('faba6f3f-5126-472f-8f0a-02272394e5ee', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '345681a7-8324-331c-94d4-1777c36538b5', 'subPropertyOf');
-INSERT INTO relations VALUES ('b72f7c83-6253-43dc-ba0a-c56d9bc828fc', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '345681a7-8324-331c-94d4-1777c36538b5', 'hasDomainClass');
-INSERT INTO relations VALUES ('2847089a-4d5d-4bf2-8b8a-cdc8bc1a3f14', '345681a7-8324-331c-94d4-1777c36538b5', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('96c29026-5565-4ec0-86a3-fe799f2013d5', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'hasDomainClass');
-INSERT INTO relations VALUES ('616abccd-2ec2-4dcd-9063-223ad12c70ae', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('398d3be4-1998-49a9-bc34-6fda2f06fecb', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'subPropertyOf');
-INSERT INTO relations VALUES ('300870e2-0582-4b97-a3be-dd793968d154', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'hasDomainClass');
-INSERT INTO relations VALUES ('cad694a8-b67c-4713-a7fb-442a7fb0d6fc', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'hasRangeClass');
-INSERT INTO relations VALUES ('f0624c89-599b-4d73-a4b1-5a587034902e', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'hasDomainClass');
-INSERT INTO relations VALUES ('71e0e458-09e0-413d-9079-34b2708bf8af', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('6fd283b4-83e7-4145-acfe-034f85f1fffa', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'hasDomainClass');
-INSERT INTO relations VALUES ('852562cc-de12-45d1-8a9c-e26240a3f3e9', 'e94e9966-e05b-3b5a-a5f0-893166474b80', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('c2bee7f1-3aeb-44e8-9f18-edcc09d96fd2', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'aad29816-af79-36cf-919e-80980f7c41a3', 'subPropertyOf');
-INSERT INTO relations VALUES ('553382ec-71c3-4225-9a2b-81571ca100fc', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'aad29816-af79-36cf-919e-80980f7c41a3', 'hasDomainClass');
-INSERT INTO relations VALUES ('9370b887-2642-4b2c-96fc-0ca7167e9911', 'aad29816-af79-36cf-919e-80980f7c41a3', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('5deffbfc-d218-4be1-8112-a78849efd0a3', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'subPropertyOf');
-INSERT INTO relations VALUES ('35f69ff8-cd49-4236-a52e-c3ea76ef5f82', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'hasDomainClass');
-INSERT INTO relations VALUES ('34b229d7-f33f-4017-b527-246fae4b064c', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('5928dcf1-b61f-4224-b405-4e194990189b', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'hasDomainClass');
-INSERT INTO relations VALUES ('f634ab42-c694-4883-932c-f75678ce753d', 'f24070b3-fc3b-3838-8765-87350b40ba84', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('4ea6d197-f4ee-4db1-8ca1-a9e231682cf2', '99e8de0f-fa06-381d-8406-9d467d3f96b5', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'subPropertyOf');
-INSERT INTO relations VALUES ('7c7bb5b3-d35d-4046-abed-8ecdf147de05', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'hasDomainClass');
-INSERT INTO relations VALUES ('081c8d32-f252-47a6-8022-967e598dec4e', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
-INSERT INTO relations VALUES ('bb7ea5ca-f2d0-43bf-bc9c-7a1f2cfee4c6', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'subPropertyOf');
-INSERT INTO relations VALUES ('a18c8e8c-98b1-49e9-8c97-4b62d59a874b', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'hasDomainClass');
-INSERT INTO relations VALUES ('0133e381-5f13-49ec-9a60-f373ab5ac118', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('3cf705d4-95e3-402e-98c7-2765f912e973', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'subPropertyOf');
-INSERT INTO relations VALUES ('32958802-18cf-43b1-8643-48b3fc6af5b9', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'hasDomainClass');
-INSERT INTO relations VALUES ('838f9433-b098-440b-9a00-c21786377fd5', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'hasRangeClass');
-INSERT INTO relations VALUES ('4682a00f-e5e9-4259-81f9-c06861293df7', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'd9f02df8-6676-371e-8114-1f37700639b5', 'subPropertyOf');
-INSERT INTO relations VALUES ('a86bda65-a236-4345-9d04-5d767cc918b5', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'd9f02df8-6676-371e-8114-1f37700639b5', 'hasDomainClass');
-INSERT INTO relations VALUES ('d0cdb52f-c898-4317-bd70-1607db4c05f0', 'd9f02df8-6676-371e-8114-1f37700639b5', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('78ba4c1f-725b-44d2-a874-6d58216ae34d', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'subPropertyOf');
-INSERT INTO relations VALUES ('58532df9-f28c-4adb-adbb-3cc475a593ef', 'c411cc1b-d477-3619-a63b-d1566635ead7', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'hasDomainClass');
-INSERT INTO relations VALUES ('00f7dfc4-38fa-477d-94e4-764ebe9098bb', '79183fdd-7275-32a2-a48d-bb70fe683efd', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
-INSERT INTO relations VALUES ('22b0d8ae-9a1e-4a54-abd8-a58913dce209', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'subPropertyOf');
-INSERT INTO relations VALUES ('b3cd277b-4909-416f-9eef-2c9a74b1c396', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'hasDomainClass');
-INSERT INTO relations VALUES ('fc40b7fd-103d-42d0-a58b-5cfdb11c33da', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
-INSERT INTO relations VALUES ('73263683-d6d9-4239-bfb6-64e4b22a59d5', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'subPropertyOf');
-INSERT INTO relations VALUES ('074b32eb-e4e7-43b8-9841-74927a4cbd7a', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'hasDomainClass');
-INSERT INTO relations VALUES ('c2eff0da-ee48-4aa7-b410-850643068676', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
-INSERT INTO relations VALUES ('a5fa4b12-8662-44d3-affa-c0375d97a3b0', '839c9e24-c1ab-34b4-94da-2efb1d32af01', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'subPropertyOf');
-INSERT INTO relations VALUES ('e1d95246-55f3-4a76-9bf1-5a4fc9ebc4b0', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'hasDomainClass');
-INSERT INTO relations VALUES ('f39a817a-495d-4894-a07e-863dd00ed9d9', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('040f2694-7dda-439e-a3cc-1878d005ad47', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'subPropertyOf');
-INSERT INTO relations VALUES ('7630e1ec-2a80-4f68-9e73-c8210a5ab65e', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'hasDomainClass');
-INSERT INTO relations VALUES ('9838ef0b-2220-491a-8b5c-034e25f8199b', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
-INSERT INTO relations VALUES ('e49cc8a1-8496-4450-af44-68ef944d7ef2', '839c9e24-c1ab-34b4-94da-2efb1d32af01', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'subPropertyOf');
-INSERT INTO relations VALUES ('cbaeec5e-8228-4225-9778-4234c3b2602f', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'hasDomainClass');
-INSERT INTO relations VALUES ('a7fce625-4bbb-4801-b076-5a428f554d24', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('f878840d-fccd-4cda-8201-870e504f6a1c', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'subPropertyOf');
-INSERT INTO relations VALUES ('c3b3dcd5-3130-4a91-921b-c7e11dad3804', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'hasDomainClass');
-INSERT INTO relations VALUES ('0340c974-76ed-4e3e-86ee-de26a1c7074e', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('4ba1173f-6189-4dc6-ba20-d55858c9185d', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '167c0167-35fd-3c57-b90e-20715fd2c200', 'hasDomainClass');
-INSERT INTO relations VALUES ('7681cd0a-f609-4b42-9a8d-bacb78d9e592', '167c0167-35fd-3c57-b90e-20715fd2c200', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
-INSERT INTO relations VALUES ('b1dfdec1-977d-4c2c-9c0e-3289ec3f28ba', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'hasDomainClass');
-INSERT INTO relations VALUES ('e4ae5880-450f-4277-8cd2-40bab58dfa01', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
-INSERT INTO relations VALUES ('c7d32179-8195-46e9-99f7-a61d1cc7c86b', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'hasDomainClass');
-INSERT INTO relations VALUES ('65fb6501-1c7d-4cff-bde3-e2730c8bc2a5', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
-INSERT INTO relations VALUES ('3f2c9f10-f73b-4ccf-b860-dbd1167fb909', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'hasDomainClass');
-INSERT INTO relations VALUES ('0b3d519a-c86a-4015-bfad-4749f897f418', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('6bb5efef-b8f7-43f5-8334-c9a6855594bd', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '356c8ba7-0114-32c3-861f-8432bc46e963', 'subPropertyOf');
-INSERT INTO relations VALUES ('4d41ec1a-1fdb-433a-a971-0cebc6cc7650', 'c03db431-4564-34eb-ba86-4c8169e4276c', '356c8ba7-0114-32c3-861f-8432bc46e963', 'hasDomainClass');
-INSERT INTO relations VALUES ('6b6858ef-f774-4b9a-b766-e02a13e6c3b6', '356c8ba7-0114-32c3-861f-8432bc46e963', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
-INSERT INTO relations VALUES ('2c27719b-8d4f-4cad-bd40-04a3c9c215ca', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'hasDomainClass');
-INSERT INTO relations VALUES ('4a30250d-2386-4387-8497-c295c84d21db', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('02761459-3c32-4f2d-9954-c3ef06619c9c', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'subPropertyOf');
-INSERT INTO relations VALUES ('51eb2e64-830b-4a7e-8f21-ced8f0e3d73e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'hasDomainClass');
-INSERT INTO relations VALUES ('2390a270-5a9f-43a0-a93c-07b1066bd2d7', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('28c55a59-fe28-4dc8-8e5f-0afd7963eb7d', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'hasDomainClass');
-INSERT INTO relations VALUES ('8db086d8-855e-44bb-b09f-765d0fdef330', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('50b4f6c1-06d7-463a-a83b-320fdd5032d8', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'subPropertyOf');
-INSERT INTO relations VALUES ('81f9fb33-2254-402a-ae8a-4952bb6dd8a3', '140073c4-60b5-352d-a5f7-244072fc4086', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'subPropertyOf');
-INSERT INTO relations VALUES ('055af077-88a3-411b-aa4b-9d81b7184a19', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'hasDomainClass');
-INSERT INTO relations VALUES ('cb44c2b4-c0bd-4fcf-b2c9-6c8535087b21', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('9cdee554-025b-4cd0-82a9-74b7f0b382ca', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'hasDomainClass');
-INSERT INTO relations VALUES ('b4fa5181-d872-4023-a166-37f8f992981e', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('6d61cb1e-7b22-4a3b-a080-d07a50d61503', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'hasDomainClass');
-INSERT INTO relations VALUES ('5c70a035-9ad0-4e20-bc00-6d0b66adf6af', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('6d4de559-9124-4d9a-b8e5-bee326f0dfd5', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'subPropertyOf');
-INSERT INTO relations VALUES ('1a611ce2-1690-4267-b723-7cc2616d8654', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'hasDomainClass');
-INSERT INTO relations VALUES ('f3d40262-d32e-4b8e-8021-d3872465dad6', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('dd23a250-efb9-45bb-a4a5-59daf1b8a663', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'subPropertyOf');
-INSERT INTO relations VALUES ('5c18640d-6827-4349-b55d-0f2b2454d937', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'hasDomainClass');
-INSERT INTO relations VALUES ('96703280-51fd-476a-86bd-119f086cd417', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'hasRangeClass');
-INSERT INTO relations VALUES ('2041cb2f-fc68-41d4-bc3f-e1881c5de512', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', '5afb86ba-c943-367b-857c-d7aaec92b5e3', 'hasDomainClass');
-INSERT INTO relations VALUES ('d0be31a3-6018-4b27-8702-65be755f413d', '5afb86ba-c943-367b-857c-d7aaec92b5e3', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'hasRangeClass');
-INSERT INTO relations VALUES ('d0126ed0-be07-4299-9c72-ee335af04fd7', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '89cad4c1-914c-3675-9d66-83eed1c61e3e', 'hasDomainClass');
-INSERT INTO relations VALUES ('b3216d26-1864-41e2-9c50-b4e9dc2266d0', '89cad4c1-914c-3675-9d66-83eed1c61e3e', '4e3d11b3-c6a8-3838-9a62-0571b84914fa', 'hasRangeClass');
-INSERT INTO relations VALUES ('80ff5894-e133-49cc-bb66-57cbe6c5ff55', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'hasDomainClass');
-INSERT INTO relations VALUES ('612b5ee7-3920-496a-a60c-df2989c5c52d', '21f8fc78-e937-3048-95e9-e69404b1d3f1', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('2bd3233f-1604-4d57-961e-ef506d31109f', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '05804845-b0d6-3634-a977-a5c7785d2dde', 'hasDomainClass');
-INSERT INTO relations VALUES ('43d80b25-7f76-44a4-ac5f-b14553303f87', '05804845-b0d6-3634-a977-a5c7785d2dde', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('4ebb733f-f271-494f-8445-630d6875b96a', '007dac32-df80-366b-88ce-02f4c1928537', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'subPropertyOf');
-INSERT INTO relations VALUES ('bf0023f0-7750-444e-afe5-7b3478d13437', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'hasDomainClass');
-INSERT INTO relations VALUES ('602ad678-879a-40f5-b129-5a73797673bc', '15f83f67-48e0-3afd-b693-605172ea3fd2', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'hasRangeClass');
-INSERT INTO relations VALUES ('a4076ca9-0beb-4f7d-8ea0-2906e84d593f', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', '629ed771-13e7-397e-8345-69f6cfb3db30', 'hasDomainClass');
-INSERT INTO relations VALUES ('9a57cde9-467b-4928-a179-763cd1ac6664', '629ed771-13e7-397e-8345-69f6cfb3db30', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('fe542232-cf94-4591-b27f-e5af15c5ae9a', '629ed771-13e7-397e-8345-69f6cfb3db30', '037c3de7-65ae-3002-8328-18cc33572501', 'subPropertyOf');
-INSERT INTO relations VALUES ('761a0450-40a5-4e03-8da5-0b90faeb7776', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', '037c3de7-65ae-3002-8328-18cc33572501', 'hasDomainClass');
-INSERT INTO relations VALUES ('3f5c8f9d-8b63-4aba-9936-ce7fb524fcea', '037c3de7-65ae-3002-8328-18cc33572501', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
-INSERT INTO relations VALUES ('ec5ddbb1-71ad-4520-af53-49094a53e409', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'hasDomainClass');
-INSERT INTO relations VALUES ('c5556049-5e9e-42f7-89be-a47dfb41cd91', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'hasRangeClass');
-INSERT INTO relations VALUES ('b85a0cb2-ea78-4d98-af04-bbd6751631be', '629ed771-13e7-397e-8345-69f6cfb3db30', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'subPropertyOf');
-INSERT INTO relations VALUES ('11d2ff5b-7dd0-4e66-b2be-bff5e7581245', '84a17c0c-78f2-3607-ba85-da1fc47def5a', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'hasDomainClass');
-INSERT INTO relations VALUES ('d87c258c-1be5-4c90-8685-0b2077f6fc2c', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('4252c4f2-8c5e-4440-ad52-1b391b1505f6', '629ed771-13e7-397e-8345-69f6cfb3db30', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'subPropertyOf');
-INSERT INTO relations VALUES ('baaec5dc-e0d6-4749-9170-157485498bd0', '0df9cb10-1203-3efd-8d9e-448f5b02506b', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'hasDomainClass');
-INSERT INTO relations VALUES ('2d75d024-4ee1-4b33-a0d8-dd0ddfea7988', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('bc6b0884-0c2c-414e-b7d0-3400a909fc58', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'hasDomainClass');
-INSERT INTO relations VALUES ('6d219b9e-1875-4490-b7a8-8c03bd06790c', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', '4e75b119-d77b-3c1e-acf8-fbdfd197c9f1', 'hasRangeClass');
-INSERT INTO relations VALUES ('532f1698-9786-4402-bbbe-badadbc94bb3', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'subPropertyOf');
-INSERT INTO relations VALUES ('a5109d9a-4e9a-4eac-b475-c76b8fddb8aa', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'hasDomainClass');
-INSERT INTO relations VALUES ('27905336-c802-4f4b-8760-ec8c8def0d64', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'hasRangeClass');
-INSERT INTO relations VALUES ('a8ce4713-93f1-454c-9899-a535257d18ff', 'af051b0a-be2f-39da-8f46-429a714e242c', '5869a9ed-ebe5-3613-acc2-29c184737885', 'hasDomainClass');
-INSERT INTO relations VALUES ('d4bf9fef-fb10-475c-94b4-5a691868cb09', '5869a9ed-ebe5-3613-acc2-29c184737885', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('186aaebb-3ff8-4de6-bfa1-cf70e52d8179', 'af051b0a-be2f-39da-8f46-429a714e242c', '44813770-321a-370d-bb8f-ba619bcb4334', 'hasDomainClass');
-INSERT INTO relations VALUES ('b389e73b-7fef-4525-8445-b01419a91149', '44813770-321a-370d-bb8f-ba619bcb4334', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'hasRangeClass');
-INSERT INTO relations VALUES ('d4d14a50-b6bf-431d-be7f-c5dd4ca7a226', 'af051b0a-be2f-39da-8f46-429a714e242c', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'hasDomainClass');
-INSERT INTO relations VALUES ('d942a9f6-fd52-414d-9311-ea56c591f77d', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'hasRangeClass');
-INSERT INTO relations VALUES ('eb4d77d2-dd93-4a72-8866-314c485133c3', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'subPropertyOf');
-INSERT INTO relations VALUES ('0c0e7fad-ebb2-4e3d-8e8e-ca7a4dd5a2ba', '9d55628a-0085-3b88-a939-b7a327263f53', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'hasDomainClass');
-INSERT INTO relations VALUES ('a2735664-a3eb-4d92-b869-e73f92e39257', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'hasRangeClass');
-INSERT INTO relations VALUES ('5ccb2d75-f150-476a-99ca-6904ea50d401', 'fd06e07d-057b-38aa-99ac-1add45f9f217', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'subPropertyOf');
-INSERT INTO relations VALUES ('46fe73ae-d54d-43cd-b73e-cb2f23a4a559', '9d55628a-0085-3b88-a939-b7a327263f53', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'hasDomainClass');
-INSERT INTO relations VALUES ('36214e0e-df6b-4f89-a0b1-76949666e12c', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
-INSERT INTO relations VALUES ('8ebfa323-2363-457a-87d7-9d8e37812cf7', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'b1c4e551-2f6e-327b-8905-191228330e2f', 'subPropertyOf');
-INSERT INTO relations VALUES ('42e81a43-7063-407e-b901-c6414beb4221', '9d55628a-0085-3b88-a939-b7a327263f53', 'b1c4e551-2f6e-327b-8905-191228330e2f', 'hasDomainClass');
-INSERT INTO relations VALUES ('cd68f062-ac0c-470e-9544-14f433d12597', 'b1c4e551-2f6e-327b-8905-191228330e2f', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
-INSERT INTO relations VALUES ('27af44ad-046c-47c4-97b0-60fe7a95fec3', '9d55628a-0085-3b88-a939-b7a327263f53', '6a998971-7a85-3615-9929-d613fe90391c', 'hasDomainClass');
-INSERT INTO relations VALUES ('03d5b419-5c3d-4f61-abe5-c28c19ab7ba7', '6a998971-7a85-3615-9929-d613fe90391c', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'hasRangeClass');
-INSERT INTO relations VALUES ('05160a49-7a58-4e30-b0dc-285432b87010', '9d55628a-0085-3b88-a939-b7a327263f53', '890ddf47-6e5e-32f7-b3a8-ecd251002877', 'hasDomainClass');
-INSERT INTO relations VALUES ('9cab0ebf-7340-40a4-beb1-0f9a2ea25b57', '890ddf47-6e5e-32f7-b3a8-ecd251002877', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'hasRangeClass');
-INSERT INTO relations VALUES ('f885c38a-cef9-4a99-86c7-349b781666d7', '9d55628a-0085-3b88-a939-b7a327263f53', 'b38666a2-59fd-3154-85c3-90edaa812979', 'hasDomainClass');
-INSERT INTO relations VALUES ('c3ab16b1-0bfd-463e-b078-73c12d89488d', 'b38666a2-59fd-3154-85c3-90edaa812979', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
-INSERT INTO relations VALUES ('559436f5-39b0-43d7-a65a-bfe3d501c20b', '9d55628a-0085-3b88-a939-b7a327263f53', '86caed02-d112-3cd7-8f21-4836e4997850', 'hasDomainClass');
-INSERT INTO relations VALUES ('7efe9353-2ddd-4a0a-9e0e-a9619d202ccd', '86caed02-d112-3cd7-8f21-4836e4997850', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
-INSERT INTO relations VALUES ('a673208e-9aa2-4dc8-b7a2-aa9fc696dcde', '9d55628a-0085-3b88-a939-b7a327263f53', '014fefdb-ddad-368b-b69c-951a0763824d', 'hasDomainClass');
-INSERT INTO relations VALUES ('f805af61-b42f-493b-87c3-1aa9f274d015', '014fefdb-ddad-368b-b69c-951a0763824d', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
-INSERT INTO relations VALUES ('d9cb0020-c955-4b0f-b0f6-66f8f9e5dab9', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '697dc6cc-0da6-301c-9703-78edbf812fac', 'subPropertyOf');
-INSERT INTO relations VALUES ('10a740db-eb14-481e-9466-b212f9dac171', '12f08da7-e25c-3e10-8179-62ed76da5da0', '697dc6cc-0da6-301c-9703-78edbf812fac', 'hasDomainClass');
-INSERT INTO relations VALUES ('f7d2ef0e-3982-44ef-8e3a-f53a2bacc2a7', '697dc6cc-0da6-301c-9703-78edbf812fac', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'hasRangeClass');
-INSERT INTO relations VALUES ('1d1a9fa9-5404-42db-8ace-57457d284531', '12f08da7-e25c-3e10-8179-62ed76da5da0', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'hasDomainClass');
-INSERT INTO relations VALUES ('8ba70ff1-418d-461c-9e3a-b4bd367d4d53', '900165c3-a630-3b9c-bb0b-572df34ea3e6', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('5ba74944-474b-4d3f-8e3e-d305ce13057a', 'bdf5f93e-589c-3c63-baad-e108520c4072', '26af9ec1-e169-3486-9bb5-3c8187784c8e', 'hasDomainClass');
-INSERT INTO relations VALUES ('b53a6e06-8eb1-41d3-aa81-c20bc7dbba53', '26af9ec1-e169-3486-9bb5-3c8187784c8e', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'hasRangeClass');
-INSERT INTO relations VALUES ('949447bd-78a2-44cd-b3cc-cc9c9fe3f835', 'bdf5f93e-589c-3c63-baad-e108520c4072', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'hasDomainClass');
-INSERT INTO relations VALUES ('a1e178de-3fba-4747-b928-5261a992599f', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'c1f0e36c-770f-30f9-8241-30d44921c6c8', 'hasRangeClass');
-INSERT INTO relations VALUES ('1d5e7a18-2c90-41ab-9603-caddb54d873a', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'subPropertyOf');
-INSERT INTO relations VALUES ('c705b969-6de1-4987-922f-ca08d86d3634', '255bba42-8ffb-3796-9caa-807179a20d9a', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'hasDomainClass');
-INSERT INTO relations VALUES ('9a6a97bf-3edd-421e-af2d-192423653743', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
-INSERT INTO relations VALUES ('f12e21de-2056-4be0-a1e8-ee29a7393ceb', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f865c72a-09dd-386f-a9eb-385176727d94', 'subPropertyOf');
-INSERT INTO relations VALUES ('a0c39eeb-0f3f-4aa9-b1e1-4cc267ed7960', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', 'f865c72a-09dd-386f-a9eb-385176727d94', 'hasDomainClass');
-INSERT INTO relations VALUES ('bdc45cbd-4ff4-4c8a-a2df-653db4c14c47', 'f865c72a-09dd-386f-a9eb-385176727d94', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
-INSERT INTO relations VALUES ('76504b1d-0da9-42cc-a802-353e42826508', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'subPropertyOf');
-INSERT INTO relations VALUES ('90e8c79e-a1dc-4e2b-9dea-a2e03c173edc', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'hasDomainClass');
-INSERT INTO relations VALUES ('33071dc2-ab55-4be7-b99b-77132da0b427', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'hasRangeClass');
-INSERT INTO relations VALUES ('4f328876-4dc9-4254-9afc-1c2be1d9df57', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'subPropertyOf');
-INSERT INTO relations VALUES ('3a7f11b2-8ccc-44e3-92e0-43a69b135f5b', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'hasDomainClass');
-INSERT INTO relations VALUES ('b4bf0dc4-5b06-423c-bad2-822322d43d30', '9623a310-4d14-33dc-ae6e-10fb48062af5', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
-INSERT INTO relations VALUES ('1462cab4-b506-4ae4-82c3-eed013144e23', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '9e806e49-e728-32cf-821e-504ca9916afc', 'subPropertyOf');
-INSERT INTO relations VALUES ('32f9da16-7cab-47ed-8f73-5f403bf7ded7', '07fcf604-d28f-3993-90fa-d301c4004913', '9e806e49-e728-32cf-821e-504ca9916afc', 'hasDomainClass');
-INSERT INTO relations VALUES ('ec6ef050-f27d-4723-91bc-0321885901ea', '9e806e49-e728-32cf-821e-504ca9916afc', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
-INSERT INTO relations VALUES ('50c2e10d-7b30-4fa4-b79f-75738712037b', '07fcf604-d28f-3993-90fa-d301c4004913', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'hasDomainClass');
-INSERT INTO relations VALUES ('9d94b63b-5c14-4a7e-849a-7c48366d0b72', '19c3c1bf-e443-3f89-a366-d3e8c645a546', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
-INSERT INTO relations VALUES ('9a9e912c-2f10-49b0-ac3c-2221e703cbc1', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'subPropertyOf');
-INSERT INTO relations VALUES ('186a3212-e7b8-430c-bde3-7e5a920fc0a3', '07fcf604-d28f-3993-90fa-d301c4004913', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'hasDomainClass');
-INSERT INTO relations VALUES ('1ddabfd7-f506-4377-b579-aa23bdde370b', 'c511a177-3e0b-3a90-babe-e951f56f18d1', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
-INSERT INTO relations VALUES ('2e129c9a-305c-43ac-81da-b7a44de8d9a4', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'subPropertyOf');
-INSERT INTO relations VALUES ('f4ea79e9-bcbb-4695-9180-d899bf2663f7', 'f865c72a-09dd-386f-a9eb-385176727d94', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'subPropertyOf');
-INSERT INTO relations VALUES ('b61e4a0d-507d-4229-ba3a-90bfe0b265a1', '8bba5cfd-675d-3899-8c95-03b2de2a0a31', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'hasDomainClass');
-INSERT INTO relations VALUES ('8fccff15-6165-4d37-983a-31a8beae224c', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
-INSERT INTO relations VALUES ('8a7a8494-0f92-4848-abdc-f138d73d883f', 'f865c72a-09dd-386f-a9eb-385176727d94', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'subPropertyOf');
-INSERT INTO relations VALUES ('d18629de-4787-4bfb-8a95-d97b1f7af8f4', '725afd13-ebc5-38a8-815b-d3a1e5510698', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'hasDomainClass');
-INSERT INTO relations VALUES ('73070f34-e07b-459c-a57e-e83c8dde38f5', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
-INSERT INTO relations VALUES ('883f1612-d5fb-4796-8cbc-2b7c7324eb42', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'hasDomainClass');
-INSERT INTO relations VALUES ('9460f872-8a4f-4b14-855d-42b6b3f317aa', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('bb54a4c3-c5e6-453d-8971-3620448c884c', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '8c69765e-7827-371f-9db3-fea290f87739', 'subPropertyOf');
-INSERT INTO relations VALUES ('1d0ee746-9933-4dbb-81bb-8b81ec03482c', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '8c69765e-7827-371f-9db3-fea290f87739', 'hasDomainClass');
-INSERT INTO relations VALUES ('79ee9152-5806-4ed1-97e5-3de871f09f4a', '8c69765e-7827-371f-9db3-fea290f87739', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'hasRangeClass');
-INSERT INTO relations VALUES ('094b39eb-251a-433a-9a3d-0b928ebe1af8', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'hasDomainClass');
-INSERT INTO relations VALUES ('52d5dedc-0e91-4a46-9c5d-083cbc093e10', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('4abc3739-6415-41e1-8e56-b93617b1e0c3', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'hasDomainClass');
-INSERT INTO relations VALUES ('cb531058-2e67-4dd2-b329-2b1ff45c48c7', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'hasRangeClass');
-INSERT INTO relations VALUES ('2e2d6b97-a718-4995-a460-dc555537765e', '78b224a2-9271-3716-8c2e-c82302cdae9c', '140073c4-60b5-352d-a5f7-244072fc4086', 'hasDomainClass');
-INSERT INTO relations VALUES ('fa1a5dc1-5574-4c70-9ac7-d1d2324c0825', '140073c4-60b5-352d-a5f7-244072fc4086', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('3edb49ee-4330-46df-aa71-6b68393f498a', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'hasDomainClass');
-INSERT INTO relations VALUES ('07c486e1-1fe0-4dc1-a26f-399da0645f05', 'f677091c-aa91-3851-8aa1-1225980d5e02', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
-INSERT INTO relations VALUES ('53eaebca-eee1-4beb-82ec-7d66ef937a80', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'hasDomainClass');
-INSERT INTO relations VALUES ('7ca819b8-b3d7-486c-8a19-0f1b3e6df59c', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('93183c73-52f9-4c0d-a78c-250de4d7e639', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '632197f8-15a2-32b6-9886-c93e587f5b64', 'subPropertyOf');
-INSERT INTO relations VALUES ('d0d6b2dc-f58b-41b4-8feb-285eaa9ec417', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '632197f8-15a2-32b6-9886-c93e587f5b64', 'subPropertyOf');
-INSERT INTO relations VALUES ('595b2347-009b-4581-81f2-fd3d7aeb1601', 'f27afcc0-7657-3c5e-8314-b913c562759e', '632197f8-15a2-32b6-9886-c93e587f5b64', 'hasDomainClass');
-INSERT INTO relations VALUES ('71308b3e-26d5-4bbc-97dc-d75d2028192e', '632197f8-15a2-32b6-9886-c93e587f5b64', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
-INSERT INTO relations VALUES ('15b4d4af-98a2-439b-a34d-4cf17da9650e', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'subPropertyOf');
-INSERT INTO relations VALUES ('f90d3cab-52c4-4a37-800a-d84f27b62460', 'a9888169-3160-3403-a8a2-3fa260b1ad16', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'hasDomainClass');
-INSERT INTO relations VALUES ('42a4eb19-283e-4e71-abae-a8d1146988cc', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('98013ad6-d114-4dba-94d1-1e53fe535adc', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '41f65567-9d44-371a-8806-03e08d332918', 'subPropertyOf');
-INSERT INTO relations VALUES ('47c17a67-e431-4e67-9f5b-3c2f3ccde4ad', '048fe43e-349a-3dda-9524-7046dcbf7287', '41f65567-9d44-371a-8806-03e08d332918', 'hasDomainClass');
-INSERT INTO relations VALUES ('f870e980-38c3-48f0-9fec-daa392151158', '41f65567-9d44-371a-8806-03e08d332918', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
-INSERT INTO relations VALUES ('e487a3b9-f3ed-4c36-9e39-e88e5b063b91', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'subPropertyOf');
-INSERT INTO relations VALUES ('4395d59a-7986-454c-9a70-acad9cc61336', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'subPropertyOf');
-INSERT INTO relations VALUES ('a3f65bed-c23f-4d64-b36a-cc1fb0abef5e', '048fe43e-349a-3dda-9524-7046dcbf7287', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'hasDomainClass');
-INSERT INTO relations VALUES ('c5774a3f-9f72-49c0-8a03-de4601e00d57', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('080aae2a-26dd-49f7-8700-fb79b7d31d0d', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'subPropertyOf');
-INSERT INTO relations VALUES ('728c798e-2cf5-44fd-89df-0bc32650dae7', '92a38250-9b25-3bc0-881b-89e778c0ac43', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'hasDomainClass');
-INSERT INTO relations VALUES ('8657594b-b88e-4645-a48c-eebc02caf4b9', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
-INSERT INTO relations VALUES ('ae4c1400-589a-4e8e-9955-83f19ccebeff', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'subPropertyOf');
-INSERT INTO relations VALUES ('a13a1599-84ef-4168-b776-5efa002a1743', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'hasDomainClass');
-INSERT INTO relations VALUES ('bdfdc4ce-e091-4bb3-91e7-8d34da114a8e', 'f887076f-2375-38bd-b11c-e2511a59e0a2', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('0d03bf18-c2d8-4ace-9202-5f1c78c1c4c6', '70064b58-4490-3d09-b463-fd18defae21f', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', 'hasDomainClass');
-INSERT INTO relations VALUES ('dfb91b24-979a-4847-810a-9d2336891de9', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('b36d6b67-4127-4f6f-8abc-a8038a555238', '70064b58-4490-3d09-b463-fd18defae21f', '8687cd99-3201-3f8f-bb1c-241732242a8f', 'hasDomainClass');
-INSERT INTO relations VALUES ('c6f4e84b-6e7d-4b6e-bfa0-ef94f9424da4', '8687cd99-3201-3f8f-bb1c-241732242a8f', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('e599e09e-eeac-442f-abf7-ffd4ee8f233e', '70064b58-4490-3d09-b463-fd18defae21f', '61861fca-6102-3151-af0c-599e14e7a93a', 'hasDomainClass');
-INSERT INTO relations VALUES ('6119b2d1-5901-4829-9c9e-30533e2bd2aa', '61861fca-6102-3151-af0c-599e14e7a93a', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('ad6244e0-ed98-4216-b9f9-2836becebb6a', '70064b58-4490-3d09-b463-fd18defae21f', '740ab790-feb0-3700-8922-f152320272a5', 'hasDomainClass');
-INSERT INTO relations VALUES ('6ce6fb3d-a424-4d96-94d6-cda5125a755c', '740ab790-feb0-3700-8922-f152320272a5', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('07b2afc8-9f39-4330-816a-520f3700b325', '70064b58-4490-3d09-b463-fd18defae21f', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'hasDomainClass');
-INSERT INTO relations VALUES ('d11db9a7-f6a9-4e58-a0ca-661ed026acc8', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('6ac7b50e-503a-42c0-981a-88b5ea24a18a', '70064b58-4490-3d09-b463-fd18defae21f', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'hasDomainClass');
-INSERT INTO relations VALUES ('a31f0ec5-d0de-44e0-bea9-344447094c89', '8b7a9392-ce48-360e-b28a-c01d70eaf672', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('c52c6030-a9dc-4028-a074-a035dc937d6f', '70064b58-4490-3d09-b463-fd18defae21f', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'hasDomainClass');
-INSERT INTO relations VALUES ('416bb506-8199-41b3-a4b3-e37d31d111fe', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
-INSERT INTO relations VALUES ('6f94d6b8-11ea-4dd0-b537-84c365c45e10', '12f08da7-e25c-3e10-8179-62ed76da5da0', '74e69af6-6a10-32be-91d3-50dd33b7876b', 'hasDomainClass');
-INSERT INTO relations VALUES ('cd14ef3d-9dbe-46ce-abf0-7b0bfbdb967f', '74e69af6-6a10-32be-91d3-50dd33b7876b', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('80c0ce23-c5c2-4de6-a8c0-fceb39e22516', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'da6e698d-cb4e-31ae-8ef4-c0a219a35673', 'hasDomainClass');
-INSERT INTO relations VALUES ('bedffa1c-1345-47b4-83d8-ed34a3987c4a', 'da6e698d-cb4e-31ae-8ef4-c0a219a35673', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('e5573dc4-fe4c-43cc-a3ba-78303190a755', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'subPropertyOf');
-INSERT INTO relations VALUES ('8ac635b6-1ec4-4ac0-b2da-e5bbbefb289f', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'hasDomainClass');
-INSERT INTO relations VALUES ('6d22c297-8c4a-4073-8700-d7d7aba977ac', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
-INSERT INTO relations VALUES ('6df940e6-ca83-4584-981c-1e12a1294aa7', 'f865c72a-09dd-386f-a9eb-385176727d94', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'subPropertyOf');
-INSERT INTO relations VALUES ('cd1813df-f7d3-49e1-89a4-7e8e412123ed', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'hasDomainClass');
-INSERT INTO relations VALUES ('e7503c7e-edad-472a-a858-3cb1a5832c86', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
-INSERT INTO relations VALUES ('181d5aef-2147-4aa8-822f-81c27f80a2ec', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'hasDomainClass');
-INSERT INTO relations VALUES ('a3c4cba7-dbee-444c-b57b-1f847a5c3843', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('c0bbde76-9e7d-4985-9869-8eb6555c687b', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '8bfff662-9024-325a-a23a-b3c9bf509031', 'hasDomainClass');
-INSERT INTO relations VALUES ('487e689e-ac98-4062-8c45-0fb9a84064b8', '8bfff662-9024-325a-a23a-b3c9bf509031', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
-INSERT INTO relations VALUES ('15f3ac4f-0e31-41c4-b6dd-8aa233f4d73b', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'hasDomainClass');
-INSERT INTO relations VALUES ('3c2bda9f-d6de-4da3-974e-1570a72706d5', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('c9e08b79-cde7-47e4-9c1d-f61aa8b5d91a', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '007dac32-df80-366b-88ce-02f4c1928537', 'subPropertyOf');
-INSERT INTO relations VALUES ('61096f03-1eec-4a47-815d-0993364b8c97', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '007dac32-df80-366b-88ce-02f4c1928537', 'hasDomainClass');
-INSERT INTO relations VALUES ('d0b8c1b3-515a-4cf3-be53-c8c5610c45a3', '007dac32-df80-366b-88ce-02f4c1928537', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
-INSERT INTO relations VALUES ('69bb67bd-3fac-49f8-ac25-bc36245272a1', '629ed771-13e7-397e-8345-69f6cfb3db30', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'subPropertyOf');
-INSERT INTO relations VALUES ('c64aa8c7-3429-46c4-9b79-a171f2a3ea08', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'hasDomainClass');
-INSERT INTO relations VALUES ('32fcb6ec-7b2a-4373-a0d4-5faa8160fa1c', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('7024d7b6-eb21-4125-b43d-e6837311779c', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'hasDomainClass');
-INSERT INTO relations VALUES ('582c819f-4697-4d68-8aee-dc4af0f7976c', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
-INSERT INTO relations VALUES ('fba607a1-c841-457c-aff9-a4762f1f65d2', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'subPropertyOf');
-INSERT INTO relations VALUES ('e82851d4-105c-4ab2-ac90-e1c0fb1c0627', 'af051b0a-be2f-39da-8f46-429a714e242c', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'hasDomainClass');
-INSERT INTO relations VALUES ('269e0411-4194-4e23-8f41-d71e8a6a359f', '68dd1374-d854-3b4e-bca3-95d41675fb2f', '6f38d2ca-e114-33a0-b4db-4f298e53be3d', 'hasRangeClass');
-INSERT INTO relations VALUES ('aa8dc3cd-7d60-48a8-a90a-710a65be1128', '94ffd715-18f7-310a-bee2-010d800be058', '50060723-772d-3974-864e-8f8c326f169d', 'hasDomainClass');
-INSERT INTO relations VALUES ('1203ee2b-855f-449f-b457-0f162d38361c', '50060723-772d-3974-864e-8f8c326f169d', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
-INSERT INTO relations VALUES ('d7e825fb-bb08-4303-b0b7-b48a58d7cd6d', '94ffd715-18f7-310a-bee2-010d800be058', '95473150-07f2-3967-88f3-20b803dd239d', 'hasDomainClass');
-INSERT INTO relations VALUES ('09ae32a3-1c60-4f44-bd4a-73da3fdb1093', '95473150-07f2-3967-88f3-20b803dd239d', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
-INSERT INTO relations VALUES ('70e48dff-ef1b-4b05-ae5b-a5eab8339f84', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'subPropertyOf');
-INSERT INTO relations VALUES ('4859e406-368d-46e3-bfaa-0102fad9f620', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'hasDomainClass');
-INSERT INTO relations VALUES ('882b336d-2e51-45d5-8c01-aef9ac5eba18', '1051349b-b0bf-3d88-8ab7-302c5c969197', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
-INSERT INTO relations VALUES ('e9773d3f-bb17-4a87-8280-a6f4c6aa0b99', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'subPropertyOf');
-INSERT INTO relations VALUES ('0427bbb5-cb98-4af9-b0c2-e139d8160681', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'hasDomainClass');
-INSERT INTO relations VALUES ('3e0f73fb-28c8-47ce-8bde-1e375adbfd90', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('62efd93d-cd12-498b-b055-b08a6e81b5a1', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'subPropertyOf');
-INSERT INTO relations VALUES ('2cb2abfa-b7dc-4e8c-abd6-fc3de511c6e8', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'hasDomainClass');
-INSERT INTO relations VALUES ('728cfd67-8317-4377-bead-01fcfab10177', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('bde694ae-0b04-4588-8a51-8329011b8f8c', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'subPropertyOf');
-INSERT INTO relations VALUES ('f519309c-03b7-49da-81fa-0584230d8c42', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'hasDomainClass');
-INSERT INTO relations VALUES ('3d7321bb-061a-4940-80ac-6a9d5d277f4c', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('dfdac32b-f5d7-4d04-9732-fcf082e835df', '629ed771-13e7-397e-8345-69f6cfb3db30', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'subPropertyOf');
-INSERT INTO relations VALUES ('c9b0ea6e-284e-4a48-bde4-9f891c8ce321', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'hasDomainClass');
-INSERT INTO relations VALUES ('df40e17f-3e83-4c4f-b161-f4883aa1da39', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('2695d842-c7de-426f-b74a-ddb3b45dfb19', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'hasDomainClass');
-INSERT INTO relations VALUES ('ffa6dd57-699f-4228-8b0a-8cab88f7e176', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'hasRangeClass');
-INSERT INTO relations VALUES ('d71afb80-7eb2-4149-b50f-dc8a161e7014', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'hasDomainClass');
-INSERT INTO relations VALUES ('6baac3a8-27de-47e1-8679-972c8392e3df', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('eacff540-470e-4f54-adec-018556eb2b6f', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'hasDomainClass');
-INSERT INTO relations VALUES ('0a685eb7-9bc6-4612-a76e-5f4934090314', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('ae72b523-fde4-4a79-91b6-ca2ef9640906', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'subPropertyOf');
-INSERT INTO relations VALUES ('54d3183b-822f-49ae-a624-ff7dad2816c5', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'hasDomainClass');
-INSERT INTO relations VALUES ('7ddc27ec-b29f-4bba-a8b6-d44ab1686ae8', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
-INSERT INTO relations VALUES ('2bad06ec-77ea-4fd5-b659-8ab4a13447e7', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'subPropertyOf');
-INSERT INTO relations VALUES ('4a7632b6-4cc9-45b1-854b-5c60dca527c7', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'hasDomainClass');
-INSERT INTO relations VALUES ('473f1a08-9cb4-4189-8113-6eaa10c77711', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('a5c93414-e6bb-43ec-85c8-236cb9973625', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '406ee11a-a430-386f-9087-30c28c677da6', 'subPropertyOf');
-INSERT INTO relations VALUES ('4ce3ae45-a922-4589-88ad-d5c239d8d537', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', '406ee11a-a430-386f-9087-30c28c677da6', 'hasDomainClass');
-INSERT INTO relations VALUES ('20ffa682-a9ec-48a0-b9d2-1fc0bd916bba', '406ee11a-a430-386f-9087-30c28c677da6', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
-INSERT INTO relations VALUES ('0efde8b3-8f8a-43e2-8c71-95f633103db3', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'subPropertyOf');
-INSERT INTO relations VALUES ('665a8ee2-1f69-4bec-8f61-cc62795bf720', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'hasDomainClass');
-INSERT INTO relations VALUES ('59513ab8-7a67-4fed-b9c2-77ba0a0beed7', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
-INSERT INTO relations VALUES ('46fff977-5deb-435d-9c38-de3089ae5fd3', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'subPropertyOf');
-INSERT INTO relations VALUES ('528b8b1a-8296-462c-a926-55256295b9ca', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'hasDomainClass');
-INSERT INTO relations VALUES ('7adc627e-1499-4ba1-9edc-9a9176454533', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
-INSERT INTO relations VALUES ('062c6854-ed0e-44f2-83c6-002a0df5c3bb', 'de74c0db-a5fa-3f45-8684-344c379e6b0d', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'hasDomainClass');
-INSERT INTO relations VALUES ('5a614404-1fd8-410d-a2c7-53a83756e47f', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'hasRangeClass');
-INSERT INTO relations VALUES ('f4ebb10c-14f9-40ae-8da9-298e1b5ea2ea', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'hasDomainClass');
-INSERT INTO relations VALUES ('4b381ac1-bed3-4a51-afb8-1d6c3e54c651', 'df779f07-03dd-3ed7-91aa-025a71c95957', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'hasRangeClass');
-INSERT INTO relations VALUES ('f10f8d1b-18e7-4966-9e1d-275c8f4d0228', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'subPropertyOf');
-INSERT INTO relations VALUES ('8c0cc0f1-2f66-4a81-853a-c309e2cf2535', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'hasDomainClass');
-INSERT INTO relations VALUES ('1c444379-f951-4ada-b978-a643587b0dd3', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'ae27d5a7-abfc-32e3-9927-99795abc53a4', 'hasRangeClass');
-INSERT INTO relations VALUES ('38d8becc-0713-4360-b3a5-e73c85fb9a38', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '75825fa7-ab9a-3b62-b7e8-250712914631', 'hasDomainClass');
-INSERT INTO relations VALUES ('c2b9e900-a091-4773-afce-4cfe514a4971', '75825fa7-ab9a-3b62-b7e8-250712914631', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
-INSERT INTO relations VALUES ('24de73f5-a67a-4cca-8508-321b87f624bf', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '63c5d303-2789-3999-8496-297343edf6dc', 'subPropertyOf');
-INSERT INTO relations VALUES ('a94d9d4f-7db1-453d-89d5-bd618c94965c', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', '63c5d303-2789-3999-8496-297343edf6dc', 'hasDomainClass');
-INSERT INTO relations VALUES ('936db822-4241-4b42-a27c-dee61d75201a', '63c5d303-2789-3999-8496-297343edf6dc', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
-INSERT INTO relations VALUES ('310e1f92-f473-431d-8449-c29f802ace22', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', 'hasDomainClass');
-INSERT INTO relations VALUES ('f33bfa9d-a5f4-42cf-95a7-2ecf919c2301', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
-INSERT INTO relations VALUES ('8e029c25-be9f-4d08-98cd-b31b62614153', 'db25f50b-28f3-3041-b091-8bb7d2557856', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'subPropertyOf');
-INSERT INTO relations VALUES ('ab4e6b60-097e-410d-8c2b-1bbc0930a39c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'hasDomainClass');
-INSERT INTO relations VALUES ('f8f9a04a-d88f-4995-81b4-bc258962f40d', '222f5899-aa3f-3d52-a784-e5a0a68722f2', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('4fb221e1-f5c8-4c09-b35c-dd41cc1c4d03', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'hasDomainClass');
-INSERT INTO relations VALUES ('e7c2b6e7-1e4d-4098-89c2-be2ed17a9a22', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
-INSERT INTO relations VALUES ('04cc8ee8-f3bd-4251-9161-e0bcde539953', '94ffd715-18f7-310a-bee2-010d800be058', '6f3ce351-dc26-30bf-8c50-9392f873968d', 'hasDomainClass');
-INSERT INTO relations VALUES ('ab13c65e-09c1-4238-b9f6-bc97c3e003dc', '6f3ce351-dc26-30bf-8c50-9392f873968d', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
-INSERT INTO relations VALUES ('5683713e-a227-42c8-86c5-63f21a89d4a7', '94ffd715-18f7-310a-bee2-010d800be058', 'db25f50b-28f3-3041-b091-8bb7d2557856', 'hasDomainClass');
-INSERT INTO relations VALUES ('28f6d0da-8b9e-40b5-bb04-584519bb538c', 'db25f50b-28f3-3041-b091-8bb7d2557856', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('0334d92a-52b8-4967-a5d0-60eb0974ab03', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', '68633428-a835-3af2-9e8e-ac1ba713d4c8', 'hasDomainClass');
-INSERT INTO relations VALUES ('72ca70a7-aab1-4d9b-8fa2-7b48e585dca3', '68633428-a835-3af2-9e8e-ac1ba713d4c8', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
-INSERT INTO relations VALUES ('b266502e-7b83-4c40-b5fb-36686fd8b539', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'subPropertyOf');
-INSERT INTO relations VALUES ('abf73f53-d68c-4202-a8c4-7db9c0eb14fc', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'hasDomainClass');
-INSERT INTO relations VALUES ('84249fbd-a85a-41b6-8b17-73d9715cabcd', 'a5a812b2-d786-38db-928f-1df9f416ab59', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
-INSERT INTO relations VALUES ('72490f83-fbf1-4e1f-8c20-71e48b77cc0e', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'hasDomainClass');
-INSERT INTO relations VALUES ('6a8e1a63-3785-4e37-985d-b50f490dbb7e', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
-INSERT INTO relations VALUES ('7eeb4c5d-9e02-4918-ac83-5fb0cd4bfa6e', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'da115774-50f3-3292-97dc-da1cbb527ca5', 'hasDomainClass');
-INSERT INTO relations VALUES ('3b9f011a-9588-4265-a6fc-47ccbfaa43bf', 'da115774-50f3-3292-97dc-da1cbb527ca5', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
-INSERT INTO relations VALUES ('ba5495dc-eb58-49a4-8e5e-c2e4341e942d', '12f08da7-e25c-3e10-8179-62ed76da5da0', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'hasDomainClass');
-INSERT INTO relations VALUES ('54e65e6f-be35-48df-8d81-748de4c13a74', '81fd2793-2d69-37fe-8027-ff705a54ce3d', '1036c7f1-ea95-3ad8-886f-849ca10f9584', 'hasRangeClass');
-INSERT INTO relations VALUES ('db716968-e373-413a-9a9c-aba9e80b274c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '7cd91c49-743e-3eed-ad91-d993b09af867', 'hasDomainClass');
-INSERT INTO relations VALUES ('4c88f74d-0a9d-49f0-aa2f-ed3fb9f4a0ad', '7cd91c49-743e-3eed-ad91-d993b09af867', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
-INSERT INTO relations VALUES ('ceee9586-4485-47a4-b834-9903d36c7c47', '00000000-0000-0000-0000-000000000002', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'narrowerTransitive');
+INSERT INTO relations VALUES ('0230119a-4dd7-48ee-b44e-04e2077221df', 'c03db431-4564-34eb-ba86-4c8169e4276c', '70064b58-4490-3d09-b463-fd18defae21f', 'subClassOf');
+INSERT INTO relations VALUES ('64297289-d758-494b-9d24-785488ad02c7', '70064b58-4490-3d09-b463-fd18defae21f', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'subClassOf');
+INSERT INTO relations VALUES ('4a80a2a2-8e25-496e-af07-fdf5704e921f', '70064b58-4490-3d09-b463-fd18defae21f', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'subClassOf');
+INSERT INTO relations VALUES ('7a0068e3-7b14-4c49-b44f-f877dc9f7f99', '94ffd715-18f7-310a-bee2-010d800be058', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'subClassOf');
+INSERT INTO relations VALUES ('4ca4f025-492d-4a9e-93bb-31890ced75ba', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'subClassOf');
+INSERT INTO relations VALUES ('30f38f5c-c6ed-43ef-be3c-4ad3f9e0f1ea', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '94b5ce18-d4ca-3ac6-b903-d68c86258f95', 'subClassOf');
+INSERT INTO relations VALUES ('93b86eed-0f41-417a-bbc2-a5c087cf4256', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'subClassOf');
+INSERT INTO relations VALUES ('f2b3f34d-38ae-4be8-a6cc-88e4854d0dd0', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', 'subClassOf');
+INSERT INTO relations VALUES ('622a90ee-0a5a-47d1-81a1-50a97f2b5e10', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'subClassOf');
+INSERT INTO relations VALUES ('2d70c27a-3e65-4ee2-b45d-eea2c28d288b', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'subClassOf');
+INSERT INTO relations VALUES ('54372776-8f52-411f-9de2-1e9ff6e923fe', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'subClassOf');
+INSERT INTO relations VALUES ('37eb9cc2-3c2e-4a30-ace1-cee4fde164fb', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'f27afcc0-7657-3c5e-8314-b913c562759e', 'subClassOf');
+INSERT INTO relations VALUES ('d27295f5-d0e2-4536-a1a1-d9e38c3667d2', '255bba42-8ffb-3796-9caa-807179a20d9a', 'f27afcc0-7657-3c5e-8314-b913c562759e', 'subClassOf');
+INSERT INTO relations VALUES ('22acda8c-7d03-4dde-b864-cc6ac7f19bcd', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'subClassOf');
+INSERT INTO relations VALUES ('486281df-f01b-476b-acf8-eadbed23adf0', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'subClassOf');
+INSERT INTO relations VALUES ('abef869d-b5a5-4881-be7a-ef5a4af7e025', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'subClassOf');
+INSERT INTO relations VALUES ('2970422e-888b-4b8c-ba06-fc1f58e463a7', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', 'subClassOf');
+INSERT INTO relations VALUES ('f74c0195-2c6a-4e81-b09f-a20e937b8866', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'subClassOf');
+INSERT INTO relations VALUES ('385f7dd1-a2c7-4b34-b036-5f610a1b0694', '78b224a2-9271-3716-8c2e-c82302cdae9c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'subClassOf');
+INSERT INTO relations VALUES ('f5896ac5-119b-4220-ba8c-270688cef334', '94ffd715-18f7-310a-bee2-010d800be058', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'subClassOf');
+INSERT INTO relations VALUES ('03ee4c9e-e063-4930-a07a-8d54eb1b67bb', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'subClassOf');
+INSERT INTO relations VALUES ('a9ea2fbb-1f76-4eea-9858-9a8bfe7cf5f2', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', '2c287084-c289-36b2-8328-853e381f0ed4', 'subClassOf');
+INSERT INTO relations VALUES ('717a0821-567c-4134-8b6d-6969100ee219', '2c287084-c289-36b2-8328-853e381f0ed4', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'subClassOf');
+INSERT INTO relations VALUES ('86da174d-3611-4271-9a8b-85ef9ee39e3f', 'af051b0a-be2f-39da-8f46-429a714e242c', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'subClassOf');
+INSERT INTO relations VALUES ('22ade0bc-500a-43c6-983c-6ad2156bb81f', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'subClassOf');
+INSERT INTO relations VALUES ('51ddb0d5-b2e5-40f4-9b9e-6ca88a1bab04', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'subClassOf');
+INSERT INTO relations VALUES ('b27e3964-0d5a-4e85-95d2-afbd2b576c0b', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'subClassOf');
+INSERT INTO relations VALUES ('0d78ea0e-1ff5-4f2f-92e8-4fc19b30f25c', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'subClassOf');
+INSERT INTO relations VALUES ('9d3605be-4fab-4c81-8e7f-bae7986d0b9c', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '4bb246c3-e51e-32f9-a466-3003a17493c5', 'subClassOf');
+INSERT INTO relations VALUES ('9facc71a-3ac6-4ac5-bab7-ef5bc57e0d21', '2bc61bb4-384d-3427-bc89-2320be9896f2', '4bb246c3-e51e-32f9-a466-3003a17493c5', 'subClassOf');
+INSERT INTO relations VALUES ('be27ccd9-26aa-4344-a695-9b8dd70af02a', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'subClassOf');
+INSERT INTO relations VALUES ('2efc4d5d-7dee-4b23-8c1e-9d31f3bb16cb', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'a89d6e8b-6f86-33cd-9084-b6c77165bed1', 'subClassOf');
+INSERT INTO relations VALUES ('ef073bc9-2130-4c8f-9bc6-3b621951286e', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'subClassOf');
+INSERT INTO relations VALUES ('6a60fb93-3159-4fd5-8ed9-e96c4c2935c2', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'subClassOf');
+INSERT INTO relations VALUES ('7c082c8c-dfc2-4a08-8d0d-49b1cf34c000', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'subClassOf');
+INSERT INTO relations VALUES ('31e75b34-528e-4659-8df6-5fb8e6d1ed54', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '84a17c0c-78f2-3607-ba85-da1fc47def5a', 'subClassOf');
+INSERT INTO relations VALUES ('d43c85e2-4f95-45b6-98b5-0caa549ca56b', '84a17c0c-78f2-3607-ba85-da1fc47def5a', '0df9cb10-1203-3efd-8d9e-448f5b02506b', 'subClassOf');
+INSERT INTO relations VALUES ('3cb8c09a-470e-4b96-83e4-9f70e5f9df92', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'subClassOf');
+INSERT INTO relations VALUES ('95f98cca-1685-4002-9b3e-620055302c92', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '21fa6d60-095b-3044-9ca3-088e2cdab1f0', 'subClassOf');
+INSERT INTO relations VALUES ('23541e13-1125-485e-8111-0d3c9a1818e3', '7e62fc5e-947d-3806-bcd7-ce6bb716b6fe', '21fa6d60-095b-3044-9ca3-088e2cdab1f0', 'subClassOf');
+INSERT INTO relations VALUES ('ce28cfdf-f09a-44bb-b568-ed7e3ec41f79', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'subClassOf');
+INSERT INTO relations VALUES ('21ec304b-7f7d-49aa-aeb8-5e4ff70395a8', 'b43d4537-6674-37cb-af6e-834b5d63c978', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'subClassOf');
+INSERT INTO relations VALUES ('e12bbe2b-a9e0-4b71-835c-33001145593f', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'subClassOf');
+INSERT INTO relations VALUES ('17dc9235-c5a8-41b8-9eca-895f13b9ebd9', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', '7e62fc5e-947d-3806-bcd7-ce6bb716b6fe', 'subClassOf');
+INSERT INTO relations VALUES ('d12671e9-0de8-4751-99d8-690eb2f31ee6', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', '9cc69985-2a19-3fa6-abf5-addf02a52b90', 'subClassOf');
+INSERT INTO relations VALUES ('853d20c6-7835-4971-a0c4-d206cc1cba22', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'af051b0a-be2f-39da-8f46-429a714e242c', 'subClassOf');
+INSERT INTO relations VALUES ('fa806388-ab94-42b5-b0f2-f731ff857b8a', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '40a8beed-541b-35cd-b287-b7c345f998fe', 'subClassOf');
+INSERT INTO relations VALUES ('51391589-79b1-4638-8050-144e5b2523e1', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'subClassOf');
+INSERT INTO relations VALUES ('585a79e9-4166-4141-9ca0-179ccd5dd4fd', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'subClassOf');
+INSERT INTO relations VALUES ('2947ebae-3b60-42bd-babf-828a490bc34d', 'b43d4537-6674-37cb-af6e-834b5d63c978', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'subClassOf');
+INSERT INTO relations VALUES ('d9ed970f-2cad-4b52-955b-2ff0d64125a7', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'ac777d6e-452a-3a10-80c9-5190b5d9f6f2', 'subClassOf');
+INSERT INTO relations VALUES ('4ea22740-fd5b-4a2f-b2d5-a5399dee72aa', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'ac777d6e-452a-3a10-80c9-5190b5d9f6f2', 'subClassOf');
+INSERT INTO relations VALUES ('a45ad31c-e467-4ef8-86b2-8117ed5c4531', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', '4e3d11b3-c6a8-3838-9a62-0571b84914fa', 'subClassOf');
+INSERT INTO relations VALUES ('1baa5b12-b278-4bb8-a0da-19373d9ca9ab', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', '35bfed01-08dc-34b9-94a0-42facd1291ac', 'subClassOf');
+INSERT INTO relations VALUES ('fb3270f4-9619-440f-a354-a5970735dd1c', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'e276711d-008c-3380-934b-e048a6a0d665', 'subClassOf');
+INSERT INTO relations VALUES ('c985b00f-1f07-4500-aac1-072d15c26d32', 'b43d4537-6674-37cb-af6e-834b5d63c978', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'subClassOf');
+INSERT INTO relations VALUES ('2a071e76-008e-467d-9dfe-20bf390e7627', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'c8b36269-f507-32fc-8624-2a9404390719', 'subClassOf');
+INSERT INTO relations VALUES ('48e308dc-cbf0-4368-a84c-c9f267003231', 'b43d4537-6674-37cb-af6e-834b5d63c978', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'subClassOf');
+INSERT INTO relations VALUES ('212c0f9a-2879-4577-8354-fe311c71940e', 'c03db431-4564-34eb-ba86-4c8169e4276c', '9d55628a-0085-3b88-a939-b7a327263f53', 'subClassOf');
+INSERT INTO relations VALUES ('94fa1e29-f0fd-4cf4-851b-487c0a7b8981', 'c03db431-4564-34eb-ba86-4c8169e4276c', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'subClassOf');
+INSERT INTO relations VALUES ('68c46609-18b3-4a45-960f-50f8efc6e083', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'subClassOf');
+INSERT INTO relations VALUES ('20f1a28e-ed4f-48a5-a84d-f5a43c057209', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'subClassOf');
+INSERT INTO relations VALUES ('a91249bd-adbb-448c-b0ed-9ad9cf837ec4', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '4e75b119-d77b-3c1e-acf8-fbdfd197c9f1', 'subClassOf');
+INSERT INTO relations VALUES ('8b3691d7-9142-41f5-ba37-9a37fb8de256', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'subClassOf');
+INSERT INTO relations VALUES ('7a0533f4-ced1-45b8-99ec-8c34b00552e1', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'c1f0e36c-770f-30f9-8241-30d44921c6c8', 'subClassOf');
+INSERT INTO relations VALUES ('0aa0aa1f-987b-41cb-8d41-f764b39bd015', '8471e471-3045-3269-a9b8-86d0e6065176', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'subClassOf');
+INSERT INTO relations VALUES ('8cbcc5ad-2578-4332-9f55-24af26878ba7', '8471e471-3045-3269-a9b8-86d0e6065176', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'subClassOf');
+INSERT INTO relations VALUES ('ead77ae8-8579-4b2e-be3c-8ffbaf54bd02', '8471e471-3045-3269-a9b8-86d0e6065176', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'subClassOf');
+INSERT INTO relations VALUES ('7fc2e64c-afd0-4851-a74e-2b9d9e16a9ec', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '255bba42-8ffb-3796-9caa-807179a20d9a', 'subClassOf');
+INSERT INTO relations VALUES ('d56e0976-8683-46b7-9b97-bf9eafa5fdb7', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', 'subClassOf');
+INSERT INTO relations VALUES ('8e992cdd-e5ae-474c-ba0b-aa9f4b707626', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', 'subClassOf');
+INSERT INTO relations VALUES ('5f767a27-5645-4ac3-a83f-ce6d2b37b7a3', '255bba42-8ffb-3796-9caa-807179a20d9a', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', 'subClassOf');
+INSERT INTO relations VALUES ('e9e83631-65a3-46f9-9ea4-db46496c0a4c', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'subClassOf');
+INSERT INTO relations VALUES ('7c6fe655-7f9e-49f5-a389-be1a9507f7d6', '255bba42-8ffb-3796-9caa-807179a20d9a', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'subClassOf');
+INSERT INTO relations VALUES ('ab27163c-ab97-46b8-bc18-8beaa8f3a7a8', '255bba42-8ffb-3796-9caa-807179a20d9a', '07fcf604-d28f-3993-90fa-d301c4004913', 'subClassOf');
+INSERT INTO relations VALUES ('6e980574-0f00-4440-8616-756bba76cace', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '8bba5cfd-675d-3899-8c95-03b2de2a0a31', 'subClassOf');
+INSERT INTO relations VALUES ('6d9f2020-fb1e-45c3-8348-38b0e0c2527b', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '725afd13-ebc5-38a8-815b-d3a1e5510698', 'subClassOf');
+INSERT INTO relations VALUES ('40468129-d30c-4ea9-b892-bd6b7eca3baa', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'subClassOf');
+INSERT INTO relations VALUES ('b0385557-c728-44be-ab84-f56ded6f5b2b', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'subClassOf');
+INSERT INTO relations VALUES ('89a52c6d-b7df-4cd9-a7e5-6c102b8e9cbf', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'subClassOf');
+INSERT INTO relations VALUES ('49639258-b965-47f9-b5d2-653f34a76b2c', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'subClassOf');
+INSERT INTO relations VALUES ('bd9abf9f-39c0-48b5-9c2d-148c66896190', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'subClassOf');
+INSERT INTO relations VALUES ('71f5e8b1-4a0f-446a-8bff-ae3d7190c203', 'af051b0a-be2f-39da-8f46-429a714e242c', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'subClassOf');
+INSERT INTO relations VALUES ('c47f10b1-8b74-461f-a05e-d66f66d3ebf0', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'ae27d5a7-abfc-32e3-9927-99795abc53a4', 'subClassOf');
+INSERT INTO relations VALUES ('ccd2c6a6-380f-4efb-889a-374aaed9ca36', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'subClassOf');
+INSERT INTO relations VALUES ('93542417-c4eb-4287-a3f5-471dc7761232', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'subClassOf');
+INSERT INTO relations VALUES ('5b0c84f8-0793-4533-ac00-eced9e5916ab', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '048fe43e-349a-3dda-9524-7046dcbf7287', 'subClassOf');
+INSERT INTO relations VALUES ('84332de1-4b3d-4685-bec6-92664741b9be', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'subClassOf');
+INSERT INTO relations VALUES ('4741e2e1-5632-4b99-b57c-001822c83cb8', '255bba42-8ffb-3796-9caa-807179a20d9a', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'subClassOf');
+INSERT INTO relations VALUES ('3a3c6e48-ef02-4670-8af6-a4bcc506054f', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'subClassOf');
+INSERT INTO relations VALUES ('b95fed44-7a24-46e4-abba-6317906592e6', 'b43d4537-6674-37cb-af6e-834b5d63c978', '6f38d2ca-e114-33a0-b4db-4f298e53be3d', 'subClassOf');
+INSERT INTO relations VALUES ('d95526fa-e0b2-4431-a73f-5eaaba7a8843', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'subClassOf');
+INSERT INTO relations VALUES ('9d4bc570-5ebc-4d20-965a-c657691ee071', 'fd416d6d-2d73-35c7-a9a6-6e43e89d9fe9', 'b850529a-18cd-3fbc-9ab2-e1302ee000a6', 'subClassOf');
+INSERT INTO relations VALUES ('779e3f8f-3590-420f-a46a-fc22c434be3a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'subClassOf');
+INSERT INTO relations VALUES ('05a9be5c-fd08-45d3-8d5a-7336c8c5c7fd', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', 'subClassOf');
+INSERT INTO relations VALUES ('01f6d13a-89ec-4df0-9369-d373a3cc5d7c', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'de74c0db-a5fa-3f45-8684-344c379e6b0d', 'subClassOf');
+INSERT INTO relations VALUES ('8a604120-245b-4ad4-911d-07d1ee99626e', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'subClassOf');
+INSERT INTO relations VALUES ('3cbec657-6134-450e-8196-4c009988974b', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'subClassOf');
+INSERT INTO relations VALUES ('97aa4242-3ccb-49e6-b72e-64d2e3611ec9', '78b224a2-9271-3716-8c2e-c82302cdae9c', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'subClassOf');
+INSERT INTO relations VALUES ('b3693df0-ecc2-479f-87d7-e064687905f3', 'c03db431-4564-34eb-ba86-4c8169e4276c', '94ffd715-18f7-310a-bee2-010d800be058', 'subClassOf');
+INSERT INTO relations VALUES ('dbebe164-78e8-4791-9e6e-4255a070244b', '94ffd715-18f7-310a-bee2-010d800be058', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'subClassOf');
+INSERT INTO relations VALUES ('a399607a-de98-49b2-b9da-c2c058d7f76e', '94ffd715-18f7-310a-bee2-010d800be058', '1036c7f1-ea95-3ad8-886f-849ca10f9584', 'subClassOf');
+INSERT INTO relations VALUES ('916992c1-6ce6-4fb3-a08d-5ca293cee4ac', 'c03db431-4564-34eb-ba86-4c8169e4276c', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'hasDomainClass');
+INSERT INTO relations VALUES ('871b2215-2b6b-443e-9b40-44ab561d8c06', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'hasRangeClass');
+INSERT INTO relations VALUES ('3968d451-876b-408b-ba07-eb1ee5ac610c', 'b43d4537-6674-37cb-af6e-834b5d63c978', '89403c67-0097-311d-b3f4-eeb45e98020f', 'hasDomainClass');
+INSERT INTO relations VALUES ('d3e4bd06-6d6b-40ad-a21b-4ed036fce1e6', '89403c67-0097-311d-b3f4-eeb45e98020f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('466beb1a-e3f1-4e5e-8c8c-9feb6958ab22', 'c03db431-4564-34eb-ba86-4c8169e4276c', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'hasDomainClass');
+INSERT INTO relations VALUES ('f2c53cf5-3e02-49e2-986f-5b325cd61947', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('5528f48f-6b31-4800-9ed1-c708549bb8d5', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'hasDomainClass');
+INSERT INTO relations VALUES ('8661b6b5-0ed9-4e5d-82c3-240cfb6ca6cf', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('89f851a8-6a6f-4e49-9528-2f78d62354cc', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'hasDomainClass');
+INSERT INTO relations VALUES ('69c91c50-dd56-4bd9-9299-0347018794e7', 'fd06e07d-057b-38aa-99ac-1add45f9f217', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
+INSERT INTO relations VALUES ('81952aee-13f0-4d3f-8395-7360aae18b7b', '70064b58-4490-3d09-b463-fd18defae21f', 'fc174f36-37ef-3f45-aec4-5b8ebe0e7729', 'hasDomainClass');
+INSERT INTO relations VALUES ('afb4c8d9-6244-437e-b9c1-6b827bdba2f6', 'fc174f36-37ef-3f45-aec4-5b8ebe0e7729', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('efeb21e9-7d3b-4aeb-aac8-aca96310167e', '9d55628a-0085-3b88-a939-b7a327263f53', 'd0580517-738e-3601-b5f0-5c64c845ea8c', 'hasDomainClass');
+INSERT INTO relations VALUES ('5e8dbd6b-7308-48cc-826a-4024600150bf', 'd0580517-738e-3601-b5f0-5c64c845ea8c', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('727f6c83-a733-4541-a969-39020fb21727', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', 'hasDomainClass');
+INSERT INTO relations VALUES ('5f11e40d-1dee-46cc-86a1-0fcda0b64c4e', 'e0f3172d-f1e7-3c80-af06-eeb0a1636cfa', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
+INSERT INTO relations VALUES ('4f88fc7a-f448-4190-871f-0fbff2579dee', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'd631ab44-05a4-332d-bf95-747391c40405', 'hasDomainClass');
+INSERT INTO relations VALUES ('53f56e37-377d-48f1-b5eb-d7ea3b1442df', 'd631ab44-05a4-332d-bf95-747391c40405', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
+INSERT INTO relations VALUES ('cefdda64-5174-46dc-8d8f-adead9706005', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', 'hasDomainClass');
+INSERT INTO relations VALUES ('04712651-cb2a-4451-955c-efe62089c4a2', 'd2a09554-6718-3230-8f6f-10ff2daab9b3', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('8ea46111-9446-41f8-9397-d58a6871ecfc', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'a3268d4d-058c-30a5-b630-5b45c8644070', 'hasDomainClass');
+INSERT INTO relations VALUES ('da793d96-8e51-4708-a9e6-fb38e8a1ba65', 'a3268d4d-058c-30a5-b630-5b45c8644070', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'hasRangeClass');
+INSERT INTO relations VALUES ('7a79f5d3-1a03-47c8-8997-313ad64310c8', '0cc20557-978d-31ae-bee8-b3939398b1c8', '9f10aa95-ba46-3601-bac2-3ea828c154e6', 'hasDomainClass');
+INSERT INTO relations VALUES ('49e41afe-5142-4178-ae85-cb735bc9a08a', '9f10aa95-ba46-3601-bac2-3ea828c154e6', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('fcc27ed0-94cd-49c0-9169-d1c91801be4e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '9625fbb7-9930-3406-be4e-ecb8a536e876', 'hasDomainClass');
+INSERT INTO relations VALUES ('9f237d65-6d0f-4d67-9ae2-41eee815200d', '9625fbb7-9930-3406-be4e-ecb8a536e876', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'hasRangeClass');
+INSERT INTO relations VALUES ('4b79b7e4-f4ce-40d2-9486-2442db3bb260', '4913d287-3538-30ca-9f27-feb3b082321b', '6909b643-03f7-3606-b276-2be0e8773207', 'subPropertyOf');
+INSERT INTO relations VALUES ('58f2ac40-d19a-4f28-a0eb-0ed83409c913', '0cc20557-978d-31ae-bee8-b3939398b1c8', '6909b643-03f7-3606-b276-2be0e8773207', 'hasDomainClass');
+INSERT INTO relations VALUES ('f2ee8734-73dd-4153-b3f6-23c06409b226', '6909b643-03f7-3606-b276-2be0e8773207', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'hasRangeClass');
+INSERT INTO relations VALUES ('47d35cbe-df25-4db5-86cd-97590c19b9e7', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', '135ff5ff-c172-33fc-bf86-d46750007e95', 'subPropertyOf');
+INSERT INTO relations VALUES ('c1a08969-f796-49f5-a668-a18c79079877', '0cc20557-978d-31ae-bee8-b3939398b1c8', '135ff5ff-c172-33fc-bf86-d46750007e95', 'hasDomainClass');
+INSERT INTO relations VALUES ('dffbeb05-b8cd-42f4-be43-98e12521f95b', '135ff5ff-c172-33fc-bf86-d46750007e95', '0cc20557-978d-31ae-bee8-b3939398b1c8', 'hasRangeClass');
+INSERT INTO relations VALUES ('5ebbc863-24d3-4c6d-8566-285c923274bb', '94ffd715-18f7-310a-bee2-010d800be058', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', 'hasDomainClass');
+INSERT INTO relations VALUES ('3d3b7f73-4ef1-43f7-9340-4558e48ea3d9', 'b12aa689-98d5-39ea-ac35-cb8020da3ea4', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('92cad21b-7392-4276-80b4-6abad30aba61', '94ffd715-18f7-310a-bee2-010d800be058', '4913d287-3538-30ca-9f27-feb3b082321b', 'hasDomainClass');
+INSERT INTO relations VALUES ('9f846dd0-7de0-4217-a195-f1f9e277304f', '4913d287-3538-30ca-9f27-feb3b082321b', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('73d04c23-635e-4bf8-a030-eaf94a998f69', '99e8de0f-fa06-381d-8406-9d467d3f96b5', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'subPropertyOf');
+INSERT INTO relations VALUES ('4d355d2d-4e89-48f1-a695-5f6b92120fea', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'hasDomainClass');
+INSERT INTO relations VALUES ('a5dc1eb7-7809-4d63-8ece-b992425ae8ce', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('47b9d6f1-4877-48ad-ad71-732a99c521bf', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'subPropertyOf');
+INSERT INTO relations VALUES ('eb87e8a1-fbeb-4334-a371-be1c1346b9cf', 'af051b0a-be2f-39da-8f46-429a714e242c', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'hasDomainClass');
+INSERT INTO relations VALUES ('a4449dbd-e225-4d5c-9c92-80312a1017dd', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'hasRangeClass');
+INSERT INTO relations VALUES ('50426863-9e04-4714-96cd-2edb8bf35f12', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'hasDomainClass');
+INSERT INTO relations VALUES ('a5c9d91f-f37d-4886-95b6-cc7ac357e2ab', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
+INSERT INTO relations VALUES ('b75f3490-1122-4140-b17c-92b87648b00d', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'hasDomainClass');
+INSERT INTO relations VALUES ('417595e8-c75b-4b66-a7f1-19ae4bd73ea4', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'hasRangeClass');
+INSERT INTO relations VALUES ('9d414883-a4a3-4b68-a2db-d3c63fd09b85', 'f865c72a-09dd-386f-a9eb-385176727d94', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'subPropertyOf');
+INSERT INTO relations VALUES ('44d847ca-5af3-499f-929d-64616837a00d', '94b5ce18-d4ca-3ac6-b903-d68c86258f95', '0d61e94e-8834-3ba5-b51b-d55951a84fae', 'hasDomainClass');
+INSERT INTO relations VALUES ('c12ddfc7-bc7d-44c2-90d2-f3816588992f', '0d61e94e-8834-3ba5-b51b-d55951a84fae', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('618b7ebd-0970-4f96-88f2-5232206e1203', '28bd339b-43e4-3671-add8-6a48fad8593e', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'subPropertyOf');
+INSERT INTO relations VALUES ('29ba9f80-af78-42e3-a7bd-0976be04981e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '1b4e719b-b6e3-39e3-882d-0090a501c42f', 'hasDomainClass');
+INSERT INTO relations VALUES ('9a105720-08ee-4e33-aac6-33458d238132', '1b4e719b-b6e3-39e3-882d-0090a501c42f', '94b5ce18-d4ca-3ac6-b903-d68c86258f95', 'hasRangeClass');
+INSERT INTO relations VALUES ('c97f0b6e-dd59-4fab-985c-25862913ed25', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'subPropertyOf');
+INSERT INTO relations VALUES ('742948b3-a66a-4970-bde8-cbc08d313226', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'hasDomainClass');
+INSERT INTO relations VALUES ('3079c7fd-62e5-402c-912d-aaf1e50be731', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('91004ad6-16c6-4993-b59e-935b10c19960', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'subPropertyOf');
+INSERT INTO relations VALUES ('473fb511-df48-4ae6-b687-1a1990379cca', 'af051b0a-be2f-39da-8f46-429a714e242c', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'hasDomainClass');
+INSERT INTO relations VALUES ('bc1b9973-409a-4c4f-b96d-9c6cb62eef06', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('d59c10e8-de05-4c3f-8c83-5cef42ceca59', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'hasDomainClass');
+INSERT INTO relations VALUES ('e678b88d-e8b0-4b91-8570-f378d296e383', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('bea0aa85-fd55-4a18-8abb-5cdf9f213046', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', 'hasDomainClass');
+INSERT INTO relations VALUES ('0df37d12-8c44-49ee-aef6-ee1fa5276f53', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('3b9d692b-4998-4f75-b453-db524c3474a5', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'subPropertyOf');
+INSERT INTO relations VALUES ('e2e7f1db-9068-4a4a-a71b-bc300d5d666a', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'subPropertyOf');
+INSERT INTO relations VALUES ('adc7edae-7ab6-4265-91bd-3e42ee629e16', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'hasDomainClass');
+INSERT INTO relations VALUES ('3b40f362-5168-4267-bdbd-ab20c1c88a25', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
+INSERT INTO relations VALUES ('75dea76c-02ed-4158-999f-1d16049d0c1f', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '526049ea-951e-39ba-87f9-749bea349fe5', 'subPropertyOf');
+INSERT INTO relations VALUES ('d32d0c43-a5ba-44c6-8acc-17a6b707db0c', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', '526049ea-951e-39ba-87f9-749bea349fe5', 'subPropertyOf');
+INSERT INTO relations VALUES ('43cffc57-4552-4109-8724-261b5f07c381', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '526049ea-951e-39ba-87f9-749bea349fe5', 'hasDomainClass');
+INSERT INTO relations VALUES ('175a258c-63da-432d-b43e-38e37177565c', '526049ea-951e-39ba-87f9-749bea349fe5', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('5a3a667f-1484-40d1-87e2-ed4d439577c9', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'subPropertyOf');
+INSERT INTO relations VALUES ('8972c739-7b66-4971-b79a-f850e827c79d', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'hasDomainClass');
+INSERT INTO relations VALUES ('e463ff5d-2521-4c9d-8d44-3921ee983379', '2e24daa3-5793-30a8-a96e-3710c3862af4', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('e2457bfb-ccec-4430-b6c7-9ea855e6943e', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'subPropertyOf');
+INSERT INTO relations VALUES ('74fe4c5b-c7cd-4098-a31f-d67880e40fff', 'c03db431-4564-34eb-ba86-4c8169e4276c', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', 'hasDomainClass');
+INSERT INTO relations VALUES ('a7e85a67-1875-471b-a1b7-24c010f57d11', '10852206-4e4b-3948-8d6d-65f2ff5e39a6', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('e47cc8e7-b3f5-4c68-ab95-13c910c22d31', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', 'hasDomainClass');
+INSERT INTO relations VALUES ('7508eccb-8760-48cd-affc-c11cf0d46520', '8aa15071-614f-31b9-a8d5-a60afa7b5cd6', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'hasRangeClass');
+INSERT INTO relations VALUES ('955a9ec7-9f6e-448c-9aae-cdb4d5237caf', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', 'hasDomainClass');
+INSERT INTO relations VALUES ('35f8b696-15aa-4956-9d0e-e3eac4001533', '07c97d4d-7f10-3eaa-8e46-e054ee4151c8', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('f82b50f8-11b1-4bb5-a976-f289130b1bd7', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'hasDomainClass');
+INSERT INTO relations VALUES ('b6f58702-d470-4569-acb8-9a3fbf74ab22', '50ac84c9-d606-34b8-8c46-f2a0c7cf07bf', 'a6ef9479-248e-3847-bf68-9c9017b0add8', 'hasRangeClass');
+INSERT INTO relations VALUES ('adb3f868-1f85-4a74-84a7-73e77cb62378', 'a6ef9479-248e-3847-bf68-9c9017b0add8', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', 'hasDomainClass');
+INSERT INTO relations VALUES ('4996fbfd-9acc-497e-84ac-b78120a80605', '2408118e-a91e-3266-ba3c-7ea0dc30c30b', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('6a73fa25-590c-4d45-b627-eadbb96d764a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'hasDomainClass');
+INSERT INTO relations VALUES ('0f89c394-0611-4383-856e-f00e2207a7ba', '9c11dd9d-0693-36c3-8b4a-a56e4b67daf5', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('c17946d4-bc11-480a-beda-4a3d590a2043', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', 'hasDomainClass');
+INSERT INTO relations VALUES ('4fcf4867-1325-4169-a7d0-8b814490e071', 'f8ad62a0-7f4a-3a00-9df0-b44e0d38f086', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('b03555de-7982-4726-a410-9120b4c07603', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'subPropertyOf');
+INSERT INTO relations VALUES ('1cc22b8e-fd6f-424f-a45f-3baedafb2f59', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'hasDomainClass');
+INSERT INTO relations VALUES ('fcbf6a92-d3aa-4197-94e5-4112f3aea64c', '5c8d2516-e5bc-383e-ad10-a74e55cf93fe', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('e01fbdce-def8-4979-8f32-e838183517ec', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', 'b246f449-73f0-36f1-930e-7055a99805bb', 'subPropertyOf');
+INSERT INTO relations VALUES ('e80c42bb-4913-4e52-8f7f-823157b5e83b', 'af051b0a-be2f-39da-8f46-429a714e242c', 'b246f449-73f0-36f1-930e-7055a99805bb', 'hasDomainClass');
+INSERT INTO relations VALUES ('952407ad-bdb9-4e6b-8cf0-43d093dd6c8e', 'b246f449-73f0-36f1-930e-7055a99805bb', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', 'hasRangeClass');
+INSERT INTO relations VALUES ('076ee61b-8c41-41a0-9daf-032b7cc17044', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '345681a7-8324-331c-94d4-1777c36538b5', 'subPropertyOf');
+INSERT INTO relations VALUES ('46b3409b-4897-46c7-a8b2-37ad2bf44c0d', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '345681a7-8324-331c-94d4-1777c36538b5', 'hasDomainClass');
+INSERT INTO relations VALUES ('35a1b160-f672-44dc-b1c1-7fd8f30709e4', '345681a7-8324-331c-94d4-1777c36538b5', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('d1445556-b0b6-43b4-9c40-84b9f788c06f', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'subPropertyOf');
+INSERT INTO relations VALUES ('e3ef3ce3-a603-4d23-90f0-533ead5c2301', 'af051b0a-be2f-39da-8f46-429a714e242c', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'hasDomainClass');
+INSERT INTO relations VALUES ('f7870c25-61be-414b-845e-cef3e0b01b46', '82e03de1-76b0-3340-b892-35b25e0c9c11', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', 'hasRangeClass');
+INSERT INTO relations VALUES ('2104e498-5667-4cbb-8b95-5df456620d5a', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', 'hasDomainClass');
+INSERT INTO relations VALUES ('395675cd-96b3-4da2-8fb0-05f4e80253e4', '3d2a5865-d1f0-340f-9cd7-edd19ad98119', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('ab4c809c-9e58-449a-882b-ab7d68b8b80d', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'hasDomainClass');
+INSERT INTO relations VALUES ('c902a873-6a69-46da-abef-6d634bdb0b27', 'd25f0c41-927b-3951-8c08-d09ade624ea6', 'd0d1b126-40ad-3b89-a60c-c0bf6662d57a', 'hasRangeClass');
+INSERT INTO relations VALUES ('b5b8894a-ca44-4e86-be52-f3393b42daa1', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'subPropertyOf');
+INSERT INTO relations VALUES ('4241b59c-0cf2-49ce-bef4-0b9166f182c7', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', 'hasDomainClass');
+INSERT INTO relations VALUES ('8bd3537d-0a9c-4c87-b55c-515d25b53287', 'f05d0f06-c8b2-3cc9-bd57-9f8152f211f9', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('f431ac4c-5623-436c-ae46-bd364b9ab03e', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'subPropertyOf');
+INSERT INTO relations VALUES ('214b7d2a-b77d-48f9-b429-b7379550d752', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', '1b5077d8-0704-3cff-a5ae-9e807fd78095', 'hasDomainClass');
+INSERT INTO relations VALUES ('262a639c-a392-48df-a397-cf4d57969f47', '1b5077d8-0704-3cff-a5ae-9e807fd78095', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'hasRangeClass');
+INSERT INTO relations VALUES ('2befea43-79f9-4508-94e3-e546ade4de70', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', 'hasDomainClass');
+INSERT INTO relations VALUES ('9d939eb8-3d6f-4cdb-afaf-ef1e75408997', 'fa90e1e4-3906-3c8c-80f2-c51255d21fcb', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('46441f4d-2541-476f-bc40-9ed90b825867', 'a3268d4d-058c-30a5-b630-5b45c8644070', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'subPropertyOf');
+INSERT INTO relations VALUES ('5afe0685-d9ac-4bb6-8298-8c04a6d165ff', '12f08da7-e25c-3e10-8179-62ed76da5da0', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', 'hasDomainClass');
+INSERT INTO relations VALUES ('e35c276a-9936-4b4c-b975-cffd1b3ed521', '1ed2dc6a-48f3-3ac8-aaaf-16b5c78426cd', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'hasRangeClass');
+INSERT INTO relations VALUES ('ef036abc-64ba-468d-92dd-10d673b17040', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'e94e9966-e05b-3b5a-a5f0-893166474b80', 'hasDomainClass');
+INSERT INTO relations VALUES ('3b2081ba-0616-4c0d-8d2a-c80ebf9f7b73', 'e94e9966-e05b-3b5a-a5f0-893166474b80', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('3d028260-5837-4b92-85b0-64292fb5de15', 'a3268d4d-058c-30a5-b630-5b45c8644070', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'subPropertyOf');
+INSERT INTO relations VALUES ('8fa8d317-e67e-44b4-89da-dc1452ec8590', '12f08da7-e25c-3e10-8179-62ed76da5da0', '7cf91853-4423-3f39-974f-c72e89ccc1d3', 'hasDomainClass');
+INSERT INTO relations VALUES ('358f648a-0a20-4894-a1c0-e86596f08012', '7cf91853-4423-3f39-974f-c72e89ccc1d3', '8f400a1e-e2f6-3cd7-85ae-f0790a3aea0c', 'hasRangeClass');
+INSERT INTO relations VALUES ('2bbab1c0-9f3a-4196-94b6-9c70d84e7f3a', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', 'aad29816-af79-36cf-919e-80980f7c41a3', 'subPropertyOf');
+INSERT INTO relations VALUES ('35b2f9f2-1efa-4ad5-99e5-a56ffb6e6834', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'aad29816-af79-36cf-919e-80980f7c41a3', 'hasDomainClass');
+INSERT INTO relations VALUES ('eb4b2f39-d823-48df-be16-69c3260175c7', 'aad29816-af79-36cf-919e-80980f7c41a3', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('ebfba09f-8581-480b-be74-fa652be497a6', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', '53983b68-30b1-3818-b952-e04f6b5a038f', 'subPropertyOf');
+INSERT INTO relations VALUES ('e35f3a04-cc96-48d8-86c1-d9023472d68d', 'af051b0a-be2f-39da-8f46-429a714e242c', '53983b68-30b1-3818-b952-e04f6b5a038f', 'hasDomainClass');
+INSERT INTO relations VALUES ('1cfa8457-2c05-4eac-a6a7-ee758d64b60e', '53983b68-30b1-3818-b952-e04f6b5a038f', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'hasRangeClass');
+INSERT INTO relations VALUES ('021775ee-df51-4861-91ae-a7947a12aded', 'f1c1e55b-4fad-3074-a49b-d08c287f3fa5', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'subPropertyOf');
+INSERT INTO relations VALUES ('942b4b17-aef1-40f0-a2e7-95e5556f6cac', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'hasDomainClass');
+INSERT INTO relations VALUES ('b2729ccb-cb77-47b0-a783-1002ab6f4562', '8d2ad7fb-6c1b-3b46-9786-4abef3688198', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('16701c33-6941-41c9-ad30-660b73639d18', '2a0c8f12-04b1-3db6-a46a-c2afb4b272ad', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'subPropertyOf');
+INSERT INTO relations VALUES ('cc5410cf-fb9f-494f-9af5-a6f271bd3410', 'af051b0a-be2f-39da-8f46-429a714e242c', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', 'hasDomainClass');
+INSERT INTO relations VALUES ('be137802-533e-4d02-8af7-3594c3314462', '9eaea23c-aad4-3149-a2c7-0501fab3e06c', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'hasRangeClass');
+INSERT INTO relations VALUES ('18560354-4f37-4dc7-8d8a-3db90d885bf9', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'f24070b3-fc3b-3838-8765-87350b40ba84', 'hasDomainClass');
+INSERT INTO relations VALUES ('e5a28fa1-72c6-4f0f-a508-d27bf86cd561', 'f24070b3-fc3b-3838-8765-87350b40ba84', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('9af58e2a-b85b-480e-a86b-b055632026db', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', 'hasDomainClass');
+INSERT INTO relations VALUES ('d1beb2e4-2e0a-492b-9f3b-e1aa41e21d75', 'cb197d7f-f05f-3cb9-b833-c1576ea4494f', '2f277cee-3506-3366-a9b5-c4bfe7e265cb', 'hasRangeClass');
+INSERT INTO relations VALUES ('e183b97d-3d68-4bbe-bb6f-934ad52b926a', '99e8de0f-fa06-381d-8406-9d467d3f96b5', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'subPropertyOf');
+INSERT INTO relations VALUES ('f8350312-0f7e-47d7-ac0e-b2095cdacca4', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'hasDomainClass');
+INSERT INTO relations VALUES ('81417cdc-60a5-42a8-85b2-0ad4516bca40', '439f0684-5ebc-3227-93a5-ae9ebca7e015', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('afa1eacf-ab0e-4451-97ed-33c35e305027', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'subPropertyOf');
+INSERT INTO relations VALUES ('3eff02b7-22ea-4790-ac4b-e56a2bdd2baf', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'hasDomainClass');
+INSERT INTO relations VALUES ('cfae5bfa-83a4-4329-ba3e-c17c619c326d', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'hasRangeClass');
+INSERT INTO relations VALUES ('9898d200-c268-4992-8d46-637a977b9ac2', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'subPropertyOf');
+INSERT INTO relations VALUES ('104549b8-4356-4a57-b515-285d64733070', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'hasDomainClass');
+INSERT INTO relations VALUES ('b4205fbb-b24f-42c0-bb1e-5783d6500dd7', '1a5c940f-b67a-31c7-a34b-17d1fda7796b', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('3993ed9b-66ad-4ece-9c41-21c0aa1b1eb0', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'subPropertyOf');
+INSERT INTO relations VALUES ('78be43f6-89b0-4b7c-8bda-7d4f1707f177', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'c1d1943d-d502-39ca-b7c3-cf954112484a', 'hasDomainClass');
+INSERT INTO relations VALUES ('57fb87e8-f6aa-489b-b4ee-a7412de893ac', 'c1d1943d-d502-39ca-b7c3-cf954112484a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('f27450f6-772e-4534-88b5-e9776c16e6fe', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'subPropertyOf');
+INSERT INTO relations VALUES ('6d7e7303-c0a3-4ce5-839a-1e39248399b2', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', 'hasDomainClass');
+INSERT INTO relations VALUES ('6408e3a5-e58e-4d73-b9d8-d813c972b4bd', 'f370e85a-d4e4-35bb-89dd-737c57eef9d5', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'hasRangeClass');
+INSERT INTO relations VALUES ('12806721-c41d-4477-9eae-f515e526b446', '526049ea-951e-39ba-87f9-749bea349fe5', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'subPropertyOf');
+INSERT INTO relations VALUES ('f8e8d35a-b5a5-47c5-927a-16f722f275f3', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', 'hasDomainClass');
+INSERT INTO relations VALUES ('35c9af91-13e0-4a93-a1a0-292529ad3c81', '070cc284-9bb8-33b8-a5fe-538be9c3ba4a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('9fa34b2e-640f-4968-a88b-e05eaa8a8cb4', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'd9f02df8-6676-371e-8114-1f37700639b5', 'subPropertyOf');
+INSERT INTO relations VALUES ('6383822e-4dd9-4378-9788-0c209c42d683', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'd9f02df8-6676-371e-8114-1f37700639b5', 'hasDomainClass');
+INSERT INTO relations VALUES ('c881bdea-7999-4e3f-9f19-2a8f2d42557a', 'd9f02df8-6676-371e-8114-1f37700639b5', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('3e1c9e34-25e8-44b6-a6d9-c197c34f2cf9', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'subPropertyOf');
+INSERT INTO relations VALUES ('ed292032-4765-41fc-a3ab-5ec14ad81b10', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'hasDomainClass');
+INSERT INTO relations VALUES ('6f842caa-5297-4850-9e69-97e7f410aafe', 'b2537adc-c1d9-3ed3-8c43-b38b741c7948', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'hasRangeClass');
+INSERT INTO relations VALUES ('eaf98d1b-b60a-419d-9d88-2b7b7651e60a', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'subPropertyOf');
+INSERT INTO relations VALUES ('e0e4555a-9012-4c6c-89c7-3d56a80d27f9', 'c411cc1b-d477-3619-a63b-d1566635ead7', '79183fdd-7275-32a2-a48d-bb70fe683efd', 'hasDomainClass');
+INSERT INTO relations VALUES ('ce441bd0-7b8a-4775-a1ad-af527c3728da', '79183fdd-7275-32a2-a48d-bb70fe683efd', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
+INSERT INTO relations VALUES ('1fbda80f-b604-4755-9d8c-9b955b0b5386', '936cd63c-8307-3de9-a507-0f796fe07542', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'subPropertyOf');
+INSERT INTO relations VALUES ('7187650c-79c5-4deb-bce5-a526ba51244a', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'hasDomainClass');
+INSERT INTO relations VALUES ('a7cffa19-9f00-474b-89d6-193006cad44d', 'f8fc0d9f-782b-38c7-a135-e6d1fe1b3690', 'c411cc1b-d477-3619-a63b-d1566635ead7', 'hasRangeClass');
+INSERT INTO relations VALUES ('c94f1822-eb99-4c05-b708-9616091c6026', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'subPropertyOf');
+INSERT INTO relations VALUES ('daf311e2-5d5b-46d4-8ce9-5047d67f680b', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'hasDomainClass');
+INSERT INTO relations VALUES ('bc80e059-4144-4099-843c-ce9f2bff370c', 'd35815f0-0426-3ac0-b396-7ce2959ebf77', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
+INSERT INTO relations VALUES ('d9363941-6fbf-4c44-9d5e-1491fe8b6c49', '936cd63c-8307-3de9-a507-0f796fe07542', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'subPropertyOf');
+INSERT INTO relations VALUES ('8c8278af-1355-451d-8788-9e510e4b8fb9', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', 'hasDomainClass');
+INSERT INTO relations VALUES ('d661d22d-a4d3-459f-b9bc-9863e94c592b', '4936af4b-ecfd-3398-b2ce-1e3f2c9adf3a', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'hasRangeClass');
+INSERT INTO relations VALUES ('53a7cd8b-594a-4cac-ba09-875547dca42f', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'subPropertyOf');
+INSERT INTO relations VALUES ('5edc1ab8-71fe-47fc-aa4c-4cfd8e787ca4', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'hasDomainClass');
+INSERT INTO relations VALUES ('204141b7-10b5-42e0-86ac-da97dad6a96b', 'caf4c608-3653-397c-a26e-6cc5135274f8', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
+INSERT INTO relations VALUES ('7ec8d1d0-a8c5-4819-8334-742561511c20', '936cd63c-8307-3de9-a507-0f796fe07542', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'subPropertyOf');
+INSERT INTO relations VALUES ('22b34bfd-b6fd-4be4-861f-654bc5dc3104', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', 'hasDomainClass');
+INSERT INTO relations VALUES ('7dfa7e8a-2b68-4675-8251-91aced798427', 'c71f33f7-eef1-38ca-b8d2-487ed56d20ef', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'hasRangeClass');
+INSERT INTO relations VALUES ('39c652b2-bb13-4e6f-be8c-7100ce588ea3', '839c9e24-c1ab-34b4-94da-2efb1d32af01', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'subPropertyOf');
+INSERT INTO relations VALUES ('999eb462-aeed-4385-a1f7-712c8b3d125f', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'hasDomainClass');
+INSERT INTO relations VALUES ('a698fe24-bd11-40bf-ba5d-fc30185fe91c', '736d6bff-30b8-34d9-aeb7-24f012968ecc', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('b824b214-6921-4418-b252-f1ab6fbf7eae', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'subPropertyOf');
+INSERT INTO relations VALUES ('07c4df76-44bd-4325-97b7-743bafc8b309', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'hasDomainClass');
+INSERT INTO relations VALUES ('7ce5125e-2ace-41a4-9732-2fd572dea2f7', 'e74bd69e-a07d-3292-933a-46d31cbd354e', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', 'hasRangeClass');
+INSERT INTO relations VALUES ('30697831-ff8e-4f30-80fc-f148cb368e5d', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'subPropertyOf');
+INSERT INTO relations VALUES ('5529caf9-9626-44f9-90c7-0fc60c8230b7', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'hasDomainClass');
+INSERT INTO relations VALUES ('d7ab7cf8-4124-4588-9db7-784af5ca35aa', '5c72bddb-0c50-328c-a5aa-d3ce3da73f16', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
+INSERT INTO relations VALUES ('838dce28-f209-4b68-940c-05566ea7f822', '936cd63c-8307-3de9-a507-0f796fe07542', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'subPropertyOf');
+INSERT INTO relations VALUES ('e95c927e-51cd-454c-a37e-a432bfe7774e', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'hasDomainClass');
+INSERT INTO relations VALUES ('ee8f514e-5ec7-4b3e-ad90-cec99fd87a48', 'e68adc8c-1abc-3503-a261-11c542b43cde', 'a92f95fd-aa72-3c47-bca1-3c0c9520656b', 'hasRangeClass');
+INSERT INTO relations VALUES ('5ed7b025-7787-4c3e-afa1-42c932ada302', '839c9e24-c1ab-34b4-94da-2efb1d32af01', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'subPropertyOf');
+INSERT INTO relations VALUES ('4421ccb7-9daf-4160-866c-0f4e53318edc', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'hasDomainClass');
+INSERT INTO relations VALUES ('7febe360-0e06-4e33-bd5b-2f087488318d', '8a263f1b-a5b5-34f8-a8c6-cd1879982ef0', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('750505fb-5091-4766-a079-2bcbbd02f245', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'subPropertyOf');
+INSERT INTO relations VALUES ('54821fcf-02ba-4a59-9fd5-690d0791d4ae', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'hasDomainClass');
+INSERT INTO relations VALUES ('fee933ed-31ef-42fa-ba6c-de016f8b9d99', 'a34323b2-3e7d-3cf6-9c74-6677ed44effb', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'hasRangeClass');
+INSERT INTO relations VALUES ('9af13c41-8a5e-418e-af6c-663f258fde76', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'subPropertyOf');
+INSERT INTO relations VALUES ('f5b77ccd-4f88-4149-9659-9af854cdd122', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'hasDomainClass');
+INSERT INTO relations VALUES ('d760cbe0-8209-4735-919b-0cb8ac657c59', 'f7e7d2db-6b00-3f32-9337-ae46982ed7a5', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('8f26798c-431e-47e5-9018-712fe7e8b639', '936cd63c-8307-3de9-a507-0f796fe07542', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'subPropertyOf');
+INSERT INTO relations VALUES ('85c35d63-ba5f-41a4-9c9c-7923dcafe50d', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'hasDomainClass');
+INSERT INTO relations VALUES ('309470ec-5621-4aa4-ba2b-2041814c01f5', 'd1e640c1-247a-3ce0-84b4-551d730fac4a', 'd4b331cf-09dc-3f5b-a8a9-9df1bfde30b5', 'hasRangeClass');
+INSERT INTO relations VALUES ('0b8e7aa6-2781-41c2-9365-3517edcc61b5', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '167c0167-35fd-3c57-b90e-20715fd2c200', 'hasDomainClass');
+INSERT INTO relations VALUES ('c738aebf-52cb-4bfd-8847-8a83b87cb2ea', '167c0167-35fd-3c57-b90e-20715fd2c200', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
+INSERT INTO relations VALUES ('4729540d-c495-44cd-80bb-73d9584af0c4', 'bdf5f93e-589c-3c63-baad-e108520c4072', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', 'hasDomainClass');
+INSERT INTO relations VALUES ('decfefc9-b246-4ea4-8d30-3d910c95b056', '2879a57f-a9b6-34a4-b5a2-073d466a7e9f', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
+INSERT INTO relations VALUES ('71e4b9a4-190f-44ab-b62e-b05d67eed3f3', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', 'hasDomainClass');
+INSERT INTO relations VALUES ('c02deaa7-d212-4e37-b5c4-38bfb57e38a7', 'ada32613-4ae4-30a5-8bf0-08a51bbf636a', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'hasRangeClass');
+INSERT INTO relations VALUES ('62b4e1d3-566f-42f1-bc8c-7fb341ca3581', '12cfab6c-8a4c-37c8-9569-a7a2db3fafad', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', 'hasDomainClass');
+INSERT INTO relations VALUES ('731b317e-a924-45ab-b2ba-74d7545d87dd', 'bf8b94da-19b6-3d95-b675-58d66ad4fa8a', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('5c1bbb86-84e3-4336-9ce9-8f380d4bae2c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', 'hasDomainClass');
+INSERT INTO relations VALUES ('1e178069-25cf-4807-aa70-78da1a09724b', 'c4f5c11a-77fa-3601-825f-e7cac6c29d73', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
+INSERT INTO relations VALUES ('4eafa97a-3fff-4811-809c-c5761dca1527', '15afdb47-2e96-3076-8a28-ec86a8fe4674', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', 'hasDomainClass');
+INSERT INTO relations VALUES ('39c35c39-6eaf-4627-846d-fc77cc5bfd93', '366b5f06-3b25-3e83-8fbb-436f8daca3e3', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('2a1d4cca-3e8d-4fcd-9fa3-72fad9b3bdbf', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'hasDomainClass');
+INSERT INTO relations VALUES ('1add309e-84c8-4be1-9f25-0e8bbf0ce849', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('836025fa-e1c1-477b-823d-3c174838588c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', 'hasDomainClass');
+INSERT INTO relations VALUES ('a261899f-d069-456e-8dc1-5e4e55967629', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('f0e549f1-4fd9-4fdd-8c70-67c64e2abc87', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '356c8ba7-0114-32c3-861f-8432bc46e963', 'subPropertyOf');
+INSERT INTO relations VALUES ('ac8b8978-e4b9-49cb-bbea-2fdc07795616', 'c03db431-4564-34eb-ba86-4c8169e4276c', '356c8ba7-0114-32c3-861f-8432bc46e963', 'hasDomainClass');
+INSERT INTO relations VALUES ('4ad46801-236e-4e19-b447-d5501bb78025', '356c8ba7-0114-32c3-861f-8432bc46e963', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', 'hasRangeClass');
+INSERT INTO relations VALUES ('a210ccb9-0bf4-4374-9cf7-e037e4e40f9b', '89403c67-0097-311d-b3f4-eeb45e98020f', '63221473-4f24-3feb-a536-acb76f2f1b94', 'subPropertyOf');
+INSERT INTO relations VALUES ('d3358477-fa8e-4e1d-ab86-f5b6e96e8509', 'fc4193ce-c5a3-3c1b-907f-6b4d299c8f5c', '63221473-4f24-3feb-a536-acb76f2f1b94', 'hasDomainClass');
+INSERT INTO relations VALUES ('90634921-b886-4a20-9cd4-defec864552d', '63221473-4f24-3feb-a536-acb76f2f1b94', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('b4d98adb-716d-458c-8f19-279081a72846', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'hasDomainClass');
+INSERT INTO relations VALUES ('34b79eb2-4a68-4d1f-9f79-4f789786b2fb', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('f43f51bf-7594-4330-b8ef-53c79e40c8eb', 'af051b0a-be2f-39da-8f46-429a714e242c', 'c97f21db-5aed-3dea-9209-a800985c0aa5', 'hasDomainClass');
+INSERT INTO relations VALUES ('e83e2e08-d6c7-480b-a2b9-763bb44d8165', 'c97f21db-5aed-3dea-9209-a800985c0aa5', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('d3789a1e-f33f-4f2e-8151-5923f02828cb', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'subPropertyOf');
+INSERT INTO relations VALUES ('94c20363-42a7-462a-bbb5-2426c45990be', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'hasDomainClass');
+INSERT INTO relations VALUES ('d6480006-3777-46d3-8b3a-b59800d535cd', '2e2cce91-09c2-3160-95ad-c17efcc59ac7', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('31277ca0-cd6b-4d3e-aa40-7e69a5dd5e0a', 'c97f21db-5aed-3dea-9209-a800985c0aa5', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'subPropertyOf');
+INSERT INTO relations VALUES ('de4fcb11-97d9-44d6-a6e4-43ea275d6e71', 'af051b0a-be2f-39da-8f46-429a714e242c', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', 'hasDomainClass');
+INSERT INTO relations VALUES ('629e99c7-b6c2-4591-8328-6bdbb5cc8707', '653fe540-ac0a-3c7f-a9e0-cc6a72e33ba9', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('ad2db4b1-ce97-4d63-a436-3e760e871d49', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'hasDomainClass');
+INSERT INTO relations VALUES ('d3b5da03-d47e-4a50-94a6-f3a20d9d77db', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('96647327-e1f1-4e4c-96e9-e61eadb9100b', 'af051b0a-be2f-39da-8f46-429a714e242c', '5cab4232-9297-318b-806a-263f2287713d', 'hasDomainClass');
+INSERT INTO relations VALUES ('689dbfba-e485-40a8-8290-29759c78d324', '5cab4232-9297-318b-806a-263f2287713d', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('daef8143-08bd-4eb9-83f2-16db3ac153f8', '6eaf78e8-89c1-3e66-97ed-c189478fed2f', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'subPropertyOf');
+INSERT INTO relations VALUES ('62894da1-77b1-4221-899b-2adb76b111b9', '140073c4-60b5-352d-a5f7-244072fc4086', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'subPropertyOf');
+INSERT INTO relations VALUES ('c1357d06-5558-4623-a87b-784a2be55b5f', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'hasDomainClass');
+INSERT INTO relations VALUES ('af5b3b50-1882-4a26-aa0a-5927f4e2ed5b', '954c6e65-1fca-3f29-bcb8-7bc9d56fa191', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('1d747c68-36e5-441e-960c-b45bb0a72835', '5cab4232-9297-318b-806a-263f2287713d', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'subPropertyOf');
+INSERT INTO relations VALUES ('019ddf75-5ba1-4199-8a0a-bef1f50668fa', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'subPropertyOf');
+INSERT INTO relations VALUES ('9b0ad546-bd27-4c4b-9543-18b150a21a5e', 'af051b0a-be2f-39da-8f46-429a714e242c', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', 'hasDomainClass');
+INSERT INTO relations VALUES ('ee167eb7-d793-42eb-8dd3-6b9e3fb25e0f', '36fadbd3-0b01-3685-96d3-10e34c6e1b1c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('ee644265-64aa-41e4-be76-2d2588a4d7ec', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'hasDomainClass');
+INSERT INTO relations VALUES ('b239e388-985f-4bc6-8658-08c636ffdcd8', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('305c7f7d-84bd-4f90-aee1-ea76bf985922', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', 'hasDomainClass');
+INSERT INTO relations VALUES ('cd5ee1d0-01ad-4a14-9c87-19f2f92b76cb', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('00154a5d-2ce9-4427-b2a3-7c09aafbcc4e', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', 'hasDomainClass');
+INSERT INTO relations VALUES ('b8f3a480-d08a-4113-b1f7-52de60038f77', 'e9f7831d-a7cb-383b-8c8d-afa4f18ab124', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('ec7aa852-f8fe-4f6b-8e26-9b1faa0970dd', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', 'hasDomainClass');
+INSERT INTO relations VALUES ('fbb44d9c-a895-49b3-845e-ebaa7e6f2cdb', 'd50067c9-6a89-3c10-8644-91d068c1f5c0', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('5180d1e0-9895-46a4-8c7c-95c1e6e4c1f8', 'a343bd21-9eb3-3ab7-a2a8-f6a76abfc2f1', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'subPropertyOf');
+INSERT INTO relations VALUES ('1aeb98e2-127a-4ba3-bf9b-b311f2a5fe57', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', 'hasDomainClass');
+INSERT INTO relations VALUES ('ec902842-ad45-44de-9218-7c1bb4a215ea', 'f2565243-677f-37a3-b4dd-b3b9525f7c4c', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('38e1dbe0-de99-4bae-bb04-08a3582fc07f', 'b88655f5-9dcc-3113-a0a8-c9f8bd051fd2', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'subPropertyOf');
+INSERT INTO relations VALUES ('f3c46de9-9ab8-4353-8fc9-23cefd04c2c4', '12f08da7-e25c-3e10-8179-62ed76da5da0', '560925df-0b2b-36b2-9b4f-9652b38a6da2', 'hasDomainClass');
+INSERT INTO relations VALUES ('d58faa66-75a6-47a4-9f84-87b2b719b467', '560925df-0b2b-36b2-9b4f-9652b38a6da2', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('dc089ac1-97ac-4ee4-8146-b9263629f466', 'e37e8cfe-e1b7-3335-818b-d56090f2974e', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'subPropertyOf');
+INSERT INTO relations VALUES ('790ffd45-4fea-4527-9cd2-1beb41102619', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', 'hasDomainClass');
+INSERT INTO relations VALUES ('fe59c1d2-0f7b-48ac-aac5-e670bb84ee71', 'e85f32d0-ac0d-3039-a95e-a1beda15fc3d', '2bc61bb4-384d-3427-bc89-2320be9896f2', 'hasRangeClass');
+INSERT INTO relations VALUES ('7b65e76d-ed4d-4981-88e3-d8b354316390', '63d6df0c-982e-3ce9-87d2-19ba36c80e5e', '118e3917-94ae-3339-a738-a05540f6a087', 'subPropertyOf');
+INSERT INTO relations VALUES ('a8576703-d2d2-4b84-b9ac-cb0de441728b', '2bc61bb4-384d-3427-bc89-2320be9896f2', '118e3917-94ae-3339-a738-a05540f6a087', 'hasDomainClass');
+INSERT INTO relations VALUES ('8a5b3c26-86a4-4153-b0c0-170e9c88907f', '118e3917-94ae-3339-a738-a05540f6a087', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('3358f788-381e-4342-abd4-ba68ae5308f3', '3f975fdf-518e-3ac6-9037-8a288f3bd6c4', '5afb86ba-c943-367b-857c-d7aaec92b5e3', 'hasDomainClass');
+INSERT INTO relations VALUES ('beafb621-49b6-436c-892f-c1396bfe1eb1', '5afb86ba-c943-367b-857c-d7aaec92b5e3', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'hasRangeClass');
+INSERT INTO relations VALUES ('575ed0b7-c580-411c-b1f8-13d5f43f74d4', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '89cad4c1-914c-3675-9d66-83eed1c61e3e', 'hasDomainClass');
+INSERT INTO relations VALUES ('72dbcf77-7a3e-46b7-9bb1-0fce7d9882f1', '89cad4c1-914c-3675-9d66-83eed1c61e3e', '4e3d11b3-c6a8-3838-9a62-0571b84914fa', 'hasRangeClass');
+INSERT INTO relations VALUES ('4d01cd85-8975-4e38-a797-d3055b15b9f1', '4e3d11b3-c6a8-3838-9a62-0571b84914fa', 'af0950ae-298d-33e6-9dff-db7a9cce0769', 'hasDomainClass');
+INSERT INTO relations VALUES ('266a353a-303c-47ef-b4a6-148e8d6f9777', 'af0950ae-298d-33e6-9dff-db7a9cce0769', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('a9bb882c-d468-4f02-9c06-0f28c7415e3c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '21f8fc78-e937-3048-95e9-e69404b1d3f1', 'hasDomainClass');
+INSERT INTO relations VALUES ('5d0626c7-622c-4950-a1ac-e8ac6d2419c1', '21f8fc78-e937-3048-95e9-e69404b1d3f1', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('48afe3e1-e152-4cb1-a196-be39ed0f20ba', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'b77952c3-1145-3340-964f-6212caf1c63f', 'hasDomainClass');
+INSERT INTO relations VALUES ('e3d014e5-b27d-4e64-9d88-ffded561200f', 'b77952c3-1145-3340-964f-6212caf1c63f', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('a493e357-e4cd-40bc-a0fe-de524464b572', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '05804845-b0d6-3634-a977-a5c7785d2dde', 'hasDomainClass');
+INSERT INTO relations VALUES ('e1e9550a-a73c-47c8-a0f0-db1c2f71006a', '05804845-b0d6-3634-a977-a5c7785d2dde', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('17b20750-372f-416b-a23c-d4534d04094b', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'hasDomainClass');
+INSERT INTO relations VALUES ('49b13a79-1a5c-49c8-867c-9d6f5d0c47a4', 'e218d84c-7bef-348b-a571-621c6237b4d0', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('dea9e6ad-f181-415d-8dbb-8d2649383655', '007dac32-df80-366b-88ce-02f4c1928537', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'subPropertyOf');
+INSERT INTO relations VALUES ('e40d77f1-fb06-4f9f-bc76-ff22c2a06f05', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '15f83f67-48e0-3afd-b693-605172ea3fd2', 'hasDomainClass');
+INSERT INTO relations VALUES ('5698a300-5552-45f0-bab4-c8c9fa30717a', '15f83f67-48e0-3afd-b693-605172ea3fd2', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'hasRangeClass');
+INSERT INTO relations VALUES ('93d4e2e8-1c8d-4adc-b788-d764daa697a4', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'subPropertyOf');
+INSERT INTO relations VALUES ('29203682-31e1-484e-86f3-b672c011a554', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'hasDomainClass');
+INSERT INTO relations VALUES ('1dc570cb-5bc9-4885-a356-2ada2667a273', '7041ae27-e444-3ecb-9530-e21b3b0c2d01', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('b224ca29-3e6e-4127-988a-c97d7d0df20f', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', '629ed771-13e7-397e-8345-69f6cfb3db30', 'hasDomainClass');
+INSERT INTO relations VALUES ('9ec7d8e4-2800-4dfb-b697-8ade8633affa', '629ed771-13e7-397e-8345-69f6cfb3db30', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('22b56bab-86ff-4173-aaab-f4ce64dba0dc', 'c03db431-4564-34eb-ba86-4c8169e4276c', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'hasDomainClass');
+INSERT INTO relations VALUES ('874d7429-fc81-43b5-9007-905ae562d7f9', '501d59a2-21cc-3c94-b043-7071cb9551d5', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'hasRangeClass');
+INSERT INTO relations VALUES ('699bd562-d727-4830-8cc5-4cf0ac397d47', '629ed771-13e7-397e-8345-69f6cfb3db30', '037c3de7-65ae-3002-8328-18cc33572501', 'subPropertyOf');
+INSERT INTO relations VALUES ('ec38ac79-cdaa-4e19-b5c9-5b3a03768fe8', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', '037c3de7-65ae-3002-8328-18cc33572501', 'hasDomainClass');
+INSERT INTO relations VALUES ('83187844-481b-4bb0-9d2f-8a260fb3e75c', '037c3de7-65ae-3002-8328-18cc33572501', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
+INSERT INTO relations VALUES ('fa85e4f1-7840-499d-bb62-d07bd829d4b5', '501d59a2-21cc-3c94-b043-7071cb9551d5', '426216f3-fa37-32c7-88e7-be709f0f7182', 'subPropertyOf');
+INSERT INTO relations VALUES ('10a60a15-4258-40e2-a0e8-350fabb3657f', '15afdb47-2e96-3076-8a28-ec86a8fe4674', '426216f3-fa37-32c7-88e7-be709f0f7182', 'hasDomainClass');
+INSERT INTO relations VALUES ('a82909ac-3f9b-4cd3-a00c-a71f3fdb4950', '426216f3-fa37-32c7-88e7-be709f0f7182', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'hasRangeClass');
+INSERT INTO relations VALUES ('54400367-bdc6-410b-a994-cebf663fba70', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', 'hasDomainClass');
+INSERT INTO relations VALUES ('2d8c010e-7edf-4683-8cd6-c99359299016', 'b92c8654-6db7-3c41-87a4-69d6ccf66e1c', '3b35ea57-508c-352e-8d98-ec5cbc29c7a7', 'hasRangeClass');
+INSERT INTO relations VALUES ('0ca314c9-7a67-43de-932d-12e09bc81033', '629ed771-13e7-397e-8345-69f6cfb3db30', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'subPropertyOf');
+INSERT INTO relations VALUES ('b4363a84-c370-4671-aae8-38dc62b02336', '84a17c0c-78f2-3607-ba85-da1fc47def5a', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'hasDomainClass');
+INSERT INTO relations VALUES ('c84fbbfa-06f8-4b6e-8c38-5892090397cb', '3ca0d5b2-a1ec-3aca-9a43-fcd160432782', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('a3bc6e10-bf4e-4bb5-9fb5-0ee318f683d3', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'subPropertyOf');
+INSERT INTO relations VALUES ('dc380889-bf3c-4b5e-a56c-10483826f250', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', 'hasDomainClass');
+INSERT INTO relations VALUES ('7b0f2b25-814a-4e31-95fd-2205cec7e05b', 'b87f2804-1dea-3728-a2b9-eb7a24fe6fa1', '84a17c0c-78f2-3607-ba85-da1fc47def5a', 'hasRangeClass');
+INSERT INTO relations VALUES ('e3241ff7-9e87-4592-994c-d49bcb8de9c0', '629ed771-13e7-397e-8345-69f6cfb3db30', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'subPropertyOf');
+INSERT INTO relations VALUES ('8aed8304-c0a2-4858-9dc0-99f4b50535aa', '0df9cb10-1203-3efd-8d9e-448f5b02506b', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'hasDomainClass');
+INSERT INTO relations VALUES ('f8a08fca-807a-4701-8b27-4c333f6cb478', '549c04f2-465b-3af6-ba22-8d21aacfe0af', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('a7178067-3a7c-48ff-a2c9-11e2ef161a83', '501d59a2-21cc-3c94-b043-7071cb9551d5', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'subPropertyOf');
+INSERT INTO relations VALUES ('7a8587c4-2b67-4194-b61b-182e210735f8', 'c03db431-4564-34eb-ba86-4c8169e4276c', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', 'hasDomainClass');
+INSERT INTO relations VALUES ('31379a8a-b007-4fb7-87d6-7492949dbaa4', '9e71dec5-05a7-3e87-8b69-8852fdbaa241', '0df9cb10-1203-3efd-8d9e-448f5b02506b', 'hasRangeClass');
+INSERT INTO relations VALUES ('1c54a40f-3801-4b9f-918c-9c40f5b029f8', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', 'hasDomainClass');
+INSERT INTO relations VALUES ('10e3dfd7-aa49-46eb-a3a0-a526dd0d1f0c', 'e4096768-5cad-36ca-8ee7-d5b928a0045a', '4e75b119-d77b-3c1e-acf8-fbdfd197c9f1', 'hasRangeClass');
+INSERT INTO relations VALUES ('e48b95e0-3013-4646-872b-ef3ce7d99409', '4e75b119-d77b-3c1e-acf8-fbdfd197c9f1', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'hasDomainClass');
+INSERT INTO relations VALUES ('1f84a75e-d430-4df8-8e38-7924abad3382', '2795125f-7e1a-39ac-8ba7-71afde6c1e4a', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'hasRangeClass');
+INSERT INTO relations VALUES ('3037aca5-c17b-477f-92a1-47be3974b4f2', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'subPropertyOf');
+INSERT INTO relations VALUES ('7bb31cb5-2f3f-48fd-978b-7931a93cbb0e', 'fa1b039d-00cd-36e8-b03c-247176a6368d', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'hasDomainClass');
+INSERT INTO relations VALUES ('b1b4d2b8-14b2-4055-b93d-134184de646e', '8a9489d3-6c67-3b70-9b4d-64980efa0879', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'hasRangeClass');
+INSERT INTO relations VALUES ('7e3dd6f1-f6d9-4d1d-84a2-6a2e1c03366e', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'c185435d-2391-302f-b892-687406865462', 'subPropertyOf');
+INSERT INTO relations VALUES ('481355c7-6bee-4af3-a7a8-18dec09889d9', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'c185435d-2391-302f-b892-687406865462', 'hasDomainClass');
+INSERT INTO relations VALUES ('293bc39d-d6e5-4941-8e60-59f218f8a791', 'c185435d-2391-302f-b892-687406865462', 'fa1b039d-00cd-36e8-b03c-247176a6368d', 'hasRangeClass');
+INSERT INTO relations VALUES ('33bf7e60-3513-4516-941a-fe1258f79b36', 'af051b0a-be2f-39da-8f46-429a714e242c', '5869a9ed-ebe5-3613-acc2-29c184737885', 'hasDomainClass');
+INSERT INTO relations VALUES ('bb88e984-8788-44de-9ce3-405133742f55', '5869a9ed-ebe5-3613-acc2-29c184737885', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('884ab487-2c2c-429e-8a95-e693deb6cf4c', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'b8b3baaf-161f-3234-8239-21d64232a602', 'hasDomainClass');
+INSERT INTO relations VALUES ('817add4f-c620-4226-aaf3-ac92294eb90c', 'b8b3baaf-161f-3234-8239-21d64232a602', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('bba89726-3656-45f7-8c29-927ec53e6109', 'af051b0a-be2f-39da-8f46-429a714e242c', '44813770-321a-370d-bb8f-ba619bcb4334', 'hasDomainClass');
+INSERT INTO relations VALUES ('ab3c219c-5876-4568-a1e2-f6e308695271', '44813770-321a-370d-bb8f-ba619bcb4334', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'hasRangeClass');
+INSERT INTO relations VALUES ('432a4865-9d8b-4999-91e6-b21f89562a90', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'hasDomainClass');
+INSERT INTO relations VALUES ('1f48cb21-27fa-4228-80b8-a83b744c2afe', '99d57bf5-f645-37c0-82fd-592f32a457ea', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('7bc850a8-2d5e-495c-b83a-5c0174137ab2', 'af051b0a-be2f-39da-8f46-429a714e242c', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', 'hasDomainClass');
+INSERT INTO relations VALUES ('21f1d2e4-df1e-4b2e-aa2a-a71454ee121a', 'e39e863c-0b62-39ae-8db7-e49b56fcbd1e', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'hasRangeClass');
+INSERT INTO relations VALUES ('75fdbdeb-93c2-4ad6-a956-d33d3cb82936', '7cee80d2-87e9-3a29-9d1e-f61d46d892ca', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'hasDomainClass');
+INSERT INTO relations VALUES ('c70cdbbb-d4f9-4f6d-b438-5916e58d1437', 'd18864b3-7463-34d1-92c4-9655ddcef018', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('4b692622-5440-4eed-bea9-30a1fdf2100b', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'subPropertyOf');
+INSERT INTO relations VALUES ('86086793-8d53-41eb-afbd-ff5b1d3919c5', '9d55628a-0085-3b88-a939-b7a327263f53', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', 'hasDomainClass');
+INSERT INTO relations VALUES ('0940c98b-afbc-4955-81b3-29d02955bec9', '5f425a21-ce2e-3ec6-b434-38ada47bc29c', '9ca9a75f-0eca-378a-a095-91574ad77a30', 'hasRangeClass');
+INSERT INTO relations VALUES ('ce88e670-c139-458d-8da3-d67cc2c428b5', '89403c67-0097-311d-b3f4-eeb45e98020f', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'subPropertyOf');
+INSERT INTO relations VALUES ('664b0010-5175-4306-8ecc-ad392e1b5564', '9ca9a75f-0eca-378a-a095-91574ad77a30', '804a34c3-4d1b-382e-af15-787c0dacc71c', 'hasDomainClass');
+INSERT INTO relations VALUES ('9c2c6eb1-84c5-4741-beff-ed7ec8698915', '804a34c3-4d1b-382e-af15-787c0dacc71c', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('953ffe5b-d8a5-4546-a6c8-75da6b19ea76', 'fd06e07d-057b-38aa-99ac-1add45f9f217', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'subPropertyOf');
+INSERT INTO relations VALUES ('30f20ad0-ca87-4a94-9c61-f64870cac9e2', '9d55628a-0085-3b88-a939-b7a327263f53', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', 'hasDomainClass');
+INSERT INTO relations VALUES ('adff66a0-423c-48ed-a493-8a957c0316fc', '2585bcd7-dcd6-3b79-b29f-f4d664a65fc9', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
+INSERT INTO relations VALUES ('87258b47-3da0-489c-a06b-80697205d99a', 'fd06e07d-057b-38aa-99ac-1add45f9f217', 'b1c4e551-2f6e-327b-8905-191228330e2f', 'subPropertyOf');
+INSERT INTO relations VALUES ('48e00479-1a55-457d-8cc3-2abbf1560f07', '9d55628a-0085-3b88-a939-b7a327263f53', 'b1c4e551-2f6e-327b-8905-191228330e2f', 'hasDomainClass');
+INSERT INTO relations VALUES ('9590bf23-4970-44d4-a863-ab80fafe6c85', 'b1c4e551-2f6e-327b-8905-191228330e2f', '6e30fbe8-5a0d-3de8-be79-4ec6ebf4db39', 'hasRangeClass');
+INSERT INTO relations VALUES ('d1afba03-a6a9-4a54-a73f-a057a6add32c', '9d55628a-0085-3b88-a939-b7a327263f53', '6a998971-7a85-3615-9929-d613fe90391c', 'hasDomainClass');
+INSERT INTO relations VALUES ('8e1211ab-130b-422d-a9bd-d82307e795e9', '6a998971-7a85-3615-9929-d613fe90391c', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'hasRangeClass');
+INSERT INTO relations VALUES ('e3fa4cdc-49b0-42f9-a892-6751d9790b4d', '9d55628a-0085-3b88-a939-b7a327263f53', '890ddf47-6e5e-32f7-b3a8-ecd251002877', 'hasDomainClass');
+INSERT INTO relations VALUES ('c1f7384b-4148-4934-8f03-528f6197c767', '890ddf47-6e5e-32f7-b3a8-ecd251002877', 'fd8302b4-921b-300c-a9bf-c50d92418797', 'hasRangeClass');
+INSERT INTO relations VALUES ('6a764785-d000-4656-957f-97b6a474e142', '9d55628a-0085-3b88-a939-b7a327263f53', 'b38666a2-59fd-3154-85c3-90edaa812979', 'hasDomainClass');
+INSERT INTO relations VALUES ('c8ddc55b-2a0a-4068-ace2-57fb14b13ae9', 'b38666a2-59fd-3154-85c3-90edaa812979', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
+INSERT INTO relations VALUES ('799e0c79-bb98-4d82-8944-9b5d5811744c', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', 'hasDomainClass');
+INSERT INTO relations VALUES ('1d58d4bc-4be2-40ae-b248-c69f97059f9e', 'dfed4f9a-1166-3713-99d9-ba0a6073790e', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('44948370-d963-47d3-8de3-1b75c1b95609', '9d55628a-0085-3b88-a939-b7a327263f53', '86caed02-d112-3cd7-8f21-4836e4997850', 'hasDomainClass');
+INSERT INTO relations VALUES ('e4be6807-9e09-41b5-90e3-49c4b1cdc233', '86caed02-d112-3cd7-8f21-4836e4997850', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
+INSERT INTO relations VALUES ('071c6640-d053-4207-9211-a02803bde093', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'cb739b74-45d4-37be-98b6-b25ea041218a', 'hasDomainClass');
+INSERT INTO relations VALUES ('2fa40a96-d20f-425b-8dbb-3ff5cd3efdfb', 'cb739b74-45d4-37be-98b6-b25ea041218a', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('d4d68a2f-db97-41c9-b0db-5e06d91ea1d7', '9d55628a-0085-3b88-a939-b7a327263f53', '014fefdb-ddad-368b-b69c-951a0763824d', 'hasDomainClass');
+INSERT INTO relations VALUES ('41ba10ed-35ed-4513-8c39-5efb775a23e9', '014fefdb-ddad-368b-b69c-951a0763824d', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('94f82955-46ea-48fd-82ac-ef40720df7fe', '9d55628a-0085-3b88-a939-b7a327263f53', 'a00b04f9-5853-3359-90cd-e863df4c4d68', 'hasDomainClass');
+INSERT INTO relations VALUES ('bf9069e5-a6a8-427f-a193-826184bd4a04', 'a00b04f9-5853-3359-90cd-e863df4c4d68', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('63c61444-3691-4aa3-9587-3cf92bc9a5d4', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '697dc6cc-0da6-301c-9703-78edbf812fac', 'subPropertyOf');
+INSERT INTO relations VALUES ('da45aecf-c9ed-499a-ad12-38c93f52d9b8', '12f08da7-e25c-3e10-8179-62ed76da5da0', '697dc6cc-0da6-301c-9703-78edbf812fac', 'hasDomainClass');
+INSERT INTO relations VALUES ('ae740161-b084-4981-af6b-0e2860c0676f', '697dc6cc-0da6-301c-9703-78edbf812fac', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', 'hasRangeClass');
+INSERT INTO relations VALUES ('d1b89a46-95b3-4d00-b790-7d76563fa4c3', '89403c67-0097-311d-b3f4-eeb45e98020f', '1bad9598-520c-36c3-9116-44e24129f3e0', 'subPropertyOf');
+INSERT INTO relations VALUES ('59f5c5fa-a4c1-4070-8627-1714c42dea59', '19e2c4fb-70b7-3913-be69-1c824a0bf23f', '1bad9598-520c-36c3-9116-44e24129f3e0', 'hasDomainClass');
+INSERT INTO relations VALUES ('bef074ae-2997-4df8-a290-95db18d3db5d', '1bad9598-520c-36c3-9116-44e24129f3e0', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('38bf4d87-bdcf-4165-82c3-00466687af48', '12f08da7-e25c-3e10-8179-62ed76da5da0', '900165c3-a630-3b9c-bb0b-572df34ea3e6', 'hasDomainClass');
+INSERT INTO relations VALUES ('41315621-672e-473f-81e7-6dc300d163d2', '900165c3-a630-3b9c-bb0b-572df34ea3e6', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('25236b2a-5756-43ce-a1e8-d970420a9275', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'b16ef45e-a699-3d18-9a14-75c743895d14', 'hasDomainClass');
+INSERT INTO relations VALUES ('5ff83f2c-8c19-4be3-84c6-c74b7a6df838', 'b16ef45e-a699-3d18-9a14-75c743895d14', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('bab72548-784c-43a2-9526-588321e45d70', 'bdf5f93e-589c-3c63-baad-e108520c4072', '26af9ec1-e169-3486-9bb5-3c8187784c8e', 'hasDomainClass');
+INSERT INTO relations VALUES ('e534237e-fc2a-434f-b1a2-4a2ff95a9d32', '26af9ec1-e169-3486-9bb5-3c8187784c8e', '30c58f1c-03f4-36f8-9f50-4fefc84bb0a6', 'hasRangeClass');
+INSERT INTO relations VALUES ('34fb945c-bdef-440f-8297-6282b5f00e8e', 'bdf5f93e-589c-3c63-baad-e108520c4072', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'hasDomainClass');
+INSERT INTO relations VALUES ('cc54c785-7130-4a37-8e2f-2bc5379ce216', '166f17e8-15b8-3abc-bba7-7a56c364bf42', 'c1f0e36c-770f-30f9-8241-30d44921c6c8', 'hasRangeClass');
+INSERT INTO relations VALUES ('3d019e88-85c1-48b0-92c1-dec547435840', 'c1f0e36c-770f-30f9-8241-30d44921c6c8', '4beb6f38-12e5-35b5-99b2-283c924db270', 'hasDomainClass');
+INSERT INTO relations VALUES ('6c544360-9e22-4e22-af8c-8887a475a60c', '4beb6f38-12e5-35b5-99b2-283c924db270', 'bdf5f93e-589c-3c63-baad-e108520c4072', 'hasRangeClass');
+INSERT INTO relations VALUES ('958c5a25-c1af-4213-b9f6-3b9cf689b22e', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'subPropertyOf');
+INSERT INTO relations VALUES ('9eefe628-875c-49cc-80b2-9ba31d2bd6fc', '255bba42-8ffb-3796-9caa-807179a20d9a', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'hasDomainClass');
+INSERT INTO relations VALUES ('6c0f1609-477b-49c7-95d1-b524200e47aa', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
+INSERT INTO relations VALUES ('c7f934e2-b0a5-4652-87d9-4437fb66407e', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '92388748-e308-3295-9140-6974beab1611', 'subPropertyOf');
+INSERT INTO relations VALUES ('b2718aa7-7375-477c-bb47-e3571478e70e', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '92388748-e308-3295-9140-6974beab1611', 'hasDomainClass');
+INSERT INTO relations VALUES ('ea142afd-3630-4a0d-ae41-e9af8b9d6110', '92388748-e308-3295-9140-6974beab1611', '255bba42-8ffb-3796-9caa-807179a20d9a', 'hasRangeClass');
+INSERT INTO relations VALUES ('653b6515-57f4-4100-a937-13bf24e9a0c8', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f865c72a-09dd-386f-a9eb-385176727d94', 'subPropertyOf');
+INSERT INTO relations VALUES ('71957fa7-0525-4cc4-8853-6cc634d980a9', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', 'f865c72a-09dd-386f-a9eb-385176727d94', 'hasDomainClass');
+INSERT INTO relations VALUES ('bf4e66df-d705-4c7a-9041-797b8bb478a2', 'f865c72a-09dd-386f-a9eb-385176727d94', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
+INSERT INTO relations VALUES ('396f3d4b-7174-4a57-8b70-adac883ae281', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '28bd339b-43e4-3671-add8-6a48fad8593e', 'subPropertyOf');
+INSERT INTO relations VALUES ('51770a54-eef6-4a4f-bed9-fed3ec3e9596', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '28bd339b-43e4-3671-add8-6a48fad8593e', 'hasDomainClass');
+INSERT INTO relations VALUES ('8e6d26ee-be89-47e8-b6a5-5c1e5f3db17a', '28bd339b-43e4-3671-add8-6a48fad8593e', '064e52a9-ae25-33fc-9c59-ad7ecbee3d42', 'hasRangeClass');
+INSERT INTO relations VALUES ('891a7b1b-e98d-4b68-ae79-40492a87504c', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'subPropertyOf');
+INSERT INTO relations VALUES ('7ac31632-ea7a-4fb4-9c23-1ee5668fe5ed', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'hasDomainClass');
+INSERT INTO relations VALUES ('ae6e10f8-7da8-4b0d-8c96-0d8a03f365c0', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'hasRangeClass');
+INSERT INTO relations VALUES ('e31bdee4-72db-4d27-a7d8-129b09268c8a', '92388748-e308-3295-9140-6974beab1611', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'subPropertyOf');
+INSERT INTO relations VALUES ('9c4d8196-900d-4c81-93a6-03eaf951a80c', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'hasDomainClass');
+INSERT INTO relations VALUES ('961d5c03-c429-48e0-af34-e6c8410cf830', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', 'ec30d38a-0102-3a93-a31a-d596fb6def0b', 'hasRangeClass');
+INSERT INTO relations VALUES ('844abf74-60a2-46cd-b6ca-61aec312e751', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'subPropertyOf');
+INSERT INTO relations VALUES ('9a3a3134-9257-4718-89ab-975da20e8cca', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', '9623a310-4d14-33dc-ae6e-10fb48062af5', 'hasDomainClass');
+INSERT INTO relations VALUES ('14de460c-f4a2-437d-b652-fdcba1aeb33e', '9623a310-4d14-33dc-ae6e-10fb48062af5', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('804a6951-7801-4940-82e7-b5be9cb59430', '92388748-e308-3295-9140-6974beab1611', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'subPropertyOf');
+INSERT INTO relations VALUES ('6d404453-b7aa-4908-a081-5b38da2e1b76', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', 'hasDomainClass');
+INSERT INTO relations VALUES ('c1ba6a81-bcf6-4a69-807c-bf2a0978c866', '7ac8a478-498b-37ce-900d-e8f0f3b4d117', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('f5455f43-38d6-45cf-8e62-0a7dff5b118c', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '9e806e49-e728-32cf-821e-504ca9916afc', 'subPropertyOf');
+INSERT INTO relations VALUES ('1826a063-5da9-4b53-a17d-4bc9bd016107', '07fcf604-d28f-3993-90fa-d301c4004913', '9e806e49-e728-32cf-821e-504ca9916afc', 'hasDomainClass');
+INSERT INTO relations VALUES ('7543216f-1a88-4f4f-ae71-78bcbbf44c7b', '9e806e49-e728-32cf-821e-504ca9916afc', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('913df88c-9579-44ad-bb3c-dcac05614cc8', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'subPropertyOf');
+INSERT INTO relations VALUES ('92267589-daeb-4d49-b4d5-661eb093f6c9', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', 'hasDomainClass');
+INSERT INTO relations VALUES ('06724113-85d0-4a75-b90b-be1724c9a559', 'cbc37737-f587-3e4d-b28d-dec02e7f9f3b', '07fcf604-d28f-3993-90fa-d301c4004913', 'hasRangeClass');
+INSERT INTO relations VALUES ('f8b6bcf7-7973-4a33-96b1-5b85cd581d5c', '07fcf604-d28f-3993-90fa-d301c4004913', '19c3c1bf-e443-3f89-a366-d3e8c645a546', 'hasDomainClass');
+INSERT INTO relations VALUES ('69d6f7b6-270a-47da-a074-cebbec3eac7a', '19c3c1bf-e443-3f89-a366-d3e8c645a546', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('2539322f-b2b0-4067-995a-bbea138653c5', '9ff08a71-8094-35ed-9005-d94abddefdfe', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', 'hasDomainClass');
+INSERT INTO relations VALUES ('277110af-06e4-40ad-9096-8c7ba64ff2ae', '381221b3-7c31-3ea7-a6ac-29e7efc9095e', '07fcf604-d28f-3993-90fa-d301c4004913', 'hasRangeClass');
+INSERT INTO relations VALUES ('49064e54-bb53-401e-bf57-13d9f2329b2e', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'subPropertyOf');
+INSERT INTO relations VALUES ('6a4bd5bf-7bc2-4858-b2cd-2fac125aafda', '07fcf604-d28f-3993-90fa-d301c4004913', 'c511a177-3e0b-3a90-babe-e951f56f18d1', 'hasDomainClass');
+INSERT INTO relations VALUES ('998d73b8-d31b-48df-80e8-c50f2b407ad8', 'c511a177-3e0b-3a90-babe-e951f56f18d1', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('799387f5-2ec9-4278-b2e4-ebf0b5ab3632', '92388748-e308-3295-9140-6974beab1611', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'subPropertyOf');
+INSERT INTO relations VALUES ('198a84b0-adee-4fcb-80f2-64d6c3e016ff', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', 'hasDomainClass');
+INSERT INTO relations VALUES ('fbbf1647-6d8b-4797-b33c-0c68da4e21fb', 'f0bd1c0f-3d0d-3eb8-996f-b240a7b24824', '07fcf604-d28f-3993-90fa-d301c4004913', 'hasRangeClass');
+INSERT INTO relations VALUES ('0b56d174-50c6-4f63-81c4-6bfe60b03782', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'subPropertyOf');
+INSERT INTO relations VALUES ('cd958b22-255d-4493-b87b-2d1460a9251b', 'f865c72a-09dd-386f-a9eb-385176727d94', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'subPropertyOf');
+INSERT INTO relations VALUES ('5a3f8a4e-d17c-421e-8abc-fd69bd0df5d0', '8bba5cfd-675d-3899-8c95-03b2de2a0a31', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', 'hasDomainClass');
+INSERT INTO relations VALUES ('9b067be6-d7b4-4629-9a2e-9167f5822441', '9a1d1b8c-4dde-3258-83d2-9a1ebe1a541e', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('716a2419-9c42-4e6c-bf38-2ec6a9271440', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '78d02711-1e0a-3448-9bef-518d6039f63f', 'subPropertyOf');
+INSERT INTO relations VALUES ('be29747b-877a-4e27-b589-8e08e2896075', '28bd339b-43e4-3671-add8-6a48fad8593e', '78d02711-1e0a-3448-9bef-518d6039f63f', 'subPropertyOf');
+INSERT INTO relations VALUES ('a78c221c-653c-4076-bf79-82423e3e5c1e', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '78d02711-1e0a-3448-9bef-518d6039f63f', 'hasDomainClass');
+INSERT INTO relations VALUES ('c680f99b-4f96-458d-a435-5f5fd97a7e46', '78d02711-1e0a-3448-9bef-518d6039f63f', '8bba5cfd-675d-3899-8c95-03b2de2a0a31', 'hasRangeClass');
+INSERT INTO relations VALUES ('8a96368c-9893-4f94-9ec3-66cf5fd24410', 'f865c72a-09dd-386f-a9eb-385176727d94', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'subPropertyOf');
+INSERT INTO relations VALUES ('06032c6e-a2da-4210-8cb7-21aac98f54c8', '725afd13-ebc5-38a8-815b-d3a1e5510698', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', 'hasDomainClass');
+INSERT INTO relations VALUES ('62e590a0-8678-419a-a811-67f171a3410a', 'b0ed382c-8dcc-3b98-845b-c22620d5633f', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('b0d33429-3625-4667-a85f-b427cc405b6c', '28bd339b-43e4-3671-add8-6a48fad8593e', '72248902-0df0-3571-a980-203a75528b5e', 'subPropertyOf');
+INSERT INTO relations VALUES ('5dcf28b4-b91f-4a2e-b0f2-9aabfd7c94c5', '9ff08a71-8094-35ed-9005-d94abddefdfe', '72248902-0df0-3571-a980-203a75528b5e', 'hasDomainClass');
+INSERT INTO relations VALUES ('aca02596-5f05-41b6-8f97-96f257aeba71', '72248902-0df0-3571-a980-203a75528b5e', '725afd13-ebc5-38a8-815b-d3a1e5510698', 'hasRangeClass');
+INSERT INTO relations VALUES ('af6658ca-1afb-4df3-a256-2ec337243c14', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'hasDomainClass');
+INSERT INTO relations VALUES ('f7cf4460-794e-49e4-9fbe-1baa16800327', 'f8b28fad-0fae-3a0b-a688-8a2c259bb214', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('994b367d-83d9-4478-8c2f-085239dd2a38', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', 'hasDomainClass');
+INSERT INTO relations VALUES ('8c7876a6-3679-4b3e-b6f6-cf5573bd0340', 'efa1ef96-7d50-3d2f-8395-a401a64934d3', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
+INSERT INTO relations VALUES ('27ab9619-93dd-4895-8947-7fd265e96428', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '8c69765e-7827-371f-9db3-fea290f87739', 'subPropertyOf');
+INSERT INTO relations VALUES ('8067c066-e7c0-4dcb-a4ea-fd64df2004a3', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '8c69765e-7827-371f-9db3-fea290f87739', 'hasDomainClass');
+INSERT INTO relations VALUES ('9f20dd2f-6f3e-4a42-9f55-dbc257e355a8', '8c69765e-7827-371f-9db3-fea290f87739', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'hasRangeClass');
+INSERT INTO relations VALUES ('450f151e-1b14-4366-983f-1a5a650ead3e', '89403c67-0097-311d-b3f4-eeb45e98020f', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'subPropertyOf');
+INSERT INTO relations VALUES ('817f6bff-1c98-41bd-b71b-3f1174b2f957', '48a1d09d-dc16-3903-9ad0-f2eba8b79b20', 'a35c0d79-ac31-3778-8614-a11f0419d131', 'hasDomainClass');
+INSERT INTO relations VALUES ('f5351902-681a-4e28-9cf9-cbabd50c8ef0', 'a35c0d79-ac31-3778-8614-a11f0419d131', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'hasRangeClass');
+INSERT INTO relations VALUES ('7658546e-8dc2-4cd1-84b6-7be3c612b7a4', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'hasDomainClass');
+INSERT INTO relations VALUES ('bda3036d-ed6a-4f1e-a944-77d87ba59f58', '0fcef1a0-49b7-37cb-90c7-51dcf2cd86d7', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('735b1e77-53a0-4a0a-8f91-3a39abc335e3', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '151b036f-ded8-3b43-898e-e4008bdad1e2', 'hasDomainClass');
+INSERT INTO relations VALUES ('fb0b64d2-fb9f-4e80-813e-72e05d4584a5', '151b036f-ded8-3b43-898e-e4008bdad1e2', '558bfc6c-03fc-3f1a-81d2-95493448d4a9', 'hasRangeClass');
+INSERT INTO relations VALUES ('cefb3302-da78-4cd5-91b4-cb7851d9d144', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'hasDomainClass');
+INSERT INTO relations VALUES ('1e323e50-8255-441b-9c15-015379c14a8d', 'e091bc5e-86c9-328a-8c1c-deabe778c821', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'hasRangeClass');
+INSERT INTO relations VALUES ('8cfdc733-b8d0-4ed3-a412-dadf564a6a2d', 'e02834c9-ae10-3659-a8e5-ccfdc1866e87', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', 'hasDomainClass');
+INSERT INTO relations VALUES ('2e8ff8b3-be0b-4316-b949-81fc3d78c221', 'c9658c88-12f1-315b-a6ce-c28b4e706fd9', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'hasRangeClass');
+INSERT INTO relations VALUES ('3cdc77ad-ac54-47b4-b40e-6693fbdd8af3', '78b224a2-9271-3716-8c2e-c82302cdae9c', '140073c4-60b5-352d-a5f7-244072fc4086', 'hasDomainClass');
+INSERT INTO relations VALUES ('ac676ee1-cea8-452f-8580-d04777cf6ccf', '140073c4-60b5-352d-a5f7-244072fc4086', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('298cab29-c378-4f8d-96f6-3c921da5b39a', 'af051b0a-be2f-39da-8f46-429a714e242c', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', 'hasDomainClass');
+INSERT INTO relations VALUES ('9221fc94-cf5e-475a-b69c-270bc562f625', '049f6254-936e-347a-a2b6-a3cc1ec5a7cc', '78b224a2-9271-3716-8c2e-c82302cdae9c', 'hasRangeClass');
+INSERT INTO relations VALUES ('aa3d46a5-e101-47b3-b9ac-785c8fbaeb01', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'hasDomainClass');
+INSERT INTO relations VALUES ('55a08f70-f1f2-4b4a-8d82-53efbbc81e93', 'f677091c-aa91-3851-8aa1-1225980d5e02', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
+INSERT INTO relations VALUES ('16011409-e9ab-40d2-9161-ba9223a17a97', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', 'hasDomainClass');
+INSERT INTO relations VALUES ('e91c66f4-02e2-4eca-bd59-6cd50f336289', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
+INSERT INTO relations VALUES ('9b9ee8e4-b60a-4156-8ac7-e032925b2ec4', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'hasDomainClass');
+INSERT INTO relations VALUES ('9a01fea9-7333-47b3-979b-913cd86ca88c', 'f24003c3-0d20-3703-b044-9ed3ee42da07', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('27b830ed-c665-4536-9c60-8e37e7d5704f', 'af051b0a-be2f-39da-8f46-429a714e242c', '340b1b73-f4b7-3350-95fe-b037454ae21c', 'hasDomainClass');
+INSERT INTO relations VALUES ('fab6b3f6-7686-4b9c-b8a2-2e38b006cf49', '340b1b73-f4b7-3350-95fe-b037454ae21c', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('588e799f-a212-4cfc-8a95-8eb2b626bada', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '632197f8-15a2-32b6-9886-c93e587f5b64', 'subPropertyOf');
+INSERT INTO relations VALUES ('625c041a-2758-484a-b55f-d41e1d8249c4', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '632197f8-15a2-32b6-9886-c93e587f5b64', 'subPropertyOf');
+INSERT INTO relations VALUES ('77b1a6ba-b101-4a09-93ff-b7c388f58151', 'f27afcc0-7657-3c5e-8314-b913c562759e', '632197f8-15a2-32b6-9886-c93e587f5b64', 'hasDomainClass');
+INSERT INTO relations VALUES ('3bb18577-b8b6-49ef-b92c-b0e6cd529f1e', '632197f8-15a2-32b6-9886-c93e587f5b64', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('7bce3dda-0a61-4185-9898-03917af09c9e', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'subPropertyOf');
+INSERT INTO relations VALUES ('766d3655-4ac1-425d-bd34-9c1c47917600', '92388748-e308-3295-9140-6974beab1611', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'subPropertyOf');
+INSERT INTO relations VALUES ('a710c749-37fa-4056-8f46-543bd63f1cc8', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'hasDomainClass');
+INSERT INTO relations VALUES ('6c65d6fa-717b-408b-a427-d78589ccb5d5', 'c4297d36-8af0-3a9a-9dcf-0cfb6095341c', 'f27afcc0-7657-3c5e-8314-b913c562759e', 'hasRangeClass');
+INSERT INTO relations VALUES ('96d47141-ed2c-4103-bf8c-1d2f0d985ab8', '7a181c4e-57f4-3a6b-a9bf-f32f1fbb18dc', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'subPropertyOf');
+INSERT INTO relations VALUES ('57340cf2-7fc5-416b-8dec-6afab9012987', 'a9888169-3160-3403-a8a2-3fa260b1ad16', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'hasDomainClass');
+INSERT INTO relations VALUES ('f4f131e3-32a4-43ff-b58b-3c2d3c1f01e8', '4bc601ba-6daa-3474-82dc-e3a88fca0a93', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('c3c6de73-efc2-4206-a560-79eb290dcd7e', 'c97f21db-5aed-3dea-9209-a800985c0aa5', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'subPropertyOf');
+INSERT INTO relations VALUES ('d13d5e09-7dc8-4bb1-839b-f91668faea30', 'af051b0a-be2f-39da-8f46-429a714e242c', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'hasDomainClass');
+INSERT INTO relations VALUES ('e1ffc897-0dd8-4685-a48a-6981e13c42e6', '6849aeb3-a4cb-3942-8db5-ad9cb4af7034', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'hasRangeClass');
+INSERT INTO relations VALUES ('3a523a50-0493-4c6c-8399-96ead8cda59a', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '41f65567-9d44-371a-8806-03e08d332918', 'subPropertyOf');
+INSERT INTO relations VALUES ('19ba79d5-d1fc-42d3-8b9f-2963f531d7fb', '048fe43e-349a-3dda-9524-7046dcbf7287', '41f65567-9d44-371a-8806-03e08d332918', 'hasDomainClass');
+INSERT INTO relations VALUES ('7a6e76bf-9523-4323-94db-7b4cbad19bda', '41f65567-9d44-371a-8806-03e08d332918', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('c61c48bd-c3bd-4a30-81e1-08a5161b62e8', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'subPropertyOf');
+INSERT INTO relations VALUES ('284c79dc-5ac4-49dc-97f3-2eb0213b4ec4', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'c2182fd6-f019-3144-99a8-9d7f475f7388', 'hasDomainClass');
+INSERT INTO relations VALUES ('e54ba11b-0452-4ea9-8b39-73350ddf0271', 'c2182fd6-f019-3144-99a8-9d7f475f7388', '048fe43e-349a-3dda-9524-7046dcbf7287', 'hasRangeClass');
+INSERT INTO relations VALUES ('08cc88cf-51e9-433b-8b80-fd5e90d026a2', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'subPropertyOf');
+INSERT INTO relations VALUES ('520e1bdf-c6ce-4561-a166-a6a4d559c0d7', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'subPropertyOf');
+INSERT INTO relations VALUES ('04a64526-1070-4da3-9fc6-f9c7e0d34c1b', '048fe43e-349a-3dda-9524-7046dcbf7287', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', 'hasDomainClass');
+INSERT INTO relations VALUES ('d6c146f7-99a6-483d-afdd-f123ba563ef6', 'a80e1218-6520-3b92-babc-ce2d71c2ba8c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('16a1c444-d3cc-4201-9aba-47d55ed8010b', '526049ea-951e-39ba-87f9-749bea349fe5', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'subPropertyOf');
+INSERT INTO relations VALUES ('98969faa-9ff3-49be-8c46-4125c2cb41ba', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'subPropertyOf');
+INSERT INTO relations VALUES ('43a69fdf-c12a-4739-867f-e4e2775c7fa6', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', 'hasDomainClass');
+INSERT INTO relations VALUES ('1d18f3d7-4c4d-4bb6-9324-62b3d719d707', 'c690e060-6fae-3bc4-9c20-3d01a3e1b2ba', '048fe43e-349a-3dda-9524-7046dcbf7287', 'hasRangeClass');
+INSERT INTO relations VALUES ('3d990aa4-231f-4f93-919e-75adb5a995b9', '439f0684-5ebc-3227-93a5-ae9ebca7e015', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'subPropertyOf');
+INSERT INTO relations VALUES ('10f34b20-c6b0-4a33-8373-6160d9524c0a', '92a38250-9b25-3bc0-881b-89e778c0ac43', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'hasDomainClass');
+INSERT INTO relations VALUES ('d4c18510-9198-4076-b124-badee6846737', '87e930ce-8aef-3700-af96-dd4d420fdc0f', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', 'hasRangeClass');
+INSERT INTO relations VALUES ('07c525d0-397f-457e-93bc-e211c83518ed', '935d5751-75c2-3a9d-8af4-981ff3cf9e6e', '34359201-a879-316c-ae02-94f36ef88720', 'subPropertyOf');
+INSERT INTO relations VALUES ('4b0e3e9f-09c5-459d-b9cf-0621476e5ac9', 'a9f055a5-3cbd-3c24-9b90-b2d422fcdaa8', '34359201-a879-316c-ae02-94f36ef88720', 'hasDomainClass');
+INSERT INTO relations VALUES ('58b5cf6c-d378-44d5-8530-b693640355c5', '34359201-a879-316c-ae02-94f36ef88720', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'hasRangeClass');
+INSERT INTO relations VALUES ('6fea8089-a64c-486c-9505-7576c97c7af1', '99e8de0f-fa06-381d-8406-9d467d3f96b5', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'subPropertyOf');
+INSERT INTO relations VALUES ('11218716-01ea-41fd-bdd6-865ddbf765ae', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'f887076f-2375-38bd-b11c-e2511a59e0a2', 'hasDomainClass');
+INSERT INTO relations VALUES ('3d32c61a-eaba-4d83-9e8c-d3cd1651b5da', 'f887076f-2375-38bd-b11c-e2511a59e0a2', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('108e6f37-9771-40fe-825e-83beb1f81c68', '2b2fadd1-b230-3f16-a7fa-897a05c47d17', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'subPropertyOf');
+INSERT INTO relations VALUES ('22e72776-c971-4a78-ad0a-4b68730afd1c', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '501b9466-760d-31b7-8c39-50fe0d4553b3', 'hasDomainClass');
+INSERT INTO relations VALUES ('9a86236b-e20f-41d6-8d8f-85c5d43f0fe0', '501b9466-760d-31b7-8c39-50fe0d4553b3', '92a38250-9b25-3bc0-881b-89e778c0ac43', 'hasRangeClass');
+INSERT INTO relations VALUES ('da5aee60-f1d9-4154-a3d3-2220c155402d', '70064b58-4490-3d09-b463-fd18defae21f', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', 'hasDomainClass');
+INSERT INTO relations VALUES ('da32004f-cdb2-407a-8026-06fa54b647eb', 'a9837ed9-5ff8-34ae-907d-2dba6012e877', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('10311cd4-dd61-4e34-a03b-9be30850a03e', '70064b58-4490-3d09-b463-fd18defae21f', '8687cd99-3201-3f8f-bb1c-241732242a8f', 'hasDomainClass');
+INSERT INTO relations VALUES ('17b372cb-ed01-4fb0-aff5-3841fea7ae77', '8687cd99-3201-3f8f-bb1c-241732242a8f', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('d92f3a93-02d3-4d94-bc19-77de61347fe0', '70064b58-4490-3d09-b463-fd18defae21f', '0d28bdef-9003-370d-9d95-9c28865c133e', 'hasDomainClass');
+INSERT INTO relations VALUES ('4185f603-0170-4d94-be33-79de952d99b0', '0d28bdef-9003-370d-9d95-9c28865c133e', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('298a3b36-e872-48a8-9dfa-8b0a691d3107', '70064b58-4490-3d09-b463-fd18defae21f', '61861fca-6102-3151-af0c-599e14e7a93a', 'hasDomainClass');
+INSERT INTO relations VALUES ('33c71d06-8d81-4201-a5f8-c358119a5dbb', '61861fca-6102-3151-af0c-599e14e7a93a', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('98fc5162-20e9-4d59-89e0-bd1c74522929', '70064b58-4490-3d09-b463-fd18defae21f', 'dab5e797-c679-397a-90a0-e10979c1346f', 'hasDomainClass');
+INSERT INTO relations VALUES ('a4168510-2b4e-4804-a6b9-e6bd5031c8b2', 'dab5e797-c679-397a-90a0-e10979c1346f', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('08c73969-9177-4c3e-a6b2-1bcdd9e2a2e4', '70064b58-4490-3d09-b463-fd18defae21f', '740ab790-feb0-3700-8922-f152320272a5', 'hasDomainClass');
+INSERT INTO relations VALUES ('45e1dd8d-183c-4c4e-9a09-b4c96590523c', '740ab790-feb0-3700-8922-f152320272a5', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('0dea7c94-a2b8-4f65-81fc-dda6a8c1dbcf', '70064b58-4490-3d09-b463-fd18defae21f', '154ea871-9290-35a3-bf75-9a4029c78721', 'hasDomainClass');
+INSERT INTO relations VALUES ('9a996e5a-2eb3-4bf5-aeaf-a10955ee371c', '154ea871-9290-35a3-bf75-9a4029c78721', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('ffab8ea9-1546-47f2-a389-72b52a81cf3d', '70064b58-4490-3d09-b463-fd18defae21f', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', 'hasDomainClass');
+INSERT INTO relations VALUES ('cdcee1cd-b352-4511-884e-a0c1282c0d99', 'b4b2a280-ac3e-3e4b-b3d2-a6fef7742a0a', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('16d93064-f5c0-4216-991f-da150986927c', '70064b58-4490-3d09-b463-fd18defae21f', '715dd995-2c63-3432-a195-845a3d19abed', 'hasDomainClass');
+INSERT INTO relations VALUES ('0bfafb6a-ecd4-40fb-80ee-be40c316a5f3', '715dd995-2c63-3432-a195-845a3d19abed', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('633422c8-2070-40ec-b0cc-e60ea69c48da', '70064b58-4490-3d09-b463-fd18defae21f', '8b7a9392-ce48-360e-b28a-c01d70eaf672', 'hasDomainClass');
+INSERT INTO relations VALUES ('4b5a1c82-a69b-4a1b-a8ba-a855f33c4322', '8b7a9392-ce48-360e-b28a-c01d70eaf672', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('c368bdd3-d3b2-4a99-9997-66edbb16935e', '70064b58-4490-3d09-b463-fd18defae21f', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', 'hasDomainClass');
+INSERT INTO relations VALUES ('e289a6ac-fe44-4169-afc3-03569ffce970', 'b36aa92e-1648-3945-8ff7-2a742dc309e6', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('ec4a715c-32c2-4230-b307-b71e79b009da', '70064b58-4490-3d09-b463-fd18defae21f', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', 'hasDomainClass');
+INSERT INTO relations VALUES ('f19b4a1b-f38f-4708-a47b-01c4199e361a', '911a2bbd-3ef6-30dc-afea-ae2e80d4fac8', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('b42dae26-1511-4112-a730-35b5c7dd4d7c', '70064b58-4490-3d09-b463-fd18defae21f', '781d59a3-2a3a-36cb-be4f-516b2331ba85', 'hasDomainClass');
+INSERT INTO relations VALUES ('ea9a5e01-3c43-4923-b7bd-4997559db25a', '781d59a3-2a3a-36cb-be4f-516b2331ba85', '70064b58-4490-3d09-b463-fd18defae21f', 'hasRangeClass');
+INSERT INTO relations VALUES ('63f66e23-e6f3-4c34-abbf-9b69b60fed98', '12f08da7-e25c-3e10-8179-62ed76da5da0', '74e69af6-6a10-32be-91d3-50dd33b7876b', 'hasDomainClass');
+INSERT INTO relations VALUES ('530d5435-1ff2-4b9a-b76c-d8c278710c20', '74e69af6-6a10-32be-91d3-50dd33b7876b', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('bd63c8e5-de0f-40f5-a1cd-727df20e10fc', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'da6e698d-cb4e-31ae-8ef4-c0a219a35673', 'hasDomainClass');
+INSERT INTO relations VALUES ('edb0c743-c053-4ab6-b9e1-97c6fd9e194a', 'da6e698d-cb4e-31ae-8ef4-c0a219a35673', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('f5ad74e7-1d64-4849-9d09-3f6a87f5a87e', 'c2b2aac9-2434-3e1e-b4a4-52a7a317ff72', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'subPropertyOf');
+INSERT INTO relations VALUES ('6f54e87c-0176-4121-9ecb-f11e76602f3a', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'hasDomainClass');
+INSERT INTO relations VALUES ('33fc040a-fe21-49bf-b0bd-23a65e21f410', '50bbc81a-fe17-3469-a055-6c821ed66db1', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
+INSERT INTO relations VALUES ('d4fdf8b6-f532-4a05-b55e-734e962ec557', '92388748-e308-3295-9140-6974beab1611', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'subPropertyOf');
+INSERT INTO relations VALUES ('00821b9b-74b5-475b-abc8-e52d1fc8821b', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', 'hasDomainClass');
+INSERT INTO relations VALUES ('f5c92598-e7fd-44f7-b9a2-7fbe0d393fec', 'fa94fd3f-0d86-3b51-a330-9d9560478c19', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'hasRangeClass');
+INSERT INTO relations VALUES ('0e9f8a8e-dc4b-4bc6-b7cf-35c8a3768ed2', 'f865c72a-09dd-386f-a9eb-385176727d94', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'subPropertyOf');
+INSERT INTO relations VALUES ('ee71ac32-61fb-4201-b475-81d0f86d6d6c', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'hasDomainClass');
+INSERT INTO relations VALUES ('b23cea5a-0cbd-4ff9-8f89-2590ed266974', '98e3e69e-6101-3510-9a8c-7c11e279fd95', 'af1d24cc-428c-3689-bbd1-726d62ec5595', 'hasRangeClass');
+INSERT INTO relations VALUES ('695e732c-4f4f-4f91-b85c-a4874d044b2d', '28bd339b-43e4-3671-add8-6a48fad8593e', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'subPropertyOf');
+INSERT INTO relations VALUES ('827535d5-7511-40dc-85d2-50961c769144', 'af1d24cc-428c-3689-bbd1-726d62ec5595', '7c4e440c-c11a-3805-8b96-f7e8f4659252', 'hasDomainClass');
+INSERT INTO relations VALUES ('d687cc52-0c1f-46d6-801e-53751e431ce0', '7c4e440c-c11a-3805-8b96-f7e8f4659252', '32b1fbb2-0f12-3f63-9f7e-c1d4026aae57', 'hasRangeClass');
+INSERT INTO relations VALUES ('d6bceea2-0811-44fb-b393-3649118583fc', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'hasDomainClass');
+INSERT INTO relations VALUES ('4865394f-4e84-42bf-a6b9-ff118754fdc7', 'c1eee83b-8cd1-31e6-adf3-0ce296815ba8', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('3b53d61a-9ba0-4ea6-9400-31257fc1c889', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', 'hasDomainClass');
+INSERT INTO relations VALUES ('e9fed3fa-863e-45f3-b4a8-15297bc93da3', '3e9f6d59-9eaa-3513-99f5-27b6d6fb95c0', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('47bc5526-915f-4c27-9938-c036494f1946', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', '8bfff662-9024-325a-a23a-b3c9bf509031', 'hasDomainClass');
+INSERT INTO relations VALUES ('4a96f19f-03e6-4c2c-ad2a-33094408ed3b', '8bfff662-9024-325a-a23a-b3c9bf509031', '15afdb47-2e96-3076-8a28-ec86a8fe4674', 'hasRangeClass');
+INSERT INTO relations VALUES ('167062aa-37da-43df-ac5e-79293259480b', '15afdb47-2e96-3076-8a28-ec86a8fe4674', '47e28679-c612-3f90-b494-61b97c407f20', 'hasDomainClass');
+INSERT INTO relations VALUES ('d9134b6c-2ade-45db-8707-d13889726a3f', '47e28679-c612-3f90-b494-61b97c407f20', 'ecb59937-c663-313c-bfbb-7f56c7ab8c81', 'hasRangeClass');
+INSERT INTO relations VALUES ('346aaf6b-eee5-47a8-83d3-1d77198c8e3d', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'hasDomainClass');
+INSERT INTO relations VALUES ('b72dac7b-a1c7-4c36-84eb-d3b56a51ab5d', '7fdc7c54-ac81-3275-b555-9d1508bad4f9', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('2413f911-26b8-4831-957b-1615e9a72df3', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'hasDomainClass');
+INSERT INTO relations VALUES ('8e49012e-01d5-4dbc-bf27-5b2ee85ca47d', '100d559e-7503-3a21-bd2a-2d959e8a5115', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('e6a8586d-2ee8-477b-b38b-8ba16c8e5c09', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '007dac32-df80-366b-88ce-02f4c1928537', 'subPropertyOf');
+INSERT INTO relations VALUES ('04376437-51f0-4562-8212-ce9894a6f985', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '007dac32-df80-366b-88ce-02f4c1928537', 'hasDomainClass');
+INSERT INTO relations VALUES ('74e2d10c-7fad-4894-b1d1-24b283a5ca72', '007dac32-df80-366b-88ce-02f4c1928537', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
+INSERT INTO relations VALUES ('6a59a4e3-a926-4de7-a0aa-58ef2ed8698c', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'subPropertyOf');
+INSERT INTO relations VALUES ('e12cc525-25d6-4a55-a6c0-6a6fed9b7853', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', 'hasDomainClass');
+INSERT INTO relations VALUES ('f9bb587a-c065-4e77-92fb-daac1a1ee145', 'd6827900-cff1-30d3-b661-3e97fe79ff2d', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('3c3259f1-6faf-414f-b76d-237e3e26e5c0', '629ed771-13e7-397e-8345-69f6cfb3db30', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'subPropertyOf');
+INSERT INTO relations VALUES ('5d11a2d2-d0ed-40bf-b3eb-c77338cdf252', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'hasDomainClass');
+INSERT INTO relations VALUES ('99eb5219-9d30-4926-b51a-14706170f453', 'c0db66c7-ce95-3f85-a2e3-914a7004c9cc', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('a08ea160-2764-4b96-b7ca-8bf42f2fb9db', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'subPropertyOf');
+INSERT INTO relations VALUES ('1281cb5b-4c60-47fb-a4e7-add5eccf2e0c', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', 'hasDomainClass');
+INSERT INTO relations VALUES ('0aa7663a-984c-45c7-a148-80bed1e47fa7', 'ad07bffb-5d06-33b6-9c45-db33ce2dff15', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'hasRangeClass');
+INSERT INTO relations VALUES ('35ddec06-c0b7-4c21-8bcc-7bafb2410609', 'c185435d-2391-302f-b892-687406865462', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'subPropertyOf');
+INSERT INTO relations VALUES ('36e5713e-9b0b-49e1-a71b-df57647c7bf0', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', 'hasDomainClass');
+INSERT INTO relations VALUES ('e776a54a-04c4-4698-bc8e-692f96749ca2', 'd6d729ca-ad20-3897-afaa-8427d5771c3f', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
+INSERT INTO relations VALUES ('d2e6bc24-12bf-4d1a-a55b-4a978f3a693b', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', '658d04df-450c-3044-82f1-8f47cc5eecb2', 'hasDomainClass');
+INSERT INTO relations VALUES ('8f31ba55-dcd4-4a61-9410-ae12cebc329a', '658d04df-450c-3044-82f1-8f47cc5eecb2', '8c2720ca-5c3f-3dd0-af7c-cf217f64babb', 'hasRangeClass');
+INSERT INTO relations VALUES ('b75bbd7a-8e8c-450d-9554-2d65c1486ea9', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'subPropertyOf');
+INSERT INTO relations VALUES ('3edb60bb-53ed-41da-9687-9f9631eaabf6', 'af051b0a-be2f-39da-8f46-429a714e242c', '68dd1374-d854-3b4e-bca3-95d41675fb2f', 'hasDomainClass');
+INSERT INTO relations VALUES ('94da3602-a7d5-4d12-9344-5fba4f39c3c1', '68dd1374-d854-3b4e-bca3-95d41675fb2f', '6f38d2ca-e114-33a0-b4db-4f298e53be3d', 'hasRangeClass');
+INSERT INTO relations VALUES ('f63f0d81-6284-470d-adb5-6027af4e0339', '89403c67-0097-311d-b3f4-eeb45e98020f', '6431b808-3267-360f-b592-38eff1ad552f', 'subPropertyOf');
+INSERT INTO relations VALUES ('18ec0095-6974-400a-bfc3-984b5a1ea536', '6f38d2ca-e114-33a0-b4db-4f298e53be3d', '6431b808-3267-360f-b592-38eff1ad552f', 'hasDomainClass');
+INSERT INTO relations VALUES ('a7ebd585-c82d-4f81-9000-25f4b96dfbe4', '6431b808-3267-360f-b592-38eff1ad552f', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('c148593b-f275-4464-92ed-b365adbc0a90', '94ffd715-18f7-310a-bee2-010d800be058', '50060723-772d-3974-864e-8f8c326f169d', 'hasDomainClass');
+INSERT INTO relations VALUES ('a0dd28ea-4b99-45a3-8c84-7ac49c4bc6c0', '50060723-772d-3974-864e-8f8c326f169d', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('25b62a3c-825f-4adc-963f-7cd87d014517', '94ffd715-18f7-310a-bee2-010d800be058', '95473150-07f2-3967-88f3-20b803dd239d', 'hasDomainClass');
+INSERT INTO relations VALUES ('34f403b3-3bc2-4de4-9cc8-a77f8544ec56', '95473150-07f2-3967-88f3-20b803dd239d', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('876f372c-37a8-4047-a8fb-33ef4026c8bd', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'subPropertyOf');
+INSERT INTO relations VALUES ('00bda0f3-ca2c-480d-a26a-d00b7c3e2f54', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '1051349b-b0bf-3d88-8ab7-302c5c969197', 'hasDomainClass');
+INSERT INTO relations VALUES ('0625a61e-dfe0-49c1-b780-5402b18b2e91', '1051349b-b0bf-3d88-8ab7-302c5c969197', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('9324c676-6c3b-4fe7-9fb5-ce3ca1a504a0', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', '669d3c80-b736-3563-afd1-66c9a445754e', 'subPropertyOf');
+INSERT INTO relations VALUES ('e441d79d-fa4c-4294-8028-c239fc07606a', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', '669d3c80-b736-3563-afd1-66c9a445754e', 'hasDomainClass');
+INSERT INTO relations VALUES ('68d0e8ba-8da5-4a01-8935-6654c2deb492', '669d3c80-b736-3563-afd1-66c9a445754e', '6f647ebe-423c-3fbc-a3aa-be532a1fb772', 'hasRangeClass');
+INSERT INTO relations VALUES ('d3f7820f-c28b-4d95-a1b5-7c8025df55e1', '3d79fb08-357c-358a-a5ae-c9af6aa8051b', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'subPropertyOf');
+INSERT INTO relations VALUES ('1d906aed-2ef4-4bce-9e97-53081dd068a4', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'hasDomainClass');
+INSERT INTO relations VALUES ('204ff43a-7690-41bd-b939-56d92875022d', 'a84f68c6-b6c4-3a37-b069-e85b0b286489', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('4de44b54-5096-4c31-97df-ec93701cca35', '0bc86b34-c3bf-31b5-8bf5-d3f3199635de', '939b25e8-e272-312a-9803-cb1152535f68', 'subPropertyOf');
+INSERT INTO relations VALUES ('3ca05b2f-4bde-4334-a9f4-e58f59337bdc', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '939b25e8-e272-312a-9803-cb1152535f68', 'hasDomainClass');
+INSERT INTO relations VALUES ('df87e66b-57a9-4f34-b8ab-c32f9a393245', '939b25e8-e272-312a-9803-cb1152535f68', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'hasRangeClass');
+INSERT INTO relations VALUES ('b6468e23-50c9-49a7-a05d-5e6fd9664819', 'b9ec13a4-02ec-39f2-892d-970762c3f25d', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'subPropertyOf');
+INSERT INTO relations VALUES ('52457106-f7ab-4ff0-9586-19ef7b7179b3', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'hasDomainClass');
+INSERT INTO relations VALUES ('afb548fe-5d9e-41c2-8803-2f6c84576727', 'ec02e000-349e-35ec-8c4e-743dc12b5e6b', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('5ee78c99-cc0b-4fe4-bea8-572a9777b342', 'f1ae3345-8e86-37c0-8915-aa3bc3aa9d3c', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'subPropertyOf');
+INSERT INTO relations VALUES ('22ff158f-7fa3-4518-b6e4-b6b623fb38ce', 'c03db431-4564-34eb-ba86-4c8169e4276c', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', 'hasDomainClass');
+INSERT INTO relations VALUES ('a34e4de8-7e69-4dcc-a334-fc7fe3d7175b', '4442c71b-d0e8-3c62-abf7-5b76c5c8f5c0', '70c1d151-becb-38ad-a2b5-687c8a2e89cc', 'hasRangeClass');
+INSERT INTO relations VALUES ('cef7f028-ef71-462b-9f81-0ffc715246d4', '2f8fd82d-2679-3d69-b697-7efe545e76ab', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'subPropertyOf');
+INSERT INTO relations VALUES ('8d70daa9-c19c-40e3-a1ea-f33b6ff506de', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'hasDomainClass');
+INSERT INTO relations VALUES ('e4056ee7-6562-44c0-847b-3baa0369f42b', 'ada26737-46ff-3a34-8aed-7b70117c34aa', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('610b3d18-83c0-4ebd-ab1a-3454a45a0ad4', 'b386500c-c5ee-3bcd-9ec2-23f8976463ec', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'subPropertyOf');
+INSERT INTO relations VALUES ('6074ec0d-27dc-46bf-8cd8-a9ee3b3afaf8', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'hasDomainClass');
+INSERT INTO relations VALUES ('d8cca3b1-9f5c-4770-82be-f34b632e6cd9', 'b5cb150a-8663-359b-9f0b-e088f334e862', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('e73b2a9a-de2e-47ee-adf7-ff4842d27763', '629ed771-13e7-397e-8345-69f6cfb3db30', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'subPropertyOf');
+INSERT INTO relations VALUES ('5016c29f-af0c-4826-a333-1b6d72655ef3', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'hasDomainClass');
+INSERT INTO relations VALUES ('1f932a8a-86c4-4685-9114-306e3aecd578', 'bd92eefc-6385-33ba-b7c6-d37e1ee99ee7', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('80d6caf7-36ad-4db6-92ca-ee19ea1562db', '501d59a2-21cc-3c94-b043-7071cb9551d5', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'subPropertyOf');
+INSERT INTO relations VALUES ('a75b1d86-6a5d-419f-a863-b65a0608544c', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', 'hasDomainClass');
+INSERT INTO relations VALUES ('19c54033-14e6-4144-87fe-5991949a0a91', 'c66bfe5d-f3f6-3d5f-974f-e0c78a4f024c', '675b1b07-d25a-3539-b5d9-84ee73f3e39e', 'hasRangeClass');
+INSERT INTO relations VALUES ('834c2907-30fe-4bfc-b9be-06ffa7d61691', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'hasDomainClass');
+INSERT INTO relations VALUES ('32579b4d-26f4-4fd2-80cf-e25e005a20f5', 'b13335f9-b208-3363-af5a-2e79fb56f7cc', 'b43d4537-6674-37cb-af6e-834b5d63c978', 'hasRangeClass');
+INSERT INTO relations VALUES ('7b8f280b-f9cd-49e4-895b-b750738d59bb', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'hasDomainClass');
+INSERT INTO relations VALUES ('90ad1f93-5522-4a4a-8efd-c23240425e5e', '839c9e24-c1ab-34b4-94da-2efb1d32af01', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('c5bd7e3f-1213-4ef5-ba31-55c0f9cb9a3c', 'c03db431-4564-34eb-ba86-4c8169e4276c', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'hasDomainClass');
+INSERT INTO relations VALUES ('ae95d455-704c-430b-a9c0-813474bdbb17', '8dc78a68-fde8-34d1-a86e-40d2187fe316', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'hasRangeClass');
+INSERT INTO relations VALUES ('1a8731b2-daaf-46e3-bbd1-43e914cde60d', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'hasDomainClass');
+INSERT INTO relations VALUES ('dcf0bfcc-f2a5-4747-b174-edc167041b55', '90e33e9d-8647-3d3c-b55c-7579a5bd0ce2', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('ba41244d-ce12-4c65-b91c-28d121ed02e8', 'c03db431-4564-34eb-ba86-4c8169e4276c', '936cd63c-8307-3de9-a507-0f796fe07542', 'hasDomainClass');
+INSERT INTO relations VALUES ('2050f281-38d1-4c58-9792-0ca27a66f829', '936cd63c-8307-3de9-a507-0f796fe07542', 'fe1fa40b-7b56-3a38-bbd4-09112ce28eb3', 'hasRangeClass');
+INSERT INTO relations VALUES ('25c11ffc-5cb6-40c6-9b2a-462bc93c2759', 'b51b95ee-99b0-3847-80a0-50a2bd7d00e7', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'subPropertyOf');
+INSERT INTO relations VALUES ('1a203389-bf60-486b-be75-4f83ee23adb0', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', 'hasDomainClass');
+INSERT INTO relations VALUES ('1a3f200e-cc8d-4db0-8521-68e3eb6a0a8f', 'f4734d6b-f54c-3ec2-8c0e-5f98211b13bc', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
+INSERT INTO relations VALUES ('0cc4ec13-5b4d-4200-ab6f-8bbf86b7f6c0', '526049ea-951e-39ba-87f9-749bea349fe5', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'subPropertyOf');
+INSERT INTO relations VALUES ('f6b87f2b-a4a0-4e00-b9d4-a71925338e70', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', '1185b7bf-33f3-3451-b7b9-2d3caba52257', 'hasDomainClass');
+INSERT INTO relations VALUES ('def23230-ee5d-4c78-9391-19b5065c9142', '1185b7bf-33f3-3451-b7b9-2d3caba52257', '09c85414-85f5-336b-87e7-9e3f1a14faeb', 'hasRangeClass');
+INSERT INTO relations VALUES ('7b25347f-865b-419a-8b45-663bdce884d4', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'subPropertyOf');
+INSERT INTO relations VALUES ('9b1065cc-e7c2-4dcb-a6b6-903964b1c0bc', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'hasDomainClass');
+INSERT INTO relations VALUES ('67ce5340-54fe-4866-89a6-ca28b476be77', 'aac583c1-05e4-34fe-aac2-e9bbc9c6d8fd', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('68cea99e-ea68-433e-a5ab-51892e066e34', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'subPropertyOf');
+INSERT INTO relations VALUES ('52fdc0ee-5935-42ce-a965-c4126054484f', 'af051b0a-be2f-39da-8f46-429a714e242c', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'hasDomainClass');
+INSERT INTO relations VALUES ('b05b6aaa-2bb8-4b0c-ac84-fe4fda96a77a', '4ef098b9-187a-3e7a-a9e2-5c2042e8e775', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'hasRangeClass');
+INSERT INTO relations VALUES ('672c1b28-6455-49d7-87fb-f97bef10cf92', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '406ee11a-a430-386f-9087-30c28c677da6', 'subPropertyOf');
+INSERT INTO relations VALUES ('9100d25f-4e66-41d3-9ad6-84b1dfb88484', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', '406ee11a-a430-386f-9087-30c28c677da6', 'hasDomainClass');
+INSERT INTO relations VALUES ('bb105f12-6de9-4a2e-bbd2-94b4eb471027', '406ee11a-a430-386f-9087-30c28c677da6', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('391fae09-aa44-4498-ae2a-1bef6c722118', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '55e212ca-8ccb-3269-bf57-047a7927e388', 'subPropertyOf');
+INSERT INTO relations VALUES ('180bcb46-9173-41c7-86ee-d7fc52c0e498', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '55e212ca-8ccb-3269-bf57-047a7927e388', 'hasDomainClass');
+INSERT INTO relations VALUES ('460fc42f-1ad9-4ae0-a3b3-09c342eb2dcc', '55e212ca-8ccb-3269-bf57-047a7927e388', 'b4f509a5-bf1f-3b1b-875f-e4dade14f862', 'hasRangeClass');
+INSERT INTO relations VALUES ('6d231537-58f5-4961-af87-bd90d5418552', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'subPropertyOf');
+INSERT INTO relations VALUES ('a56f3119-ace9-4a51-9c31-a1ff491ee705', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'hasDomainClass');
+INSERT INTO relations VALUES ('fdf82f55-3689-4287-b3cd-f020c0970642', '7722c7a7-c2ff-3a33-8dd6-829c5b108191', 'af051b0a-be2f-39da-8f46-429a714e242c', 'hasRangeClass');
+INSERT INTO relations VALUES ('bd5e7189-9f85-4126-92a5-370f56bf70a7', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'subPropertyOf');
+INSERT INTO relations VALUES ('424b5753-66f0-4a3f-85d7-a9fa0879af4c', 'af051b0a-be2f-39da-8f46-429a714e242c', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', 'hasDomainClass');
+INSERT INTO relations VALUES ('05e74eee-f630-498f-9c6d-8e044df48f76', '0f7a7bbd-abc3-3b4f-a3fa-d57356bae280', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', 'hasRangeClass');
+INSERT INTO relations VALUES ('64456a33-5940-4da6-afa4-aead4c822a17', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'subPropertyOf');
+INSERT INTO relations VALUES ('607c33bf-c441-4976-bcf2-e48b5370d347', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', 'hasDomainClass');
+INSERT INTO relations VALUES ('eaa24b39-cf5a-4ece-950a-43316f552d80', '5bea9c01-5e34-32ce-a1b2-cddc51a6bc7c', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('fb608110-b0c2-457a-ab4c-2e8ec84a5748', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', '0d9d0f81-5038-355c-a836-36374e32df2c', 'subPropertyOf');
+INSERT INTO relations VALUES ('0ac25f66-a899-423d-bd4c-e9417475e825', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', '0d9d0f81-5038-355c-a836-36374e32df2c', 'hasDomainClass');
+INSERT INTO relations VALUES ('d8d048ba-4d66-479d-8a5d-8737e467b629', '0d9d0f81-5038-355c-a836-36374e32df2c', '2c5fbf8d-b6ca-39f4-8ee7-5522732fe77e', 'hasRangeClass');
+INSERT INTO relations VALUES ('c7eeb24d-da66-4951-9c63-e1eaedebc646', 'de74c0db-a5fa-3f45-8684-344c379e6b0d', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'hasDomainClass');
+INSERT INTO relations VALUES ('9ad5585f-a33c-46da-a945-342953ba7b3e', '9c8d34b1-0379-35d6-9470-9ad11efdef5a', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'hasRangeClass');
+INSERT INTO relations VALUES ('4aa067f6-68e2-4eca-a378-f38c56114189', 'a9888169-3160-3403-a8a2-3fa260b1ad16', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'hasDomainClass');
+INSERT INTO relations VALUES ('8790f5ac-7ab5-4397-966f-24df2369256a', 'd48721f7-f462-3183-be01-a5e0bfc49a4c', 'de74c0db-a5fa-3f45-8684-344c379e6b0d', 'hasRangeClass');
+INSERT INTO relations VALUES ('70862210-2eaf-4e17-95e8-0672181210a7', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'df779f07-03dd-3ed7-91aa-025a71c95957', 'hasDomainClass');
+INSERT INTO relations VALUES ('c0b0c121-f619-42a9-855b-bd4f33bd465a', 'df779f07-03dd-3ed7-91aa-025a71c95957', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'hasRangeClass');
+INSERT INTO relations VALUES ('7ba230c0-28a3-4b36-8381-50f6acc4b26a', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', '2093d28a-ae1a-3621-a251-7bf59478b67a', 'hasDomainClass');
+INSERT INTO relations VALUES ('4489f16d-6ed8-4250-8f9a-77b61d4c9ee1', '2093d28a-ae1a-3621-a251-7bf59478b67a', '18a02c1c-38df-3f50-baf5-fc0b5bf2732d', 'hasRangeClass');
+INSERT INTO relations VALUES ('7b49e9da-595b-4371-aade-8d844cd3be7b', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'subPropertyOf');
+INSERT INTO relations VALUES ('fcafacff-1a0d-4274-8ac4-b456681ef263', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'hasDomainClass');
+INSERT INTO relations VALUES ('1185d2f7-d1dd-4ab4-955e-1c47b1414b82', 'c6888cc6-3b5e-373c-a6ba-6e6bc24773c6', 'ae27d5a7-abfc-32e3-9927-99795abc53a4', 'hasRangeClass');
+INSERT INTO relations VALUES ('16954016-70e4-4e02-92e9-f4a563bede3d', '89403c67-0097-311d-b3f4-eeb45e98020f', '8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', 'subPropertyOf');
+INSERT INTO relations VALUES ('543e6861-73cb-4d3a-b0ba-347dfbd6e90e', 'ae27d5a7-abfc-32e3-9927-99795abc53a4', '8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', 'hasDomainClass');
+INSERT INTO relations VALUES ('9bb71788-fe75-4b03-9a84-00d93c48bcad', '8b6bb755-c172-3d2e-9c65-1c9ef0be15c2', '0fb4acc5-0860-3bac-a8f4-3f833baaca9d', 'hasRangeClass');
+INSERT INTO relations VALUES ('702296a9-d89b-4c75-8178-59a1812e6790', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '75825fa7-ab9a-3b62-b7e8-250712914631', 'hasDomainClass');
+INSERT INTO relations VALUES ('babb0cc2-8c43-43bb-befb-42a3efa2b2c9', '75825fa7-ab9a-3b62-b7e8-250712914631', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('5b775b9d-80ed-49b5-8f26-3fff6eec337e', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', '75893825-da4f-370f-aaf7-0f9055fb822f', 'hasDomainClass');
+INSERT INTO relations VALUES ('d7b94009-ca5c-4cbd-8862-c913324f4cfc', '75893825-da4f-370f-aaf7-0f9055fb822f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'hasRangeClass');
+INSERT INTO relations VALUES ('8a9c6546-bb56-48d1-8228-fa46de32168c', '338e1bb4-ccdd-3d29-9d50-96c385fc2c98', '63c5d303-2789-3999-8496-297343edf6dc', 'subPropertyOf');
+INSERT INTO relations VALUES ('78c7f322-62ff-46f3-9933-d001e7037428', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', '63c5d303-2789-3999-8496-297343edf6dc', 'hasDomainClass');
+INSERT INTO relations VALUES ('846d62a4-9cd2-48e6-adef-b201b65238d9', '63c5d303-2789-3999-8496-297343edf6dc', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'hasRangeClass');
+INSERT INTO relations VALUES ('3abdfac0-6415-4e3d-b9a8-8b45100bac59', '0c87d0be-c266-3d88-a4e6-1b8fbf8f8773', 'b07d00db-77cc-3fcd-8a77-00640ea7a4b4', 'subPropertyOf');
+INSERT INTO relations VALUES ('b71dc433-1b62-496a-91bc-a4071b6a10e3', '211d0da0-5fd2-3d83-bb88-c08c71b46feb', 'b07d00db-77cc-3fcd-8a77-00640ea7a4b4', 'hasDomainClass');
+INSERT INTO relations VALUES ('a104f1b3-dbfa-4bd0-adbe-2de46d2dc5e7', 'b07d00db-77cc-3fcd-8a77-00640ea7a4b4', '5f7a1d37-99f2-3560-b591-9f78fd2b77c4', 'hasRangeClass');
+INSERT INTO relations VALUES ('f06c25d9-9168-4ce3-8ec7-b853ae0a3337', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', 'hasDomainClass');
+INSERT INTO relations VALUES ('5f5c16a0-af9f-46eb-a9ce-5434fbe71595', 'e28841b2-0d53-3f91-afbf-3694a6236a5d', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('115af581-4afc-412c-ad9a-c613382b73a7', '9ff08a71-8094-35ed-9005-d94abddefdfe', '8892bafe-d1eb-3729-aae7-11b84d33fe4f', 'hasDomainClass');
+INSERT INTO relations VALUES ('80f7b38f-8282-40c1-a108-4139b3a65231', '8892bafe-d1eb-3729-aae7-11b84d33fe4f', '9ff08a71-8094-35ed-9005-d94abddefdfe', 'hasRangeClass');
+INSERT INTO relations VALUES ('05718b36-b6ca-459f-986c-fc26f1c017ae', 'db25f50b-28f3-3041-b091-8bb7d2557856', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'subPropertyOf');
+INSERT INTO relations VALUES ('60daf5f3-d57c-4c2d-bc27-248d21b297ff', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '222f5899-aa3f-3d52-a784-e5a0a68722f2', 'hasDomainClass');
+INSERT INTO relations VALUES ('a3726482-b3ab-45b7-8d7a-8ed39e7779df', '222f5899-aa3f-3d52-a784-e5a0a68722f2', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('cb4c125b-cacc-4318-a784-e6f00d30fff8', '1cea6134-b1e4-328d-9f42-2b05ef652051', 'fea70b78-1787-3af8-abbe-9ce28ff2938d', 'subPropertyOf');
+INSERT INTO relations VALUES ('db387758-8649-4cd3-bf0e-c118c9eaefc8', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'fea70b78-1787-3af8-abbe-9ce28ff2938d', 'hasDomainClass');
+INSERT INTO relations VALUES ('d1af216a-dedc-4257-9cf4-17ff3560ae43', 'fea70b78-1787-3af8-abbe-9ce28ff2938d', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('cf643349-2383-43e4-a922-c455f192320d', 'b77952c3-1145-3340-964f-6212caf1c63f', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'subPropertyOf');
+INSERT INTO relations VALUES ('9ef87339-8d8b-4220-b05d-641bb518c487', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', 'hasDomainClass');
+INSERT INTO relations VALUES ('727184d4-7171-4f83-9d72-e178030875a0', 'be7f5fbc-6abd-33cd-8cb0-a7e447068b20', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', 'hasRangeClass');
+INSERT INTO relations VALUES ('f794e945-7593-4f8b-ae50-28932136d163', '21f8fc78-e937-3048-95e9-e69404b1d3f1', '1be49423-63ef-3cb1-884a-4fd252df9a40', 'subPropertyOf');
+INSERT INTO relations VALUES ('694d1d30-7cbc-4699-802c-e4b228cdc008', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '1be49423-63ef-3cb1-884a-4fd252df9a40', 'hasDomainClass');
+INSERT INTO relations VALUES ('efda5060-fb1c-40a0-a8e0-75be51587d5c', '1be49423-63ef-3cb1-884a-4fd252df9a40', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('99961bd5-919f-4899-9e3e-5776c9f829f8', '94ffd715-18f7-310a-bee2-010d800be058', '6f3ce351-dc26-30bf-8c50-9392f873968d', 'hasDomainClass');
+INSERT INTO relations VALUES ('a824210a-825c-42c3-9f4d-71d40dca261c', '6f3ce351-dc26-30bf-8c50-9392f873968d', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('b27b8a11-e58e-49cf-b5b7-069e2c926231', '9d55628a-0085-3b88-a939-b7a327263f53', 'd5340d69-ae62-3784-a09f-4265441bc799', 'hasDomainClass');
+INSERT INTO relations VALUES ('7113f453-6c10-49a7-a1cc-62c39549709b', 'd5340d69-ae62-3784-a09f-4265441bc799', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('b44dd889-a146-4ce7-b88f-609bc118c26f', '94ffd715-18f7-310a-bee2-010d800be058', 'db25f50b-28f3-3041-b091-8bb7d2557856', 'hasDomainClass');
+INSERT INTO relations VALUES ('634b5307-932d-4067-8dbe-d999d5fb3ca5', 'db25f50b-28f3-3041-b091-8bb7d2557856', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('7bbd38e2-cfd0-4ad4-b5a2-ce8b40c61ce0', '12f08da7-e25c-3e10-8179-62ed76da5da0', '1cea6134-b1e4-328d-9f42-2b05ef652051', 'hasDomainClass');
+INSERT INTO relations VALUES ('29dabe67-4a2c-4140-a8a6-18f3ba01b136', '1cea6134-b1e4-328d-9f42-2b05ef652051', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('1a6f0d13-d411-4f47-a13e-73da34b9d942', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', '68633428-a835-3af2-9e8e-ac1ba713d4c8', 'hasDomainClass');
+INSERT INTO relations VALUES ('5288ac9b-b0ac-4e3c-bad0-39ecfe894a4b', '68633428-a835-3af2-9e8e-ac1ba713d4c8', '9d55628a-0085-3b88-a939-b7a327263f53', 'hasRangeClass');
+INSERT INTO relations VALUES ('5ebf2964-6e6e-4930-894a-8a3880690fd3', '9d55628a-0085-3b88-a939-b7a327263f53', '4d0347cf-bb90-39ec-b1ce-62cde88563c5', 'hasDomainClass');
+INSERT INTO relations VALUES ('c524fb86-f973-439e-b4d0-9aa05088c33f', '4d0347cf-bb90-39ec-b1ce-62cde88563c5', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'hasRangeClass');
+INSERT INTO relations VALUES ('eb68c2ff-2d35-4a2e-8936-dfe968b52ca6', 'f677091c-aa91-3851-8aa1-1225980d5e02', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'subPropertyOf');
+INSERT INTO relations VALUES ('926cc950-5bcd-40ee-8f43-76bcd0165490', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'a5a812b2-d786-38db-928f-1df9f416ab59', 'hasDomainClass');
+INSERT INTO relations VALUES ('107eca15-a220-4e62-bcbb-987c0e2c0056', 'a5a812b2-d786-38db-928f-1df9f416ab59', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', 'hasRangeClass');
+INSERT INTO relations VALUES ('e4fea81f-2581-4887-ab60-6b1c806d6a95', '818930b0-35d2-34fd-80d0-cb508a5d0dcc', '737107d1-0987-399a-acc9-ad999343883d', 'subPropertyOf');
+INSERT INTO relations VALUES ('d91054cb-08e0-4117-acea-1428225b46be', '5d9e0c89-8d69-3a58-8c53-3f47236c86f7', '737107d1-0987-399a-acc9-ad999343883d', 'hasDomainClass');
+INSERT INTO relations VALUES ('9e2e73eb-bace-4b90-945e-7852ec5099fb', '737107d1-0987-399a-acc9-ad999343883d', '31aab780-6dfa-3742-bd7a-7ef0310ed0b1', 'hasRangeClass');
+INSERT INTO relations VALUES ('fb65856c-8d45-4e78-b198-505b44d9c99c', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', 'hasDomainClass');
+INSERT INTO relations VALUES ('02d8ffa7-d1f3-49a2-ae5d-1e7ff4aae282', '6560a44c-f6b7-3c67-bbaf-c60585bc56d9', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('5a3ce296-b7df-4d1d-9f9e-a75762774f07', '94ffd715-18f7-310a-bee2-010d800be058', '10d74c25-d701-39f0-b392-3d14ce53e777', 'hasDomainClass');
+INSERT INTO relations VALUES ('4a26136c-2572-4747-97e6-e15d504f2cdb', '10d74c25-d701-39f0-b392-3d14ce53e777', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'hasRangeClass');
+INSERT INTO relations VALUES ('3d000f50-8644-45b9-baf7-4d17492c2c4c', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', 'da115774-50f3-3292-97dc-da1cbb527ca5', 'hasDomainClass');
+INSERT INTO relations VALUES ('ebc92d3d-9821-4a55-9113-548f88499310', 'da115774-50f3-3292-97dc-da1cbb527ca5', '12f08da7-e25c-3e10-8179-62ed76da5da0', 'hasRangeClass');
+INSERT INTO relations VALUES ('c7ffb0db-d1f1-48bb-97fb-95b9401c0cb7', 'b9af2b98-3c9d-34f1-9a87-f5eb071fb53d', '3cdc8241-3fe5-30a9-be46-c4de963ec173', 'hasDomainClass');
+INSERT INTO relations VALUES ('0f184adb-2d6f-4d3a-9d64-c67494dbd4f6', '3cdc8241-3fe5-30a9-be46-c4de963ec173', '94ffd715-18f7-310a-bee2-010d800be058', 'hasRangeClass');
+INSERT INTO relations VALUES ('fcb33799-9109-46d8-8694-aefdb5774474', '12f08da7-e25c-3e10-8179-62ed76da5da0', '81fd2793-2d69-37fe-8027-ff705a54ce3d', 'hasDomainClass');
+INSERT INTO relations VALUES ('d56971b7-0a81-460d-b736-f7a920ffa8d2', '81fd2793-2d69-37fe-8027-ff705a54ce3d', '1036c7f1-ea95-3ad8-886f-849ca10f9584', 'hasRangeClass');
+INSERT INTO relations VALUES ('903b1a6d-650f-4664-9cca-ec85e5cf55ad', '4389f634-920e-3cbb-bc3a-2a68eaa6df24', '208c9b27-1418-3691-8edf-b86d3f3db3e9', 'hasDomainClass');
+INSERT INTO relations VALUES ('8b6bef0d-a110-4da4-9004-5b307c87de25', '208c9b27-1418-3691-8edf-b86d3f3db3e9', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'hasRangeClass');
+INSERT INTO relations VALUES ('bb303015-ba5f-4064-8bbe-86b14a890221', '00000000-0000-0000-0000-000000000002', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'narrowerTransitive');
 
 
--- Completed on 2016-05-09 13:34:44 PDT
+-- Completed on 2016-05-12 15:09:13 PDT
 
 --
 -- PostgreSQL database dump complete
