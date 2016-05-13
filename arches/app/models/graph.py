@@ -34,15 +34,11 @@ class Graph(object):
         self.nodes = {}
         self.edges = {}
         self.nodegroups = {}
+        self.metadata = {}
 
         if args:
-            if (isinstance(args[0], basestring) or
-               isinstance(args[0], uuid.UUID)):
-                root = models.Node.objects.get(pk=args[0])
-                self.get_nodes_and_edges(root)
-            elif isinstance(args[0], models.Node):
-                self.get_nodes_and_edges(args[0])
-            elif args[0]["nodes"] and args[0]["edges"]:
+            if isinstance(args[0], dict):
+                self.metadata = models.Graph()
                 for node in args[0]["nodes"]:
                     newNode = self.add_node(node)
                     if node['istopnode']:
@@ -53,6 +49,28 @@ class Graph(object):
 
                 self.populate_null_nodegroups()
 
+                metadata_dict = args[0]["metadata"]
+                for key, value in metadata_dict.iteritems():
+                    setattr(self.metadata, key, value)
+            else:
+                if (isinstance(args[0], basestring) or
+                   isinstance(args[0], uuid.UUID)):
+                    self.metadata = models.Graph.objects.get(pk=args[0])
+                elif isinstance(args[0], models.Graph):
+                    self.metadata = args[0]
+                elif isinstance(args[0], models.Node):
+                    self.metadata = args[0].graph
+                self.root = self.metadata.node_set.get(istopnode=True)
+                nodes = self.metadata.node_set.all()
+                edges = self.metadata.edge_set.all()
+                for node in nodes:
+                    self.add_node(node)
+                for edge in edges:
+                    edge.domainnode = self.nodes[edge.domainnode.pk]
+                    edge.rangenode = self.nodes[edge.rangenode.pk]
+                    self.add_edge(edge)
+
+
     def add_node(self, node):
         """
         Adds a node to this graph
@@ -61,7 +79,6 @@ class Graph(object):
         node -- a dictionary representing a Node instance or an actual models.Node instance
 
         """
-
         if not isinstance(node, models.Node):
             nodeobj = node.copy()
             node = models.Node()
@@ -69,18 +86,17 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.isresource = nodeobj.get('isresource','')
-            node.isactive = nodeobj.get('isactive','')
-            node.ontologyclass = nodeobj.get('ontologyclass','')
+            node.ontologyclass_id = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroupid','')
-            node.graphmetadata_id = nodeobj.get('graphmetadataid','')
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup = models.NodeGroup(
                     pk=node.nodegroup_id,
                     cardinality=nodeobj.get('cardinality', '')
                 )
+
+        node.graph = self.metadata
 
         if node.pk == None:
             node.pk = uuid.uuid1()
@@ -100,7 +116,6 @@ class Graph(object):
         edge -- a dictionary representing a Edge instance or an actual models.Edge instance
 
         """
-
         if not isinstance(edge, models.Edge):
             egdeobj = edge.copy()
             edge = models.Edge()
@@ -108,7 +123,8 @@ class Graph(object):
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
-            edge.graphmetadataid = egdeobj.get('graphmetadataid', '')
+
+        edge.graph = self.metadata
 
         if edge.pk == None:
             edge.pk = uuid.uuid1()
@@ -122,6 +138,8 @@ class Graph(object):
         """
 
         with transaction.atomic():
+            self.metadata.save()
+
             for nodegroup_id, nodegroup in self.nodegroups.iteritems():
                 nodegroup.save()
 
@@ -130,6 +148,7 @@ class Graph(object):
 
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
+
 
     def get_tree(self, root=None):
         """
@@ -180,26 +199,7 @@ class Graph(object):
 
         return traverse_tree(tree)
 
-    def get_nodes_and_edges(self, node):
-        """
-        Populate a Graph from the database with the child nodes and edges of parameter: 'node'
-
-        Arguments:
-        node -- the root node from which to gather all the child nodes and edges
-
-        """
-
-        self.root = node
-        self.add_node(node)
-
-        child_nodes, child_edges = node.get_child_nodes_and_edges()
-
-        for node in child_nodes:
-            self.add_node(node)
-        for edge in child_edges:
-            self.add_edge(edge)
-
-    def append_branch(self, property, nodeid=None, branch_root=None, graphmetadataid=None):
+    def append_branch(self, property, nodeid=None, graphid=None):
         """
         Appends a branch onto this graph
 
@@ -210,16 +210,9 @@ class Graph(object):
         nodeid -- if given will append the branch to this node, if not supplied will
         append the branch to the root of this graph
 
-        branch_root -- the root node of the branch you want to append
-
-        graphmetadataid -- get the branch to append based on the graphmetadataid,
-        if given, branch_root takes precedence
-
+        graphid -- get the branch to append based on the graphid
         """
-
-        if not branch_root:
-            branch_root = models.Node.objects.get(graphmetadata=graphmetadataid, istopnode=True)
-        branch_graph = Graph(branch_root)
+        branch_graph = Graph(graphid)
 
         branch_copy = branch_graph.copy()
         branch_copy.root.istopnode = False
@@ -228,7 +221,8 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty = property
+                ontologyproperty = property,
+                graph = self.metadata
             )
             branch_copy.add_edge(newEdge)
         for key, node in branch_copy.nodes.iteritems():
@@ -247,11 +241,15 @@ class Graph(object):
 
         new_nodegroups = {}
 
-        copy_of_self = Graph(self.root.pk)
+        copy_of_self = Graph(self.metadata.pk)
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
 
+        copy_of_self.metadata.pk = uuid.uuid1()
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
+            if node == self.root:
+                copy_of_self.root = node
+            node.graph = copy_of_self.metadata
             is_collector = node.is_collector()
             node.pk = uuid.uuid1()
             if is_collector:
@@ -265,6 +263,7 @@ class Graph(object):
 
         for edge_id, edge in copy_of_self.edges.iteritems():
             edge.pk = uuid.uuid1()
+            edge.graph = copy_of_self.metadata
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
 
@@ -293,12 +292,12 @@ class Graph(object):
         if not node.is_collector():
             nodegroup = node.nodegroup
 
-            # make a graph of node, so that we can easily get all the child nodes
-            graph = Graph(node)
-            for node_id, node in graph.nodes.iteritems():
-                if node.nodegroup == nodegroup:
-                    self.nodes[node_id].nodegroup = None
-                    ret['nodes'].append(self.nodes[node_id])
+            child_nodes, child_edges = node.get_child_nodes_and_edges()
+            child_nodes.append(node)
+            for child_node in child_nodes:
+                if child_node.nodegroup == nodegroup:
+                    self.nodes[child_node.pk].nodegroup = None
+                    ret['nodes'].append(child_node)
 
         for edge_id, edge in self.edges.iteritems():
             if edge.rangenode == node:
@@ -310,6 +309,7 @@ class Graph(object):
 
     def serialize(self):
         ret = {}
+        ret['metadata'] = self.metadata
         ret['root'] = self.root
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['nodes'] = [node for key, node in self.nodes.iteritems()]

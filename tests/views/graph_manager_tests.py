@@ -22,7 +22,7 @@ from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
-from arches.app.models.models import Node, NodeGroup
+from arches.app.models.models import Node, NodeGroup, Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -34,6 +34,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         cls.ROOT_ID = 'd8f4db21-343e-4af3-8857-f7322dc9eb4b'
         cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
+        cls.ARCHES_CONFIG_ID = '20000000-0000-0000-0000-000000000000'
         cls.NODE_COUNT = 111
         cls.PLACE_NODE_COUNT = 17
         cls.client = Client()
@@ -63,12 +64,13 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('graph', kwargs={'nodeid':''})
+        url = reverse('graph', kwargs={'graphid':''})
         response = self.client.get(url)
         graphs = json.loads(response.context['graphs'])
-        self.assertEqual(len(graphs), 4)
+        self.assertEqual(len(graphs), Graph.objects.count())
 
-        url = reverse('graph', kwargs={'nodeid':self.ROOT_ID})
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('graph', kwargs={'graphid':graphid})
         response = self.client.get(url)
         graph = json.loads(response.context['graph'])
 
@@ -77,6 +79,30 @@ class GraphManagerViewTests(ArchesTestCase):
 
         edge_count = len(graph['edges'])
         self.assertEqual(edge_count, self.NODE_COUNT)
+
+    def test_graph_settings(self):
+        """
+        Test the graph settings view
+
+        """
+        self.client.login(username='admin', password='admin')
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('graph_settings', kwargs={'graphid':graphid})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        metadata = json.loads(response.context['metadata_json'])
+
+        metadata['name'] = 'new graph name'
+        post_data = {'metadata':metadata, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}
+        post_data = JSONSerializer().serialize(post_data)
+        content_type = 'application/x-www-form-urlencoded'
+        response = self.client.post(url, post_data, content_type)
+        response_json = json.loads(response.content)
+
+        self.assertTrue(response_json['success'])
+        self.assertEqual(response_json['metadata']['name'], 'new graph name')
+        self.assertTrue(self.ARCHES_CONFIG_ID in response_json['relatable_resource_ids'])
 
     def test_node_update(self):
         """
@@ -94,7 +120,7 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
 
-        self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT-1)
+        self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT)
         self.assertEqual(response_json['node']['name'], 'new node name')
 
         node_ = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
@@ -127,7 +153,8 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('clone_graph', kwargs={'nodeid':self.ROOT_ID})
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('clone_graph', kwargs={'graphid':graphid})
         post_data = JSONSerializer().serialize({'name': 'test cloned graph'})
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)

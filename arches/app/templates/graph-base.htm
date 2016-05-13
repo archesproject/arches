@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Page Controls -->
         <div>
             <div class="dismiss-edit-panel">
-                <a href="{% url 'graph' '' %}"><i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i></a>
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' '' %}' }"><i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i></a>
             </div>
         </div>
     </div>
@@ -47,13 +47,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Page Top Panel (title block) -->
     <div class="relative edit-panel-content" data-bind="css: {'edit-panel-content-full': !menuActive()}">
         <div class="edit-panel">
+            {% block graph_header %}
             <!-- Title -->
             <div class="text-left edit-panel-top-bar">
                 <div class="center-div">
-                    <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-certificate icon-wrap bg-gray arches-panel-icon"></i> Resource Name Here</h1>
-                    <p class="arches-panel-subtitle">Resource subtitle here</p>
+                    <h1 class="page-header text-overflow arches-panel-header"><i class="text-center {{metadata.iconclass|default:'fa fa-question'}} icon-wrap bg-gray arches-panel-icon"></i> {{metadata.name}}</h1>
+                    <p class="arches-panel-subtitle">{{metadata.subtitle}}</p>
                 </div>
             </div>
+            {% endblock graph_header %}
 
             <!-- Page Alert -->
             <div id="edit-page-alert"></div>
@@ -78,7 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu Item -->
             <li id="settings-manager" class="edit-menu-item{% if main_script == "graph-settings" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' nodeid %}' }">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' graphid %}' }">
                     <div class="media-body">
                         <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
                         <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
@@ -88,7 +90,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu Item -->
             <li class="edit-menu-item{% if main_script == "graph-manager" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' nodeid %}' }">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' graphid %}' }">
                     <div class="media-body">
                         <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graph Manager</div>
                         <span class="text-muted menu-item-subtitle">Define graph, permissions</span>
@@ -130,10 +132,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </div>
 
-<input id="graph-data" name="graph-data" type="hidden" value="{{graph}}" />
-<input id="validations" name="validations" type="hidden" value="{{validations}}" />
-<input id="datatypes" name="datatypes" type="hidden" value="{{datatypes}}" />
-<input id="branches" name="branches" type="hidden" value="{{branches}}" />
 {% endblock body %}
 
 {% block tabs %}{% endblock tabs %}

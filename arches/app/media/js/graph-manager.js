@@ -47,9 +47,14 @@ require([
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
+    graphModel.on('select-node', function(model, options){
+        viewModel.nodeForm.closeClicked(true);
+    });
 
+    var loading = ko.observable(false);
     var viewModel = {
-        graphModel: graphModel
+        graphModel: graphModel,
+        loading: loading
     };
 
     viewModel.graphView = new GraphView({
@@ -57,28 +62,19 @@ require([
         graphModel: graphModel
     });
 
+    viewModel.branchListView= new BranchListView({
+        el: $('#branch-library'),
+        branches: ko.observableArray(branches),
+        graphModel: graphModel,
+        loading: loading
+    });
+
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         graphModel: graphModel,
-        validations: validations
-    });
-
-    viewModel.graphView.on('node-clicked', function (node) {
-        var editNode = graphModel.get('editNode');
-        if (editNode() && editNode().dirty()) {
-            viewModel.nodeForm.closeClicked(true);
-            return;
-        }
-        graphModel.get('nodes')().forEach(function (node) {
-            node.editing(false);
-        });
-        node.editing(true);
-    });
-
-    viewModel.branchList = new BranchListView({
-        el: $('#branch-library'),
-        branches: ko.observableArray(branches),
-        graphModel: graphModel
+        validations: validations,
+        branchListView: viewModel.branchListView,
+        loading: loading
     });
 
     viewModel.nodeList = new NodeListView({

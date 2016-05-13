@@ -21,8 +21,6 @@ CREATE TABLE "nodes"(
  "name" Text NOT NULL,
  "description" Text NOT NULL,
  "istopnode" Boolean NOT NULL,
- "isresource" Boolean NOT NULL,
- "isactive" Boolean NOT NULL,
  "crmclass" Text NOT NULL,
  "datatype" Text NOT NULL,
  "validation" Text,
@@ -30,7 +28,7 @@ CREATE TABLE "nodes"(
  "inputmask" Text,
  "status" Bigint,
  "nodegroupid" UUID,
- "graphmetadataid" UUID
+ "graphid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -198,7 +196,7 @@ CREATE TABLE "edges"(
  "crmproperty" Text NOT NULL,
  "domainnodeid" UUID NOT NULL,
  "rangenodeid" UUID NOT NULL,
- "graphmetadataid" UUID
+ "graphid" UUID NOT NULL
 )
 WITH (OIDS=FALSE)
 ;
@@ -458,8 +456,7 @@ ALTER TABLE "edit_log" ADD CONSTRAINT "pk_edit_log" PRIMARY KEY ("editlogid")
 CREATE TABLE "resource2resource_constraints"(
  "resource2resourceid" UUID NOT NULL,
  "resourceclassfrom" UUID,
- "resourceclassto" UUID,
- "cardinality" Text
+ "resourceclassto" UUID
 )
 WITH (OIDS=FALSE)
 ;
@@ -788,22 +785,26 @@ COMMENT ON TABLE "nodegroups" IS '0:1
 ALTER TABLE "nodegroups" ADD CONSTRAINT "nodegroups_pk" PRIMARY KEY ("nodegroupid")
 ;
 
--- Table graphmetadata
+-- Table graph
 
-CREATE TABLE "graphmetadata"(
- "graphmetadataid" UUID NOT NULL,
+CREATE TABLE "graph"(
+ "graphid" UUID NOT NULL,
  "name" Bigint,
  "deploymentfile" Text,
  "author" Text,
  "deploymentdate" Timestamp,
- "version" Text
+ "version" Text,
+ "isresource" Boolean NOT NULL,
+ "isactive" Boolean NOT NULL,
+ "iconclass" Text,
+ "subtitle" Text
 )
 WITH (OIDS=FALSE)
 ;
 
--- Add keys for table graphmetadata
+-- Add keys for table graph
 
-ALTER TABLE "graphmetadata" ADD CONSTRAINT "deploymentmetadata_pk" PRIMARY KEY ("graphmetadataid")
+ALTER TABLE "graph" ADD CONSTRAINT "deploymentmetadata_pk" PRIMARY KEY ("graphid")
 ;
 
 -- Table resourceinstances
@@ -849,6 +850,21 @@ WITH (OIDS=FALSE)
 -- Add keys for table validations
 
 ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "validations_x_nodes_pk" PRIMARY KEY ("id")
+;
+
+-- Table icons
+
+CREATE TABLE "icons"(
+ "id" serial NOT NULL,
+ "name" Text,
+ "cssclass" Text
+)
+WITH (OIDS=FALSE)
+;
+
+-- Add keys for table icons
+
+ALTER TABLE "icons" ADD CONSTRAINT "icons_pk" PRIMARY KEY ("id")
 ;
 
 -- Create relationships section -------------------------------------------------
@@ -955,7 +971,7 @@ ALTER TABLE "public"."auth_permission" ADD CONSTRAINT "content_type_id_refs_id_7
 ALTER TABLE "nodes" ADD CONSTRAINT "nodegroups_x_nodes_fk" FOREIGN KEY ("nodegroupid") REFERENCES "nodegroups" ("nodegroupid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
-ALTER TABLE "nodes" ADD CONSTRAINT "deploymentmetadata_x_nodes_fk" FOREIGN KEY ("graphmetadataid") REFERENCES "graphmetadata" ("graphmetadataid") ON DELETE NO ACTION ON UPDATE NO ACTION
+ALTER TABLE "nodes" ADD CONSTRAINT "deploymentmetadata_x_nodes_fk" FOREIGN KEY ("graphid") REFERENCES "graph" ("graphid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
 ALTER TABLE "tileinstances" ADD CONSTRAINT "resourceinstances_tileinstances_fk" FOREIGN KEY ("resourceinstanceid") REFERENCES "resourceinstances" ("resourceinstanceid") ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -973,7 +989,7 @@ ALTER TABLE "resource2resource_constraints" ADD CONSTRAINT "nodes_rscr2rsrc_cons
 ALTER TABLE "resource2resource_constraints" ADD CONSTRAINT "nodes_rscr2rsrc_constraints_fk2" FOREIGN KEY ("resourceclassto") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
-ALTER TABLE "edges" ADD CONSTRAINT "graphmetadata_edges_fk" FOREIGN KEY ("graphmetadataid") REFERENCES "graphmetadata" ("graphmetadataid") ON DELETE NO ACTION ON UPDATE NO ACTION
+ALTER TABLE "edges" ADD CONSTRAINT "graph_edges_fk" FOREIGN KEY ("graphid") REFERENCES "graph" ("graphid") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
 ALTER TABLE "validations_x_nodes" ADD CONSTRAINT "nodes_validations_x_nodes_fk" FOREIGN KEY ("nodeid") REFERENCES "nodes" ("nodeid") ON DELETE NO ACTION ON UPDATE NO ACTION

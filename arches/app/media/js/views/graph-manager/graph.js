@@ -6,8 +6,8 @@ define([
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
         initialize: function(options) {
-            this.editNode = options.graphModel.get('editNode');
-            this.selectedNodes = options.graphModel.get('selectedNodes');
+            this.graphModel = options.graphModel;
+            this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
 
             this.addNodeListeners();
@@ -20,8 +20,7 @@ define([
             }, this);
 
             ko.computed(function() {
-                this.editNode();
-                this.selectedNodes();
+                this.selectedNode();
                 this.render();
             }, this);
         },
@@ -30,10 +29,9 @@ define([
             var self = this;
             var nodeMouseOver = 8;
             var getNodeClass = function (d, className) {
-                className += d.editing() ? ' node-editing' : '';
                 className += d.selected() ? ' node-selected' : '';
                 className += d.filtered() ? ' node-filtered' : '';
-                className += (self.editNode() && self.editNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
+                className += (self.selectedNode() && self.selectedNode().nodeGroupId() === d.nodeGroupId()) ? ' node-collected' : '';
                 return className;
             }
             this.initDragDrop();
@@ -43,7 +41,7 @@ define([
                     return getNodeClass(d, '');
                 })
                 .on("mouseover", function(d) {
-                    self.selectedNode = d3.select(this.parentElement);
+                    self.overNode = d3.select(this.parentElement);
                     d3.select(this)
                         .attr("r", nodeMouseOver)
                         .attr("class", function (d) {
@@ -51,10 +49,10 @@ define([
                         })
                 })
                 .on("click", function (node) {
-                    self.trigger('node-clicked', node);
+                    self.graphModel.selectNode(node);
                 })
                 .on("mouseout", function(d) {
-                    self.selectedNode = null;
+                    self.overNode = null;
                     d3.select(this)
                         .attr("r", self.nodesize)
                         .attr("class", function (d) {
@@ -82,8 +80,8 @@ define([
             this.svg.selectAll(".link")
                 .attr("class", function (d) {
                     var className = 'link';
-                    if (self.editNode()) {
-                        var selectedGroup = self.editNode().nodeGroupId();
+                    if (self.selectedNode()) {
+                        var selectedGroup = self.selectedNode().nodeGroupId();
                         if (d.source.nodeGroupId() === selectedGroup && d.target.nodeGroupId() === selectedGroup) {
                             className += ' link-collected';
                         }

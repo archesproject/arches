@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import codecs
 from django.conf import settings
 from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
@@ -11,7 +12,7 @@ from arches.db.migration_operations.extras import CreateExtension, CreateAutoPop
 
 def get_sql_string_from_file(pathtofile):
     ret = []
-    with open(pathtofile) as f:
+    with codecs.open(pathtofile, encoding='utf-8') as f:
         ret = f.read()
         #print sqlparse.split(sqlparse.format(ret,strip_comments=True))
         # for stmt in sqlparse.split(sqlparse.format(f.read(),strip_comments=True)):
@@ -162,18 +163,22 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='GraphMetadata',
+            name='Graph',
             fields=[
-                ('graphmetadataid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                ('graphid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
                 ('deploymentfile', models.TextField(null=True, blank=True)),
                 ('author', models.TextField(null=True, blank=True)),
                 ('deploymentdate', models.DateTimeField(null=True, blank=True)),
                 ('version', models.TextField(null=True, blank=True)),
+                ('isresource', models.BooleanField()),
+                ('isactive', models.BooleanField()),
+                ('iconclass', models.TextField(null=True, blank=True)),
+                ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={
-                'db_table': 'graph_metadata',
+                'db_table': 'graphs',
                 'managed': True,
             },
         ),
@@ -282,7 +287,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
                 'db_table': 'edges',
@@ -351,17 +356,27 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Icon',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=True)),
+                ('name', models.TextField(blank=True, null=True)),
+                ('cssclass', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'icons',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Node',
             fields=[
                 ('nodeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('isresource', models.BooleanField()),
-                ('isactive', models.BooleanField()),
-                ('ontologyclass', models.TextField()),
+                ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
                 ('datatype', models.TextField()),
-                ('graphmetadata', models.ForeignKey(blank=True, db_column='graphmetadataid', null=True, to='models.GraphMetadata')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
                 'db_table': 'nodes',
@@ -424,7 +439,6 @@ class Migration(migrations.Migration):
             name='Resource2ResourceConstraint',
             fields=[
                 ('resource2resourceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('cardinality', models.TextField(blank=True, null=True)),
                 ('resourceclassfrom', models.ForeignKey(blank=True, db_column='resourceclassfrom', null=True, related_name='resxres_contstraint_classes_from', to='models.Node')),
                 ('resourceclassto', models.ForeignKey(blank=True, db_column='resourceclassto', null=True, related_name='resxres_contstraint_classes_to', to='models.Node')),
             ],
@@ -622,7 +636,7 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'card', 'widget')]),
         ),
 
-        CreateAutoPopulateUUIDField('graph_metadata', ['graphmetadataid']),
+        CreateAutoPopulateUUIDField('graphs', ['graphid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
         CreateAutoPopulateUUIDField('concepts', ['conceptid']),
         CreateAutoPopulateUUIDField('edges', ['edgeid']),
@@ -637,6 +651,7 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 
+        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'arches_ontology_602.sql')), ''),
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
     ]

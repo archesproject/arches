@@ -7,11 +7,11 @@ define([
     var NodeFormView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'validations'));
+            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branchListView'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
-            this.node = this.graphModel.get('editNode');
+            this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
-            this.loading = ko.observable(false);
+            this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
 
             this.title = ko.computed(function () {
@@ -34,7 +34,7 @@ define([
             this.failed(false);
             this.closeClicked(true);
             if (this.node() && !this.node().dirty()) {
-                this.node().editing(false);
+                this.node().selected(false);
             }
         },
         cancel: function () {
@@ -86,12 +86,6 @@ define([
         },
         toggleCardinality: function () {
             this.node().toggleCardinality();
-        },
-        toggleIsResource: function () {
-            this.node().isresource(!this.node().isresource());
-        },
-        toggleIsActive: function () {
-            this.node().isactive(!this.node().isactive());
         }
     });
     return NodeFormView;
