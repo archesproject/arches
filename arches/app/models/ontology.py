@@ -31,7 +31,7 @@ class Ontology(Concept):
         # get a list of ontology classes based on any properties to child nodes
         ontology_classes = set()
         if len(child_properties) > 0:
-            q_list = [Q(conceptto_id=child_property['ontologyclass_id']) for child_property in child_properties]
+            q_list = [Q(conceptto_id=child_property['ontologyproperty_id']) for child_property in child_properties]
             for ontology_property in models.Relation.objects.filter(reduce(operator.or_, q_list)).distinct('conceptfrom_id'):
                 subclasses = Ontology().get_subclasses(id=ontology_property.conceptfrom_id, include=['label'], lang=lang)
 

@@ -146,7 +146,7 @@ define([
         },
 
         getValidNodesEdges: function(){
-            var relatedNodesEdges = this.graph.getRelatedNodesEdges(this);
+            var relatedNodesEdges = this.getRelatedNodesEdges(this);
             this.ontology_cache.removeAll();
             this._doRequest({
                 type: "POST",
@@ -170,15 +170,30 @@ define([
                 this.graph.get('edges')().forEach(function (edge) {
                     if (edge.rangenode_id === this.nodeid){
                         ret = edge.ontologyproperty_id;
-                        // this.graph.get('nodes')().forEach(function (node) {
-                        //     if (node.nodeid === edge.domainnode_id){
-                        //         ret = node;
-                        //     }
-                        // });
                     }
                 }, this);
             }
             return ret;
-        }
+        },
+
+        getRelatedNodesEdges: function(){
+            var ret = {
+                'childedges': [],
+                'parentnode': {}
+            }
+            this.graph.get('edges')().forEach(function (edge) {
+                if (edge.rangenode_id === this.nodeid){
+                    this.graph.get('nodes')().forEach(function (node) {
+                        if (node.nodeid === edge.domainnode_id){
+                            ret.parentnode = node;
+                        }
+                    });
+                }
+                if (edge.domainnode_id === this.nodeid){
+                    ret.childedges.push(edge);
+                }
+            }, this);
+            return ret
+        },
     });
 });
