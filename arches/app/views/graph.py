@@ -194,52 +194,52 @@ def get_related_nodes(request):
         'classes': []
     }
     lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
-    #data = JSONDeserializer().deserialize(request.body)
-    data = {
-        "childedges": [
-            {
-                "name": None,
-                "edgeid": "a2c06110-16f5-11e6-b8fe-af29a288d01a",
-                "domainnode_id": "20000000-0000-0000-0000-000000000001",
-                "rangenode_id": "20000000-0000-0000-0000-000000000002",
-                "ontologyclass_id": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
-                "graphmetadata_id": None,
-                "description": None
-            },
-            {
-                "name": None,
-                "edgeid": "a2c06660-16f5-11e6-b8fe-a37f8a08ca7b",
-                "domainnode_id": "20000000-0000-0000-0000-000000000001",
-                "rangenode_id": "20000000-0000-0000-0000-000000000004",
-                "ontologyclass_id": "fd06e07d-057b-38aa-99ac-1add45f9f217",
-                "graphmetadata_id": None,
-                "description": None
-            },
-            {
-                "name": None,
-                "edgeid": "a2c063b8-16f5-11e6-b8fe-b7d2f22d7012",
-                "domainnode_id": "20000000-0000-0000-0000-000000000001",
-                "rangenode_id": "20000000-0000-0000-0000-000000000003",
-                "ontologyclass_id": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
-                "graphmetadata_id": None,
-                "description": None
-            }
-        ],
-        "parentnode": [
-            {
-                "ontologyclass_id": "c03db431-4564-34eb-ba86-4c8169e4276c",
-                "description": "Group to hold unique keys used by Arches",
-                "istopnode": False,
-                "validations": [],
-                "nodeid": "20000000-0000-0000-0000-000000000001",
-                "datatype": "semantic",
-                "nodegroup_id": "20000000-0000-0000-0000-000000000001",
-                "graphmetadata_id": None,
-                "name": "KEYS",
-                "cardinality": "n"
-            }
-        ]
-    }
+    data = JSONDeserializer().deserialize(request.body)
+    # data = {
+    #     "childedges": [
+    #         {
+    #             "name": None,
+    #             "edgeid": "a2c06110-16f5-11e6-b8fe-af29a288d01a",
+    #             "domainnode_id": "20000000-0000-0000-0000-000000000001",
+    #             "rangenode_id": "20000000-0000-0000-0000-000000000002",
+    #             "ontologyclass_id": "9bf487d8-c0a3-3510-b228-1b5cd74f4c56",
+    #             "graphmetadata_id": None,
+    #             "description": None
+    #         },
+    #         {
+    #             "name": None,
+    #             "edgeid": "a2c06660-16f5-11e6-b8fe-a37f8a08ca7b",
+    #             "domainnode_id": "20000000-0000-0000-0000-000000000001",
+    #             "rangenode_id": "20000000-0000-0000-0000-000000000004",
+    #             "ontologyclass_id": "fd06e07d-057b-38aa-99ac-1add45f9f217",
+    #             "graphmetadata_id": None,
+    #             "description": None
+    #         },
+    #         {
+    #             "name": None,
+    #             "edgeid": "a2c063b8-16f5-11e6-b8fe-b7d2f22d7012",
+    #             "domainnode_id": "20000000-0000-0000-0000-000000000001",
+    #             "rangenode_id": "20000000-0000-0000-0000-000000000003",
+    #             "ontologyclass_id": "2f8fd82d-2679-3d69-b697-7efe545e76ab",
+    #             "graphmetadata_id": None,
+    #             "description": None
+    #         }
+    #     ],
+    #     "parentnode": [
+    #         {
+    #             "ontologyclass_id": "c03db431-4564-34eb-ba86-4c8169e4276c",
+    #             "description": "Group to hold unique keys used by Arches",
+    #             "istopnode": False,
+    #             "validations": [],
+    #             "nodeid": "20000000-0000-0000-0000-000000000001",
+    #             "datatype": "semantic",
+    #             "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+    #             "graphmetadata_id": None,
+    #             "name": "KEYS",
+    #             "cardinality": "n"
+    #         }
+    #     ]
+    # }
 
     related_properties = Ontology().get_valid_ontology_concepts(data['parentnode'][0], child_properties=data['childedges'], lang=lang)
     return JSONResponse(related_properties, indent=4)

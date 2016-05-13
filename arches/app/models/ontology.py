@@ -27,19 +27,25 @@ class Ontology(Concept):
         """
 
         ret = []
+        
+        # get a list of ontology classes based on any properties to child nodes
         ontology_classes = set()
-        q_list = [Q(conceptto_id=child_property['ontologyclass_id']) for child_property in child_properties]
-        for ontology_property in models.Relation.objects.filter(reduce(operator.or_, q_list)).distinct('conceptfrom_id'):
-            subclasses = Ontology().get_subclasses(id=ontology_property.conceptfrom_id, include=['label'], lang=lang)
+        if len(child_properties) > 0:
+            q_list = [Q(conceptto_id=child_property['ontologyclass_id']) for child_property in child_properties]
+            for ontology_property in models.Relation.objects.filter(reduce(operator.or_, q_list)).distinct('conceptfrom_id'):
+                subclasses = Ontology().get_subclasses(id=ontology_property.conceptfrom_id, include=['label'], lang=lang)
 
-            if len(ontology_classes) == 0:
-                ontology_classes = subclasses
-            else:
-                ontology_classes = ontology_classes.intersection(subclasses)
+                if len(ontology_classes) == 0:
+                    ontology_classes = subclasses
+                else:
+                    ontology_classes = ontology_classes.intersection(subclasses)
 
-            if len(ontology_classes) == 0:
-                break
+                if len(ontology_classes) == 0:
+                    break
 
+        # get a list of properties (and corresponding classes) that could be used to relate to my parent node
+        # limit the list of properties based on the intersection between the properties classes and the list of 
+        # ontology classes we defined above
         if parent_node:
             related_properties = self.get_related_properties(parent_node['ontologyclass_id'], lang=lang)
             for related_property in related_properties:
@@ -55,6 +61,7 @@ class Ontology(Concept):
                 ret.append(item)
 
         else:
+        # if no parent node then just use the list of ontology classes from above, there will be no properties to return
             item = {
                 'ontology_property':None,
                 'ontology_classes':[]

@@ -82,7 +82,9 @@ define([
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
                     cardinality: self.cardinality(),
-                    validations: self.validations()
+                    validations: self.validations(),
+                    ontologyclass_id: self.ontologyclass_id(),
+                    parentproperty_id: self.parentproperty_id()
                 }))
             });
 
@@ -160,6 +162,23 @@ define([
                     });
                 }, this);
             }, this, 'changed');
+        },
+
+        getParentProperty: function(){
+            var ret;
+            if(this.graph){
+                this.graph.get('edges')().forEach(function (edge) {
+                    if (edge.rangenode_id === this.nodeid){
+                        ret = edge.ontologyproperty_id;
+                        // this.graph.get('nodes')().forEach(function (node) {
+                        //     if (node.nodeid === edge.domainnode_id){
+                        //         ret = node;
+                        //     }
+                        // });
+                    }
+                }, this);
+            }
+            return ret;
         }
     });
 });
