@@ -8,6 +8,7 @@ define([
 
         initialize: function (options) {
             var self = this;
+            self.graph = options.graph;
             self.datatypelookup = options.datatypelookup;
 
             self._node = ko.observable('');
@@ -70,7 +71,6 @@ define([
             }, this);        
 
             self.parse(options.source);
-            self.graph = options.graph;
 
             self.iconclass = ko.computed(function() {
                 return self.datatypelookup[self.datatype()];
@@ -117,6 +117,9 @@ define([
                 self.validations.push(validation);
             });
 
+            self.parentproperty_value = source.parentproperty_value;
+            self.ontologyclass_value = source.ontologyclass_value;
+
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
 
@@ -148,11 +151,16 @@ define([
         getValidNodesEdges: function(){
             var relatedNodesEdges = this.getRelatedNodesEdges(this);
             this.ontology_cache.removeAll();
+            this.ontology_cache.push({
+                'property': {'id':this.parentproperty_id(),'value': this.parentproperty_value},
+                'class': {'id':this.ontologyclass_id(),'value': this.ontologyclass_value}
+            })
             this._doRequest({
                 type: "POST",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
                 data: JSON.stringify(relatedNodesEdges)
             }, function(response, status, self){
+                //self.ontology_cache.removeAll();
                 response.responseJSON.forEach(function(item){
                     item.ontology_classes.forEach(function(ontologyclass){
                         self.ontology_cache.push({
@@ -162,18 +170,6 @@ define([
                     });
                 }, this);
             }, this, 'changed');
-        },
-
-        getParentProperty: function(){
-            var ret;
-            if(this.graph){
-                this.graph.get('edges')().forEach(function (edge) {
-                    if (edge.rangenode_id === this.nodeid){
-                        ret = edge.ontologyproperty_id;
-                    }
-                }, this);
-            }
-            return ret;
         },
 
         getRelatedNodesEdges: function(){

@@ -20,6 +20,7 @@ import uuid
 from copy import copy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.ontology import Ontology
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -308,10 +309,32 @@ class Graph(object):
         return ret
 
     def serialize(self):
+        """
+        serialize to a different form then used by the internal class structure
+        
+        used to append additional values (like Ontology preflabels) that 
+        internal objects (like models.Nodes) don't support
+
+        """
+
         ret = {}
         ret['metadata'] = self.metadata
         ret['root'] = self.root
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
-        ret['nodes'] = [node for key, node in self.nodes.iteritems()]
+
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
+        ret['nodes'] = []
+        parentproperties = {
+            self.root.nodeid: {'id': None, 'value': None}
+        }
+        for edge_id, edge in self.edges.iteritems():
+            parentproperties[edge.rangenode_id] = Ontology(edge.ontologyproperty).simplify(lang='en-US')
+        for key, node in self.nodes.iteritems():
+            nodeobj = JSONSerializer().serializeToPython(node)
+            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]['id']
+            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]['value']
+            
+            Ontology(node.ontologyclass).simplify(lang='en-US')
+            nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
+            ret['nodes'].append(nodeobj)
         return ret

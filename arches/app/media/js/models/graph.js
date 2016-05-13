@@ -129,6 +129,7 @@ define(['arches',
             }, this)
             this.set('datatypelookup', datatypelookup);
 
+            this.set('edges', ko.observableArray(attributes.data.edges));
             attributes.data.nodes.forEach(function (node, i) {
                 attributes.data.nodes[i] = new NodeModel({
                     source: node,
@@ -137,7 +138,6 @@ define(['arches',
                 });
             });
             this.set('nodes', ko.observableArray(attributes.data.nodes));
-            this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('root', attributes.data.root);
             this.set('metadata', attributes.data.metadata);
 

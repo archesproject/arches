@@ -125,16 +125,16 @@ def node(request, nodeid):
                 node.name = data.get('name', '')
                 node.description = data.get('description', '')
                 node.istopnode = data.get('istopnode', '')
-                node.crmclass = data.get('crmclass', '')
+                node.ontologyclass_id = data.get('ontologyclass_id', '')
                 node.datatype = data.get('datatype', '')
                 node.status = data.get('status', '')
+                node.set_parentproperty_id(data.get('parentproperty_id', ''))
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
                 if unicode(node.nodegroup_id) != new_nodegroup_id:
                     for model in node.set_nodegroup(new_nodegroup_id):
                         model.save()
-                cardinality = data.get('cardinality', 'n')
-                node.nodegroup.cardinality = cardinality
+                node.nodegroup.cardinality = data.get('cardinality', 'n')
                 node.nodegroup.save()
                 node.save()
                 group_nodes = node.nodegroup.node_set.all()

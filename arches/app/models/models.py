@@ -308,6 +308,9 @@ class Node(models.Model):
         updated_models = [c.nodegroup for c in collectors] + group_nodes + [new_group]
         return updated_models
 
+    def set_parentproperty_id(self, parentproperty_id):
+        return Edge.objects.filter(rangenode=self).update(ontologyproperty_id=parentproperty_id)
+
     class Meta:
         managed = True
         db_table = 'nodes'
