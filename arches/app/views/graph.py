@@ -137,8 +137,14 @@ def node(request, nodeid):
                 node.nodegroup.cardinality = data.get('cardinality', 'n')
                 node.nodegroup.save()
                 node.save()
-                group_nodes = node.nodegroup.node_set.all()
-                return JSONResponse({'node': node, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
+                group_nodes = []
+                for node in node.nodegroup.node_set.all():
+                    nodeobj = JSONSerializer().serializeToPython(node)
+                    nodeobj['parentproperty_id'] = node.get_parentproperty_id()
+                    group_nodes.append(nodeobj)
+                nodeobj = JSONSerializer().serializeToPython(node)
+                nodeobj['parentproperty_id'] = node.get_parentproperty_id()
+                return JSONResponse({'node': nodeobj, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
         node = models.Node.objects.get(nodeid=nodeid)

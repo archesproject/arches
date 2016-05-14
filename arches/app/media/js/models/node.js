@@ -150,17 +150,17 @@ define([
 
         getValidNodesEdges: function(){
             var relatedNodesEdges = this.getRelatedNodesEdges(this);
-            this.ontology_cache.removeAll();
-            this.ontology_cache.push({
-                'property': {'id':this.parentproperty_id(),'value': this.parentproperty_value},
-                'class': {'id':this.ontologyclass_id(),'value': this.ontologyclass_value}
-            })
+            // this.ontology_cache.removeAll();
+            // this.ontology_cache.push({
+            //     'property': {'id':this.parentproperty_id(),'value': this.parentproperty_value},
+            //     'class': {'id':this.ontologyclass_id(),'value': this.ontologyclass_value}
+            // })
             this._doRequest({
                 type: "POST",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
                 data: JSON.stringify(relatedNodesEdges)
             }, function(response, status, self){
-                //self.ontology_cache.removeAll();
+                self.ontology_cache.removeAll();
                 response.responseJSON.forEach(function(item){
                     item.ontology_classes.forEach(function(ontologyclass){
                         self.ontology_cache.push({

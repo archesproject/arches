@@ -149,6 +149,16 @@ define(['arches',
             }));
         },
 
+        getParentProperty: function(node){
+            var ret;
+            this.get('edges')().forEach(function (edge) {
+                if (edge.rangenode_id === node.nodeid){
+                    ret = edge.ontologyproperty_id;
+                }
+            }, this);
+            return ret;
+        },
+
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
             if (! scope){
