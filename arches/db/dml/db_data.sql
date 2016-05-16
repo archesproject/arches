@@ -105,7 +105,8 @@ INSERT INTO d_node_types VALUES ('Concept', 'skos');
 INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 INSERT INTO d_node_types VALUES ('Ontology', 'arches');
-
+INSERT INTO d_node_types VALUES ('Ontology Class', 'arches');
+INSERT INTO d_node_types VALUES ('Ontology Property', 'arches');
 
 --Data types
 INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o');
