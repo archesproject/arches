@@ -1431,14 +1431,6 @@ div.dropdown-menu.open {
     animation: loader .5s infinite ease-in-out both;
     margin: -25px 0 0 -25px;
 }
-33% {
-    background: #ccc;
-    box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd;
-}
-66% {
-    background: #ccc;
-    box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc;
-}
 .card-container-header {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -3436,6 +3428,11 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .cd-light div div .node-title, .cd-light div div .card-manager-title {
     color: #37495b;
+}
+@keyframes loader {
+	0% { background: #ddd; }
+	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
+	66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
 }
 @media min-width 992px {
     #page-content {
