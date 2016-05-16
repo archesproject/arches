@@ -1624,7 +1624,7 @@ ul .collapse li:last-of-type {
     padding-top: 10px;
     padding-left: 0;
 }
-.container-highlight {
+.container-highlight, .resource-grid-main-container:hover {
     background: #f6f6f6;
 }
 .resource-grid-icon {
