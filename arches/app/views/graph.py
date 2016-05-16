@@ -180,9 +180,16 @@ def clone(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         graph = Graph(graphid).copy()
+        if 'isresource' in data:
+            graph.metadata.isresource = data['isresource']
+
         if 'name' in data:
-            graph.root.name = data['name']
-            graph.metadata.name = data['name']
+            name = data['name']
+        else:
+            name = _('New Resource') if graph.metadata.isresource else _('New Graph')
+        graph.root.name = name
+        graph.metadata.name = name
+
         graph.populate_null_nodegroups()
         graph.save()
         return JSONResponse(graph)
