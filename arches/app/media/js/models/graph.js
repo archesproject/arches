@@ -129,14 +129,15 @@ define(['arches',
             }, this)
             this.set('datatypelookup', datatypelookup);
 
+            this.set('edges', ko.observableArray(attributes.data.edges));
             attributes.data.nodes.forEach(function (node, i) {
                 attributes.data.nodes[i] = new NodeModel({
                     source: node,
-                    datatypelookup: datatypelookup
+                    datatypelookup: datatypelookup,
+                    graph: self
                 });
             });
             this.set('nodes', ko.observableArray(attributes.data.nodes));
-            this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('root', attributes.data.root);
             this.set('metadata', attributes.data.metadata);
 
@@ -146,6 +147,16 @@ define(['arches',
                 }, this);
                 return selectedNode;
             }));
+        },
+
+        getParentProperty: function(node){
+            var ret;
+            this.get('edges')().forEach(function (edge) {
+                if (edge.rangenode_id === node.nodeid){
+                    ret = edge.ontologyproperty_id;
+                }
+            }, this);
+            return ret;
         },
 
         _doRequest: function (config, callback, scope, eventname) {

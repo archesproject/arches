@@ -202,7 +202,7 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph(self.rootNode)
-        graph.append_branch('P1', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.append_branch('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
@@ -224,7 +224,7 @@ class GraphTests(ArchesTestCase):
                 self.assertEqual(node, self.rootNode)
 
 
-        appended_branch = graph.append_branch('P1', graphid=self.SINGLE_NODE_GRAPHID)
+        appended_branch = graph.append_branch('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', graphid=self.SINGLE_NODE_GRAPHID)
         graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
@@ -245,13 +245,13 @@ class GraphTests(ArchesTestCase):
         # test moving a single node to another branch
         # this node should be grouped with it's new parent nodegroup
         graph = Graph(self.rootNode)
-        branch_one = graph.append_branch('P1', graphid=self.NODE_NODETYPE_GRAPHID)
-        branch_two = graph.append_branch('P1', graphid=self.NODE_NODETYPE_GRAPHID)
-        branch_three = graph.append_branch('P1', graphid=self.SINGLE_NODE_GRAPHID)
+        branch_one = graph.append_branch('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_two = graph.append_branch('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', graphid=self.NODE_NODETYPE_GRAPHID)
+        branch_three = graph.append_branch('9bf487d8-c0a3-3510-b228-1b5cd74f4c56', graphid=self.SINGLE_NODE_GRAPHID)
 
         branch_three_nodeid = branch_three.nodes.iterkeys().next()
         branch_one_rootnodeid = branch_one.root.nodeid
-        graph.move_node(branch_three_nodeid, 'P1', branch_one_rootnodeid)
+        graph.move_node(branch_three_nodeid, '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', branch_one_rootnodeid)
 
         new_parent_nodegroup = None
         moved_branch_nodegroup = None
@@ -269,7 +269,7 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        graph.move_node(branch_one_rootnodeid, 'P1', branch_two_rootnodeid)
+        graph.move_node(branch_one_rootnodeid, '9bf487d8-c0a3-3510-b228-1b5cd74f4c56', branch_two_rootnodeid)
 
         new_parent_nodegroup = None
         moved_branch_nodegroup = None

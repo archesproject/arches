@@ -25,54 +25,32 @@ def import_concepts(reference_data):
     values = reference_data[1]['values']
     relations = reference_data[2]['relations']
 
-    keys = []
-    def validate_recursion(conceptid):
-        if conceptid in keys:
-            # print conceptid + ' has been referenced twice.'
-            return True
-        else:
-            keys.append(conceptid)
-            for relation in relations:
-                if relation['conceptidfrom'] == conceptid:
-                    validate_recursion(relation['conceptidto'])
-
-    validate_recursion('00000000-0000-0000-0000-000000000002')
-
-    def get_concept_values(conceptid):
-        related_values = []
-        for value in values:
-            existing_valuetypes = [o.valuetype for o in models.DValueType.objects.all()]
-
-            if value['valuetype'] not in existing_valuetypes:
-                models.DValueType(valuetype = value['valuetype'], category = 'undefined', namespace = 'arches').save()
-
-            if value['conceptid'] == conceptid:
-                conceptvalue_obj = ConceptValue()
-                conceptvalue_obj.id = value['valueid']
-                conceptvalue_obj.type = value['valuetype']
-                conceptvalue_obj.value = value['value']
-                conceptvalue_obj.language = value['languageid']
-                related_values.append(conceptvalue_obj)
-
-        return related_values
-
     concept_objs = {}
     for concept in concepts:
         concept_obj = Concept()
         concept_obj.id = concept['conceptid']
         concept_obj.nodetype = concept['nodetype']
         concept_obj.legacyoid = concept['legacyoid']
-        concept_obj.values = get_concept_values(concept['conceptid'])
         concept_obj.save()
 
         concept_objs[concept_obj.id] = concept_obj
 
+    existing_valuetypes = [o.valuetype for o in models.DValueType.objects.all()]
+    for value in values:
+        if value['valuetype'] not in existing_valuetypes:
+            models.DValueType.objects.create(valuetype = value['valuetype'], category = 'undefined', namespace = 'arches')
+            existing_valuetypes.append(value['valuetype'])
+
+        conceptvalue_obj = ConceptValue()
+        conceptvalue_obj.id = value['valueid']
+        conceptvalue_obj.conceptid = value['conceptid']
+        conceptvalue_obj.type = value['valuetype']
+        conceptvalue_obj.value = value['value']
+        conceptvalue_obj.language = value['languageid']
+        conceptvalue_obj.save()
 
     for relation in relations:
         if relation['conceptidfrom'] in concept_objs and relation['conceptidto'] in concept_objs:
             conceptfrom = concept_objs[relation['conceptidfrom']]
             conceptto = concept_objs[relation['conceptidto']]
             conceptfrom.add_relation(conceptto, relation['relationtype'])
-
-
-
