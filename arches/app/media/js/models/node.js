@@ -18,8 +18,56 @@ define([
             self.datatype = ko.observable('');
             self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
-            self.relatableclasses = ko.observableArray();
-            self.relatableproperties = ko.observableArray();
+            self.ontologyclass_id = ko.observable('');
+            self.parentproperty_id = ko.observable('');
+            self.ontology_cache = ko.observableArray();
+
+            self.validclasses = ko.computed(function() {
+                if (!self.parentproperty_id()) {
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.class.value;
+                        })
+                        .uniq(function(item){
+                            return item.class.id;
+                        })
+                        .pluck('class')
+                        .value();
+                }else{
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.class.value;
+                        })
+                        .filter(function(item){
+                            return item.property.id === self.parentproperty_id();
+                        })
+                        .pluck('class')
+                        .value();
+                }
+            }, this),
+            self.validproperties = ko.computed(function() {
+                if (!self.ontologyclass_id()) {
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.property.value;
+                        })
+                        .uniq(function(item){
+                            return item.property.id;
+                        })
+                        .pluck('property')
+                        .value();
+                }else{
+                    return _.chain(self.ontology_cache())
+                        .sortBy(function(item){
+                            return item.property.value;
+                        })
+                        .filter(function(item){
+                            return item.class.id === self.ontologyclass_id();
+                        })
+                        .pluck('property')
+                        .value();
+                }
+            }, this);        
 
             self.parse(options.source);
             self.graph = options.graph;
@@ -48,7 +96,7 @@ define([
 
             self.selected.subscribe(function(selected){
                 if (selected){
-                    self.getRelatableNodesEdges();
+                    self.getValidNodesEdges();
                 }
             })
         },
@@ -60,6 +108,8 @@ define([
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
             self.cardinality(source.cardinality);
+            self.ontologyclass_id(source.ontologyclass_id);
+            self.parentproperty_id(source.parentproperty_id);
             self.validations.removeAll();
             source.validations.forEach(function(validation) {
                 self.validations.push(validation);
@@ -67,7 +117,6 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
-            self.ontologyclass_id = source.ontologyclass_id;
 
             self.set('id', self.nodeid);
         },
@@ -94,30 +143,21 @@ define([
             this.cardinality(cardinality);
         },
 
-        getRelatableNodesEdges: function(){
+        getValidNodesEdges: function(){
             var relatedNodesEdges = this.graph.getRelatedNodesEdges(this);
-            this.relatableproperties.removeAll();
-            this.relatableclasses.removeAll();
+            this.ontology_cache.removeAll();
             this._doRequest({
                 type: "POST",
                 url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
                 data: JSON.stringify(relatedNodesEdges)
             }, function(response, status, self){
-                response.responseJSON.properties.forEach(function(property){
-                    if(property.classes){
-                        property.classes.forEach(function(ontologyclass){
-                            self.relatableproperties.push({
-                                'id': property.id,
-                                'value': property.value,
-                                'classid': ontologyclass.id
-                            })
-                            self.relatableclasses.push({
-                                'id': ontologyclass.id,
-                                'value': ontologyclass.value,
-                                'propertyid': property.id
-                            })
-                        });
-                    }
+                response.responseJSON.forEach(function(item){
+                    item.ontology_classes.forEach(function(ontologyclass){
+                        self.ontology_cache.push({
+                            'property': item.ontology_property,
+                            'class': ontologyclass
+                        })
+                    });
                 }, this);
             }, this, 'changed');
         }

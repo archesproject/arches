@@ -36,8 +36,8 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class GraphMetadata(models.Model):
-    graphmetadataid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+class Graph(models.Model):
+    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -51,7 +51,7 @@ class GraphMetadata(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'graph_metadata'
+        db_table = 'graphs'
 
 
 class Card(models.Model):
@@ -148,7 +148,7 @@ class Edge(models.Model):
     ontologyproperty = models.ForeignKey(Concept, db_column='ontologyproperty', blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
+    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -244,45 +244,25 @@ class Node(models.Model):
     ontologyclass = models.ForeignKey(Concept, db_column='ontologyclass', blank=True, null=True)
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    graphmetadata = models.ForeignKey(GraphMetadata, db_column='graphmetadataid', blank=True, null=True)
+    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
-    def _traverse_graph(self):
+    def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
 
         returns a tuple of nodes and edges
 
         """
-
         nodes = []
         edges = []
         for edge in Edge.objects.filter(domainnode=self):
             nodes.append(edge.rangenode)
             edges.append(edge)
 
-            child_nodes, child_edges = edge.rangenode._traverse_graph()
+            child_nodes, child_edges = edge.rangenode.get_child_nodes_and_edges()
             nodes.extend(child_nodes)
             edges.extend(child_edges)
-        return (nodes, edges)
-
-    def get_child_nodes_and_edges(self):
-        """
-        _traverse_graph does the bulk of the work in gathering up the child nodes and edges
-
-        what we do here is make sure that the common node referenced by two or more edges is the same node reference in memory
-        that way if a user updates a node attribute that update is reflected accross all edges that reference that node
-
-        """
-
-        nodes, edges = self._traverse_graph()
-        node_mapping = {node.pk:node for node in nodes}
-        for edge in edges:
-            if edge.domainnode.pk == self.pk:
-                edge.domainnode = self
-            else:
-                edge.domainnode = node_mapping[edge.domainnode.pk]
-            edge.rangenode = node_mapping[edge.rangenode.pk]
         return (nodes, edges)
 
     def is_collector(self):
@@ -303,6 +283,30 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
+    def set_nodegroup(self, nodegroupid):
+        nodes, edges = self.get_child_nodes_and_edges()
+        collectors = [node_ for node_ in nodes if node_.is_collector()]
+        node_ids = [id_node.nodeid for id_node in nodes]
+        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
+        edge = Edge.objects.get(rangenode_id=self.pk)
+        parent_group = edge.domainnode.nodegroup
+        new_group = parent_group
+
+        if nodegroupid == str(self.pk):
+            new_group, created = NodeGroup.objects.get_or_create(nodegroupid=self.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+            new_group.parentnodegroup = parent_group
+            parent_group = new_group
+
+        for collector in collectors:
+            collector.nodegroup.parentnodegroup = parent_group
+
+        for group_node in group_nodes:
+            group_node.nodegroup = new_group
+
+        self.nodegroup = new_group
+
+        updated_models = [c.nodegroup for c in collectors] + group_nodes + [new_group]
+        return updated_models
 
     class Meta:
         managed = True
@@ -348,7 +352,6 @@ class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
     resourceclassto = models.ForeignKey(Node, db_column='resourceclassto', blank=True, null=True, related_name='resxres_contstraint_classes_to')
-    cardinality = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True

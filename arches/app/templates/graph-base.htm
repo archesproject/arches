@@ -80,7 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu Item -->
             <li id="settings-manager" class="edit-menu-item{% if main_script == "graph-settings" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' nodeid %}' }">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' graphid %}' }">
                     <div class="media-body">
                         <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
                         <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
@@ -90,7 +90,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu Item -->
             <li class="edit-menu-item{% if main_script == "graph-manager" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' nodeid %}' }">
+                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' graphid %}' }">
                     <div class="media-body">
                         <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graph Manager</div>
                         <span class="text-muted menu-item-subtitle">Define graph, permissions</span>

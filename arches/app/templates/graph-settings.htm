@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="text-left edit-panel-top-bar">
     <div class="center-div">
         <h1 class="page-header text-overflow arches-panel-header">
-            <i class="text-center {{metadata.iconclass|default:'fa fa-question'}} icon-wrap bg-gray arches-panel-icon"  data-bind="css: (metadata.iconclass()?metadata.iconclass():'fa fa-question') + ' text-center icon-wrap bg-gray arches-panel-icon'"></i>
+            <i class="text-center {{metadata.iconclass|default:'fa fa-question'}} icon-wrap bg-gray arches-panel-icon"  data-bind="css: (metadata.iconclass() || 'fa fa-question') + ' text-center icon-wrap bg-gray arches-panel-icon'"></i>
             <span data-bind="text:metadata.name">{{metadata.name}}</span>
         </h1>
         <p class="arches-panel-subtitle" data-bind="text:metadata.subtitle">{{metadata.subtitle}}</p>
@@ -38,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="panel card-panel">
             <div class="panel-heading">
                 <div>
-                    <h3 class="panel-title card-main-title">Settings</h3>
+                    <h3 class="panel-title card-main-title">{% trans "Settings" %}</h3>
                 </div>
             </div>
 
@@ -55,17 +55,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <ul class="nav nav-tabs card-nav-container">
                         <li id="xx-id-group" class="active">
                             <a id="xx-id-tab" data-toggle="tab" href="#id-card" class="card-tab-title" aria-expanded="true">
-                                Resource Identifiers
+                                {% trans "Resource Identifiers" %}
                             </a>
                         </li>
                         <li id="xx-desc-group">
                             <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
-                                Description
+                                {% trans "Description" %}
                             </a>
                         </li>
                         <li id="xx-meta-group">
                             <a id="xx-meta-tab" data-toggle="tab" href="#meta-card" class="card-tab-title" aria-expanded="true">
-                                Status
+                                {% trans "Status" %}
                             </a>
                         </li>
                     </ul>
@@ -85,11 +85,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- Card Instruction -->
                                     <p id="install-instructions" class="content-instructions">
-                                        Set the defaults for your resource
+                                        {% trans "Set the defaults for your resource" %}
 
                                         <!-- Help link -->
                                         <span>
-                                            <a id="card-help" class="pull-right card-help help"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a id="card-help" class="pull-right card-help help"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </p>
 
@@ -101,14 +101,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="form-group">
                                                     <div class="relative">
                                                         <label class="col-xs-12 control-label widget-input-label">
-                                                            Resource Name
+                                                            {% trans "Resource Name" %}
                                                             <i class="ion-ios-checkmark-outline"></i>
                                                             <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title="Show Vocabulary"></i>
                                                         </label>
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="Name" class="form-control input-lg widget-input" data-bind="value:metadata.name">
+                                                        <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.name">
                                                     </div>
                                                 </div>
                                             </div>
@@ -116,11 +116,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> Resource Subtitle <i class="ion-ios-checkmark-outline"></i></label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resource Subtitle" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="Subtitle" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle">
+                                                        <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle">
                                                     </div>
                                                 </div>
                                             </div>
@@ -128,7 +128,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div>
-                                                        <label class="col-xs-12 control-label widget-input-label"> Form Icon <i class="ion-ios-checkmark-outline"></i></label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Form Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                     </div>
 
                                                     <!-- Icon search -->
@@ -137,12 +137,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <!-- Currently selected icon -->
                                                             <div>
-                                                                Selected icon:
+                                                                {% trans "Selected icon:" %}
                                                                 <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + metadata.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
                                                             </div>
 
                                                             <div style="position: absolute; left: 130px; top: 21px;">
-                                                                <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="Find an icon" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                                <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                                 <!-- Remove Search -->
                                                                 <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
@@ -182,7 +182,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- Card Instruction -->
                                     <p id="install-instructions" class="content-instructions">
-                                        Define this resource's status
+                                        {% trans "Define this resource's status" %}
                                     </p>
 
                                     <!-- Form -->
@@ -191,16 +191,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="row widget-container">
                                             <div class="form-group">
                                                 <div class="relative">
-                                                    <label class="col-xs-12 control-label widget-input-label"> Type <i class="ion-ios-checkmark-outline"></i></label>
+                                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Type" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                 </div>
 
                                                 <div class="col-xs-12">
                                                     <div class="pad-hor">
                                                         <label data-bind="css: { 'active': metadata.isresource() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="true"> Resource
+                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="true"> {% trans "Resource" %}
                                                         </label>
                                                         <label data-bind="css: { 'active': !metadata.isresource() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="false"> Graph
+                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="false"> {% trans "Graph" %}
                                                         </label>
                                                     </div>
                                                 </div>
@@ -210,16 +210,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="row widget-container">
                                             <div class="form-group">
                                                 <div class="relative">
-                                                    <label class="col-xs-12 control-label widget-input-label"> Status <i class="ion-ios-checkmark-outline"></i></label>
+                                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                 </div>
 
                                                 <div class="col-xs-12">
                                                     <div class="pad-hor">
                                                         <label data-bind="css: { 'active': metadata.isactive() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="true"> Active
+                                                            <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="true"> {% trans "Active" %}
                                                         </label>
                                                         <label data-bind="css: { 'active': !metadata.isactive() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="false"> Inactive
+                                                            <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="false"> {% trans "Inactive" %}
                                                         </label>
                                                     </div>
                                                 </div>
@@ -229,7 +229,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="row widget-container" data-bind="visible: metadata.isresource()">
                                             <div class="form-group">
                                                 <div class="relative">
-                                                    <label class="col-xs-12 control-label widget-input-label"> Resources that may be related:</label>
+                                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Resources that may be related:" %}</label>
                                                 </div>
 
                                                 <div class="col-xs-12">
@@ -260,7 +260,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- Card Instruction -->
                                     <p id="install-instructions" class="content-instructions">
-                                        Describe this resource
+                                        {% trans "Describe this resource" %}
                                     </p>
 
                                     <!-- Form -->
@@ -270,11 +270,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> Author</label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Author" %}</label>
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="Author name" class="form-control input-lg widget-input" data-bind="value:metadata.author">
+                                                        <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.author">
                                                     </div>
                                                 </div>
                                             </div>
@@ -282,11 +282,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> Abstract</label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Abstract" %}</label>
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <textarea placeholder="Resource abstract/description" rows="6" class="form-control" data-bind="value:metadata.description"></textarea>
+                                                        <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:metadata.description"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -300,8 +300,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Save Input -->
                 <div class="wizard-buttons pull-right">
-                    <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt btn-editable" data-bind="click:reset"> Discard edits</button>
-                    <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check btn-editable" data-bind="click:save"> Save settings</button>
+                    <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt btn-editable" data-bind="click:reset"> {% trans "Discard edits" %}</button>
+                    <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check btn-editable" data-bind="click:save"> {% trans "Save settings" %}</button>
                 </div>
             </div>
         </div>
