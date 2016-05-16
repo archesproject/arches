@@ -74,6 +74,7 @@
                     </div>
                 </div>
 
+                <!-- ko if: !node().istopnode -->
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "Relation to parent" %}
@@ -82,6 +83,7 @@
                         <select class="design" data-bind="value: node().parentproperty_id, options: node().validproperties, optionsText: 'value', optionsValue: 'id',valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+                <!-- /ko -->
 
                 <div class="node-widget-label">
                     <div class="control-label">

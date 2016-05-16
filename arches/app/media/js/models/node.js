@@ -22,6 +22,8 @@ define([
             self.ontologyclass_id = ko.observable('');
             self.parentproperty_id = ko.observable('');
             self.ontology_cache = ko.observableArray();
+            
+            self.parse(options.source);
 
             self.validclasses = ko.computed(function() {
                 if (!self.parentproperty_id()) {
@@ -45,32 +47,33 @@ define([
                         .pluck('class')
                         .value();
                 }
-            }, this),
-            self.validproperties = ko.computed(function() {
-                if (!self.ontologyclass_id()) {
-                    return _.chain(self.ontology_cache())
-                        .sortBy(function(item){
-                            return item.property.value;
-                        })
-                        .uniq(function(item){
-                            return item.property.id;
-                        })
-                        .pluck('property')
-                        .value();
-                }else{
-                    return _.chain(self.ontology_cache())
-                        .sortBy(function(item){
-                            return item.property.value;
-                        })
-                        .filter(function(item){
-                            return item.class.id === self.ontologyclass_id();
-                        })
-                        .pluck('property')
-                        .value();
-                }
-            }, this);        
+            }, this);
 
-            self.parse(options.source);
+            if(!self.istopnode){
+                self.validproperties = ko.computed(function() {
+                    if (!self.ontologyclass_id()) {
+                        return _.chain(self.ontology_cache())
+                            .sortBy(function(item){
+                                return item.property.value;
+                            })
+                            .uniq(function(item){
+                                return item.property.id;
+                            })
+                            .pluck('property')
+                            .value();
+                    }else{
+                        return _.chain(self.ontology_cache())
+                            .sortBy(function(item){
+                                return item.property.value;
+                            })
+                            .filter(function(item){
+                                return item.class.id === self.ontologyclass_id();
+                            })
+                            .pluck('property')
+                            .value();
+                    }
+                }, this); 
+            }
 
             self.iconclass = ko.computed(function() {
                 return self.datatypelookup[self.datatype()];
