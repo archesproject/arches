@@ -66,6 +66,9 @@ class Ontology(Concept):
                 'ontology_property':None,
                 'ontology_classes':[]
             }
+            if len(child_properties) == 0:
+                for concept in models.Concept.objects.filter(nodetype='Ontology Class'):
+                    item['ontology_classes'].append(Ontology(concept).simplify(lang=lang))
             for ontology_class in ontology_classes:
                 item['ontology_classes'].append(ontology_class.simplify(lang=lang))
 
