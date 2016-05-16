@@ -76,6 +76,12 @@ class Ontology(Concept):
 
         return ret
 
+    def get_valid_domain_connections(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
+        pass
+
+    def get_valid_range_connections(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
+        pass
+
     def get_related_properties(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
         """
         gets the ontology properties that are allowed between the given ontology class and other ontology classes
@@ -211,8 +217,6 @@ class Ontology(Concept):
                     self.relationshiptype = relation.relationtype.pk
                     #ret.append(parentconcepts[-1])
         return ret
-
-
 
     def simplify(self, lang=settings.LANGUAGE_CODE):
         return {

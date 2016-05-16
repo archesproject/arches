@@ -71,7 +71,6 @@ class Graph(object):
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
 
-
     def add_node(self, node):
         """
         Adds a node to this graph
@@ -307,6 +306,10 @@ class Graph(object):
 
         self.populate_null_nodegroups()
         return ret
+
+    def get_valid_parent_conections(self):
+        #self.root.ontologyclass_id
+        pass
 
     def serialize(self):
         """
