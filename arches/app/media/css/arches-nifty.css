@@ -5,7 +5,7 @@
 @import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css);
 @import url(../plugins/themify-icons/themify-icons.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css);
+@import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
@@ -207,20 +207,6 @@ input[type="checkbox"] {
     height: 1.9em;
     width: 1.9em;
     font-size: 1.3em;
-}
-.chosen-container {
-    margin-bottom: 0;
-    color: #8d8d8d;
-    line-height: 1.3333333;
-}
-.chosen-container-multi .chosen-choices li.search-field {
-    margin: 2px 3px 0 10px;
-}
-.chosen-container-single .chosen-single {
-    background: #314151;
-    border: 1px solid #314151;
-    color: #fff;
-    height: 36px;
 }
 .form-text.form-checkbox:not(.btn), .form-text.form-radio:not(.btn) {
     padding-right: 25px;
@@ -467,22 +453,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .switch.on > small {
     left: 13px;
-}
-.chosen-container .chosen-results {
-    background: #314151;
-    color: #fff;
-    margin-right: 0;
-}
-.chosen-container-single .chosen-drop {
-    background: #314151;
-    font-size: 11px;
-}
-.chosen-container a, .chosen-container a:hover {
-    color: #fff;
-    cursor: pointer;
-}
-.chosen-container-active.chosen-with-drop .chosen-single {
-    background-image: none;
 }
 .library {
     position: absolute;
@@ -1462,13 +1432,19 @@ div.dropdown-menu.open {
     height: 170px;
     margin: 3px;
 }
-.chosen-container .chosen-single {
-    padding-top: 3px;
-    color: #bbb;
-    font-size: 11px;
+
+.chosen-container {
+	margin-bottom: 0px;
+	color: #8d8d8d;
+	line-height: 1.3333333;
 }
-.chosen-container .chosen-single b {
-    margin-top: 3px;
+
+.chosen-container-multi .chosen-choices li.search-field {
+    margin: 2px 3px 0 10px;
+}
+
+.chosen-container-single .chosen-single {
+	height: 36px;
 }
 .list-group-item.active:hover, .list-group-item.active:active, .list-group-item.active:focus {
     background-color: #f9f9f9;
@@ -2953,12 +2929,11 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-form-content {
     position: absolute;
-    top: 100px;
+    top: 50px;
     left: 0;
     right: 0;
     z-index: 10;
     transition: all .30s ease;
-    padding: 12px;
 }
 .ep-card-search {
     position: absolute;
