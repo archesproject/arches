@@ -68,7 +68,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="settings-manager" class="edit-menu-item selected">
+                    <li id="settings-manager" class="edit-menu-item {% if main_script == "graph-settings" %} selected{% endif %}">
+
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
@@ -108,7 +109,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="graph-manager" class="edit-menu-item">
+                    <li id="graph-manager" class="edit-menu-item {% if main_script == "graph-manager" %} selected{% endif %}">
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graphs/Semantics</div>
