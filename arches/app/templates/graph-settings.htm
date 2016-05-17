@@ -25,19 +25,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock graph_title %}
 
-
 {% block graph_header %}
-<div class="">
-    <h4 class="ep-form-toolbar-title"> {% trans "Resource Settings" %} </h4>
-</div>
-
-<!-- Tools -->
-<div class="ep-form-toolbar-tools">
-    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:reset">{% trans "Discard Edits" %}</button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:save">{% trans "Save Edits" %}</button>
-    <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Exit" %}</button>
-</div>
+{% trans "Resource Settings" %}
 {% endblock graph_header %}
+
+{% block graph_header_buttons %}
+<button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:reset">{% trans "Discard Edits" %}</button>
+<button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:save">{% trans "Save Edits" %}</button>
+{{ block.super }}
+{% endblock graph_header_buttons %}
 
 {% block content %}
 <div id="external-page-content">

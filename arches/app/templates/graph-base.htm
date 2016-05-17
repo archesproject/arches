@@ -165,8 +165,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div id="settings-form" class="relative fade in" style="display: block;">
                 <!-- Title Block -->
                 <div class="ep-form-toolbar">
-                    {% block graph_header %}
-                    {% endblock graph_header %}
+                    <div>
+                        <h4 class="ep-form-toolbar-title">
+                        {% block graph_header %}
+                        {% endblock graph_header %}
+                        </h4>
+                    </div>
+
+                    <!-- Tools -->
+                    <div class="ep-form-toolbar-tools">
+                        {% block graph_header_buttons %}
+                        <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Exit" %}</button>
+                        {% endblock graph_header_buttons %}
+                    </div>
                 </div>
 
                 <!-- Settings Form -->
