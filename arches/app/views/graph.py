@@ -43,17 +43,15 @@ def manager(request, graphid):
     validations = models.Validation.objects.all()
     metadata_records = JSONSerializer().serializeToPython(models.Graph.objects.all())
     branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
-
     branches = []
     for metadata_record in metadata_records:
-        try:
-            rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
-            metadata_record['graph'] = Graph(rootnode)
-            metadata_record['relates_via'] = ['P1', 'P2', 'P3']
-            branches.append(metadata_record)
-        except models.Node.DoesNotExist:
-            pass
-
+       try:
+           rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
+           metadata_record['graph'] = Graph(rootnode)
+           metadata_record['relates_via'] = ['P1', 'P2', 'P3']
+           branches.append(metadata_record)
+       except models.Node.DoesNotExist:
+           pass
     datatypes = models.DDataType.objects.all()
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
@@ -199,7 +197,12 @@ def clone(request, graphid):
 
     return HttpResponseNotFound()
 
-def get_related_nodes(request, ontology_concept_id):
-    lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    properties = Ontology().get_related_properties(ontology_concept_id, lang=lang)
-    return JSONResponse(properties, indent=4)
+def get_related_nodes(request):
+    ret = {
+        'properties': [],
+        'classes': []
+    }
+    lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+    data = JSONDeserializer().deserialize(request.body)
+    related_properties = Ontology().get_valid_ontology_concepts(data['parentnode'], child_properties=data['childedges'], lang=lang)
+    return JSONResponse(related_properties, indent=4)
