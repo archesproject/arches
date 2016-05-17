@@ -47,7 +47,7 @@ class Ontology(Concept):
         # limit the list of properties based on the intersection between the properties classes and the list of 
         # ontology classes we defined above
         if parent_node:
-            related_properties = self.get_related_properties(parent_node['ontologyclass_id'], lang=lang)
+            related_properties = self.get_valid_range_connections(parent_node['ontologyclass_id'], lang=lang)
             for related_property in related_properties:
                 if len(child_properties) > 0:
                     related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
@@ -77,12 +77,12 @@ class Ontology(Concept):
         return ret
 
     def get_valid_domain_connections(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
-        pass
+        return self.get_related_properties(ontology_concept_id, direction='up', lang=lang)
 
     def get_valid_range_connections(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
-        pass
+        return self.get_related_properties(ontology_concept_id, direction='down', lang=lang)
 
-    def get_related_properties(self, ontology_concept_id, lang=settings.LANGUAGE_CODE):
+    def get_related_properties(self, ontology_concept_id, direction='down', lang=settings.LANGUAGE_CODE):
         """
         gets the ontology properties that are allowed between the given ontology class and other ontology classes
         returned ontology properties include their related classes
@@ -100,13 +100,13 @@ class Ontology(Concept):
             include=None, depth_limit=2, pathway_filter=(Q(relationtype='hasDomainClass') | Q(relationtype='hasRangeClass')), lang=lang)
 
         for subconcept in concept_graph.subconcepts:
-            if subconcept.relationshiptype == "hasDomainClass":
+            if subconcept.relationshiptype == 'hasDomainClass' if direction == 'down' else 'hasRangeClass':
                 item = {
                     'ontology_property': subconcept,
                     'ontology_classes': []
                 }
                 for ontology_class in subconcept.subconcepts:
-                    if ontology_class.relationshiptype == "hasRangeClass":
+                    if ontology_class.relationshiptype == 'hasRangeClass' if direction == 'down' else 'hasDomainClass':
                         for subclass in ontology_class.get_subclasses(include=['label'], lang=lang):
                             item['ontology_classes'].append(subclass)
 

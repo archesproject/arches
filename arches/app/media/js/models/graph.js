@@ -75,9 +75,14 @@ define(['arches',
                 response.responseJSON.nodes.forEach(function(node){
                     self.get('nodes').push(new NodeModel({
                         source: node,
-                        datatypelookup: self.get('datatypelookup')
+                        datatypelookup: self.get('datatypelookup'),
+                        graph: self
                     }));
                 }, this);
+                response.responseJSON.edges.forEach(function(edge){
+                    self.get('edges').push(edge);
+                }, this);
+                
                 self.get('nodes')().forEach(function (node) {
                     node.selected(false);
                     if (node.nodeid === branchroot.nodeid){
@@ -85,9 +90,6 @@ define(['arches',
                     }
                 });
 
-                response.responseJSON.edges.forEach(function(edge){
-                    self.get('edges').push(edge);
-                }, this);
 
                 callback();
             }, scope, 'changed');

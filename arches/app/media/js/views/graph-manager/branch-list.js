@@ -5,6 +5,12 @@ define([
     'knockout'
 ], function(ListView, GraphBase, GraphModel , ko) {
     var BranchList = ListView.extend({
+        /**
+        * A backbone view to manage a list of graph nodes
+        * @augments ListView
+        * @constructor
+        * @name NodeList
+        */
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
@@ -12,8 +18,14 @@ define([
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
+            // _.filter(options.branches, function(branch){
+            //     return _.find(branch.domain_connections, function(domain_connection){
+            //         return _.find(domain_connection.ontology_classes, function(ontology_class){
+            //             return ontology_class.id === this.selectedNode().ontologyclass_id();
+            //         }, this) 
+            //     }, this);
+            // }, this);
             this.items().forEach(function (branch) {
-                branch.ontology_property = ko.observable('');
                 branch.graphModel = new GraphModel({
                     data: branch.graph
                 })
@@ -42,9 +54,19 @@ define([
             var self = this;
             if(this.selectedNode()){
                 this.loading(true);
-                this.graphModel.appendBranch(this.selectedNode().nodeid, item.ontology_property(), item.graphid, function(response){
-                    self.loading(false);
-                }, this)
+                var ontology_connection = _.find(item.graph.domain_connections, function(domain_connection){
+                    return _.find(domain_connection.ontology_classes, function(ontology_class){
+                        return ontology_class.id === this.selectedNode().ontologyclass_id();
+                    }, this) 
+                }, this);
+                if(ontology_connection){
+                    this.graphModel.appendBranch(this.selectedNode().nodeid, ontology_connection.ontology_property.id, item.graphid, function(response){
+                        self.loading(false);
+                    }, this)
+                }else{
+                    this.loading(true);
+                    // need to alert the user!, although this shoudn't happen
+                }
             }
             this.closeForm();
         },

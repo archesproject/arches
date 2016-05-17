@@ -35,6 +35,9 @@ class OntologyModelTests(ArchesTestCase):
         cls.E39_Actor = "af051b0a-be2f-39da-8f46-429a714e242c"
         cls.E1_CRM_Entity = "c03db431-4564-34eb-ba86-4c8169e4276c"
         cls.E77_Persistent_Item = "af1d24cc-428c-3689-bbd1-726d62ec5595"
+        cls.E74_Group = "211d0da0-5fd2-3d83-bb88-c08c71b46feb"
+        cls.E40_Legal_Body = "40a8beed-541b-35cd-b287-b7c345f998fe"
+        cls.E21_Person = "9ff08a71-8094-35ed-9005-d94abddefdfe"
 
     @classmethod
     def tearDownClass(cls):
@@ -445,7 +448,18 @@ class OntologyModelTests(ArchesTestCase):
         self.assertFalse(any(x != y.id for x, y in pairs))
 
     def test_get_sub_classes(self):
-        pass
+        """
+        test to make sure we can get a distinct list of sub classes of a given ontolgy class 
+
+        """
+
+        ontology_concepts = Ontology().get_subclasses(id=self.E39_Actor, lang='en-US')
+        self.assertEqual(4, len(ontology_concepts))
+        
+        ontology_concepts = sorted(ontology_concepts, key=attrgetter("id"))
+        classes = sorted([self.E39_Actor, self.E74_Group, self.E40_Legal_Body, self.E21_Person])
+        pairs = zip(classes, ontology_concepts)
+        self.assertFalse(any(x != y.id for x, y in pairs))
 
     def test_get_relatable_classes_and_properties(self):
         data = {

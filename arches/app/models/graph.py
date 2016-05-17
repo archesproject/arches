@@ -307,9 +307,8 @@ class Graph(object):
         self.populate_null_nodegroups()
         return ret
 
-    def get_valid_parent_conections(self):
-        #self.root.ontologyclass_id
-        pass
+    def get_valid_domain_connections(self):
+        return Ontology().get_valid_domain_connections(self.root.ontologyclass_id)
 
     def serialize(self):
         """
@@ -324,6 +323,7 @@ class Graph(object):
         ret['metadata'] = self.metadata
         ret['root'] = self.root
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
+        ret['domain_connections'] = self.get_valid_domain_connections()
 
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
