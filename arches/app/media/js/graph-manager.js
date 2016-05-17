@@ -72,6 +72,11 @@ require([
         loading: loading
     });
 
+    viewModel.dirty = ko.computed(function () {
+        var node = viewModel.nodeForm.node();
+        return node ? viewModel.nodeForm.node().dirty() : false;
+    });
+
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
         graphModel: graphModel
