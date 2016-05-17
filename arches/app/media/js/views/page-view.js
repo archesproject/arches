@@ -16,10 +16,23 @@ define([
                 showTabs: ko.observable(false),
                 tabsActive: ko.observable(false),
                 menuActive: ko.observable(false),
-                navigate: function(url) {
+                dirty: ko.observable(false),
+                showConfirmNav: ko.observable(false),
+                navDestination: ko.observable(''),
+                navigate: function(url, bypass) {
+                    if (!bypass && self.viewModel.dirty()) {
+                        self.viewModel.navDestination(url);
+                        self.viewModel.showConfirmNav(true);
+                        return;
+                    }
+                    self.viewModel.showConfirmNav(false);
                     self.viewModel.loading(true);
                     window.location = url;
                 }
+            });
+
+            this.viewModel.showConfirmNav.subscribe(function(val) {
+                $('#confirm-nav-modal').modal(val?'show':'hide')
             });
 
             Backbone.View.apply(this, arguments);
