@@ -23,6 +23,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graph Designer" %}
 {% endblock graph_header %}
 
+{% block graph_header_buttons %}
+<span data-bind="if: nodeForm.node() && nodeForm.node().dirty()">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:function () { nodeForm.cancel() }">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:function () { nodeForm.save() }">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
 {% block content %}
 <div id="graph-container">
 
@@ -36,12 +44,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					</div>
 
 					<!-- Node Editor -->
-					<div id="nodeCrud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="library library-dark">
-                        {% include 'views/graph-manager/node-form.htm' %}
-						<!-- Graph Metadata -->
-						<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
-	                        {% include 'views/graph-manager/branch-info.htm' %}
-						</div>
+					<div data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+                        <div class="panel ep-card-crud-panel relative">
+                            {% include 'views/graph-manager/node-form.htm' %}
+    						<!-- Graph Metadata -->
+    						<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
+    	                        {% include 'views/graph-manager/branch-info.htm' %}
+    						</div>
+                        </div>
 					</div>
 
 					<!-- Graph -->

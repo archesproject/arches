@@ -576,11 +576,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     margin-top: -5px;
 }
 .library-search {
-    background-color: inherit;
-    border: 1px solid #314151;
-    color: #fff;
-    margin-left: 10px;
-    margin-right: 10px;
     font-size: 11px;
     height: 32px;
     width: 100%;
@@ -3305,8 +3300,11 @@ li.search-field {
 li.aside-li.active:hover, .library-dark .tab-content {
     background: #37495b;
 }
-.nav-tabs.library-tools > li.active > a > i, .help-close:hover, .library-close-btn:hover, .clear-selection-link:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover, .clear-selection-link:hover {
+.help-close:hover, .library-close-btn:hover, .clear-selection-link:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover, #aside .nav-tabs a i:hover, .node-note, .o-nav-library-tab i, .jqtree-title.jqtree_common:hover, .btn-flat:focus, .help-close:hover, .clear-selection-link:hover {
     color: #fff;
+}
+.nav-tabs.library-tools > li.active > a > i {
+    color: #123;
 }
 .ltr, .wizard-buttons *, .ltr {
     direction: ltr;
