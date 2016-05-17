@@ -2,7 +2,7 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'views/page-view',
+    'views/graph-page-view',
     'views/graph-manager/graph',
     'views/graph-manager/branch-list',
     'views/graph-manager/node-list',

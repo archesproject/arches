@@ -6,7 +6,7 @@ define([
     ko.bindingHandlers.chosen = {
         init: function(element, valueAccessor, allBindingsAccessor) {
             $(element).addClass('chzn-select');
-            $(element).chosen();
+            $(element).chosen({ width: '100%' });
         },
         update: function(element) {
             $(element).trigger('liszt:updated');

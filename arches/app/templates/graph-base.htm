@@ -27,111 +27,169 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
 <div class="loading-mask" data-bind="visible:loading()"></div>
 
-<div id="edit-panel" class="pt-page fade in">
+<div id="edit-panel" class="pt-page fade relative in">
+
     <!-- Page Header -->
-    <div class="edit-page-toolbar relative">
+    <div class="ep-toolbar relative">
 
-        <!-- Menu Panel Control -->
-        <div class="edit-menu-control" data-bind="css: {'edit-menu-control-out': !menuActive()}">
-            <button id="menu-btn" data-bind="click:function() { menuActive(!menuActive()); }" class="text-semibold btn btn-flat btn-flat-sm"><i id="menu-back" class="ion-ios-arrow-back dismiss-panel" data-bind="visible:menuActive()"></i> Menu <i id="menu-forward" class="ion-ios-arrow-forward dismiss-panel" data-bind="visible:!menuActive()"></i></button>
+        <!-- Tools Menu -->
+        <div class="ep-tools text-center">
+          <a id="menu-control" href="" class="ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> Manage <i class="ion-more"></i></a>
         </div>
 
-        <!-- Page Controls -->
-        <div>
-            <div class="dismiss-edit-panel">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' '' %}' }"><i class="ion-ios-close dismiss-panel add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Dismiss"></i></a>
+        <!-- Title Bar -->
+        {% block graph_title %}
+        <div class="ep-tools-title">
+          <h1 class="page-header text-overflow ep-graph-title"><i class="{{metadata.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i> {{metadata.name}}</h1>
+        </div>
+        {% endblock graph_title %}
+
+        <!-- Search Bar -->
+        <div class="ep-tools-search text-center">
+          <a id="" href="" class=""><i class="ion-search add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Search"></i></a>
+        </div>
+
+        <!-- Help Bar -->
+        <div class="ep-tools-help text-center">
+          <a id="help-control" href="" class=""><i class="ion-information-circled add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Help"></i></a>
+        </div>
+    </div>
+
+    <!-- Menu -->
+    <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+        <div class="panel ep-menu-panel relative" style="">
+
+            <!-- Menu List -->
+            <div class="panel-body">
+               <ul class="list-group ep-menu-list">
+                    <!-- Menu Item -->
+                    <li id="" class="resource-selector">
+                        <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: graphs, optionsText: 'name', optionsValue: 'graphid', chosen: true"></select>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="settings-manager" class="edit-menu-item selected">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
+                                <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="card-manager" class="edit-menu-item">
+                        <a href="#">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-file-o"></i> Data Widgets and Cards </div>
+                                <span class="text-muted menu-item-subtitle">Configure data entry cards</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="form-manager" class="edit-menu-item">
+                        <a href="#">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-files-o"></i> Data Entry Forms</div>
+                                <span class="text-muted menu-item-subtitle">Group data entry cards</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li class="edit-menu-item">
+                        <a id="" href="#">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-book"></i> Reports</div>
+                                <span class="text-muted menu-item-subtitle">Configure resource reports </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="graph-manager" class="edit-menu-item">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graphs/Semantics</div>
+                                <span class="text-muted menu-item-subtitle">Define graph, permissions</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li class="edit-menu-item">
+                        <a id="" href="#">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-tag"></i> Return to Resource Designer</div>
+                                <span class="text-muted menu-item-subtitle">Create Arches Resources </span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel-footer ep-menu-footer hidden">
+
+                footer
             </div>
         </div>
     </div>
 
-    <!-- Page Top Panel (title block) -->
-    <div class="relative edit-panel-content" data-bind="css: {'edit-panel-content-full': !menuActive()}">
-        <div class="edit-panel">
-            {% block graph_header %}
-            <!-- Title -->
-            <div class="text-left edit-panel-top-bar">
-                <div class="center-div">
-                    <h1 class="page-header text-overflow arches-panel-header"><i class="text-center {{metadata.iconclass|default:'fa fa-question'}} icon-wrap bg-gray arches-panel-icon"></i> {{metadata.name}}</h1>
-                    <p class="arches-panel-subtitle">{{metadata.subtitle}}</p>
+    <!-- Help Panel -->
+    <div id="" class="ep-help" style="display: none;">
+        <div class="panel ep-help-panel relative" style="">
+
+            <!-- Help Item List -->
+            <div class="panel-body">
+                <p class="ep-tool-title">Help Topics Go Here</p>
+
+            </div>
+
+            <div class="panel-footer ep-menu-footer">
+                <div class="footer-tools">
+                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">Close</button>
                 </div>
             </div>
-            {% endblock graph_header %}
 
-            <!-- Page Alert -->
-            <div id="edit-page-alert"></div>
-
-            <div class="edit-content">
-            {% block content %}
-            {% endblock content %}
-            </div>
         </div>
     </div>
 
-    <!-- Edit Menu -->
-    <div id="edit-menu" class="edit-menu" data-bind="css: { 'edit-menu-out': !menuActive() }">
-        <ul class="list-group edit-menu-list">
-            <!-- Menu Title -->
-            <li>
-                <div class="edit-menu-title">
-                    <h1 class="page-header text-overflow"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> Arches Designer</h1>
-                    <p class="arches-panel-subtitle" style="padding-left: 45px;">Create Arches Resources</p>
+
+    <!-- Edit Content -->
+    <div class="relative ep-content">
+        <div id="" class="edit-content relative" style="top: 0px;">
+
+
+            <!-- Settings -->
+            <div id="settings-form" class="relative fade in" style="display: block;">
+                <!-- Title Block -->
+                <div class="ep-form-toolbar">
+                    {% block graph_header %}
+                    {% endblock graph_header %}
                 </div>
-            </li>
 
-            <!-- Menu Item -->
-            <li id="settings-manager" class="edit-menu-item{% if main_script == "graph-settings" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph_settings' graphid %}' }">
-                    <div class="media-body">
-                        <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
-                        <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
-                    </div>
-                </a>
-            </li>
+                <!-- Settings Form -->
+                <div class="ep-form-content">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+            </div>
 
-            <!-- Menu Item -->
-            <li class="edit-menu-item{% if main_script == "graph-manager" %} selected{% endif %}">
-                <a href="#" data-bind="click:function () { loading(true); window.location = '{% url 'graph' graphid %}' }">
-                    <div class="media-body">
-                        <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graph Manager</div>
-                        <span class="text-muted menu-item-subtitle">Define graph, permissions</span>
-                    </div>
-                </a>
-            </li>
 
-            <!-- Menu Item -->
-            <li id="card-manager" class="edit-menu-item">
-                <a href="#maps-form">
-                    <div class="media-body">
-                        <div class="menu-item-title"><i class="fa fa-file-o"></i> Card Manager</div>
-                        <span class="text-muted menu-item-subtitle">Configure data entry cards</span>
-                    </div>
-                </a>
-            </li>
-
-            <!-- Menu Item -->
-            <li id="form-manager" class="edit-menu-item">
-                <a href="#maps-form">
-                    <div class="media-body">
-                        <div class="menu-item-title"><i class="fa fa-files-o"></i> Form Manager</div>
-                        <span class="text-muted menu-item-subtitle">Group data entry cards</span>
-                    </div>
-                </a>
-            </li>
-
-            <!-- Menu Item -->
-            <li class="edit-menu-item">
-                <a href="#maps-form">
-                    <div class="media-body">
-                        <div class="menu-item-title"><i class="fa fa-book"></i> Report Manager</div>
-                        <span class="text-muted menu-item-subtitle">Configure resource reports </span>
-                    </div>
-                </a>
-            </li>
-        </ul>
+        </div>
     </div>
-
 </div>
-
 {% endblock body %}
 
 {% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+<script>{% autoescape off %}
+define('graph-base-data', [], function () {
+    return {
+        graphs: {{graphs}},
+        graphid: '{{graphid}}'
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

@@ -19,16 +19,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block graph_title %}
+<div class="ep-tools-title">
+  <h1 class="page-header text-overflow ep-graph-title"><i class="{{metadata.iconclass|default:'fa fa-question'}} text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (metadata.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:metadata.name">{{metadata.name}}</span></h1>
+</div>
+{% endblock graph_title %}
+
+
 {% block graph_header %}
-<!-- Title -->
-<div class="text-left edit-panel-top-bar">
-    <div class="center-div">
-        <h1 class="page-header text-overflow arches-panel-header">
-            <i class="text-center {{metadata.iconclass|default:'fa fa-question'}} icon-wrap bg-gray arches-panel-icon"  data-bind="css: (metadata.iconclass() || 'fa fa-question') + ' text-center icon-wrap bg-gray arches-panel-icon'"></i>
-            <span data-bind="text:metadata.name">{{metadata.name}}</span>
-        </h1>
-        <p class="arches-panel-subtitle" data-bind="text:metadata.subtitle">{{metadata.subtitle}}</p>
-    </div>
+<div class="">
+    <h4 class="ep-form-toolbar-title"> {% trans "Resource Settings" %} </h4>
+</div>
+
+<!-- Tools -->
+<div class="ep-form-toolbar-tools">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:reset">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:save">{% trans "Save Edits" %}</button>
+    <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Exit" %}</button>
 </div>
 {% endblock graph_header %}
 
@@ -297,12 +304,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </div>
                 </div>
-
-                <!-- Save Input -->
-                <div class="wizard-buttons pull-right">
-                    <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt btn-editable" data-bind="click:reset"> {% trans "Discard edits" %}</button>
-                    <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check btn-editable" data-bind="click:save"> {% trans "Save settings" %}</button>
-                </div>
             </div>
         </div>
     </div>
@@ -310,6 +311,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock content %}
 
 {% block pre_require_js %}
+{{ block.super }}
 <script>{% autoescape off %}
 define('graph-settings-data', [], function () {
     return {

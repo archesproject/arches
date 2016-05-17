@@ -32,8 +32,8 @@ from arches.app.models.ontology import Ontology
 
 @group_required('edit')
 def manager(request, graphid):
+    graphs = models.Graph.objects.all()
     if graphid is None or graphid == '':
-        graphs = models.Graph.objects.all()
         return render(request, 'graph-list.htm', {
             'main_script': 'graph-list',
             'graphs': JSONSerializer().serialize(graphs)
@@ -58,6 +58,7 @@ def manager(request, graphid):
     return render(request, 'graph-manager.htm', {
         'main_script': 'graph-manager',
         'graphid': graphid,
+        'graphs': JSONSerializer().serialize(graphs),
         'graph': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
@@ -105,10 +106,12 @@ def settings(request, graphid):
                 'metadata': res,
                 'is_relatable': (node in relatable_resources)
             })
+    graphs = models.Graph.objects.all()
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
         'metadata_json': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(graphs),
         'graphid': graphid,
         'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data)

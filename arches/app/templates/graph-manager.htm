@@ -50,6 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock content %}
 
 {% block pre_require_js %}
+{{ block.super }}
 <script>{% autoescape off %}
 define('graph-manager-data', [], function () {
     return {

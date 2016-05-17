@@ -3,7 +3,7 @@ require([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'views/page-view',
+    'views/graph-page-view',
     'graph-settings-data'
 ], function($, _, ko, koMapping, PageView, data) {
     var resourceJSON = JSON.stringify(data.resources);

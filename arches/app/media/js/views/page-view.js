@@ -23,9 +23,11 @@ define([
             });
 
             Backbone.View.apply(this, arguments);
-
-            ko.applyBindings(this.viewModel);
             return this;
+        },
+
+        initialize: function(options) {
+            ko.applyBindings(this.viewModel);
         }
     });
     return PageView;
