@@ -20,6 +20,7 @@ import uuid
 from copy import copy
 from django.db import transaction
 from arches.app.models import models
+from arches.app.models.ontology import Ontology
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -69,7 +70,6 @@ class Graph(object):
                     edge.domainnode = self.nodes[edge.domainnode.pk]
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
-
 
     def add_node(self, node):
         """
@@ -122,7 +122,7 @@ class Graph(object):
             edge.edgeid = egdeobj.get('edgeid', None)
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
-            edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
+            edge.ontologyproperty_id = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self.metadata
 
@@ -221,7 +221,7 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty = property,
+                ontologyproperty_id = property,
                 graph = self.metadata
             )
             branch_copy.add_edge(newEdge)
@@ -307,11 +307,37 @@ class Graph(object):
         self.populate_null_nodegroups()
         return ret
 
+    def get_valid_domain_connections(self):
+        return Ontology().get_valid_domain_connections(self.root.ontologyclass_id)
+
     def serialize(self):
+        """
+        serialize to a different form then used by the internal class structure
+        
+        used to append additional values (like Ontology preflabels) that 
+        internal objects (like models.Nodes) don't support
+
+        """
+
         ret = {}
         ret['metadata'] = self.metadata
         ret['root'] = self.root
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
-        ret['nodes'] = [node for key, node in self.nodes.iteritems()]
+        ret['domain_connections'] = self.get_valid_domain_connections()
+
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
+        ret['nodes'] = []
+        parentproperties = {
+            self.root.nodeid: {'id': None, 'value': None}
+        }
+        for edge_id, edge in self.edges.iteritems():
+            parentproperties[edge.rangenode_id] = Ontology(edge.ontologyproperty).simplify(lang='en-US')
+        for key, node in self.nodes.iteritems():
+            nodeobj = JSONSerializer().serializeToPython(node)
+            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]['id']
+            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]['value']
+            
+            Ontology(node.ontologyclass).simplify(lang='en-US')
+            nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
+            ret['nodes'].append(nodeobj)
         return ret
