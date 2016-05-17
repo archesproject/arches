@@ -61,6 +61,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% trans "Resource Identifiers" %}
                             </a>
                         </li>
+                        <li id="xx-icon-group">
+                            <a id="xx-icon-tab" data-toggle="tab" href="#icons-card" class="card-tab-title" aria-expanded="true">
+                                {% trans "Icons" %}
+                            </a>
+                        </li>
                         <li id="xx-desc-group">
                             <a id="xx-desc-tab" data-toggle="tab" href="#desc-card" class="card-tab-title" aria-expanded="true">
                                 {% trans "Description" %}
@@ -127,7 +132,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Card -->
+                        <div id="icons-card" class="tab-pane fade">
+                            <div class="panel-body card-panel-body">
+                                <div class="card-content">
+
+                                    <!-- Card Level Alert -->
+                                    <div id="summary-card-alert" class="panel install-card-alert"></div>
+
+                                    <!-- Card Instruction -->
+                                    <p id="install-instructions" class="content-instructions">
+                                        {% trans "Pick an icon for your resource" %}
+
+                                        <!-- Help link -->
+                                        <span>
+                                            <a id="card-help" class="pull-right card-help help"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                                        </span>
+                                    </p>
+
+                                    <!-- Form -->
+                                    <div class="col-xs-12">
+
+                                        <form class="widgets">
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div>
@@ -173,7 +205,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
                         </div>
-
 
                         <!-- Card -->
                         <div id="meta-card" class="tab-pane fade">
