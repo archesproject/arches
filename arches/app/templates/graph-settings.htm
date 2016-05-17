@@ -307,9 +307,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 </div>
-
-<input id="icon-data" name="icon-data" type="hidden" value="{{icons}}" />
-<input id="graph-metadata" name="graph-metadata" type="hidden" value="{{metadata_json}}" />
-<input id="node-data" name="node-data" type="hidden" value="{{node}}" />
-<input id="resource-data" name="resource-data" type="hidden" value="{{resource_data}}" />
 {% endblock content %}
+
+{% block pre_require_js %}
+<script>{% autoescape off %}
+define('graph-settings-data', [], function () {
+    return {
+        icons: {{icons}},
+        metadata: {{metadata_json}},
+        resources: {{resource_data}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

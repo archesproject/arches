@@ -12,13 +12,8 @@ require([
     'views/graph-manager/branch-info',
     'models/node',
     'models/graph',
-    'bootstrap-nifty'
-], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel, GraphModel) {
-    var graphData = JSON.parse($('#graph-data').val());
-    var branches = JSON.parse($('#branches').val());
-    var datatypes = JSON.parse($('#datatypes').val());
-    var validations = JSON.parse($('#validations').val());
-
+    'graph-manager-data'
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel, GraphModel, data) {
     var prepGraph = function(graph) {
         graph.nodes.forEach(function(node) {
             node.cardinality = 'n';
@@ -31,17 +26,17 @@ require([
         })
     };
 
-    branches.forEach(function(branch){
+    data.branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
         prepGraph(branch.graph);
     }, this);
 
-    prepGraph(graphData);
+    prepGraph(data.graph);
 
     var graphModel = new GraphModel({
-        data: graphData,
-        datatypes: datatypes
+        data: data.graph,
+        datatypes: data.datatypes
     });
 
     graphModel.on('changed', function(model, options){
@@ -64,7 +59,7 @@ require([
 
     viewModel.branchListView= new BranchListView({
         el: $('#branch-library'),
-        branches: ko.observableArray(branches),
+        branches: ko.observableArray(data.branches),
         graphModel: graphModel,
         loading: loading
     });
@@ -72,7 +67,7 @@ require([
     viewModel.nodeForm = new NodeFormView({
         el: $('#nodeCrud'),
         graphModel: graphModel,
-        validations: validations,
+        validations: data.validations,
         branchListView: viewModel.branchListView,
         loading: loading
     });

@@ -326,6 +326,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock body %}
 
 {% block javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
+
+{% block pre_require_js %}
+{% endblock pre_require_js %}
 
 {% include 'javascript.htm' %}
 

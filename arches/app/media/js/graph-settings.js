@@ -3,26 +3,25 @@ require([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'views/page-view'
-], function($, _, ko, koMapping, PageView) {
-    var icons = JSON.parse($('#icon-data').val());
-    var resourceJSON = $('#resource-data').val();
-    var resources = JSON.parse(resourceJSON);
-    resources.forEach(function(resource) {
+    'views/page-view',
+    'graph-settings-data'
+], function($, _, ko, koMapping, PageView, data) {
+    var resourceJSON = JSON.stringify(data.resources);
+    data.resources.forEach(function(resource) {
         resource.isRelatable = ko.observable(resource.is_relatable);
     });
-    var srcJSON = $('#graph-metadata').val();
-    var metadata = koMapping.fromJSON(srcJSON);
+    var srcJSON = JSON.stringify(data.metadata);
+    var metadata = koMapping.fromJS(data.metadata);
     var iconFilter = ko.observable('');
     var viewModel = {
         iconFilter: iconFilter,
         icons: ko.computed(function () {
-            return _.filter(icons, function (icon) {
+            return _.filter(data.icons, function (icon) {
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
         metadata: metadata,
-        resources: resources,
+        resources: data.resources,
         isResource: ko.computed({
             read: function() {
                 return metadata.isresource().toString();
@@ -41,7 +40,7 @@ require([
         }),
         save: function () {
             pageView.viewModel.loading(true);
-            var relatableResourceIds = _.filter(resources, function(resource){
+            var relatableResourceIds = _.filter(data.resources, function(resource){
                 return resource.isRelatable();
             }).map(function(resource){
                 return resource.id
@@ -66,7 +65,7 @@ require([
                 metadata[key](value);
             });
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
-                var resource = _.find(resources, function (resource) {
+                var resource = _.find(data.resources, function (resource) {
                     return resource.id === jsonResource.id;
                 });
                 resource.isRelatable(jsonResource.is_relatable);
