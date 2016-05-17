@@ -12,8 +12,19 @@ require([
     });
     var srcJSON = JSON.stringify(data.metadata);
     var metadata = koMapping.fromJS(data.metadata);
+    var dirtyInitialized = false;
+    var dirty = ko.computed(function () {
+        if (!dirtyInitialized) {
+            ko.toJS(metadata);
+            ko.toJS(data.resources);
+            dirtyInitialized = true;
+            return false;
+        }
+        return true;
+    });
     var iconFilter = ko.observable('');
     var viewModel = {
+        dirty: dirty,
         iconFilter: iconFilter,
         icons: ko.computed(function () {
             return _.filter(data.icons, function (icon) {
