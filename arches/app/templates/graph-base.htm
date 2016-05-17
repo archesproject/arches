@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Tools Menu -->
         <div class="ep-tools text-center">
-          <a id="menu-control" href="" class="ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> Manage <i class="ion-more"></i></a>
+          <a id="menu-control" href="" class="ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> {% trans "Manage" %} <i class="ion-more"></i></a>
         </div>
 
         <!-- Title Bar -->
@@ -72,8 +72,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-wrench"></i> Settings</div>
-                                <span class="text-muted menu-item-subtitle">Asset Name, Settings, Relations</span>
+                                <div class="menu-item-title"><i class="fa fa-wrench"></i> {% trans "Settings" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Asset Name, Settings, Relations" %}</span>
                             </div>
                         </a>
                     </li>
@@ -82,8 +82,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="card-manager" class="edit-menu-item">
                         <a href="#">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-file-o"></i> Data Widgets and Cards </div>
-                                <span class="text-muted menu-item-subtitle">Configure data entry cards</span>
+                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
                             </div>
                         </a>
                     </li>
@@ -92,8 +92,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="form-manager" class="edit-menu-item">
                         <a href="#">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-files-o"></i> Data Entry Forms</div>
-                                <span class="text-muted menu-item-subtitle">Group data entry cards</span>
+                                <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
                             </div>
                         </a>
                     </li>
@@ -102,8 +102,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="edit-menu-item">
                         <a id="" href="#">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-book"></i> Reports</div>
-                                <span class="text-muted menu-item-subtitle">Configure resource reports </span>
+                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
                             </div>
                         </a>
                     </li>
@@ -112,8 +112,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="graph-manager" class="edit-menu-item {% if main_script == "graph-manager" %} selected{% endif %}">
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-sitemap"></i> Graphs/Semantics</div>
-                                <span class="text-muted menu-item-subtitle">Define graph, permissions</span>
+                                <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Define graph, permissions" %}</span>
                             </div>
                         </a>
                     </li>
@@ -122,8 +122,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="edit-menu-item">
                         <a id="" href="#">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-tag"></i> Return to Resource Designer</div>
-                                <span class="text-muted menu-item-subtitle">Create Arches Resources </span>
+                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Resource Designer" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resources" %} </span>
                             </div>
                         </a>
                     </li>
@@ -148,7 +148,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="panel-footer ep-menu-footer">
                 <div class="footer-tools">
-                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">Close</button>
+                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">{% trans "Close" %}</button>
                 </div>
             </div>
 

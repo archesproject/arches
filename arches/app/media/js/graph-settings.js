@@ -12,16 +12,21 @@ require([
     });
     var srcJSON = JSON.stringify(data.metadata);
     var metadata = koMapping.fromJS(data.metadata);
+    var dirty = ko.observable(false);
     var dirtyInitialized = false;
-    var dirty = ko.computed(function () {
+    ko.computed(function () {
         if (!dirtyInitialized) {
             ko.toJS(metadata);
             ko.toJS(data.resources);
             dirtyInitialized = true;
-            return false;
+            return;
         }
-        return true;
+        dirty(true);
     });
+    var resetDirty = function () {
+        dirtyInitialized = false;
+        dirty(false);
+    };
     var iconFilter = ko.observable('');
     var viewModel = {
         dirty: dirty,
@@ -64,6 +69,7 @@ require([
                     relatable_resource_ids: relatableResourceIds
                 }),
                 success: function(response) {
+                    resetDirty();
                     pageView.viewModel.loading(false);
                 },
                 failure: function(response) {
@@ -81,6 +87,7 @@ require([
                 });
                 resource.isRelatable(jsonResource.is_relatable);
             });
+            resetDirty();
         }
     };
 
