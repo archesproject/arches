@@ -96,11 +96,13 @@ require([
     });
 
     var resize = function(){
-        $('#graph').height($(window).height()-200);
-        $('.tab-content').height($(window).height()-259);
-        $('.grid-container').height($(window).height()-360);
+        $('#graph').height($(window).height()-100);
+        $('.tab-content').height($(window).height()-191);
+        $('.grid-container').height($(window).height()-260);
         viewModel.graphView.resize();
     }
+
+    viewModel.nodeForm.node.subscribe(resize)
 
     $( window ).resize(resize);
 
