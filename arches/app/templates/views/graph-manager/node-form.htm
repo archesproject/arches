@@ -1,6 +1,5 @@
 {% load staticfiles %}
 {% load i18n %}
-<!-- ko template: { if: node, afterRender: function() { $('[data-toggle="tooltip"]').tooltip(); } } -->
 <h4 class="title-block-title">
     <span class="node-title" data-bind="text: title"></span>
     <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
@@ -27,15 +26,14 @@
             <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
         </a>
     </li>
-    <!-- ko if: !node().istopnode -->
-    <li>
+    <li data-bind="visible: node() && !node().istopnode">
        <a href="#" class="nav-library-tab-link" data-bind="click:deleteNode">
            <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>
        </a>
    </li>
-   <!-- /ko -->
 </ul>
 
+<!-- ko if: node() -->
 <!-- Tabs Content -->
 <div class="tab-content" style="margin-top:10px;">
 

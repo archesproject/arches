@@ -2,7 +2,8 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'knockout'
+    'knockout',
+    'bootstrap-nifty'
 ], function($, _, Backbone, ko) {
     var PageView = Backbone.View.extend({
         el: $('body'),
@@ -41,6 +42,7 @@ define([
 
         initialize: function(options) {
             ko.applyBindings(this.viewModel);
+            $('[data-toggle="tooltip"]').tooltip();
         }
     });
     return PageView;
