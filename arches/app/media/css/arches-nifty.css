@@ -542,6 +542,9 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background-color: #f8f8f8;
     cursor: pointer;
 }
+#branch-library .library-card {
+    width: 300px;
+}
 .library-icon {
     width: 30px;
     position: absolute;
@@ -1478,7 +1481,7 @@ div.dropdown-menu.open {
 #branch-panel, #permissions-panel {
     position: absolute;
     top: 0;
-    right: 220px;
+    left: 450px;
     padding-left: 7px;
     padding-right: 5px;
     overflow-y: scroll;
@@ -3155,6 +3158,7 @@ li.card-tree-list:last-of-type {
     width: 249px;
 }
 .ep-node-card {
+    overflow: auto;
     position: absolute;
     top: 0;
     bottom: 0;

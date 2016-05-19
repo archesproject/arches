@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block body_attributes %}style="overflow:hidden;"{% endblock %}
+
 {% block graph_header %}
 {% trans "Graph Designer" %}
 {% endblock graph_header %}
@@ -48,11 +50,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="panel ep-card-crud-panel relative">
                             {% include 'views/graph-manager/node-form.htm' %}
     						<!-- Graph Metadata -->
-    						<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
-    	                        {% include 'views/graph-manager/branch-info.htm' %}
-    						</div>
                         </div>
 					</div>
+                    <div id="branch-panel" class="library ep-card-crud-panel" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
+                        {% include 'views/graph-manager/branch-info.htm' %}
+                    </div>
 
 					<!-- Graph -->
 					<div id="graph" style="margin-left:200px;"></div>

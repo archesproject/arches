@@ -40,7 +40,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
-<body class="scroll-y">
+<body {% block body_attributes %}class="scroll-y"{% endblock %}>
     {% block body %}
 
     <div class="wrapper">
