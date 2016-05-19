@@ -131,14 +131,19 @@ def node(request, nodeid):
                 node.status = data.get('status', '')
                 node.validations.set(data.get('validations', []))
                 new_nodegroup_id = data.get('nodegroup_id', None)
-                if unicode(node.nodegroup_id) != new_nodegroup_id:
+                old_nodegroup_id = unicode(node.nodegroup_id) if node.nodegroup_id is not None else None
+                if old_nodegroup_id != new_nodegroup_id:
                     for model in node.toggle_is_collector():
                         model.save()
-                cardinality = data.get('cardinality', 'n')
-                node.nodegroup.cardinality = cardinality
-                node.nodegroup.save()
+                if node.nodegroup_id is not None:
+                    cardinality = data.get('cardinality', 'n')
+                    node.nodegroup.cardinality = cardinality
+                    node.nodegroup.save()
+                    group_nodes = node.nodegroup.node_set.all()
+                else:
+                    child_nodes, child_edges = node.get_child_nodes_and_edges()
+                    group_nodes = [child_node for child_node in child_nodes if child_node.nodegroup is None]
                 node.save()
-                group_nodes = node.nodegroup.node_set.all()
                 return JSONResponse({'node': node, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
 
     if request.method == 'DELETE':
