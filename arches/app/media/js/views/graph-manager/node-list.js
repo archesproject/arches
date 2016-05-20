@@ -14,8 +14,8 @@ define([
             this.items().forEach(function(item){
                 item.filtered(true);
                 if(item.name().toLowerCase().indexOf(filter) !== -1 ||
-                   item.datatype().toLowerCase().indexOf(filter) !== -1 ||
-                   item.ontologyclass_id.toLowerCase().indexOf(filter) !== -1){
+                    item.datatype().toLowerCase().indexOf(filter) !== -1 ||
+                    item.ontologyclass_id.toLowerCase().indexOf(filter) !== -1){
                     item.filtered(false);
                 }
             }, this);

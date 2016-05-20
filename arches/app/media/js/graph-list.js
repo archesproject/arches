@@ -7,39 +7,32 @@ require([
     'bootstrap-nifty'
 ], function($, _, ko, PageView, NodeModel) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
-    var selectedGraph = ko.observable(null);
-    var newGraphName = ko.observable('');
+
+    var cloneGraph = function(graphid, data) {
+        data = data || {};
+        pageView.viewModel.loading(true);
+        $.ajax({
+            type: "POST",
+            url: 'clone/' + graphid,
+            data: JSON.stringify(data),
+            success: function(response) {
+                window.location = response.metadata.graphid + '/settings';
+            },
+            failure: function(response) {
+                pageView.viewModel.loading(false);
+            }
+        });
+    }
 
     graphs().forEach(function(graph) {
-        graph.open = function() {
+        graph.open = function(page) {
+            page = page || '';
             pageView.viewModel.loading(true);
-            window.location = graph.graphid + '/settings';
+            window.location = graph.graphid + page;
         };
         graph.clone = function() {
-            if (newGraphName() === '') {
-                graph.select();
-                $('#graph-name-modal').modal('show');
-            } else {
-                pageView.viewModel.loading(true);
-                $.ajax({
-                    type: "POST",
-                    url: 'clone/' + selectedGraph(),
-                    data: JSON.stringify({name: newGraphName()}),
-                    success: function(response) {
-                        window.location = response.metadata.graphid + '/settings';
-                    },
-                    failure: function(response) {
-                        pageView.viewModel.loading(false);
-                    }
-                });
-            }
+            cloneGraph(graph.graphid);
         };
-        graph.select = function() {
-            selectedGraph(graph.graphid);
-        };
-        graph.selected = ko.computed(function() {
-            return graph.graphid === selectedGraph();
-        });
         graph.deleteGraph = function () {
             var node = new NodeModel({
                 source: graph,
@@ -59,17 +52,30 @@ require([
         };
     });
 
+    var newGraph = function (isResource) {
+        var graphId = '22000000-0000-0000-0000-000000000000';
+        cloneGraph(graphId, {
+            isresource: !!isResource
+        });
+    };
+
     var pageView = new PageView({
         viewModel: {
-            graphs: graphs,
-            selectedGraph: selectedGraph,
-            newGraphName: newGraphName,
-            cloneSelected: function () {
-                if (selectedGraph()) {
-                    _.find(graphs(), function (graph) {
-                        return graph.selected()
-                    }).clone();
-                }
+            graphs: ko.computed(function() {
+                return ko.utils.arrayFilter(graphs(), function(graph) {
+                    return !graph.isresource;
+                });
+            }),
+            resources: ko.computed(function() {
+                return ko.utils.arrayFilter(graphs(), function(graph) {
+                    return graph.isresource;
+                });
+            }),
+            newResource: function () {
+                newGraph(true);
+            },
+            newGraph: function () {
+                newGraph(false);
             }
         }
     });

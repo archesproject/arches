@@ -166,3 +166,8 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['nodes']), self.NODE_COUNT+1)
+
+        post_data = JSONSerializer().serialize({'isresource': False})
+        response = self.client.post(url, post_data, content_type)
+        response_json = json.loads(response.content)
+        self.assertFalse(response_json['metadata']['isresource'])
