@@ -1,15 +1,12 @@
 {% load staticfiles %}
 {% load i18n %}
-<!-- ko if: node -->
-<h4>
-    <i class="ion-arrow-right-b"></i>
-    <span class="node-title" data-bind="text: title">
-        <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
-    </span>
+<h4 class="title-block-title">
+    <span class="node-title" data-bind="text: title"></span>
+    <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
 </h4>
 
 <div class="relative">
-    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: close"><i class="ion-ios-close"></i></a>
+    <a id="node-crud-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: close" style="margin-top:-5px;"><i class="ion-ios-close"></i></a>
 </div>
 
 <!-- nav bar -->
@@ -29,16 +26,20 @@
             <i class="ion-ios-glasses add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Preview Card" %}"></i>
         </a>
     </li>
+    <li data-bind="visible: node() && !node().istopnode">
+       <a href="#" class="nav-library-tab-link" data-bind="click:deleteNode">
+           <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Delete Node" %}"></i>
+       </a>
+   </li>
 </ul>
 
+<!-- ko if: node() -->
 <!-- Tabs Content -->
-<div class="tab-content">
+<div class="tab-content" style="margin-top:10px; overflow:auto;">
 
     <!--Node Listing tab -->
-    
-    <div id="node-form" class="tab-pane fade in active">
 
-        <hr class="section-division-dark node-section-division">
+    <div id="node-form" class="tab-pane fade in active">
 
         <div class="alert node-form-loading install-card-alert" data-bind="visible: loading()">
             <i class="fa fa-spinner fa-spin"> </i> <span> {% trans "Loading..." %}</span>
@@ -61,7 +62,7 @@
                         {% trans "Node Name" %}
                     </div>
                     <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
-                        <input type="text" placeholder="{% trans "Enter node name here..." %}``" class="node-attribute-widget" style="background: #314151; height: 32px;" data-bind="value:node().name, valueUpdate: 'keyup'">
+                        <input type="text" placeholder="{% trans "Enter node name here..." %}"class="form-control library-search" style="" placeholder="{% trans "node name" %}" data-bind="value:node().name, valueUpdate: 'keyup'">
                     </div>
                 </div>
 
@@ -111,7 +112,7 @@
 
         <div class="node-section">
 
-            <div style="padding-bottom: 15px;" data-bind="if: !node().istopnode">
+            <div style="padding-bottom: 15px;">
 
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
 
@@ -139,16 +140,6 @@
 
         </div>
 
-
-        <div class="pull-right" data-bind="if: node().dirty()">
-            <hr>
-            <button class="btn btn-primary btn-sm btn-labeled fa fa-check" data-bind="click:save"> {% trans "Save" %}</button>
-            <button class="btn btn-info btn-sm btn-labeled fa fa-times" data-bind="click:cancel"> {% trans "Cancel" %}</button>
-        </div>
-        <div class="pull-right">
-            <hr>
-            <button class="btn btn-danger btn-sm btn-labeled fa fa-times" data-bind="click:deleteNode"> {% trans "Delete" %}</button>
-        </div>
     </div>
 
     <!--Branch Library tab -->

@@ -13,9 +13,10 @@
         </span>
     </div>
     <div class="library-card-main" style="">
-        <a class="listitem_name" data-bind="text: $data.name">
+        <a class="name" data-bind="text: $data.name">
         </a>
     </div>
+    <div class="library-card-subtitle none" data-bind="text: $data.datatype().toLowerCase() + '; ' + $data.ontologyclass_value">
     <div class="library-card-subtitle" data-bind="text: $data.datatype().toLowerCase() + '; ' + $data.ontologyclass_value()">
     </div>
 {% endblock %}

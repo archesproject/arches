@@ -19,37 +19,62 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block body_attributes %}style="overflow:hidden;"{% endblock %}
+
+{% block graph_header %}
+{% trans "Graph Designer" %}
+{% endblock graph_header %}
+
+{% block graph_header_buttons %}
+<span data-bind="if: nodeForm.node() && nodeForm.node().dirty()">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:function () { nodeForm.cancel() }">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:function () { nodeForm.save() }">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
 {% block content %}
 <div id="graph-container">
 
-	<div class="panel" style="border: 1px solid #ddd;">
+	<div class="panel" style="border: 1px solid #ddd;margin:0px;">
 		<div class="eq-height clearfix">
 			<div class="row mar-no">
 				<div class="eq-box-md eq-no-panel">
 					<!--Node Listing -->
-					<div class="library library-medium library-dark" id="node-listing" data-bind="with: nodeList">
+					<div class="ep-card-tools" id="node-listing" data-bind="with: nodeList">
                         {% include 'views/graph-manager/node-list.htm' %}
 					</div>
 
 					<!-- Node Editor -->
-					<div id="nodeCrud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="library library-dark">
-                        {% include 'views/graph-manager/node-form.htm' %}
-						<!-- Graph Metadata -->
-						<div id="branch-panel" class="library library-medium library-dark" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
-	                        {% include 'views/graph-manager/branch-info.htm' %}
-						</div>
+					<div data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+                        <div class="panel ep-card-crud-panel relative">
+                            {% include 'views/graph-manager/node-form.htm' %}
+    						<!-- Graph Metadata -->
+                        </div>
 					</div>
+                    <div id="branch-panel" class="library ep-card-crud-panel" style="display: none;" data-bind="visible: branchListView.viewMetadata, with: branchListView">
+                        {% include 'views/graph-manager/branch-info.htm' %}
+                    </div>
 
 					<!-- Graph -->
-					<div id="graph" style="margin-left:300px;"></div>
+					<div id="graph" style="margin-left:200px;"></div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-
-<input id="graph-data" name="graph-data" type="hidden" value="{{graph}}" />
-<input id="validations" name="validations" type="hidden" value="{{validations}}" />
-<input id="datatypes" name="datatypes" type="hidden" value="{{datatypes}}" />
-<input id="branches" name="branches" type="hidden" value="{{branches}}" />
 {% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-manager-data', [], function () {
+    return {
+        graph: {{graph}},
+        validations: {{validations}},
+        datatypes: {{datatypes}},
+        branches: {{branches}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
