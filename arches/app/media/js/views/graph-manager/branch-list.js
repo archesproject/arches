@@ -6,10 +6,10 @@ define([
 ], function(ListView, GraphBase, GraphModel , ko) {
     var BranchList = ListView.extend({
         /**
-        * A backbone view to manage a list of graph nodes
+        * A backbone view to manage a list of branch graphs
         * @augments ListView
         * @constructor
-        * @name NodeList
+        * @name BranchList
         */
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
@@ -43,6 +43,13 @@ define([
             }, this);
         },
 
+        /**
+        * Sets the selected branch from the users selection
+        * @augments ListView#selectItem
+        * @memberof ListView.prototype
+        * @param {branch object} item - the branch object the user selected 
+        * @param {click event object} evt 
+        */
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
 
@@ -59,6 +66,12 @@ define([
             }
         },
 
+        /**
+        * Appends the currently selected branch onto the currently selected node in the graph
+        * @memberof ListView.prototype
+        * @param {branch object} item - the branch object the user selected 
+        * @param {click event object} evt 
+        */
         appendBranch: function(item, evt){
             var self = this;
             if(this.selectedNode()){
@@ -80,12 +93,15 @@ define([
             this.closeForm();
         },
 
+        /**
+        * Closes the form and deselects the currently selected branch
+        * @memberof ListView.prototype
+        */
         closeForm: function(){
             this.clearSelection();
             this.selectedBranch(null);
             this.viewMetadata(false);
         },
-
 
 
     });
