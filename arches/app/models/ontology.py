@@ -47,18 +47,21 @@ class Ontology(Concept):
         # limit the list of properties based on the intersection between the properties classes and the list of 
         # ontology classes we defined above
         if parent_node:
-            related_properties = self.get_valid_range_connections(parent_node['ontologyclass_id'], lang=lang)
-            for related_property in related_properties:
-                if len(child_properties) > 0:
-                    related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
+            # get the super classes of the parent node and then for each node
+            # call get valid range connnections
+            for superclass in self.get_superclasses(id=parent_node['ontologyclass_id']):
+                related_properties = self.get_valid_range_connections(superclass.id, lang=lang)
+                for related_property in related_properties:
+                    if len(child_properties) > 0:
+                        related_property['ontology_classes'] = set(related_property['ontology_classes']).intersection(ontology_classes)
 
-                item = {
-                    'ontology_property':related_property['ontology_property'].simplify(lang=lang),
-                    'ontology_classes':[]
-                }
-                for ontology_class in related_property['ontology_classes']:
-                    item['ontology_classes'].append(ontology_class.simplify(lang=lang))
-                ret.append(item)
+                    item = {
+                        'ontology_property':related_property['ontology_property'].simplify(lang=lang),
+                        'ontology_classes':[]
+                    }
+                    for ontology_class in related_property['ontology_classes']:
+                        item['ontology_classes'].append(ontology_class.simplify(lang=lang))
+                    ret.append(item)
 
         else:
         # if no parent node then just use the list of ontology classes from above, there will be no properties to return
