@@ -18,13 +18,6 @@ define([
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
-            // _.filter(options.branches, function(branch){
-            //     return _.find(branch.domain_connections, function(domain_connection){
-            //         return _.find(domain_connection.ontology_classes, function(ontology_class){
-            //             return ontology_class.id === this.selectedNode().ontologyclass_id();
-            //         }, this) 
-            //     }, this);
-            // }, this);
             this.items().forEach(function (branch) {
                 branch.graphModel = new GraphModel({
                     data: branch.graph
@@ -32,6 +25,22 @@ define([
             });
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
+
+            this.selectedNode.subscribe(function(node){
+                if(node){
+                    _.each(this.items(), function(branch){
+                        branch.filtered(true);
+                        var found = _.find(branch.graph.domain_connections, function(domain_connection){
+                            return _.find(domain_connection.ontology_classes, function(ontology_class){
+                                return ontology_class.id === node.ontologyclass_id();
+                            }, this) 
+                        }, this);
+                        if(found){
+                            branch.filtered(false);
+                        }
+                    }, this);
+                }
+            }, this);
         },
 
         selectItem: function(item, evt){
