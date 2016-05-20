@@ -9,11 +9,10 @@ require([
     'views/graph-manager/permissions-list',
     'views/graph-manager/node-form',
     'views/graph-manager/permissions-form',
-    'views/graph-manager/branch-info',
     'models/node',
     'models/graph',
     'graph-manager-data'
-], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, BranchInfoView, NodeModel, GraphModel, data) {
+], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, data) {
     var prepGraph = function(graph) {
         graph.nodes.forEach(function(node) {
             node.cardinality = 'n';
