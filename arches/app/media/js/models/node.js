@@ -20,6 +20,7 @@ define([
             self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
             self.ontologyclass_id = ko.observable('');
+            self.ontologyclass_value = ko.observable('');
             self.parentproperty_id = ko.observable('');
             self.ontology_cache = ko.observableArray();
             
@@ -104,6 +105,13 @@ define([
                     self.getValidNodesEdges();
                 }
             })
+
+            self.ontologyclass_id.subscribe(function(ontologyclass_id){
+                var ontologyclass = _.find(self.validclasses(), function(ontologyclass){
+                    return ontologyclass_id === ontologyclass.id;
+                });
+                self.ontologyclass_value(ontologyclass.value);
+            }, this);
         },
 
         parse: function(source) {
@@ -114,6 +122,7 @@ define([
             self.datatype(source.datatype);
             self.cardinality(source.cardinality);
             self.ontologyclass_id(source.ontologyclass_id);
+            self.ontologyclass_value(source.ontologyclass_value);
             self.parentproperty_id(source.parentproperty_id);
             self.validations.removeAll();
             source.validations.forEach(function(validation) {
@@ -121,7 +130,6 @@ define([
             });
 
             self.parentproperty_value = source.parentproperty_value;
-            self.ontologyclass_value = source.ontologyclass_value;
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
