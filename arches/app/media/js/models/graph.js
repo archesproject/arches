@@ -27,42 +27,51 @@ define(['arches',
             }
         },
 
-        deleteNode: function(node){
-            var getEdges = function (node) {
-                var edges = this.get('edges')()
-                    .filter(function (edge) {
-                        return edge.domainnode_id === node.nodeid;
-                    });
+        deleteNode: function(node, callback, scope){            
+            var self = this;
+            this._doRequest({
+                type: "POST",
+                url: this.url + 'update_node/' + this.get('metadata').graphid,
+                data: JSON.stringify(node.toJSON())
+            }, function(response, status){
+
+                var getEdges = function (node) {
+                    var edges = this.get('edges')()
+                        .filter(function (edge) {
+                            return edge.domainnode_id === node.nodeid;
+                        });
+                    var nodes = edges.map(function (edge) {
+                        return this.get('nodes')().find(function (node) {
+                            return edge.rangenode_id === node.nodeid;
+                        });
+                    }, this);
+                    nodes.forEach(function (node) {
+                        edges = edges.concat(getEdges.call(this, node));
+                    }, this);
+                    return edges
+                };
+
+                var edges = getEdges.call(this, node);
                 var nodes = edges.map(function (edge) {
                     return this.get('nodes')().find(function (node) {
                         return edge.rangenode_id === node.nodeid;
                     });
                 }, this);
-                nodes.forEach(function (node) {
-                    edges = edges.concat(getEdges.call(this, node));
-                }, this);
-                return edges
-            };
-
-            var edges = getEdges.call(this, node);
-            var nodes = edges.map(function (edge) {
-                return this.get('nodes')().find(function (node) {
-                    return edge.rangenode_id === node.nodeid;
+                var edge = this.get('edges')()
+                    .find(function (edge) {
+                        return edge.rangenode_id === node.nodeid;
+                    });
+                nodes.push(node);
+                edges.push(edge);
+                this.get('edges').remove(function (edge) {
+                    return _.contains(edges, edge);
                 });
-            }, this);
-            var edge = this.get('edges')()
-                .find(function (edge) {
-                    return edge.rangenode_id === node.nodeid;
+                this.get('nodes').remove(function (node) {
+                    return _.contains(nodes, node);
                 });
-            nodes.push(node);
-            edges.push(edge);
-            this.get('edges').remove(function (edge) {
-                return _.contains(edges, edge);
-            });
-            this.get('nodes').remove(function (node) {
-                return _.contains(nodes, node);
-            });
-            this.trigger('changed');
+                this.trigger('changed');
+                callback.call(scope, response, status);
+            }, scope, 'changed');
         },
 
         appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
@@ -117,6 +126,27 @@ define(['arches',
                     }
                 });
                 callback();
+            }, scope, 'changed');
+        },
+
+        updateNode: function(node, callback, scope){
+            var self = this;
+            this._doRequest({
+                type: "POST",
+                url: this.url + 'update_node/' + this.get('metadata').graphid,
+                data: JSON.stringify(node.toJSON())
+            }, function(response, status){
+                _.each(self.get('nodes')(), function(node){
+                    var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
+                        return node.nodeid === returned_node.nodeid;
+                    });
+                    var nodeGroup = _.find(response.responseJSON.nodegroups, function (returned_nodegroup) {
+                        return node.nodeid === returned_nodegroup.nodegroupid;
+                    });
+                    nodeJSON.cardinality = nodeGroup?nodeGroup.cardinality:null;
+                    node.parse(nodeJSON);
+                }, this);
+                callback.call(scope, response, status);
             }, scope, 'changed');
         },
 

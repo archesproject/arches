@@ -115,47 +115,27 @@ def settings(request, graphid):
         'resource_data': JSONSerializer().serialize(resource_data)
     })
 
-
 @group_required('edit')
-def node(request, nodeid):
-    if request.method == 'POST':
-        data = JSONDeserializer().deserialize(request.body)
-        if data:
-            node = models.Node.objects.get(nodeid=nodeid)
-            with transaction.atomic():
-                node.name = data.get('name', '')
-                node.description = data.get('description', '')
-                node.istopnode = data.get('istopnode', '')
-                node.crmclass = data.get('crmclass', '')
-                node.datatype = data.get('datatype', '')
-                node.status = data.get('status', '')
-                node.validations.set(data.get('validations', []))
-                new_nodegroup_id = data.get('nodegroup_id', None)
-                old_nodegroup_id = unicode(node.nodegroup_id) if node.nodegroup_id is not None else None
-                if old_nodegroup_id != new_nodegroup_id:
-                    for model in node.toggle_is_collector():
-                        model.save()
-                if node.nodegroup_id is not None:
-                    cardinality = data.get('cardinality', 'n')
-                    node.nodegroup.cardinality = cardinality
-                    node.nodegroup.save()
-                    group_nodes = node.nodegroup.node_set.all()
-                else:
-                    child_nodes, child_edges = node.get_child_nodes_and_edges()
-                    group_nodes = [child_node for child_node in child_nodes if child_node.nodegroup is None]
-                node.save()
-                return JSONResponse({'node': node, 'group_nodes': group_nodes, 'nodegroup': node.nodegroup})
+def node(request, graphid):
+    data = JSONDeserializer().deserialize(request.body)
+    if data:
+        if request.method == 'POST':
+            graph = Graph(graphid)
+            graph.update_node(data)
+            graph.save()
 
-    if request.method == 'DELETE':
-        node = models.Node.objects.get(nodeid=nodeid)
-        nodes, edges = node.get_child_nodes_and_edges()
-        if not node.istopnode:
-            edges.append(models.Edge.objects.get(rangenode=node))
-        nodes.append(node)
-        with transaction.atomic():
-            [edge.delete() for edge in edges]
-            [node.delete() for node in nodes]
-            return JSONResponse({})
+            return JSONResponse(graph)
+
+        if request.method == 'DELETE':
+            node = models.Node.objects.get(nodeid=data.get('nodeid'))
+            nodes, edges = node.get_child_nodes_and_edges()
+            if not node.istopnode:
+                edges.append(models.Edge.objects.get(rangenode=node))
+            nodes.append(node)
+            with transaction.atomic():
+                [edge.delete() for edge in edges]
+                [node.delete() for node in nodes]
+                return JSONResponse({})
 
     return HttpResponseNotFound()
 

@@ -59,26 +59,23 @@ define([
             }, self.node());
         },
         save: function () {
-            var self = this;
-            this.callAsync('save', function (request) {
-                var groupNodes = request.responseJSON.group_nodes;
-                var nodes = self.graphModel.get('nodes')();
-                var nodeJSON = request.responseJSON.node;
-                nodeJSON.cardinality = request.responseJSON.nodegroup?request.responseJSON.nodegroup.cardinality:self.node().cardinality();
-                groupNodes.forEach(function(nodeJSON) {
-                    var node = _.find(nodes, function (node) {
-                        return node.nodeid === nodeJSON.nodeid;
-                    });
-                    nodeJSON.cardinality = node.cardinality();
-                    node.parse(nodeJSON);
-                });
-                self.node().parse(nodeJSON);
-            });
+            var self = this
+            this.loading(true);
+            this.failed(false);
+            this.graphModel.updateNode(this.node(), function(response, status){
+                var success = (status === 'success');
+                this.loading(false);
+                this.closeClicked(false);
+                this.failed(!success);
+                if (success) {
+                    this.close();
+                }
+            },this);
         },
         deleteNode: function () {
             var self = this;
             this.callAsync('delete', function () {
-                self.graphModel.deleteNode(self.node())
+                self.graphModel.deleteNode(self.node());
             });
         },
         toggleIsCollector: function () {

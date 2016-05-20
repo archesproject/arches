@@ -86,15 +86,18 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.ontologyclass_id = nodeobj.get('ontologyclass','')
+            node.ontologyclass_id = nodeobj.get('ontologyclass_id','')
             node.datatype = nodeobj.get('datatype','')
-            node.nodegroup_id = nodeobj.get('nodegroupid','')
+            node.nodegroup_id = nodeobj.get('nodegroup_id','')
+            node.validations.set(nodeobj.get('validations', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup = models.NodeGroup(
-                    pk=node.nodegroup_id,
-                    cardinality=nodeobj.get('cardinality', '')
+                    pk=uuid.UUID(node.nodegroup_id),
+                    cardinality='n' if nodeobj.get('cardinality', 'n') == None else nodeobj.get('cardinality', 'n')
                 )
+            else:
+                node.nodegroup = None
 
         node.graph = self.metadata
 
@@ -306,6 +309,28 @@ class Graph(object):
 
         self.populate_null_nodegroups()
         return ret
+
+    def update_node(self, node):
+        """
+        updates a node in the graph
+
+        Arguments:
+        node -- the node object to update
+
+        """
+
+        node['nodeid'] = uuid.UUID(node.get('nodeid'))
+        self.nodes.pop(node['nodeid'], None)
+        new_node = self.add_node(node)
+        
+        for edge_id, edge in self.edges.iteritems():
+            if edge.domainnode_id == new_node.nodeid:
+                edge.domainnode = new_node
+            if edge.rangenode_id == new_node.nodeid:
+                edge.rangenode = new_node
+
+        self.populate_null_nodegroups()
+        return self
 
     def get_valid_domain_connections(self):
         return Ontology().get_valid_domain_connections(self.root.ontologyclass_id)
