@@ -110,7 +110,8 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('node', kwargs={'graphid':graphid})
         node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
         node.name = "new node name"
         nodegroup, created = NodeGroup.objects.get_or_create(pk=self.HERITAGE_RESOURCE_PLACE_ID)
@@ -120,8 +121,13 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
 
-        self.assertEqual(len(response_json['group_nodes']), self.PLACE_NODE_COUNT)
-        self.assertEqual(response_json['node']['name'], 'new node name')
+        node_count = 0
+        for node in response_json['nodes']:
+            if node['nodeid'] == self.HERITAGE_RESOURCE_PLACE_ID:
+                self.assertEqual(node['name'], 'new node name')
+            if node['nodegroup_id'] == self.HERITAGE_RESOURCE_PLACE_ID:
+                node_count =  node_count + 1
+        self.assertEqual(node_count, self.PLACE_NODE_COUNT)
 
         node_ = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
 
@@ -134,18 +140,18 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
         self.client.login(username='admin', password='admin')
-        url = reverse('node', kwargs={'nodeid':self.HERITAGE_RESOURCE_PLACE_ID})
-        response = self.client.delete(url)
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('node', kwargs={'graphid':graphid})
+        node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
+        post_data = JSONSerializer().serialize(node)
+        response = self.client.delete(url, post_data)
         self.assertEqual(response.status_code, 200)
         new_count = self.NODE_COUNT-self.PLACE_NODE_COUNT
         root = Node.objects.get(nodeid=self.ROOT_ID)
 
         nodes, edges = root.get_child_nodes_and_edges()
-        node_count = len(nodes)
-        edge_count = len(edges)
-
-        self.assertEqual(node_count, new_count)
-        self.assertEqual(edge_count, new_count)
+        self.assertEqual(len(nodes), new_count)
+        self.assertEqual(len(edges), new_count)
 
     def test_node_clone(self):
         """
