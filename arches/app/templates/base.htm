@@ -80,6 +80,11 @@
     </div><!--/wrapper-->
 
 	{% block javascript %}
+        <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+
+        {% block pre_require_js %}
+        {% endblock pre_require_js %}
+
         {% include 'javascript.htm' %}
     {% endblock javascript %}
 

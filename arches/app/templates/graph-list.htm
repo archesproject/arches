@@ -50,144 +50,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <div style="position: absolute; right: 50px; top: 10px;">
-            <a class="btn btn-flat btn-flat-trans" href="#new-project-modal" data-toggle="modal"><i class="fa fa-plus-circle"></i> {% trans "New Resource" %}</a>
+            <button class="btn btn-primary" data-bind="click: newResource"><i class="fa fa-plus-circle"></i> {% trans "New Resource" %}</button>
+            <button class="btn btn-primary" data-bind="click: newGraph"><i class="fa fa-plus-circle"></i> {% trans "New Graph" %}</button>
         </div>
     </div>
 </div>
 
 
 <!-- Default Page content-->
-<div id="page-content" style="overflow: auto; padding: 0 50px 50px; margin-top: -1px;">
+<div id="page-content" style="overflow: auto; padding: 0 50px 160px; margin-top: -1px;">
+    <h2 class="resource-grid-title text-overflow">Resources</h2>
+
+    <div id="report-image-grid" class="report-image-grid">
+
+        <!-- ko foreach: resources -->
+        {% include 'views/graph-list-item.htm' %}
+        <!-- /ko -->
+
+    </div>
+
+    <h2 class="resource-grid-title text-overflow">Graphs</h2>
 
     <div id="report-image-grid" class="report-image-grid">
 
         <!-- ko foreach: graphs -->
-        <div class="resource-grid-item relative">
-            <!-- Resource Type -->
-            <div class="resource-grid-main-container">
-                <div class="resource-grid-main">
-                    <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon'"></i> <span data-bind="text:name"></span></h1>
-                    <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
-                </div>
-            </div>
-
-            <!-- Resource Tools -->
-            <div class="resource-grid-tools-container">
-                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:open"><i class="fa fa-check-circle"></i> {% trans "Edit" %}</a>
-                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:clone"><i class="fa fa-copy"></i> {% trans "Copy" %}</a>
-                <a href="javascript:void(0)" class="pad-rgt" data-bind="click:deleteGraph"><i class="fa fa-trash"></i> {% trans "Delete" %}</a>
-            </div>
-
-            <!-- Resource Metadata -->
-            <div class="resource-grid-meta-container">
-                <ul class="list-inline resource-grid-meta">
-                    <li data-bind="if:!isresource">{% trans "Graph" %}</li>
-                    <li data-bind="if:isresource">{% trans "Resource" %}</li>
-                    <li class="text-semibold text-primary" data-bind="if: isactive">{% trans "Active" %}</li>
-                    <li class="text-semibold text-danger" data-bind="if: !isactive">{% trans "Inactive" %}</li>
-                </ul>
-            </div>
-        </div>
+        {% include 'views/graph-list-item.htm' %}
         <!-- /ko -->
 
     </div>
 </div>
-
-
-<div class="modal fade" id="new-project-modal" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-
-			<!--Modal header-->
-			<div class="modal-header">
-				<button data-dismiss="modal" class="close" type="button">
-				<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">{% trans "Create New Graph" %}</h4>
-			</div>
-
-			<!--Modal body-->
-			<div class="modal-body">
-
-				<!-- New Project Tools -->
-				<div class="row">
-					<div class="col-sm-6">
-						<input data-bind="value:newGraphName, valueUpdate: 'keyup'" placeholder="{% trans "Name your graph" %}" class="form-control input-lg widget-input" style="background: #f4f4f4; border: 1px solid #bbb;">
-					</div>
-					<div class="col-sm-6" style="margin-top: 10px;">
-						<a class="pad-rgt pull-right">
-							<h4 style="font-size: 13px; font-weight: 700;">{% trans "Pick a template" %}</h4>
-						</a>
-					</div>
-				</div>
-
-				<!-- Isotope Layout -->
-				<div id="template-image-grid" class="report-image-grid" style="overflow-y: scroll;">
-
-					<!-- Template -->
-                    <!-- ko foreach: graphs -->
-					<div class="template-grid-item" data-bind="click:select, css:{'selected-template':selected()}">
-						<div class="panel mar-no">
-							<!-- Project Name, Abstract -->
-							<div class="panel-body" style="padding: 15px 20px 25px 20px; height: 125px;">
-								<h4 class="mar-no" data-bind="text:name"></h4>
-                                <span data-bind='text: description || "{% trans "No description available." %}"'></span>
-							</div>
-
-							<!-- Project Tools -->
-							<div class="panel-footer" style="height: 40px;">
-                                <span data-bind="if:isresource"><span><i class="fa fa-sitemap"></i> {% trans "resource" %}, </span> <i class="fa" data-bind="css: {'fa-check-circle': isactive, 'fa-minus-circle': !isactive}"></i> <span data-bind='text:isactive?"{% trans "active" %}":"{% trans "inactive" %}"'></span></span>
-                                <span data-bind="if:!isresource"><span><i class="fa fa-link"></i> {% trans "graph" %}</span></span>
-							</div>
-						</div>
-					</div>
-                    <!-- /ko -->
-
-				</div>
-			</div>
-
-			<!--Modal footer-->
-			<div class="modal-footer">
-				<button data-dismiss="modal" class="btn btn-danger btn-labeled fa fa-times" data-bind="click: function () { newGraphName(''); selectedGraph(null); }" type="button">{% trans "Nevermind" %}</button>
-				<button class="btn btn-primary btn-labeled fa fa-check" data-bind="css: {'disabled':!selectedGraph()||newGraphName()===''}, click: cloneSelected">{% trans "Create graph" %}</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="graph-name-modal" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-
-			<!--Modal header-->
-			<div class="modal-header">
-				<button data-dismiss="modal" class="close" type="button">
-				<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">{% trans "Name Your New Graph" %}</h4>
-			</div>
-
-			<!--Modal body-->
-			<div class="modal-body">
-
-				<!-- New Project Tools -->
-				<div class="row">
-					<div class="col-sm-12">
-						<input data-bind="value:newGraphName, valueUpdate: 'keyup'" placeholder="{% trans "Name your graph" %}" class="form-control input-lg widget-input" style="background: #f4f4f4; border: 1px solid #bbb;">
-					</div>
-				</div>
-
-			</div>
-
-			<!--Modal footer-->
-			<div class="modal-footer">
-				<button data-dismiss="modal" class="btn btn-danger btn-labeled fa fa-times" data-bind="click: function () { newGraphName(''); selectedGraph(null); }" type="button">{% trans "Nevermind" %}</button>
-				<button class="btn btn-primary btn-labeled fa fa-check" data-bind="css: {'disabled':!selectedGraph()||newGraphName()===''}, click: cloneSelected">{% trans "Create graph" %}</button>
-			</div>
-		</div>
-	</div>
-</div>
-
 
 <input id="graphs" name="graphs" type="hidden" value="{{graphs}}"/>
 {% endblock content %}

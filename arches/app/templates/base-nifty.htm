@@ -40,8 +40,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
-{% block body %}
-<body class="scroll-y">
+<body {% block body_attributes %}class="scroll-y"{% endblock %}>
+    {% block body %}
 
     <div class="wrapper">
         <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'aside-in': tabsActive() && showTabs()}">
@@ -322,10 +322,48 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
+    {% endblock body %}
+
+    <div class="modal fade" id="confirm-nav-modal" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!--Modal header-->
+                <div class="modal-header">
+                    <button data-dismiss="modal" class="close" type="button">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">{% trans "Edits pending..." %}</h4>
+                </div>
+
+                <!--Modal body-->
+                <div class="modal-body">
+
+                    <!-- New Project Tools -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {% trans "You have edits pending on this page, are you sure you'd like to proceed (and discard any pending edits)?" %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--Modal footer-->
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-danger btn-labeled fa fa-times" data-bind="click: function () { showConfirmNav(false) }" type="button">{% trans "Nevermind" %}</button>
+                    <button class="btn btn-primary btn-labeled fa fa-check" data-bind="click: function() { navigate(navDestination(), true) }">{% trans "Continue and discard changes" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
-{% endblock body %}
 
 {% block javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
+
+{% block pre_require_js %}
+{% endblock pre_require_js %}
 
 {% include 'javascript.htm' %}
 
