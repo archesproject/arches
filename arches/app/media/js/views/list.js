@@ -41,7 +41,9 @@ define([
         },
 
         /**
+        * initializes the view with optional parameters
         * @memberof ListView.prototype
+        * @param {object} options - optional parameters to pass in during initialization, currently unused
         */
         initialize: function(options) {
             this.filter = ko.observable('');
@@ -52,6 +54,8 @@ define([
         * Toggles the selected status of a single list item, if {@link ListView#single_select} is 
         *   true clear the selected status of all other list items
         * @memberof ListView.prototype
+        * @param {object} item - the item to be selected or unselected
+        * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
             if(this.trigger('item-selected', item, evt)){

@@ -11,6 +11,14 @@ define([
         * @constructor
         * @name BranchList
         */
+
+        /**
+        * initializes the view with optional parameters
+        * @memberof BranchList.prototype
+        * @param {object} options
+        * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
+        * @param {boolean} options.branches - an observableArray of branches
+        */
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, arguments);
 
@@ -45,8 +53,7 @@ define([
 
         /**
         * Sets the selected branch from the users selection
-        * @augments ListView#selectItem
-        * @memberof ListView.prototype
+        * @memberof BranchList.prototype
         * @param {object} item - the branch object the user selected 
         * @param {object} evt - click event object
         */
@@ -68,7 +75,7 @@ define([
 
         /**
         * Appends the currently selected branch onto the currently selected node in the graph
-        * @memberof ListView.prototype
+        * @memberof BranchList.prototype
         * @param {object} item - the branch object the user selected 
         * @param {object} evt - click event object
         */
@@ -95,7 +102,7 @@ define([
 
         /**
         * Closes the form and deselects the currently selected branch
-        * @memberof ListView.prototype
+        * @memberof BranchList.prototype
         */
         closeForm: function(){
             this.clearSelection();

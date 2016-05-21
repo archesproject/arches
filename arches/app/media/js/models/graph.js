@@ -5,6 +5,13 @@ define(['arches',
     'underscore'
 ], function (arches, AbstractModel, NodeModel, ko, _) {
     return AbstractModel.extend({
+        /**
+        * A backbone model to manage graph data
+        * @augments AbstractModel
+        * @constructor
+        * @name GraphModel
+        */
+
         url: arches.urls.graph,
 
         constructor: function(attributes, options){
@@ -13,6 +20,11 @@ define(['arches',
             AbstractModel.prototype.constructor.call(this, attributes, options);
         },
 
+        /**
+        * Flags the passed in node as selected
+        * @memberof GraphModel.prototype
+        * @param {object} node - the node to be selected
+        */
         selectNode: function(node){
             this.trigger('select-node', node);
             var currentlySelectedNode = this.get('selectedNode');
