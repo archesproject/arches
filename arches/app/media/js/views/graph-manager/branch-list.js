@@ -47,8 +47,8 @@ define([
         * Sets the selected branch from the users selection
         * @augments ListView#selectItem
         * @memberof ListView.prototype
-        * @param {branch object} item - the branch object the user selected 
-        * @param {click event object} evt 
+        * @param {object} item - the branch object the user selected 
+        * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
             ListView.prototype.selectItem.apply(this, arguments);
@@ -69,8 +69,8 @@ define([
         /**
         * Appends the currently selected branch onto the currently selected node in the graph
         * @memberof ListView.prototype
-        * @param {branch object} item - the branch object the user selected 
-        * @param {click event object} evt 
+        * @param {object} item - the branch object the user selected 
+        * @param {object} evt - click event object
         */
         appendBranch: function(item, evt){
             var self = this;
