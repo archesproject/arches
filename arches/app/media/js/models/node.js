@@ -17,13 +17,12 @@ define([
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
             self.datatype = ko.observable('');
-            self.cardinality = ko.observable('n');
             self.validations = ko.observableArray();
             self.ontologyclass_id = ko.observable('');
             self.ontologyclass_value = ko.observable('');
             self.parentproperty_id = ko.observable('');
             self.ontology_cache = ko.observableArray();
-            
+
             self.parse(options.source);
 
             self.validclasses = ko.computed(function() {
@@ -73,7 +72,7 @@ define([
                             .pluck('property')
                             .value();
                     }
-                }, this); 
+                }, this);
             }
 
             self.iconclass = ko.computed(function() {
@@ -85,7 +84,6 @@ define([
                     name: self.name(),
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
-                    cardinality: self.cardinality(),
                     validations: self.validations(),
                     ontologyclass_id: self.ontologyclass_id(),
                     parentproperty_id: self.parentproperty_id()
@@ -120,7 +118,6 @@ define([
             self.name(source.name);
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
-            self.cardinality(source.cardinality);
             self.ontologyclass_id(source.ontologyclass_id);
             self.ontologyclass_value(source.ontologyclass_value);
             self.parentproperty_id(source.parentproperty_id);
@@ -152,11 +149,6 @@ define([
                 nodeGroupId = (this.nodeid === _node.nodegroup_id) ? null : _node.nodegroup_id;
             }
             this.nodeGroupId(nodeGroupId);
-        },
-
-        toggleCardinality: function () {
-            var cardinality = (this.cardinality()==='n')?'1':'n';
-            this.cardinality(cardinality);
         },
 
         getValidNodesEdges: function(){

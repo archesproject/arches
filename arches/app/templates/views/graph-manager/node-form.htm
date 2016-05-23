@@ -125,19 +125,6 @@
 
             </div>
 
-            <div style="padding-bottom: 15px;" data-bind="if: node().isCollector">
-
-                <span class="switch switch-small arches-switch" data-bind="css: {'on': node().cardinality()=='n'}, click: toggleCardinality"><small></small></span>
-
-                <p style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;font-size: 12px;">
-                    {% trans "Repeatable" %}
-                </p>
-                <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
-                    {% trans "Users may enter multiple values for this node" %}
-                </span>
-
-            </div>
-
         </div>
 
     </div>

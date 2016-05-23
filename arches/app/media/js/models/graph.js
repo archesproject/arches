@@ -164,10 +164,6 @@ define(['arches',
                         var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
                             return node.nodeid === returned_node.nodeid;
                         });
-                        var nodeGroup = _.find(response.responseJSON.nodegroups, function (returned_nodegroup) {
-                            return node.nodeid === returned_nodegroup.nodegroupid;
-                        });
-                        nodeJSON.cardinality = nodeGroup?nodeGroup.cardinality:null;
                         node.parse(nodeJSON);
                     }, this);
                 }

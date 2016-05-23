@@ -13,25 +13,10 @@ require([
     'models/graph',
     'graph-manager-data'
 ], function($, _, ko, PageView, GraphView, BranchListView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, data) {
-    var prepGraph = function(graph) {
-        graph.nodes.forEach(function(node) {
-            node.cardinality = 'n';
-            if (node.nodeid === node.nodegroup_id) {
-                var group = _.find(graph.nodegroups, function(nodegroup) {
-                    return nodegroup.nodegroupid === node.nodeid;
-                });
-                node.cardinality = group.cardinality;
-            }
-        })
-    };
-
     data.branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
-        prepGraph(branch.graph);
     }, this);
-
-    prepGraph(data.graph);
 
     var graphModel = new GraphModel({
         data: data.graph,
