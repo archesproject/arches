@@ -80,9 +80,6 @@ define([
         },
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
-        },
-        toggleCardinality: function () {
-            this.node().toggleCardinality();
         }
     });
     return NodeFormView;

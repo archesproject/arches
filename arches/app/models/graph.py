@@ -92,10 +92,10 @@ class Graph(object):
             node.validations.set(nodeobj.get('validations', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
-                node.nodegroup = models.NodeGroup(
-                    pk=uuid.UUID(node.nodegroup_id),
-                    cardinality='n' if nodeobj.get('cardinality', 'n') == None else nodeobj.get('cardinality', 'n')
-                )
+                try:
+                    node.nodegroup = models.NodeGroup.objects.get(pk=uuid.UUID(node.nodegroup_id))
+                except models.NodeGroup.DoesNotExist:
+                    node.nodegroup = models.NodeGroup(pk=uuid.UUID(node.nodegroup_id), cardinality='n')
             else:
                 node.nodegroup = None
 
