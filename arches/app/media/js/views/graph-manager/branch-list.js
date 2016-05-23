@@ -23,6 +23,7 @@ define([
             ListView.prototype.initialize.apply(this, arguments);
 
             this.loading = options.loading || ko.observable(false);
+            this.failed = options.failed || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
@@ -41,7 +42,7 @@ define([
                         var found = _.find(branch.graph.domain_connections, function(domain_connection){
                             return _.find(domain_connection.ontology_classes, function(ontology_class){
                                 return ontology_class.id === node.ontologyclass_id();
-                            }, this) 
+                            }, this)
                         }, this);
                         if(found){
                             branch.filtered(false);
@@ -54,7 +55,7 @@ define([
         /**
         * Sets the selected branch from the users selection
         * @memberof BranchList.prototype
-        * @param {object} item - the branch object the user selected 
+        * @param {object} item - the branch object the user selected
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
@@ -76,7 +77,7 @@ define([
         /**
         * Appends the currently selected branch onto the currently selected node in the graph
         * @memberof BranchList.prototype
-        * @param {object} item - the branch object the user selected 
+        * @param {object} item - the branch object the user selected
         * @param {object} evt - click event object
         */
         appendBranch: function(item, evt){
@@ -86,15 +87,16 @@ define([
                 var ontology_connection = _.find(item.graph.domain_connections, function(domain_connection){
                     return _.find(domain_connection.ontology_classes, function(ontology_class){
                         return ontology_class.id === this.selectedNode().ontologyclass_id();
-                    }, this) 
+                    }, this)
                 }, this);
                 if(ontology_connection){
-                    this.graphModel.appendBranch(this.selectedNode().nodeid, ontology_connection.ontology_property.id, item.graphid, function(response){
+                    this.graphModel.appendBranch(this.selectedNode().nodeid, ontology_connection.ontology_property.id, item.graphid, function(response, status){
+                        self.failed(status !== 'success');
                         self.loading(false);
                     }, this)
                 }else{
-                    this.loading(true);
-                    // need to alert the user!, although this shoudn't happen
+                    this.loading(false);
+                    this.failed(true);
                 }
             }
             this.closeForm();
