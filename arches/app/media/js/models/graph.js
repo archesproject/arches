@@ -39,50 +39,53 @@ define(['arches',
             }
         },
 
-        deleteNode: function(node, callback, scope){            
-            var self = this;
+        deleteNode: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
                 url: this.url + 'update_node/' + this.get('metadata').graphid,
                 data: JSON.stringify(node.toJSON())
-            }, function(response, status){
+            }, function(response, status, self){
+                if (status === 'success' &&  response.responseJSON) {
+                    var getEdges = function (node) {
+                        var edges = this.get('edges')()
+                            .filter(function (edge) {
+                                return edge.domainnode_id === node.nodeid;
+                            });
+                        var nodes = edges.map(function (edge) {
+                            return this.get('nodes')().find(function (node) {
+                                return edge.rangenode_id === node.nodeid;
+                            });
+                        }, this);
+                        nodes.forEach(function (node) {
+                            edges = edges.concat(getEdges.call(this, node));
+                        }, this);
+                        return edges
+                    };
 
-                var getEdges = function (node) {
-                    var edges = this.get('edges')()
-                        .filter(function (edge) {
-                            return edge.domainnode_id === node.nodeid;
-                        });
+                    var edges = getEdges.call(this, node);
                     var nodes = edges.map(function (edge) {
                         return this.get('nodes')().find(function (node) {
                             return edge.rangenode_id === node.nodeid;
                         });
                     }, this);
-                    nodes.forEach(function (node) {
-                        edges = edges.concat(getEdges.call(this, node));
-                    }, this);
-                    return edges
-                };
-
-                var edges = getEdges.call(this, node);
-                var nodes = edges.map(function (edge) {
-                    return this.get('nodes')().find(function (node) {
-                        return edge.rangenode_id === node.nodeid;
+                    var edge = this.get('edges')()
+                        .find(function (edge) {
+                            return edge.rangenode_id === node.nodeid;
+                        });
+                    nodes.push(node);
+                    edges.push(edge);
+                    this.get('edges').remove(function (edge) {
+                        return _.contains(edges, edge);
                     });
-                }, this);
-                var edge = this.get('edges')()
-                    .find(function (edge) {
-                        return edge.rangenode_id === node.nodeid;
+                    this.get('nodes').remove(function (node) {
+                        return _.contains(nodes, node);
                     });
-                nodes.push(node);
-                edges.push(edge);
-                this.get('edges').remove(function (edge) {
-                    return _.contains(edges, edge);
-                });
-                this.get('nodes').remove(function (node) {
-                    return _.contains(nodes, node);
-                });
-                this.trigger('changed');
-                callback.call(scope, response, status);
+                    this.trigger('changed');
+                }
+                if (typeof callback === 'function') {
+                    scope = scope || self;
+                    callback.call(scope, response, status);
+                }
             }, scope, 'changed');
         },
 
@@ -92,27 +95,31 @@ define(['arches',
                 url: this.url + 'append_branch/' + this.get('metadata').graphid,
                 data: JSON.stringify({nodeid:nodeid, property: property, graphid: branchmetadatid})
             }, function(response, status, self){
-                var branchroot = response.responseJSON.root;
-                response.responseJSON.nodes.forEach(function(node){
-                    self.get('nodes').push(new NodeModel({
-                        source: node,
-                        datatypelookup: self.get('datatypelookup'),
-                        graph: self
-                    }));
-                }, this);
-                response.responseJSON.edges.forEach(function(edge){
-                    self.get('edges').push(edge);
-                }, this);
-                
-                self.get('nodes')().forEach(function (node) {
-                    node.selected(false);
-                    if (node.nodeid === branchroot.nodeid){
-                        node.selected(true);
-                    }
-                });
+                if (status === 'success' &&  response.responseJSON) {
+                    var branchroot = response.responseJSON.root;
+                    response.responseJSON.nodes.forEach(function(node){
+                        self.get('nodes').push(new NodeModel({
+                            source: node,
+                            datatypelookup: self.get('datatypelookup'),
+                            graph: self
+                        }));
+                    }, this);
+                    response.responseJSON.edges.forEach(function(edge){
+                        self.get('edges').push(edge);
+                    }, this);
 
+                    self.get('nodes')().forEach(function (node) {
+                        node.selected(false);
+                        if (node.nodeid === branchroot.nodeid){
+                            node.selected(true);
+                        }
+                    });
+                }
 
-                callback();
+                if (typeof callback === 'function') {
+                    scope = scope || self;
+                    callback.call(scope, response, status);
+                }
             }, scope, 'changed');
         },
 
@@ -122,43 +129,52 @@ define(['arches',
                 url: this.url + 'move_node/' + this.get('metadata').graphid,
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
-                self.get('edges')().find(function (edge) {
-                    if(edge.edgeid === response.responseJSON.edges[0].edgeid){
-                        edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
-                        return true;
-                    }
-                    return false;
-                });
-                self.get('nodes')().forEach(function (node) {
-                    found_node = response.responseJSON.nodes.find(function(response_node){
-                        return response_node.nodeid === node.nodeid;
+                if (status === 'success' &&  response.responseJSON) {
+                    self.get('edges')().find(function (edge) {
+                        if(edge.edgeid === response.responseJSON.edges[0].edgeid){
+                            edge.domainnode_id = response.responseJSON.edges[0].domainnode_id;
+                            return true;
+                        }
+                        return false;
                     });
-                    if (found_node){
-                        node.nodeGroupId(found_node.nodegroup_id);
-                    }
-                });
-                callback();
+                    self.get('nodes')().forEach(function (node) {
+                        found_node = response.responseJSON.nodes.find(function(response_node){
+                            return response_node.nodeid === node.nodeid;
+                        });
+                        if (found_node){
+                            node.nodeGroupId(found_node.nodegroup_id);
+                        }
+                    });
+                }
+                if (typeof callback === 'function') {
+                    scope = scope || self;
+                    callback.call(scope, response, status);
+                }
             }, scope, 'changed');
         },
 
         updateNode: function(node, callback, scope){
-            var self = this;
             this._doRequest({
                 type: "POST",
                 url: this.url + 'update_node/' + this.get('metadata').graphid,
                 data: JSON.stringify(node.toJSON())
-            }, function(response, status){
-                _.each(self.get('nodes')(), function(node){
-                    var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
-                        return node.nodeid === returned_node.nodeid;
-                    });
-                    var nodeGroup = _.find(response.responseJSON.nodegroups, function (returned_nodegroup) {
-                        return node.nodeid === returned_nodegroup.nodegroupid;
-                    });
-                    nodeJSON.cardinality = nodeGroup?nodeGroup.cardinality:null;
-                    node.parse(nodeJSON);
-                }, this);
-                callback.call(scope, response, status);
+            }, function(response, status, self){
+                if (status === 'success' &&  response.responseJSON) {
+                    _.each(self.get('nodes')(), function(node){
+                        var nodeJSON = _.find(response.responseJSON.nodes, function (returned_node) {
+                            return node.nodeid === returned_node.nodeid;
+                        });
+                        var nodeGroup = _.find(response.responseJSON.nodegroups, function (returned_nodegroup) {
+                            return node.nodeid === returned_nodegroup.nodegroupid;
+                        });
+                        nodeJSON.cardinality = nodeGroup?nodeGroup.cardinality:null;
+                        node.parse(nodeJSON);
+                    }, this);
+                }
+                if (typeof callback === 'function') {
+                    scope = scope || self;
+                    callback.call(scope, response, status);
+                }
             }, scope, 'changed');
         },
 
