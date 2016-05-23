@@ -322,7 +322,7 @@ class Graph(object):
         node['nodeid'] = uuid.UUID(node.get('nodeid'))
         self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
-        
+
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
                 edge.domainnode = new_node
@@ -338,8 +338,8 @@ class Graph(object):
     def serialize(self):
         """
         serialize to a different form then used by the internal class structure
-        
-        used to append additional values (like Ontology preflabels) that 
+
+        used to append additional values (like Ontology preflabels) that
         internal objects (like models.Nodes) don't support
 
         """
@@ -361,7 +361,7 @@ class Graph(object):
             nodeobj = JSONSerializer().serializeToPython(node)
             nodeobj['parentproperty_id'] = parentproperties[node.nodeid]['id']
             nodeobj['parentproperty_value'] = parentproperties[node.nodeid]['value']
-            
+
             Ontology(node.ontologyclass).simplify(lang='en-US')
             nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
             ret['nodes'].append(nodeobj)
