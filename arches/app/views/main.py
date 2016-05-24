@@ -42,7 +42,7 @@ def auth(request):
             auth_attempt_success = True
         else:
             auth_attempt_success = False
-    
+
     next = request.GET.get('next', reverse('home'))
     if auth_attempt_success:
         return redirect(next)
@@ -53,7 +53,6 @@ def auth(request):
             return redirect('auth')
         else:
             return render(request, 'login.htm', {
-                'main_script': 'login',
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next
             })
