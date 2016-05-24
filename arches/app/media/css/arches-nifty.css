@@ -1599,7 +1599,7 @@ ul .collapse li:last-of-type {
     padding-top: 10px;
     padding-left: 0;
 }
-.container-highlight, .resource-grid-main-container:hover {
+.container-highlight, .resource-grid-main-container.active {
     background: #f6f6f6;
 }
 .resource-grid-icon {

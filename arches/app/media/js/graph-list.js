@@ -4,7 +4,8 @@ require([
     'knockout',
     'views/page-view',
     'models/node',
-    'bootstrap-nifty'
+    'bootstrap-nifty',
+    'bindings/hover'
 ], function($, _, ko, PageView, NodeModel) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
 
@@ -25,6 +26,7 @@ require([
     }
 
     graphs().forEach(function(graph) {
+        graph.hover = ko.observable(false);
         graph.open = function(page) {
             page = page || '';
             pageView.viewModel.loading(true);
