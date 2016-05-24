@@ -6,14 +6,18 @@ require([
     'knockout',
     'plugins/knockout-select2'
 ], function($, PageView, Form) {
-    var viewModel = {
-        form: new Form({
-            el: $('.arches-form')[0],
-            modelName: 'config'
-        })
-    };
-
-    new PageView({
-        viewModel: viewModel
+    /**
+     * a view to manage configuration settings for the app
+     * @augments PageView
+     * @constructor
+     * @name ConfigManager
+     */
+    return new PageView({
+        viewModel: {
+            form: new Form({
+                el: $('.arches-form')[0],
+                modelName: 'config'
+            })
+        }
     });
 });

@@ -7,11 +7,24 @@ define([
     'bindings/datepicker'
 ], function ($, Backbone, ko, koMapping, _) {
     return Backbone.View.extend({
+        /**
+         * a view to manage the operations around saving tile data
+         * @augments Backbone.View
+         * @constructor
+         * @name Form
+         */
 
-        initialize: function(opts) {
+        /**
+         * initialize the form with a passed in model reference
+         * @memberof Form.prototype
+         * @param  {object} options [description]
+         * @param  {string} [options.modelName='tile'] name of the model use as the basis for the form
+         * @return {null} 
+         */
+        initialize: function(options) {
             var self = this;
             self.modelReady = ko.observable(false);
-            require(['models/'+(opts.modelName?opts.modelName:'tile')], function (TileModel) {
+            require(['models/'+(options.modelName?options.modelName:'tile')], function (TileModel) {
                 self.TileModel = TileModel;
                 self.modelReady(true);
             })
@@ -29,6 +42,15 @@ define([
 
         },
 
+        /**
+         * saves a new tile object back to the database and adds it to the tilegroup
+         * @memberof Form.prototype
+         * @param  {object} tilegroup a reference to the group of tiles being managed by this form
+         * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
+         * @param  {object} tile the tile to add/save
+         * @param  {object} e event object
+         * @return {null} 
+         */
         saveTile: function(tilegroup, justadd, tile, e){
             console.log(koMapping.toJS(tile));
             var nodegroup_id = tile.nodegroup_id();
@@ -52,6 +74,13 @@ define([
             }
         },
 
+        /**
+         * saves the contents of an existing tile object back to the database
+         * @memberof Form.prototype
+         * @param  {object} tile the tile to save
+         * @param  {object} e event object
+         * @return {null} 
+         */
         updateTile: function(tile, e){
             console.log(ko.toJS(tile));
             var model = new this.TileModel(ko.toJS(tile));
@@ -64,6 +93,14 @@ define([
             }, this);
         },
 
+        /**
+         * deletes a tile object from the database and removes it from the tilegroup
+         * @memberof Form.prototype
+         * @param  {object} tilegroup a reference to the group of tiles being managed by this form
+         * @param  {object} tile the tile to add/save
+         * @param  {object} e event object
+         * @return {null} 
+         */
         deleteTile: function(tilegroup, tile, e){
             console.log(ko.toJS(tile));
             var nodegroup_id = tile.nodegroup_id();
@@ -77,14 +114,34 @@ define([
             }, this);
         },
 
+        /**
+         * currently unused
+         * @memberof Form.prototype
+         * @param  {object} data a knockout reference to the tile object
+         * @param  {object} e event object
+         * @return {null} 
+         */
         cancelEdit: function(data, e){
             console.log(ko.toJSON(data));
         },
 
+        /**
+         * toggle the visiblity of the tile in the view
+         * @memberof Form.prototype
+         * @param  {object} data a knockout reference to the tile object
+         * @param  {object} e event object
+         * @return {null} 
+         */
         toggleTile: function(data, e){
             $('#abc'+data.tileid()).toggle('fast');
         },
 
+        /**
+         * removes any existing values set on the tile
+         * @memberof Form.prototype
+         * @param  {object} tile the tile to remove values from
+         * @return {null} 
+         */
         clearTile: function(tile){
             _.each(tile.data, function(value, key, list){
                 value("");

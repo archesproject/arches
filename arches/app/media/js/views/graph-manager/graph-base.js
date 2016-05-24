@@ -146,7 +146,7 @@ define([
         /**
         * Redraw the graph based on the current D3 scale and translate events
         * @memberof GraphBase.prototype
-        * @param {boolean} force - {default: false} if true remove and re-add all the nodes and edges in the graph, 
+        * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph, 
         * used after adding/removing nodes from the graph
         */
         redraw: function (force) {
