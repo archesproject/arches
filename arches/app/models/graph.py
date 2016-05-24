@@ -346,7 +346,6 @@ class Graph(object):
 
         ret = {}
         ret['metadata'] = self.metadata
-        ret['root'] = self.root
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['domain_connections'] = self.get_valid_domain_connections()
 
@@ -365,4 +364,6 @@ class Graph(object):
             Ontology(node.ontologyclass).simplify(lang='en-US')
             nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
             ret['nodes'].append(nodeobj)
+            if node.istopnode:
+                ret['root'] = nodeobj
         return ret
