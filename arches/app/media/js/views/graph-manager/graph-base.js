@@ -4,6 +4,19 @@ define([
     'd3'
 ], function(Backbone, ko, d3) {
     var GraphBase = Backbone.View.extend({
+        /**
+        * A backbone view to for rendering D3 graphs comprised of nodes and edges as svg
+        * @augments Backbone.View
+        * @constructor
+        * @name GraphBase
+        */
+
+        /**
+        * Initializes the view with optional parameters
+        * @memberof GraphBase.prototype
+        * @param {object} options
+        * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
+        */
         initialize: function(options) {
             var self = this;
             this.size = 1000;
@@ -49,6 +62,11 @@ define([
             this.render();
             this.resize();
         },
+
+        /**
+        * Renders the nodes and edges as a D3 graph
+        * @memberof GraphBase.prototype
+        */
         render: function () {
             var self = this;
             this.root = undefined;
@@ -69,6 +87,11 @@ define([
             this.renderLinks();
             this.renderNodes();
         },
+
+        /**
+        * Renders only the nodes in the graph
+        * @memberof GraphBase.prototype
+        */
         renderNodes: function(){
             this.allNodes = this.svg.selectAll(".node")
                 .data(this.tree_nodes, function(d) { return d.nodeid });
@@ -84,6 +107,11 @@ define([
             
             this.renderNodeText();
         },
+
+        /**
+        * Renders the text associated with each node in the graph
+        * @memberof GraphBase.prototype
+        */
         renderNodeText: function(){
             var self = this;
             this.node.append("text")
@@ -98,6 +126,11 @@ define([
                     return d.name();
                 });
         },
+
+        /**
+        * Renders only the edges in the graph
+        * @memberof GraphBase.prototype
+        */
         renderLinks: function(){
             var links = this.tree.links(this.tree_nodes);
 
@@ -109,6 +142,13 @@ define([
             link.exit()
                 .remove();
         },
+
+        /**
+        * Redraw the graph based on the current D3 scale and translate events
+        * @memberof GraphBase.prototype
+        * @param {boolean} force - {default: false} if true remove and re-add all the nodes and edges in the graph, 
+        * used after adding/removing nodes from the graph
+        */
         redraw: function (force) {
             var self = this;
             var previousScale = this.currentScale;
@@ -153,6 +193,11 @@ define([
                 this.render();
             }
         },
+
+        /**
+        * Resizes the rendered svg graph to fit it's enclosing html container
+        * @memberof GraphBase.prototype
+        */
         resize: function(){
             d3.select(this.el)
                 .style("height", this.$el.height() + "px")
