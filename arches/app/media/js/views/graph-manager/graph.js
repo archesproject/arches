@@ -5,6 +5,13 @@ define([
     'd3'
 ], function(Backbone, GraphBase, ko, d3) {
     var GraphView = GraphBase.extend({
+        /**
+        * A backbone view to manage a list of branch graphs
+        * @augments GraphBase
+        * @constructor
+        * @name GraphView
+        */
+
         initialize: function(options) {
             this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
@@ -24,6 +31,14 @@ define([
                 this.render();
             }, this);
         },
+
+        /**
+        * Renders only the nodes in the graph and adds Drag and Drop functionality 
+        * as well as dynamically updating the styling based on hover events and allowing 
+        * users to select a node by directly clicking it.  Nodes tagged as selected or filtered 
+        * are rendered differently
+        * @memberof GraphView.prototype
+        */
         renderNodes: function(){
             GraphBase.prototype.renderNodes.apply(this, arguments);
             var self = this;
@@ -63,6 +78,12 @@ define([
             this.allNodes.exit()
                 .remove();
         },
+
+        /**
+        * Renders the text associated with each node in the graph.  
+        * Nodes tagged as filtered are rendered differently
+        * @memberof GraphView.prototype
+        */
         renderNodeText: function(){
             GraphBase.prototype.renderNodeText.apply(this, arguments);
             var getNodeClass = function (d, className) {
@@ -74,6 +95,12 @@ define([
                     return getNodeClass(d, '');
                 })
         },
+
+        /**
+        * Renders only the edges in the graph.  Nodes with a common group id have 
+        * a different link styling
+        * @memberof GraphView.prototype
+        */
         renderLinks: function(){
             var self = this;
             GraphBase.prototype.renderLinks.apply(this, arguments);
@@ -89,6 +116,11 @@ define([
                     return className;
                 });
         },
+
+        /**
+        * Listens to changes in node name or groupid and forces a {@link GraphView#render} 
+        * @memberof GraphView.prototype
+        */
         addNodeListeners: function () {
             var self = this;
             var nodes = this.nodes();
@@ -102,6 +134,12 @@ define([
                 });
             });
         },
+
+        /**
+        * Allows users to drag a part of the graph and append it to another part.  Styling 
+        * of the graph is updated to reflect only valid drop targets.
+        * @memberof GraphView.prototype
+        */
         initDragDrop: function(){
             var self = this;
             var dragging = false;
