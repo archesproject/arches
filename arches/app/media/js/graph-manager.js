@@ -44,7 +44,7 @@ require([
 
     viewModel.branchListView= new BranchListView({
         el: $('#branch-library'),
-        branches: ko.observableArray(data.branches),
+        branches: ko.observableArray(_.filter(data.branches, function(branch){return branch.isresource === false})),
         graphModel: graphModel,
         loading: loading
     });
