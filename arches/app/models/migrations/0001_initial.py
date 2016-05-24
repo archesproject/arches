@@ -397,6 +397,20 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Ontology',
+            fields=[
+                ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
+                ('source', models.TextField()),
+                ('target', JSONField(null=True)),
+                ('direction', models.TextField()),
+                ('version', models.TextField()),
+            ],
+            options={
+                'db_table': 'ontology',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Overlay',
             fields=[
                 ('overlaytyp', models.TextField(null=True, blank=True)),
@@ -634,6 +648,10 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name='cardxnodexwidget',
             unique_together=set([('node', 'card', 'widget')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='ontology',
+            unique_together=set([('source', 'version', 'direction')]),
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),

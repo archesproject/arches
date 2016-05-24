@@ -329,6 +329,19 @@ class Node(models.Model):
         db_table = 'nodes'
 
 
+class Ontology(models.Model):
+    ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
+    source = models.TextField()
+    target = JSONField(null=True)
+    direction = models.TextField()
+    version = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = 'ontology'
+        unique_together=(('source', 'version', 'direction'),)
+        
+
 class Overlay(models.Model):
     overlaytyp = models.TextField(blank=True, null=True)
     overlayval = models.TextField(blank=True, null=True)
