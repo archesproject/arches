@@ -1,8 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 <h4 class="title-block-title">
-    <span class="node-title" data-bind="text: title"></span>
-    <span data-bind="if: !title()">{% trans "Unnamed node" %}</span>
+    <span class="node-title" data-bind="text: (node() && node().name()) ? node().name() : '{% trans "Unnamed node" %}'"></span>
 </h4>
 
 <div class="relative">

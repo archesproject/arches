@@ -14,18 +14,6 @@ define([
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
 
-            this.title = ko.computed(function () {
-                var node = self.node();
-                if (!node || !node.name()) {
-                    return '';
-                }
-                title = node.name();
-                if (title.length > 16) {
-                    return title.substring(0,16) + '...';
-                }
-                return title;
-            });
-
             this.node.subscribe(function () {
                 self.closeClicked(false);
             });
