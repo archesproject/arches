@@ -553,7 +553,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     top: 10px;
 }
 .library-card-main {
-    width: 155px;
+    width: 135px;
     position: absolute;
     left: 55px;
     top: 12px;
@@ -564,7 +564,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .library-card-subtitle {
     text-transform: capitalize;
-    width: 155px;
+    width: 135px;
     position: absolute;
     left: 55px;
     top: 25px;
@@ -3042,6 +3042,10 @@ li.card-tree-list:last-of-type {
     margin-bottom: 5px;
     color: #666;
     padding: 5px 0 5px 5px;
+    width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .library-crud-container {
     position: absolute;
