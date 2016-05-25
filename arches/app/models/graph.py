@@ -22,7 +22,7 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.models.ontology import Ontology
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-
+from django.conf import settings
 
 class Graph(object):
     """
@@ -70,6 +70,36 @@ class Graph(object):
                     edge.domainnode = self.nodes[edge.domainnode.pk]
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
+
+    @staticmethod
+    def new(name="",is_resource=False,author=""):
+        newid = uuid.uuid1()
+        group = models.NodeGroup.objects.create(
+            pk=newid,
+            cardinality='n'
+        )
+        metadata = models.Graph.objects.create(
+            name=name,
+            subtitle="",
+            author=author,
+            description="",
+            version="",
+            isresource=is_resource,
+            isactive=False,
+            iconclass=""
+        )
+        root = models.Node.objects.create(
+            pk=newid,
+            name=name,
+            description='',
+            istopnode=True,
+            ontologyclass_id=settings.DEFAULT_GRAPH_CLASS_ID,
+            datatype='semantic',
+            nodegroup=group,
+            graph=metadata
+        )
+
+        return Graph(metadata)
 
     def add_node(self, node):
         """

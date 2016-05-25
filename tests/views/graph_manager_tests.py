@@ -153,9 +153,9 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(len(nodes), new_count)
         self.assertEqual(len(edges), new_count)
 
-    def test_node_clone(self):
+    def test_graph_clone(self):
         """
-        Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
+        Test clone a graph (HERITAGE_RESOURCE) via view
 
         """
         self.client.login(username='admin', password='admin')
@@ -170,4 +170,18 @@ class GraphManagerViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize({'isresource': False})
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
+        self.assertFalse(response_json['metadata']['isresource'])
+
+    def test_new_graph(self):
+        """
+        Test creating a new graph via the view
+
+        """
+        self.client.login(username='admin', password='admin')
+        url = reverse('new_graph')
+        post_data = JSONSerializer().serialize({'isresource': False})
+        content_type = 'application/x-www-form-urlencoded'
+        response = self.client.post(url, post_data, content_type)
+        response_json = json.loads(response.content)
+        self.assertEqual(len(response_json['nodes']), 1)
         self.assertFalse(response_json['metadata']['isresource'])
