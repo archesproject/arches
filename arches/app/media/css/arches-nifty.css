@@ -985,6 +985,14 @@ input[type="search"] {
     margin: 0;
     padding: 50px;
 }
+
+.listing-container {
+    margin-top: 10px; 
+    padding-left: 7px;
+    padding-right: 7px;
+    overflow:auto;
+}
+
 .mainnav-patch {
     background: #2d3c4b;
 }
@@ -3033,7 +3041,7 @@ li.card-tree-list:last-of-type {
 .ep-card-crud-panel {
     background: #f8f8f8;
     border-right: 1px solid #ddd;
-    padding: 7px;
+    padding: 7px 0px;
 }
 .title-block-title {
     font-size: 15px;
