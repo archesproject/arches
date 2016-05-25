@@ -182,6 +182,19 @@ def clone(request, graphid):
 
     return HttpResponseNotFound()
 
+@group_required('edit')
+def new(request):
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        isresource = data['isresource'] if 'isresource' in data else False
+        name = _('New Resource') if isresource else _('New Graph')
+        author = request.user.first_name + ' ' + request.user.last_name
+        graph = Graph.new(name=name,is_resource=isresource,author=author)
+        graph.save()
+        return JSONResponse(graph)
+
+    return HttpResponseNotFound()
+
 def get_related_nodes(request):
     ret = {
         'properties': [],
