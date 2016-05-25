@@ -29,39 +29,25 @@ define([
             this.node().reset();
             this.close();
         },
-        callAsync: function (methodName, onSuccess) {
+        callAsync: function (methodName, closeOnSuccess) {
             var self = this
-            self.loading(true);
-            self.failed(false);
-            self.node()[methodName](function (request, status) {
+            this.loading(true);
+            this.failed(false);
+            this.graphModel[methodName](this.node(), function(response, status){
                 var success = (status === 'success');
                 self.loading(false);
                 self.closeClicked(false);
                 self.failed(!success);
-                if (success) {
-                    if (onSuccess) {
-                        onSuccess(request);
-                    }
+                if (success && closeOnSuccess) {
                     self.close();
                 }
-            }, self.node());
+            });
         },
         save: function () {
-            var self = this
-            this.loading(true);
-            this.failed(false);
-            this.graphModel.updateNode(this.node(), function(response, status){
-                var success = (status === 'success');
-                this.loading(false);
-                this.closeClicked(false);
-                this.failed(!success);
-            },this);
+            this.callAsync('updateNode');
         },
         deleteNode: function () {
-            var self = this;
-            this.callAsync('delete', function () {
-                self.graphModel.deleteNode(self.node());
-            });
+            this.callAsync('deleteNode', true);
         },
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
