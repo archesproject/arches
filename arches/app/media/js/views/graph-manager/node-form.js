@@ -67,9 +67,6 @@ define([
                 this.loading(false);
                 this.closeClicked(false);
                 this.failed(!success);
-                if (success) {
-                    this.close();
-                }
             },this);
         },
         deleteNode: function () {
