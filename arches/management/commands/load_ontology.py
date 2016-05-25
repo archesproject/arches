@@ -53,10 +53,8 @@ class Command(BaseCommand):
 
         data_source = None if data_source == '' else data_source
         if data_source and version:
-            print data_source
             for direction in ['down', 'up']:
                 for ontology_class, data in self.parse_xml(data_source, direction=direction).iteritems():
-                    print ontology_class
                     models.Ontology.objects.create(source=ontology_class, target=data, direction=direction, version=version)
 
     def parse_xml(self, file, direction='down'):
@@ -105,7 +103,6 @@ class Command(BaseCommand):
             ontology_class_graph.add_node(self.get_attr(concept, ns, 'RDF:about'))
             for subclass in concept.findall('RDFS:subClassOf', ns):
                 ontology_class_graph.add_edge(self.get_attr(subclass, ns, 'RDF:resource'), self.get_attr(concept, ns, 'RDF:about'))
-
 
         # populates a graph with class/property/class relations
         for concept in root.findall('RDF:Property', ns):

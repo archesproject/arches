@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 
 import os
+import uuid
 import codecs
+import django.contrib.gis.db.models.fields
+from django.core import management
 from django.conf import settings
 from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
-import uuid
-import django.contrib.gis.db.models.fields
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
 
 def get_sql_string_from_file(pathtofile):
@@ -38,14 +39,10 @@ def forwards_func(apps, schema_editor):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(read_group)
 
+    management.call_command('load_ontology', source=os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm', 'cidoc_crm_v6.2.xml'), version='6.2')
+
 def reverse_func(apps, schema_editor):
-    # forwards_func() creates two Country instances,
-    # so reverse_func() should delete them.
-    pass
-    # Country = apps.get_model("myapp", "Country")
-    # db_alias = schema_editor.connection.alias
-    # Country.objects.using(db_alias).filter(name="USA", code="us").delete()
-    # Country.objects.using(db_alias).filter(name="France", code="fr").delete()
+    models.Ontology.objects.filter(version='6.2').delete()
 
 class Migration(migrations.Migration):
 
