@@ -629,10 +629,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     color: inherit!important;
 }
 .branch-preview {
-    height: 550px;
+    height: 280px;
     width: 280px;
-    background: #f1f1f1;
-    border: 1px solid #123;
+    background: #fff;
+    border: 1px solid #ddd;
     color: #123;
 }
 .branch-metadata {
