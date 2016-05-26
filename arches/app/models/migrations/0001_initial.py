@@ -399,7 +399,6 @@ class Migration(migrations.Migration):
                 ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ('source', models.TextField()),
                 ('target', JSONField(null=True)),
-                ('direction', models.TextField()),
                 ('version', models.TextField()),
             ],
             options={
@@ -648,7 +647,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='ontology',
-            unique_together=set([('source', 'version', 'direction')]),
+            unique_together=set([('source', 'version')]),
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),

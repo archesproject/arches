@@ -333,13 +333,12 @@ class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     source = models.TextField()
     target = JSONField(null=True)
-    direction = models.TextField()
     version = models.TextField()
 
     class Meta:
         managed = True
         db_table = 'ontology'
-        unique_together=(('source', 'version', 'direction'),)
+        unique_together=(('source', 'version'),)
         
 
 class Overlay(models.Model):
