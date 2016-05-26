@@ -41,7 +41,7 @@ define([
                         branch.filtered(true);
                         var found = _.find(branch.graph.domain_connections, function(domain_connection){
                             return _.find(domain_connection.ontology_classes, function(ontology_class){
-                                return ontology_class.id === node.ontologyclass_id();
+                                return ontology_class.id === node.ontologyclass();
                             }, this)
                         }, this);
                         if(found){
@@ -86,7 +86,7 @@ define([
                 this.loading(true);
                 var ontology_connection = _.find(item.graph.domain_connections, function(domain_connection){
                     return _.find(domain_connection.ontology_classes, function(ontology_class){
-                        return ontology_class.id === this.selectedNode().ontologyclass_id();
+                        return ontology_class.id === this.selectedNode().ontologyclass();
                     }, this)
                 }, this);
                 if(ontology_connection){

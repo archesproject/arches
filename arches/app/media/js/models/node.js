@@ -18,31 +18,30 @@ define([
             self.nodeGroupId = ko.observable('');
             self.datatype = ko.observable('');
             self.validations = ko.observableArray();
-            self.ontologyclass_id = ko.observable('');
-            self.ontologyclass_value = ko.observable('');
-            self.parentproperty_id = ko.observable('');
+            self.ontologyclass = ko.observable('');
+            self.parentproperty = ko.observable('');
             self.ontology_cache = ko.observableArray();
 
             self.parse(options.source);
 
             self.validclasses = ko.computed(function() {
-                if (!self.parentproperty_id()) {
+                if (!self.parentproperty()) {
                     return _.chain(self.ontology_cache())
                         .sortBy(function(item){
-                            return item.class.value;
+                            return item.class;
                         })
                         .uniq(function(item){
-                            return item.class.id;
+                            return item.class;
                         })
                         .pluck('class')
                         .value();
                 }else{
                     return _.chain(self.ontology_cache())
                         .sortBy(function(item){
-                            return item.class.value;
+                            return item.class;
                         })
                         .filter(function(item){
-                            return item.property.id === self.parentproperty_id();
+                            return item.property === self.parentproperty();
                         })
                         .pluck('class')
                         .value();
@@ -51,23 +50,23 @@ define([
 
             if(!self.istopnode){
                 self.validproperties = ko.computed(function() {
-                    if (!self.ontologyclass_id()) {
+                    if (!self.ontologyclass()) {
                         return _.chain(self.ontology_cache())
                             .sortBy(function(item){
-                                return item.property.value;
+                                return item.property;
                             })
                             .uniq(function(item){
-                                return item.property.id;
+                                return item.property;
                             })
                             .pluck('property')
                             .value();
                     }else{
                         return _.chain(self.ontology_cache())
                             .sortBy(function(item){
-                                return item.property.value;
+                                return item.property;
                             })
                             .filter(function(item){
-                                return item.class.id === self.ontologyclass_id();
+                                return item.class === self.ontologyclass();
                             })
                             .pluck('property')
                             .value();
@@ -85,8 +84,8 @@ define([
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
                     validations: self.validations(),
-                    ontologyclass_id: self.ontologyclass_id(),
-                    parentproperty_id: self.parentproperty_id()
+                    ontologyclass: self.ontologyclass(),
+                    parentproperty: self.parentproperty()
                 }))
             });
 
@@ -103,13 +102,6 @@ define([
                     self.getValidNodesEdges();
                 }
             })
-
-            self.ontologyclass_id.subscribe(function(ontologyclass_id){
-                var ontologyclass = _.find(self.validclasses(), function(ontologyclass){
-                    return ontologyclass_id === ontologyclass.id;
-                });
-                self.ontologyclass_value(ontologyclass.value);
-            }, this);
         },
 
         parse: function(source) {
@@ -118,15 +110,12 @@ define([
             self.name(source.name);
             self.nodeGroupId(source.nodegroup_id);
             self.datatype(source.datatype);
-            self.ontologyclass_id(source.ontologyclass_id);
-            self.ontologyclass_value(source.ontologyclass_value);
-            self.parentproperty_id(source.parentproperty_id);
+            self.ontologyclass(source.ontologyclass);
+            self.parentproperty(source.parentproperty);
             self.validations.removeAll();
             source.validations.forEach(function(validation) {
                 self.validations.push(validation);
             });
-
-            self.parentproperty_value = source.parentproperty_value;
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
@@ -155,8 +144,8 @@ define([
             var relatedNodesEdges = this.getRelatedNodesEdges(this);
             // this.ontology_cache.removeAll();
             // this.ontology_cache.push({
-            //     'property': {'id':this.parentproperty_id(),'value': this.parentproperty_value},
-            //     'class': {'id':this.ontologyclass_id(),'value': this.ontologyclass_value}
+            //     'property': {'id':this.parentproperty(),'value': this.parentproperty_value},
+            //     'class': {'id':this.ontologyclass(),'value': this.ontologyclass_value}
             // })
             this._doRequest({
                 type: "POST",

@@ -209,7 +209,7 @@ define(['arches',
             var ret;
             this.get('edges')().forEach(function (edge) {
                 if (edge.rangenode_id === node.nodeid){
-                    ret = edge.ontologyproperty_id;
+                    ret = edge.ontologyproperty;
                 }
             }, this);
             return ret;

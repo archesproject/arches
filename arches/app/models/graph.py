@@ -359,10 +359,8 @@ class Graph(object):
             parentproperties[edge.rangenode_id] = edge.ontologyproperty
         for key, node in self.nodes.iteritems():
             nodeobj = JSONSerializer().serializeToPython(node)
-            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]
-            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]
+            nodeobj['parentproperty'] = parentproperties[node.nodeid]
 
-            nodeobj['ontologyclass_value'] = node.ontologyclass
             ret['nodes'].append(nodeobj)
             if node.istopnode:
                 ret['root'] = nodeobj
