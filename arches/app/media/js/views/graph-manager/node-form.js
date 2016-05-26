@@ -5,6 +5,12 @@ define([
     'bindings/chosen'
 ], function(_, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
+        /**
+        * A backbone model to manage graph data
+        * @augments Backbone.View
+        * @constructor
+        * @name NodeFormView
+        */
         initialize: function(options) {
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'validations', 'branchListView'));
@@ -18,6 +24,10 @@ define([
                 self.closeClicked(false);
             });
         },
+
+        /**
+         * closes the node form view
+         */
         close: function() {
             this.failed(false);
             this.closeClicked(true);
@@ -25,10 +35,24 @@ define([
                 this.node().selected(false);
             }
         },
+
+        /**
+         * resets the edited model and closes the form
+         */
         cancel: function () {
             this.node().reset();
             this.close();
         },
+
+
+        /**
+         * calls an async method on the graph model based on the passed in
+         * method name and optionally closes the form on success.
+         * manages showing loading mask & failure alert
+         *
+         * @param  {string} methodName - method to call on the graph model
+         * @param  {boolean} closeOnSuccess - true to close form on success
+         */
         callAsync: function (methodName, closeOnSuccess) {
             var self = this
             this.loading(true);
@@ -43,12 +67,24 @@ define([
                 }
             });
         },
+
+        /**
+         * calls the updateNode method on the graph model for the edited node
+         */
         save: function () {
             this.callAsync('updateNode');
         },
+
+        /**
+         * calls the deleteNode method on the graph model for the edited node
+         */
         deleteNode: function () {
             this.callAsync('deleteNode', true);
         },
+
+        /**
+         * calls the toggleIsCollector method on the node model
+         */
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
         }
