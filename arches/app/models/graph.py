@@ -334,7 +334,10 @@ class Graph(object):
 
     def get_valid_domain_connections(self):
         ontology = models.OntologyClass.objects.get(source=self.root.ontologyclass)
-        return ontology.target
+        return ontology.target['up']
+
+    def get_valid_ontology_classes(self, nodeid=None, parentnodeid=None):
+        pass
 
     def serialize(self):
         """
@@ -346,6 +349,7 @@ class Graph(object):
         """
 
         ret = {}
+        ret['root'] = self.root;
         ret['metadata'] = self.metadata
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['domain_connections'] = self.get_valid_domain_connections()
@@ -360,8 +364,6 @@ class Graph(object):
         for key, node in self.nodes.iteritems():
             nodeobj = JSONSerializer().serializeToPython(node)
             nodeobj['parentproperty'] = parentproperties[node.nodeid]
-
             ret['nodes'].append(nodeobj)
-            if node.istopnode:
-                ret['root'] = nodeobj
+
         return ret
