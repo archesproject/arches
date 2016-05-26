@@ -145,7 +145,7 @@ class Edge(models.Model):
     edgeid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    ontologyproperty = models.ForeignKey(Concept, db_column='ontologyproperty', blank=True, null=True)
+    ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
     graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
@@ -241,7 +241,7 @@ class Node(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
-    ontologyclass = models.ForeignKey(Concept, db_column='ontologyclass', blank=True, null=True)
+    ontologyclass = models.TextField(blank=True, null=True)
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
@@ -315,14 +315,14 @@ class Node(models.Model):
 
         return updated_models
 
-    def set_parentproperty_id(self, parentproperty_id):
-        return Edge.objects.filter(rangenode=self).update(ontologyproperty_id=parentproperty_id)
+    def set_parentproperty(self, parentproperty):
+        return Edge.objects.filter(rangenode=self).update(ontologyproperty=parentproperty)
 
-    def get_parentproperty_id(self):
+    def get_parentproperty(self):
         if self.istopnode:
             return None
         edge = Edge.objects.get(rangenode=self)
-        return edge.ontologyproperty_id
+        return edge.ontologyproperty
 
     class Meta:
         managed = True

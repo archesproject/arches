@@ -91,22 +91,12 @@ INSERT INTO d_relation_types VALUES ('hasTopConcept', 'Properties', 'skos');
 INSERT INTO d_relation_types VALUES ('hasCollection', 'Entitytype Relations', 'arches');
 INSERT INTO d_relation_types VALUES ('hasEntity', 'Entitynode Relations', 'arches');
 
-
---Arches ontology relations between to classes
-INSERT INTO d_relation_types VALUES ('subClassOf', 'Ontology Relations', 'arches');
-INSERT INTO d_relation_types VALUES ('subPropertyOf', 'Ontology Relations', 'arches');
-INSERT INTO d_relation_types VALUES ('hasDomainClass', 'Ontology Relations', 'arches');
-INSERT INTO d_relation_types VALUES ('hasRangeClass', 'Ontology Relations', 'arches');
-
 --OWL Class types and Arches specific types
 INSERT INTO d_node_types VALUES ('GroupingNode', 'arches');
 INSERT INTO d_node_types VALUES ('ConceptScheme', 'skos');
 INSERT INTO d_node_types VALUES ('Concept', 'skos');
 INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
-INSERT INTO d_node_types VALUES ('Ontology', 'arches');
-INSERT INTO d_node_types VALUES ('Ontology Class', 'arches');
-INSERT INTO d_node_types VALUES ('Ontology Property', 'arches');
 
 --Data types
 INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o');
@@ -120,7 +110,6 @@ INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
-INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000002', 'ConceptScheme', 'ONTOLOGY');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000004', 'GroupingNode', 'ENTITY NODES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000005', 'Collection', 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv');
@@ -130,7 +119,6 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005', 'hasTopConcept');
 
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000002', 'prefLabel', 'Ontology', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000003', 'prefLabel', 'Dropdown Lists', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', 'prefLabel', 'Entity Nodes', 'en-US');
 INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
@@ -168,7 +156,7 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string', '22000000-0000-0000-0000-000000000000');
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'string', '22000000-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
@@ -180,19 +168,19 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
+    VALUES ('20000000-0000-0000-0000-100000000001', 'Node', '', 't', 'E1_CRM_Entity', 'string',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'domain',
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'domain',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000001', 'n', '');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', '2f8fd82d-2679-3d69-b697-7efe545e76ab');
+    VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
 
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
@@ -200,40 +188,40 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic',
+    VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
         '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'semantic',
+    VALUES ('20000000-0000-0000-0000-000000000001', 'KEYS', 'Group to hold unique keys used by Arches', 'f', 'E46_Section_Definition', 'semantic',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000002', 'KEY_NAME', 'Name of the key', 'f', 'E42_Identifier', 'string',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'a8f7cd0b-8771-3b91-a827-422ff7a15250', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'domain',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'c03db431-4564-34eb-ba86-4c8169e4276c', 'string',
+    VALUES ('20000000-0000-0000-0000-000000000004', 'KEY_VALUE', 'Value of the key', 'f', 'E42_Identifier', 'string',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56');
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000001', 'P1_is_identified_by');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56');
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000002', 'P1_is_identified_by');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56');
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000003', 'P2_has_type');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
-    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004', '9bf487d8-c0a3-3510-b228-1b5cd74f4c56');
+    VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004', 'P1_is_identified_by');
 
 INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
     VALUES ('20000000-0000-0000-0000-000000000000', 'n', '');

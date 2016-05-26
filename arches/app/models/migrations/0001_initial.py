@@ -283,7 +283,7 @@ class Migration(migrations.Migration):
                 ('edgeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('ontologyproperty', models.ForeignKey(blank=True, db_column='ontologyproperty', null=True, to='models.Concept')),
+                ('ontologyproperty', models.TextField(blank=True, null=True)),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
@@ -371,7 +371,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
+                ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
@@ -665,7 +665,6 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'arches_ontology_602.sql')), ''),
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
     ]
