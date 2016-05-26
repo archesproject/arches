@@ -36,11 +36,13 @@ class Command(BaseCommand):
             help='An XML file of describing an ontology graph')
         parser.add_argument('-vn', '--vernum', action='store', dest='version', default='',
             help='The version of the ontology being loaded')
+        parser.add_argument('-n', '--name', action='store', dest='name', default='',
+            help='Name to use to identify the ontology')
 
     def handle(self, *args, **options):
         self.run_loader(data_source=options['source'], version=options['version'])
 
-    def run_loader(self, data_source=None, version=None):
+    def run_loader(self, data_source=None, version=None, name=None):
         """
         load the given ontology file in xml format into the database
 
@@ -53,8 +55,11 @@ class Command(BaseCommand):
 
         data_source = None if data_source == '' else data_source
         if data_source and version:
+            if not name:
+                name = os.path.splitext(os.path.split(data_source)[1])[0]
+            ontology = models.Ontology.objects.create(version=version, name=name)
             for ontology_class, data in self.parse_xml(data_source).iteritems():
-                models.Ontology.objects.create(source=ontology_class, target=data, version=version)
+                models.OntologyClass.objects.create(source=ontology_class, target=data, ontology=ontology)
 
     def parse_xml(self, file):
         """

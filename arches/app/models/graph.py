@@ -333,7 +333,7 @@ class Graph(object):
         return self
 
     def get_valid_domain_connections(self):
-        ontology = models.Ontology.objects.get(source=self.root.ontologyclass)
+        ontology = models.OntologyClass.objects.get(source=self.root.ontologyclass)
         return ontology.target
 
     def serialize(self):

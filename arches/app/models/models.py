@@ -331,14 +331,25 @@ class Node(models.Model):
 
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
-    source = models.TextField()
-    target = JSONField(null=True)
+    name = models.TextField()
     version = models.TextField()
+    parentontology = models.ForeignKey('Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)
 
     class Meta:
         managed = True
-        db_table = 'ontology'
-        unique_together=(('source', 'version'),)
+        db_table = 'ontologies'
+
+
+class OntologyClass(models.Model):
+    ontologyclassid = models.UUIDField(default=uuid.uuid1, primary_key=True)
+    source = models.TextField()
+    target = JSONField(null=True)
+    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='ontologyclasses')
+
+    class Meta:
+        managed = True
+        db_table = 'ontologyclasses'
+        unique_together=(('source', 'ontology'),)
         
 
 class Overlay(models.Model):

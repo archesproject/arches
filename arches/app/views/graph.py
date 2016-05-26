@@ -189,6 +189,6 @@ def get_related_nodes(request):
     }
     lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
     data = JSONDeserializer().deserialize(request.body)
-    ontology = models.Ontology.objects.get(source=data['parentnode']['ontologyclass'])
+    ontology = models.OntologyClass.objects.get(source=data['parentnode']['ontologyclass'])
     #related_properties = Ontology().get_valid_ontology_concepts(data['parentnode'], child_properties=data['childedges'], lang=lang)
     return JSONResponse(ontology.target['down'], indent=4)

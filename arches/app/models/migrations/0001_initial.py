@@ -397,12 +397,25 @@ class Migration(migrations.Migration):
             name='Ontology',
             fields=[
                 ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
-                ('source', models.TextField()),
-                ('target', JSONField(null=True)),
+                ('name', models.TextField()),
                 ('version', models.TextField()),
+                ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
             ],
             options={
-                'db_table': 'ontology',
+                'db_table': 'ontologies',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='OntologyClass',
+            fields=[
+                ('ontologyclassid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
+                ('source', models.TextField()),
+                ('target', JSONField(null=True)),
+                ('ontology', models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='ontologyclasses')),
+            ],
+            options={
+                'db_table': 'ontologyclasses',
                 'managed': True,
             },
         ),
@@ -646,8 +659,8 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'card', 'widget')]),
         ),
         migrations.AlterUniqueTogether(
-            name='ontology',
-            unique_together=set([('source', 'version')]),
+            name='ontologyclass',
+            unique_together=set([('source', 'ontology')]),
         ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),
