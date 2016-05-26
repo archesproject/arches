@@ -53,40 +53,45 @@ class Command(BaseCommand):
 
         data_source = None if data_source == '' else data_source
         if data_source and version:
-            for direction in ['down', 'up']:
-                for ontology_class, data in self.parse_xml(data_source, direction=direction).iteritems():
-                    models.Ontology.objects.create(source=ontology_class, target=data, direction=direction, version=version)
+            for ontology_class, data in self.parse_xml(data_source).iteritems():
+                models.Ontology.objects.create(source=ontology_class, target=data, version=version)
 
-    def parse_xml(self, file, direction='down'):
+    def parse_xml(self, file):
         """
         parses the xml file into a dictionary object keyed off of the ontology class name found in the rdf:about attributes
-        object values are dictionaries with 2 properties, 'ontology_property' and 'ontology_classes'
+        object values are dictionaries with 2 properties, 'down' and 'up' and within each of those another 2 properties, 
+        'ontology_property' and 'ontology_classes'
+
+        "down" assumes a known domain class, while "up" assumes a known range class
 
         .. code-block:: python
 
-            {
-                "ontology_property": "P1_is_identified_by",
-                "ontology_classes": [
-                    "E51_Contact_Point",
-                    "E75_Conceptual_Object_Appellation",
-                    "E42_Identifier",
-                    "E45_Address",
-                    "E41_Appellation",
-                    "E44_Place_Appellation",
-                    "E35_Title",
-                    "E50_Date",
-                    "E82_Actor_Appellation",
-                    "E48_Place_Name",
-                    "E49_Time_Appellation",
-                    "E47_Spatial_Coordinates",
-                    "E46_Section_Definition"
-                ]
-            }
+            "down":[
+                {
+                    "ontology_property": "P1_is_identified_by",
+                    "ontology_classes": [
+                        "E51_Contact_Point",
+                        "E75_Conceptual_Object_Appellation",
+                        "E42_Identifier",
+                        "E45_Address",
+                        "E41_Appellation",
+                        ....
+                    ]
+                }
+            ]
+            "up":[
+                    "ontology_property": "P1i_identifies",
+                    "ontology_classes": [
+                        "E51_Contact_Point",
+                        "E75_Conceptual_Object_Appellation",
+                        "E42_Identifier"
+                        ....
+                    ]
+                }
+            ]
 
         Keyword Arguments:
         file -- the file to parse
-
-        direction -- "down" {default}, or "up".  "down" assumes a known domain class, while "up" assumes a known range class
 
         """
 
@@ -111,17 +116,19 @@ class Command(BaseCommand):
             ontology_property_graph.add_edge(domain, range, name=self.get_attr(concept, ns, 'RDF:about'))
 
         ret = {}
-        lookup = {}
-        for ontology_class in ontology_property_graph.nodes_iter():
-            if ontology_class not in lookup:
-                lookup[ontology_class] = self.get_properties_and_relatedclasses(ontology_class_graph, ontology_property_graph, ontology_class, direction=direction)
-            
-            ret[ontology_class] = lookup[ontology_class]
+        lookup = {'down':{}, 'up':{}}
+        for ontology_class in ontology_class_graph.nodes_iter():
+            ret[ontology_class] = {'down':{}, 'up':{}}
+            for direction in ['down', 'up']:
+                if ontology_class not in lookup[direction]:
+                    lookup[direction][ontology_class] = self.get_properties_and_relatedclasses(ontology_class_graph, ontology_property_graph, ontology_class, direction=direction)
 
-            for superclass in nx.ancestors(ontology_class_graph, ontology_class):
-                if superclass not in lookup:
-                    lookup[superclass] = self.get_properties_and_relatedclasses(ontology_class_graph, ontology_property_graph, superclass, direction=direction)
-                ret[ontology_class] = ret[ontology_class] + lookup[superclass]
+                ret[ontology_class][direction] = lookup[direction][ontology_class]
+
+                for superclass in nx.ancestors(ontology_class_graph, ontology_class):
+                    if superclass not in lookup[direction]:
+                        lookup[direction][superclass] = self.get_properties_and_relatedclasses(ontology_class_graph, ontology_property_graph, superclass, direction=direction)
+                    ret[ontology_class][direction] = ret[ontology_class][direction] + lookup[direction][superclass]
                 
         return ret
         
