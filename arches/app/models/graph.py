@@ -86,7 +86,7 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.ontologyclass_id = nodeobj.get('ontologyclass_id','')
+            node.ontologyclass = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.validations.set(nodeobj.get('validations', []))
@@ -125,7 +125,7 @@ class Graph(object):
             edge.edgeid = egdeobj.get('edgeid', None)
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
-            edge.ontologyproperty_id = egdeobj.get('ontologyproperty', '')
+            edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self.metadata
 
@@ -224,7 +224,7 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty_id = property,
+                ontologyproperty = property,
                 graph = self.metadata
             )
             branch_copy.add_edge(newEdge)
@@ -333,7 +333,8 @@ class Graph(object):
         return self
 
     def get_valid_domain_connections(self):
-        return Ontology().get_valid_domain_connections(self.root.ontologyclass_id)
+        ontology = models.Ontology.objects.get(source=self.root.ontologyclass)
+        return ontology.target
 
     def serialize(self):
         """
@@ -355,14 +356,13 @@ class Graph(object):
             self.root.nodeid: {'id': None, 'value': None}
         }
         for edge_id, edge in self.edges.iteritems():
-            parentproperties[edge.rangenode_id] = Ontology(edge.ontologyproperty).simplify(lang='en-US')
+            parentproperties[edge.rangenode_id] = edge.ontologyproperty
         for key, node in self.nodes.iteritems():
             nodeobj = JSONSerializer().serializeToPython(node)
-            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]['id']
-            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]['value']
+            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]
+            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]
 
-            Ontology(node.ontologyclass).simplify(lang='en-US')
-            nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
+            nodeobj['ontologyclass_value'] = node.ontologyclass
             ret['nodes'].append(nodeobj)
             if node.istopnode:
                 ret['root'] = nodeobj
