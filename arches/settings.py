@@ -130,7 +130,7 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = 'Arches'
 
-DEFAULT_GRAPH_CLASS_ID = 'c03db431-4564-34eb-ba86-4c8169e4276c'
+DEFAULT_GRAPH_CLASS_ID = 'E1_CRM_Entity'
 
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###

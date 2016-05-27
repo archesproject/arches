@@ -93,7 +93,7 @@ class Graph(object):
             name=name,
             description='',
             istopnode=True,
-            ontologyclass_id=settings.DEFAULT_GRAPH_CLASS_ID,
+            ontologyclass=settings.DEFAULT_GRAPH_CLASS_ID,
             datatype='semantic',
             nodegroup=group,
             graph=metadata
