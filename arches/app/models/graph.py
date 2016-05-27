@@ -446,11 +446,18 @@ class Graph(object):
                             ret.append(ontology_property)
 
             else:
-                # if no parent node then just use the list of ontology classes from above, there will be no properties to return
-                ret = [{
-                    'ontology_property':'',
-                    'ontology_classes':list(ontology_classes)
-                }]
+                # if a brand new resource
+                if len(out_edges) == 0:
+                    ret = [{
+                        'ontology_property':'',
+                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True)
+                    }]
+                else:
+                    # if no parent node then just use the list of ontology classes from above, there will be no properties to return
+                    ret = [{
+                        'ontology_property':'',
+                        'ontology_classes':list(ontology_classes)
+                    }]
                
         return ret
 
