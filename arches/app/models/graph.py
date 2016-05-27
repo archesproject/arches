@@ -380,7 +380,7 @@ class Graph(object):
 
         Arguments:
         nodeid -- the id of the node in question
-        
+
         """
 
         ret = []
@@ -403,14 +403,13 @@ class Graph(object):
         
             # get a list of properties (and corresponding classes) that could be used to relate to my parent node
             # limit the list of properties based on the intersection between the property's classes and the list of 
-            # ontology classes we defined above
+            # ontology classes we found above
             if parent_node:
-                # get the super classes of the parent node and then for each node
-                # call get valid range connnections
+                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
                 if len(out_edges) == 0:
-                    return models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
+                    return range_ontologies
                 else:
-                    for ontology_property in models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']:
+                    for ontology_property in range_ontologies:
                         ontology_property['ontology_classes'] = list(set(ontology_property['ontology_classes']).intersection(ontology_classes))
 
                         if len(ontology_property['ontology_classes']) > 0:
@@ -419,7 +418,7 @@ class Graph(object):
             else:
                 # if no parent node then just use the list of ontology classes from above, there will be no properties to return
                 ret = [{
-                    'ontology_property':None,
+                    'ontology_property':'',
                     'ontology_classes':list(ontology_classes)
                 }]
                
@@ -443,7 +442,7 @@ class Graph(object):
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
         parentproperties = {
-            self.root.nodeid: {'id': None, 'value': None}
+            self.root.nodeid: ''
         }
         for edge_id, edge in self.edges.iteritems():
             parentproperties[edge.rangenode_id] = edge.ontologyproperty

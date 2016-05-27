@@ -141,7 +141,7 @@ define([
         },
 
         getValidNodesEdges: function(){
-            this.graph.getValidNodesEdges(this.nodeid, '', function(responseJSON){
+            this.graph.getValidNodesEdges(this.nodeid, function(responseJSON){
                 this.ontology_cache.removeAll();
                 responseJSON.forEach(function(item){
                     item.ontology_classes.forEach(function(ontologyclass){
