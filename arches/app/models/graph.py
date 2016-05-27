@@ -334,6 +334,14 @@ class Graph(object):
         return self
 
     def get_parent_node(self, nodeid):
+        """
+        get the parent node of a node with the given nodeid
+
+        Arguments:
+        nodeid -- the node we want to find the parent of
+
+        """
+
         if str(self.root.nodeid) == str(nodeid):
             return None
         for edge_id, edge in self.edges.iteritems():
@@ -342,6 +350,14 @@ class Graph(object):
         return None
 
     def get_out_edges(self, nodeid):
+        """
+        get all the edges of a node with the given nodeid where that node is the domainnode
+
+        Arguments:
+        nodeid -- the nodeid of the node we want to find the edges of
+        
+        """
+
         ret = []
         for edge_id, edge in self.edges.iteritems():
             if str(edge.domainnode_id) == str(nodeid):
@@ -349,15 +365,25 @@ class Graph(object):
         return ret
 
     def get_valid_domain_connections(self):
+        """
+        gets the ontology properties (and related classes) this graph can have with a parent node 
+
+        """
+
         ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
         return ontology_classes.target['up']
 
-    def get_valid_ontology_classes(self, nodeid=None, parentnodeid=None):
+    def get_valid_ontology_classes(self, nodeid=None):
+        """
+        get possible ontology properties (and related classes) a node with the given nodeid can have 
+        taking into consideration it's current position in the graph 
+
+        Arguments:
+        nodeid -- the id of the node in question
+        
+        """
+
         ret = []
-
-        if parentnodeid:
-            return models.OntologyClass.objects.get(source=self.nodes[parentnodeid].ontologyclass).target['down']
-
         if nodeid:
             parent_node = self.get_parent_node(nodeid)
             out_edges = self.get_out_edges(nodeid)
