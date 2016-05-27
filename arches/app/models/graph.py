@@ -332,12 +332,72 @@ class Graph(object):
         self.populate_null_nodegroups()
         return self
 
+    def get_parent_node(self, nodeid):
+        if str(self.root.nodeid) == str(nodeid):
+            return None
+        for edge_id, edge in self.edges.iteritems():
+            if str(edge.rangenode_id) == str(nodeid):
+                return edge.domainnode
+        return None
+
+    def get_out_edges(self, nodeid):
+        ret = []
+        for edge_id, edge in self.edges.iteritems():
+            if str(edge.domainnode_id) == str(nodeid):
+                ret.append(edge)
+        return ret
+
     def get_valid_domain_connections(self):
-        ontology = models.OntologyClass.objects.get(source=self.root.ontologyclass)
-        return ontology.target['up']
+        ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
+        return ontology_classes.target['up']
 
     def get_valid_ontology_classes(self, nodeid=None, parentnodeid=None):
-        pass
+        ret = []
+
+        if parentnodeid:
+            return models.OntologyClass.objects.get(source=self.nodes[parentnodeid].ontologyclass).target['down']
+
+        if nodeid:
+            parent_node = self.get_parent_node(nodeid)
+            out_edges = self.get_out_edges(nodeid)
+
+            ontology_classes = set()
+            if len(out_edges) > 0:
+                print len(out_edges)
+                for edge in out_edges:
+                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass).target['up']:
+                        if edge.ontologyproperty == ontology_property['ontology_property']:
+                            if len(ontology_classes) == 0:
+                                ontology_classes = set(ontology_property['ontology_classes'])
+                            else:
+                                ontology_classes = ontology_classes.intersection(set(ontology_property['ontology_classes']))
+
+                            if len(ontology_classes) == 0:
+                                break
+        
+            # get a list of properties (and corresponding classes) that could be used to relate to my parent node
+            # limit the list of properties based on the intersection between the properties classes and the list of 
+            # ontology classes we defined above
+            if parent_node:
+                # get the super classes of the parent node and then for each node
+                # call get valid range connnections
+                if len(out_edges) == 0:
+                    return models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
+                else:
+                    for ontology_property in models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']:
+                        ontology_property['ontology_classes'] = list(set(ontology_property['ontology_classes']).intersection(ontology_classes))
+
+                        if len(ontology_property['ontology_classes']) > 0:
+                            ret.append(ontology_property)
+
+            else:
+                # if no parent node then just use the list of ontology classes from above, there will be no properties to return
+                ret = [{
+                    'ontology_property':None,
+                    'ontology_classes':list(ontology_classes)
+                }]
+               
+        return ret
 
     def serialize(self):
         """

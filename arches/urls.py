@@ -63,7 +63,7 @@ urlpatterns = [
     url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, graph.move_node, name='move_node'),
     url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='update_node'),
     url(r'^graph/clone/(?P<graphid>%s)$' % uuid_regex, graph.clone, name='clone_graph'),
-    url(r'^node/get_related_nodes$', graph.get_related_nodes, name='get_related_nodes'),
+    url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='node'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

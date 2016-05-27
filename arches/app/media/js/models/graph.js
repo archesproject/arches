@@ -174,6 +174,22 @@ define(['arches',
             }, scope, 'changed');
         },
 
+        getValidNodesEdges: function(nodeid, parentnodeid, callback, scope){
+            //var relatedNodesEdges = this.getRelatedNodesEdges(this);
+            // this.ontology_cache.removeAll();
+            // this.ontology_cache.push({
+            //     'property': {'id':this.parentproperty(),'value': this.parentproperty_value},
+            //     'class': {'id':this.ontologyclass(),'value': this.ontologyclass_value}
+            // })
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('metadata').graphid + '/get_related_nodes',
+                data: JSON.stringify({'nodeid': nodeid, 'parentnodeid':parentnodeid})
+            }, function(response, status, self){
+                callback.call(scope, response.responseJSON);
+            }, this, 'changed');
+        },
+
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};

@@ -141,47 +141,17 @@ define([
         },
 
         getValidNodesEdges: function(){
-            var relatedNodesEdges = this.getRelatedNodesEdges(this);
-            // this.ontology_cache.removeAll();
-            // this.ontology_cache.push({
-            //     'property': {'id':this.parentproperty(),'value': this.parentproperty_value},
-            //     'class': {'id':this.ontologyclass(),'value': this.ontologyclass_value}
-            // })
-            this._doRequest({
-                type: "POST",
-                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','') + 'get_related_nodes',
-                data: JSON.stringify(relatedNodesEdges)
-            }, function(response, status, self){
-                self.ontology_cache.removeAll();
-                response.responseJSON.forEach(function(item){
+            this.graph.getValidNodesEdges(this.nodeid, '', function(responseJSON){
+                this.ontology_cache.removeAll();
+                responseJSON.forEach(function(item){
                     item.ontology_classes.forEach(function(ontologyclass){
-                        self.ontology_cache.push({
+                        this.ontology_cache.push({
                             'property': item.ontology_property,
                             'class': ontologyclass
                         })
-                    });
+                    }, this);
                 }, this);
-            }, this, 'changed');
-        },
-
-        getRelatedNodesEdges: function(){
-            var ret = {
-                'childedges': [],
-                'parentnode': {}
-            }
-            this.graph.get('edges')().forEach(function (edge) {
-                if (edge.rangenode_id === this.nodeid){
-                    this.graph.get('nodes')().forEach(function (node) {
-                        if (node.nodeid === edge.domainnode_id){
-                            ret.parentnode = node;
-                        }
-                    });
-                }
-                if (edge.domainnode_id === this.nodeid){
-                    ret.childedges.push(edge);
-                }
             }, this);
-            return ret
-        },
+        }
     });
 });
