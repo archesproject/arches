@@ -9,12 +9,12 @@ require([
 ], function($, _, ko, PageView, NodeModel) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
 
-    var cloneGraph = function(graphid, data) {
+    var newGraph = function(url, data) {
         data = data || {};
         pageView.viewModel.loading(true);
         $.ajax({
             type: "POST",
-            url: 'clone/' + graphid,
+            url: url,
             data: JSON.stringify(data),
             success: function(response) {
                 window.location = response.metadata.graphid + '/settings';
@@ -33,7 +33,7 @@ require([
             window.location = graph.graphid + page;
         };
         graph.clone = function() {
-            cloneGraph(graph.graphid);
+            newGraph('clone/' + graph.graphid);
         };
         graph.deleteGraph = function () {
             var node = new NodeModel({
@@ -54,12 +54,6 @@ require([
         };
     });
 
-    var newGraph = function (isResource) {
-        var graphId = '22000000-0000-0000-0000-000000000000';
-        cloneGraph(graphId, {
-            isresource: !!isResource
-        });
-    };
 
     var pageView = new PageView({
         viewModel: {
@@ -74,10 +68,10 @@ require([
                 });
             }),
             newResource: function () {
-                newGraph(true);
+                newGraph('new', {isresource: true});
             },
             newGraph: function () {
-                newGraph(false);
+                newGraph('new', {isresource: false});
             }
         }
     });

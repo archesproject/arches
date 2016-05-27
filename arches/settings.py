@@ -130,6 +130,8 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = 'Arches'
 
+DEFAULT_GRAPH_CLASS_ID = 'c03db431-4564-34eb-ba86-4c8169e4276c'
+
 #######################################
 ###  END PACKAGE SPECIFIC SETTINGS  ###
 #######################################
@@ -319,7 +321,7 @@ CONCEPT_SCHEME_LOCATIONS = (
     # Put strings here, like "/home/data/authority_files" or "C:/data/authority_files".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    
+
     # 'absolute/path/to/authority_files',
     # os.path.join(PACKAGE_ROOT, 'source_data', 'sample_data', 'concepts', 'sample_authority_files'),
 )

@@ -233,7 +233,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
 
                             <!--Menu list item-->
-                            <li>
+                            <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
                                 <a href="{% url 'graph' '' %}">
                                     <i class="fa fa-bookmark"></i>
                                     <span class="menu-title">
@@ -289,7 +289,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <li class="list-header">Modules</li>
 
                             <!--Menu list item-->
-                            <li>
+                            <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
                                 <a href="{% url 'rdm' '' %}">
                                     <i class="fa fa-align-left"></i>
                                     <span class="menu-title">

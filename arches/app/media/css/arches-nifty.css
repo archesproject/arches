@@ -553,7 +553,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     top: 10px;
 }
 .library-card-main {
-    width: 155px;
+    width: 135px;
     position: absolute;
     left: 55px;
     top: 12px;
@@ -564,7 +564,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .library-card-subtitle {
     text-transform: capitalize;
-    width: 155px;
+    width: 135px;
     position: absolute;
     left: 55px;
     top: 25px;
@@ -629,10 +629,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     color: inherit!important;
 }
 .branch-preview {
-    height: 550px;
+    height: 280px;
     width: 280px;
-    background: #f1f1f1;
-    border: 1px solid #123;
+    background: #fff;
+    border: 1px solid #ddd;
     color: #123;
 }
 .branch-metadata {
@@ -985,6 +985,14 @@ input[type="search"] {
     margin: 0;
     padding: 50px;
 }
+
+.listing-container {
+    margin-top: 10px; 
+    padding-left: 7px;
+    padding-right: 7px;
+    overflow:auto;
+}
+
 .mainnav-patch {
     background: #2d3c4b;
 }
@@ -3033,7 +3041,7 @@ li.card-tree-list:last-of-type {
 .ep-card-crud-panel {
     background: #f8f8f8;
     border-right: 1px solid #ddd;
-    padding: 7px;
+    padding: 7px 0px;
 }
 .title-block-title {
     font-size: 15px;
@@ -3042,6 +3050,10 @@ li.card-tree-list:last-of-type {
     margin-bottom: 5px;
     color: #666;
     padding: 5px 0 5px 5px;
+    width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .library-crud-container {
     position: absolute;

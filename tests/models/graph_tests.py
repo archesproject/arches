@@ -70,6 +70,18 @@ class GraphTests(ArchesTestCase):
     def tearDown(self):
         self.deleteGraph(self.rootNode)
 
+    def test_new_graph(self):
+        name = "TEST NEW GRAPH"
+        author = "ARCHES TEST"
+        graph = Graph.new(name=name,is_resource=True,author=author)
+
+        self.assertEqual(graph.metadata.name, name)
+        self.assertEqual(graph.metadata.author, author)
+        self.assertTrue(graph.metadata.isresource)
+        self.assertEqual(graph.root.name, name)
+        self.assertTrue(graph.root.is_collector())
+        self.assertEqual(len(graph.nodes), 1)
+
     def test_graph_doesnt_polute_db(self):
         """
         test that the mere act of creating a Graph instance

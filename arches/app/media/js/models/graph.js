@@ -39,13 +39,18 @@ define(['arches',
             }
         },
 
+
+        /**
+         * deleteNode - deletes the passed in node from the db and updates the graph
+         * @memberof GraphModel.prototype
+         * @param  {object} node - the node to be deleted
+         * @param  {function} callback - (optional) a callback function
+         * @param  {object} scope - (optional) the scope used for the callback
+         */
         deleteNode: function(node, callback, scope){
-            this._doRequest({
-                type: "POST",
-                url: this.url + 'update_node/' + this.get('metadata').graphid,
-                data: JSON.stringify(node.toJSON())
-            }, function(response, status, self){
-                if (status === 'success' &&  response.responseJSON) {
+            node['delete'](function (response, status) {
+                var success = (status === 'success');
+                if (success) {
                     var getEdges = function (node) {
                         var edges = this.get('edges')()
                             .filter(function (edge) {
@@ -86,7 +91,7 @@ define(['arches',
                     scope = scope || self;
                     callback.call(scope, response, status);
                 }
-            }, scope, 'changed');
+            }, this);
         },
 
         appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
