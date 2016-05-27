@@ -322,12 +322,13 @@ class Graph(object):
         node['nodeid'] = uuid.UUID(node.get('nodeid'))
         self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
-
+        
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
+                edge.ontologyproperty = node.get('parentproperty')
 
         self.populate_null_nodegroups()
         return self
@@ -363,7 +364,6 @@ class Graph(object):
 
             ontology_classes = set()
             if len(out_edges) > 0:
-                print len(out_edges)
                 for edge in out_edges:
                     for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass).target['up']:
                         if edge.ontologyproperty == ontology_property['ontology_property']:
@@ -376,7 +376,7 @@ class Graph(object):
                                 break
         
             # get a list of properties (and corresponding classes) that could be used to relate to my parent node
-            # limit the list of properties based on the intersection between the properties classes and the list of 
+            # limit the list of properties based on the intersection between the property's classes and the list of 
             # ontology classes we defined above
             if parent_node:
                 # get the super classes of the parent node and then for each node

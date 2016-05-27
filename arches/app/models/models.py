@@ -315,15 +315,6 @@ class Node(models.Model):
 
         return updated_models
 
-    def set_parentproperty(self, parentproperty):
-        return Edge.objects.filter(rangenode=self).update(ontologyproperty=parentproperty)
-
-    def get_parentproperty(self):
-        if self.istopnode:
-            return None
-        edge = Edge.objects.get(rangenode=self)
-        return edge.ontologyproperty
-
     class Meta:
         managed = True
         db_table = 'nodes'
