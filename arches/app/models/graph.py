@@ -93,7 +93,7 @@ class Graph(object):
             name=name,
             description='',
             istopnode=True,
-            ontologyclass_id=settings.DEFAULT_GRAPH_CLASS_ID,
+            ontologyclass=settings.DEFAULT_GRAPH_CLASS_ID,
             datatype='semantic',
             nodegroup=group,
             graph=metadata
@@ -116,7 +116,7 @@ class Graph(object):
             node.name = nodeobj.get('name', '')
             node.description = nodeobj.get('description','')
             node.istopnode = nodeobj.get('istopnode','')
-            node.ontologyclass_id = nodeobj.get('ontologyclass_id','')
+            node.ontologyclass = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.validations.set(nodeobj.get('validations', []))
@@ -155,7 +155,7 @@ class Graph(object):
             edge.edgeid = egdeobj.get('edgeid', None)
             edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
-            edge.ontologyproperty_id = egdeobj.get('ontologyproperty', '')
+            edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self.metadata
 
@@ -254,7 +254,7 @@ class Graph(object):
             newEdge = models.Edge(
                 domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
                 rangenode = branch_copy.root,
-                ontologyproperty_id = property,
+                ontologyproperty = property,
                 graph = self.metadata
             )
             branch_copy.add_edge(newEdge)
@@ -352,18 +352,114 @@ class Graph(object):
         node['nodeid'] = uuid.UUID(node.get('nodeid'))
         self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
-
+        
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
                 edge.domainnode = new_node
             if edge.rangenode_id == new_node.nodeid:
                 edge.rangenode = new_node
+                edge.ontologyproperty = node.get('parentproperty')
 
         self.populate_null_nodegroups()
         return self
 
+    def get_parent_node(self, nodeid):
+        """
+        get the parent node of a node with the given nodeid
+
+        Arguments:
+        nodeid -- the node we want to find the parent of
+
+        """
+
+        if str(self.root.nodeid) == str(nodeid):
+            return None
+        for edge_id, edge in self.edges.iteritems():
+            if str(edge.rangenode_id) == str(nodeid):
+                return edge.domainnode
+        return None
+
+    def get_out_edges(self, nodeid):
+        """
+        get all the edges of a node with the given nodeid where that node is the domainnode
+
+        Arguments:
+        nodeid -- the nodeid of the node we want to find the edges of
+        
+        """
+
+        ret = []
+        for edge_id, edge in self.edges.iteritems():
+            if str(edge.domainnode_id) == str(nodeid):
+                ret.append(edge)
+        return ret
+
     def get_valid_domain_connections(self):
-        return Ontology().get_valid_domain_connections(self.root.ontologyclass_id)
+        """
+        gets the ontology properties (and related classes) this graph can have with a parent node 
+
+        """
+
+        ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
+        return ontology_classes.target['up']
+
+    def get_valid_ontology_classes(self, nodeid=None):
+        """
+        get possible ontology properties (and related classes) a node with the given nodeid can have 
+        taking into consideration it's current position in the graph 
+
+        Arguments:
+        nodeid -- the id of the node in question
+
+        """
+
+        ret = []
+        if nodeid:
+            parent_node = self.get_parent_node(nodeid)
+            out_edges = self.get_out_edges(nodeid)
+
+            ontology_classes = set()
+            if len(out_edges) > 0:
+                for edge in out_edges:
+                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass).target['up']:
+                        if edge.ontologyproperty == ontology_property['ontology_property']:
+                            if len(ontology_classes) == 0:
+                                ontology_classes = set(ontology_property['ontology_classes'])
+                            else:
+                                ontology_classes = ontology_classes.intersection(set(ontology_property['ontology_classes']))
+
+                            if len(ontology_classes) == 0:
+                                break
+        
+            # get a list of properties (and corresponding classes) that could be used to relate to my parent node
+            # limit the list of properties based on the intersection between the property's classes and the list of 
+            # ontology classes we found above
+            if parent_node:
+                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
+                if len(out_edges) == 0:
+                    return range_ontologies
+                else:
+                    for ontology_property in range_ontologies:
+                        ontology_property['ontology_classes'] = list(set(ontology_property['ontology_classes']).intersection(ontology_classes))
+
+                        if len(ontology_property['ontology_classes']) > 0:
+                            ret.append(ontology_property)
+
+            else:
+                # if a brand new resource
+                if len(out_edges) == 0:
+                    ret = [{
+                        'ontology_property':'',
+                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True)
+                    }]
+                else:
+                    # if no parent node then just use the list of ontology classes from above, there will be no properties to return
+                    ret = [{
+                        'ontology_property':'',
+                        'ontology_classes':list(ontology_classes)
+                    }]
+               
+        return ret
 
     def serialize(self):
         """
@@ -375,6 +471,7 @@ class Graph(object):
         """
 
         ret = {}
+        ret['root'] = self.root;
         ret['metadata'] = self.metadata
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['domain_connections'] = self.get_valid_domain_connections()
@@ -382,18 +479,13 @@ class Graph(object):
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
         parentproperties = {
-            self.root.nodeid: {'id': None, 'value': None}
+            self.root.nodeid: ''
         }
         for edge_id, edge in self.edges.iteritems():
-            parentproperties[edge.rangenode_id] = Ontology(edge.ontologyproperty).simplify(lang='en-US')
+            parentproperties[edge.rangenode_id] = edge.ontologyproperty
         for key, node in self.nodes.iteritems():
             nodeobj = JSONSerializer().serializeToPython(node)
-            nodeobj['parentproperty_id'] = parentproperties[node.nodeid]['id']
-            nodeobj['parentproperty_value'] = parentproperties[node.nodeid]['value']
-
-            Ontology(node.ontologyclass).simplify(lang='en-US')
-            nodeobj['ontologyclass_value'] = Ontology(node.ontologyclass).simplify(lang='en-US')['value']
+            nodeobj['parentproperty'] = parentproperties[node.nodeid]
             ret['nodes'].append(nodeobj)
-            if node.istopnode:
-                ret['root'] = nodeobj
+
         return ret

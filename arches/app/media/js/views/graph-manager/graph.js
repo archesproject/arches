@@ -150,7 +150,7 @@ define([
                 self.allNodes.property('canDrop', false);
                 return self.allNodes.filter(function(node){
                     return _.find(relatableclasses, function(ontologyclass){
-                        return ontologyclass.id === node.ontologyclass_id();
+                        return ontologyclass.id === node.ontologyclass();
                     })
                 }, self);
             };

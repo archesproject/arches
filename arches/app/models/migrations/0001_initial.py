@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 
 import os
+import uuid
 import codecs
+import django.contrib.gis.db.models.fields
+from django.core import management
 from django.conf import settings
 from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
-import uuid
-import django.contrib.gis.db.models.fields
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
 
 def get_sql_string_from_file(pathtofile):
@@ -38,14 +39,10 @@ def forwards_func(apps, schema_editor):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(read_group)
 
+    management.call_command('load_ontology', source=os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm', 'cidoc_crm_v6.2.xml'), version='6.2')
+
 def reverse_func(apps, schema_editor):
-    # forwards_func() creates two Country instances,
-    # so reverse_func() should delete them.
-    pass
-    # Country = apps.get_model("myapp", "Country")
-    # db_alias = schema_editor.connection.alias
-    # Country.objects.using(db_alias).filter(name="USA", code="us").delete()
-    # Country.objects.using(db_alias).filter(name="France", code="fr").delete()
+    models.Ontology.objects.filter(version='6.2').delete()
 
 class Migration(migrations.Migration):
 
@@ -286,7 +283,7 @@ class Migration(migrations.Migration):
                 ('edgeid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('ontologyproperty', models.ForeignKey(blank=True, db_column='ontologyproperty', null=True, to='models.Concept')),
+                ('ontologyproperty', models.TextField(blank=True, null=True)),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
             options={
@@ -374,7 +371,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('description', models.TextField(blank=True, null=True)),
                 ('istopnode', models.BooleanField()),
-                ('ontologyclass', models.ForeignKey(blank=True, db_column='ontologyclass', null=True, to='models.Concept')),
+                ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
             ],
@@ -393,6 +390,32 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'node_groups',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Ontology',
+            fields=[
+                ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
+                ('name', models.TextField()),
+                ('version', models.TextField()),
+                ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'ontologies',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='OntologyClass',
+            fields=[
+                ('ontologyclassid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
+                ('source', models.TextField()),
+                ('target', JSONField(null=True)),
+                ('ontology', models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='ontologyclasses')),
+            ],
+            options={
+                'db_table': 'ontologyclasses',
                 'managed': True,
             },
         ),
@@ -635,6 +658,10 @@ class Migration(migrations.Migration):
             name='cardxnodexwidget',
             unique_together=set([('node', 'card', 'widget')]),
         ),
+        migrations.AlterUniqueTogether(
+            name='ontologyclass',
+            unique_together=set([('source', 'ontology')]),
+        ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
@@ -651,7 +678,6 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'arches_ontology_602.sql')), ''),
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
     ]

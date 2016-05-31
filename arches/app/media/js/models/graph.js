@@ -179,6 +179,16 @@ define(['arches',
             }, scope, 'changed');
         },
 
+        getValidNodesEdges: function(nodeid, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('metadata').graphid + '/get_related_nodes',
+                data: JSON.stringify({'nodeid': nodeid})
+            }, function(response, status, self){
+                callback.call(scope, response.responseJSON);
+            }, this, 'changed');
+        },
+
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
@@ -214,7 +224,7 @@ define(['arches',
             var ret;
             this.get('edges')().forEach(function (edge) {
                 if (edge.rangenode_id === node.nodeid){
-                    ret = edge.ontologyproperty_id;
+                    ret = edge.ontologyproperty;
                 }
             }, this);
             return ret;
