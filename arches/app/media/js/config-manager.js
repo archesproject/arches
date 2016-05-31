@@ -4,7 +4,7 @@ require([
     'views/form',
     'bootstrap-nifty',
     'knockout',
-    'plugins/knockout-select2'
+    'widgets'
 ], function($, PageView, Form) {
     /**
      * a view to manage configuration settings for the app

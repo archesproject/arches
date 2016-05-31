@@ -48,7 +48,7 @@
 
                     <div data-bind="with: $data.data">
                         {% for widget in card.widgets %}
-                            {% include widget.path %}
+                            <{{widget.name}} params="config:{{widget.config}}, value: $data['{{widget.nodeid}}']"></{{widget.name}}>
                         {% endfor %}
                     </div>
 
@@ -87,7 +87,7 @@
 
                             <!-- ko with:$data.data -->
                             {% for widget in card.widgets %}
-                                {% include widget.path %}
+                                <{{widget.name}} params="config:{{widget.config}}, value: $data['{{widget.nodeid}}']"></{{widget.name}}>
                             {% endfor %}
                             <!-- /ko -->
 

@@ -147,4 +147,8 @@
 
         return resourceTypes;;
     });
+
+    {% if widgets %}
+        define('widgets', ['{{ widgets|join:"','" }}'], function () {return});
+    {% endif %}
 </script>

@@ -36,6 +36,7 @@ def manager(request):
             'main_script': 'config-manager',
             'active_page': 'Home',
             'forms': form.forms,
+            'widgets': form.widgets,
             'blanks': JSONSerializer().serialize(form.blanks),
             'tiledata': JSONSerializer().serialize(form.tiles)
         })
