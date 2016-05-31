@@ -32,14 +32,14 @@
    </li>
 </ul>
 
-<!-- ko if: node() -->
+
 <!-- Tabs Content -->
 <div class="tab-content listing-container">
 
     <!--Node Listing tab -->
 
     <div id="node-form" class="tab-pane fade in active">
-
+        <!-- ko if: node() -->
         <div class="alert alert-info install-card-alert" style="margin-bottom: 10px;" data-bind="visible: closeClicked() && node().dirty()">
             <span>{% trans "You have pending edits. Please save or cancel your edits before closing." %}</span>
         </div>
@@ -121,14 +121,16 @@
             </div>
 
         </div>
-
+        <!-- /ko -->
     </div>
 
     <!--Branch Library tab -->
-    <div id="branch-library" class="tab-pane fade" data-bind="with: branchListView">
-        {% include 'views/graph-manager/branch-list.htm' %}
+    <div id="branch-library" class="tab-pane fade">
+        <!-- ko if: node() -->
+        <div data-bind="with: branchListView">
+            {% include 'views/graph-manager/branch-list.htm' %}
+        </div>
+        <!-- /ko -->
     </div>
 
 </div>
-
-<!-- /ko -->
