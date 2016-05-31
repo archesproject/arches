@@ -2,8 +2,9 @@ define([
     'underscore',
     'backbone',
     'knockout',
+    'views/graph-manager/branch-list',
     'bindings/chosen'
-], function(_, Backbone, ko) {
+], function(_, Backbone, ko, BranchListView) {
     var NodeFormView = Backbone.View.extend({
         /**
         * A backbone model to manage graph data
@@ -13,12 +14,19 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branchListView'));
+            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branches'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
+
+            this.branchListView = new BranchListView({
+                el: $('#branch-library'),
+                branches: ko.observableArray(_.filter(this.branches, function(branch){return branch.isresource === false})),
+                graphModel: this.graphModel,
+                loading: this.loading
+            });
 
             this.node.subscribe(function () {
                 self.closeClicked(false);
