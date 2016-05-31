@@ -6,14 +6,6 @@ define(['knockout', 'plugins/knockout-select2'], function (ko) {
             this.placeholder = params.config.placeholder;
             this.options = params.config.options;
         },
-        template:
-            '<div class="row mar-btm">\
-                <div class="form-group">\
-                    <label class="col-xs-12 control-label widget-input-label" for="" data-bind="text:label"></label>\
-                    <div class="col-xs-12 col-md-9">\
-                        <input class="select2 arches-select2-crud-form" data-bind="select2: {value: selectedValue, select2Config: {data: options}, placeholder: placeholder}"></input>\
-                    </div>\
-                </div>\
-            </div>'
+        template: { require: 'text!widgets/select.html' }
     });
 });
