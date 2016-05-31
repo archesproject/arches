@@ -201,16 +201,20 @@ define(['arches',
             this.set('datatypelookup', datatypelookup);
 
             this.set('edges', ko.observableArray(attributes.data.edges));
+            this.set('metadata', attributes.data.metadata);
+            
             attributes.data.nodes.forEach(function (node, i) {
                 attributes.data.nodes[i] = new NodeModel({
                     source: node,
                     datatypelookup: datatypelookup,
                     graph: self
                 });
-            });
+                if(node.istopnode){
+                    this.set('root', attributes.data.nodes[i]);
+                    attributes.data.nodes[i].selected(true);
+                }
+            }, this);
             this.set('nodes', ko.observableArray(attributes.data.nodes));
-            this.set('root', attributes.data.root);
-            this.set('metadata', attributes.data.metadata);
 
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){
