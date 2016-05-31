@@ -27,7 +27,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
-from arches.app.models.ontology import Ontology
 
 
 @group_required('edit')
