@@ -12,6 +12,15 @@ define([
         * @constructor
         * @name NodeFormView
         */
+
+        /**
+        * Initializes the view with optional parameters
+        * @memberof NodeFormView.prototype
+        * @param {object} options
+        * @param {object} options.graphModel - a reference to the selected {@link GraphModel}
+        * @param {array} options.validations - an array of validation objects
+        * @param {array} options.branches - an array of branch objects
+        */
         initialize: function(options) {
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'validations', 'branches'));
@@ -34,7 +43,8 @@ define([
         },
 
         /**
-         * closes the node form view
+         * Closes the node form view
+         * @memberof NodeFormView.prototype
          */
         close: function() {
             this.failed(false);
@@ -45,7 +55,8 @@ define([
         },
 
         /**
-         * resets the edited model and closes the form
+         * Resets the edited model and closes the form
+         * @memberof NodeFormView.prototype
          */
         cancel: function () {
             this.node().reset();
@@ -54,9 +65,10 @@ define([
 
 
         /**
-         * calls an async method on the graph model based on the passed in
+         * Calls an async method on the graph model based on the passed in
          * method name and optionally closes the form on success.
-         * manages showing loading mask & failure alert
+         * Manages showing loading mask & failure alert
+         * @memberof NodeFormView.prototype
          *
          * @param  {string} methodName - method to call on the graph model
          * @param  {boolean} closeOnSuccess - true to close form on success
@@ -77,21 +89,24 @@ define([
         },
 
         /**
-         * calls the updateNode method on the graph model for the edited node
+         * Calls the updateNode method on the graph model for the edited node
+         * @memberof NodeFormView.prototype
          */
         save: function () {
             this.callAsync('updateNode');
         },
 
         /**
-         * calls the deleteNode method on the graph model for the edited node
+         * Calls the deleteNode method on the graph model for the edited node
+         * @memberof NodeFormView.prototype
          */
         deleteNode: function () {
             this.callAsync('deleteNode', true);
         },
 
         /**
-         * calls the toggleIsCollector method on the node model
+         * Calls the toggleIsCollector method on the node model
+         * @memberof NodeFormView.prototype
          */
         toggleIsCollector: function () {
             this.node().toggleIsCollector();
