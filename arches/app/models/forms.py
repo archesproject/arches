@@ -53,14 +53,14 @@ class Form(object):
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000002',
                         'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps'
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000004',
                         'label': 'Key',
-                        'placeholder': 'Enter key value'
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
                     }]
                 },{
                     'id': '30000000-0000-0000-0000-000000000000',
@@ -70,20 +70,20 @@ class Form(object):
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
                         'name': 'select-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000003',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
+                        'nodeid': '20000000-0000-0000-0000-000000000003',
                         'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000002',
                         'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps'
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000004',
                         'label': 'Key',
-                        'placeholder': 'Enter key value'
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
                     }]
                 }]
             },
@@ -100,20 +100,20 @@ class Form(object):
                     'description': _('Do something awesome here'),
                     'widgets':[{
                         'name': 'select-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000003',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
+                        'nodeid': '20000000-0000-0000-0000-000000000003',
                         'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000002',
                         'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps'
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000004',
                         'label': 'Key',
-                        'placeholder': 'Enter key value'
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
                     }]
                 }
                 ,{
@@ -124,14 +124,14 @@ class Form(object):
                     'description': _('TEAFASDF'),
                     'widgets':[{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000002',
                         'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps'
+                        'placeholder': 'e.g. MapBox Base Maps',
+                        'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
-                        'nodeid': '20000000-0000-0000-0000-000000000004',
                         'label': 'Key',
-                        'placeholder': 'Enter key value'
+                        'placeholder': 'Enter key value',
+                        'nodeid': '20000000-0000-0000-0000-000000000004'
                     }]
                 }
                 ]
