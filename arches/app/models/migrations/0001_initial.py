@@ -39,7 +39,7 @@ def forwards_func(apps, schema_editor):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(read_group)
 
-    management.call_command('load_ontology', source=os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm', 'cidoc_crm_v6.2.xml'), version='6.2')
+    management.call_command('load_ontology', source=os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm', 'cidoc_crm_v6.2.xml'), version='6.2', id='100000000-000-0000-0000-000000000000')
 
 def reverse_func(apps, schema_editor):
     models.Ontology.objects.filter(version='6.2').delete()
