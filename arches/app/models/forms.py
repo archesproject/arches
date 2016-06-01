@@ -25,6 +25,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class Form(object):
     def __init__(self, resourceid=None):
         self.forms = []
+        self.widgets = []
         self.tiles = {}
         self.blanks = {}
 
@@ -32,9 +33,7 @@ class Form(object):
             self.load(resourceid)
 
     def load(self, resourceid):
-        widgets = models.Widget.objects.all()
-        string_widget = widgets.get(name='string')
-        select_widget = widgets.get(name='select')
+        self.widgets = models.Widget.objects.all()
 
         self.forms = [{
             'id': '1',
@@ -53,12 +52,12 @@ class Form(object):
                     'nodegroup_id': '99999999-0000-0000-0000-000000000001',
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
                         'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
                         'nodeid': '20000000-0000-0000-0000-000000000004'
@@ -70,18 +69,18 @@ class Form(object):
                     'nodegroup_id': '99999999-0000-0000-0000-000000000000',
                     'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
                     'widgets':[{
-                        'path': select_widget.template.path,
+                        'name': 'select-widget',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
                         'nodeid': '20000000-0000-0000-0000-000000000003',
-                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
+                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
                         'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
                         'nodeid': '20000000-0000-0000-0000-000000000004'
@@ -100,18 +99,18 @@ class Form(object):
                     'nodegroup_id': '32999999-0000-0000-0000-000000000000',
                     'description': _('Do something awesome here'),
                     'widgets':[{
-                        'path': select_widget.template.path,
+                        'name': 'select-widget',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
                         'nodeid': '20000000-0000-0000-0000-000000000003',
-                        'select2Config': {'data': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]}
+                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
                         'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
                         'nodeid': '20000000-0000-0000-0000-000000000004'
@@ -124,12 +123,12 @@ class Form(object):
                     'nodegroup_id': '19999999-0000-0000-0000-000000000000',
                     'description': _('TEAFASDF'),
                     'widgets':[{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
                         'nodeid': '20000000-0000-0000-0000-000000000002'
                     },{
-                        'path': string_widget.template.path,
+                        'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
                         'nodeid': '20000000-0000-0000-0000-000000000004'

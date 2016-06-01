@@ -18,8 +18,6 @@ from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Q
 
-widget_storage_location = FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'app/templates/views/forms/widgets/'))
-
 
 class Address(models.Model):
     addressnum = models.TextField(blank=True, null=True)
@@ -341,7 +339,7 @@ class OntologyClass(models.Model):
         managed = True
         db_table = 'ontologyclasses'
         unique_together=(('source', 'ontology'),)
-        
+
 
 class Overlay(models.Model):
     overlaytyp = models.TextField(blank=True, null=True)
@@ -463,7 +461,7 @@ class Value(models.Model):
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
-    template = models.FileField(storage=widget_storage_location)
+    component = models.TextField()
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)

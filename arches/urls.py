@@ -67,6 +67,8 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='node'),
 
+    url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

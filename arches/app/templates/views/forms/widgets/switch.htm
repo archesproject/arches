@@ -1,9 +1,9 @@
 {% load i18n %}
 <div class="row mar-btm">
     <div class="form-group">
-        <label class="col-xs-12 control-label widget-input-label">{{widget.label}}</label>
+        <label class="col-xs-12 control-label widget-input-label" data-bind="text:label"></label>
         <div class="col-xs-12 col-md-9 switch-container">
-            <span class="switch switch-small" data-bind="css: {'on': $data['{{widget.nodeid}}']()}, click: function() { $data['{{widget.nodeid}}'](!$data['{{widget.nodeid}}']()); }"><small></small></span>
+            <span class="switch switch-small" data-bind="css: {\'on\': value()}, click: function() { value(!value()); }"><small></small></span>
         </div>
     </div>
 </div>

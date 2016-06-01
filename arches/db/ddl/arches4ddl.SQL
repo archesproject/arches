@@ -93,6 +93,7 @@ ALTER TABLE "cardgroups" ADD CONSTRAINT "cardgroups_pk" PRIMARY KEY ("cardgroupi
 CREATE TABLE "widgets"(
  "widgetid" UUID NOT NULL,
  "name" Text NOT NULL,
+ "component" Text NOT NULL,
  "defaultlabel" Text,
  "defaultmask" Text
 )
