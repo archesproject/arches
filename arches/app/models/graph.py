@@ -20,7 +20,6 @@ import uuid
 from copy import copy
 from django.db import transaction
 from arches.app.models import models
-from arches.app.models.ontology import Ontology
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
 

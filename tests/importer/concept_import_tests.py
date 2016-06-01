@@ -20,7 +20,7 @@ from operator import itemgetter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
-from arches.app.models.ontology import Concept
+from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
