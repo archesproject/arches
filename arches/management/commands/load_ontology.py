@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 import os
+import uuid
 import xml.etree.ElementTree as ET
 import networkx as nx
 from django.core.management.base import BaseCommand, CommandError
@@ -38,11 +39,13 @@ class Command(BaseCommand):
             help='The version of the ontology being loaded')
         parser.add_argument('-n', '--name', action='store', dest='name', default='',
             help='Name to use to identify the ontology')
+        parser.add_argument('-id', '--id', action='store', dest='id', default='',
+            help='UUID to use as the primary key to the ontology')
 
     def handle(self, *args, **options):
-        self.run_loader(data_source=options['source'], version=options['version'])
+        self.run_loader(data_source=options['source'], version=options['version'], id=options['id'])
 
-    def run_loader(self, data_source=None, version=None, name=None):
+    def run_loader(self, data_source=None, version=None, name=None, id=None):
         """
         load the given ontology file in xml format into the database
 
@@ -57,7 +60,9 @@ class Command(BaseCommand):
         if data_source and version:
             if not name:
                 name = os.path.splitext(os.path.split(data_source)[1])[0]
-            ontology = models.Ontology.objects.create(version=version, name=name)
+            if not id:
+                id = str(uuid.uuid4())
+            ontology = models.Ontology.objects.create(pk=id, version=version, name=name)
             for ontology_class, data in self.parse_xml(data_source).iteritems():
                 models.OntologyClass.objects.create(source=ontology_class, target=data, ontology=ontology)
 
