@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'bindings/datepicker'], function (ko) {
     return ko.components.register('datepicker-widget', {
         viewModel: function(params) {
             this.value = params.value;
