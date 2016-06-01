@@ -15,7 +15,7 @@ define([
         * Initializes the view with optional parameters
         * @memberof GraphBase.prototype
         * @param {object} options
-        * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
+        * @param {object} options.graphModel - a reference to the selected {@link GraphModel}
         */
         initialize: function(options) {
             var self = this;
