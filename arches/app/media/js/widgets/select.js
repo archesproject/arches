@@ -1,4 +1,4 @@
-define(['knockout', 'plugins/knockout-select2'], function (ko) {
+define(['knockout', 'underscore', 'plugins/knockout-select2'], function (ko, _) {
     return ko.components.register('select-widget', {
         viewModel: function(params) {
             this.value = params.value;

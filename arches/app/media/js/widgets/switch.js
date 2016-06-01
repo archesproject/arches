@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'underscore'], function (ko, _) {
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
             this.value = params.value;
