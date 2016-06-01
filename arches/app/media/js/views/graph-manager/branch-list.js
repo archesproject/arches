@@ -35,13 +35,19 @@ define([
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
 
-            this.selectedNode.subscribe(function(node){
-                if(node){
+            var nodelistener = function(node){
+                if(this.selectedNode()){
+                    if (typeof node !== 'string'){
+                        if(this.alreadysubscribed){
+                            this.alreadysubscribed.dispose();
+                        }
+                        this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
+                    }
                     _.each(this.items(), function(branch){
                         branch.filtered(true);
                         var found = _.find(branch.graph.domain_connections, function(domain_connection){
                             return _.find(domain_connection.ontology_classes, function(ontology_class){
-                                return ontology_class === node.ontologyclass();
+                                return ontology_class === this.selectedNode().ontologyclass();
                             }, this)
                         }, this);
                         if(found){
@@ -49,7 +55,9 @@ define([
                         }
                     }, this);
                 }
-            }, this);
+            }
+            this.selectedNode.subscribe(nodelistener, this);
+            nodelistener.call(this, this.selectedNode());
         },
 
         /**

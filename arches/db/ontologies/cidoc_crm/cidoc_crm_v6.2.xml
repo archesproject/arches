@@ -5305,10 +5305,10 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	<rdfs:range rdf:resource="E53_Place"/>
 </rdf:Property>
 
-<rdf:Property rdf:about="P167i_was_place_of">
-	<rdfs:label xml:lang="en">was place of</rdfs:label>
-	<rdfs:domain rdf:resource="E93_Presence"/>
-	<rdfs:range rdf:resource="E92_Spacetime_Volume"/>
+<rdf:Property rdf:about="P167i_was_place_at">
+	<rdfs:label xml:lang="en">was place at</rdfs:label>
+	<rdfs:domain rdf:resource="E53_Place"/>
+	<rdfs:range rdf:resource="E93_Presence"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="P168_place_is_defined_by">

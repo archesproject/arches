@@ -20,7 +20,6 @@ import uuid
 from copy import copy
 from django.db import transaction
 from arches.app.models import models
-from arches.app.models.ontology import Ontology
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
 
@@ -465,7 +464,7 @@ class Graph(object):
         """
         serialize to a different form then used by the internal class structure
 
-        used to append additional values (like Ontology preflabels) that
+        used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
 
         """

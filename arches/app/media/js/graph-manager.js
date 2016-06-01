@@ -21,8 +21,7 @@ require([
         data: data.graph,
         datatypes: data.datatypes
     });
-    graphModel.get('nodes')()[0].selected(true);
-
+    
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });

@@ -116,7 +116,7 @@ class Concept(object):
         })
 
         if semantic == True:
-            pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties') | Q(relationtype__category = 'Ontology Relations')
+            pathway_filter = pathway_filter if pathway_filter else Q(relationtype__category = 'Semantic Relations') | Q(relationtype__category = 'Properties')
         else:
             pathway_filter = pathway_filter if pathway_filter else Q(relationtype = 'member')
 
