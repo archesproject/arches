@@ -38,6 +38,7 @@ require([
         }),
         metadata: metadata,
         resources: data.resources,
+        ontologies: data.ontologies,
         isResource: ko.computed({
             read: function() {
                 return metadata.isresource().toString();

@@ -109,7 +109,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="form-group">
                                                     <div class="relative">
                                                         <label class="col-xs-12 control-label widget-input-label">
-                                                            {% trans "Resource Name" %}
+                                                            {% trans "Name" %}
                                                             <i class="ion-ios-checkmark-outline"></i>
                                                             <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title="Show Vocabulary"></i>
                                                         </label>
@@ -124,7 +124,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resource Subtitle" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} <i class="ion-ios-checkmark-outline"></i></label>
                                                     </div>
 
                                                     <div class="col-xs-12">
@@ -132,6 +132,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="row widget-container">
+                                                <div class="form-group">
+                                                    <div class="relative">
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                    </div>
+
+                                                    <div class="col-xs-12">
+                                                        <select class="design" data-bind="value: metadata.ontology_id, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', valueAllowUnset: true, optionsCaption: '{% trans "Choose an ontology" %}', chosen: {width: '100%'}"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
@@ -344,6 +357,7 @@ define('graph-settings-data', [], function () {
     return {
         icons: {{icons}},
         metadata: {{metadata_json}},
+        ontologies: {{ontologies}},
         resources: {{resource_data}}
     };
 });

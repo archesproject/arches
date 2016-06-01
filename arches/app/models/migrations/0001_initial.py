@@ -642,6 +642,11 @@ class Migration(migrations.Migration):
             name='validations',
             field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
         ),
+        migrations.AddField(
+            model_name='graph',
+            name='ontology',
+            field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
+        ),
         migrations.AlterUniqueTogether(
             name='resourceclassxform',
             unique_together=set([('resourceclass', 'form')]),

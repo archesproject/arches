@@ -46,6 +46,7 @@ class Graph(models.Model):
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
+    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
 
     class Meta:
         managed = True

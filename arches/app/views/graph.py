@@ -104,11 +104,13 @@ def settings(request, graphid):
                 'is_relatable': (node in relatable_resources)
             })
     graphs = models.Graph.objects.all()
+    ontologies = models.Ontology.objects.all()
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
         'metadata_json': JSONSerializer().serialize(graph),
         'graphs': JSONSerializer().serialize(graphs),
+        'ontologies': JSONSerializer().serialize(ontologies),
         'graphid': graphid,
         'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data)
