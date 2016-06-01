@@ -15,7 +15,6 @@ import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.core.files.storage import FileSystemStorage
 from django.db.models import Q
 
 
@@ -322,6 +321,7 @@ class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
     version = models.TextField()
+    rdf = models.FilePathField(path=os.path.join(settings.ROOT_DIR, 'db/ontologies'), match="*.xml", recursive=True)
     parentontology = models.ForeignKey('Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)
 
     class Meta:

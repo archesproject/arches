@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 name = os.path.splitext(os.path.split(data_source)[1])[0]
             if not id:
                 id = str(uuid.uuid4())
-            ontology = models.Ontology.objects.create(pk=id, version=version, name=name)
+            ontology = models.Ontology.objects.create(pk=id, version=version, name=name, rdf=data_source)
             for ontology_class, data in self.parse_xml(data_source).iteritems():
                 models.OntologyClass.objects.create(source=ontology_class, target=data, ontology=ontology)
 

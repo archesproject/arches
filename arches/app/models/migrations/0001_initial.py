@@ -399,6 +399,7 @@ class Migration(migrations.Migration):
                 ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ('name', models.TextField()),
                 ('version', models.TextField()),
+                ('rdf', models.FilePathField(path=os.path.join(settings.ROOT_DIR, 'db/ontologies'), match="*.xml", recursive=True)),
                 ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
             ],
             options={
