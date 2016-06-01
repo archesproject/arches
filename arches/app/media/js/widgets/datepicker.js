@@ -4,6 +4,6 @@ define(['knockout', 'underscore', 'bindings/datepicker'], function (ko, _) {
             this.value = params.value;
             _.extend(this, _.pick(params.config, 'label', 'placeholder'));
         },
-        template: { require: 'text!widgets/datepicker.html' }
+        template: { require: 'text!widget-templates/datepicker' }
     });
 });

@@ -6,6 +6,7 @@
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
+            'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '//cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
             'text': '//cdnjs.cloudflare.com/ajax/libs/require-text/2.0.12/text.min',

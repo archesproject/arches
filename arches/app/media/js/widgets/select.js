@@ -4,6 +4,6 @@ define(['knockout', 'underscore', 'plugins/knockout-select2'], function (ko, _) 
             this.value = params.value;
             _.extend(this, _.pick(params.config, 'label', 'placeholder', 'options'));
         },
-        template: { require: 'text!widgets/select.html' }
+        template: { require: 'text!widget-templates/select' }
     });
 });
