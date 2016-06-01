@@ -461,7 +461,7 @@ class Value(models.Model):
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
-    template = models.TextField()
+    component = models.TextField()
     defaultlabel = models.TextField(blank=True, null=True)
     defaultmask = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)

@@ -149,5 +149,5 @@
         return resourceTypes;;
     });
 
-    define('widgets', [{% for widget in widgets %}'{{ widget.template }}',{% endfor %}], function () {return});
+    define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {return});
 </script>

@@ -555,7 +555,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('widgetid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
-                ('template', models.FileField(storage=django.core.files.storage.FileSystemStorage(location='app/templates/views/forms/widgets/'), upload_to=b'')),
+                ('component', models.TextField()),
                 ('defaultlabel', models.TextField(blank=True, null=True)),
                 ('defaultmask', models.TextField(blank=True, null=True)),
                 ('helptext', models.TextField(blank=True, null=True)),
