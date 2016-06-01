@@ -33,10 +33,7 @@ class Form(object):
             self.load(resourceid)
 
     def load(self, resourceid):
-        widgets = models.Widget.objects.all()
-        string_widget = widgets.get(name='string')
-        select_widget = widgets.get(name='select')
-        self.widgets = ['widgets/text', 'widgets/select']
+        self.widgets = models.Widget.objects.all()
 
         self.forms = [{
             'id': '1',
@@ -57,17 +54,13 @@ class Form(object):
                     'widgets':[{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000002',
-                        'config': {
-                            'label': 'Service Name',
-                            'placeholder': 'e.g. MapBox Base Maps',
-                        }
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps'
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000004',
-                        'config': {
-                            'label': 'Key',
-                            'placeholder': 'Enter key value',
-                        }
+                        'label': 'Key',
+                        'placeholder': 'Enter key value'
                     }]
                 },{
                     'id': '30000000-0000-0000-0000-000000000000',
@@ -78,25 +71,19 @@ class Form(object):
                     'widgets':[{
                         'name': 'select-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000003',
-                        'config': {
-                            'label': 'Service Provider',
-                            'placeholder': 'e.g.: MapBox',
-                            'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
-                        }
+                        'label': 'Service Provider',
+                        'placeholder': 'e.g.: MapBox',
+                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000002',
-                        'config': {
-                            'label': 'Service Name',
-                            'placeholder': 'e.g. MapBox Base Maps',
-                        }
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps'
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000004',
-                        'config': {
-                            'label': 'Key',
-                            'placeholder': 'Enter key value',
-                        }
+                        'label': 'Key',
+                        'placeholder': 'Enter key value'
                     }]
                 }]
             },
@@ -114,25 +101,19 @@ class Form(object):
                     'widgets':[{
                         'name': 'select-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000003',
-                        'config': {
-                            'label': 'Service Provider',
-                            'placeholder': 'e.g.: MapBox',
-                            'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
-                        }
+                        'label': 'Service Provider',
+                        'placeholder': 'e.g.: MapBox',
+                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000002',
-                        'config': {
-                            'label': 'Service Name',
-                            'placeholder': 'e.g. MapBox Base Maps',
-                        }
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps'
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000004',
-                        'config': {
-                            'label': 'Key',
-                            'placeholder': 'Enter key value',
-                        }
+                        'label': 'Key',
+                        'placeholder': 'Enter key value'
                     }]
                 }
                 ,{
@@ -144,17 +125,13 @@ class Form(object):
                     'widgets':[{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000002',
-                        'config': {
-                            'label': 'Service Name',
-                            'placeholder': 'e.g. MapBox Base Maps',
-                        }
+                        'label': 'Service Name',
+                        'placeholder': 'e.g. MapBox Base Maps'
                     },{
                         'name': 'text-widget',
                         'nodeid': '20000000-0000-0000-0000-000000000004',
-                        'config': {
-                            'label': 'Key',
-                            'placeholder': 'Enter key value',
-                        }
+                        'label': 'Key',
+                        'placeholder': 'Enter key value'
                     }]
                 }
                 ]

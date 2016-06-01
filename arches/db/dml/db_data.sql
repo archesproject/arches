@@ -140,16 +140,16 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'string', 'string.htm');
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text', 'widgets/text');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'select.htm');
+    VALUES ('10000000-0000-0000-0000-000000000002', 'select', 'widgets/select');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000003', 'switch', 'switch.htm');
+    VALUES ('10000000-0000-0000-0000-000000000003', 'switch', 'widgets/switch');
 
 INSERT INTO widgets(widgetid, name, template)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'datepicker.htm');
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker', 'widgets/datepicker');
 
 -- Node branch
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
