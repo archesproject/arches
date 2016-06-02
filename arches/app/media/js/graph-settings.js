@@ -61,7 +61,10 @@ require([
                 return resource.isRelatable();
             }).map(function(resource){
                 return resource.id
-            })
+            });
+            if (metadata.ontology_id() === undefined) {
+                metadata.ontology_id(null);
+            }
             $.ajax({
                 type: "POST",
                 url: '',
