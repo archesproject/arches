@@ -48,6 +48,22 @@ Property P81 is dedicated for modeling the Time-Span's maximum known temporal ex
 Property P82 is for modeling the minimum outer bounds of events i.e. at_some_time_within. 
 P81 has its time interval redefined by P81a and P81b. Similarly, we redefine P82 by P82a and P82b.
 
+
+
+EDITS FOR ARCHES:
+Add E59, E60, E61, E62 classes for primitives.
+Add E94_Space class.
+Change any references in subProperties or domains/ranges from external literals to literal classes we added.
+Add P161i_is_spatial_projection_of as a subProperty of P156i_is_occupied_by.
+Add P160i_is_temporal_projection_of property.
+Add P161i_is_spatial_projection_of property.
+Make P156i_is_occupied_by a subproperty of P161i_is_spatial_projection_of.
+Add BM.PX_is_related_to property.
+Change P168 range from E92_Spacetime_Volume to E94_Space.
+Create P168i as inverse of P168.
+General syntax fixes including removing extra spaces in some scopenotes and removing language label tags with no closing tag.
+
+
 -->
 <rdf:RDF xml:lang="en" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:base="http://www.cidoc-crm.org/cidoc-crm/">
 
@@ -964,9 +980,8 @@ It may be used for temporal reasoning about things (physical items, groups of pe
 	<rdfs:label xml:lang="pt">Formação</rdfs:label>
 	<rdfs:label xml:lang="zh">组成</rdfs:label>
 	<rdfs:comment>This class comprises events that result in the formation of a formal or informal E74 Group of people, such as a club, society, association, corporation or nation. 
-
 E66 Formation does not include the arbitrary aggregation of people who do not act as a collective.
-The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining.
+The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining. 
 </rdfs:comment>
 	<rdfs:subClassOf rdf:resource="E7_Activity"/>
 	<rdfs:subClassOf rdf:resource="E63_Beginning_of_Existence"/>
@@ -5317,6 +5332,12 @@ A digital photograph of a manuscript page incorporates the text of the manuscrip
 	</rdfs:comment>
 	<rdfs:domain rdf:resource="E53_Place"/>
 	<rdfs:range rdf:resource="E94_Space"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="P168i_defines_place">
+	<rdfs:label xml:lang="en">defines place</rdfs:label>
+	<rdfs:domain rdf:resource="E94_Space"/>
+	<rdfs:range rdf:resource="E53_Place"/>
 </rdf:Property>
 
 <rdf:Property rdf:about="BM.PX_is_related_to">
