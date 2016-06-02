@@ -113,7 +113,8 @@ def settings(request, graphid):
         'ontologies': JSONSerializer().serialize(ontologies),
         'graphid': graphid,
         'metadata': graph,
-        'resource_data': JSONSerializer().serialize(resource_data)
+        'resource_data': JSONSerializer().serialize(resource_data),
+        'node_count': models.Node.objects.filter(graph=graph).count()
     })
 
 @group_required('edit')
