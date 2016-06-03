@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 from operator import itemgetter, attrgetter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
@@ -30,14 +31,17 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 class OntologyModelTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        pass
-
+        management.call_command('load_ontology', source=os.path.join(test_settings.ONTOLOGY_FIXTURES, 'cidoc_crm_v6.2.test.xml'), 
+            version='6.2', id='11111111-0000-0000-0000-000000000000', extensions=None)
+        
     @classmethod
     def tearDownClass(cls):
-        pass
+        ontology = models.Ontology.objects.get(pk='11111111-0000-0000-0000-000000000000')
+        ontology.path.delete()
+        ontology.delete()
 
     def test_load_ontology(self):
-        ontology_class = models.OntologyClass.objects.get(ontology__name='cidoc_crm_v6.2', source='E53_Place')
+        ontology_class = models.OntologyClass.objects.get(ontology__pk='11111111-0000-0000-0000-000000000000', source='E53_Place')
 
         predicted_property_list = set([
             'P1_is_identified_by',
