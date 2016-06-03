@@ -16,7 +16,10 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Q
+from django.core.files.storage import FileSystemStorage
 
+def get_ontology_storage_system():
+    return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
 
 class Address(models.Model):
     addressnum = models.TextField(blank=True, null=True)
@@ -321,7 +324,7 @@ class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
     version = models.TextField()
-    rdf = models.FilePathField(path=os.path.join(settings.ROOT_DIR, 'db/ontologies'), match="*.xml", recursive=True)
+    path = models.FileField(storage=get_ontology_storage_system)
     parentontology = models.ForeignKey('Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)
 
     class Meta:

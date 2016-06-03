@@ -9,6 +9,7 @@ from django.core import management
 from django.conf import settings
 from django.db import migrations, models
 from django.contrib.postgres.fields import JSONField
+from arches.app.models.models import get_ontology_storage_system
 from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
 
 def get_sql_string_from_file(pathtofile):
@@ -39,7 +40,17 @@ def forwards_func(apps, schema_editor):
     anonymous_user = User.objects.using(db_alias).get(username='anonymous')
     anonymous_user.groups.add(read_group)
 
-    management.call_command('load_ontology', source=os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm', 'cidoc_crm_v6.2.xml'), version='6.2', id='100000000-000-0000-0000-000000000000')
+    path_to_ontologies = os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
+    extensions = [
+        os.path.join(path_to_ontologies, 'CRMsci_v1.2.3.rdfs.xml'),
+        os.path.join(path_to_ontologies, 'CRMarchaeo_v1.4.rdfs.xml'),
+        os.path.join(path_to_ontologies, 'CRMgeo_v1.2.rdfs.xml'),
+        os.path.join(path_to_ontologies, 'CRMdig_v3.2.1.rdfs.xml'),
+        os.path.join(path_to_ontologies, 'CRMinf_v0.7.rdfs.xml')
+    ]
+    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'), 
+        version='6.2', id='100000000-000-0000-0000-000000000000', extensions=','.join(extensions))
+
 
 def reverse_func(apps, schema_editor):
     models.Ontology.objects.filter(version='6.2').delete()
@@ -399,7 +410,7 @@ class Migration(migrations.Migration):
                 ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ('name', models.TextField()),
                 ('version', models.TextField()),
-                ('rdf', models.FilePathField(path=os.path.join(settings.ROOT_DIR, 'db/ontologies'), match="*.xml", recursive=True)),
+                ('path', models.FileField(storage=get_ontology_storage_system)),
                 ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
             ],
             options={
