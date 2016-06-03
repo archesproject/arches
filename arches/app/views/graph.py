@@ -86,11 +86,14 @@ def settings(request, graphid):
             setattr(graph, key, value)
         graph.save()
         node.set_relatable_resources(data.get('relatable_resource_ids'))
+        node.ontologyclass = data.get('ontology_class')
+        node.save()
         return JSONResponse({
             'success': True,
             'metadata': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
+    node_json = JSONSerializer().serialize(node)
     icons = models.Icon.objects.order_by('name')
     resource_graphs = models.Graph.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
     resource_data = []
@@ -105,12 +108,15 @@ def settings(request, graphid):
             })
     graphs = models.Graph.objects.all()
     ontologies = models.Ontology.objects.all()
+    ontology_classes = models.OntologyClass.objects.all()
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
         'metadata_json': JSONSerializer().serialize(graph),
+        'node_json': node_json,
         'graphs': JSONSerializer().serialize(graphs),
         'ontologies': JSONSerializer().serialize(ontologies),
+        'ontology_classes': JSONSerializer().serialize(ontology_classes),
         'graphid': graphid,
         'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data),

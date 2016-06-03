@@ -145,6 +145,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
 
+                                            <div class="row widget-container" data-bind="if: metadata.ontology_id()">
+                                                <div class="form-group">
+                                                    <div class="relative">
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                    </div>
+
+                                                    <div class="col-xs-12">
+                                                        <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: ontologyClass, valueAllowUnset: true, options: ontologyClasses, optionsText: 'source', optionsValue:'source', optionsCaption: '{% trans "None" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
@@ -357,7 +369,9 @@ define('graph-settings-data', [], function () {
     return {
         icons: {{icons}},
         metadata: {{metadata_json}},
+        node: {{node_json}},
         ontologies: {{ontologies}},
+        ontologyClasses: {{ontology_classes}},
         resources: {{resource_data}}
     };
 });
