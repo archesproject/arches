@@ -39,6 +39,12 @@ require([
         metadata: metadata,
         resources: data.resources,
         ontologies: data.ontologies,
+        ontologyClass: ko.observable(data.node.ontologyclass),
+        ontologyClasses: ko.computed(function () {
+            return _.filter(data.ontologyClasses, function (ontologyClass) {
+                return ontologyClass.ontology_id === metadata.ontology_id();
+            });
+        }),
         isResource: ko.computed({
             read: function() {
                 return metadata.isresource().toString();
@@ -70,7 +76,8 @@ require([
                 url: '',
                 data: JSON.stringify({
                     metadata: koMapping.toJS(metadata),
-                    relatable_resource_ids: relatableResourceIds
+                    relatable_resource_ids: relatableResourceIds,
+                    ontology_class: viewModel.ontologyClass()
                 }),
                 success: function(response) {
                     resetDirty();

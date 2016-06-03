@@ -202,7 +202,7 @@ define(['arches',
 
             this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('metadata', attributes.data.metadata);
-            
+
             attributes.data.nodes.forEach(function (node, i) {
                 attributes.data.nodes[i] = new NodeModel({
                     source: node,
