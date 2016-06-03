@@ -410,7 +410,7 @@ class Migration(migrations.Migration):
                 ('ontologyid', models.UUIDField(default=uuid.uuid1, primary_key=True)),
                 ('name', models.TextField()),
                 ('version', models.TextField()),
-                ('path', models.FileField(storage=get_ontology_storage_system)),
+                ('path', models.FileField(storage=get_ontology_storage_system())),
                 ('parentontology', models.ForeignKey(to='models.Ontology', db_column='parentontologyid', related_name='extensions', null=True, blank=True)),
             ],
             options={

@@ -31,6 +31,8 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'resource_gra
 
 CONCEPT_SCHEME_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'authority_files'),)
 
+ONTOLOGY_FIXTURES = os.path.join(PACKAGE_ROOT, 'fixtures', 'ontologies')
+
 BUSISNESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
