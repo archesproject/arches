@@ -12,16 +12,22 @@ require([
     'models/graph',
     'graph-manager-data'
 ], function($, _, ko, PageView, GraphView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, data) {
+    /**
+    * prep data for model
+    */
     data.branches.forEach(function(branch){
         branch.selected = ko.observable(false);
         branch.filtered = ko.observable(false);
     }, this);
 
+    /**
+    * create graph model
+    */
     var graphModel = new GraphModel({
         data: data.graph,
         datatypes: data.datatypes
     });
-    
+
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
@@ -29,6 +35,9 @@ require([
         viewModel.nodeForm.closeClicked(true);
     });
 
+    /**
+    * set up the page view model with the graph model and related sub views
+    */
     var loading = ko.observable(false);
     var viewModel = {
         graphModel: graphModel,
@@ -66,10 +75,17 @@ require([
         el: $('#permissions-panel')
     });
 
+    /**
+    * a GraphPageView representing the graph manager page
+    */
     new PageView({
         viewModel: viewModel
     });
 
+
+    /**
+    * update the sizing of elements on window resize
+    */
     var resize = function(){
         $('#graph').height($(window).height()-100);
         $('.tab-content').height($(window).height()-191);

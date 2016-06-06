@@ -5,9 +5,29 @@ define([
     'knockout',
     'bootstrap-nifty'
 ], function($, _, Backbone, ko) {
+    /**
+    * A backbone view representing a basic page in arches.  It sets up the
+    * viewModel defaults, optionally accepts additional view model data and
+    * binds the view model to the entire page.  When using, no other views
+    * should bind data to the DOM.
+    *
+    * @augments Backbone.View
+    * @constructor
+    * @name PageView
+    */
     var PageView = Backbone.View.extend({
         el: $('body'),
 
+        /**
+        * Creates an instance of PageView, optionally using a passed in view
+        * model
+        *
+        * @memberof PageView.prototype
+        * @param {object} options
+        * @param {object} options.viewModel - an optional view model to be
+        *                 bound to the page
+        * @return {object} an instance of PageView
+        */
         constructor: function (options) {
             var self = this;
             this.viewModel = (options && options.viewModel) ? options.viewModel : {};

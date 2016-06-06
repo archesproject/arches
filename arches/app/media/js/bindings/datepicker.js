@@ -3,6 +3,12 @@ define([
     'knockout',
     'bootstrap-datepicker'
 ], function ($, ko) {
+    /**
+    * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
+    * data-bind property to the datepicker on init
+    * @constructor
+    * @name datepicker
+    */
     ko.bindingHandlers.datepicker = {
         init: function(element, valueAccessor, allBindingsAccessor) {
           //initialize datepicker with some optional options

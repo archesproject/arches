@@ -4,8 +4,22 @@ define([
     'arches'
 ], function (ko, AbstractModel, arches) {
     return AbstractModel.extend({
+        /**
+        * A backbone model representing a single node in a graph
+        * @augments AbstractModel
+        * @constructor
+        * @name NodeModel
+        */
         url: arches.urls.node,
 
+        /**
+        * Initializes the model with optional parameters
+        * @memberof NodeModel.prototype
+        * @param {object} options
+        * @param {object} options.graph - a reference to the parent {@link GraphModel}
+        * @param {array} options.datatypelookup - an array of datatype objects
+        * @param {object} options.source - an object containing node data
+        */
         initialize: function (options) {
             var self = this;
             self.graph = options.graph;
@@ -104,6 +118,11 @@ define([
             })
         },
 
+        /**
+        * Parses a js object and updates the model
+        * @memberof NodeModel.prototype
+        * @param {object} source - an object containing node data
+        */
         parse: function(source) {
             var self = this;
             self._node(JSON.stringify(source));
@@ -123,14 +142,28 @@ define([
             self.set('id', self.nodeid);
         },
 
+        /**
+        * discards unsaved model changes and resets the model data
+        * @memberof NodeModel.prototype
+        */
         reset: function () {
             this.parse(JSON.parse(this._node()), self);
         },
 
+        /**
+        * returns a JSON object containing model data
+        * @memberof NodeModel.prototype
+        * @return {object} a JSON object containing model data
+        */
         toJSON: function () {
             return JSON.parse(this.json());
         },
 
+
+        /**
+        * toggles the isCollector state of the node model by managing group ids
+        * @memberof NodeModel.prototype
+        */
         toggleIsCollector: function () {
             var nodeGroupId = this.nodeid;
             if (this.isCollector()) {
@@ -140,6 +173,10 @@ define([
             this.nodeGroupId(nodeGroupId);
         },
 
+        /**
+        * updates the cache of available ontology classes based on graph state
+        * @memberof NodeModel.prototype
+        */
         getValidNodesEdges: function(){
             this.graph.getValidNodesEdges(this.nodeid, function(responseJSON){
                 this.ontology_cache.removeAll();
