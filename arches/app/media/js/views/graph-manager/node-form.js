@@ -71,9 +71,8 @@ define([
          * @memberof NodeFormView.prototype
          *
          * @param  {string} methodName - method to call on the graph model
-         * @param  {boolean} closeOnSuccess - true to close form on success
          */
-        callAsync: function (methodName, closeOnSuccess) {
+        callAsync: function (methodName) {
             var self = this
             this.loading(true);
             this.failed(false);
@@ -82,9 +81,6 @@ define([
                 self.loading(false);
                 self.closeClicked(false);
                 self.failed(!success);
-                if (success && closeOnSuccess) {
-                    self.close();
-                }
             });
         },
 
@@ -101,7 +97,7 @@ define([
          * @memberof NodeFormView.prototype
          */
         deleteNode: function () {
-            this.callAsync('deleteNode', true);
+            this.callAsync('deleteNode');
         },
 
         /**
