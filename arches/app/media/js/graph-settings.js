@@ -6,11 +6,18 @@ require([
     'views/graph-page-view',
     'graph-settings-data'
 ], function($, _, ko, koMapping, PageView, data) {
+    /**
+    * prep data for models
+    */
     var resourceJSON = JSON.stringify(data.resources);
     data.resources.forEach(function(resource) {
         resource.isRelatable = ko.observable(resource.is_relatable);
     });
     var srcJSON = JSON.stringify(data.metadata);
+
+    /**
+    * setting up page view model
+    */
     var metadata = koMapping.fromJS(data.metadata);
     var dirty = ko.observable(false);
     var dirtyInitialized = false;
@@ -102,6 +109,9 @@ require([
         }
     };
 
+    /**
+    * a GraphPageView representing the graph settings page
+    */
     var pageView = new PageView({
         viewModel: viewModel
     });
