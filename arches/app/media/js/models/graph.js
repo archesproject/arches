@@ -51,6 +51,7 @@ define(['arches',
             node['delete'](function (response, status) {
                 var success = (status === 'success');
                 if (success) {
+                    var parentNode = this.getParentNode(node);
                     var getEdges = function (node) {
                         var edges = this.get('edges')()
                             .filter(function (edge) {
@@ -85,6 +86,7 @@ define(['arches',
                     this.get('nodes').remove(function (node) {
                         return _.contains(nodes, node);
                     });
+                    parentNode.selected(true);
                     this.trigger('changed');
                 }
                 if (typeof callback === 'function') {
@@ -92,6 +94,23 @@ define(['arches',
                     callback.call(scope, response, status);
                 }
             }, this);
+        },
+
+        /**
+         * getParentNode - gets the parent node of the passed in node
+         * @memberof GraphModel.prototype
+         * @param  {object} node - the node whose parent should be retrieved
+         * @return {object} the parent node of the passed in node
+         */
+        getParentNode: function(node) {
+            var edge = this.get('edges')()
+                .find(function (edge) {
+                    return edge.rangenode_id === node.nodeid;
+                });
+            return this.get('nodes')()
+                .find(function (node) {
+                    return edge.domainnode_id === node.nodeid;
+                });
         },
 
         appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
