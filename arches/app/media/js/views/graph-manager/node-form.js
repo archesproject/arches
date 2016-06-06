@@ -7,7 +7,7 @@ define([
 ], function(_, Backbone, ko, BranchListView) {
     var NodeFormView = Backbone.View.extend({
         /**
-        * A backbone model to manage graph data
+        * A backbone view representing a node form
         * @augments Backbone.View
         * @constructor
         * @name NodeFormView
