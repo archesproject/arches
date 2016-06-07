@@ -48,8 +48,8 @@ def forwards_func(apps, schema_editor):
         os.path.join(path_to_ontologies, 'CRMdig_v3.2.1.rdfs.xml'),
         os.path.join(path_to_ontologies, 'CRMinf_v0.7.rdfs.xml')
     ]
-    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'), 
-        version='6.2', ontology_name='CIDOC CRM v6.2', id='100000000-000-0000-0000-000000000000', extensions=','.join(extensions))
+    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'),
+        version='6.2', ontology_name='CIDOC CRM v6.2', id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions))
 
 
 def reverse_func(apps, schema_editor):
