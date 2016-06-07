@@ -61,6 +61,7 @@
                     </div>
                 </div>
 
+                <!-- ko if: hasOntolgoy -->
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "CRM Class" %}
@@ -79,6 +80,7 @@
                         <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+                <!-- /ko -->
                 <!-- /ko -->
 
                 <div class="node-widget-label">

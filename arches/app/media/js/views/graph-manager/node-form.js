@@ -25,6 +25,7 @@ define([
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'validations', 'branches'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
+            this.hasOntolgoy = this.graphModel.get('metadata').ontology_id ? true: false;
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
