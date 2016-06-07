@@ -1,7 +1,7 @@
 <!--- Provide a general summary of the issue in the Title above -->
 <!--- You can erase any part of this template that is not applicable to your Issue. -->
 
-# Bug Report:
+# Bug Report
 <!--- By fully explaining what you are encountering, you can help us understand and reproduce the issue.  -->
 
 ## Expected Behavior
@@ -35,17 +35,13 @@
 * Operating System and version (desktop or mobile):
 * Link to your Arches Install (optional):
 
-# Development Ticket:
-<!--- For Developers, please include what the ticket consists of and acceptance criteria. -->
+# User Story
+<!--- If you are submitting a User Story, please change the title with the following template: As a <user type>, I want <a goal> so that <benefit>. -->
 
-## Description:
+## Acceptance Criteria
 - [ ]
 - [ ]
-- [ ]
-- [ ]
+- [ ] Unit Tests passed <!--- If Necessary -->
+- [ ] Documentation <!--- If Necessary -->
 
-## Acceptance Criteria:
-- [ ]
-- [ ]
-- [ ] Unit Tests passed <!--- If Necessary-->
-- [ ] Documentation <!--- If Necessary-->
+## Definition of Done
