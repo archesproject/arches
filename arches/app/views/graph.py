@@ -107,7 +107,7 @@ def settings(request, graphid):
                 'is_relatable': (node in relatable_resources)
             })
     graphs = models.Graph.objects.all()
-    ontologies = models.Ontology.objects.all()
+    ontologies = models.Ontology.objects.filter(parentontology=None)
     ontology_classes = models.OntologyClass.objects.all()
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
