@@ -39,6 +39,10 @@ class Graph(object):
         if args:
             if isinstance(args[0], dict):
                 self.metadata = models.Graph()
+                metadata_dict = args[0]["metadata"]
+                for key, value in metadata_dict.iteritems():
+                    setattr(self.metadata, key, value)
+                
                 for node in args[0]["nodes"]:
                     newNode = self.add_node(node)
 
@@ -47,9 +51,6 @@ class Graph(object):
 
                 self.populate_null_nodegroups()
 
-                metadata_dict = args[0]["metadata"]
-                for key, value in metadata_dict.iteritems():
-                    setattr(self.metadata, key, value)
             else:
                 if (isinstance(args[0], basestring) or
                    isinstance(args[0], uuid.UUID)):
