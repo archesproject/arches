@@ -41,8 +41,6 @@ class Graph(object):
                 self.metadata = models.Graph()
                 for node in args[0]["nodes"]:
                     newNode = self.add_node(node)
-                    if node['istopnode']:
-                        self.root = newNode
 
                 for edge in args[0]["edges"]:
                     self.add_edge(edge)
@@ -60,7 +58,6 @@ class Graph(object):
                     self.metadata = args[0]
                 elif isinstance(args[0], models.Node):
                     self.metadata = args[0].graph
-                self.root = self.metadata.node_set.get(istopnode=True)
                 nodes = self.metadata.node_set.all()
                 edges = self.metadata.edge_set.all()
                 for node in nodes:
@@ -134,6 +131,8 @@ class Graph(object):
             node.pk = uuid.uuid1()
         if node.nodegroup != None:
             self.nodegroups[node.nodegroup.pk] = node.nodegroup
+        if node.istopnode:
+            self.root = node
         self.nodes[node.pk] = node
         return node
 
