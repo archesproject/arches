@@ -118,6 +118,8 @@ define([
             this.clearSelection();
             this.selectedBranch(null);
             this.viewMetadata(false);
+
+            this.trigger('close');
         },
 
 

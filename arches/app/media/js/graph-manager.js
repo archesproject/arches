@@ -50,7 +50,7 @@ require([
     });
 
     viewModel.nodeForm = new NodeFormView({
-        el: $('#nodeCrud'),
+        el: $('#node-crud'),
         graphModel: graphModel,
         validations: data.validations,
         branches: data.branches,

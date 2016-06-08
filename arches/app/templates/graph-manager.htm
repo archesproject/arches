@@ -46,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					</div>
 
 					<!-- Node Editor -->
-					<div data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+					<div id="node-crud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
                         <div class="panel ep-card-crud-panel relative">
                             {% include 'views/graph-manager/node-form.htm' %}
     						<!-- Graph Metadata -->

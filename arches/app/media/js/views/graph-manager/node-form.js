@@ -38,6 +38,10 @@ define([
                 loading: this.loading
             });
 
+            this.branchListView.on('close', function(){
+                this.$el.find('a[href="#node-form"]').tab('show');
+            }, this);
+
             this.node.subscribe(function () {
                 self.closeClicked(false);
             });
