@@ -48,6 +48,7 @@ NOSE_ARGS = [
     '--nocapture', 
     '--cover-package=arches',
     '--verbosity=1',
+    '--cover-erase',
 ]
 
 INSTALLED_APPS = INSTALLED_APPS + (
