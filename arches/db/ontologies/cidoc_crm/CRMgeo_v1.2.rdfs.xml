@@ -14,6 +14,12 @@ Encoding Rules:
    For instance "Q2 occupied (is occupied by)" is represented as:
    "Q2_occupied" for the domain to range direction and "Q2i_is_occupied_by" for the range to domain direction.
 
+
+
+EDITS FOR ARCHES:
+Change any references in subProperties or domains/ranges from external reference literals to 
+CRM literal classes (E62_String, etc..).
+
 -->
 
 

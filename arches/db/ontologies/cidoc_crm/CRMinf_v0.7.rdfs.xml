@@ -23,6 +23,11 @@ Encoding Rules:
    equivalent to S5 Inference Making is lost.
 
 
+
+EDITS FOR ARCHES:
+Change any references in subProperties or domains/ranges from external reference literals to 
+CRM literal classes (E62_String, etc..).
+
 -->
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
         xml:base="http://www.ics.forth.gr/isl/CRMinf/" xml:lang="en">
