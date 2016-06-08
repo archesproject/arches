@@ -351,7 +351,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(ret[0]['ontology_classes']), models.OntologyClass.objects.filter(ontology_id=graph.metadata.ontology_id).count())
 
     def test_get_valid_ontology_classes_on_resource_with_no_ontology_set(self):
-         """
+        """
         test to see if we return the proper ontology classes for a graph that doesn't use an ontology system
 
         """
