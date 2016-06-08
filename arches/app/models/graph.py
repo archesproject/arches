@@ -260,8 +260,12 @@ class Graph(object):
             )
             branch_copy.add_edge(newEdge)
         for key, node in branch_copy.nodes.iteritems():
+            if self.metadata.ontology_id is None:
+                node.ontologyclass = None
             self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
+            if self.metadata.ontology_id is None:
+                edge.ontologyproperty = None
             self.add_edge(edge)
 
         self.populate_null_nodegroups()
