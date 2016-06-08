@@ -243,7 +243,9 @@ class Graph(object):
         append the branch to the root of this graph
 
         graphid -- get the branch to append based on the graphid
+
         """
+
         branch_graph = Graph(graphid)
 
         branch_copy = branch_graph.copy()
@@ -413,14 +415,14 @@ class Graph(object):
         """
 
         ret = []
-        if nodeid:
+        if nodeid and self.metadata.ontology_id is not None:
             parent_node = self.get_parent_node(nodeid)
             out_edges = self.get_out_edges(nodeid)
 
             ontology_classes = set()
             if len(out_edges) > 0:
                 for edge in out_edges:
-                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass).target['up']:
+                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass, ontology_id=self.metadata.ontology_id).target['up']:
                         if edge.ontologyproperty == ontology_property['ontology_property']:
                             if len(ontology_classes) == 0:
                                 ontology_classes = set(ontology_property['ontology_classes'])
@@ -434,7 +436,7 @@ class Graph(object):
             # limit the list of properties based on the intersection between the property's classes and the list of 
             # ontology classes we found above
             if parent_node:
-                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
+                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass, ontology_id=self.metadata.ontology_id).target['down']
                 if len(out_edges) == 0:
                     return range_ontologies
                 else:
@@ -449,7 +451,7 @@ class Graph(object):
                 if len(out_edges) == 0:
                     ret = [{
                         'ontology_property':'',
-                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True)
+                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True).filter(ontology_id=self.metadata.ontology_id)
                     }]
                 else:
                     # if no parent node then just use the list of ontology classes from above, there will be no properties to return

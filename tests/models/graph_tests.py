@@ -51,6 +51,7 @@ class GraphTests(ArchesTestCase):
             subtitle="ARCHES TEST GRAPH",
             author="Arches",
             description="ARCHES TEST GRAPH",
+            ontology_id="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             version="v1.0.0",
             isresource=True,
             isactive=False,
@@ -335,3 +336,27 @@ class GraphTests(ArchesTestCase):
 #                         branch_one_rootnodeid (Node)    branch_two_child (NodeType)
 #                                 /   \
 # branch_one_childnodeid (NodeType)    branch_three_nodeid (Node)
+
+    def test_get_valid_ontology_classes(self):
+        """
+        test to see if we return the proper ontology classes for a graph that uses an ontology system
+
+        """
+
+        graph = Graph(self.rootNode)
+        ret = graph.get_valid_ontology_classes(nodeid=self.rootNode.nodeid)
+        self.assertTrue(len(ret) == 1)
+
+        self.assertEqual(ret[0]['ontology_property'], '')
+        self.assertEqual(len(ret[0]['ontology_classes']), models.OntologyClass.objects.filter(ontology_id=graph.metadata.ontology_id).count())
+
+    def test_get_valid_ontology_classes_on_resource_with_no_ontology_set(self):
+         """
+        test to see if we return the proper ontology classes for a graph that doesn't use an ontology system
+
+        """
+
+        self.rootNode.graph.ontology_id = None
+        graph = Graph(self.rootNode)
+        ret = graph.get_valid_ontology_classes(nodeid=self.rootNode.nodeid)
+        self.assertTrue(len(ret) == 0)
