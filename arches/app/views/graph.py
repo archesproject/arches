@@ -40,7 +40,10 @@ def manager(request, graphid):
 
     graph = Graph(graphid)
     validations = models.Validation.objects.all()
-    metadata_records = JSONSerializer().serializeToPython(models.Graph.objects.exclude(pk=graphid).filter(ontology=graph.metadata.ontology))
+    branch_graphs = models.Graph.objects.exclude(pk=graphid)
+    if graph.metadata.ontology is not None:
+        branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
+    metadata_records = JSONSerializer().serializeToPython(branch_graphs)
     branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
     branches = []
     for metadata_record in metadata_records:
