@@ -122,7 +122,11 @@
                 id: 'AerialWithLabels',
                 name: "{% trans 'Streets & Satellite' %}",
                 icon: "{% static 'img/map/bing_hybrid.png' %}"
-            }]
+            }],
+            confirmNav:{
+                title: "{% trans 'Edits pending...' %}",
+                text: "{% trans 'You have edits pending on this page, are you sure you would like to proceed (and discard any pending edits)?' %}"
+            }
         };
     });
 
