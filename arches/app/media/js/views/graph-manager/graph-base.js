@@ -19,12 +19,20 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            this.size = 1000;
+            options = _.defaults(options, {nodeSize: 11, labelOffset: 2});
+            this.nodeSize = options.nodeSize;
+            this.labelOffset = options.labelOffset;
+            this.nodeLabelOffset = this.nodeSize + this.labelOffset;
             this.currentOffset = [0,0];
             this.currentScale = 1;
             this.graphModel = options.graphModel;
             this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
             this.edges = options.graphModel.get('edges') || ko.observableArray([]);
+            this.getsize = function(){
+                return 1000;
+                // console.log((this.nodes().length * 5) + 500)
+                // return (this.nodes().length * 30) + 500;
+            };
 
             var diameter = this.$el.width() < this.$el.height() ? this.$el.width() : this.$el.height();
 
@@ -41,7 +49,7 @@ define([
                             });
                         });
                 })
-                .size([360, this.size])
+                .size([360, this.getsize()])
                 .separation(function(a, b) { 
                     return (a.parent == b.parent ? 1 : 2) / a.depth;  
                 });
@@ -70,7 +78,7 @@ define([
         render: function () {
             var self = this;
             this.root = undefined;
-            this.nodesize = 6;
+            
             this.nodes().forEach(function (node) {
                 if (node.istopnode) {
                     this.root = node;
@@ -103,7 +111,7 @@ define([
                 });
                 
             this.node.append("circle")
-                .attr("r", this.nodesize)
+                .attr("r", this.nodeSize)
             
             this.renderNodeText();
         },
@@ -118,7 +126,7 @@ define([
                 .attr("dy", ".31em")
                 .attr("class", "node-text")
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+                .attr("transform", function(d) { return d.x < 180 ? "translate(" + self.nodeLabelOffset + ")" : "rotate(180)translate(-" + self.nodeLabelOffset + ")"; })
                 .text(function (d) {
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
@@ -186,7 +194,7 @@ define([
                                 });
                             });
                     })
-                    .size([360, this.size * this.currentScale])
+                    .size([360, this.getsize() * this.currentScale])
                     .separation(function(a, b) { 
                         return (a.parent == b.parent ? 1 : 2) / (a.depth);  
                     });

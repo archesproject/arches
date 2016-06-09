@@ -666,7 +666,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke-width: 1px;
 }
 .node {
-    font-size: 13px;
+    font-size: 15px;
     transition: all .40s ease;
 }
 .node .node-selected {
@@ -676,7 +676,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     opacity: .3;
 }
 .node-text {
-    font-size: 10px;
     text-overflow: ellipsis;
 }
 .link {
@@ -690,7 +689,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke-width: 3px;
 }
 .node .node-over {
-    stroke: navy;
+    fill: #4682B4;
     cursor: pointer;
     transition: all .40s ease;
 }
