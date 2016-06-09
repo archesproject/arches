@@ -256,10 +256,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="col-xs-12">
                                                     <div class="pad-hor">
                                                         <label data-bind="css: { 'active': metadata.isresource() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="true"> {% trans "Resource" %}
+                                                            <input type="radio" name="type-w-label" data-bind="disable: disableIsResource, checked: isResource" value="true"> {% trans "Resource" %}
                                                         </label>
                                                         <label data-bind="css: { 'active': !metadata.isresource() }" class="form-radio form-normal form-text">
-                                                            <input type="radio" name="type-w-label" data-bind="checked: isResource" value="false"> {% trans "Graph" %}
+                                                            <input type="radio" name="type-w-label" data-bind="disable: disableIsResource, checked: isResource" value="false"> {% trans "Graph" %}
                                                         </label>
                                                     </div>
                                                 </div>

@@ -30,6 +30,7 @@ define([
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
+            this.disableDatatype = this.graphModel.get('metadata').isresource;
 
             this.branchListView = new BranchListView({
                 el: $('#branch-library'),

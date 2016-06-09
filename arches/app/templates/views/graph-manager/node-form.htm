@@ -80,7 +80,7 @@
                         {% trans "Data type" %}
                     </div>
                     <div class="col-sm-12 pad-no node-attribute-label">
-                        <select class="design" data-bind="value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                        <select class="design" data-bind="disable: disableDatatype, value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 
