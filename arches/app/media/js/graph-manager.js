@@ -10,8 +10,10 @@ require([
     'views/graph-manager/permissions-form',
     'models/node',
     'models/graph',
+    'viewmodels/alert',
+    'arches',
     'graph-manager-data'
-], function($, _, ko, PageView, GraphView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, data) {
+], function($, _, ko, PageView, GraphView, NodeListView, PermissionsListView, NodeFormView, PermissionsFormView, NodeModel, GraphModel, AlertViewModel, arches, data) {
     /**
     * prep data for model
     */
@@ -81,10 +83,30 @@ require([
     /**
     * a GraphPageView representing the graph manager page
     */
-    new PageView({
+    var pageView = new PageView({
         viewModel: viewModel
     });
 
+    viewModel.nodeForm.failed.subscribe(function(failed) {
+        if (failed) {
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+        } else {
+            pageView.viewModel.alert(null);
+        }
+    });
+
+    viewModel.nodeForm.closeClicked.subscribe(function(closeClicked) {
+        var node = viewModel.nodeForm.node();
+        if (closeClicked && node && node.dirty()) {
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function () {
+                viewModel.nodeForm.cancel();
+            }, function () {
+                viewModel.nodeForm.save();
+            }));
+        } else {
+            pageView.viewModel.alert(null);
+        }
+    });
 
     /**
     * update the sizing of elements on window resize

@@ -363,7 +363,7 @@ class GraphTests(ArchesTestCase):
 
     def test_append_branch_to_resource_with_no_ontology_system(self):
         """
-        test to see that we remove all ontologyclass and ontologyproperty references when appending a 
+        test to see that we remove all ontologyclass and ontologyproperty references when appending a
         graph that uses an ontolgoy system to a graph that doesn't
 
         """
@@ -376,3 +376,18 @@ class GraphTests(ArchesTestCase):
             self.assertTrue(node.ontologyclass is None)
         for edge_id, edge in graph.edges.iteritems():
             self.assertTrue(edge.ontologyproperty is None)
+
+    def test_delete_graph(self):
+        """
+        test the graph delete method
+
+        """
+        graph = Graph(self.NODE_NODETYPE_GRAPHID)
+        self.assertEqual(len(graph.nodes),2)
+        self.assertEqual(len(graph.edges),1)
+        graph.delete()
+
+        node_count = models.Node.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
+        edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
+        self.assertEqual(node_count,0)
+        self.assertEqual(edge_count,0)

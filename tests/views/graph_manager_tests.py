@@ -22,7 +22,7 @@ from tests.base_test import ArchesTestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
-from arches.app.models.models import Node, NodeGroup, Graph
+from arches.app.models.models import Node, NodeGroup, Graph, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -185,3 +185,18 @@ class GraphManagerViewTests(ArchesTestCase):
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['nodes']), 1)
         self.assertFalse(response_json['metadata']['isresource'])
+
+    def test_delete_graph(self):
+        """
+        test the graph delete method
+
+        """
+        self.client.login(username='admin', password='admin')
+        graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
+        url = reverse('graph', kwargs={'graphid':graphid})
+        response = self.client.delete(url)
+
+        node_count = Node.objects.filter(graph_id=graphid).count()
+        edge_count = Edge.objects.filter(graph_id=graphid).count()
+        self.assertEqual(node_count,0)
+        self.assertEqual(edge_count,0)

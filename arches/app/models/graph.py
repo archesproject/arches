@@ -182,6 +182,18 @@ class Graph(object):
             for edge_id, edge in self.edges.iteritems():
                 edge.save()
 
+    def delete(self):
+        with transaction.atomic():
+            for edge_id, edge in self.edges.iteritems():
+                edge.delete()
+
+            for node_id, node in self.nodes.iteritems():
+                node.delete()
+
+            for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+                nodegroup.delete()
+
+            self.metadata.delete()
 
     def get_tree(self, root=None):
         """

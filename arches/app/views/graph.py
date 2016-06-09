@@ -31,6 +31,11 @@ from arches.app.models import models
 
 @group_required('edit')
 def manager(request, graphid):
+    if request.method == 'DELETE':
+        graph = Graph(graphid)
+        graph.delete()
+        return JSONResponse({'succces':True})
+        
     graphs = models.Graph.objects.all()
     if graphid is None or graphid == '':
         return render(request, 'graph-list.htm', {
