@@ -42,7 +42,7 @@ class Graph(object):
                 metadata_dict = args[0]["metadata"]
                 for key, value in metadata_dict.iteritems():
                     setattr(self.metadata, key, value)
-                
+
                 for node in args[0]["nodes"]:
                     newNode = self.add_node(node)
 
@@ -83,14 +83,15 @@ class Graph(object):
             version="",
             isresource=is_resource,
             isactive=False,
-            iconclass=""
+            iconclass="",
+            ontology=None
         )
         root = models.Node.objects.create(
             pk=newid,
             name=name,
             description='',
             istopnode=True,
-            ontologyclass=settings.DEFAULT_GRAPH_CLASS_ID,
+            ontologyclass=None,
             datatype='semantic',
             nodegroup=group,
             graph=metadata
@@ -357,7 +358,7 @@ class Graph(object):
         node['nodeid'] = uuid.UUID(node.get('nodeid'))
         self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
-        
+
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
                 edge.domainnode = new_node
@@ -390,7 +391,7 @@ class Graph(object):
 
         Arguments:
         nodeid -- the nodeid of the node we want to find the edges of
-        
+
         """
 
         ret = []
@@ -401,17 +402,19 @@ class Graph(object):
 
     def get_valid_domain_connections(self):
         """
-        gets the ontology properties (and related classes) this graph can have with a parent node 
+        gets the ontology properties (and related classes) this graph can have with a parent node
 
         """
-
-        ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
-        return ontology_classes.target['up']
+        if self.root.ontologyclass is not None:
+            ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
+            return ontology_classes.target['up']
+        else:
+            return []
 
     def get_valid_ontology_classes(self, nodeid=None):
         """
-        get possible ontology properties (and related classes) a node with the given nodeid can have 
-        taking into consideration it's current position in the graph 
+        get possible ontology properties (and related classes) a node with the given nodeid can have
+        taking into consideration it's current position in the graph
 
         Arguments:
         nodeid -- the id of the node in question
@@ -435,9 +438,9 @@ class Graph(object):
 
                             if len(ontology_classes) == 0:
                                 break
-        
+
             # get a list of properties (and corresponding classes) that could be used to relate to my parent node
-            # limit the list of properties based on the intersection between the property's classes and the list of 
+            # limit the list of properties based on the intersection between the property's classes and the list of
             # ontology classes we found above
             if parent_node:
                 range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass, ontology_id=self.metadata.ontology_id).target['down']
@@ -463,7 +466,7 @@ class Graph(object):
                         'ontology_property':'',
                         'ontology_classes':list(ontology_classes)
                     }]
-               
+
         return ret
 
     def serialize(self):
