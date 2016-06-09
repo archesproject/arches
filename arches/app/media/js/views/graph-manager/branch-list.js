@@ -44,13 +44,17 @@ define([
                         this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
                     }
                     _.each(this.items(), function(branch){
-                        branch.filtered(true);
-                        var found = _.find(branch.graph.domain_connections, function(domain_connection){
-                            return _.find(domain_connection.ontology_classes, function(ontology_class){
-                                return ontology_class === this.selectedNode().ontologyclass();
-                            }, this)
-                        }, this);
-                        if(found){
+                        if (branch.graph.ontology){
+                            branch.filtered(true);
+                            var found = _.find(branch.graph.domain_connections, function(domain_connection){
+                                return _.find(domain_connection.ontology_classes, function(ontology_class){
+                                    return ontology_class === this.selectedNode().ontologyclass();
+                                }, this)
+                            }, this);
+                            if(found){
+                                branch.filtered(false);
+                            }
+                        } else {
                             branch.filtered(false);
                         }
                     }, this);
@@ -97,8 +101,9 @@ define([
                         return ontology_class === this.selectedNode().ontologyclass();
                     }, this)
                 }, this);
-                if(ontology_connection){
-                    this.graphModel.appendBranch(this.selectedNode().nodeid, ontology_connection.ontology_property, item.graphid, function(response, status){
+                if(ontology_connection || !item.graph.ontology){
+                    var property = ontology_connection ? ontology_connection.ontology_property : null;
+                    this.graphModel.appendBranch(this.selectedNode().nodeid, property, item.graphid, function(response, status){
                         self.failed(status !== 'success');
                         self.loading(false);
                     }, this)
