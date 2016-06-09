@@ -16,6 +16,9 @@ define([
             this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
+            
+            options = _.defaults(options, {nodeSizeOver: this.nodeSize});
+            this.nodeSizeOver = options.nodeSizeOver;
 
             this.addNodeListeners();
             this.nodes.subscribe(function() {
@@ -42,7 +45,6 @@ define([
         renderNodes: function(){
             GraphBase.prototype.renderNodes.apply(this, arguments);
             var self = this;
-            var nodeMouseOver = 8;
             var getNodeClass = function (d, className) {
                 className += d.selected() ? ' node-selected' : '';
                 className += d.filtered() ? ' node-filtered' : '';
@@ -58,7 +60,7 @@ define([
                 .on("mouseover", function(d) {
                     self.overNode = d3.select(this.parentElement);
                     d3.select(this)
-                        .attr("r", nodeMouseOver)
+                        .attr("r", self.nodeSizeOver)
                         .attr("class", function (d) {
                             return getNodeClass(d, 'node-over');
                         })
@@ -69,7 +71,7 @@ define([
                 .on("mouseout", function(d) {
                     self.overNode = null;
                     d3.select(this)
-                        .attr("r", self.nodesize)
+                        .attr("r", self.nodeSize)
                         .attr("class", function (d) {
                             return getNodeClass(d, '');
                         });

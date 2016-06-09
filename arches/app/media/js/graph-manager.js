@@ -46,7 +46,10 @@ require([
 
     viewModel.graphView = new GraphView({
         el: $('#graph'),
-        graphModel: graphModel
+        graphModel: graphModel,
+        nodeSize: 14,
+        nodeSizeOver: 16,
+        labelOffset: 2
     });
 
     viewModel.nodeForm = new NodeFormView({
