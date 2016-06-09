@@ -52,6 +52,7 @@ require([
                 return ontologyClass.ontology_id === metadata.ontology_id();
             });
         }),
+        disableIsResource: (data.node.datatype!=='semantic'),
         isResource: ko.computed({
             read: function() {
                 return metadata.isresource().toString();
