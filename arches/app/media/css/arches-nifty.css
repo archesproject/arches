@@ -666,22 +666,27 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke-width: 1px;
 }
 .node {
-    font-size: 15px;
+    font-size: 23px;
     transition: all .40s ease;
+    stroke: #aaa;
+    stroke-width: 1px;
 }
 .node .node-selected {
-    fill: #4682B4;
+    fill: #3ACAA2;
+    stroke: #009E72;
+    stroke-width: 1px;
 }
 .node .node-filtered {
-    opacity: .3;
+    fill: #f4f4f4;
 }
-.node-text {
+.graph-node-text {
     text-overflow: ellipsis;
+    stroke: steelblue;
 }
 .link {
     fill: none;
-    stroke: #ddd;
-    stroke-width: 1.5px;
+    stroke: #aaa;
+    stroke-width: 1px;
 }
 .templink {
     fill: none;
@@ -689,7 +694,9 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke-width: 3px;
 }
 .node .node-over {
-    fill: #4682B4;
+    fill: #3ACAA2;
+    stroke: #009E72;
+    stroke-width: 1.5px;
     cursor: pointer;
     transition: all .40s ease;
 }
