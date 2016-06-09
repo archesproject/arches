@@ -124,12 +124,12 @@ define([
             var self = this;
             this.node.append("text")
                 .attr("dy", ".31em")
-                .attr("class", "node-text")
+                .attr("class", 'graph-node-text')
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                 .attr("transform", function(d) { return d.x < 180 ? "translate(" + self.nodeLabelOffset + ")" : "rotate(180)translate(-" + self.nodeLabelOffset + ")"; })
                 .text(function (d) {
-                    if(d.name().length > 16*self.currentScale) {
-                        return d.name().substring(0,16*self.currentScale)+'...';
+                    if(d.name().length > 20*self.currentScale) {
+                        return d.name().substring(0,20*self.currentScale)+'...';
                     }
                     return d.name();
                 });
