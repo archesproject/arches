@@ -3488,6 +3488,10 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	bottom: 10px;
 	right: 25px;
 }
+.graph-list-header .ep-form-alert {
+	position: relative;
+    top: 0px;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

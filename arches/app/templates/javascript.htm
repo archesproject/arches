@@ -123,9 +123,17 @@
                 name: "{% trans 'Streets & Satellite' %}",
                 icon: "{% static 'img/map/bing_hybrid.png' %}"
             }],
-            confirmNav:{
+            confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
-                text: "{% trans 'You have edits pending on this page, are you sure you would like to proceed (and discard any pending edits)?' %}"
+                text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
+            },
+            confirmGraphDelete: {
+                title: "{% trans 'Delete Graph/Resource?' %}",
+                text: "{% trans 'Deleting this graph/resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
+            },
+            requestFailed: {
+                title: "{% trans 'Request Failed...' %}",
+                text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             }
         };
     });

@@ -3,10 +3,11 @@ require([
     'underscore',
     'knockout',
     'views/page-view',
-    'models/node',
+    'viewmodels/alert',
+    'arches',
     'bootstrap-nifty',
     'bindings/hover'
-], function($, _, ko, PageView, NodeModel) {
+], function($, _, ko, PageView, AlertViewModel, arches) {
     var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
 
     /**
@@ -47,21 +48,21 @@ require([
             newGraph('clone/' + graph.graphid);
         };
         graph.deleteGraph = function () {
-            var node = new NodeModel({
-                source: graph,
-                datatypelookup: {}
-            });
-            pageView.viewModel.loading(true);
-            node['delete'](function (request, status) {
-                var success = (status === 'success');
-                pageView.viewModel.loading(false);
-                if (success) {
-                    if (graph.selected()) {
-                        selectedGraph(null);
-                    }
-                    graphs.remove(graph);
-                }
-            }, node);
+            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
+                return;
+            }, function(){
+                pageView.viewModel.loading(true);
+                $.ajax({
+                    complete: function (request, status) {
+                        pageView.viewModel.loading(false);
+                        if (status === 'success') {
+                            graphs.remove(graph);
+                        }
+                    },
+                    type: "DELETE",
+                    url: graph.graphid
+                });
+            }));
         };
     });
 
