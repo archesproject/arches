@@ -86,7 +86,7 @@ def settings(request, graphid):
             setattr(graph, key, value)
         graph.save()
         node.set_relatable_resources(data.get('relatable_resource_ids'))
-        node.ontologyclass = data.get('ontology_class')
+        node.ontologyclass = data.get('ontology_class') if graph.ontology is not None else None
         node.save()
         return JSONResponse({
             'success': True,
