@@ -3507,7 +3507,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     margin-left: -5px;
     background: rgba(214,214,214,0.3);
     color: transparent;
-    z-index: 1000000;
+    z-index: 1;
     width: 100%;
     height: 100%;
 }
