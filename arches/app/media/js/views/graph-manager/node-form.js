@@ -30,8 +30,12 @@ define([
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
-            this.disableDatatype = this.graphModel.get('metadata').isresource;
-            this.disableIsCollector = this.graphModel.get('metadata').isresource;
+            var isResourceTopNode = ko.computed(function() {
+                var node = self.node();
+                return self.graphModel.get('metadata').isresource && node && node.istopnode;
+            });
+            this.disableDatatype = isResourceTopNode;
+            this.disableIsCollector = isResourceTopNode;
 
             this.branchListView = new BranchListView({
                 el: $('#branch-library'),
