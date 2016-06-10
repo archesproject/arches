@@ -80,7 +80,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.metadata.author, author)
         self.assertTrue(graph.metadata.isresource)
         self.assertEqual(graph.root.name, name)
-        self.assertTrue(graph.root.is_collector())
+        self.assertFalse(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
 
     def test_graph_doesnt_polute_db(self):
