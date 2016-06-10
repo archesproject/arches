@@ -253,6 +253,91 @@ define(['arches',
             return ret;
         },
 
+        isNodeInParentGroup: function (node) {
+            var isInParentGroup = false;
+            var nodeGroupId = node.nodeGroupId();
+            if (nodeGroupId) {
+                var childNodesAndEdges = this.getChildNodesAndEdges(node);
+                var childGroupNode = childNodesAndEdges.nodes.find(function(childNode) {
+                    return childNode.nodeGroupId() !== nodeGroupId;
+                });
+                if (childGroupNode) {
+                    isInParentGroup = true;
+                }
+            }
+            return isInParentGroup;
+        },
+
+        isNodeInChildGroup: function (node) {
+            var nodeGroupId = node.nodeGroupId()
+            if (!nodeGroupId) {
+                return false;
+            }
+            var parentNodes = this.getParentNodesAndEdges(node).nodes;
+            var hasParentGroup = !!parentNodes.find(function (parentNode) {
+                parentNodeGroupId = parentNode.nodeGroupId()
+                return parentNodeGroupId && parentNodeGroupId !== nodeGroupId;
+            });
+            return hasParentGroup;
+        },
+
+        getGroupedNodes: function (node) {
+            var nodeGroupId = node.nodeGroupId();
+            if (!nodeGroupId) {
+                return [node];
+            }
+            return _.filter(this.get('nodes')(), function(node) {
+                return node.nodeGroupId && node.nodeGroupId === nodeGroupId;
+            })
+        },
+
+        getParentNodesAndEdges: function (node) {
+            var self = this;
+            var nodes = [];
+            var edges = [];
+            var edge = self.get('edges')().find(function(edge){
+                return edge.rangenode_id === node.nodeid;
+            });
+            if (edge) {
+                var domainnode = self.get('nodes')().find(function(node) {
+                    return node.nodeid === edge.domainnode_id;
+                });
+                nodes.push(domainnode);
+                edges.push(edge);
+
+                var nodesAndEdges = self.getParentNodesAndEdges(domainnode);
+                nodes = nodes.concat(nodesAndEdges.nodes);
+                edges = edges.concat(nodesAndEdges.edges);
+            }
+            return {
+                nodes: nodes,
+                edges: edges
+            }
+        },
+
+        getChildNodesAndEdges: function (node) {
+            var self = this;
+            var nodes = [];
+            var edges = [];
+            self.get('edges')().filter(function(edge){
+                return edge.domainnode_id === node.nodeid;
+            }).forEach(function (edge) {
+                var rangenode = self.get('nodes')().find(function(node) {
+                    return node.nodeid === edge.rangenode_id;
+                });
+                nodes.push(rangenode);
+                edges.push(edge);
+
+                var nodesAndEdges = self.getChildNodesAndEdges(rangenode);
+                nodes = nodes.concat(nodesAndEdges.nodes);
+                edges = edges.concat(nodesAndEdges.edges);
+            }, self);
+            return {
+                nodes: nodes,
+                edges: edges
+            }
+        },
+
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
             if (! scope){
