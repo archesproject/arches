@@ -3498,6 +3498,19 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	position: relative;
     top: 0px;
 }
+.switch-section {
+    position: relative;
+}
+.switch-section.disabled::before {
+    content: '.';
+    position: absolute;
+    margin-left: -5px;
+    background: rgba(214,214,214,0.3);
+    color: transparent;
+    z-index: 1000000;
+    width: 100%;
+    height: 100%;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

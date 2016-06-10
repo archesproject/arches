@@ -34,8 +34,40 @@ define([
                 var node = self.node();
                 return self.graphModel.get('metadata').isresource && node && node.istopnode;
             });
-            this.disableDatatype = isResourceTopNode;
-            this.disableIsCollector = isResourceTopNode;
+            this.disableDatatype = ko.computed(function () {
+                var node = self.node();
+                var isInParentGroup = false;
+                if (node) {
+                    isInParentGroup = self.graphModel.isNodeInParentGroup(node);
+                }
+                return isResourceTopNode() || isInParentGroup;
+            });
+            this.disableIsCollector = ko.computed(function () {
+                var node = self.node();
+                var isCollector = false;
+                var isNodeInChildGroup = false;
+                var hasNonSemanticParentNodes = false;
+                var isInParentGroup = false;
+                var groupHasNonSemanticNodes = false;
+                if (node) {
+                    isCollector = node.isCollector();
+                    isNodeInChildGroup = self.graphModel.isNodeInChildGroup(node);
+                    var groupNodes = self.graphModel.getGroupedNodes(node);
+                    var childNodes = self.graphModel.getChildNodesAndEdges(node).nodes;
+                    childNodes.push(node);
+                    var parentGroupNodes = _.difference(groupNodes, childNodes);
+                    hasNonSemanticParentNodes = !!_.find(parentGroupNodes, function (node) {
+                        return node.datatype !== 'semantic';
+                    });
+                    groupHasNonSemanticNodes = !!_.find(groupNodes, function (node) {
+                        return node.datatype !== 'semantic';
+                    });
+                    isInParentGroup = self.graphModel.isNodeInParentGroup(node);
+                }
+                return isResourceTopNode() ||
+                    (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
+                    (isCollector && groupHasNonSemanticNodes && isInParentGroup);
+            });
 
             this.branchListView = new BranchListView({
                 el: $('#branch-library'),
