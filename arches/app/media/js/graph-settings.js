@@ -19,22 +19,27 @@ require([
     * setting up page view model
     */
     var metadata = koMapping.fromJS(data.metadata);
-    var dirty = ko.observable(false);
-    var dirtyInitialized = false;
-    ko.computed(function () {
-        if (!dirtyInitialized) {
-            ko.toJS(metadata);
-            ko.toJS(data.resources);
-            dirtyInitialized = true;
-            return;
-        }
-        dirty(true);
-    });
-    var resetDirty = function () {
-        dirtyInitialized = false;
-        dirty(false);
-    };
     var iconFilter = ko.observable('');
+    var ontologyClass = ko.observable(data.node.ontologyclass);
+    var jsonData = ko.computed(function() {
+        var relatableResourceIds = _.filter(data.resources, function(resource){
+            return resource.isRelatable();
+        }).map(function(resource){
+            return resource.id
+        });
+        if (metadata.ontology_id() === undefined) {
+            metadata.ontology_id(null);
+        }
+        return JSON.stringify({
+            metadata: koMapping.toJS(metadata),
+            relatable_resource_ids: relatableResourceIds,
+            ontology_class: ontologyClass()
+        });
+    });
+    var jsonCache = ko.observable(jsonData());
+    var dirty = ko.computed(function () {
+        return jsonData() !== jsonCache();
+    });
     var viewModel = {
         dirty: dirty,
         iconFilter: iconFilter,
@@ -46,7 +51,7 @@ require([
         metadata: metadata,
         resources: data.resources,
         ontologies: data.ontologies,
-        ontologyClass: ko.observable(data.node.ontologyclass),
+        ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {
             return _.filter(data.ontologyClasses, function (ontologyClass) {
                 return ontologyClass.ontology_id === metadata.ontology_id();
@@ -71,24 +76,12 @@ require([
         }),
         save: function () {
             pageView.viewModel.loading(true);
-            var relatableResourceIds = _.filter(data.resources, function(resource){
-                return resource.isRelatable();
-            }).map(function(resource){
-                return resource.id
-            });
-            if (metadata.ontology_id() === undefined) {
-                metadata.ontology_id(null);
-            }
             $.ajax({
                 type: "POST",
                 url: '',
-                data: JSON.stringify({
-                    metadata: koMapping.toJS(metadata),
-                    relatable_resource_ids: relatableResourceIds,
-                    ontology_class: viewModel.ontologyClass()
-                }),
+                data: jsonData(),
                 success: function(response) {
-                    resetDirty();
+                    jsonCache(jsonData());
                     pageView.viewModel.loading(false);
                 },
                 failure: function(response) {
@@ -106,7 +99,7 @@ require([
                 });
                 resource.isRelatable(jsonResource.is_relatable);
             });
-            resetDirty();
+            jsonCache(jsonData());
         }
     };
 

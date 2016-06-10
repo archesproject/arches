@@ -30,8 +30,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header %}
 
 {% block graph_header_buttons %}
+<!-- ko if: dirty() -->
 <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:reset">{% trans "Discard Edits" %}</button>
 <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:save">{% trans "Save Edits" %}</button>
+<!-- /ko -->
 {{ block.super }}
 {% endblock graph_header_buttons %}
 
@@ -116,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.name">
+                                                        <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.name, valueUpdate: 'keyup'">
                                                     </div>
                                                 </div>
                                             </div>
@@ -128,7 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle">
+                                                        <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle, valueUpdate: 'keyup'">
                                                     </div>
                                                 </div>
                                             </div>
@@ -333,7 +335,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.author">
+                                                        <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.author, valueUpdate: 'keyup'">
                                                     </div>
                                                 </div>
                                             </div>
@@ -345,7 +347,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
 
                                                     <div class="col-xs-12">
-                                                        <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:metadata.description"></textarea>
+                                                        <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:metadata.description, valueUpdate: 'keyup'"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
