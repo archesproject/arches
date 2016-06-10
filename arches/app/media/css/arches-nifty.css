@@ -704,6 +704,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     opacity: 0.2;
     fill: red;
     stroke: red;
+    stroke-width: 25px;
+}
+.target-node  circle.node-over {
+    opacity: 0.5;
+    fill: red;
+    stroke: red;
     stroke-width: 32px;
 }
 #nodeCrud {
