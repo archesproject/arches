@@ -260,14 +260,14 @@ class Graph(object):
         branch_copy = branch_graph.copy()
         branch_copy.root.istopnode = False
 
-        with transaction.atomic():
-            newEdge = models.Edge(
-                domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
-                rangenode = branch_copy.root,
-                ontologyproperty = property,
-                graph = self.metadata
-            )
-            branch_copy.add_edge(newEdge)
+        newEdge = models.Edge(
+            domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
+            rangenode = branch_copy.root,
+            ontologyproperty = property,
+            graph = self.metadata
+        )
+        branch_copy.add_edge(newEdge)
+        
         for key, node in branch_copy.nodes.iteritems():
             if self.metadata.ontology_id is None:
                 node.ontologyclass = None
