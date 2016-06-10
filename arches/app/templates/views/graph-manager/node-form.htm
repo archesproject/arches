@@ -16,7 +16,7 @@
         </a>
     </li>
     <li>
-        <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab">
+        <a href="#branch-library" class="nav-library-tab-link" data-toggle="tab" data-bind="visible: node() && !node().dirty()">
             <i class="ion-ios-plus add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Add Child Nodes" %}"></i>
         </a>
     </li>
