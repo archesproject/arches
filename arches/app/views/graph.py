@@ -215,3 +215,8 @@ def get_related_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     graph = Graph(graphid)
     return JSONResponse(graph.get_valid_ontology_classes(nodeid=data['nodeid']))
+
+def get_valid_domain_nodes(request, graphid):
+    data = JSONDeserializer().deserialize(request.body)
+    graph = Graph(graphid)
+    return JSONResponse(graph.get_valid_domain_ontology_classes(nodeid=data['nodeid']))

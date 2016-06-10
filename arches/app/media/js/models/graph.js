@@ -205,7 +205,17 @@ define(['arches',
                 data: JSON.stringify({'nodeid': nodeid})
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
-            }, this, 'changed');
+            }, this);
+        },
+
+        getValidDomainClasses: function(nodeid, callback, scope){
+            this._doRequest({
+                type: "POST",
+                url: this.url + this.get('metadata').graphid + '/get_valid_domain_nodes',
+                data: JSON.stringify({'nodeid': nodeid})
+            }, function(response, status, self){
+                callback.call(scope, response.responseJSON);
+            }, this);
         },
 
         parse: function(attributes){
@@ -349,7 +359,9 @@ define(['arches',
                         callback.call(scope, request, status, self);
                     }
                     if (status === 'success' &&  request.responseJSON) {
-                        self.trigger(eventname, self);
+                        if(eventname || eventname !== ''){
+                            self.trigger(eventname, self);
+                        }
                     }
                 }
             }, config));

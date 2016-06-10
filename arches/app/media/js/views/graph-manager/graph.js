@@ -33,6 +33,7 @@ define([
                 this.selectedNode();
                 this.render();
             }, this);
+
         },
 
         /**
@@ -144,31 +145,45 @@ define([
         */
         initDragDrop: function(){
             var self = this;
+            var cache = {};
             var dragging = false;
             var draggingNode = null;
 
-            var getTargetNodes = function(relatableclasses){
-                var allowed_target_ontologies = ['E1', 'E2'];
-                self.allNodes.property('canDrop', false);
-                return self.allNodes.filter(function(node){
-                    return _.find(relatableclasses, function(ontologyclass){
-                        return ontologyclass.id === node.ontologyclass();
-                    })
-                }, self);
+            var getTargetNodes = function(node, callback){
+                if(_.has(cache, node.ontologyclass())){
+                    callback(cache[node.ontologyclass()]);
+                }else{
+                    self.graphModel.getValidDomainClasses(node.nodeid, function(response){
+                        cache[node.ontologyclass()] = response;
+                        callback(response);
+                    }, self);
+                }
             };
 
             var initiateDrag = function(d, draggedNodeElement) {
                 var nodes = self.tree.nodes(d);
                 draggingNode = d;
 
-                // style possible drop targets
-                getTargetNodes(d.relatableclasses)[0].forEach(function(node){
-                    var d3node = d3.select(node);
-                    if (d3node.data()[0].id != draggingNode.id){
-                        d3node.attr('class', 'target-node')
-                        .property('canDrop', true);
-                    }
-                }, this);
+                getTargetNodes(d, function(response){
+                    var allowed_target_ontologies = []
+                    _.each(response, function(item){
+                        allowed_target_ontologies = allowed_target_ontologies.concat(item.ontology_classes)
+                    }, this)
+                    allowed_target_ontologies = _.uniq(allowed_target_ontologies);
+                    self.allNodes.property('canDrop', false);
+                    nodes = self.allNodes.filter(function(node){
+                        return _.find(allowed_target_ontologies, function(ontologyclass){
+                            return ontologyclass === node.ontologyclass();
+                        })
+                    }, self);
+                    nodes[0].forEach(function(node){
+                        var d3node = d3.select(node);
+                        if (d3node.data()[0].id != draggingNode.id){
+                            d3node.attr('class', 'target-node')
+                            .property('canDrop', true);
+                        }
+                    }, this);
+                });
 
                 // remove the text of the dragged node
                 draggedNodeElement.nextSibling.remove();
@@ -208,6 +223,7 @@ define([
 
             var endDrag = function() {
                 self.redraw(true);
+                self.graphModel.selectNode(draggingNode);
                 draggingNode = null;
                 dragging = false;
             };
@@ -219,22 +235,20 @@ define([
                         return;
                     }
                     //console.log('drag start');
-                    dragStarted = true;
+                    //dragStarted = true;
                     d3.event.sourceEvent.stopPropagation();
                     // it's important that we suppress the mouseover event on the node being dragged. 
                     // Otherwise it will absorb the mouseover event and the underlying node will not 
                     // detect it 
                     d3.select(this).attr('pointer-events', 'none');
+                    initiateDrag(d, this);
                 })
                 .on("drag", function(d) {
                     if (d.istopnode || d3.event.sourceEvent.shiftKey === false) {
                         return;
                     }
                     //console.log('dragging');
-                    if (dragStarted) {
-                        dragging = true;
-                        initiateDrag(d, this);
-                    }
+                    dragging = true;
 
                     if (isNaN(d.x)) {
                         d.x = 0;
@@ -246,14 +260,15 @@ define([
                     d.y = mouse_location[0] / 180 * Math.PI;
                     node.attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
                     //updateTempConnector();
+
                 }).on("dragend", function(d) {
                     //console.log('drag end');
                     if (dragging){
-                        if (d3.event.sourceEvent.shiftKey === false || !self.selectedNode || self.selectedNode.property('canDrop') === false) {
+                        if (d3.event.sourceEvent.shiftKey === false || !self.overNode || self.overNode.property('canDrop') === false) {
                             endDrag();
                             return;
                         }else{
-                            self.graphModel.moveNode(draggingNode, 'P1', self.selectedNode.data()[0], function(){
+                            self.graphModel.moveNode(draggingNode, 'P1', self.overNode.data()[0], function(){
                             }, self);
                             endDrag();
                         }

@@ -442,13 +442,17 @@ class Graph(object):
                 ret.append(edge)
         return ret
 
-    def get_valid_domain_connections(self):
+    def get_valid_domain_ontology_classes(self, nodeid=None):
         """
         gets the ontology properties (and related classes) this graph can have with a parent node
 
+        Keyword Arguments:
+        nodeid -- {default=root node id} the id of the node to use as the lookup for valid ontologyclasses
+
         """
-        if self.root.ontologyclass is not None:
-            ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
+        if self.metadata.ontology is not None:
+            source = self.nodes[uuid.UUID(str(nodeid))].ontologyclass if nodeid is not None else self.root.ontologyclass
+            ontology_classes = models.OntologyClass.objects.get(source=source, ontology=self.metadata.ontology)
             return ontology_classes.target['up']
         else:
             return []
@@ -524,7 +528,7 @@ class Graph(object):
         ret['root'] = self.root;
         ret['metadata'] = self.metadata
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
-        ret['domain_connections'] = self.get_valid_domain_connections()
+        ret['domain_connections'] = self.get_valid_domain_ontology_classes()
 
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
