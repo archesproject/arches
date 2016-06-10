@@ -35,7 +35,7 @@ def manager(request, graphid):
         graph = Graph(graphid)
         graph.delete()
         return JSONResponse({'succces':True})
-        
+
     graphs = models.Graph.objects.all()
     if graphid is None or graphid == '':
         return render(request, 'graph-list.htm', {

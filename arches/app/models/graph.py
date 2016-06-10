@@ -354,6 +354,34 @@ class Graph(object):
         self.populate_null_nodegroups()
         return ret
 
+    def toggle_is_collector(self, node):
+        nodes, edges = node.get_child_nodes_and_edges()
+        collectors = [node_ for node_ in nodes if node_.is_collector()]
+        node_ids = [id_node.nodeid for id_node in nodes]
+        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
+        if node.istopnode:
+            parent_group = None
+        else:
+            edge = models.Edge.objects.get(rangenode_id=node.pk)
+            parent_group = edge.domainnode.nodegroup
+
+        if not node.is_collector():
+            new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=node.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
+            new_group.parentnodegroup = parent_group
+            parent_group = new_group
+            self.nodegroups[new_group.pk] = new_group
+        else:
+            new_group = parent_group
+
+        for collector in collectors:
+            collector.nodegroup.parentnodegroup = parent_group
+            self.nodegroups[collector.nodegroup.pk] = collector.nodegroup
+
+        for group_node in group_nodes:
+            group_node.nodegroup = new_group
+            self.nodes[group_node.pk] = group_node
+        node.nodegroup = new_group
+
     def update_node(self, node):
         """
         updates a node in the graph
@@ -364,6 +392,10 @@ class Graph(object):
         """
 
         node['nodeid'] = uuid.UUID(node.get('nodeid'))
+        new_nodegroup_id = node.get('nodegroup_id', None)
+        old_node = self.nodes[node['nodeid']]
+        old_nodegroup_id = unicode(old_node.nodegroup_id) if old_node.nodegroup_id is not None else None
+        node['nodegroup_id'] = old_nodegroup_id
         self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
 
@@ -374,7 +406,9 @@ class Graph(object):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty')
 
-        self.populate_null_nodegroups()
+        if old_nodegroup_id != new_nodegroup_id:
+            self.toggle_is_collector(new_node)
+
         return self
 
     def get_parent_node(self, nodeid):
