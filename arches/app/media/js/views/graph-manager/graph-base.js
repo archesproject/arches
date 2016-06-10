@@ -123,7 +123,7 @@ define([
         renderNodeText: function(){
             var self = this;
             this.node.append("text")
-                .attr("dy", ".31em")
+                .attr("dy", function(d){return d.children ? "-.31em" : ".31em"})
                 .attr("class", 'graph-node-text')
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                 .attr("transform", function(d) { return d.x < 180 ? "translate(" + self.nodeLabelOffset + ")" : "rotate(180)translate(-" + self.nodeLabelOffset + ")"; })
