@@ -355,10 +355,21 @@ class Graph(object):
         return ret
 
     def toggle_is_collector(self, node):
+        """
+        flips the collector state of a passed in node and updates the graph
+        accordingly
+
+        Arguments:
+        node -- the node to whose collector state should be toggled
+
+        """
         nodes, edges = node.get_child_nodes_and_edges()
+        # get the downstream collector nodes
         collectors = [node_ for node_ in nodes if node_.is_collector()]
+        # get the nodes in the current nodegroup
         node_ids = [id_node.nodeid for id_node in nodes]
         group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
+        # get the parent node's nodegroup (none if root)
         if node.istopnode:
             parent_group = None
         else:
@@ -366,20 +377,30 @@ class Graph(object):
             parent_group = edge.domainnode.nodegroup
 
         if not node.is_collector():
+            # if the node is not a collector, we create a new nodegroup
+            # and make it a collector...
             new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=node.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
             new_group.parentnodegroup = parent_group
             parent_group = new_group
+            # update the group on the graph model
             self.nodegroups[new_group.pk] = new_group
         else:
+            # otherwise, we will use the parent node's group for assignment
             new_group = parent_group
 
         for collector in collectors:
+            # update the downstream collector's parentgroup reference
             collector.nodegroup.parentnodegroup = parent_group
+            # update the node on the graph model
             self.nodegroups[collector.nodegroup.pk] = collector.nodegroup
 
         for group_node in group_nodes:
+            # update the group nodes nodegroup reference
             group_node.nodegroup = new_group
+            # update the node on the graph model
             self.nodes[group_node.pk] = group_node
+
+        # assign the new nodegroup to the node
         node.nodegroup = new_group
 
     def update_node(self, node):
