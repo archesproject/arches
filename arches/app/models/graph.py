@@ -71,10 +71,6 @@ class Graph(object):
     @staticmethod
     def new(name="",is_resource=False,author=""):
         newid = uuid.uuid1()
-        group = models.NodeGroup.objects.create(
-            pk=newid,
-            cardinality='n'
-        )
         metadata = models.Graph.objects.create(
             name=name,
             subtitle="",
@@ -93,7 +89,7 @@ class Graph(object):
             istopnode=True,
             ontologyclass=None,
             datatype='semantic',
-            nodegroup=group,
+            nodegroup=None,
             graph=metadata
         )
 
