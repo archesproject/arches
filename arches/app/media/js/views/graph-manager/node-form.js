@@ -73,7 +73,10 @@ define([
                 el: $('#branch-library'),
                 branches: ko.observableArray(_.filter(this.branches, function(branch){return branch.isresource === false})),
                 graphModel: this.graphModel,
-                loading: this.loading
+                loading: this.loading,
+                disableAppendButton: ko.computed(function () {
+                    return self.node() && self.node().dirty();
+                })
             });
 
             this.branchListView.on('close', function(){

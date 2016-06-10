@@ -24,6 +24,7 @@ define([
 
             this.loading = options.loading || ko.observable(false);
             this.failed = options.failed || ko.observable(false);
+            this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
             this.items = options.branches;
