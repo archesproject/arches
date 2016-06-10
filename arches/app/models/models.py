@@ -284,38 +284,6 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
-    def toggle_is_collector(self):
-        nodes, edges = self.get_child_nodes_and_edges()
-        collectors = [node_ for node_ in nodes if node_.is_collector()]
-        node_ids = [id_node.nodeid for id_node in nodes]
-        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
-        if self.istopnode:
-            parent_group = None
-        else:
-            edge = Edge.objects.get(rangenode_id=self.pk)
-            parent_group = edge.domainnode.nodegroup
-
-        updated_models = []
-        if not self.is_collector():
-            new_group, created = NodeGroup.objects.get_or_create(nodegroupid=self.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
-            new_group.parentnodegroup = parent_group
-            parent_group = new_group
-            updated_models.append(new_group)
-        else:
-            new_group = parent_group
-
-        for collector in collectors:
-            collector.nodegroup.parentnodegroup = parent_group
-            updated_models.append(collector.nodegroup)
-
-        for group_node in group_nodes:
-            group_node.nodegroup = new_group
-            updated_models.append(group_node)
-
-        self.nodegroup = new_group
-
-        return updated_models
-
     class Meta:
         managed = True
         db_table = 'nodes'
