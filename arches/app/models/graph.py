@@ -267,7 +267,7 @@ class Graph(object):
             graph = self.metadata
         )
         branch_copy.add_edge(newEdge)
-        
+
         for key, node in branch_copy.nodes.iteritems():
             if self.metadata.ontology_id is None:
                 node.ontologyclass = None
@@ -379,8 +379,7 @@ class Graph(object):
         if not node.is_collector():
             # if the node is not a collector, we create a new nodegroup
             # and make it a collector...
-            new_group, created = models.NodeGroup.objects.get_or_create(nodegroupid=node.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
-            new_group.parentnodegroup = parent_group
+            new_group = models.NodeGroup(nodegroupid=node.pk, cardinality='n', legacygroupid=None, parentnodegroup=parent_group)
             parent_group = new_group
             # update the group on the graph model
             self.nodegroups[new_group.pk] = new_group
