@@ -51,7 +51,8 @@ require([
         graphModel: graphModel,
         nodeSize: 20,
         nodeSizeOver: 20,
-        labelOffset: 10
+        labelOffset: 10,
+        loading: loading
     });
 
     viewModel.nodeForm = new NodeFormView({
