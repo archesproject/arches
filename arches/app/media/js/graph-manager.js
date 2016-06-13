@@ -73,6 +73,10 @@ require([
         graphModel: graphModel
     });
 
+    viewModel.nodeList.on('node-selected', function(node) {
+        viewModel.graphView.zoomTo(node);
+    });
+
     viewModel.permissionsList = new PermissionsListView({
         el: $('#node-permissions')
     });

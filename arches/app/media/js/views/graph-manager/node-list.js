@@ -41,6 +41,7 @@ define([
         */
         selectItem: function(item, evt){
             this.graphModel.selectNode(item);
+            this.trigger('node-selected', item);
         },
 
     });

@@ -51,21 +51,23 @@ define([
                         });
                 })
                 .size([360, this.getsize()])
-                .separation(function(a, b) { 
-                    return (a.parent == b.parent ? 1 : 2) / a.depth;  
+                .separation(function(a, b) {
+                    return (a.parent == b.parent ? 1 : 2) / a.depth;
                 });
 
             this.diagonal = d3.svg.diagonal.radial()
-                .projection(function(d) { 
-                    return [d.y, d.x / 180 * Math.PI];   
+                .projection(function(d) {
+                    return [d.y, d.x / 180 * Math.PI];
+                });
+
+            this.zoom = d3.behavior.zoom().on("zoom", function() {
+                    self.redraw();
                 });
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
                 .attr("height", this.$el.height())
-                .call(d3.behavior.zoom().on("zoom", function() {
-                    self.redraw();
-                }))
+                .call(this.zoom)
                 .append("g")
 
             this.render();
@@ -79,7 +81,7 @@ define([
         render: function () {
             var self = this;
             this.root = undefined;
-            
+
             this.nodes().forEach(function (node) {
                 if (node.istopnode) {
                     this.root = node;
@@ -107,13 +109,13 @@ define([
 
             this.node = this.allNodes.enter().append("g")
                 .attr("class", 'node')
-                .attr("transform", function(d) { 
-                    return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; 
+                .attr("transform", function(d) {
+                    return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
                 });
-                
+
             this.node.append("circle")
                 .attr("r", this.nodeSize)
-            
+
             this.renderNodeText();
         },
 
@@ -155,14 +157,14 @@ define([
         /**
         * Redraw the graph based on the current D3 scale and translate events
         * @memberof GraphBase.prototype
-        * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph, 
+        * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph,
         * used after adding/removing nodes from the graph
         */
         redraw: function (force) {
             var self = this;
             var previousScale = this.currentScale;
             force = force || false;
-            
+
             if (d3.event){
                 this.currentScale = d3.event.scale || this.currentScale;
                 this.currentOffset = d3.event.translate || this.currentOffset;
@@ -196,8 +198,8 @@ define([
                             });
                     })
                     .size([360, this.getsize() * this.currentScale])
-                    .separation(function(a, b) { 
-                        return (a.parent == b.parent ? 1 : 2) / (a.depth);  
+                    .separation(function(a, b) {
+                        return (a.parent == b.parent ? 1 : 2) / (a.depth);
                     });
                 this.render();
             }
@@ -216,12 +218,22 @@ define([
             this.center = [(this.$el.width() / 2), this.$el.height() / 2];
             var xt = this.currentOffset[0] + this.center[0];
             var yt = this.currentOffset[1] + this.center[1];
-            
-            this.svg.attr("transform", 
+
+            this.svg.attr("transform",
                 "translate(" + xt + "," + yt + ")" +
                 " scale(" + this.currentScale + ")");
+        },
+
+        zoomTo: function (node) {
+            var x = -node.y * Math.cos((node.x - 90) / 180 * Math.PI);
+            var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI);
+
+            var trans = this.zoom
+                .translate([x+117, y]);
+            this.svg.transition()
+                .duration(1000)
+                .call(trans.event);
         }
     });
     return GraphBase;
 });
-
