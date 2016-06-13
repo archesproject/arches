@@ -225,8 +225,8 @@ define([
         },
 
         zoomTo: function (node) {
-            var x = -node.y * Math.cos((node.x - 90) / 180 * Math.PI);
-            var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI);
+            var x = -node.y * Math.cos((node.x - 90) / 180 * Math.PI)*this.currentScale;
+            var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI)*this.currentScale;
 
             var trans = this.zoom
                 .translate([x+117, y]);
