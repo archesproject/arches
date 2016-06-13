@@ -19,7 +19,8 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            options = _.defaults(options, {nodeSize: 11, labelOffset: 2});
+            options = _.defaults(options, {nodeSize: 11, labelOffset: 2, loading: ko.observable(false)});
+            this.loading = options.loading;
             this.nodeSize = options.nodeSize;
             this.labelOffset = options.labelOffset;
             this.nodeLabelOffset = this.nodeSize + this.labelOffset;
