@@ -204,9 +204,9 @@ class GraphTests(ArchesTestCase):
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 
-    def test_branch_append(self):
+    def test_branch_append_with_ontology(self):
         """
-        test if a branch is properly appended to a graph
+        test if a branch is properly appended to a graph that defines an ontology
 
         """
 
@@ -231,8 +231,10 @@ class GraphTests(ArchesTestCase):
             self.assertIsNotNone(graph.nodes[edge.rangenode_id])
             self.assertEqual(edge.domainnode, graph.nodes[edge.domainnode.pk])
             self.assertEqual(edge.rangenode, graph.nodes[edge.rangenode.pk])
+            self.assertIsNotNone(edge.ontologyproperty)
 
         for key, node in graph.nodes.iteritems():
+            self.assertIsNotNone(node.ontologyclass)
             if node.istopnode:
                 self.assertEqual(node, self.rootNode)
 
@@ -369,8 +371,7 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph(self.rootNode)
-        graph.metadata.ontology_id = None
-        graph.root.ontologyclass = None
+        graph.clear_ontology_references()
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         for node_id, node in graph.nodes.iteritems():
             self.assertTrue(node.ontologyclass is None)
