@@ -110,7 +110,7 @@
                     {% trans "Root card" %}
                     <!-- /ko -->
                     <!-- ko if: !node().istopnode -->
-                        <span data-bind="text: (node().nodeGroupId() && !node().isCollector()) ? '{% trans "Make sub-card" %}' : '{% trans "Make card" %}'"></span>
+                        <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Make sub-card" %}' : '{% trans "Make card" %}'"></span>
                     <!-- /ko -->
                 </p>
                 <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
