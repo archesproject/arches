@@ -59,6 +59,10 @@ define([
                 }
             });
 
+            window.addEventListener("beforeunload", function (event) {
+                self.viewModel.loading(true);
+            });
+
             Backbone.View.apply(this, arguments);
             return this;
         },

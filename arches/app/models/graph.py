@@ -22,6 +22,7 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 class Graph(object):
     """
@@ -84,7 +85,7 @@ class Graph(object):
         )
         root = models.Node.objects.create(
             pk=newid,
-            name=name,
+            name=_("Top Node"),
             description='',
             istopnode=True,
             ontologyclass=None,
@@ -125,6 +126,8 @@ class Graph(object):
 
         node.graph = self.metadata
 
+        if self.metadata.ontology == None:
+            node.ontologyclass = None
         if node.pk == None:
             node.pk = uuid.uuid1()
         if node.nodegroup != None:
@@ -157,6 +160,8 @@ class Graph(object):
 
         if edge.pk == None:
             edge.pk = uuid.uuid1()
+        if self.metadata.ontology == None:
+            edge.ontologyproperty = None
         self.edges[edge.pk] = edge
         return edge
 
@@ -269,16 +274,30 @@ class Graph(object):
         branch_copy.add_edge(newEdge)
 
         for key, node in branch_copy.nodes.iteritems():
-            if self.metadata.ontology_id is None:
-                node.ontologyclass = None
             self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
-            if self.metadata.ontology_id is None:
-                edge.ontologyproperty = None
             self.add_edge(edge)
 
         self.populate_null_nodegroups()
+
+        if self.metadata.ontology is None:
+            branch_copy.clear_ontology_references()
+
         return branch_copy
+
+    def clear_ontology_references(self):
+        """
+        removes any references to ontolgoy classes and properties in a graph
+
+        """
+
+        for node_id, node in self.nodes.iteritems():
+            node.ontologyclass = None
+
+        for edge_id, edge in self.edges.iteritems():
+            edge.ontologyproperty = None
+
+        self.metadata.ontology = None
 
     def copy(self):
         """

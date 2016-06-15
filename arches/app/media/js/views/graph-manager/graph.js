@@ -226,6 +226,7 @@ define([
                 self.graphModel.selectNode(draggingNode);
                 draggingNode = null;
                 dragging = false;
+                self.loading(false);
             };
 
             // Define the drag listeners for drag/drop behaviour of nodes.
@@ -264,13 +265,13 @@ define([
                 }).on("dragend", function(d) {
                     //console.log('drag end');
                     if (dragging){
+                        self.loading(true);
                         if (d3.event.sourceEvent.shiftKey === false || !self.overNode || self.overNode.property('canDrop') === false) {
                             endDrag();
-                            return;
                         }else{
                             self.graphModel.moveNode(draggingNode, 'P1', self.overNode.data()[0], function(){
+                                endDrag();
                             }, self);
-                            endDrag();
                         }
                     }
                 });

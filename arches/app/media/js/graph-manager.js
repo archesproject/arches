@@ -49,9 +49,10 @@ require([
     viewModel.graphView = new GraphView({
         el: $('#graph'),
         graphModel: graphModel,
-        nodeSize: 20,
+        nodeSize: 15,
         nodeSizeOver: 20,
-        labelOffset: 10
+        labelOffset: 10,
+        loading: loading
     });
 
     viewModel.nodeForm = new NodeFormView({
@@ -70,6 +71,10 @@ require([
     viewModel.nodeList = new NodeListView({
         el: $('#node-listing'),
         graphModel: graphModel
+    });
+
+    viewModel.nodeList.on('node-selected', function(node) {
+        viewModel.graphView.zoomTo(node);
     });
 
     viewModel.permissionsList = new PermissionsListView({

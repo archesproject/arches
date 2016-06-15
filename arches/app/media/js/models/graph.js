@@ -267,7 +267,10 @@ define(['arches',
             var isInParentGroup = false;
             var nodeGroupId = node.nodeGroupId();
             if (nodeGroupId) {
-                var childNodesAndEdges = this.getChildNodesAndEdges(node);
+                var collector = _.find(this.get('nodes')(), function (node) {
+                    return node.nodeid === nodeGroupId;
+                });
+                var childNodesAndEdges = this.getChildNodesAndEdges(collector);
                 var childGroupNode = childNodesAndEdges.nodes.find(function(childNode) {
                     return childNode.nodeGroupId() !== nodeGroupId;
                 });
