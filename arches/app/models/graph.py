@@ -72,6 +72,9 @@ class Graph(object):
     @staticmethod
     def new(name="",is_resource=False,author=""):
         newid = uuid.uuid1()
+        nodegroup = models.NodeGroup.objects.create(
+            pk=newid
+        )
         metadata = models.Graph.objects.create(
             name=name,
             subtitle="",
@@ -90,7 +93,7 @@ class Graph(object):
             istopnode=True,
             ontologyclass=None,
             datatype='semantic',
-            nodegroup=None,
+            nodegroup=nodegroup,
             graph=metadata
         )
 
@@ -118,9 +121,9 @@ class Graph(object):
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 try:
-                    node.nodegroup = models.NodeGroup.objects.get(pk=uuid.UUID(node.nodegroup_id))
+                    node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
                 except models.NodeGroup.DoesNotExist:
-                    node.nodegroup = models.NodeGroup(pk=uuid.UUID(node.nodegroup_id), cardinality='n')
+                    node.nodegroup = models.NodeGroup(pk=node.nodegroup_id, cardinality='n')
             else:
                 node.nodegroup = None
 
@@ -229,21 +232,30 @@ class Graph(object):
         """
 
         tree = self.get_tree()
+        new_nodegroup_set = set()
 
         def traverse_tree(tree, current_nodegroup=None):
-            if tree['node'].nodegroup == None:
-                tree['node'].nodegroup = current_nodegroup
-            else:
-                current_nodegroup = models.NodeGroup(
+            if str(tree['node'].nodeid) == str(tree['node'].nodegroup_id):
+                 current_nodegroup = models.NodeGroup(
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
                 )
+            tree['node'].nodegroup = current_nodegroup
+            new_nodegroup_set.add(str(current_nodegroup.pk))
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
 
-        return traverse_tree(tree)
+        traverse_tree(tree)
+
+        #remove any node groups not referenced by the nodes
+        old_nodegroup_set = set(list(str(key) for key in self.nodegroups.keys()))
+        unused_nodegroup_ids = old_nodegroup_set.difference(new_nodegroup_set)
+        for unused_nodegroup_id in unused_nodegroup_ids:
+            self.nodegroups.pop(uuid.UUID(unused_nodegroup_id))
+
+        return tree
 
     def append_branch(self, property, nodeid=None, graphid=None):
         """
@@ -266,7 +278,7 @@ class Graph(object):
         branch_copy.root.istopnode = False
 
         newEdge = models.Edge(
-            domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
+            domainnode = (self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root),
             rangenode = branch_copy.root,
             ontologyproperty = property,
             graph = self.metadata
@@ -373,69 +385,17 @@ class Graph(object):
         self.populate_null_nodegroups()
         return ret
 
-    def toggle_is_collector(self, node):
-        """
-        flips the collector state of a passed in node and updates the graph
-        accordingly
-
-        Arguments:
-        node -- the node to whose collector state should be toggled
-
-        """
-        nodes, edges = node.get_child_nodes_and_edges()
-        # get the downstream collector nodes
-        collectors = [node_ for node_ in nodes if node_.is_collector()]
-        # get the nodes in the current nodegroup
-        node_ids = [id_node.nodeid for id_node in nodes]
-        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
-        # get the parent node's nodegroup (none if root)
-        if node.istopnode:
-            parent_group = None
-        else:
-            edge = models.Edge.objects.get(rangenode_id=node.pk)
-            parent_group = edge.domainnode.nodegroup
-
-        if not node.is_collector():
-            # if the node is not a collector, we create a new nodegroup
-            # and make it a collector...
-            new_group = models.NodeGroup(nodegroupid=node.pk, cardinality='n', legacygroupid=None, parentnodegroup=parent_group)
-            parent_group = new_group
-            # update the group on the graph model
-            self.nodegroups[new_group.pk] = new_group
-        else:
-            # otherwise, we will use the parent node's group for assignment
-            new_group = parent_group
-
-        for collector in collectors:
-            # update the downstream collector's parentgroup reference
-            collector.nodegroup.parentnodegroup = parent_group
-            # update the node on the graph model
-            self.nodegroups[collector.nodegroup.pk] = collector.nodegroup
-
-        for group_node in group_nodes:
-            # update the group nodes nodegroup reference
-            group_node.nodegroup = new_group
-            # update the node on the graph model
-            self.nodes[group_node.pk] = group_node
-
-        # assign the new nodegroup to the node
-        node.nodegroup = new_group
-
     def update_node(self, node):
         """
         updates a node in the graph
 
         Arguments:
-        node -- the node object to update
+        node -- a python dictionary representing a node object to be used to update the graph
 
         """
 
-        node['nodeid'] = uuid.UUID(node.get('nodeid'))
-        new_nodegroup_id = node.get('nodegroup_id', None)
-        old_node = self.nodes[node['nodeid']]
-        old_nodegroup_id = unicode(old_node.nodegroup_id) if old_node.nodegroup_id is not None else None
-        node['nodegroup_id'] = old_nodegroup_id
-        self.nodes.pop(node['nodeid'], None)
+        node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
+        old_node = self.nodes.pop(node['nodeid'], None)
         new_node = self.add_node(node)
 
         for edge_id, edge in self.edges.iteritems():
@@ -445,8 +405,8 @@ class Graph(object):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty')
 
-        if old_nodegroup_id != new_nodegroup_id:
-            self.toggle_is_collector(new_node)
+        if str(old_node.nodegroup_id) != str(node.get('nodegroup_id', None)):
+            self.populate_null_nodegroups()
 
         return self
 
@@ -465,6 +425,21 @@ class Graph(object):
             if str(edge.rangenode_id) == str(nodeid):
                 return edge.domainnode
         return None
+
+    def get_child_nodes(self, nodeid):
+        """
+        get the child nodes of a node with the given nodeid
+
+        Arguments:
+        nodeid -- the node we want to find the children of
+
+        """
+
+        ret = []
+        for edge in self.get_out_edges(nodeid):
+            ret.append(edge.rangenode)
+            ret.extend(self.get_child_nodes(edge.rangenode.nodeid))
+        return ret
 
     def get_out_edges(self, nodeid):
         """

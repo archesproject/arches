@@ -22,7 +22,7 @@ from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
 from arches.app.models.graph import Graph
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class GraphTests(ArchesTestCase):
@@ -79,13 +79,12 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.metadata.name, name)
         self.assertEqual(graph.metadata.author, author)
         self.assertTrue(graph.metadata.isresource)
-        self.assertFalse(graph.root.is_collector())
+        self.assertTrue(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
 
     def test_graph_doesnt_polute_db(self):
         """
-        test that the mere act of creating a Graph instance
-        doesn't save anything to the database
+        test that the mere act of creating a Graph instance doesn't save anything to the database
 
         """
 
@@ -107,7 +106,7 @@ class GraphTests(ArchesTestCase):
                 "istopnode": True,
                 "ontologyclass": "",
                 "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
-                "nodegroupid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "nodegroup_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
                 "datatype": "semantic",
                 "cardinality": "1"
             },{
@@ -117,7 +116,7 @@ class GraphTests(ArchesTestCase):
                 "istopnode": False,
                 "ontologyclass": "",
                 "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
-                "nodegroupid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "nodegroup_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
                 "datatype": "string",
                 "cardinality": "n"
             }],
@@ -249,6 +248,60 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
 
         self.assertEqual(appended_branch.root.nodegroup,self.rootNode.nodegroup)
+
+    def test_manage_nodegroups_during_node_update(self):
+        """
+        test to make sure that node groups are properly managed when changing a nodegroup value on a node being updated 
+        
+        """
+
+        # create a graph, append the node/node type graph and confirm is has the correct 
+        # number of nodegroups then remove the appended branches group and reconfirm that 
+        # the proper number of groups are properly relfected in the graph
+
+        graph = Graph(self.rootNode)
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        self.assertEqual(len(graph.nodegroups), 2)
+
+        node_to_update = None
+        for node_id, node in graph.nodes.iteritems():
+            if node.name == 'Node':
+                node_to_update = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
+            if node.name == 'Node Type':
+                node_type_node = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
+
+        node_to_update['nodegroup_id'] = None
+        graph.update_node(node_to_update)
+        self.assertEqual(len(graph.nodegroups), 1)
+        for node_id, node in graph.nodes.iteritems():
+            self.assertEqual(graph.root.nodegroup, node.nodegroup)
+
+        graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.NODE_NODETYPE_GRAPHID)
+        self.assertEqual(len(graph.nodegroups), 2)
+
+        for edge_id, edge in graph.edges.iteritems():
+            if str(edge.domainnode_id) == str(node_type_node['nodeid']):
+                child_nodegroup_node = JSONDeserializer().deserialize(JSONSerializer().serialize(edge.rangenode))
+
+        child_nodegroup_node['nodegroup_id'] = None
+        graph.update_node(child_nodegroup_node)
+        self.assertEqual(len(graph.nodegroups), 1)
+        for node_id, node in graph.nodes.iteritems():
+            self.assertEqual(graph.root.nodegroup, node.nodegroup)
+
+        node_to_update['nodegroup_id'] = node_to_update['nodeid']
+        graph.update_node(node_to_update)
+        self.assertEqual(len(graph.nodegroups), 2)
+        children = graph.get_child_nodes(node_to_update['nodeid'])
+        for child in children:
+            self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
+
+        child_nodegroup_node['nodegroup_id'] = child_nodegroup_node['nodeid']
+        graph.update_node(child_nodegroup_node)
+        self.assertEqual(len(graph.nodegroups), 3)
+        children = graph.get_child_nodes(child_nodegroup_node['nodeid'])
+        for child in children:
+            self.assertEqual(child.nodegroup_id, child_nodegroup_node['nodegroup_id'])
 
     def test_move_node(self):
         """
