@@ -113,11 +113,20 @@ define(['arches',
                 });
         },
 
-        appendBranch: function(nodeid, property, branchmetadatid, callback, scope){
+        /**
+         * appendBranch - appends a graph onto a specific node within this graph
+         * @memberof GraphModel.prototype
+         * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
+         * @param  {string} property - the ontology property to use to connect the branch
+         * @param  {string} graphid - the graph id of the branch we're appending to this graph
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         */
+        appendBranch: function(nodeid, property, graphid, callback, scope){
             this._doRequest({
                 type: "POST",
                 url: this.url + 'append_branch/' + this.get('metadata').graphid,
-                data: JSON.stringify({nodeid:nodeid, property: property, graphid: branchmetadatid})
+                data: JSON.stringify({nodeid:nodeid, property: property, graphid: graphid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
@@ -146,7 +155,16 @@ define(['arches',
                 }
             }, scope, 'changed');
         },
-
+        
+        /**
+         * moveNode - moves a node from one part of the graph to another
+         * @memberof GraphModel.prototype
+         * @param  {object} node - the node within this graph that we're moving
+         * @param  {string} property - the ontology property to use to connect the branch
+         * @param  {object} newParentNode - the node to which we moved our branch to
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         */
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
@@ -177,6 +195,13 @@ define(['arches',
             }, scope, 'changed');
         },
 
+        /**
+         * updateNode - updates the values of a node
+         * @memberof GraphModel.prototype
+         * @param  {object} node - the node with updated values
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         */
         updateNode: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
