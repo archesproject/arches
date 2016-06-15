@@ -8,6 +8,13 @@
 @import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
+
+
+.navbar-top-links:last-child>li {
+    border-right: 1px solid rgba(0,0,0,0.07);
+}
+
+
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
     border-bottom: 1px solid #eee;
     background-color: rgba(0, 0, 0, 0.05);
@@ -666,7 +673,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     stroke-width: 1px;
 }
 .node {
-    font-size: 23px;
+    font-size: 17px;
     transition: all .40s ease;
     stroke: #aaa;
     stroke-width: 1px;
@@ -2865,10 +2872,17 @@ ul.jqtree_common li.jqtree-folder {
 .ep-tools {
     width: 100px;
     border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     height: 50px;
     vertical-align: middle;
     display: table-cell;
 }
+
+.ep-tools:hover {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
 .ep-tool-title {
     font-size: 14px;
     font-weight: 600;
@@ -2892,6 +2906,13 @@ ul.jqtree_common li.jqtree-folder {
     color: #666;
     background: #f4f4f4;
 }
+
+.header-tools:hover {
+    cursor: pointer;
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
 .ep-tools-help {
     position: absolute;
     top: 0;
@@ -2946,7 +2967,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-form-content {
     position: absolute;
-    top: 50px;
+    top: 100px;
     left: 0;
     right: 0;
     z-index: 10;
@@ -3440,7 +3461,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .ep-form-alert {
 	position: absolute;
-	top: 50px;
+	top: 100px;
     z-index:1000;
 	width: 100%;
 	height: 0px;
@@ -3504,6 +3525,15 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	position: relative;
     top: 0px;
 }
+
+.page-title-block {
+    height: 80px; 
+    background: #fafafa; 
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #ddd;
+}
+
+
 .switch-section {
     position: relative;
 }

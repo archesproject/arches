@@ -70,7 +70,7 @@ def manager(request, graphid):
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
             'title': _('Node List'),
-            'search_placeholder': _('Find a node in the graph')
+            'search_placeholder': _('Find a node...')
         },
         'permissions_list': {
             'title': _('Permissions'),
