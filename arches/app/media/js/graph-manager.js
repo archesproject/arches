@@ -49,7 +49,7 @@ require([
     viewModel.graphView = new GraphView({
         el: $('#graph'),
         graphModel: graphModel,
-        nodeSize: 20,
+        nodeSize: 15,
         nodeSizeOver: 20,
         labelOffset: 10,
         loading: loading
