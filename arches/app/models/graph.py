@@ -243,15 +243,6 @@ class Graph(object):
             tree['node'].nodegroup = current_nodegroup
             new_nodegroup_set.add(str(current_nodegroup.pk))
 
-
-            # if tree['node'].nodegroup is None:
-            #     tree['node'].nodegroup = current_nodegroup
-            # else:
-            #     current_nodegroup = models.NodeGroup(
-            #         pk=tree['node'].nodegroup_id,
-            #         parentnodegroup=current_nodegroup
-            #     )
-
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
@@ -261,10 +252,6 @@ class Graph(object):
         #remove any node groups not referenced by the nodes
         old_nodegroup_set = set(list(str(key) for key in self.nodegroups.keys()))
         unused_nodegroup_ids = old_nodegroup_set.difference(new_nodegroup_set)
-        # print '--' * 10
-        # print old_nodegroup_set
-        # print new_nodegroup_set
-        # print unused_nodegroup_ids
         for unused_nodegroup_id in unused_nodegroup_ids:
             self.nodegroups.pop(uuid.UUID(unused_nodegroup_id))
 
