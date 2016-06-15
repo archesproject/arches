@@ -49,6 +49,7 @@ define([
                 var hasNonSemanticParentNodes = false;
                 var isInParentGroup = false;
                 var groupHasNonSemanticNodes = false;
+                var hasDownstreamCollector = false;
                 if (node) {
                     isCollector = node.isCollector();
                     isNodeInChildGroup = self.graphModel.isNodeInChildGroup(node);
@@ -62,10 +63,15 @@ define([
                     groupHasNonSemanticNodes = !!_.find(groupNodes, function (node) {
                         return node.datatype !== 'semantic';
                     });
+                    var nodeGroupId = node.nodeGroupId();
+                    hasDownstreamCollector = !!_.find(childNodes, function (node) {
+                        return node.isCollector();
+                    });
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                 }
                 return isResourceTopNode() ||
                     (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
+                    (!isCollector && isInParentGroup && hasDownstreamCollector) ||
                     (isCollector && groupHasNonSemanticNodes && isInParentGroup);
             });
 
