@@ -90,8 +90,6 @@ def settings(request, graphid):
     graph = node.graph
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        if data.get('metadata')['name'] != graph.name:
-            node.name = data.get('metadata')['name']
         for key, value in data.get('metadata').iteritems():
             setattr(graph, key, value)
         graph.save()
