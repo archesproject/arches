@@ -116,7 +116,7 @@ def settings(request, graphid):
             })
     graphs = models.Graph.objects.all()
     ontologies = models.Ontology.objects.filter(parentontology=None)
-    ontology_classes = models.OntologyClass.objects.all()
+    ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
     return render(request, 'graph-settings.htm', {
         'main_script': 'graph-settings',
         'icons': JSONSerializer().serialize(icons),
@@ -192,7 +192,6 @@ def clone(request, graphid):
         graph.root.name = name
         graph.metadata.name = name
 
-        graph.populate_null_nodegroups()
         graph.save()
         return JSONResponse(graph)
 
