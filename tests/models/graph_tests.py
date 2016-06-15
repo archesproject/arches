@@ -79,7 +79,6 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.metadata.name, name)
         self.assertEqual(graph.metadata.author, author)
         self.assertTrue(graph.metadata.isresource)
-        self.assertEqual(graph.root.name, name)
         self.assertTrue(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
 
