@@ -22,6 +22,7 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 class Graph(object):
     """
@@ -84,7 +85,7 @@ class Graph(object):
         )
         root = models.Node.objects.create(
             pk=newid,
-            name=name,
+            name=_("Top Node"),
             description='',
             istopnode=True,
             ontologyclass=None,
@@ -271,7 +272,7 @@ class Graph(object):
             graph = self.metadata
         )
         branch_copy.add_edge(newEdge)
-        
+
         for key, node in branch_copy.nodes.iteritems():
             self.add_node(node)
         for key, edge in branch_copy.edges.iteritems():
@@ -287,7 +288,7 @@ class Graph(object):
     def clear_ontology_references(self):
         """
         removes any references to ontolgoy classes and properties in a graph
-        
+
         """
 
         for node_id, node in self.nodes.iteritems():
