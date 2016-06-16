@@ -5,6 +5,7 @@ define([
     'knockout',
     'arches',
     'viewmodels/alert',
+    'bindings/scrollTo',
     'bootstrap-nifty'
 ], function($, _, Backbone, ko, arches,  AlertViewModel) {
     /**
