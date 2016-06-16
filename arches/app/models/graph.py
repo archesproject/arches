@@ -72,9 +72,11 @@ class Graph(object):
     @staticmethod
     def new(name="",is_resource=False,author=""):
         newid = uuid.uuid1()
-        nodegroup = models.NodeGroup.objects.create(
-            pk=newid
-        )
+        nodegroup = None
+        if not is_resource:
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
         metadata = models.Graph.objects.create(
             name=name,
             subtitle="",

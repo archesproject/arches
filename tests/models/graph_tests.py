@@ -75,10 +75,16 @@ class GraphTests(ArchesTestCase):
         name = "TEST NEW GRAPH"
         author = "ARCHES TEST"
         graph = Graph.new(name=name,is_resource=True,author=author)
-
         self.assertEqual(graph.metadata.name, name)
         self.assertEqual(graph.metadata.author, author)
         self.assertTrue(graph.metadata.isresource)
+        self.assertFalse(graph.root.is_collector())
+        self.assertEqual(len(graph.nodes), 1)
+
+        graph = Graph.new(name=name,is_resource=False,author=author)
+        self.assertEqual(graph.metadata.name, name)
+        self.assertEqual(graph.metadata.author, author)
+        self.assertFalse(graph.metadata.isresource)
         self.assertTrue(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
 
