@@ -244,7 +244,7 @@ define(['arches',
         },
 
         /**
-         * isType - is this graph contain a card, a collection of cards, or no cards
+         * isType - does this graph contain a card, a collection of cards, or no cards
          * @memberof GraphModel.prototype
          * @return  {string} - either 'card', 'card_collector', or 'undefined'
          */
