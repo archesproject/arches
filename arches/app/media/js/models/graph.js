@@ -243,6 +243,30 @@ define(['arches',
             }, this);
         },
 
+        /**
+         * isType - is this graph contain a card, a collection of cards, or no cards
+         * @memberof GraphModel.prototype
+         * @return  {string} - either 'card', 'card_collector', or 'undefined'
+         */
+        isType: function(){
+            var nodegroups = [];
+            this.get('nodes')().forEach(function (node) {
+                if(node.isCollector()){
+                    nodegroups.push(node);
+                }
+            });
+            switch(nodegroups.length) {
+                case 0:
+                    return 'undefined';
+                    break;
+                case 1:
+                    return 'card'
+                    break;
+                default:
+                    return 'card_collector'
+            }
+        },
+
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};

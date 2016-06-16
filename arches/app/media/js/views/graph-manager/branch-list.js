@@ -45,7 +45,8 @@ define([
                         this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
                     }
                     _.each(this.items(), function(branch){
-                        if (branch.graph.ontology){
+                        branch.filtered(false);
+                        if(branch.graph.ontology){
                             branch.filtered(true);
                             var found = _.find(branch.graph.domain_connections, function(domain_connection){
                                 return _.find(domain_connection.ontology_classes, function(ontology_class){
@@ -55,8 +56,11 @@ define([
                             if(found){
                                 branch.filtered(false);
                             }
-                        } else {
-                            branch.filtered(false);
+                        }
+                        if(this.graphModel.get('metadata').isresource){
+                            if(branch.graphModel.isType() === 'undefined'){
+                                branch.filtered(true);
+                            }
                         }
                     }, this);
                 }
