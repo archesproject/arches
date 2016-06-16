@@ -36,7 +36,8 @@ class GraphManagerViewTests(ArchesTestCase):
         cls.HERITAGE_RESOURCE_PLACE_ID = '9b35fd39-6668-4b44-80fb-d50d0e5211a2'
         cls.ARCHES_CONFIG_ID = '20000000-0000-0000-0000-000000000000'
         cls.NODE_COUNT = 111
-        cls.PLACE_NODE_COUNT = 17
+        cls.PLACE_NODE_COUNT = 1
+        cls.PLACE_BRANCH_COUNT = 17
         cls.client = Client()
 
     @classmethod
@@ -146,7 +147,8 @@ class GraphManagerViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize(node)
         response = self.client.delete(url, post_data)
         self.assertEqual(response.status_code, 200)
-        new_count = self.NODE_COUNT-self.PLACE_NODE_COUNT
+        new_count = self.NODE_COUNT-self.PLACE_BRANCH_COUNT
+
         root = Node.objects.get(nodeid=self.ROOT_ID)
 
         nodes, edges = root.get_child_nodes_and_edges()
