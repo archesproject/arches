@@ -4763,7 +4763,7 @@
             "istopnode": false,
             "ontologyclass": "E12_Production",
             "nodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
-            "nodegroup_id": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
+            "nodegroup_id": null,
             "datatype": "semantic",
             "cardinality": "1"
         },
@@ -4799,7 +4799,7 @@
             "istopnode": false,
             "ontologyclass": "E49_Time_Appellation",
             "nodeid": "aecb48b7-73ba-4171-936b-ee749709d5e5",
-            "nodegroup_id": null,
+            "nodegroup_id": "891d06ab-202a-42f6-945f-ff0670cbcccc",
             "datatype": "date",
             "cardinality": ""
         },
@@ -4811,7 +4811,7 @@
             "istopnode": false,
             "ontologyclass": "E49_Time_Appellation",
             "nodeid": "bc1a350d-0c7d-448c-8d67-270029777669",
-            "nodegroup_id": null,
+            "nodegroup_id": "891d06ab-202a-42f6-945f-ff0670cbcccc",
             "datatype": "date",
             "cardinality": ""
         },
@@ -4823,7 +4823,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "612d3407-e679-486b-a119-a9d87558aef8",
-            "nodegroup_id": null,
+            "nodegroup_id": "612d3407-e679-486b-a119-a9d87558aef8",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4835,7 +4835,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "74f6b547-a3cd-4c9b-a470-7f8880212612",
-            "nodegroup_id": null,
+            "nodegroup_id": "612d3407-e679-486b-a119-a9d87558aef8",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4847,7 +4847,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "d6d6e299-a42d-4424-9069-af2e5a647907",
-            "nodegroup_id": null,
+            "nodegroup_id": "d6d6e299-a42d-4424-9069-af2e5a647907",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4859,7 +4859,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "ff142283-70e6-4202-84f7-ec5d47ac43e1",
-            "nodegroup_id": null,
+            "nodegroup_id": "d6d6e299-a42d-4424-9069-af2e5a647907",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4871,7 +4871,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
-            "nodegroup_id": null,
+            "nodegroup_id": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4883,7 +4883,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "60b8fcc5-9be5-403f-95de-b721c26f5de6",
-            "nodegroup_id": null,
+            "nodegroup_id": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4895,7 +4895,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "8b1dc471-bf24-421c-a02e-a830bd2158de",
-            "nodegroup_id": null,
+            "nodegroup_id": "8b1dc471-bf24-421c-a02e-a830bd2158de",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4907,7 +4907,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "175c1de9-25a1-4948-bd05-701ad3bc1dbf",
-            "nodegroup_id": null,
+            "nodegroup_id": "8b1dc471-bf24-421c-a02e-a830bd2158de",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4919,7 +4919,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
-            "nodegroup_id": null,
+            "nodegroup_id": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4931,7 +4931,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "b732d9d2-de7a-45d4-9fbc-2368a5a21b90",
-            "nodegroup_id": null,
+            "nodegroup_id": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4955,7 +4955,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
-            "nodegroup_id": null,
+            "nodegroup_id": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4967,7 +4967,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "b8cfc362-ae59-4344-8377-8e745ed30eb0",
-            "nodegroup_id": null,
+            "nodegroup_id": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
             "datatype": "string",
             "cardinality": ""
         },
@@ -4979,7 +4979,7 @@
             "istopnode": false,
             "ontologyclass": "E57_Material",
             "nodeid": "9505a004-f327-471b-ace3-f549f895a6e6",
-            "nodegroup_id": null,
+            "nodegroup_id": "9505a004-f327-471b-ace3-f549f895a6e6",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -4991,7 +4991,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "7bd3f3ee-945a-4217-baef-5bfd49ee9cb3",
-            "nodegroup_id": null,
+            "nodegroup_id": "9505a004-f327-471b-ace3-f549f895a6e6",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5003,7 +5003,7 @@
             "istopnode": false,
             "ontologyclass": "E12_Production",
             "nodeid": "1a113bf2-e066-41f3-a670-8f44995ac849",
-            "nodegroup_id": null,
+            "nodegroup_id": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "datatype": "semantic",
             "cardinality": ""
         },
@@ -5015,7 +5015,7 @@
             "istopnode": false,
             "ontologyclass": "E29_Design_or_Procedure",
             "nodeid": "179c4a57-0547-425c-bf54-f5d92f4db89e",
-            "nodegroup_id": null,
+            "nodegroup_id": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "datatype": "semantic",
             "cardinality": ""
         },
@@ -5027,7 +5027,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
-            "nodegroup_id": null,
+            "nodegroup_id": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5039,7 +5039,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "692c3a1c-3172-4ea9-b55b-7f385442af5b",
-            "nodegroup_id": null,
+            "nodegroup_id": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5423,7 +5423,7 @@
             "istopnode": false,
             "ontologyclass": "E47_Spatial_Coordinates",
             "nodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
-            "nodegroup_id": null,
+            "nodegroup_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
             "datatype": "geometry",
             "cardinality": ""
         },
@@ -5435,7 +5435,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
-            "nodegroup_id": null,
+            "nodegroup_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5447,7 +5447,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "8c1423c7-73c3-4e86-a5d6-d4f9affe9462",
-            "nodegroup_id": null,
+            "nodegroup_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5459,7 +5459,7 @@
             "istopnode": false,
             "ontologyclass": "E45_Address",
             "nodeid": "d72362cb-3c6d-450f-9da8-3bb894073333",
-            "nodegroup_id": null,
+            "nodegroup_id": "d72362cb-3c6d-450f-9da8-3bb894073333",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5471,7 +5471,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
-            "nodegroup_id": null,
+            "nodegroup_id": "d72362cb-3c6d-450f-9da8-3bb894073333",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5483,7 +5483,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "b66d8f0c-746b-4856-abd7-e812feef9b68",
-            "nodegroup_id": null,
+            "nodegroup_id": "d72362cb-3c6d-450f-9da8-3bb894073333",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5495,7 +5495,7 @@
             "istopnode": false,
             "ontologyclass": "E48_Place_Name",
             "nodeid": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
-            "nodegroup_id": null,
+            "nodegroup_id": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5507,7 +5507,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
-            "nodegroup_id": null,
+            "nodegroup_id": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5519,7 +5519,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "3d6c2c79-ed19-4cc6-bd95-bf5f47f149a5",
-            "nodegroup_id": null,
+            "nodegroup_id": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5531,7 +5531,7 @@
             "istopnode": false,
             "ontologyclass": "E53_Place",
             "nodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
-            "nodegroup_id": null,
+            "nodegroup_id": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "datatype": "semantic",
             "cardinality": "n"
         },
@@ -5543,7 +5543,7 @@
             "istopnode": false,
             "ontologyclass": "E62_String",
             "nodeid": "78814316-478f-4ff8-835c-316a2cc48090",
-            "nodegroup_id": null,
+            "nodegroup_id": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5555,7 +5555,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
-            "nodegroup_id": null,
+            "nodegroup_id": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5567,7 +5567,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "f1f672c0-5c48-459a-80fe-4dd7265d25e8",
-            "nodegroup_id": null,
+            "nodegroup_id": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5579,7 +5579,7 @@
             "istopnode": false,
             "ontologyclass": "E53_Place",
             "nodeid": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
-            "nodegroup_id": null,
+            "nodegroup_id": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
             "datatype": "semantic",
             "cardinality": ""
         },
@@ -5591,7 +5591,7 @@
             "istopnode": false,
             "ontologyclass": "E53_Place",
             "nodeid": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
-            "nodegroup_id": null,
+            "nodegroup_id": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
             "datatype": "semantic",
             "cardinality": ""
         },
@@ -5603,7 +5603,7 @@
             "istopnode": false,
             "ontologyclass": "E44_Place_Appellation",
             "nodeid": "61d11030-0d24-47ab-ba10-fb029b4ce18a",
-            "nodegroup_id": null,
+            "nodegroup_id": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5675,7 +5675,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "d2788b73-9485-462a-abcb-79f8afdb511d",
-            "nodegroup_id": null,
+            "nodegroup_id": "d2788b73-9485-462a-abcb-79f8afdb511d",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5687,7 +5687,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "37193249-2da8-4f2a-b97c-c445c1f60a19",
-            "nodegroup_id": null,
+            "nodegroup_id": "d2788b73-9485-462a-abcb-79f8afdb511d",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5699,7 +5699,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "17beaae7-5635-4073-86ca-0fc00877d9a6",
-            "nodegroup_id": null,
+            "nodegroup_id": "17beaae7-5635-4073-86ca-0fc00877d9a6",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5711,7 +5711,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "931e7ae5-695b-44f2-8f84-fb9dac806903",
-            "nodegroup_id": null,
+            "nodegroup_id": "17beaae7-5635-4073-86ca-0fc00877d9a6",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5723,7 +5723,7 @@
             "istopnode": false,
             "ontologyclass": "E62_String",
             "nodeid": "45ce0539-6c17-4b16-a1fa-809aae4a84be",
-            "nodegroup_id": null,
+            "nodegroup_id": "45ce0539-6c17-4b16-a1fa-809aae4a84be",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5735,7 +5735,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "10988901-c874-4bcd-a86f-e8dde8841341",
-            "nodegroup_id": null,
+            "nodegroup_id": "10988901-c874-4bcd-a86f-e8dde8841341",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5747,7 +5747,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "9a38c9da-8237-466d-8b11-edf3d540255d",
-            "nodegroup_id": null,
+            "nodegroup_id": "10988901-c874-4bcd-a86f-e8dde8841341",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5759,7 +5759,7 @@
             "istopnode": false,
             "ontologyclass": "E55_Type",
             "nodeid": "1f99e703-5adc-4145-9df8-cc523311d9d3",
-            "nodegroup_id": null,
+            "nodegroup_id": "1f99e703-5adc-4145-9df8-cc523311d9d3",
             "datatype": "domain",
             "cardinality": ""
         },
@@ -5771,7 +5771,7 @@
             "istopnode": false,
             "ontologyclass": "E32_Authority_Document",
             "nodeid": "483825b8-7f69-44dd-9576-a23c2d34fb2b",
-            "nodegroup_id": null,
+            "nodegroup_id": "1f99e703-5adc-4145-9df8-cc523311d9d3",
             "datatype": "string",
             "cardinality": ""
         },
@@ -5795,7 +5795,7 @@
             "istopnode": false,
             "ontologyclass": "E49_Time_Appellation",
             "nodeid": "2d5eb21d-2cf1-4f39-9b39-ac7099a49d73",
-            "nodegroup_id": null,
+            "nodegroup_id": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
             "datatype": "date",
             "cardinality": ""
         },
@@ -5807,7 +5807,7 @@
             "istopnode": false,
             "ontologyclass": "E49_Time_Appellation",
             "nodeid": "5c92ae97-fb6f-460d-b5d7-281420e0d882",
-            "nodegroup_id": null,
+            "nodegroup_id": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
             "datatype": "date",
             "cardinality": ""
         },
@@ -5819,7 +5819,7 @@
             "istopnode": false,
             "ontologyclass": "E49_Time_Appellation",
             "nodeid": "b00fb3e9-cc1b-4d8e-ac26-f9efc5742415",
-            "nodegroup_id": null,
+            "nodegroup_id": "b00fb3e9-cc1b-4d8e-ac26-f9efc5742415",
             "datatype": "date",
             "cardinality": ""
         },

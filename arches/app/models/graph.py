@@ -51,6 +51,8 @@ class Graph(object):
                     self.add_edge(edge)
 
                 self.populate_null_nodegroups()
+                self.populate_parent_nodegroups()
+
 
             else:
                 if (isinstance(args[0], basestring) or
@@ -120,6 +122,7 @@ class Graph(object):
             node.validations.set(nodeobj.get('validations', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
+                node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 try:
                     node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
                 except models.NodeGroup.DoesNotExist:
@@ -135,6 +138,9 @@ class Graph(object):
             node.pk = uuid.uuid1()
         if node.nodegroup != None:
             self.nodegroups[node.nodegroup.pk] = node.nodegroup
+            if hasattr(node, 'cardinality'):
+                if node.cardinality != None:
+                    self.nodegroups[node.nodegroup.pk].cardinality = node.cardinality
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
@@ -173,6 +179,9 @@ class Graph(object):
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
+
+
+        self.validate()
 
         with transaction.atomic():
             self.metadata.save()
@@ -253,9 +262,21 @@ class Graph(object):
         old_nodegroup_set = set(list(str(key) for key in self.nodegroups.keys()))
         unused_nodegroup_ids = old_nodegroup_set.difference(new_nodegroup_set)
         for unused_nodegroup_id in unused_nodegroup_ids:
-            self.nodegroups.pop(uuid.UUID(unused_nodegroup_id))
+            self.nodegroups.pop(uuid.UUID(str(unused_nodegroup_id)))
 
         return tree
+
+    def populate_parent_nodegroups(self):
+        """
+        populates the parent node group of a node group
+
+        """
+
+        for node_id, node in self.nodes.iteritems():
+            if str(node_id) == str(node.nodegroup_id) and node.istopnode == False:
+                parent_node = self.get_parent_node(node.nodeid)
+                self.nodegroups[uuid.UUID(str(node_id))].parentnodegroup = parent_node.nodegroup
+
 
     def append_branch(self, property, nodeid=None, graphid=None):
         """
@@ -557,3 +578,67 @@ class Graph(object):
             ret['nodes'].append(nodeobj)
 
         return ret
+
+
+    def validate(self):
+
+        # validates that the top node of a resource graph is semantic
+
+        if self.metadata.isresource == True:
+            for node_id, node in self.nodes.iteritems():
+                if node.graph_id == self.metadata.graphid and node.istopnode == True:
+                    if node.datatype != 'semantic':
+                        raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
+                        ###copout
+                    if node.nodegroup == None:
+                        raise ValidationError("The top node of your resource graph should be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.")
+
+
+        
+        # validates that a node group that has child node groups is not itself a child node group
+        # 20160609 can't implement this without changing our default resource graph --REA
+        
+        # parentnodegroups = []
+        # for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+        #     if nodegroup.parentnodegroup:
+        #         parentnodegroups.append(nodegroup)
+
+        # for parent in parentnodegroups:
+        #     for child in parentnodegroups:
+        #         if parent.parentnodegroup_id == child.nodegroupid:
+        #             raise ValidationError("A parent node group cannot be a child of another node group.")
+
+
+
+        # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
+
+        for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+            if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
+                for node_id, node in self.nodes.iteritems():
+                    if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
+                        raise ValidationError("A parent node group must only contain semantic nodes.")
+
+                # find all nodes that have the same parentnode groupid and confirm they are all semantic
+
+
+        # # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
+
+        if self.metadata.ontology is not None:
+            ontology_classes = []
+            for ontology in self.metadata.ontology.ontologyclasses.all():
+                ontology_classes.append(ontology.source)
+
+            for node_id, node in self.nodes.iteritems():
+                if node.ontologyclass not in ontology_classes:
+                    raise ValidationError("{0} is not a valid {1} ontology class".format(node.ontologyclass, self.metadata.ontology.ontologyid))
+        else:
+            for node_id, node in self.nodes.iteritems():
+                if node.ontologyclass is not None:
+                    raise ValidationError("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph.")       
+
+
+class ValidationError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
