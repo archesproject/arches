@@ -99,6 +99,7 @@
 
         <hr class="section-division-dark node-section-division">
 
+        <!-- ko if: node() && !isResourceTopNode() -->
         <div class="node-section switch-section" data-bind="css: {'disabled': disableIsCollector()}">
 
             <div style="padding-bottom: 15px;">
@@ -125,6 +126,8 @@
             </div>
 
         </div>
+        <!-- /ko -->
+
         <!-- /ko -->
     </div>
 

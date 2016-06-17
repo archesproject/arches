@@ -30,7 +30,7 @@ define([
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
-            var isResourceTopNode = ko.computed(function() {
+            this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
                 return self.graphModel.get('metadata').isresource && node && node.istopnode;
             });
@@ -40,7 +40,7 @@ define([
                 if (node) {
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                 }
-                return isResourceTopNode() || isInParentGroup;
+                return self.isResourceTopNode() || isInParentGroup;
             });
             this.disableIsCollector = ko.computed(function () {
                 var node = self.node();
@@ -69,7 +69,7 @@ define([
                     });
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                 }
-                return isResourceTopNode() ||
+                return self.isResourceTopNode() ||
                     (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
                     (!isCollector && isInParentGroup && hasDownstreamCollector) ||
                     (isCollector && groupHasNonSemanticNodes && isInParentGroup);
