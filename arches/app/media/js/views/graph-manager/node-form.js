@@ -73,7 +73,7 @@ define([
                     (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
                     (!isCollector && isInParentGroup && hasDownstreamCollector) ||
                     (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
-                    (self.graphModel.get('nodes').length < 1 && node.istopnode);
+                    (self.graphModel.get('nodes').length < 1 && node && node.istopnode);
             });
 
             this.branchListView = new BranchListView({
