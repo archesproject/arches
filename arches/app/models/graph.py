@@ -74,9 +74,11 @@ class Graph(object):
     @staticmethod
     def new(name="",is_resource=False,author=""):
         newid = uuid.uuid1()
-        nodegroup = models.NodeGroup.objects.create(
-            pk=newid
-        )
+        nodegroup = None
+        if not is_resource:
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
         metadata = models.Graph.objects.create(
             name=name,
             subtitle="",
@@ -250,7 +252,8 @@ class Graph(object):
                     parentnodegroup=current_nodegroup
                 )
             tree['node'].nodegroup = current_nodegroup
-            new_nodegroup_set.add(str(current_nodegroup.pk))
+            if current_nodegroup is not None:
+                new_nodegroup_set.add(str(current_nodegroup.pk))
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
@@ -590,8 +593,8 @@ class Graph(object):
                     if node.datatype != 'semantic':
                         raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
                         ###copout
-                    if node.nodegroup == None:
-                        raise ValidationError("The top node of your resource graph should be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.")
+                    if node.nodegroup != None:
+                        raise ValidationError("The top node of your resource graph can't be a collector. Hint: check that nodegroup_id of your resource node(s) are null.")
 
 
         
