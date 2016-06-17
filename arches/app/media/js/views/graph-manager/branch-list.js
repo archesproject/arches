@@ -20,6 +20,7 @@ define([
         * @param {boolean} options.branches - an observableArray of branches
         */
         initialize: function(options) {
+            var self = this;
             ListView.prototype.initialize.apply(this, arguments);
 
             this.loading = options.loading || ko.observable(false);
@@ -36,14 +37,18 @@ define([
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
 
-            var nodelistener = function(node){
+            var valueListener = ko.computed(function() {
+                var node = self.selectedNode;
+                if(!!node()){
+                    var oc = node().ontologyclass();
+                    var datatype = node().datatype();
+                    return true;
+                }
+                return false;
+            });
+
+            var updateList = function(){
                 if(this.selectedNode()){
-                    if (typeof node !== 'string'){
-                        if(this.alreadysubscribed){
-                            this.alreadysubscribed.dispose();
-                        }
-                        this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
-                    }
                     _.each(this.items(), function(branch){
                         branch.filtered(true);
                         if(this.graphModel.canAppend(branch.graphModel)){
@@ -52,8 +57,8 @@ define([
                     }, this);
                 }
             }
-            this.selectedNode.subscribe(nodelistener, this);
-            nodelistener.call(this, this.selectedNode());
+            valueListener.subscribe(updateList, this);
+            updateList.call(this);
         },
 
         /**
