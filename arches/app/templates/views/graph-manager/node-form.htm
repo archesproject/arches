@@ -107,12 +107,7 @@
                 <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector()}, click: toggleIsCollector"><small></small></span>
 
                 <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
-                    <!-- ko if: node().istopnode -->
-                    {% trans "Root card" %}
-                    <!-- /ko -->
-                    <!-- ko if: !node().istopnode -->
-                        <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Make sub-card" %}' : '{% trans "Make card" %}'"></span>
-                    <!-- /ko -->
+                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Make sub-card" %}' : '{% trans "Make card" %}'"></span>
                 </p>
                 <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
                     <!-- ko if: node().istopnode -->
