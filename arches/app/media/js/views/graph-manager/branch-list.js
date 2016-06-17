@@ -60,10 +60,12 @@ define([
                         }
                         if(!branch.filtered()){
                             if(this.graphModel.get('metadata').isresource){
-                               if(this.selectedNode() !== this.graphModel.get('root') && this.selectedNode().nodeGroupId()){
-                                    //if(branchType === 'undefined'){
+                                if(this.selectedNode() !== this.graphModel.get('root')){
+                                    branch.filtered(true);
+                                }else{
+                                    if(branchType === 'undefined'){
                                         branch.filtered(true);
-                                    //}
+                                    }
                                 }
                             }else{
                                 switch(this.graphModel.isType()) {
