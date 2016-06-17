@@ -58,10 +58,10 @@ define([
                     childNodes.push(node);
                     var parentGroupNodes = _.difference(groupNodes, childNodes);
                     hasNonSemanticParentNodes = !!_.find(parentGroupNodes, function (node) {
-                        return node.datatype !== 'semantic';
+                        return node.datatype() !== 'semantic';
                     });
                     groupHasNonSemanticNodes = !!_.find(groupNodes, function (node) {
-                        return node.datatype !== 'semantic';
+                        return node.datatype() !== 'semantic';
                     });
                     var nodeGroupId = node.nodeGroupId();
                     hasDownstreamCollector = !!_.find(childNodes, function (node) {
@@ -72,7 +72,8 @@ define([
                 return self.isResourceTopNode() ||
                     (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
                     (!isCollector && isInParentGroup && hasDownstreamCollector) ||
-                    (isCollector && groupHasNonSemanticNodes && isInParentGroup);
+                    (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
+                    (self.graphModel.get('nodes').length < 1 && node.istopnode);
             });
 
             this.branchListView = new BranchListView({

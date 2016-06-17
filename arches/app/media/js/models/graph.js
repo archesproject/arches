@@ -155,7 +155,7 @@ define(['arches',
                 }
             }, scope, 'changed');
         },
-        
+
         /**
          * moveNode - moves a node from one part of the graph to another
          * @memberof GraphModel.prototype
@@ -325,7 +325,7 @@ define(['arches',
                 return [node];
             }
             return _.filter(this.get('nodes')(), function(node) {
-                return node.nodeGroupId && node.nodeGroupId === nodeGroupId;
+                return node.nodeGroupId() && node.nodeGroupId() === nodeGroupId;
             })
         },
 
