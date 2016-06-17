@@ -278,7 +278,7 @@ define(['arches',
             nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
             var typeOfGraphToAppend = graphToAppend.isType();
 
-            if(graphToAppend.get('metadata').ontology_id !== ''){
+            if(!!this.get('metadata').ontology_id && !!graphToAppend.get('metadata').ontology_id){
                 var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
                     return !!_.find(domain_connection.ontology_classes, function(ontology_class){
                         return ontology_class === nodeToAppendTo.ontologyclass();
@@ -419,7 +419,7 @@ define(['arches',
          */
         isGroupSemantic: function(node){
             return _.every(this.getGroupedNodes(node), function(node){
-                return node.datatype === 'semantic';
+                return node.datatype() === 'semantic';
             }, this)
         },
 
