@@ -4715,7 +4715,7 @@
             "isactive": false,
             "ontologyclass": "E18_Physical_Thing",
             "nodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
-            "nodegroup_id": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "nodegroup_id": "",
             "datatype": "semantic",
             "cardinality": "1"
         },

@@ -42,10 +42,6 @@ class GraphTests(ArchesTestCase):
 
     def setUp(self):
         newid = uuid.uuid1()
-        newgroup = models.NodeGroup.objects.create(
-            pk=newid,
-            cardinality='1'
-        )
         metadata = models.Graph.objects.create(
             name="TEST GRAPH",
             subtitle="ARCHES TEST GRAPH",
@@ -64,7 +60,7 @@ class GraphTests(ArchesTestCase):
             istopnode=True,
             ontologyclass='E1_CRM_Entity',
             datatype='semantic',
-            nodegroup=newgroup,
+            nodegroup=None,
             graph=metadata
         )
 
@@ -112,7 +108,7 @@ class GraphTests(ArchesTestCase):
                 "istopnode": True,
                 "ontologyclass": "",
                 "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
-                "nodegroup_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "nodegroup_id": "",
                 "datatype": "semantic",
                 "cardinality": "1"
             },{
@@ -122,7 +118,7 @@ class GraphTests(ArchesTestCase):
                 "istopnode": False,
                 "ontologyclass": "",
                 "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
-                "nodegroup_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
                 "datatype": "string",
                 "cardinality": "n"
             }],
@@ -224,7 +220,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.nodes), 3)
         self.assertEqual(len(graph.edges), 2)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.nodegroups), 1)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
@@ -247,7 +243,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.nodegroups), 1)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
@@ -267,7 +263,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph(self.rootNode)
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.nodegroups), 1)
 
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
@@ -278,12 +274,12 @@ class GraphTests(ArchesTestCase):
 
         node_to_update['nodegroup_id'] = None
         graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.nodegroups), 0)
         for node_id, node in graph.nodes.iteritems():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
         graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.nodegroups), 1)
 
         for edge_id, edge in graph.edges.iteritems():
             if str(edge.domainnode_id) == str(node_type_node['nodeid']):
@@ -291,20 +287,20 @@ class GraphTests(ArchesTestCase):
 
         child_nodegroup_node['nodegroup_id'] = None
         graph.update_node(child_nodegroup_node)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.nodegroups), 0)
         for node_id, node in graph.nodes.iteritems():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
         node_to_update['nodegroup_id'] = node_to_update['nodeid']
         graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.nodegroups), 1)
         children = graph.get_child_nodes(node_to_update['nodeid'])
         for child in children:
             self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
 
         child_nodegroup_node['nodegroup_id'] = child_nodegroup_node['nodeid']
         graph.update_node(child_nodegroup_node)
-        self.assertEqual(len(graph.nodegroups), 3)
+        self.assertEqual(len(graph.nodegroups), 2)
         children = graph.get_child_nodes(child_nodegroup_node['nodeid'])
         for child in children:
             self.assertEqual(child.nodegroup_id, child_nodegroup_node['nodegroup_id'])
