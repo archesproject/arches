@@ -243,7 +243,8 @@ class Graph(object):
                     parentnodegroup=current_nodegroup
                 )
             tree['node'].nodegroup = current_nodegroup
-            new_nodegroup_set.add(str(current_nodegroup.pk))
+            if current_nodegroup is not None:
+                new_nodegroup_set.add(str(current_nodegroup.pk))
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
