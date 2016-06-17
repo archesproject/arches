@@ -45,54 +45,9 @@ define([
                         this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
                     }
                     _.each(this.items(), function(branch){
-                        var branchType = branch.graphModel.isType();
-                        branch.filtered(false);
-                        if(branch.graph.ontology){
-                            branch.filtered(true);
-                            var found = _.find(branch.graph.domain_connections, function(domain_connection){
-                                return _.find(domain_connection.ontology_classes, function(ontology_class){
-                                    return ontology_class === this.selectedNode().ontologyclass();
-                                }, this)
-                            }, this);
-                            if(found){
-                                branch.filtered(false);
-                            }
-                        }
-                        if(!branch.filtered()){
-                            if(this.graphModel.get('metadata').isresource){
-                                if(this.selectedNode() !== this.graphModel.get('root')){
-                                    branch.filtered(true);
-                                }else{
-                                    if(branchType === 'undefined'){
-                                        branch.filtered(true);
-                                    }
-                                }
-                            }else{
-                                switch(this.graphModel.isType()) {
-                                    case 'undefined':
-                                        if(branchType === 'undefined'){
-                                            branch.filtered(true);
-                                        }
-                                        break;
-                                    case 'card':
-                                        if(branchType === 'card_collector'){
-                                            branch.filtered(true);
-                                        }
-                                        break;
-                                    case 'card_collector':
-                                        if(branchType === 'card_collector'){
-                                            branch.filtered(true);
-                                            break;
-                                        }
-                                        if(this.graphModel.isNodeInChildGroup(this.selectedNode())){
-                                            if(branchType === 'card' || branchType === 'card_collector'){
-                                                branch.filtered(true);
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
+                        branch.filtered(true);
+                        if(this.graphModel.canAppend(branch.graphModel)){
+                            branch.filtered(false);
                         }
                     }, this);
                 }

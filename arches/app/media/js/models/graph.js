@@ -267,17 +267,85 @@ define(['arches',
             }
         },
 
+        /**
+         * canAppend - does this graph contain a card, a collection of cards, or no cards
+         * @memberof GraphModel.prototype
+         * @param  {object} graphToAppend - the {@link GraphModel} to test appending on to this graph
+         * @param  {object} nodeToAppendTo - the node from which to append the graph, defaults to the graphs selected node
+         * @return  {boolean} - true if the graph can be appended, false otherwise
+         */
+        canAppend: function(graphToAppend, nodeToAppendTo){
+            nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
+            var typeOfGraphToAppend = graphToAppend.isType();
+
+            if(graphToAppend.get('metadata').ontology_id !== ''){
+                var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
+                    return !!_.find(domain_connection.ontology_classes, function(ontology_class){
+                        return ontology_class === nodeToAppendTo.ontologyclass();
+                    }, this)
+                }, this);
+                if(!found){
+                    return false;
+                }
+            }
+            
+            if(this.get('metadata').isresource){
+                if(nodeToAppendTo !== this.get('root')){
+                    return false;
+                }else{
+                    if(typeOfGraphToAppend === 'undefined'){
+                        return false;
+                    }
+                }
+            }else{ // this graph is a Graph
+                switch(this.isType()) {
+                    case 'undefined':
+                        if(typeOfGraphToAppend === 'undefined'){
+                            return false;
+                        }
+                        break;
+                    case 'card':
+                        if(typeOfGraphToAppend === 'card'){
+                            if(nodeToAppendTo === this.get('root')){
+                                if(!(this.isGroupSemantic(nodeToAppendTo))){
+                                    return false;
+                                }
+                            }else{
+                                return false;
+                            }
+                        }
+                        else if(typeOfGraphToAppend === 'card_collector'){
+                            return false;
+                        }
+                        break;
+                    case 'card_collector':
+                        if(typeOfGraphToAppend === 'card_collector'){
+                            return false;
+                        }
+                        if(this.isNodeInChildGroup(nodeToAppendTo)){
+                            if(typeOfGraphToAppend === 'card'){
+                                return false;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            return true;
+        },
+
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
 
-            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[]}, attributes);
+            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[], domain_connections:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype.iconclass;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
+            this.set('domain_connections', attributes.data.domain_connections);
             this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('metadata', attributes.data.metadata);
 
@@ -343,13 +411,25 @@ define(['arches',
             return hasParentGroup;
         },
 
+        /**
+         * isGroupSemantic - test to see if all the nodes in a group are semantic
+         * @memberof GraphModel.prototype
+         * @param  {object} node - the node to use as a basis of finding the group
+         * @return  {boolean} - true if the group contains only semantic nodes, otherwise false
+         */
+        isGroupSemantic: function(node){
+            return _.every(this.getGroupedNodes(node), function(node){
+                return node.datatype === 'semantic';
+            }, this)
+        },
+
         getGroupedNodes: function (node) {
             var nodeGroupId = node.nodeGroupId();
             if (!nodeGroupId) {
                 return [node];
             }
             return _.filter(this.get('nodes')(), function(node) {
-                return node.nodeGroupId && node.nodeGroupId === nodeGroupId;
+                return node.nodeGroupId() && node.nodeGroupId() === nodeGroupId;
             })
         },
 
