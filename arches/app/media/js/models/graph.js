@@ -141,12 +141,14 @@ define(['arches',
                         self.get('edges').push(edge);
                     }, this);
 
-                    self.get('nodes')().forEach(function (node) {
-                        node.selected(false);
-                        if (node.nodeid === branchroot.nodeid){
-                            node.selected(true);
-                        }
-                    });
+                    if(!self.get('metadata').isresource){
+                        self.get('nodes')().forEach(function (node) {
+                            node.selected(false);
+                            if (node.nodeid === branchroot.nodeid){
+                                node.selected(true);
+                            }
+                        });
+                    }
                 }
 
                 if (typeof callback === 'function') {
