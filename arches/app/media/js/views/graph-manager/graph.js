@@ -1,9 +1,10 @@
 define([
     'backbone',
     'views/graph-manager/graph-base',
+    'models/graph',
     'knockout',
     'd3'
-], function(Backbone, GraphBase, ko, d3) {
+], function(Backbone, GraphBase, GraphModel, ko, d3) {
     var GraphView = GraphBase.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -160,6 +161,31 @@ define([
                 }
             };
 
+            var testCanAppend = function(d, node, allowed_target_ontologies){
+                var data = self.graphModel.getChildNodesAndEdges(d);
+                data.nodes.push(d);
+                data.nodes = _.map(data.nodes, function(node){
+                    return node.toJSON();
+                });
+
+                data.metadata = {
+                    ontology_id: self.graphModel.get('metadata').ontology_id
+                }
+                data.domain_connections = [{
+                    ontology_classes: allowed_target_ontologies
+                }]
+
+                var draggedGraph = new GraphModel({
+                    data: data
+                });
+   
+                if(self.graphModel.canAppend(draggedGraph, node)){
+                    return true;
+                }
+
+                return false;
+            }
+
             var initiateDrag = function(d, draggedNodeElement) {
                 var nodes = self.tree.nodes(d);
                 draggingNode = d;
@@ -172,9 +198,7 @@ define([
                     allowed_target_ontologies = _.uniq(allowed_target_ontologies);
                     self.allNodes.property('canDrop', false);
                     nodes = self.allNodes.filter(function(node){
-                        return _.find(allowed_target_ontologies, function(ontologyclass){
-                            return ontologyclass === node.ontologyclass();
-                        })
+                        return testCanAppend(d, node, allowed_target_ontologies);
                     }, self);
                     nodes[0].forEach(function(node){
                         var d3node = d3.select(node);
@@ -184,6 +208,8 @@ define([
                         }
                     }, this);
                 });
+
+                
 
                 // remove the text of the dragged node
                 draggedNodeElement.nextSibling.remove();
