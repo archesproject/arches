@@ -21,7 +21,7 @@ from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models import models
-from arches.app.models.graph import Graph
+from arches.app.models.graph import Graph, ValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -49,7 +49,7 @@ class GraphTests(ArchesTestCase):
             description="ARCHES TEST GRAPH",
             ontology_id="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             version="v1.0.0",
-            isresource=True,
+            isresource=False,
             isactive=False,
             iconclass="fa fa-building"
         )
@@ -250,6 +250,69 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
 
         self.assertEqual(appended_branch.root.nodegroup,self.rootNode.nodegroup)
+
+    def test_rules_for_appending(self):
+        """
+        test the rules that control the appending of branches to graphs
+
+        """
+
+        graph = Graph(self.rootNode)
+        graph.metadata.isresource = True
+        self.assertIsNotNone(graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID))
+
+        # try to append to any other node that is not the root
+        for node in graph.nodes.itervalues():
+            if node is not graph.root:
+                with self.assertRaises(ValidationError): 
+                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+
+        # try to append a non-grouped graph
+        with self.assertRaises(ValidationError): 
+            graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+
+
+        graph = Graph(self.SINGLE_NODE_GRAPHID)
+        # test that we can't append a single non-grouped node to a graph that is a single non grouped node
+        with self.assertRaises(ValidationError):
+            graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+
+        graph = Graph.new()
+        graph.root.datatype = 'string'
+        graph.update_node(JSONSerializer().serializeToPython(graph.root))
+
+        # test that we can't append a card to a graph that is a card that at it's root is not semantic
+        with self.assertRaises(ValidationError):
+            graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        # test that we can't append a card as a child to another card
+        graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        for node in graph.nodes.itervalues():
+            if node != graph.root:
+                with self.assertRaises(ValidationError):
+                    graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
+
+
+        # create card collector graph to use for appending on to other graphs
+        collector_graph = Graph.new()
+        collector_graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        collector_graph.save()
+
+        # test that we can't append a card collector on to a graph that is a card
+        graph = Graph.new()
+        with self.assertRaises(ValidationError):
+            graph.append_branch('P1_is_identified_by', graphid=collector_graph.metadata.graphid)
+
+        # test that we can't append a card collector to another card collector
+        collector_copy = collector_graph.copy()
+        with self.assertRaises(ValidationError):
+            collector_copy.append_branch('P1_is_identified_by', graphid=collector_graph.metadata.graphid)
+
+        # test that we can't append a card to a node in a child card within a card collector
+        for node in collector_graph.nodes.itervalues():
+            if node != collector_graph.root:
+                with self.assertRaises(ValidationError):
+                    collector_graph.append_branch('P1_is_identified_by', graphid=graph.metadata.graphid, nodeid=node.nodeid)
 
     def test_manage_nodegroups_during_node_update(self):
         """

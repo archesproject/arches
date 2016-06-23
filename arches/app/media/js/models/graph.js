@@ -286,7 +286,7 @@ define(['arches',
         },
 
         /**
-         * canAppend - does this graph contain a card, a collection of cards, or no cards
+         * canAppend - test to see whether or not a graph can be appened to this graph at a specific location
          * @memberof GraphModel.prototype
          * @param  {object} graphToAppend - the {@link GraphModel} to test appending on to this graph
          * @param  {NodeModel} nodeToAppendTo - the node from which to append the graph, defaults to the graphs selected node
