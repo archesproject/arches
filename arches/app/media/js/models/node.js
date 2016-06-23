@@ -34,7 +34,7 @@ define([
             self.validations = ko.observableArray();
             self.ontologyclass = ko.observable('');
             self.parentproperty = ko.observable('');
-            self.ontology_cache = ko.observableArray();
+            self.ontology_cache = ko.observableArray().extend({ deferred: true });
 
             self.parse(options.source);
 

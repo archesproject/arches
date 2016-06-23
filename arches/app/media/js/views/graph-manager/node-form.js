@@ -30,7 +30,7 @@ define([
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
-            var isResourceTopNode = ko.computed(function() {
+            this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
                 return self.graphModel.get('metadata').isresource && node && node.istopnode;
             });
@@ -40,7 +40,7 @@ define([
                 if (node) {
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                 }
-                return isResourceTopNode() || isInParentGroup;
+                return self.isResourceTopNode() || isInParentGroup;
             });
             this.disableIsCollector = ko.computed(function () {
                 var node = self.node();
@@ -58,10 +58,10 @@ define([
                     childNodes.push(node);
                     var parentGroupNodes = _.difference(groupNodes, childNodes);
                     hasNonSemanticParentNodes = !!_.find(parentGroupNodes, function (node) {
-                        return node.datatype !== 'semantic';
+                        return node.datatype() !== 'semantic';
                     });
                     groupHasNonSemanticNodes = !!_.find(groupNodes, function (node) {
-                        return node.datatype !== 'semantic';
+                        return node.datatype() !== 'semantic';
                     });
                     var nodeGroupId = node.nodeGroupId();
                     hasDownstreamCollector = !!_.find(childNodes, function (node) {
@@ -69,10 +69,11 @@ define([
                     });
                     isInParentGroup = self.graphModel.isNodeInParentGroup(node);
                 }
-                return isResourceTopNode() ||
+                return self.isResourceTopNode() ||
                     (!isCollector && (isNodeInChildGroup || hasNonSemanticParentNodes)) ||
                     (!isCollector && isInParentGroup && hasDownstreamCollector) ||
-                    (isCollector && groupHasNonSemanticNodes && isInParentGroup);
+                    (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
+                    (self.graphModel.get('nodes').length < 1 && node && node.istopnode);
             });
 
             this.branchListView = new BranchListView({

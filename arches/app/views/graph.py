@@ -55,7 +55,6 @@ def manager(request, graphid):
        try:
            rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
            metadata_record['graph'] = Graph(rootnode)
-           metadata_record['relates_via'] = ['P1', 'P2', 'P3']
            branches.append(metadata_record)
        except models.Node.DoesNotExist:
            pass

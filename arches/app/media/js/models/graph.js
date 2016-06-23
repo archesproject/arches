@@ -23,7 +23,7 @@ define(['arches',
         /**
         * Flags the passed in node as selected
         * @memberof GraphModel.prototype
-        * @param {object} node - the node to be selected
+        * @param {NodeModel} node - the node to be selected
         */
         selectNode: function(node){
             this.trigger('select-node', node);
@@ -43,7 +43,7 @@ define(['arches',
         /**
          * deleteNode - deletes the passed in node from the db and updates the graph
          * @memberof GraphModel.prototype
-         * @param  {object} node - the node to be deleted
+         * @param  {NodeModel} node - the node to be deleted
          * @param  {function} callback - (optional) a callback function
          * @param  {object} scope - (optional) the scope used for the callback
          */
@@ -99,7 +99,7 @@ define(['arches',
         /**
          * getParentNode - gets the parent node of the passed in node
          * @memberof GraphModel.prototype
-         * @param  {object} node - the node whose parent should be retrieved
+         * @param  {NodeModel} node - the node whose parent should be retrieved
          * @return {object} the parent node of the passed in node
          */
         getParentNode: function(node) {
@@ -141,12 +141,14 @@ define(['arches',
                         self.get('edges').push(edge);
                     }, this);
 
-                    self.get('nodes')().forEach(function (node) {
-                        node.selected(false);
-                        if (node.nodeid === branchroot.nodeid){
-                            node.selected(true);
-                        }
-                    });
+                    if(!self.get('metadata').isresource){
+                        self.get('nodes')().forEach(function (node) {
+                            node.selected(false);
+                            if (node.nodeid === branchroot.nodeid){
+                                node.selected(true);
+                            }
+                        });
+                    }
                 }
 
                 if (typeof callback === 'function') {
@@ -155,13 +157,13 @@ define(['arches',
                 }
             }, scope, 'changed');
         },
-        
+
         /**
          * moveNode - moves a node from one part of the graph to another
          * @memberof GraphModel.prototype
-         * @param  {object} node - the node within this graph that we're moving
+         * @param  {NodeModel} node - the node within this graph that we're moving
          * @param  {string} property - the ontology property to use to connect the branch
-         * @param  {object} newParentNode - the node to which we moved our branch to
+         * @param  {NodeModel} newParentNode - the node to which we moved our branch to
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
          */
@@ -198,7 +200,7 @@ define(['arches',
         /**
          * updateNode - updates the values of a node
          * @memberof GraphModel.prototype
-         * @param  {object} node - the node with updated values
+         * @param  {NodeModel} node - the node with updated values
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
          */
@@ -223,6 +225,14 @@ define(['arches',
             }, scope, 'changed');
         },
 
+        /**
+         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node 
+         * referenced by it's id could be based on the location of the node in the graph
+         * @memberof GraphModel.prototype
+         * @param  {string} nodeid - the node id of the node of interest
+         * @param  {function} callback - function to call when the request returns
+         * @param  {object} scope - (optional) the scope used for the callback
+         */
         getValidNodesEdges: function(nodeid, callback, scope){
             this._doRequest({
                 type: "POST",
@@ -233,6 +243,14 @@ define(['arches',
             }, this);
         },
 
+        /**
+         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node 
+         * referenced by it's id could use to be appened to other nodes
+         * @memberof GraphModel.prototype
+         * @param  {string} nodeid - the node id of the node of interest
+         * @param  {function} callback - function to call when the request returns
+         * @param  {object} scope - (optional) the scope used for the callback
+         */
         getValidDomainClasses: function(nodeid, callback, scope){
             this._doRequest({
                 type: "POST",
@@ -243,17 +261,114 @@ define(['arches',
             }, this);
         },
 
+        /**
+         * isType - does this graph contain a card, a collection of cards, or no cards
+         * @memberof GraphModel.prototype
+         * @return  {string} - either 'card', 'card_collector', or 'undefined'
+         */
+        isType: function(){
+            var nodegroups = [];
+            this.get('nodes')().forEach(function (node) {
+                if(node.isCollector()){
+                    nodegroups.push(node);
+                }
+            });
+            switch(nodegroups.length) {
+                case 0:
+                    return 'undefined';
+                    break;
+                case 1:
+                    return 'card'
+                    break;
+                default:
+                    return 'card_collector'
+            }
+        },
+
+        /**
+         * canAppend - test to see whether or not a graph can be appened to this graph at a specific location
+         * @memberof GraphModel.prototype
+         * @param  {object} graphToAppend - the {@link GraphModel} to test appending on to this graph
+         * @param  {NodeModel} nodeToAppendTo - the node from which to append the graph, defaults to the graphs selected node
+         * @return  {boolean} - true if the graph can be appended, false otherwise
+         */
+        canAppend: function(graphToAppend, nodeToAppendTo){
+            nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
+            var typeOfGraphToAppend = graphToAppend.isType();
+
+            if(!!this.get('metadata').ontology_id && !!graphToAppend.get('metadata').ontology_id){
+                var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
+                    return !!_.find(domain_connection.ontology_classes, function(ontology_class){
+                        return ontology_class === nodeToAppendTo.ontologyclass();
+                    }, this)
+                }, this);
+                if(!found){
+                    return false;
+                }
+            }
+            
+            if(this.get('metadata').isresource){
+                if(nodeToAppendTo !== this.get('root')){
+                    return false;
+                }else{
+                    if(typeOfGraphToAppend === 'undefined'){
+                        return false;
+                    }
+                }
+            }else{ // this graph is a Graph
+                switch(this.isType()) {
+                    case 'undefined':
+                        if(typeOfGraphToAppend === 'undefined'){
+                            return false;
+                        }
+                        break;
+                    case 'card':
+                        if(typeOfGraphToAppend === 'card'){
+                            if(nodeToAppendTo === this.get('root')){
+                                if(!(this.isGroupSemantic(nodeToAppendTo))){
+                                    return false;
+                                }
+                            }else{
+                                return false;
+                            }
+                        }
+                        else if(typeOfGraphToAppend === 'card_collector'){
+                            return false;
+                        }
+                        break;
+                    case 'card_collector':
+                        if(typeOfGraphToAppend === 'card_collector'){
+                            return false;
+                        }
+                        if(this.isNodeInChildGroup(nodeToAppendTo)){
+                            if(typeOfGraphToAppend === 'card'){
+                                return false;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            return true;
+        },
+
+        /**
+         * parse - parses the passed in attributes into a {@link GraphModel}
+         * @memberof GraphModel.prototype
+         * @param  {object} attributes - the properties to seed a {@link GraphModel} with
+         */
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
 
-            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[]}, attributes);
+            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[], domain_connections:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype.iconclass;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
+            this.set('domain_connections', attributes.data.domain_connections);
             this.set('edges', ko.observableArray(attributes.data.edges));
             this.set('metadata', attributes.data.metadata);
 
@@ -278,16 +393,12 @@ define(['arches',
             }));
         },
 
-        getParentProperty: function(node){
-            var ret;
-            this.get('edges')().forEach(function (edge) {
-                if (edge.rangenode_id === node.nodeid){
-                    ret = edge.ontologyproperty;
-                }
-            }, this);
-            return ret;
-        },
-
+        /**
+         * isNodeInParentGroup - test to see if the node is in a group that is not a child to another group
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node to test
+         * @return {Boolean} true if the node is in a parent group, false otherwise
+         */
         isNodeInParentGroup: function (node) {
             var isInParentGroup = false;
             var nodeGroupId = node.nodeGroupId();
@@ -306,6 +417,12 @@ define(['arches',
             return isInParentGroup;
         },
 
+        /**
+         * isNodeInChildGroup - test to see if the node is in a group that is a child to another group
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node to test
+         * @return {Boolean} true if the node is in a child group, false otherwise
+         */
         isNodeInChildGroup: function (node) {
             var nodeGroupId = node.nodeGroupId()
             if (!nodeGroupId) {
@@ -319,16 +436,40 @@ define(['arches',
             return hasParentGroup;
         },
 
+        /**
+         * isGroupSemantic - test to see if all the nodes in a group are semantic
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node to use as a basis of finding the group
+         * @return  {boolean} - true if the group contains only semantic nodes, otherwise false
+         */
+        isGroupSemantic: function(node){
+            return _.every(this.getGroupedNodes(node), function(node){
+                return node.datatype() === 'semantic';
+            }, this)
+        },
+
+        /**
+         * getGroupedNodes - given a node, get any other nodes that share the same group
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node to use as a basis of finding the group
+         * @return  {array} - a list of {@link NodeModel}
+         */
         getGroupedNodes: function (node) {
             var nodeGroupId = node.nodeGroupId();
             if (!nodeGroupId) {
                 return [node];
             }
             return _.filter(this.get('nodes')(), function(node) {
-                return node.nodeGroupId && node.nodeGroupId === nodeGroupId;
+                return node.nodeGroupId() && node.nodeGroupId() === nodeGroupId;
             })
         },
 
+        /**
+         * getParentNodesAndEdges - given a node, get all the parent nodes edges
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node from which to get the node's parents
+         * @return  {object} - an object with a list of {@link NodeModel} and edges
+         */
         getParentNodesAndEdges: function (node) {
             var self = this;
             var nodes = [];
@@ -353,6 +494,12 @@ define(['arches',
             }
         },
 
+        /**
+         * getChildNodesAndEdges - given a node, get all the child nodes edges
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node from which to get the node's children
+         * @return  {object} - an object with a list of {@link NodeModel} and edges
+         */
         getChildNodesAndEdges: function (node) {
             var self = this;
             var nodes = [];
@@ -376,6 +523,14 @@ define(['arches',
             }
         },
 
+        /**
+         * _doRequest - a wrapper around a simple ajax call
+         * @memberof GraphModel.prototype
+         * @param  {object} config - a config object to pass to the ajax request
+         * @param  {function} callback - function to call when the request returns
+         * @param  {object} scope - (optional) the scope used for the callback
+         * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
+         */
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
             if (! scope){
