@@ -194,6 +194,9 @@ input[type="checkbox"] {
     font-size: 1px;
     margin-bottom: 25px;
 }
+.scroll-y-hidden {
+    overflow-y: hidden;
+}
 .tab-base .nav-tabs>li:not(.active)>a:hover {
     border-top: 1px solid #eee;
     border-right: 1px solid #eee;
@@ -2829,7 +2832,6 @@ ul.jqtree_common li.jqtree-folder {
     padding: 7px 12px;
 }
 .ep-toolbar {
-    position: fixed;
     width: 100%;
     height: 50px;
     background: #fff;
@@ -2944,8 +2946,6 @@ ul.jqtree_common li.jqtree-folder {
     transition: all .25s ease;
 }
 .ep-form-toolbar {
-    position: fixed;
-    top: 50px;
     width: 100%;
     height: 50px;
     background: #f8f8f8;
@@ -2962,23 +2962,20 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-form-toolbar-tools {
     position: absolute;
-    top: 9px;
+    top: 61px;
     right: 10px;
 }
 .ep-form-content {
-    position: absolute;
-    top: 100px;
-    left: 0;
-    right: 0;
     z-index: 10;
+    padding: 12px;
     transition: all .30s ease;
 }
 .alert-active .ep-form-content {
     top: 140px;
 }
 .ep-card-search {
-    position: absolute;
-    top: 1px;
+    position: relative;
+    top: -28px;
     left: 125px;
     width: 400px;
     height: 40px;
@@ -3111,7 +3108,7 @@ li.card-tree-list:last-of-type {
 }
 .crud-menu {
     position: absolute;
-    top: 90px;
+    top: -10px;
     left: 0;
     bottom: 0;
     border: 1px solid #ddd;

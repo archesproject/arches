@@ -131,6 +131,18 @@ def settings(request, graphid):
     })
 
 @group_required('edit')
+def cards(request, graphid):
+    node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+    graph = node.graph
+    graphs = models.Graph.objects.all()
+    return render(request, 'graph-cards.htm', {
+        'main_script': 'graph-cards',
+        'graphid': graphid,
+        'graphs': JSONSerializer().serialize(graphs),
+        'metadata': graph,
+    })
+
+@group_required('edit')
 def node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
