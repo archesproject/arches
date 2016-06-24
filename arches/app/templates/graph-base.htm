@@ -160,9 +160,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-form-toolbar">
         <div>
             <h4 class="ep-form-toolbar-title">
-            {% block graph_header %}
-            {% endblock graph_header %}
+            {% block graph_header_title %}
+            {% endblock graph_header_title %}
             </h4>
+        </div>
+
+        <div>
+            {% block graph_header_tools %}
+            {% endblock graph_header_tools %}
         </div>
 
         <!-- Tools -->
@@ -192,7 +197,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
         <!-- /ko -->
     </div>
-    
+
     <!-- Edit Content -->
     <div class="relative ep-content">
         <div id="" class="edit-content relative" style="top: 0px;" data-bind="css: {'alert-active': (alert() && alert().active())}">

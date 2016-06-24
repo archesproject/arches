@@ -2608,6 +2608,11 @@ textarea:placeholder {
     float: left;
     margin: 3px;
 }
+.card-grid{
+    -webkit-flex: 1;
+    flex: 1;
+    margin: 5px
+}
 .card-grid-item {
     float: left;
     width: 250px;
@@ -2946,24 +2951,25 @@ ul.jqtree_common li.jqtree-folder {
     transition: all .25s ease;
 }
 .ep-form-toolbar {
+    display: flex;
+    align-items: center;
     width: 100%;
     height: 50px;
     background: #f8f8f8;
     border-bottom: 1px solid #e9e9e9;
     z-index: 3000;
 }
+.ep-form-toolbar div:nth-last-child(2){
+    margin-right: auto;
+}
 .ep-form-toolbar-title {
     font-size: 14px;
     font-weight: 400;
-    margin-top: 2px;
-    margin-bottom: 5px;
     color: #666;
-    padding: 14px 0 5px 20px;
+    padding-left: 20px;
 }
 .ep-form-toolbar-tools {
-    position: absolute;
-    top: 61px;
-    right: 10px;
+    margin-right: 10px;
 }
 .ep-form-content {
     z-index: 10;
@@ -2974,11 +2980,7 @@ ul.jqtree_common li.jqtree-folder {
     top: 140px;
 }
 .ep-card-search {
-    position: relative;
-    top: -28px;
-    left: 125px;
     width: 400px;
-    height: 40px;
     padding: 5px 15px;
 }
 .card-search-widget-icon {
@@ -3107,10 +3109,8 @@ li.card-tree-list:last-of-type {
     border-bottom-width: 0;
 }
 .crud-menu {
-    position: absolute;
-    top: -10px;
-    left: 0;
-    bottom: 0;
+    overflow-x: hidden;
+    height: 100vh;
     border: 1px solid #ddd;
     border-top-width: 0;
 }
@@ -3146,7 +3146,6 @@ li.card-tree-list:last-of-type {
 }
 .ep-menu-list-title {
     border-right: 1px solid #ddd;
-    margin-top: 10px;
 }
 .edit-menu-item-right {
     height: 60px;
@@ -3216,15 +3215,20 @@ li.card-tree-list:last-of-type {
     float: right;
 }
 .new-card-indent {
-    left: 280px;
+    width: 100%;
     transition: all .30s ease;
 }
+.card-library {
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+}
 .hide-card-library {
-    left: -280px;
+    width: 0px;
     transition: all .30s ease;
 }
 .show-card-library {
-    left: 0;
+    width: 282px;
     transition: all .30s ease;
 }
 .data-widget-container {
