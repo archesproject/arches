@@ -194,6 +194,10 @@ input[type="checkbox"] {
     font-size: 1px;
     margin-bottom: 25px;
 }
+.scroll-y {
+    height: 100vh;
+    overflow-y: scroll;
+}
 .scroll-y-hidden {
     overflow-y: hidden;
 }
@@ -3448,6 +3452,14 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .cd-light div div .node-title, .cd-light div div .card-manager-title {
     color: #37495b;
 }
+
+.ep-form-alert-wrapper{
+    position: absolute;
+    top: 0px;
+    z-index: 1200;
+    padding-right: 50px;
+    width: 100%;
+}
 .ep-form-alert {
 	position: absolute;
 	top: 100px;
@@ -3510,8 +3522,8 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 	bottom: 10px;
 	right: 25px;
 }
-.graph-list-header .ep-form-alert {
-	position: relative;
+.graph-list-header .ep-form-alert{
+    position: relative;
     top: 0px;
 }
 
