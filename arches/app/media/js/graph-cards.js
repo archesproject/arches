@@ -20,8 +20,14 @@ require([
     viewModel.cardLibraryStatus = ko.pureComputed(function() {
         return this.showCardLibrary() ? 'show-card-library' : 'hide-card-library';
     }, viewModel);
+    viewModel.appliedGraphs = ko.observableArray();
+    viewModel.availableGraphs = ko.observableArray();
+    data.graphs.forEach(function(graph){
+        if(graph.isactive && !graph.isresource){
+            viewModel.availableGraphs.push(graph);
+        }
+    })
     var pageView = new PageView({
-        viewModel: viewModel,
-        graphs: data.graphs
+        viewModel: viewModel
     });
 });

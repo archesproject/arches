@@ -64,23 +64,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                <ul class="list-group ep-menu-list data-widget-library menu-title-shim">
                     <!-- Menu Item -->
                     <li id="" class="resource-selector">
-                        <select id="" class="resources" style="display: none;" data-placeholder="Find a data type..." tabindex="-1">
-                            <option value="r1">Locations</option>
-                            <option value="r2">Addresses</option>
-                            <option value="r3">Condition Assessement</option>
-                            <option value="r4">Evaluation</option>
-                            <option value="r5">Measurements</option>
-                            <option value="r6">Descriptions</option>
-                        </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Locations</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div><ul class="chosen-results"></ul></div></div>                   
+                        <select class="design" data-bind="options: availableGraphs, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Choose a card" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </li>
 
                     <!-- Data Widget Library -->
                     <li class="data-widget-container">
                         <!-- Isotope Layout -->
-                        <div id="report-image-grid" class="report-image-grid" data-bind="foreach: graphs">
+                        <div id="report-image-grid" class="report-image-grid" data-bind="foreach: availableGraphs">
                             
                             <!-- card -->
-                            <!-- ko if: (isactive && !isresource) -->
                             <div class="data-widget-grid-item relative" style="">
                                 <div class="panel mar-no">
 
@@ -108,7 +100,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     </div>
                                 </div>
                             </div>
-                            <!-- /ko -->
 
                         </div>
                     
