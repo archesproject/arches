@@ -108,3 +108,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <input id="graphs" name="graphs" type="hidden" value="{{graphs}}"/>
 {% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('view-data', [], function () {
+    return {
+        graphs: {{graphs}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
