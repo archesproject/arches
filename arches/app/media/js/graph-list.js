@@ -39,11 +39,6 @@ require([
     */
     graphs().forEach(function(graph) {
         graph.hover = ko.observable(false);
-        graph.open = function(page) {
-            page = page || '';
-            pageView.viewModel.loading(true);
-            window.location = graph.graphid + page;
-        };
         graph.clone = function() {
             newGraph('clone/' + graph.graphid);
         };
