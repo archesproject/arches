@@ -5,10 +5,11 @@ require([
     'views/page-view',
     'viewmodels/alert',
     'arches',
+    'view-data',
     'bootstrap-nifty',
     'bindings/hover'
-], function($, _, ko, PageView, AlertViewModel, arches) {
-    var graphs = ko.observableArray(JSON.parse($('#graphs').val()));
+], function($, _, ko, PageView, AlertViewModel, arches, data) {
+    var graphs = ko.observableArray(data.graphs);
 
     /**
     * creates a request to add a new graph; redirects to the graph settings
