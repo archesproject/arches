@@ -132,14 +132,14 @@ def settings(request, graphid):
 
 @group_required('edit')
 def card_manager(request, graphid):
-    node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-    graph = node.graph
+    graph = Graph(graphid)
+    graph.include_cards = True
     graphs = models.Graph.objects.all()
     return render(request, 'views/graph/card-manager.htm', {
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
-        'graphs': JSONSerializer().serialize(graphs),
-        'metadata': graph,
+        'graph': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(graphs)
     })
 
 @group_required('edit')

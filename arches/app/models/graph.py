@@ -36,6 +36,7 @@ class Graph(object):
         self.edges = {}
         self.nodegroups = {}
         self.metadata = {}
+        self.include_cards = False
 
         if args:
             if isinstance(args[0], dict):
@@ -737,6 +738,18 @@ class Graph(object):
 
         return ret
 
+    def get_cards(self):
+        """
+        get the card data (if any) associated with this graph
+
+        """
+
+        cards = []
+        for nodegroup in self.nodegroups.itervalues():
+            cards.extend(nodegroup.card_set.all())
+
+        return cards
+
     def serialize(self):
         """
         serialize to a different form then used by the internal class structure
@@ -751,6 +764,9 @@ class Graph(object):
         ret['metadata'] = self.metadata
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
+
+        if self.include_cards:
+            ret['cards'] = self.get_cards()
 
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
