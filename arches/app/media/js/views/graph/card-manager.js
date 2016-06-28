@@ -3,7 +3,7 @@ require([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'views/graph-page-view',
+    'views/graph/graph-page-view',
     'graph-cards-data'
 ], function($, _, ko, koMapping, PageView, data) {
 

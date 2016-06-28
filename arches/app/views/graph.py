@@ -59,8 +59,8 @@ def manager(request, graphid):
        except models.Node.DoesNotExist:
            pass
     datatypes = models.DDataType.objects.all()
-    return render(request, 'graph-manager.htm', {
-        'main_script': 'graph-manager',
+    return render(request, 'views/graph/graph-manager.htm', {
+        'main_script': 'views/graph/graph-manager',
         'graphid': graphid,
         'graphs': JSONSerializer().serialize(graphs),
         'graph': JSONSerializer().serialize(graph),
