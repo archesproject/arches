@@ -131,7 +131,7 @@ def settings(request, graphid):
     })
 
 @group_required('edit')
-def cards(request, graphid):
+def card_manager(request, graphid):
     node = models.Node.objects.get(graph_id=graphid, istopnode=True)
     graph = node.graph
     graphs = models.Graph.objects.all()
