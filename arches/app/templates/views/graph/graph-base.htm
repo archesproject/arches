@@ -79,7 +79,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="settings-manager" class="edit-menu-item {% if main_script == "graph-settings" %} selected{% endif %}">
+                    <li id="settings-manager" class="edit-menu-item {% if main_script == "views/graph/graph-settings" %} selected{% endif %}">
 
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
                             <div class="media-body">
@@ -90,8 +90,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="card-manager" class="edit-menu-item {% if main_script == "graph-cards" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph_cards' graphid %}') }">
+                    <li id="card-manager" class="edit-menu-item {% if main_script == "views/graph/card-manager" %} selected{% endif %}">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'card_manager' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
@@ -120,7 +120,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="graph-manager" class="edit-menu-item {% if main_script == "graph-manager" %} selected{% endif %}">
+                    <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
