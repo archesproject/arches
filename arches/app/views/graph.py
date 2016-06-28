@@ -38,8 +38,8 @@ def manager(request, graphid):
 
     graphs = models.Graph.objects.all()
     if graphid is None or graphid == '':
-        return render(request, 'graph-list.htm', {
-            'main_script': 'graph-list',
+        return render(request, 'views/graph/graph-list.htm', {
+            'main_script': 'views/graph/graph-list',
             'graphs': JSONSerializer().serialize(graphs)
         })
 
@@ -116,8 +116,8 @@ def settings(request, graphid):
     graphs = models.Graph.objects.all()
     ontologies = models.Ontology.objects.filter(parentontology=None)
     ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-    return render(request, 'graph-settings.htm', {
-        'main_script': 'graph-settings',
+    return render(request, 'views/graph/graph-settings.htm', {
+        'main_script': 'views/graph/graph-settings',
         'icons': JSONSerializer().serialize(icons),
         'metadata_json': JSONSerializer().serialize(graph),
         'node_json': node_json,
