@@ -135,8 +135,8 @@ def cards(request, graphid):
     node = models.Node.objects.get(graph_id=graphid, istopnode=True)
     graph = node.graph
     graphs = models.Graph.objects.all()
-    return render(request, 'graph-cards.htm', {
-        'main_script': 'graph-cards',
+    return render(request, 'views/graph/card-manager.htm', {
+        'main_script': 'views/graph/card-manager',
         'graphid': graphid,
         'graphs': JSONSerializer().serialize(graphs),
         'metadata': graph,
