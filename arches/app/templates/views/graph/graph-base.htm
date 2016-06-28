@@ -33,26 +33,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-toolbar">
 
         <!-- Tools Menu -->
-        <div class="ep-tools">
-          <a id="menu-control" href="" class="ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> {% trans "Manage" %} <i class="ion-more"></i></a>
-        </div>
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> 
+            <div class="">{% trans "Manage" %} 
+                <i class="ion-more"></i>
+            </div>
+        </a>
 
         <!-- Title Bar -->
         {% block graph_title %}
         <div class="ep-tools-title">
-          <h1 class="page-header text-overflow ep-graph-title"><i class="{{metadata.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i> {{metadata.name}}</h1>
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="{{metadata.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i> 
+                <span>
+                    {{metadata.name}}
+                </span>
+            </h1>
         </div>
         {% endblock graph_title %}
 
         <!-- Search Bar -->
-        <div class="ep-tools-right">
-          <a id="" href="" class=""><i class="ion-search add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Search"></i></a>
-        </div>
+        <a href="" class="ep-tools ep-tools-right">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+              <i class="ion-search"></i>
+            </div>
+        </a>
 
         <!-- Help Bar -->
-        <div class="ep-tools-right">
-          <a id="help-control" href="" class=""><i class="ion-information-circled add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Help"></i></a>
-        </div>
+        <a href="" class="ep-tools ep-tools-right">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+              <i class="ion-information-circled"></i>
+            </div>
+        </a>
     </div>
 
     <!-- Menu -->

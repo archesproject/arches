@@ -2883,17 +2883,31 @@ ul.jqtree_common li.jqtree-folder {
     height: 50px;
 }
 .ep-tools {
-    width: 100px;
+    cursor: pointer;
     border-right: 1px solid #ddd;
     height: 50px;
     display: flex;
     align-items: center;
-    margin-left: 10px;
+    padding-left: 10px;
+    padding-right: 20px;
+    border-bottom: 1px solid #ddd;
 }
 
 .ep-tools:hover {
     background: #f8f8f8;
-    border-bottom: 1px solid #ddd;
+}
+
+.ep-tools-right {
+    border-right: none;
+    border-left: 1px solid #ddd;
+    font-size: 17px;
+    padding-left: 20px;
+    padding-right: 20px;
+    min-width: 50px;
+}
+
+.ep-tools-right a:first-child {
+    margin: auto;
 }
 
 .ep-tool-title {
@@ -2917,25 +2931,6 @@ ul.jqtree_common li.jqtree-folder {
     transform: translate(0px, 0px);
     color: #666;
     background: #f4f4f4;
-}
-
-.header-tools:hover {
-    cursor: pointer;
-    background: #f8f8f8;
-    border-bottom: 1px solid #ddd;
-}
-
-.ep-tools-right {
-    width: 50px;
-    border-left: 1px solid #ddd;
-    height: 50px;
-    font-size: 17px;
-    color: #666;
-    vertical-align: middle;
-    display: flex;
-}
-.ep-tools-right a:first-child {
-    margin: auto;
 }
 
 .ep-content {
