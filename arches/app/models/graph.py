@@ -222,7 +222,8 @@ class Graph(object):
 
         tree = {
             'node': root if root else self.root,
-            'children': []
+            'children': [],
+            'parent_edge': None
         }
 
         def find_child_edges(tree):
@@ -230,7 +231,8 @@ class Graph(object):
                 if edge.domainnode == tree['node']:
                     tree['children'].append(find_child_edges({
                         'node': edge.rangenode,
-                        'children':[]
+                        'children':[],
+                        'parent_edge': edge
                     }))
 
             return tree
@@ -252,6 +254,7 @@ class Graph(object):
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
                 )
+
             tree['node'].nodegroup = current_nodegroup
             if current_nodegroup is not None:
                 self.nodegroups[current_nodegroup.pk] = current_nodegroup
@@ -435,6 +438,30 @@ class Graph(object):
             self.populate_null_nodegroups()
 
         return self
+
+    def delete_node(self, node=None):
+        if node is not None:
+            if not isinstance(node, models.Node):
+                node = self.nodes[uuid.UUID(str(node))]
+
+            nodes = []
+            edges = []
+            nodegroups = []
+
+            tree = self.get_tree(root=node)
+            def traverse_tree(tree):
+                nodes.append(tree['node'])
+                if tree['node'].is_collector:
+                    nodegroups.append(tree['node'].nodegroup)
+                for child in tree['children']:
+                    edges.append(child['parent_edge'])
+                    traverse_tree(child)
+            traverse_tree(tree)
+
+            with transaction.atomic():
+                [nodegroup.delete() for nodegroup in nodegroups]
+                [edge.delete() for edge in edges]
+                [node.delete() for node in nodes]
 
     def can_append(self, graphToAppend, nodeToAppendTo):
         """

@@ -63,6 +63,7 @@ urlpatterns = [
     url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, graph.append_branch, name='append_branch'),
     url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, graph.move_node, name='move_node'),
     url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='update_node'),
+    url(r'^graph/delete_node/(?P<graphid>%s)$' % uuid_regex, graph.delete_node, name='delete_node'),
     url(r'^graph/clone/(?P<graphid>%s)$' % uuid_regex, graph.clone, name='clone_graph'),
     url(r'^graph/new$', graph.new, name='new_graph'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),

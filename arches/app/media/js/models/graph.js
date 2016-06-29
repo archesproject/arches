@@ -48,9 +48,12 @@ define(['arches',
          * @param  {object} scope - (optional) the scope used for the callback
          */
         deleteNode: function(node, callback, scope){
-            node['delete'](function (response, status) {
-                var success = (status === 'success');
-                if (success) {
+            this._doRequest({
+                type: "DELETE",
+                url: this.url + 'delete_node/' + this.get('metadata').graphid,
+                data: JSON.stringify({nodeid:node.nodeid})
+            }, function(response, status, self){
+                if (status === 'success' &&  response.responseJSON) {
                     var parentNode = this.getParentNode(node);
                     var getEdges = function (node) {
                         var edges = this.get('edges')()
@@ -87,13 +90,13 @@ define(['arches',
                         return _.contains(nodes, node);
                     });
                     parentNode.selected(true);
-                    this.trigger('changed');
                 }
+
                 if (typeof callback === 'function') {
                     scope = scope || self;
                     callback.call(scope, response, status);
                 }
-            }, this);
+            }, scope, 'changed');
         },
 
         /**
