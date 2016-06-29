@@ -150,19 +150,18 @@ def node(request, graphid):
             graph = Graph(graphid)
             graph.update_node(data)
             graph.save()
-
             return JSONResponse(graph)
 
+    return HttpResponseNotFound()
+
+@group_required('edit')
+def delete_node(request, graphid):
+    data = JSONDeserializer().deserialize(request.body)
+    if data:
         if request.method == 'DELETE':
-            node = models.Node.objects.get(nodeid=data.get('nodeid'))
-            nodes, edges = node.get_child_nodes_and_edges()
-            if not node.istopnode:
-                edges.append(models.Edge.objects.get(rangenode=node))
-            nodes.append(node)
-            with transaction.atomic():
-                [edge.delete() for edge in edges]
-                [node.delete() for node in nodes]
-                return JSONResponse({})
+            graph = Graph(graphid)
+            graph.delete_node(node=data.get('nodeid', None))
+            return JSONResponse({})
 
     return HttpResponseNotFound()
 

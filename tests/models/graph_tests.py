@@ -425,6 +425,11 @@ class GraphTests(ArchesTestCase):
 
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
+        # have to set the parentnodegroup nodes to semantic datatype to pass validation
+        with self.assertRaises(ValidationError): 
+            graph.save()
+        for node in branch_two.nodes.itervalues():
+            node.datatype = 'semantic'
         graph.save()
         graph = Graph(self.rootNode)
         tree = graph.get_tree()
@@ -446,15 +451,15 @@ class GraphTests(ArchesTestCase):
                 self.assertEqual(len(child['children']), 0)
 
 
-# Pressumed final graph shape
-#
-#                                                self.rootNode
-#                                                      |
-#                                            branch_two_rootnodeid (Node)
-#                                                    /   \
-#                         branch_one_rootnodeid (Node)    branch_two_child (NodeType)
-#                                 /   \
-# branch_one_childnodeid (NodeType)    branch_three_nodeid (Node)
+        # Pressumed final graph shape
+        #
+        #                                                self.rootNode
+        #                                                      |
+        #                                            branch_two_rootnodeid (Node)
+        #                                                    /   \
+        #                         branch_one_rootnodeid (Node)    branch_two_child (NodeType)
+        #                                 /   \
+        # branch_one_childnodeid (NodeType)    branch_three_nodeid (Node)
 
     def test_get_valid_ontology_classes(self):
         """
@@ -509,3 +514,4 @@ class GraphTests(ArchesTestCase):
         edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
         self.assertEqual(node_count,0)
         self.assertEqual(edge_count,0)
+

@@ -55,8 +55,6 @@ class Graph(object):
                     self.add_edge(edge)
 
                 self.populate_null_nodegroups()
-                self.populate_parent_nodegroups()
-
 
             else:
                 if (isinstance(args[0], basestring) or
@@ -225,7 +223,8 @@ class Graph(object):
 
         tree = {
             'node': root if root else self.root,
-            'children': []
+            'children': [],
+            'parent_edge': None
         }
 
         def find_child_edges(tree):
@@ -233,7 +232,8 @@ class Graph(object):
                 if edge.domainnode == tree['node']:
                     tree['children'].append(find_child_edges({
                         'node': edge.rangenode,
-                        'children':[]
+                        'children':[],
+                        'parent_edge': edge
                     }))
 
             return tree
@@ -247,7 +247,7 @@ class Graph(object):
         """
 
         tree = self.get_tree()
-        new_nodegroup_set = set()
+        self.nodegroups = {}
 
         def traverse_tree(tree, current_nodegroup=None):
             if str(tree['node'].nodeid) == str(tree['node'].nodegroup_id):
@@ -255,9 +255,10 @@ class Graph(object):
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
                 )
+
             tree['node'].nodegroup = current_nodegroup
             if current_nodegroup is not None:
-                new_nodegroup_set.add(str(current_nodegroup.pk))
+                self.nodegroups[current_nodegroup.pk] = current_nodegroup
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
@@ -265,25 +266,7 @@ class Graph(object):
 
         traverse_tree(tree)
 
-        #remove any node groups not referenced by the nodes
-        old_nodegroup_set = set(list(str(key) for key in self.nodegroups.keys()))
-        unused_nodegroup_ids = old_nodegroup_set.difference(new_nodegroup_set)
-        for unused_nodegroup_id in unused_nodegroup_ids:
-            self.nodegroups.pop(uuid.UUID(str(unused_nodegroup_id)))
-
         return tree
-
-    def populate_parent_nodegroups(self):
-        """
-        populates the parent node group of a node group
-
-        """
-
-        for node_id, node in self.nodes.iteritems():
-            if str(node_id) == str(node.nodegroup_id) and node.istopnode == False:
-                parent_node = self.get_parent_node(node.nodeid)
-                self.nodegroups[uuid.UUID(str(node_id))].parentnodegroup = parent_node.nodegroup
-
 
     def append_branch(self, property, nodeid=None, graphid=None):
         """
@@ -457,10 +440,41 @@ class Graph(object):
 
         return self
 
+    def delete_node(self, node=None):
+        """
+        deletes a node and all if it's children from a graph
+
+        Arguments:
+        node -- a node id or Node model to delete from the graph
+
+        """
+
+        if node is not None:
+            if not isinstance(node, models.Node):
+                node = self.nodes[uuid.UUID(str(node))]
+
+            nodes = []
+            edges = []
+            nodegroups = []
+
+            tree = self.get_tree(root=node)
+            def traverse_tree(tree):
+                nodes.append(tree['node'])
+                if tree['node'].is_collector:
+                    nodegroups.append(tree['node'].nodegroup)
+                for child in tree['children']:
+                    edges.append(child['parent_edge'])
+                    traverse_tree(child)
+            traverse_tree(tree)
+
+            with transaction.atomic():
+                [nodegroup.delete() for nodegroup in nodegroups]
+                [edge.delete() for edge in edges]
+                [node.delete() for node in nodes]
+
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
-        can_append - does this graph contain a card, a collection of cards, or no cards
-        test to see whether or not a graph can be appened to this graph at a specific location
+        can_append - test to see whether or not a graph can be appened to this graph at a specific location
 
         returns true if the graph can be appended, false otherwise
 
@@ -643,7 +657,7 @@ class Graph(object):
 
         return True
 
-    def getGroupedNodes (self, node):
+    def getGroupedNodes(self, node):
         """
         given a node, get any other nodes that share the same group
 
