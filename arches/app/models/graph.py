@@ -440,6 +440,14 @@ class Graph(object):
         return self
 
     def delete_node(self, node=None):
+        """
+        deletes a node and all if it's children from a graph
+
+        Arguments:
+        node -- a node id or Node model to delete from the graph
+
+        """
+
         if node is not None:
             if not isinstance(node, models.Node):
                 node = self.nodes[uuid.UUID(str(node))]
