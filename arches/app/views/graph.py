@@ -45,16 +45,14 @@ def manager(request, graphid):
 
     graph = Graph(graphid)
     validations = models.Validation.objects.all()
-    branch_graphs = models.Graph.objects.exclude(pk=graphid)
+    branch_graphs = graphs.exclude(pk=graphid)
     if graph.metadata.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
     metadata_records = JSONSerializer().serializeToPython(branch_graphs)
-    branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
     branches = []
     for metadata_record in metadata_records:
        try:
-           rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
-           metadata_record['graph'] = Graph(rootnode)
+           metadata_record['graph'] = Graph(metadata_record['graphid'])
            branches.append(metadata_record)
        except models.Node.DoesNotExist:
            pass
