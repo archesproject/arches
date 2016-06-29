@@ -48,14 +48,11 @@ def manager(request, graphid):
     branch_graphs = graphs.exclude(pk=graphid)
     if graph.metadata.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
-    metadata_records = JSONSerializer().serializeToPython(branch_graphs)
-    branches = []
-    for metadata_record in metadata_records:
-       try:
-           metadata_record['graph'] = Graph(metadata_record['graphid'])
-           branches.append(metadata_record)
-       except models.Node.DoesNotExist:
-           pass
+    
+    branches = JSONSerializer().serializeToPython(branch_graphs)
+    for branch in branches:
+       branch['graph'] = Graph(branch['graphid'])
+
     datatypes = models.DDataType.objects.all()
     return render(request, 'views/graph/graph-manager.htm', {
         'main_script': 'views/graph/graph-manager',
