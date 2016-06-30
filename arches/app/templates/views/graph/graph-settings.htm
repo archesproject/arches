@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_title %}
 <div class="ep-tools-title">
-  <h1 class="page-header text-overflow ep-graph-title"><i class="{{metadata.iconclass|default:'fa fa-question'}} text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (metadata.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:metadata.name">{{metadata.name}}</span></h1>
+  <h1 class="page-header text-overflow ep-graph-title"><i class="text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (graph.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:graph.name"></span></h1>
 </div>
 {% endblock graph_title %}
 
@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.name, valueUpdate: 'keyup'">
+                                                            <input placeholder="{% trans "Name" %}" class="form-control input-lg widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -131,7 +131,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:metadata.subtitle, valueUpdate: 'keyup'">
+                                                            <input placeholder="{% trans "Subtitle" %}" class="form-control input-lg widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -143,12 +143,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: metadata.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                                            <select class="design" {% if node_count > 1 %}disabled{% endif %} data-bind="value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="row widget-container" data-bind="if: metadata.ontology_id()">
+                                                <div class="row widget-container" data-bind="if: graph.ontology_id()">
                                                     <div class="form-group">
                                                         <div class="relative">
                                                             <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} <i class="ion-ios-checkmark-outline"></i></label>
@@ -201,7 +201,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <!-- Currently selected icon -->
                                                                 <div>
                                                                     {% trans "Selected icon:" %}
-                                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + metadata.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
                                                                 </div>
 
                                                                 <div style="position: absolute; left: 130px; top: 21px;">
@@ -219,7 +219,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="row">
 
                                                                 <!-- ko foreach: icons -->
-                                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.metadata.iconclass())}, click: function() { $root.metadata.iconclass(cssclass) }">
+                                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }">
                                                                     <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                                 </div>
                                                                 <!-- /ko -->
@@ -258,10 +258,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                     <div class="col-xs-12">
                                                         <div class="pad-hor">
-                                                            <label data-bind="css: { 'active': metadata.isactive() }" class="form-radio form-normal form-text">
+                                                            <label data-bind="css: { 'active': graph.isactive() }" class="form-radio form-normal form-text">
                                                                 <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="true"> {% trans "Active" %}
                                                             </label>
-                                                            <label data-bind="css: { 'active': !metadata.isactive() }" class="form-radio form-normal form-text">
+                                                            <label data-bind="css: { 'active': !graph.isactive() }" class="form-radio form-normal form-text">
                                                                 <input type="radio" name="stat-w-label" data-bind="checked: isActive" value="false"> {% trans "Inactive" %}
                                                             </label>
                                                         </div>
@@ -269,7 +269,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
 
-                                            <div class="row widget-container" data-bind="visible: metadata.isresource()">
+                                            <div class="row widget-container" data-bind="visible: graph.isresource()">
                                                 <div class="form-group">
                                                     <div class="relative">
                                                         <label class="col-xs-12 control-label widget-input-label"> {% trans "Resources that may be related:" %}</label>
@@ -280,7 +280,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <!-- ko foreach: resources -->
                                                             <label class="form-checkbox form-normal form-primary form-text" data-bind="css: {'active': isRelatable()}">
                                                                 <input type="checkbox" data-bind="checked:isRelatable">
-                                                                <span data-bind="text:metadata.name"></span>
+                                                                <span data-bind="text:graph.name"></span>
                                                             </label>
                                                             <!-- /ko -->
                                                         </div>
@@ -317,7 +317,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:metadata.author, valueUpdate: 'keyup'">
+                                                            <input placeholder="{% trans "Author name" %}" class="form-control input-lg widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -329,7 +329,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:metadata.description, valueUpdate: 'keyup'"></textarea>
+                                                            <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -353,7 +353,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('graph-settings-data', [], function () {
     return {
         icons: {{icons}},
-        metadata: {{metadata_json}},
+        graph: {{graph}},
         node: {{node_json}},
         ontologies: {{ontologies}},
         ontologyClasses: {{ontology_classes}},

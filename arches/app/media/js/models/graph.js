@@ -50,7 +50,7 @@ define(['arches',
         deleteNode: function(node, callback, scope){
             this._doRequest({
                 type: "DELETE",
-                url: this.url + 'delete_node/' + this.get('metadata').graphid,
+                url: this.url + 'delete_node/' + this.get('graphid'),
                 data: JSON.stringify({nodeid:node.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -128,7 +128,7 @@ define(['arches',
         appendBranch: function(nodeid, property, graphid, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'append_branch/' + this.get('metadata').graphid,
+                url: this.url + 'append_branch/' + this.get('graphid'),
                 data: JSON.stringify({nodeid:nodeid, property: property, graphid: graphid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -144,7 +144,7 @@ define(['arches',
                         self.get('edges').push(edge);
                     }, this);
 
-                    if(!self.get('metadata').isresource){
+                    if(!self.get('isresource')){
                         self.get('nodes')().forEach(function (node) {
                             node.selected(false);
                             if (node.nodeid === branchroot.nodeid){
@@ -173,7 +173,7 @@ define(['arches',
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + this.get('metadata').graphid,
+                url: this.url + 'move_node/' + this.get('graphid'),
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -210,7 +210,7 @@ define(['arches',
         updateNode: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'update_node/' + this.get('metadata').graphid,
+                url: this.url + 'update_node/' + this.get('graphid'),
                 data: JSON.stringify(node.toJSON())
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -239,7 +239,7 @@ define(['arches',
         getValidNodesEdges: function(nodeid, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + this.get('metadata').graphid + '/get_related_nodes',
+                url: this.url + this.get('graphid') + '/get_related_nodes',
                 data: JSON.stringify({'nodeid': nodeid})
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
@@ -257,7 +257,7 @@ define(['arches',
         getValidDomainClasses: function(nodeid, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + this.get('metadata').graphid + '/get_valid_domain_nodes',
+                url: this.url + this.get('graphid') + '/get_valid_domain_nodes',
                 data: JSON.stringify({'nodeid': nodeid})
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
@@ -299,7 +299,7 @@ define(['arches',
             nodeToAppendTo = nodeToAppendTo ? nodeToAppendTo : this.get('selectedNode')();
             var typeOfGraphToAppend = graphToAppend.isType();
 
-            if(!!this.get('metadata').ontology_id && !!graphToAppend.get('metadata').ontology_id){
+            if(!!this.get('ontology_id') && !!graphToAppend.get('ontology_id')){
                 var found = !!_.find(graphToAppend.get('domain_connections'), function(domain_connection){
                     return !!_.find(domain_connection.ontology_classes, function(ontology_class){
                         return ontology_class === nodeToAppendTo.ontologyclass();
@@ -310,8 +310,8 @@ define(['arches',
                 }
             }
             
-            if(this.get('metadata').isresource){
-                if(nodeToAppendTo !== this.get('root')){
+            if(this.get('isresource')){
+                if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
                     return false;
                 }else{
                     if(typeOfGraphToAppend === 'undefined'){
@@ -327,7 +327,7 @@ define(['arches',
                         break;
                     case 'card':
                         if(typeOfGraphToAppend === 'card'){
-                            if(nodeToAppendTo === this.get('root')){
+                            if(nodeToAppendTo.nodeid === this.get('root').nodeid){
                                 if(!(this.isGroupSemantic(nodeToAppendTo))){
                                     return false;
                                 }
@@ -371,22 +371,29 @@ define(['arches',
             }, this)
             this.set('datatypelookup', datatypelookup);
 
-            this.set('domain_connections', attributes.data.domain_connections);
-            this.set('edges', ko.observableArray(attributes.data.edges));
-            this.set('metadata', attributes.data.metadata);
-
-            attributes.data.nodes.forEach(function (node, i) {
-                attributes.data.nodes[i] = new NodeModel({
-                    source: node,
-                    datatypelookup: datatypelookup,
-                    graph: self
-                });
-                if(node.istopnode){
-                    this.set('root', attributes.data.nodes[i]);
-                    attributes.data.nodes[i].selected(true);
+            _.each(attributes.data, function(value, key){
+                switch(key) {
+                    case 'edges':
+                        this.set('edges', ko.observableArray(value));
+                        break;
+                    case 'nodes':
+                        attributes.data.nodes.forEach(function (node, i) {
+                            attributes.data.nodes[i] = new NodeModel({
+                                source: node,
+                                datatypelookup: datatypelookup,
+                                graph: self
+                            });
+                            if(node.istopnode){
+                                this.set('root', attributes.data.nodes[i]);
+                                attributes.data.nodes[i].selected(true);
+                            }
+                        }, this);
+                        this.set('nodes', ko.observableArray(value));
+                        break;
+                    default:
+                        this.set(key, value)
                 }
-            }, this);
-            this.set('nodes', ko.observableArray(attributes.data.nodes));
+            }, this)
 
             this.set('selectedNode', ko.computed(function() {
                 var selectedNode = _.find(self.get('nodes')(), function(node){

@@ -13,12 +13,12 @@ require([
     data.resources.forEach(function(resource) {
         resource.isRelatable = ko.observable(resource.is_relatable);
     });
-    var srcJSON = JSON.stringify(data.metadata);
+    var srcJSON = JSON.stringify(data.graph);
 
     /**
     * setting up page view model
     */
-    var metadata = koMapping.fromJS(data.metadata);
+    var graph = koMapping.fromJS(data.graph);
     var iconFilter = ko.observable('');
     var ontologyClass = ko.observable(data.node.ontologyclass);
     var jsonData = ko.computed(function() {
@@ -27,11 +27,11 @@ require([
         }).map(function(resource){
             return resource.id
         });
-        if (metadata.ontology_id() === undefined) {
-            metadata.ontology_id(null);
+        if (graph.ontology_id() === undefined) {
+            graph.ontology_id(null);
         }
         return JSON.stringify({
-            metadata: koMapping.toJS(metadata),
+            graph: koMapping.toJS(graph),
             relatable_resource_ids: relatableResourceIds,
             ontology_class: ontologyClass()
         });
@@ -48,29 +48,29 @@ require([
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
-        metadata: metadata,
+        graph: graph,
         resources: data.resources,
         ontologies: data.ontologies,
         ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {
             return _.filter(data.ontologyClasses, function (ontologyClass) {
-                return ontologyClass.ontology_id === metadata.ontology_id();
+                return ontologyClass.ontology_id === graph.ontology_id();
             });
         }),
         isResource: ko.computed({
             read: function() {
-                return metadata.isresource().toString();
+                return graph.isresource().toString();
             },
             write: function(value) {
-                metadata.isresource(value === "true");
+                graph.isresource(value === "true");
             }
         }),
         isActive: ko.computed({
             read: function() {
-                return metadata.isactive().toString();
+                return graph.isactive().toString();
             },
             write: function(value) {
-                metadata.isactive(value === "true");
+                graph.isactive(value === "true");
             }
         }),
         save: function () {
@@ -90,7 +90,7 @@ require([
         },
         reset: function () {
             _.each(JSON.parse(srcJSON), function(value, key) {
-                metadata[key](value);
+                graph[key](value);
             });
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
                 var resource = _.find(data.resources, function (resource) {

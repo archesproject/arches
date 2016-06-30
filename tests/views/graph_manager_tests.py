@@ -92,17 +92,17 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        metadata = json.loads(response.context['metadata_json'])
+        graph = json.loads(response.context['graph'])
 
-        metadata['name'] = 'new graph name'
-        post_data = {'metadata':metadata, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}
+        graph['name'] = 'new graph name'
+        post_data = {'graph':graph, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}
         post_data = JSONSerializer().serialize(post_data)
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
 
         self.assertTrue(response_json['success'])
-        self.assertEqual(response_json['metadata']['name'], 'new graph name')
+        self.assertEqual(response_json['graph']['name'], 'new graph name')
         self.assertTrue(self.ARCHES_CONFIG_ID in response_json['relatable_resource_ids'])
 
     def test_node_update(self):
@@ -172,7 +172,8 @@ class GraphManagerViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize({'isresource': False})
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
-        self.assertFalse(response_json['metadata']['isresource'])
+        print response_json
+        self.assertFalse(response_json['isresource'])
 
     def test_new_graph(self):
         """
@@ -186,7 +187,7 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['nodes']), 1)
-        self.assertFalse(response_json['metadata']['isresource'])
+        self.assertFalse(response_json['isresource'])
 
     def test_delete_graph(self):
         """

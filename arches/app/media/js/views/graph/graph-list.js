@@ -26,7 +26,7 @@ require([
             url: url,
             data: JSON.stringify(data),
             success: function(response) {
-                window.location = response.metadata.graphid + '/settings';
+                window.location = response.graphid + '/settings';
             },
             failure: function(response) {
                 pageView.viewModel.loading(false);

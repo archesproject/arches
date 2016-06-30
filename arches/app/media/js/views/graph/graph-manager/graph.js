@@ -167,10 +167,7 @@ define([
                 data.nodes = _.map(data.nodes, function(node){
                     return node.toJSON();
                 });
-
-                data.metadata = {
-                    ontology_id: self.graphModel.get('metadata').ontology_id
-                }
+                data.ontology_id = self.graphModel.get('ontology_id');
                 data.domain_connections = [{
                     ontology_classes: allowed_target_ontologies
                 }]

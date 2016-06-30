@@ -28,6 +28,9 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
 
+def test(request, graphid):
+    graph = Graph(graphid)
+    return JSONResponse(graph, indent=4)
 
 @group_required('edit')
 def manager(request, graphid):
@@ -63,7 +66,8 @@ def manager(request, graphid):
         'main_script': 'views/graph/graph-manager',
         'graphid': graphid,
         'graphs': JSONSerializer().serialize(graphs),
-        'graph': JSONSerializer().serialize(graph),
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graph_json': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branches),
         'datatypes': JSONSerializer().serialize(datatypes),
@@ -78,8 +82,7 @@ def manager(request, graphid):
         'branch_list': {
             'title': _('Branch Library'),
             'search_placeholder': _('Find a graph branch')
-        },
-        'metadata': graph.root.graph
+        }
     })
 
 
@@ -89,7 +92,7 @@ def settings(request, graphid):
     graph = node.graph
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('metadata').iteritems():
+        for key, value in data.get('graph').iteritems():
             setattr(graph, key, value)
         graph.save()
         node.set_relatable_resources(data.get('relatable_resource_ids'))
@@ -97,7 +100,7 @@ def settings(request, graphid):
         node.save()
         return JSONResponse({
             'success': True,
-            'metadata': graph,
+            'graph': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
     node_json = JSONSerializer().serialize(node)
@@ -110,7 +113,7 @@ def settings(request, graphid):
             node = models.Node.objects.get(graph=res, istopnode=True)
             resource_data.append({
                 'id': node.nodeid,
-                'metadata': res,
+                'graph': res,
                 'is_relatable': (node in relatable_resources)
             })
     graphs = models.Graph.objects.all()
@@ -119,13 +122,12 @@ def settings(request, graphid):
     return render(request, 'views/graph/graph-settings.htm', {
         'main_script': 'views/graph/graph-settings',
         'icons': JSONSerializer().serialize(icons),
-        'metadata_json': JSONSerializer().serialize(graph),
+        'graph': JSONSerializer().serialize(graph),
         'node_json': node_json,
         'graphs': JSONSerializer().serialize(graphs),
         'ontologies': JSONSerializer().serialize(ontologies),
         'ontology_classes': JSONSerializer().serialize(ontology_classes),
         'graphid': graphid,
-        'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data),
         'node_count': models.Node.objects.filter(graph=graph).count()
     })
@@ -139,7 +141,7 @@ def card_manager(request, graphid):
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
         'graphs': JSONSerializer().serialize(graphs),
-        'metadata': graph,
+        'graph': graph,
     })
 
 @group_required('edit')

@@ -31,6 +31,21 @@ class Graph(object):
     """
 
     def __init__(self, *args, **kwargs):
+        # from models.Graph
+        # self.graphid = None
+        # self.name = ''
+        # self.description = ''
+        # self.deploymentfile = ''
+        # self.author = ''
+        # self.deploymentdate = None
+        # self.version = ''
+        # self.isresource = False
+        # self.isactive = False
+        # self.iconclass = ''
+        # self.subtitle = ''
+        # self.ontology = None
+        # end from models.Graph
+
         self.root = None
         self.nodes = {}
         self.edges = {}
@@ -760,9 +775,9 @@ class Graph(object):
 
         """
 
-        ret = {}
+        ret = JSONSerializer().serializeToPython(self.metadata)
         ret['root'] = self.root;
-        ret['metadata'] = self.metadata
+        #ret['metadata'] = self.metadata
         ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
 
