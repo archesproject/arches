@@ -73,7 +73,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
         url = reverse('graph', kwargs={'graphid':graphid})
         response = self.client.get(url)
-        graph = json.loads(response.context['graph'])
+        graph = json.loads(response.context['graph_json'])
 
         node_count = len(graph['nodes'])
         self.assertEqual(node_count, self.NODE_COUNT+1)
@@ -172,7 +172,6 @@ class GraphManagerViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize({'isresource': False})
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
-        print response_json
         self.assertFalse(response_json['isresource'])
 
     def test_new_graph(self):
