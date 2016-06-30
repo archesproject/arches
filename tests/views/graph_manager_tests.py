@@ -142,9 +142,9 @@ class GraphManagerViewTests(ArchesTestCase):
         """
         self.client.login(username='admin', password='admin')
         graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
-        url = reverse('node', kwargs={'graphid':graphid})
         node = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
-        post_data = JSONSerializer().serialize(node)
+        url = reverse('delete_node', kwargs={'graphid':graphid})
+        post_data = JSONSerializer().serialize({'nodeid':node.nodeid})
         response = self.client.delete(url, post_data)
         self.assertEqual(response.status_code, 200)
         new_count = self.NODE_COUNT-self.PLACE_BRANCH_COUNT
