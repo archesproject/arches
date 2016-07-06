@@ -42,6 +42,7 @@ class GraphTests(ArchesTestCase):
 
     def setUp(self):
         newid = uuid.uuid1()
+        nodegroup = None
         metadata = models.Graph.objects.create(
             name="TEST GRAPH",
             subtitle="ARCHES TEST GRAPH",
@@ -53,6 +54,10 @@ class GraphTests(ArchesTestCase):
             isactive=False,
             iconclass="fa fa-building"
         )
+        if not metadata.isresource:
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
         self.rootNode = models.Node.objects.create(
             pk=newid,
             name='ROOT NODE',
@@ -60,7 +65,7 @@ class GraphTests(ArchesTestCase):
             istopnode=True,
             ontologyclass='E1_CRM_Entity',
             datatype='semantic',
-            nodegroup=None,
+            nodegroup=nodegroup,
             graph=metadata
         )
 
@@ -220,7 +225,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.nodes), 3)
         self.assertEqual(len(graph.edges), 2)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.nodegroups), 2)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
@@ -243,7 +248,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.nodegroups), 2)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
@@ -325,8 +330,10 @@ class GraphTests(ArchesTestCase):
         # the proper number of groups are properly relfected in the graph
 
         graph = Graph(self.rootNode)
+
+        # test to confirm that a grouped set of nodes maintains their group after being appended onto a node with a different group
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.nodegroups), 2)
 
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
@@ -335,38 +342,52 @@ class GraphTests(ArchesTestCase):
             if node.name == 'Node Type':
                 node_type_node = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
 
+        # confirm that nulling out a child group will then make that group a part of the parent group
         node_to_update['nodegroup_id'] = None
         graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 0)
+        self.assertEqual(len(graph.nodegroups), 1)
         for node_id, node in graph.nodes.iteritems():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
-        graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.NODE_NODETYPE_GRAPHID)
+        # confirm that a non-grouped node takes on the parent group when appended
+        graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.SINGLE_NODE_GRAPHID)
         self.assertEqual(len(graph.nodegroups), 1)
+        for node_id, node in graph.nodes.iteritems():
+            self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
         for edge_id, edge in graph.edges.iteritems():
             if str(edge.domainnode_id) == str(node_type_node['nodeid']):
                 child_nodegroup_node = JSONDeserializer().deserialize(JSONSerializer().serialize(edge.rangenode))
 
-        child_nodegroup_node['nodegroup_id'] = None
-        graph.update_node(child_nodegroup_node)
-        self.assertEqual(len(graph.nodegroups), 0)
-        for node_id, node in graph.nodes.iteritems():
-            self.assertEqual(graph.root.nodegroup, node.nodegroup)
-
-        node_to_update['nodegroup_id'] = node_to_update['nodeid']
-        graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 1)
-        children = graph.get_child_nodes(node_to_update['nodeid'])
-        for child in children:
-            self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
-
+        # make a node group with a single node and confirm that that node is now not part of it's parent node group 
         child_nodegroup_node['nodegroup_id'] = child_nodegroup_node['nodeid']
         graph.update_node(child_nodegroup_node)
         self.assertEqual(len(graph.nodegroups), 2)
-        children = graph.get_child_nodes(child_nodegroup_node['nodeid'])
+        for node_id, node in graph.nodes.iteritems():
+            if node_id == child_nodegroup_node['nodeid']:
+                self.assertNotEqual(graph.root.nodegroup, node.nodegroup)
+            else:
+                self.assertEqual(graph.root.nodegroup, node.nodegroup)
+
+        # make another node group with a node (that has a child) and confirm that that node and 
+        # it's child are now not part of it's parent node group and that both nodes are grouped together
+        node_to_update['nodegroup_id'] = node_to_update['nodeid']
+        graph.update_node(node_to_update)
+        self.assertEqual(len(graph.nodegroups), 3)
+        children = graph.get_child_nodes(node_to_update['nodeid'])
         for child in children:
-            self.assertEqual(child.nodegroup_id, child_nodegroup_node['nodegroup_id'])
+            if child.nodeid == child_nodegroup_node['nodeid']:
+                self.assertEqual(child.nodeid, child.nodegroup_id)
+            else:
+                self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
+
+        # remove a node's node group and confirm that that node takes the node group of it's parent
+        child_nodegroup_node['nodegroup_id'] = None
+        graph.update_node(child_nodegroup_node)
+        self.assertEqual(len(graph.nodegroups), 2)
+        children = graph.get_child_nodes(node_to_update['nodeid'])
+        for child in children:
+            self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
 
     def test_move_node(self):
         """
@@ -401,7 +422,9 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid)
+        with self.assertRaises(ValidationError): 
+            graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid)
+        graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid, skip_validation=True)
 
         new_parent_nodegroup = None
         moved_branch_nodegroup = None

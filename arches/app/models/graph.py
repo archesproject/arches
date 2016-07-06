@@ -282,7 +282,7 @@ class Graph(object):
 
         return tree
 
-    def append_branch(self, property, nodeid=None, graphid=None):
+    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False):
         """
         Appends a branch onto this graph
 
@@ -295,12 +295,14 @@ class Graph(object):
 
         graphid -- get the branch to append based on the graphid
 
+        skip_validation -- don't validate the resultant graph (post append), defaults to False
+
         """
 
         branch_graph = Graph(graphid)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
 
-        if self.can_append(branch_graph, nodeToAppendTo):
+        if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()
             branch_copy.root.istopnode = False
 
@@ -380,7 +382,7 @@ class Graph(object):
 
         return copy_of_self
 
-    def move_node(self, nodeid, property, newparentnodeid):
+    def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
         move a node and it's children to a different location within this graph
 
@@ -390,6 +392,8 @@ class Graph(object):
         property -- the property value to conect the node to it's new parent nodegroup
 
         newparentnodeid -- the parent node id that the node is being moved to
+
+        skip_validation -- don't validate the resultant graph (post move), defaults to False
 
         """
 
@@ -407,7 +411,7 @@ class Graph(object):
         tree['node']['istopnode'] = True
         traverse_tree(tree)
 
-        if self.can_append(Graph(graph_dict), self.nodes[uuid.UUID(str(newparentnodeid))]):
+        if skip_validation or self.can_append(Graph(graph_dict), self.nodes[uuid.UUID(str(newparentnodeid))]):
 
             if not node.is_collector():
                 nodegroup = node.nodegroup
