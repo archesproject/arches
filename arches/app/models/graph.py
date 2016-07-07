@@ -786,17 +786,22 @@ class Graph(object):
 
 
     def validate(self):
+        """
+        validates certain aspects of resource graphs according to defined rules:
 
-        # validates that the top node of a resource graph is semantic
+        - The root node of a "Resource" can only be a semantic node, and must be a collector
+        - A node group that has child node groups may not itself be a child node group
+        - A node group can only have child node groups if the node group only contains semantic nodes
+        - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
+        - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
 
-        if self.metadata.isresource == True:
-            for node_id, node in self.nodes.iteritems():
-                if node.graph_id == self.metadata.graphid and node.istopnode == True:
-                    if node.datatype != 'semantic':
-                        raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
-                        ###copout
-                    if node.nodegroup != None:
-                        raise ValidationError("The top node of your resource graph can't be a collector. Hint: check that nodegroup_id of your resource node(s) are null.")
+        """
+
+        # validates that the top node of a resource graph is semantic and a collector
+        if self.root.datatype != 'semantic':
+            raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
+        if self.root.nodegroup == None:
+            raise ValidationError("The top node of your resource graph should be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.")
 
 
         
@@ -823,15 +828,11 @@ class Graph(object):
                     if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
                         raise ValidationError("A parent node group must only contain semantic nodes.")
 
-                # find all nodes that have the same parentnode groupid and confirm they are all semantic
 
-
-        # # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
+        # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
 
         if self.metadata.ontology is not None:
-            ontology_classes = []
-            for ontology in self.metadata.ontology.ontologyclasses.all():
-                ontology_classes.append(ontology.source)
+            ontology_classes = self.metadata.ontology.ontologyclasses.values_list('source', flat=True)
 
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass not in ontology_classes:
