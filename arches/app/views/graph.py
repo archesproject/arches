@@ -32,7 +32,7 @@ def test(request, graphid):
     #graph = Graph.objects.filter(isresource=True)
     # node = models.Node.objects.get(pk='7f5ada4c-3e29-11e6-a8d1-14109fd34195')
     # graph = Graph.objects.get(node=node)
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph, indent=4)
 
 @group_required('edit')
@@ -49,7 +49,7 @@ def manager(request, graphid):
             'graphs': JSONSerializer().serialize(graphs)
         })
 
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     validations = models.Validation.objects.all()
     branch_graphs = models.GraphModel.objects.exclude(pk=graphid)
     if graph.ontology is not None:
@@ -60,7 +60,7 @@ def manager(request, graphid):
     for metadata_record in metadata_records:
        try:
            #rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
-           metadata_record['graph'] = Graph.objects.get(pk=metadata_record['graphid'])
+           metadata_record['graph'] = Graph.objects.get(graphid=metadata_record['graphid'])
            branches.append(metadata_record)
        except models.Node.DoesNotExist:
            pass
@@ -152,7 +152,7 @@ def node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
         if request.method == 'POST':
-            graph = Graph(graphid)
+            graph = Graph.objects.get(graphid=graphid)
             graph.update_node(data)
             graph.save()
             return JSONResponse(graph)
@@ -164,7 +164,7 @@ def delete_node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
         if request.method == 'DELETE':
-            graph = Graph(graphid)
+            graph = Graph.objects.get(graphid=graphid)
             graph.delete_node(node=data.get('nodeid', None))
             return JSONResponse({})
 
@@ -174,7 +174,7 @@ def delete_node(request, graphid):
 def append_branch(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid)
+        graph = Graph.objects.get(graphid=graphid)
         new_branch = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
         graph.save()
         return JSONResponse(new_branch)
@@ -185,7 +185,7 @@ def append_branch(request, graphid):
 def move_node(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid)
+        graph = Graph.objects.get(graphid=graphid)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
@@ -196,7 +196,7 @@ def move_node(request, graphid):
 def clone(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid).copy()
+        graph = Graph.objects.get(graphid=graphid).copy()
         if 'isresource' in data:
             graph.isresource = data['isresource']
 
@@ -227,10 +227,10 @@ def new(request):
 
 def get_related_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph.get_valid_ontology_classes(nodeid=data['nodeid']))
 
 def get_valid_domain_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph.get_valid_domain_ontology_classes(nodeid=data['nodeid']))

@@ -154,7 +154,7 @@ class GraphTests(ArchesTestCase):
 
         """
         root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
-        graph = Graph(root.graph.graphid)
+        graph = Graph.objects.get(graphid=root.graph.graphid)
 
         node_mapping = {nodeid:id(node) for nodeid, node in graph.nodes.iteritems()}
 
@@ -179,7 +179,7 @@ class GraphTests(ArchesTestCase):
 
         """
         root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
-        graph = Graph(root.graph.graphid)
+        graph = Graph.objects.get(graphid=root.graph.graphid)
         graph_copy = graph.copy()
 
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
@@ -277,7 +277,7 @@ class GraphTests(ArchesTestCase):
             graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
 
-        graph = Graph(self.SINGLE_NODE_GRAPHID)
+        graph = Graph.objects.get(graphid=self.SINGLE_NODE_GRAPHID)
         # test that we can't append a single non-grouped node to a graph that is a single non grouped node
         with self.assertRaises(ValidationError):
             graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
@@ -547,7 +547,7 @@ class GraphTests(ArchesTestCase):
         test the graph delete method
 
         """
-        graph = Graph(self.NODE_NODETYPE_GRAPHID)
+        graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
         self.assertEqual(len(graph.nodes),2)
         self.assertEqual(len(graph.edges),1)
         graph.delete()
