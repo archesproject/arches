@@ -94,11 +94,8 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
-                metadata = args[0]["metadata"]
-                if isinstance(metadata, Graph):
-                    metadata = JSONSerializer().serializeToPython(metadata)
-
-                for key, value in metadata.iteritems():
+                
+                for key, value in args[0].iteritems():
                     if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'nodegroups'):
                         setattr(self, key, value)
 
@@ -439,8 +436,10 @@ class Graph(models.GraphModel):
         ret = {'nodes':[], 'edges':[]}
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
-        
-        graph_dict = {'nodes':[], 'edges':[], 'metadata':self}
+
+        graph_dict = self.serialize()
+        graph_dict['nodes'] = []
+        graph_dict['edges'] = []
         def traverse_tree(tree):
             graph_dict['nodes'].append(tree['node'])
             for child in tree['children']:

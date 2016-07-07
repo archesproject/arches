@@ -4692,18 +4692,16 @@
   ],
   "graph": [
     {
-      "metadata": {
-        "graphid": "11111111-0000-0000-0000-191919191919",
-        "name": "Heritage Resource",
-        "subtitle": "Arches cultural heritage resource",
-        "author": "Arches",
-        "description": "Arches cultural heritage resource",
-        "version": "v1.0.0",
-        "isresource": true,
-        "isactive": false,
-        "iconclass": "fa fa-building",
-        "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
-      },
+      "graphid": "11111111-0000-0000-0000-191919191919",
+      "name": "Heritage Resource",
+      "subtitle": "Arches cultural heritage resource",
+      "author": "Arches",
+      "description": "Arches cultural heritage resource",
+      "version": "v1.0.0",
+      "isresource": true,
+      "isactive": false,
+      "iconclass": "fa fa-building",
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
       "nodes": [
         {
             "status": null,

@@ -96,16 +96,14 @@ class GraphTests(ArchesTestCase):
         """
 
         graph_obj = {
-            "metadata": {
-                "name": "TEST GRAPH",
-                "subtitle": "ARCHES TEST GRAPH",
-                "author": "Arches",
-                "description": "ARCHES TEST GRAPH",
-                "version": "v1.0.0",
-                "isresource": True,
-                "isactive": False,
-                "iconclass": "fa fa-building"
-            },
+            "name": "TEST GRAPH",
+            "subtitle": "ARCHES TEST GRAPH",
+            "author": "Arches",
+            "description": "ARCHES TEST GRAPH",
+            "version": "v1.0.0",
+            "isresource": True,
+            "isactive": False,
+            "iconclass": "fa fa-building",
             'nodes':[{
                 "status": None,
                 "description": "",
@@ -146,6 +144,14 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 0)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 0)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 0)
+        self.assertEqual(graph_obj['name'], graph.name)
+        self.assertEqual(graph_obj['subtitle'], graph.subtitle)
+        self.assertEqual(graph_obj['author'], graph.author)
+        self.assertEqual(graph_obj['description'], graph.description)
+        self.assertEqual(graph_obj['version'], graph.version)
+        self.assertEqual(graph_obj['isresource'], graph.isresource)
+        self.assertEqual(graph_obj['isactive'], graph.isactive)
+        self.assertEqual(graph_obj['iconclass'], graph.iconclass)
 
     def test_nodes_are_byref(self):
         """
