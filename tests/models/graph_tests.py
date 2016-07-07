@@ -220,10 +220,6 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-        print 'in test_branch_append_with_ontology'
-        print graph.ontology
-        g = Graph.objects.get(pk=self.NODE_NODETYPE_GRAPHID)
-        print g.ontology
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
@@ -527,13 +523,8 @@ class GraphTests(ArchesTestCase):
         self.rootNode.graph.ontology_id = None
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
 
-        print 'here'
-        print graph.ontology_id
         graph.ontology_id = None
-        print graph.ontology.pk
-        print graph.ontology_id
         ret = graph.get_valid_ontology_classes(nodeid=self.rootNode.nodeid)
-        print ret
         self.assertTrue(len(ret) == 0)
 
     def test_append_branch_to_resource_with_no_ontology_system(self):
