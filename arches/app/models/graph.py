@@ -87,7 +87,7 @@ class Graph(models.GraphModel):
                     self.add_edge(edge)
 
     @staticmethod
-    def new(name="",is_resource=False,author=""):
+    def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
         nodegroup = None
         if not is_resource:
@@ -196,7 +196,6 @@ class Graph(models.GraphModel):
         Saves an entity back to the db, returns a DB model instance, not an instance of self
 
         """
-
 
         self.validate()
 
