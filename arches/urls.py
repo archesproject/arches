@@ -69,6 +69,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, graph.get_valid_domain_nodes, name='get_valid_domain_nodes'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='node'),
+    url(r'^test/(?P<graphid>%s)$' % uuid_regex, graph.test, name='test'),
 
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
 

@@ -29,17 +29,20 @@ from arches.app.models.graph import Graph
 from arches.app.models import models
 
 def test(request, graphid):
+    #graph = Graph.objects.filter(isresource=True)
+    # node = models.Node.objects.get(pk='7f5ada4c-3e29-11e6-a8d1-14109fd34195')
+    # graph = Graph.objects.get(node=node)
     graph = Graph(graphid)
     return JSONResponse(graph, indent=4)
 
 @group_required('edit')
 def manager(request, graphid):
     if request.method == 'DELETE':
-        graph = Graph(graphid)
+        graph = Graph.objects.get(pk=graphid)
         graph.delete()
         return JSONResponse({'succces':True})
 
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     if graphid is None or graphid == '':
         return render(request, 'views/graph/graph-list.htm', {
             'main_script': 'views/graph/graph-list',
@@ -48,16 +51,16 @@ def manager(request, graphid):
 
     graph = Graph(graphid)
     validations = models.Validation.objects.all()
-    branch_graphs = models.Graph.objects.exclude(pk=graphid)
-    if graph.metadata.ontology is not None:
-        branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
+    branch_graphs = models.GraphModel.objects.exclude(pk=graphid)
+    if graph.ontology is not None:
+        branch_graphs = branch_graphs.filter(ontology=graph.ontology)
     metadata_records = JSONSerializer().serializeToPython(branch_graphs)
     branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
     branches = []
     for metadata_record in metadata_records:
        try:
-           rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
-           metadata_record['graph'] = Graph(rootnode)
+           #rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
+           metadata_record['graph'] = Graph.objects.get(pk=metadata_record['graphid'])
            branches.append(metadata_record)
        except models.Node.DoesNotExist:
            pass
@@ -105,7 +108,7 @@ def settings(request, graphid):
         })
     node_json = JSONSerializer().serialize(node)
     icons = models.Icon.objects.order_by('name')
-    resource_graphs = models.Graph.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
+    resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
     resource_data = []
     relatable_resources = node.get_relatable_resources()
     for res in resource_graphs:
@@ -116,7 +119,7 @@ def settings(request, graphid):
                 'graph': res,
                 'is_relatable': (node in relatable_resources)
             })
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     ontologies = models.Ontology.objects.filter(parentontology=None)
     ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
     return render(request, 'views/graph/graph-settings.htm', {
@@ -136,7 +139,7 @@ def settings(request, graphid):
 def card_manager(request, graphid):
     node = models.Node.objects.get(graph_id=graphid, istopnode=True)
     graph = node.graph
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     return render(request, 'views/graph/card-manager.htm', {
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
@@ -195,14 +198,14 @@ def clone(request, graphid):
         data = JSONDeserializer().deserialize(request.body)
         graph = Graph(graphid).copy()
         if 'isresource' in data:
-            graph.metadata.isresource = data['isresource']
+            graph.isresource = data['isresource']
 
         if 'name' in data:
             name = data['name']
         else:
-            name = _('New Resource') if graph.metadata.isresource else _('New Graph')
+            name = _('New Resource') if graph.isresource else _('New Graph')
         graph.root.name = name
-        graph.metadata.name = name
+        graph.name = name
 
         graph.save()
         return JSONResponse(graph)
