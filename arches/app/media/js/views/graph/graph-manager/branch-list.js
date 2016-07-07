@@ -31,7 +31,7 @@ define([
             this.items = options.branches;
             this.items().forEach(function (branch) {
                 branch.graphModel = new GraphModel({
-                    data: branch.graph
+                    data: branch
                 })
             });
             this.selectedBranch = ko.observable(null);
@@ -93,12 +93,12 @@ define([
             var self = this;
             if(this.selectedNode()){
                 this.loading(true);
-                var ontology_connection = _.find(item.graph.domain_connections, function(domain_connection){
+                var ontology_connection = _.find(item.domain_connections, function(domain_connection){
                     return _.find(domain_connection.ontology_classes, function(ontology_class){
                         return ontology_class === this.selectedNode().ontologyclass();
                     }, this)
                 }, this);
-                if(ontology_connection || !item.graph.ontology){
+                if(ontology_connection || !item.ontology){
                     var property = ontology_connection ? ontology_connection.ontology_property : null;
                     this.graphModel.appendBranch(this.selectedNode().nodeid, property, item.graphid, function(response, status){
                         self.failed(status !== 'success');

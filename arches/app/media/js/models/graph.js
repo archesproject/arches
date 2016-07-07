@@ -364,7 +364,7 @@ define(['arches',
             var self = this;
             var datatypelookup = {};
 
-            attributes =_.extend({data:{'nodes':[], 'edges': []}, datatypes:[], domain_connections:[]}, attributes);
+            attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
                 datatypelookup[datatype.datatype] = datatype.iconclass;

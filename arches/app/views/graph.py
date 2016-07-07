@@ -51,19 +51,9 @@ def manager(request, graphid):
 
     graph = Graph.objects.get(graphid=graphid)
     validations = models.Validation.objects.all()
-    branch_graphs = models.GraphModel.objects.exclude(pk=graphid)
+    branch_graphs = Graph.objects.exclude(pk=graphid)
     if graph.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.ontology)
-    metadata_records = JSONSerializer().serializeToPython(branch_graphs)
-    branch_nodes = models.Node.objects.filter(~Q(graph=None), istopnode=True)
-    branches = []
-    for metadata_record in metadata_records:
-       try:
-           #rootnode = branch_nodes.get(graph_id=metadata_record['graphid'])
-           metadata_record['graph'] = Graph.objects.get(graphid=metadata_record['graphid'])
-           branches.append(metadata_record)
-       except models.Node.DoesNotExist:
-           pass
     datatypes = models.DDataType.objects.all()
     return render(request, 'views/graph/graph-manager.htm', {
         'main_script': 'views/graph/graph-manager',
@@ -72,7 +62,7 @@ def manager(request, graphid):
         'graph': JSONSerializer().serializeToPython(graph),
         'graph_json': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
-        'branches': JSONSerializer().serialize(branches),
+        'branches': JSONSerializer().serialize(branch_graphs),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
             'title': _('Node List'),
