@@ -171,7 +171,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Graph',
+            name='GraphModel',
             fields=[
                 ('graphid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
@@ -295,7 +295,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
             ],
             options={
                 'db_table': 'edges',
@@ -384,7 +384,7 @@ class Migration(migrations.Migration):
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
             ],
             options={
                 'db_table': 'nodes',
@@ -655,7 +655,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
         ),
         migrations.AddField(
-            model_name='graph',
+            model_name='graphmodel',
             name='ontology',
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
         ),
