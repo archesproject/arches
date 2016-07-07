@@ -25,51 +25,15 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-# class GraphManager(basemodel.Manager):
-#     def get_queryset(self, *args, **kwargs):
-#         print 'in get_queryset'
-#         print args
-#         return super(GraphManager, self).get_queryset()
 
 class Graph(models.GraphModel):
     """
     Used for mapping complete resource graph objects to and from the database
 
     """
-    #from_node = GraphManager()
 
     class Meta:
         proxy = True
-
-    # @staticmethod
-    # def __new__(cls, *args, **kwargs):
-    #     print args
-    #     #return super(Graph, cls).__new__(cls)
-    #     if isinstance(args[0], models.Node):
-    #         #return  Graph.objects.get(pk=args[0].graph.pk)
-    #         args = list(args)
-    #         args[0] = args[0].graph.pk
-    #         args = tuple(args)
-    #         return Graph.__new__(cls, *args, **kwargs)
-    #         return super(Graph, cls).__new__(cls, *args, **kwargs)
-
-    #     else:
-    #         return super(Graph, cls).__new__(cls, *args, **kwargs)
-
-        # modulename = kwargs.get('mod', 'default')
-        # if modulename == '':
-        #     return super(Resource, cls).__new__(cls)
-        # else:
-        #     fully_qualified_modulename = settings.RESOURCE_MODEL.get(modulename)
-        #     if fully_qualified_modulename == 'arches.app.models.resource.Resource' or fully_qualified_modulename == '':
-        #         return super(Entity, cls).__new__(cls)
-        #     components = fully_qualified_modulename.split('.')
-        #     classname = components[len(components)-1]
-        #     modulename = ('.').join(components[0:len(components)-1])
-        #     kwargs['mod'] = ''
-        #     mod = __import__(modulename, globals(), locals(), [classname], -1)
-        #     if issubclass(getattr(mod, classname), Resource):
-        #         return getattr(mod, classname)(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Graph, self).__init__(*args, **kwargs)
@@ -94,7 +58,7 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
-                
+
                 for key, value in args[0].iteritems():
                     if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'nodegroups'):
                         setattr(self, key, value)
