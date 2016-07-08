@@ -790,7 +790,7 @@ class Graph(models.GraphModel):
             parentproperties[edge.rangenode_id] = edge.ontologyproperty
         for key, node in self.nodes.iteritems():
             nodeobj = JSONSerializer().serializeToPython(node)
-            #nodeobj['parentproperty'] = parentproperties[node.nodeid]
+            nodeobj['parentproperty'] = parentproperties[node.nodeid]
             ret['nodes'].append(nodeobj)
 
         return ret
