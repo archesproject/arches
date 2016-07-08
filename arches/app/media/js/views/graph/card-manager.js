@@ -22,9 +22,9 @@ require([
     }, viewModel);
     viewModel.appliedGraphs = ko.observableArray();
     viewModel.availableGraphs = ko.observableArray();
-    data.graphs.forEach(function(graph){
-        if(graph.isactive && !graph.isresource){
-            viewModel.availableGraphs.push(graph);
+    data.branches.forEach(function(branch){
+        if(branch.isactive){
+            viewModel.availableGraphs.push(branch);
         }
     })
     var pageView = new PageView({

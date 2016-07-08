@@ -130,22 +130,19 @@ def card_manager(request, graphid):
     graph = Graph.objects.get(graphid=graphid)
     graph.include_cards = True
     
-    graphs = models.GraphModel.objects.all()
-    branch_graphs = graphs.exclude(pk=graphid)
+    branch_graphs = Graph.objects.exclude(pk=graphid, isresource=True)
     if graph.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.ontology)
     
-    branches = JSONSerializer().serializeToPython(branch_graphs)
-    for branch in branches:
-        branch_graph = Graph(branch['graphid'])
+    for branch_graph in branch_graphs:
         branch_graph.include_cards = True
-        branch['graph'] = branch_graph
 
     return render(request, 'views/graph/card-manager.htm', {
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
         'graph': JSONSerializer().serialize(graph),
-        'graphs': JSONSerializer().serialize(branches)
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'branches': JSONSerializer().serialize(branch_graphs)
     })
 
 @group_required('edit')
