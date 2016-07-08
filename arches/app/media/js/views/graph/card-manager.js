@@ -29,7 +29,7 @@ require([
         })
         if(!cardOrNode){
             cardOrNode = _.find(branch.nodes, function(node){
-                return node.nodegroup_id === nodegroupid;
+                return node.nodeid === nodegroupid;
             })
         }
         return cardOrNode;
