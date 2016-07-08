@@ -25,7 +25,7 @@ require([
 
     var findCardOrNode = function(branch, nodegroupid){
         var cardOrNode = _.find(branch.cards, function(card){
-            return card.nodegroupid === nodegroupid;
+            return card.nodegroup_id === nodegroupid;
         })
         if(!cardOrNode){
             cardOrNode = _.find(branch.nodes, function(node){
