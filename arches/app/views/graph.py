@@ -28,39 +28,41 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
 
+def test(request, graphid):
+    #graph = Graph.objects.filter(isresource=True)
+    # node = models.Node.objects.get(pk='7f5ada4c-3e29-11e6-a8d1-14109fd34195')
+    # graph = Graph.objects.get(node=node)
+    graph = Graph.objects.get(graphid=graphid)
+    return JSONResponse(graph, indent=4)
 
 @group_required('edit')
 def manager(request, graphid):
     if request.method == 'DELETE':
-        graph = Graph(graphid)
+        graph = Graph.objects.get(pk=graphid)
         graph.delete()
         return JSONResponse({'succces':True})
 
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     if graphid is None or graphid == '':
         return render(request, 'views/graph/graph-list.htm', {
             'main_script': 'views/graph/graph-list',
             'graphs': JSONSerializer().serialize(graphs)
         })
 
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     validations = models.Validation.objects.all()
-    branch_graphs = graphs.exclude(pk=graphid)
-    if graph.metadata.ontology is not None:
-        branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
-    
-    branches = JSONSerializer().serializeToPython(branch_graphs)
-    for branch in branches:
-       branch['graph'] = Graph(branch['graphid'])
-
+    branch_graphs = Graph.objects.exclude(pk=graphid)
+    if graph.ontology is not None:
+        branch_graphs = branch_graphs.filter(ontology=graph.ontology)
     datatypes = models.DDataType.objects.all()
     return render(request, 'views/graph/graph-manager.htm', {
         'main_script': 'views/graph/graph-manager',
         'graphid': graphid,
         'graphs': JSONSerializer().serialize(graphs),
-        'graph': JSONSerializer().serialize(graph),
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graph_json': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
-        'branches': JSONSerializer().serialize(branches),
+        'branches': JSONSerializer().serialize(branch_graphs),
         'datatypes': JSONSerializer().serialize(datatypes),
         'node_list': {
             'title': _('Node List'),
@@ -73,8 +75,7 @@ def manager(request, graphid):
         'branch_list': {
             'title': _('Branch Library'),
             'search_placeholder': _('Find a graph branch')
-        },
-        'metadata': graph.root.graph
+        }
     })
 
 
@@ -84,7 +85,7 @@ def settings(request, graphid):
     graph = node.graph
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('metadata').iteritems():
+        for key, value in data.get('graph').iteritems():
             setattr(graph, key, value)
         graph.save()
         node.set_relatable_resources(data.get('relatable_resource_ids'))
@@ -92,12 +93,12 @@ def settings(request, graphid):
         node.save()
         return JSONResponse({
             'success': True,
-            'metadata': graph,
+            'graph': graph,
             'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
         })
     node_json = JSONSerializer().serialize(node)
     icons = models.Icon.objects.order_by('name')
-    resource_graphs = models.Graph.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
+    resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
     resource_data = []
     relatable_resources = node.get_relatable_resources()
     for res in resource_graphs:
@@ -105,35 +106,34 @@ def settings(request, graphid):
             node = models.Node.objects.get(graph=res, istopnode=True)
             resource_data.append({
                 'id': node.nodeid,
-                'metadata': res,
+                'graph': res,
                 'is_relatable': (node in relatable_resources)
             })
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     ontologies = models.Ontology.objects.filter(parentontology=None)
     ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
     return render(request, 'views/graph/graph-settings.htm', {
         'main_script': 'views/graph/graph-settings',
         'icons': JSONSerializer().serialize(icons),
-        'metadata_json': JSONSerializer().serialize(graph),
+        'graph': JSONSerializer().serialize(graph),
         'node_json': node_json,
         'graphs': JSONSerializer().serialize(graphs),
         'ontologies': JSONSerializer().serialize(ontologies),
         'ontology_classes': JSONSerializer().serialize(ontology_classes),
         'graphid': graphid,
-        'metadata': graph,
         'resource_data': JSONSerializer().serialize(resource_data),
         'node_count': models.Node.objects.filter(graph=graph).count()
     })
 
 @group_required('edit')
 def card_manager(request, graphid):
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     graph.include_cards = True
     
-    graphs = models.Graph.objects.all()
+    graphs = models.GraphModel.objects.all()
     branch_graphs = graphs.exclude(pk=graphid)
-    if graph.metadata.ontology is not None:
-        branch_graphs = branch_graphs.filter(ontology=graph.metadata.ontology)
+    if graph.ontology is not None:
+        branch_graphs = branch_graphs.filter(ontology=graph.ontology)
     
     branches = JSONSerializer().serializeToPython(branch_graphs)
     for branch in branches:
@@ -153,7 +153,7 @@ def node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
         if request.method == 'POST':
-            graph = Graph(graphid)
+            graph = Graph.objects.get(graphid=graphid)
             graph.update_node(data)
             graph.save()
             return JSONResponse(graph)
@@ -165,7 +165,7 @@ def delete_node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
         if request.method == 'DELETE':
-            graph = Graph(graphid)
+            graph = Graph.objects.get(graphid=graphid)
             graph.delete_node(node=data.get('nodeid', None))
             return JSONResponse({})
 
@@ -175,7 +175,7 @@ def delete_node(request, graphid):
 def append_branch(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid)
+        graph = Graph.objects.get(graphid=graphid)
         new_branch = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
         graph.save()
         return JSONResponse(new_branch)
@@ -186,7 +186,7 @@ def append_branch(request, graphid):
 def move_node(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid)
+        graph = Graph.objects.get(graphid=graphid)
         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
         graph.save()
         return JSONResponse(updated_nodes_and_edges)
@@ -197,16 +197,16 @@ def move_node(request, graphid):
 def clone(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
-        graph = Graph(graphid).copy()
+        graph = Graph.objects.get(graphid=graphid).copy()
         if 'isresource' in data:
-            graph.metadata.isresource = data['isresource']
+            graph.isresource = data['isresource']
 
         if 'name' in data:
             name = data['name']
         else:
-            name = _('New Resource') if graph.metadata.isresource else _('New Graph')
+            name = _('New Resource') if graph.isresource else _('New Graph')
         graph.root.name = name
-        graph.metadata.name = name
+        graph.name = name
 
         graph.save()
         return JSONResponse(graph)
@@ -228,10 +228,10 @@ def new(request):
 
 def get_related_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph.get_valid_ontology_classes(nodeid=data['nodeid']))
 
 def get_valid_domain_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
-    graph = Graph(graphid)
+    graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph.get_valid_domain_ontology_classes(nodeid=data['nodeid']))

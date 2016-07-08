@@ -25,14 +25,14 @@ define([
             var self = this;
             _.extend(this, _.pick(options, 'graphModel', 'validations', 'branches'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
-            this.hasOntolgoy = this.graphModel.get('metadata').ontology_id ? true: false;
+            this.hasOntolgoy = this.graphModel.get('ontology_id') ? true: false;
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
             this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
-                return self.graphModel.get('metadata').isresource && node && node.istopnode;
+                return self.graphModel.get('isresource') && node && node.istopnode;
             });
             this.disableDatatype = ko.computed(function () {
                 var node = self.node();

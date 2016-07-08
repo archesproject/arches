@@ -81,7 +81,10 @@ class JSONSerializer(object):
               isinstance(object, tuple)):
             return self.handle_list(object)
         elif isinstance(object, Model):
-            return self.handle_model(object)
+            if hasattr(object, 'serialize'):
+                return getattr(object, 'serialize')()  
+            else:
+                return self.handle_model(object)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             #return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
