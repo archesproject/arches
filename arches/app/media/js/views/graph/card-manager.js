@@ -22,10 +22,30 @@ require([
     }, viewModel);
     viewModel.appliedGraphs = ko.observableArray();
     viewModel.availableGraphs = ko.observableArray();
-    data.branches.forEach(function(branch){
-        if(branch.isactive){
-            viewModel.availableGraphs.push(branch);
+
+    var findCardOrNode = function(branch, nodegroupid){
+        var cardOrNode = _.find(branch.cards, function(card){
+            return card.nodegroupid === nodegroupid;
+        })
+        if(!cardOrNode){
+            cardOrNode = _.find(branch.nodes, function(node){
+                return node.nodegroup_id === nodegroupid;
+            })
         }
+        return cardOrNode;
+    }
+    data.branches.forEach(function(branch){
+        branch.card = {'name':'', 'subcards': []}
+        branch.nodegroups.forEach(function(nodegroup){
+            var cardOrNode = findCardOrNode(branch, nodegroup.nodegroupid);
+            if(nodegroup.parentnodegroup_id){
+                branch.card.subcards.push({'name':cardOrNode.name});
+            }else{
+                branch.card.name = cardOrNode.name;
+            }
+        })
+        
+        viewModel.availableGraphs.push(branch);
     })
     var pageView = new PageView({
         viewModel: viewModel
