@@ -33,8 +33,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="ep-toolbar">
 
         <!-- Tools Menu -->
-        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }"> 
-            <div class="">{% trans "Manage" %} 
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }">
+            <div class="">{% trans "Manage" %}
                 <i class="ion-more"></i>
             </div>
         </a>
@@ -43,7 +43,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% block graph_title %}
         <div class="ep-tools-title">
             <h1 class="page-header text-overflow ep-graph-title">
-                <i class="{{graph.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i> 
+                <i class="{{graph.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
                 <span>
                     {{graph.name}}
                 </span>
@@ -189,29 +189,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 
-    <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
-        <!-- ko if: alert() -->
-        <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-        <p class="ep-form-alert-text" data-bind="text: alert().text"></p>
-
-        <div class="ep-form-alert-default-dismiss">
-            <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
-        </div>
-
-        <div class="ep-form-alert-buttons">
-            <!-- ko if: alert().cancel -->
-            <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
-            <!-- /ko -->
-            <!-- ko if: alert().ok -->
-            <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
-    </div>
 
     <!-- Edit Content -->
-    <div class="relative ep-content">
+    <div class="relative ep-content graph-base-content">
         <div id="" class="edit-content relative" style="top: 0px;" data-bind="css: {'alert-active': (alert() && alert().active())}">
+            <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
+                <!-- ko if: alert() -->
+                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                <p class="ep-form-alert-text" data-bind="text: alert().text"></p>
+
+                <div class="ep-form-alert-default-dismiss">
+                    <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                </div>
+
+                <div class="ep-form-alert-buttons">
+                    <!-- ko if: alert().cancel -->
+                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                    <!-- /ko -->
+                    <!-- ko if: alert().ok -->
+                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            </div>
 
 
             <!-- Settings -->
