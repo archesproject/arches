@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from copy import copy
 from django.db import transaction
-from django.db import models as basemodel
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
@@ -55,6 +54,7 @@ class Graph(models.GraphModel):
         self.nodes = {}
         self.edges = {}
         self.nodegroups = {}
+        self.include_cards = False
 
         if args:
             if isinstance(args[0], dict):
@@ -768,6 +768,18 @@ class Graph(models.GraphModel):
 
         return ret
 
+    def get_cards(self):
+        """
+        get the card data (if any) associated with this graph
+
+        """
+
+        cards = []
+        for nodegroup in self.nodegroups.itervalues():
+            cards.extend(nodegroup.card_set.all())
+
+        return cards
+
     def serialize(self):
         """
         serialize to a different form then used by the internal class structure
@@ -783,6 +795,9 @@ class Graph(models.GraphModel):
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+        if self.include_cards:
+            ret['cards'] = self.get_cards()
+
         parentproperties = {
             self.root.nodeid: ''
         }

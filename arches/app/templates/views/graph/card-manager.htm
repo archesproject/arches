@@ -72,14 +72,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- card Name -->
                                     <div class="panel-heading">
-                                        <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
+                                        <h3 class="panel-title library-card-panel-title" data-bind="text:card.name"></h3>
                                     </div>
                                     
                                     <!-- Abstract -->
-                                    <div class="panel-body library-card-body" style="">
-                                        <p class="library-item-subtitle">Evaluation, Evaluation Date Assessed</p>
-                                        <p class="library-item-subtitle">Description</p>
-                                        <p class="library-item-subtitle">Images</p>
+                                    <div class="panel-body library-card-body" data-bind="foreach: card.subcards">
+                                        <p class="library-item-subtitle" data-bind="text:name"></p>
                                     </div>
 
                                     <!-- Selectable -->
@@ -171,7 +169,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('graph-cards-data', [], function () {
     return {
-        graphs: {{graphs}}
+        branches: {{branches}}
     };
 });
 {% endautoescape %}</script>

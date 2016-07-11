@@ -127,14 +127,22 @@ def settings(request, graphid):
 
 @group_required('edit')
 def card_manager(request, graphid):
-    node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-    graph = node.graph
-    graphs = models.GraphModel.objects.all()
+    graph = Graph.objects.get(graphid=graphid)
+    graph.include_cards = True
+    
+    branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+    if graph.ontology is not None:
+        branch_graphs = branch_graphs.filter(ontology=graph.ontology)
+    
+    for branch_graph in branch_graphs:
+        branch_graph.include_cards = True
+
     return render(request, 'views/graph/card-manager.htm', {
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
-        'graphs': JSONSerializer().serialize(graphs),
-        'graph': graph,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'branches': JSONSerializer().serialize(branch_graphs)
     })
 
 @group_required('edit')
