@@ -548,6 +548,54 @@ class GraphTests(ArchesTestCase):
         for edge_id, edge in graph.edges.iteritems():
             self.assertTrue(edge.ontologyproperty is None)
 
+    def test_save_and_update_dont_orphan_records_in_the_db(self):
+        """
+        test that the proper number of nodes, edges, and nodegroups are persisted to the database
+        during save and update opertaions
+
+        """
+
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
+        nodegroups_count_before = models.NodeGroup.objects.count()
+        
+        # test that data is persisited propertly when creating a new graph
+        graph = Graph.new(is_resource=False)
+        
+        nodes_count_after = models.Node.objects.count()
+        edges_count_after = models.Edge.objects.count()
+        nodegroups_count_after = models.NodeGroup.objects.count()
+
+        self.assertEqual(nodes_count_after-nodes_count_before, 1)
+        self.assertEqual(edges_count_after-edges_count_before, 0)
+        self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
+
+        # test that data is persisited propertly during an append opertation
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
+
+        nodes_count_after = models.Node.objects.count()
+        edges_count_after = models.Edge.objects.count()
+        nodegroups_count_after = models.NodeGroup.objects.count()
+
+        self.assertEqual(nodes_count_after-nodes_count_before, 3)
+        self.assertEqual(edges_count_after-edges_count_before, 2)
+        self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
+
+        # test that removing a node group by setting it to None, removes it from the db
+        node_to_update = None
+        for node_id, node in graph.nodes.iteritems():
+            if node.name == 'Node':
+                node_to_update = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
+
+        node_to_update['nodegroup_id'] = None
+        graph.update_node(node_to_update)
+        graph.save()
+
+        nodegroups_count_after = models.NodeGroup.objects.count()
+        
+        self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
+
     def test_delete_graph(self):
         """
         test the graph delete method
@@ -556,10 +604,14 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
         self.assertEqual(len(graph.nodes),2)
         self.assertEqual(len(graph.edges),1)
+        self.assertEqual(len(graph.nodegroups),1)
+        nodegroups_count_before = models.NodeGroup.objects.count()
         graph.delete()
 
         node_count = models.Node.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
         edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
+        nodegroup_count_after = models.NodeGroup.objects.count()
         self.assertEqual(node_count,0)
         self.assertEqual(edge_count,0)
+        self.assertEqual(nodegroups_count_before-nodegroup_count_after, 1)
 

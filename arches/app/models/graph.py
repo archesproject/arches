@@ -55,6 +55,7 @@ class Graph(models.GraphModel):
         self.edges = {}
         self.nodegroups = {}
         self.include_cards = False
+        self._nodegroups_to_delete = {}
 
         if args:
             if isinstance(args[0], dict):
@@ -191,6 +192,14 @@ class Graph(models.GraphModel):
         self.edges[edge.pk] = edge
         return edge
 
+    def add_nodegroup(self, nodegroup):
+        """
+
+        """
+
+        self.nodegroups[nodegroup.pk] = nodegroup
+
+
     def save(self):
         """
         Saves an entity back to the db, returns a DB model instance, not an instance of self
@@ -203,24 +212,27 @@ class Graph(models.GraphModel):
             #self.save()
             super(Graph, self).save()
 
-            for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+            for nodegroup in self._nodegroups_to_delete.itervalues():
+                nodegroup.delete()
+
+            for nodegroup in self.nodegroups.itervalues():
                 nodegroup.save()
 
-            for node_id, node in self.nodes.iteritems():
+            for node in self.nodes.itervalues():
                 node.save()
 
-            for edge_id, edge in self.edges.iteritems():
+            for edge in self.edges.itervalues():
                 edge.save()
 
     def delete(self):
         with transaction.atomic():
-            for edge_id, edge in self.edges.iteritems():
+            for edge in self.edges.itervalues():
                 edge.delete()
 
-            for node_id, node in self.nodes.iteritems():
+            for node in self.nodes.itervalues():
                 node.delete()
 
-            for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+            for nodegroup in self.nodegroups.itervalues():
                 nodegroup.delete()
 
             super(Graph, self).delete()
@@ -260,6 +272,7 @@ class Graph(models.GraphModel):
         """
 
         tree = self.get_tree()
+        self._nodegroups_to_delete = self.nodegroups
         self.nodegroups = {}
 
         def traverse_tree(tree, current_nodegroup=None):
@@ -272,6 +285,7 @@ class Graph(models.GraphModel):
             tree['node'].nodegroup = current_nodegroup
             if current_nodegroup is not None:
                 self.nodegroups[current_nodegroup.pk] = current_nodegroup
+                self._nodegroups_to_delete.pop(current_nodegroup.pk, None)
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
