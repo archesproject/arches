@@ -3470,6 +3470,12 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     display: block;
     height: 90px;
 }
+.graph-base-content .alert-active .ep-form-alert {
+    top: 0;
+}
+.graph-base-content .alert-active .ep-form-content {
+    padding-top: 100px
+}
 .ep-alert-red {
 	background: #f87359;
 	border: 1px solid #B72F16;
@@ -3523,8 +3529,8 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 
 .page-title-block {
-    height: 80px; 
-    background: #fafafa; 
+    height: 80px;
+    background: #fafafa;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #ddd;
 }
