@@ -184,13 +184,15 @@ class GraphTests(ArchesTestCase):
         and that the actual node references are different
 
         """
-        root = models.Node.objects.get(pk=self.HERITAGE_RESOURCE_FIXTURE)
-        graph = Graph.objects.get(graphid=root.graph.graphid)
+
+        graph = Graph.new()
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph_copy = graph.copy()
 
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
         self.assertEqual(len(graph.edges), len(graph_copy.edges))
-        self.assertEqual(len(graph.nodegroups), len(graph_copy.nodegroups))
+        self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
+        #self.assertEqual(len(graph.cards), len(graph_copy.cards))
 
         def findNodeByName(graph, name):
             for key, node in graph.nodes.iteritems():
@@ -215,6 +217,8 @@ class GraphTests(ArchesTestCase):
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 
+        #self.assertTrue(len(set(graph.cards).intersection(set(graph_copy.cards))) == 0)
+
     def test_branch_append_with_ontology(self):
         """
         test if a branch is properly appended to a graph that defines an ontology
@@ -231,7 +235,6 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(len(graph.nodes), 3)
         self.assertEqual(len(graph.edges), 2)
-        self.assertEqual(len(graph.nodegroups), 2)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
@@ -254,7 +257,6 @@ class GraphTests(ArchesTestCase):
         graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
-        self.assertEqual(len(graph.nodegroups), 2)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
@@ -339,7 +341,7 @@ class GraphTests(ArchesTestCase):
 
 		# test to confirm that a grouped set of nodes maintains their group after being appended onto a node with a different group
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
 
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
@@ -351,13 +353,13 @@ class GraphTests(ArchesTestCase):
         # confirm that nulling out a child group will then make that group a part of the parent group
         node_to_update['nodegroup_id'] = None
         graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
         for node_id, node in graph.nodes.iteritems():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
         # confirm that a non-grouped node takes on the parent group when appended
         graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.SINGLE_NODE_GRAPHID)
-        self.assertEqual(len(graph.nodegroups), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
         for node_id, node in graph.nodes.iteritems():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
@@ -368,7 +370,7 @@ class GraphTests(ArchesTestCase):
         # make a node group with a single node and confirm that that node is now not part of it's parent node group 
         child_nodegroup_node['nodegroup_id'] = child_nodegroup_node['nodeid']
         graph.update_node(child_nodegroup_node)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
         for node_id, node in graph.nodes.iteritems():
             if node_id == child_nodegroup_node['nodeid']:
                 self.assertNotEqual(graph.root.nodegroup, node.nodegroup)
@@ -379,7 +381,7 @@ class GraphTests(ArchesTestCase):
         # it's child are now not part of it's parent node group and that both nodes are grouped together
         node_to_update['nodegroup_id'] = node_to_update['nodeid']
         graph.update_node(node_to_update)
-        self.assertEqual(len(graph.nodegroups), 3)
+        self.assertEqual(len(graph.get_nodegroups()), 3)
         children = graph.get_child_nodes(node_to_update['nodeid'])
         for child in children:
             if child.nodeid == child_nodegroup_node['nodeid']:
@@ -390,7 +392,7 @@ class GraphTests(ArchesTestCase):
         # remove a node's node group and confirm that that node takes the node group of it's parent
         child_nodegroup_node['nodegroup_id'] = None
         graph.update_node(child_nodegroup_node)
-        self.assertEqual(len(graph.nodegroups), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
         children = graph.get_child_nodes(node_to_update['nodeid'])
         for child in children:
             self.assertEqual(child.nodegroup_id, node_to_update['nodegroup_id'])
@@ -558,6 +560,7 @@ class GraphTests(ArchesTestCase):
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
+        card_count_before = models.Card.objects.count()
         
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
@@ -565,10 +568,12 @@ class GraphTests(ArchesTestCase):
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
 
         self.assertEqual(nodes_count_after-nodes_count_before, 1)
         self.assertEqual(edges_count_after-edges_count_before, 0)
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
+        #self.assertEqual(card_count_after-card_count_before, 1)
 
         # test that data is persisited propertly during an append opertation
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
@@ -577,15 +582,18 @@ class GraphTests(ArchesTestCase):
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
 
         self.assertEqual(nodes_count_after-nodes_count_before, 3)
         self.assertEqual(edges_count_after-edges_count_before, 2)
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
+        #self.assertEqual(card_count_after-card_count_before, 2)
 
         # test that removing a node group by setting it to None, removes it from the db
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
             if node.name == 'Node':
+                self.assertTrue(node.is_collector())
                 node_to_update = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
 
         node_to_update['nodegroup_id'] = None
@@ -593,25 +601,51 @@ class GraphTests(ArchesTestCase):
         graph.save()
 
         nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
         
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
+        #self.assertEqual(card_count_after-card_count_before, 1)
+
+        # test that adding back a node group adds it back to the db
+        node_to_update['nodegroup_id'] = node_to_update['nodeid']
+        graph.update_node(node_to_update)
+        graph.save()
+
+        nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
+        
+        self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
+        #self.assertEqual(card_count_after-card_count_before, 2)
 
     def test_delete_graph(self):
         """
         test the graph delete method
 
         """
+
         graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
         self.assertEqual(len(graph.nodes),2)
         self.assertEqual(len(graph.edges),1)
-        self.assertEqual(len(graph.nodegroups),1)
+        self.assertEqual(len(graph.get_nodegroups()),1)
+        
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
+        card_count_before = models.Card.objects.count()
+        
         graph.delete()
+
+        nodes_count_after = models.Node.objects.count()
+        edges_count_after = models.Edge.objects.count()
+        nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
+
+        self.assertEqual(nodes_count_before-nodes_count_after, 2)
+        self.assertEqual(edges_count_before-edges_count_after, 1)
+        self.assertEqual(nodegroups_count_before-nodegroups_count_after, 1)
+        #self.assertEqual(card_count_before-card_count_after, 1)
 
         node_count = models.Node.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
         edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
-        nodegroup_count_after = models.NodeGroup.objects.count()
         self.assertEqual(node_count,0)
         self.assertEqual(edge_count,0)
-        self.assertEqual(nodegroups_count_before-nodegroup_count_after, 1)
-

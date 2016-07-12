@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
-from copy import copy
+from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -53,15 +53,15 @@ class Graph(models.GraphModel):
         self.root = None
         self.nodes = {}
         self.edges = {}
-        self.nodegroups = {}
+        self.cards = []
         self.include_cards = False
-        self._nodegroups_to_delete = {}
+        self._nodegroups_to_delete = set()
 
         if args:
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'nodegroups'):
+                    if not (key == 'root' or key == 'nodes' or key == 'edges'):
                         setattr(self, key, value)
 
                 for node in args[0]["nodes"]:
@@ -87,6 +87,8 @@ class Graph(models.GraphModel):
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
 
+                self.populate_null_nodegroups()
+
     @staticmethod
     def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
@@ -95,6 +97,11 @@ class Graph(models.GraphModel):
             nodegroup = models.NodeGroup.objects.create(
                 pk=newid
             )
+            # models.Card.objects.create(
+            #     nodegroup=nodegroup,
+            #     name='tests',
+            #     title='test'
+            # )
         metadata = models.GraphModel.objects.create(
             name=name,
             subtitle="",
@@ -154,11 +161,6 @@ class Graph(models.GraphModel):
             node.ontologyclass = None
         if node.pk == None:
             node.pk = uuid.uuid1()
-        if node.nodegroup != None:
-            self.nodegroups[node.nodegroup.pk] = node.nodegroup
-            if hasattr(node, 'cardinality'):
-                if node.cardinality != None:
-                    self.nodegroups[node.nodegroup.pk].cardinality = node.cardinality
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
@@ -192,14 +194,6 @@ class Graph(models.GraphModel):
         self.edges[edge.pk] = edge
         return edge
 
-    def add_nodegroup(self, nodegroup):
-        """
-
-        """
-
-        self.nodegroups[nodegroup.pk] = nodegroup
-
-
     def save(self):
         """
         Saves an entity back to the db, returns a DB model instance, not an instance of self
@@ -209,13 +203,12 @@ class Graph(models.GraphModel):
         self.validate()
 
         with transaction.atomic():
-            #self.save()
             super(Graph, self).save()
 
-            for nodegroup in self._nodegroups_to_delete.itervalues():
+            for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
 
-            for nodegroup in self.nodegroups.itervalues():
+            for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
             for node in self.nodes.itervalues():
@@ -224,16 +217,19 @@ class Graph(models.GraphModel):
             for edge in self.edges.itervalues():
                 edge.save()
 
+            for card in self.cards:
+                card.save()
+
     def delete(self):
         with transaction.atomic():
+            for nodegroup in self.get_nodegroups():
+                nodegroup.delete()
+
             for edge in self.edges.itervalues():
                 edge.delete()
 
             for node in self.nodes.itervalues():
                 node.delete()
-
-            for nodegroup in self.nodegroups.itervalues():
-                nodegroup.delete()
 
             super(Graph, self).delete()
 
@@ -272,20 +268,15 @@ class Graph(models.GraphModel):
         """
 
         tree = self.get_tree()
-        self._nodegroups_to_delete = self.nodegroups
-        self.nodegroups = {}
 
         def traverse_tree(tree, current_nodegroup=None):
-            if str(tree['node'].nodeid) == str(tree['node'].nodegroup_id):
+            if tree['node'].is_collector():
                  current_nodegroup = models.NodeGroup(
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
                 )
 
             tree['node'].nodegroup = current_nodegroup
-            if current_nodegroup is not None:
-                self.nodegroups[current_nodegroup.pk] = current_nodegroup
-                self._nodegroups_to_delete.pop(current_nodegroup.pk, None)
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
@@ -363,7 +354,8 @@ class Graph(models.GraphModel):
 
         new_nodegroups = {}
 
-        copy_of_self = Graph(self.pk)
+        copy_of_self = deepcopy(self)
+        # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
 
         copy_of_self.pk = uuid.uuid1()
@@ -375,11 +367,11 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector()
             node.pk = uuid.uuid1()
             if is_collector:
-                new_nodegroups[node.nodegroup.pk] = node.nodegroup
-                node.nodegroup_id = node.nodegroup.pk = node.pk
-            elif node.nodegroup and node.nodegroup.pk in new_nodegroups:
-                node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
-                node.nodegroup = new_nodegroups[node.nodegroup.pk]
+                node.nodegroup = models.NodeGroup(pk=node.pk)
+            else:
+                node.nodegroup = None
+
+        copy_of_self.populate_null_nodegroups()
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
 
@@ -390,8 +382,6 @@ class Graph(models.GraphModel):
             edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
-
-        copy_of_self.nodegroups = new_nodegroups
 
         return copy_of_self
 
@@ -455,8 +445,10 @@ class Graph(models.GraphModel):
         """
 
         node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
-        old_node = self.nodes.pop(node['nodeid'], None)
+        old_nodegroups = set(self.get_nodegroups())
+        old_node = self.nodes.pop(node['nodeid'])
         new_node = self.add_node(node)
+        new_nodegroups = set(self.get_nodegroups())
 
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
@@ -465,8 +457,9 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty')
 
-        if str(old_node.nodegroup_id) != str(node.get('nodegroup_id', None)):
-            self.populate_null_nodegroups()
+        #if str(old_node.nodegroup_id) != str(node.get('nodegroup_id', None)):
+        self.populate_null_nodegroups()
+        self._nodegroups_to_delete = old_nodegroups.difference(new_nodegroups)
 
         return self
 
@@ -490,7 +483,7 @@ class Graph(models.GraphModel):
             tree = self.get_tree(root=node)
             def traverse_tree(tree):
                 nodes.append(tree['node'])
-                if tree['node'].is_collector:
+                if tree['node'].is_collector():
                     nodegroups.append(tree['node'].nodegroup)
                 for child in tree['children']:
                     edges.append(child['parent_edge'])
@@ -568,9 +561,11 @@ class Graph(models.GraphModel):
 
         """
 
-        if len(self.nodegroups) == 0:
+        count = self.get_nodegroups()
+
+        if len(count) == 0:
             return 'undefined'
-        elif len(self.nodegroups) == 1:
+        elif len(count) == 1:
             return 'card'
         else:
             return 'card_collector'
@@ -782,6 +777,18 @@ class Graph(models.GraphModel):
 
         return ret
 
+    def get_nodegroups(self):
+        """
+        get the nodegroups associated with this graph
+
+        """
+
+        nodegroups = []
+        for node in self.nodes.itervalues():
+            if node.is_collector():
+                nodegroups.append(node.nodegroup)
+        return nodegroups
+
     def get_cards(self):
         """
         get the card data (if any) associated with this graph
@@ -789,7 +796,7 @@ class Graph(models.GraphModel):
         """
 
         cards = []
-        for nodegroup in self.nodegroups.itervalues():
+        for nodegroup in self.get_nodegroups():
             cards.extend(nodegroup.card_set.all())
 
         return cards
@@ -804,13 +811,12 @@ class Graph(models.GraphModel):
         """
 
         ret = JSONSerializer().handle_model(self)
-        ret['root'] = self.root;
-        ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
+        ret['root'] = self.root
+        ret['cards'] = self.get_cards()
+        ret['nodegroups'] = self.get_nodegroups()
         ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
-        if self.include_cards:
-            ret['cards'] = self.get_cards()
 
         parentproperties = {
             self.root.nodeid: ''
@@ -844,7 +850,7 @@ class Graph(models.GraphModel):
         # 20160609 can't implement this without changing our default resource graph --REA
         
         # parentnodegroups = []
-        # for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+        # for nodegroup in self.get_nodegroups():
         #     if nodegroup.parentnodegroup:
         #         parentnodegroups.append(nodegroup)
 
@@ -857,7 +863,7 @@ class Graph(models.GraphModel):
 
         # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
 
-        for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+        for nodegroup in self.get_nodegroups():
             if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
                 for node_id, node in self.nodes.iteritems():
                     if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':

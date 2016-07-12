@@ -267,7 +267,7 @@ class Node(models.Model):
         return (nodes, edges)
 
     def is_collector(self):
-        return self.nodeid == self.nodegroup_id
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
 
     def get_relatable_resources(self):
         relatable_resource_ids = [r2r.resourceclassfrom for r2r in Resource2ResourceConstraint.objects.filter(resourceclassto_id=self.nodeid)]
