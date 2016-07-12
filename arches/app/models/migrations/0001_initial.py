@@ -194,10 +194,11 @@ class Migration(migrations.Migration):
             name='Card',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('name', models.TextField()),
-                ('title', models.TextField()),
+                ('name', models.TextField(null=True, blank=True)),
+                ('title', models.TextField(null=True, blank=True)),
                 ('subtitle', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
+                ('cardinality', models.TextField(blank=True, default='n')),
             ],
             options={
                 'db_table': 'cards',
@@ -395,7 +396,6 @@ class Migration(migrations.Migration):
             name='NodeGroup',
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('cardinality', models.TextField(blank=True, default='n')),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
                 ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
             ],

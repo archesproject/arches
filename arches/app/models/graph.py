@@ -54,7 +54,6 @@ class Graph(models.GraphModel):
         self.nodes = {}
         self.edges = {}
         self.cards = []
-        self.include_cards = False
         self._nodegroups_to_delete = set()
 
         if args:
@@ -151,7 +150,7 @@ class Graph(models.GraphModel):
                 try:
                     node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
                 except models.NodeGroup.DoesNotExist:
-                    node.nodegroup = models.NodeGroup(pk=node.nodegroup_id, cardinality='n')
+                    node.nodegroup = models.NodeGroup(pk=node.nodegroup_id)
             else:
                 node.nodegroup = None
 

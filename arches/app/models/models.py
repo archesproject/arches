@@ -63,6 +63,7 @@ class Card(models.Model):
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
     parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
+    cardinality = models.TextField(blank=True, default='n')
 
     class Meta:
         managed = True
@@ -223,7 +224,6 @@ class Icon(models.Model):
 
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    cardinality = models.TextField(blank=True, default='n')
     legacygroupid = models.TextField(blank=True, null=True)
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
