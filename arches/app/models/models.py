@@ -305,7 +305,7 @@ class OntologyClass(models.Model):
     """
     the target JSONField has this schema:
 
-    values are dictionaries with 2 properties, 'down' and 'up' and within each of those another 2 properties, 
+    values are dictionaries with 2 properties, 'down' and 'up' and within each of those another 2 properties,
     'ontology_property' and 'ontology_classes'
 
     "down" assumes a known domain class, while "up" assumes a known range class
@@ -433,7 +433,7 @@ class ResourceInstance(models.Model):
 class Tile(models.Model): #Tile
     """
     the data JSONField has this schema:
-    
+
     values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
 
     .. code-block:: python

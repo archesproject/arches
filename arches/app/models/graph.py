@@ -339,7 +339,7 @@ class Graph(models.GraphModel):
 
             return branch_copy
         else:
-            raise ValidationError("Appending the supplied branch to this graph would create an non-compliant graph")  
+            raise ValidationError("Appending the supplied branch to this graph would create an non-compliant graph")
 
     def clear_ontology_references(self):
         """
@@ -490,7 +490,7 @@ class Graph(models.GraphModel):
             tree = self.get_tree(root=node)
             def traverse_tree(tree):
                 nodes.append(tree['node'])
-                if tree['node'].is_collector:
+                if tree['node'].is_collector():
                     nodegroups.append(tree['node'].nodegroup)
                 for child in tree['children']:
                     edges.append(child['parent_edge'])
@@ -675,7 +675,7 @@ class Graph(models.GraphModel):
         test to see if all the nodes in a group are semantic
 
         returns true if the group contains only semantic nodes, otherwise false
-        
+
         Arguments:
         node -- the node to use as a basis of finding the group
 
@@ -692,7 +692,7 @@ class Graph(models.GraphModel):
         given a node, get any other nodes that share the same group
 
         returns a list of nodes
-       
+
         Arguments:
         node -- the node to use as a basis of finding the group
 
@@ -706,7 +706,7 @@ class Graph(models.GraphModel):
         for node in self.nodes.itervalues():
             if node.nodegroup_id == nodegroup_id:
                 ret.append(node)
-        
+
         return ret
 
     def get_valid_domain_ontology_classes(self, nodeid=None):
@@ -839,10 +839,10 @@ class Graph(models.GraphModel):
                         raise ValidationError("The top node of your resource graph can't be a collector. Hint: check that nodegroup_id of your resource node(s) are null.")
 
 
-        
+
         # validates that a node group that has child node groups is not itself a child node group
         # 20160609 can't implement this without changing our default resource graph --REA
-        
+
         # parentnodegroups = []
         # for nodegroup_id, nodegroup in self.nodegroups.iteritems():
         #     if nodegroup.parentnodegroup:
@@ -879,7 +879,7 @@ class Graph(models.GraphModel):
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
-                    raise ValidationError("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph.")       
+                    raise ValidationError("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph.")
 
 
 class ValidationError(Exception):

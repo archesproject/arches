@@ -275,11 +275,11 @@ class GraphTests(ArchesTestCase):
         # try to append to any other node that is not the root
         for node in graph.nodes.itervalues():
             if node is not graph.root:
-                with self.assertRaises(ValidationError): 
+                with self.assertRaises(ValidationError):
                     graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID, nodeid=node.nodeid)
 
         # try to append a non-grouped graph
-        with self.assertRaises(ValidationError): 
+        with self.assertRaises(ValidationError):
             graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
 
 
@@ -327,12 +327,12 @@ class GraphTests(ArchesTestCase):
 
     def test_manage_nodegroups_during_node_update(self):
         """
-        test to make sure that node groups are properly managed when changing a nodegroup value on a node being updated 
-        
+        test to make sure that node groups are properly managed when changing a nodegroup value on a node being updated
+
         """
 
-        # create a graph, append the node/node type graph and confirm is has the correct 
-        # number of nodegroups then remove the appended branches group and reconfirm that 
+        # create a graph, append the node/node type graph and confirm is has the correct
+        # number of nodegroups then remove the appended branches group and reconfirm that
         # the proper number of groups are properly relfected in the graph
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
@@ -365,7 +365,7 @@ class GraphTests(ArchesTestCase):
             if str(edge.domainnode_id) == str(node_type_node['nodeid']):
                 child_nodegroup_node = JSONDeserializer().deserialize(JSONSerializer().serialize(edge.rangenode))
 
-        # make a node group with a single node and confirm that that node is now not part of it's parent node group 
+        # make a node group with a single node and confirm that that node is now not part of it's parent node group
         child_nodegroup_node['nodegroup_id'] = child_nodegroup_node['nodeid']
         graph.update_node(child_nodegroup_node)
         self.assertEqual(len(graph.nodegroups), 2)
@@ -375,7 +375,7 @@ class GraphTests(ArchesTestCase):
             else:
                 self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
-        # make another node group with a node (that has a child) and confirm that that node and 
+        # make another node group with a node (that has a child) and confirm that that node and
         # it's child are now not part of it's parent node group and that both nodes are grouped together
         node_to_update['nodegroup_id'] = node_to_update['nodeid']
         graph.update_node(node_to_update)
@@ -443,7 +443,7 @@ class GraphTests(ArchesTestCase):
         # test moving a branch to another branch
         # this branch should NOT be grouped with it's new parent nodegroup
         branch_two_rootnodeid = branch_two.root.nodeid
-        with self.assertRaises(ValidationError): 
+        with self.assertRaises(ValidationError):
             graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid)
         graph.move_node(branch_one_rootnodeid, 'P1_is_identified_by', branch_two_rootnodeid, skip_validation=True)
         self.assertEqual(len(graph.edges), 5)
@@ -472,7 +472,7 @@ class GraphTests(ArchesTestCase):
         # save and retrieve the graph from the database and confirm that
         # the graph shape has been saved properly
         # have to set the parentnodegroup nodes to semantic datatype to pass validation
-        with self.assertRaises(ValidationError): 
+        with self.assertRaises(ValidationError):
             graph.save()
         for node in branch_two.nodes.itervalues():
             node.datatype = 'semantic'
@@ -558,10 +558,10 @@ class GraphTests(ArchesTestCase):
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
-        
+
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
-        
+
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
@@ -593,7 +593,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
 
         nodegroups_count_after = models.NodeGroup.objects.count()
-        
+
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
 
     def test_delete_graph(self):
@@ -615,3 +615,22 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(edge_count,0)
         self.assertEqual(nodegroups_count_before-nodegroup_count_after, 1)
 
+    def test_delete_node(self):
+        """
+        test the node delete method
+
+        """
+        graph = Graph.new(name='TEST',is_resource=False,author='TEST')
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
+        node = models.Node.objects.get(graph=graph,name="Node")
+        graph.delete_node(node)
+        graph = Graph.objects.get(graphid=graph.pk)
+        self.assertEqual(len(graph.nodes),1)
+
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
+        node = models.Node.objects.get(graph=graph,name="Node Type")
+        graph.delete_node(node)
+        graph = Graph.objects.get(graphid=graph.pk)
+        self.assertEqual(len(graph.nodes),2)
