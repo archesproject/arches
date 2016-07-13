@@ -629,9 +629,9 @@ class GraphTests(ArchesTestCase):
         """
 
         graph = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.nodes),2)
-        self.assertEqual(len(graph.edges),1)
-        self.assertEqual(len(graph.get_nodegroups()),1)
+        self.assertEqual(len(graph.nodes), 2)
+        self.assertEqual(len(graph.edges), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
         
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
@@ -652,8 +652,8 @@ class GraphTests(ArchesTestCase):
 
         node_count = models.Node.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
         edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
-        self.assertEqual(node_count,0)
-        self.assertEqual(edge_count,0)
+        self.assertEqual(node_count, 0)
+        self.assertEqual(edge_count, 0)
 
     def test_delete_node(self):
         """
@@ -664,13 +664,36 @@ class GraphTests(ArchesTestCase):
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
         node = models.Node.objects.get(graph=graph,name="Node")
+
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
+        nodegroups_count_before = models.NodeGroup.objects.count()
+        card_count_before = models.Card.objects.count()
+        
         graph.delete_node(node)
+
+        nodes_count_after = models.Node.objects.count()
+        edges_count_after = models.Edge.objects.count()
+        nodegroups_count_after = models.NodeGroup.objects.count()
+        card_count_after = models.Card.objects.count()
+
+        self.assertEqual(nodes_count_before-nodes_count_after, 2)
+        self.assertEqual(edges_count_before-edges_count_after, 2)
+        self.assertEqual(nodegroups_count_before-nodegroups_count_after, 1)
+        self.assertEqual(card_count_before-card_count_after, 1)
+
         graph = Graph.objects.get(graphid=graph.pk)
-        self.assertEqual(len(graph.nodes),1)
+        self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.edges), 0)
+        self.assertEqual(len(graph.get_cards()), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
 
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
         node = models.Node.objects.get(graph=graph,name="Node Type")
         graph.delete_node(node)
         graph = Graph.objects.get(graphid=graph.pk)
-        self.assertEqual(len(graph.nodes),2)
+        self.assertEqual(len(graph.nodes), 2)
+        self.assertEqual(len(graph.edges), 1)
+        self.assertEqual(len(graph.get_cards()), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
