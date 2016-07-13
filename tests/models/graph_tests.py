@@ -79,7 +79,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.name, name)
         self.assertEqual(graph.author, author)
         self.assertTrue(graph.isresource)
-        self.assertFalse(graph.root.is_collector())
+        self.assertFalse(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
         self.assertEqual(len(graph.get_nodegroups()), 0)
         self.assertEqual(len(graph.get_cards()), 0)
@@ -88,7 +88,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.name, name)
         self.assertEqual(graph.author, author)
         self.assertFalse(graph.isresource)
-        self.assertTrue(graph.root.is_collector())
+        self.assertTrue(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
         self.assertEqual(len(graph.get_cards()), 1)
@@ -206,7 +206,7 @@ class GraphTests(ArchesTestCase):
             self.assertIsNotNone(node_copy)
             self.assertNotEqual(node.pk, node_copy.pk)
             self.assertNotEqual(id(node), id(node_copy))
-            self.assertEqual(node.is_collector(), node_copy.is_collector())
+            self.assertEqual(node.is_collector, node_copy.is_collector)
             if node.nodegroup != None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
 
@@ -598,7 +598,7 @@ class GraphTests(ArchesTestCase):
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
             if node.name == 'Node':
-                self.assertTrue(node.is_collector())
+                self.assertTrue(node.is_collector)
                 node_to_update = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
 
         node_to_update['nodegroup_id'] = None

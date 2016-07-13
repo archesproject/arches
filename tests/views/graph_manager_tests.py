@@ -133,7 +133,7 @@ class GraphManagerViewTests(ArchesTestCase):
         node_ = Node.objects.get(nodeid=self.HERITAGE_RESOURCE_PLACE_ID)
 
         self.assertEqual(node_.name, 'new node name')
-        self.assertTrue(node_.is_collector())
+        self.assertTrue(node_.is_collector)
 
     def test_node_delete(self):
         """

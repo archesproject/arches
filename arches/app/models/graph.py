@@ -270,7 +270,7 @@ class Graph(models.GraphModel):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
-            if tree['node'].is_collector():
+            if tree['node'].is_collector:
                  current_nodegroup = models.NodeGroup(
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
@@ -354,7 +354,7 @@ class Graph(models.GraphModel):
 
         copy_of_self = deepcopy(self)
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
-        node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
+        node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
         copy_of_self.pk = uuid.uuid1()
         for node_id in node_ids:
@@ -362,7 +362,7 @@ class Graph(models.GraphModel):
             if node == self.root:
                 copy_of_self.root = node
             node.graph = copy_of_self
-            is_collector = node.is_collector()
+            is_collector = node.is_collector
             node.pk = uuid.uuid1()
             if is_collector:
                 node.nodegroup = models.NodeGroup(pk=node.pk)
@@ -415,7 +415,7 @@ class Graph(models.GraphModel):
         traverse_tree(tree)
 
         if skip_validation or self.can_append(Graph(graph_dict), self.nodes[uuid.UUID(str(newparentnodeid))]):
-            if not node.is_collector():
+            if not node.is_collector:
                 nodegroup = node.nodegroup
 
                 child_nodes, child_edges = node.get_child_nodes_and_edges()
@@ -481,7 +481,7 @@ class Graph(models.GraphModel):
             tree = self.get_tree(root=node)
             def traverse_tree(tree):
                 nodes.append(tree['node'])
-                if tree['node'].is_collector():
+                if tree['node'].is_collector:
                     nodegroups.append(tree['node'].nodegroup)
                 for child in tree['children']:
                     edges.append(child['parent_edge'])
@@ -783,7 +783,7 @@ class Graph(models.GraphModel):
 
         nodegroups = []
         for node in self.nodes.itervalues():
-            if node.is_collector():
+            if node.is_collector:
                 nodegroups.append(node.nodegroup)
         return nodegroups
 
