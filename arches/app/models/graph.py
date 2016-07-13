@@ -53,7 +53,6 @@ class Graph(models.GraphModel):
         self.root = None
         self.nodes = {}
         self.edges = {}
-        self.cards = []
         self._nodegroups_to_delete = set()
 
         if args:
@@ -96,11 +95,9 @@ class Graph(models.GraphModel):
             nodegroup = models.NodeGroup.objects.create(
                 pk=newid
             )
-            # models.Card.objects.create(
-            #     nodegroup=nodegroup,
-            #     name='tests',
-            #     title='test'
-            # )
+            models.Card.objects.create(
+                nodegroup=nodegroup,
+            )
         metadata = models.GraphModel.objects.create(
             name=name,
             subtitle="",
@@ -195,7 +192,8 @@ class Graph(models.GraphModel):
 
     def save(self):
         """
-        Saves an entity back to the db, returns a DB model instance, not an instance of self
+        Saves an a graph and it's nodes, edges, and nodegroups back to the db
+        creates associated card objects if any of the nodegroups don't already have a card
 
         """
 
@@ -209,6 +207,10 @@ class Graph(models.GraphModel):
 
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
+                if nodegroup.card_set.count() == 0:
+                    models.Card.objects.create(
+                        nodegroup=nodegroup,
+                    )
 
             for node in self.nodes.itervalues():
                 node.save()
@@ -216,8 +218,7 @@ class Graph(models.GraphModel):
             for edge in self.edges.itervalues():
                 edge.save()
 
-            for card in self.cards:
-                card.save()
+        return self
 
     def delete(self):
         with transaction.atomic():
@@ -328,8 +329,6 @@ class Graph(models.GraphModel):
                 branch_copy.clear_ontology_references()
 
             return branch_copy
-        else:
-            raise ValidationError("Appending the supplied branch to this graph would create an non-compliant graph")
 
     def clear_ontology_references(self):
         """

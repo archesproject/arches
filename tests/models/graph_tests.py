@@ -81,6 +81,8 @@ class GraphTests(ArchesTestCase):
         self.assertTrue(graph.isresource)
         self.assertFalse(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 0)
+        self.assertEqual(len(graph.get_cards()), 0)
 
         graph = Graph.new(name=name,is_resource=False,author=author)
         self.assertEqual(graph.name, name)
@@ -88,6 +90,8 @@ class GraphTests(ArchesTestCase):
         self.assertFalse(graph.isresource)
         self.assertTrue(graph.root.is_collector())
         self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
+        self.assertEqual(len(graph.get_cards()), 1)
 
     def test_graph_doesnt_polute_db(self):
         """
@@ -112,8 +116,7 @@ class GraphTests(ArchesTestCase):
                 "ontologyclass": "",
                 "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
                 "nodegroup_id": "",
-                "datatype": "semantic",
-                "cardinality": "1"
+                "datatype": "semantic"
             },{
                 "status": None,
                 "description": "",
@@ -122,8 +125,7 @@ class GraphTests(ArchesTestCase):
                 "ontologyclass": "",
                 "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
                 "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
-                "datatype": "string",
-                "cardinality": "n"
+                "datatype": "string"
             }],
             'edges':[{
                 "rangenodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
@@ -192,7 +194,6 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
         self.assertEqual(len(graph.edges), len(graph_copy.edges))
         self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
-        #self.assertEqual(len(graph.cards), len(graph_copy.cards))
 
         def findNodeByName(graph, name):
             for key, node in graph.nodes.iteritems():
@@ -217,7 +218,11 @@ class GraphTests(ArchesTestCase):
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 
-        #self.assertTrue(len(set(graph.cards).intersection(set(graph_copy.cards))) == 0)
+        # cards are created on demand only during the save event
+        graph.save()
+        graph_copy.save()
+        self.assertEqual(len(graph.get_cards()), len(graph_copy.get_cards()))
+        self.assertTrue(len(set(graph.get_cards()).intersection(set(graph_copy.get_cards()))) == 0)
 
     def test_branch_append_with_ontology(self):
         """
@@ -573,7 +578,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(nodes_count_after-nodes_count_before, 1)
         self.assertEqual(edges_count_after-edges_count_before, 0)
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
-        #self.assertEqual(card_count_after-card_count_before, 1)
+        self.assertEqual(card_count_after-card_count_before, 1)
 
         # test that data is persisited propertly during an append opertation
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
@@ -587,7 +592,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(nodes_count_after-nodes_count_before, 3)
         self.assertEqual(edges_count_after-edges_count_before, 2)
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
-        #self.assertEqual(card_count_after-card_count_before, 2)
+        self.assertEqual(card_count_after-card_count_before, 2)
 
         # test that removing a node group by setting it to None, removes it from the db
         node_to_update = None
@@ -604,7 +609,7 @@ class GraphTests(ArchesTestCase):
         card_count_after = models.Card.objects.count()
         
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
-        #self.assertEqual(card_count_after-card_count_before, 1)
+        self.assertEqual(card_count_after-card_count_before, 1)
 
         # test that adding back a node group adds it back to the db
         node_to_update['nodegroup_id'] = node_to_update['nodeid']
@@ -615,7 +620,7 @@ class GraphTests(ArchesTestCase):
         card_count_after = models.Card.objects.count()
         
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
-        #self.assertEqual(card_count_after-card_count_before, 2)
+        self.assertEqual(card_count_after-card_count_before, 2)
 
     def test_delete_graph(self):
         """
@@ -643,7 +648,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(nodes_count_before-nodes_count_after, 2)
         self.assertEqual(edges_count_before-edges_count_after, 1)
         self.assertEqual(nodegroups_count_before-nodegroups_count_after, 1)
-        #self.assertEqual(card_count_before-card_count_after, 1)
+        self.assertEqual(card_count_before-card_count_after, 1)
 
         node_count = models.Node.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
         edge_count = models.Edge.objects.filter(graph_id=self.NODE_NODETYPE_GRAPHID).count()
