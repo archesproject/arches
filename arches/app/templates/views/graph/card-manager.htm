@@ -169,7 +169,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('graph-cards-data', [], function () {
     return {
-        branches: {{branches}}
+        branches: {{branches}},
+        graph: {{graphJSON}}
     };
 });
 {% endautoescape %}</script>

@@ -46,7 +46,12 @@ require([
         })
         
         viewModel.availableGraphs.push(branch);
-    })
+    });
+
+    // data.graph.cards.forEach(function(card){
+        
+    //     viewModel.appliedGraphs.push(branch);
+    // });
     var pageView = new PageView({
         viewModel: viewModel
     });

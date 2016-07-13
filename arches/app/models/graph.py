@@ -795,7 +795,13 @@ class Graph(models.GraphModel):
 
         cards = []
         for nodegroup in self.get_nodegroups():
-            cards.extend(nodegroup.card_set.all())
+            for card in nodegroup.card_set.all():
+                if card.name == '' or card.name is None:
+                    if nodegroup.parentnodegroup is None:
+                        card.name = self.name
+                    else:
+                        card.name = self.nodes[nodegroup.pk].name
+                    cards.append(card)
 
         return cards
 
