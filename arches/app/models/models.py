@@ -266,6 +266,7 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
+    @property
     def is_collector(self):
         return self.nodeid == self.nodegroup_id
 
