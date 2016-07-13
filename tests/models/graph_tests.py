@@ -79,14 +79,14 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph.name, name)
         self.assertEqual(graph.author, author)
         self.assertTrue(graph.isresource)
-        self.assertFalse(graph.root.is_collector())
+        self.assertFalse(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
 
         graph = Graph.new(name=name,is_resource=False,author=author)
         self.assertEqual(graph.name, name)
         self.assertEqual(graph.author, author)
         self.assertFalse(graph.isresource)
-        self.assertTrue(graph.root.is_collector())
+        self.assertTrue(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
 
     def test_graph_doesnt_polute_db(self):
@@ -203,7 +203,7 @@ class GraphTests(ArchesTestCase):
             self.assertIsNotNone(node_copy)
             self.assertNotEqual(node.pk, node_copy.pk)
             self.assertNotEqual(id(node), id(node_copy))
-            self.assertEqual(node.is_collector(), node_copy.is_collector())
+            self.assertEqual(node.is_collector, node_copy.is_collector)
             if node.nodegroup != None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
 
