@@ -7,7 +7,8 @@ require([
     'arches',
     'view-data',
     'bootstrap-nifty',
-    'bindings/hover'
+    'bindings/hover',
+    'bindings/chosen'
 ], function($, _, ko, PageView, AlertViewModel, arches, data) {
     var graphs = ko.observableArray(data.graphs);
 
@@ -62,21 +63,39 @@ require([
         };
     });
 
-
+    var showResources = ko.observable(true);
+    var filteredGraphs = ko.computed(function() {
+        return ko.utils.arrayFilter(graphs(), function(graph) {
+            return !graph.isresource;
+        });
+    });
+    var resources = ko.computed(function() {
+        return ko.utils.arrayFilter(graphs(), function(graph) {
+            return graph.isresource;
+        });
+    });
     /**
     * a PageView representing the graph list page
     */
     var pageView = new PageView({
         viewModel: {
-            graphs: ko.computed(function() {
-                return ko.utils.arrayFilter(graphs(), function(graph) {
-                    return !graph.isresource;
-                });
+            groupedGraphs: ko.observable({
+                groups: [
+                    { name: 'Resources', items: resources() },
+                    { name: 'Graphs', items: filteredGraphs() }
+                ]
             }),
-            resources: ko.computed(function() {
-                return ko.utils.arrayFilter(graphs(), function(graph) {
-                    return graph.isresource;
-                });
+            graphId: ko.observable(null),
+            showResources: showResources,
+            showFind: ko.observable(false),
+            graphs: filteredGraphs,
+            resources: resources,
+            currentList: ko.computed(function() {
+                if (showResources()) {
+                    return resources();
+                } else {
+                    return filteredGraphs();
+                }
             }),
             newResource: function () {
                 newGraph('new', {isresource: true});
@@ -85,6 +104,10 @@ require([
                 newGraph('new', {isresource: false});
             }
         }
+    });
+
+    pageView.viewModel.graphId.subscribe(function (graphid) {
+        pageView.viewModel.navigate(arches.urls.graph + graphid + '/settings');
     });
 
     $('.dropdown').dropdown();
