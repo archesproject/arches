@@ -36,25 +36,6 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class GraphModel(models.Model):
-    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    deploymentfile = models.TextField(blank=True, null=True)
-    author = models.TextField(blank=True, null=True)
-    deploymentdate = models.DateTimeField(blank=True, null=True)
-    version = models.TextField(blank=True, null=True)
-    isresource = models.BooleanField()
-    isactive = models.BooleanField()
-    iconclass = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
-
-    class Meta:
-        managed = True
-        db_table = 'graphs'
-
-
 class Card(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -210,6 +191,25 @@ class Function(models.Model):
     class Meta:
         managed = True
         db_table = 'functions'
+
+
+class GraphModel(models.Model):
+    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    deploymentfile = models.TextField(blank=True, null=True)
+    author = models.TextField(blank=True, null=True)
+    deploymentdate = models.DateTimeField(blank=True, null=True)
+    version = models.TextField(blank=True, null=True)
+    isresource = models.BooleanField()
+    isactive = models.BooleanField()
+    iconclass = models.TextField(blank=True, null=True)
+    subtitle = models.TextField(blank=True, null=True)
+    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = 'graphs'
 
 
 class Icon(models.Model):
