@@ -32,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <option value="r2">Classifications</option>
             <option value="r3">Measurements</option>
             <option value="r4">Names</option>
-        </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Condition Assessment</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div><ul class="chosen-results"></ul></div></div>                                       
+        </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Condition Assessment</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div><ul class="chosen-results"></ul></div></div>
     </div>
 </div>
 {% endblock graph_header_tools %}
@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <span class="dismiss-card-library" data-bind="click: toggleCardLibrary"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
-            
+
             <!-- Menu List -->
             <div class="panel-body">
                <ul class="list-group ep-menu-list data-widget-library menu-title-shim">
@@ -65,16 +65,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="data-widget-container">
                         <!-- Isotope Layout -->
                         <div id="report-image-grid" class="report-image-grid" data-bind="foreach: availableGraphs">
-                            
+
                             <!-- card -->
-                            <div class="data-widget-grid-item relative" style="" data-bind="click: $parent.appendBranch.bind($parent)">
+                            <div class="data-widget-grid-item relative">
                                 <div class="panel mar-no">
 
                                     <!-- card Name -->
                                     <div class="panel-heading">
                                         <h3 class="panel-title library-card-panel-title" data-bind="text:card.name"></h3>
                                     </div>
-                                    
+
                                     <!-- Abstract -->
                                     <div class="panel-body library-card-body">
                                         <p class="library-item-subtitle" data-bind="text:card.description"></p>
@@ -87,14 +87,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <!-- card Tools -->
                                     <div class="panel-footer" style="height: 40px;">
-                                        <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
-                                        <i class="ion-plus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Add Data Widget"></i>
+                                        <a href="#" class="pull-right" data-bind="click: $parent.appendBranch.bind($parent)"><i class="ion-plus-circled"></i> Add Card</a>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
-                    
+
                     </li>
                 </ul>
             </div>
@@ -118,9 +117,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <h5 class="" style="font-weight: 200;"> Drag and drop a data widget onto your resource </h5>
                     </a>
                 </div>
-                
+
                 <!-- card -->
-                <!-- ko foreach: graph_cards -->
+                <!-- ko foreach: graphCards -->
                 <div class="card-grid-item" style="display: block">
                     <div class="panel mar-no">
 
@@ -128,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="panel-heading">
                             <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
                         </div>
-                        
+
                         <!-- Abstract -->
                         <div class="panel-body library-card-body">
                             <p class="library-item-subtitle" data-bind="text:description"></p>
@@ -141,8 +140,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
-                            <i class="ion-plus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Add Data Widget"></i>
+                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }"><i class="ion-minus-circled"></i> Remove Card</a>
                         </div>
 
                     </div>
