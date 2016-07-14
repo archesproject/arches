@@ -83,6 +83,11 @@ define(['arches',
                         });
                     nodes.push(node);
                     edges.push(edge);
+                    if (node.isCollector()) {
+                        this.get('cards').remove(function (card) {
+                            return card.nodegroup_id === node.nodeid;
+                        });
+                    }
                     this.get('edges').remove(function (edge) {
                         return _.contains(edges, edge);
                     });
@@ -162,6 +167,9 @@ define(['arches',
                     }, this);
                     response.responseJSON.edges.forEach(function(edge){
                         self.get('edges').push(edge);
+                    }, this);
+                    response.responseJSON.nodegroups.forEach(function(nodegroup){
+                        self.get('nodegroups').push(nodegroup);
                     }, this);
                     response.responseJSON.cards.forEach(function(card){
                         self.get('cards').push(card);
@@ -252,7 +260,7 @@ define(['arches',
         },
 
         /**
-         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node 
+         * getValidNodesEdges - gets a list of possible ontolgoy properties and classes the node
          * referenced by it's id could be based on the location of the node in the graph
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -270,7 +278,7 @@ define(['arches',
         },
 
         /**
-         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node 
+         * getValidDomainClasses - gets a list of possible ontolgoy properties and classes the node
          * referenced by it's id could use to be appened to other nodes
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node of interest
@@ -332,7 +340,7 @@ define(['arches',
                     return false;
                 }
             }
-            
+
             if(this.get('isresource')){
                 if(nodeToAppendTo.nodeid !== this.get('root').nodeid){
                     return false;
