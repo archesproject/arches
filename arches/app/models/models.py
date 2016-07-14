@@ -39,8 +39,8 @@ class Address(models.Model):
 class Card(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    instructions = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
     parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
@@ -131,7 +131,7 @@ class Edge(models.Model):
     ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
+    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=True, null=True)
 
     class Meta:
         managed = True

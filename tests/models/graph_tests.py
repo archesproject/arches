@@ -697,3 +697,41 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.edges), 1)
         self.assertEqual(len(graph.get_cards()), 2)
         self.assertEqual(len(graph.get_nodegroups()), 2)
+
+    def test_derive_card_values(self):
+        """
+        test to make sure we get the proper name and description for display in the ui
+
+        """
+
+        graph = Graph.new(name='TEST',is_resource=False,author='TEST')
+        graph.description = 'A test description'
+        graph.save()
+
+        self.assertEqual(len(graph.get_cards()), 1)
+        for card in graph.get_cards():
+            self.assertEqual(card.name, graph.name)
+            self.assertEqual(card.description, graph.description)
+            card.name = 'TEST card name'
+            card.description = 'TEST card description'
+            card.save()
+
+        for card in graph.get_cards():
+            self.assertEqual(card.name, 'TEST card name')
+            self.assertEqual(card.description, 'TEST card description')
+
+        graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
+        graph.save()
+
+        for node in graph.nodes.itervalues():
+            if node is not graph.root:
+                node.nodegroup = models.NodeGroup(pk=node.pk)
+                graph.update_node(JSONSerializer().serializeToPython(node))   
+                             
+        graph.save()
+
+        self.assertEqual(len(graph.get_cards()), 2)
+        for card in graph.get_cards():
+            if card.nodegroup is not graph.root.nodegroup:
+                self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
+                self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)

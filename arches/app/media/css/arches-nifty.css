@@ -2032,7 +2032,6 @@ input.cmn-toggle-yes-no:checked + label:after {
     margin-bottom: 0;
     font-size: 11px;
     color: #999;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }

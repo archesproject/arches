@@ -195,8 +195,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
-                ('title', models.TextField(null=True, blank=True)),
-                ('subtitle', models.TextField(null=True, blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('instructions', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
                 ('cardinality', models.TextField(blank=True, default='n')),
             ],

@@ -182,8 +182,8 @@ INSERT INTO node_groups(nodegroupid, legacygroupid)
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
-INSERT INTO cards(cardid, name, title, subtitle, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type Card', '', '', 'n', '20000000-0000-0000-0000-100000000001');
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type Card', 'A common pattern used frequently to match a value with a type', '', 'n', '20000000-0000-0000-0000-100000000001');
 -- End Node/NodeType graph
 
 
@@ -234,17 +234,17 @@ INSERT INTO node_groups(nodegroupid, legacygroupid)
 INSERT INTO node_groups(nodegroupid, legacygroupid)
     VALUES ('20000000-0000-0000-0000-000000000001', '');
 
-INSERT INTO cards(cardid, name, title, subtitle, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Keys', 'Keys', '', 'n', '20000000-0000-0000-0000-000000000001');
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here', 'n', '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO cards(cardid, name, title, subtitle, cardinality, nodegroupid)
-    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Arches configuration title', '', 'n', '20000000-0000-0000-0000-000000000000');
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '', 'n', '20000000-0000-0000-0000-000000000000');
 -- End Arches Configuration graph
 
 
 -- for forms.py -- remove when done developing forms
 
-INSERT INTO cards(cardid, name, title, subtitle, cardinality)
+INSERT INTO cards(cardid, name, description, instructions, cardinality)
     VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '', 'n');
 
 INSERT INTO node_groups(nodegroupid, legacygroupid)

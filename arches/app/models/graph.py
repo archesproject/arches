@@ -674,13 +674,13 @@ class Graph(models.GraphModel):
 
         """
 
-        for node in self.getGroupedNodes(node):
+        for node in self.get_grouped_nodes(node):
             if node.datatype != 'semantic':
                 return False
 
         return True
 
-    def getGroupedNodes(self, node):
+    def get_grouped_nodes(self, node):
         """
         given a node, get any other nodes that share the same group
 
@@ -796,12 +796,17 @@ class Graph(models.GraphModel):
         cards = []
         for nodegroup in self.get_nodegroups():
             for card in nodegroup.card_set.all():
-                if card.name == '' or card.name is None:
+                if not card.name:
                     if nodegroup.parentnodegroup is None:
                         card.name = self.name
                     else:
                         card.name = self.nodes[nodegroup.pk].name
-                    cards.append(card)
+                if not card.description:
+                    if nodegroup.parentnodegroup is None:
+                        card.description = self.description
+                    else:
+                        card.description = self.nodes[nodegroup.pk].description
+                cards.append(card)
 
         return cards
 
