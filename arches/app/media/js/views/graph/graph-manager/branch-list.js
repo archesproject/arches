@@ -96,28 +96,14 @@ define([
             if(this.selectedNode()){
                 this.loading(true);
                 this.failed(false);
-                var property = null;
-                if(this.selectedNode().ontologyclass()){
-                    var ontology_connection = _.find(item.domain_connections, function(domain_connection){
-                        return _.find(domain_connection.ontology_classes, function(ontology_class){
-                            return ontology_class === this.selectedNode().ontologyclass();
-                        }, this)
-                    }, this);
-                    if(ontology_connection){
-                        property = ontology_connection.ontology_property;
-                    }else{
-                        this.loading(false);
-                        _.delay(this.failed, 300, true);
-                        return;
-                    }
-                }
-
-                this.graphModel.appendBranch(this.selectedNode().nodeid, property, item.graphid, function(response, status){
-                    this.failed(status !== 'success');
+                this.graphModel.appendBranch(this.selectedNode().nodeid, null, item.graphModel, function(response, status){
                     this.loading(false);
-                    if(!(this.failed())){
-                        this.closeForm();
-                    }
+                    _.delay(_.bind(function(){
+                        this.failed(status !== 'success');
+                        if(!(this.failed())){
+                            this.closeForm();
+                        }
+                    }, this), 300, true);
                 }, this)
             }
         },

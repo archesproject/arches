@@ -120,18 +120,36 @@ define(['arches',
          * appendBranch - appends a graph onto a specific node within this graph
          * @memberof GraphModel.prototype
          * @param  {string} nodeid - the node id of the node within this graph that we're connecting the branch to
-         * @param  {string} property - the ontology property to use to connect the branch
-         * @param  {string} graphid - the graph id of the branch we're appending to this graph
+         * @param  {string} property - the ontology property to use to connect the branch, leave null to use the first available property
+         * @param  {string} branch_graph - the {@link GraphModel} we're appending to this graph
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
          */
-        appendBranch: function(nodeid, property, graphid, callback, scope){
+        appendBranch: function(nodeid, property, branch_graph, callback, scope){
+            property = property ? property : null;
+            if(property === null){
+                if(this.get('selectedNode')().ontologyclass()){
+                    var ontology_connection = _.find(branch_graph.get('domain_connections'), function(domain_connection){
+                        return _.find(domain_connection.ontology_classes, function(ontology_class){
+                            return ontology_class === this.get('selectedNode')().ontologyclass();
+                        }, this)
+                    }, this);
+                    if(ontology_connection){
+                        property = ontology_connection.ontology_property;
+                    }else{
+                        if (typeof callback === 'function') {
+                            scope = scope || self;
+                            callback.call(scope, null, 'failed');
+                        }
+                        return;
+                    }
+                }
+            }
 
-            
             this._doRequest({
                 type: "POST",
                 url: this.url + 'append_branch/' + this.get('graphid'),
-                data: JSON.stringify({nodeid:nodeid, property: property, graphid: graphid})
+                data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
