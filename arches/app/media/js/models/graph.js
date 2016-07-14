@@ -126,6 +126,8 @@ define(['arches',
          * @param  {object} scope - the value of "this" in the callback function
          */
         appendBranch: function(nodeid, property, graphid, callback, scope){
+
+            
             this._doRequest({
                 type: "POST",
                 url: this.url + 'append_branch/' + this.get('graphid'),

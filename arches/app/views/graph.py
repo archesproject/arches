@@ -51,7 +51,7 @@ def manager(request, graphid):
 
     graph = Graph.objects.get(graphid=graphid)
     validations = models.Validation.objects.all()
-    branch_graphs = Graph.objects.exclude(pk=graphid)
+    branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
     if graph.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.ontology)
     datatypes = models.DDataType.objects.all()

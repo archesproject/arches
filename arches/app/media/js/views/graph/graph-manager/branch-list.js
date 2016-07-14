@@ -28,12 +28,14 @@ define([
             this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
-            this.items = options.branches;
-            this.items().forEach(function (branch) {
+            options.branches.forEach(function (branch) {
+                branch.selected = ko.observable(false);
+                branch.filtered = ko.observable(false);
                 branch.graphModel = new GraphModel({
                     data: branch
                 })
-            });
+                this.items.push(branch);
+            }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
 

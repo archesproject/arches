@@ -78,7 +78,7 @@ define([
 
             this.branchListView = new BranchListView({
                 el: $('#branch-library'),
-                branches: ko.observableArray(_.filter(this.branches, function(branch){return branch.isresource === false})),
+                branches: this.branches,
                 graphModel: this.graphModel,
                 loading: this.loading,
                 disableAppendButton: ko.computed(function () {
