@@ -156,7 +156,7 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'string', '22000000-0000-0000-0000-000000000000');
+    VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'semantic', '22000000-0000-0000-0000-000000000000');
 
 INSERT INTO node_groups(nodegroupid, legacygroupid)
     VALUES ('20000000-0000-0000-0000-100000000000', '');
