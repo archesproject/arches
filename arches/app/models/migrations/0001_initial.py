@@ -48,8 +48,8 @@ def forwards_func(apps, schema_editor):
         os.path.join(path_to_ontologies, 'CRMdig_v3.2.1.rdfs.xml'),
         os.path.join(path_to_ontologies, 'CRMinf_v0.7.rdfs.xml')
     ]
-    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'), 
-        version='6.2', id='100000000-000-0000-0000-000000000000', extensions=','.join(extensions))
+    management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'),
+        version='6.2', ontology_name='CIDOC CRM v6.2', id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions))
 
 
 def reverse_func(apps, schema_editor):
@@ -171,7 +171,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Graph',
+            name='GraphModel',
             fields=[
                 ('graphid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
@@ -194,10 +194,11 @@ class Migration(migrations.Migration):
             name='Card',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
-                ('name', models.TextField()),
-                ('title', models.TextField()),
-                ('subtitle', models.TextField(null=True, blank=True)),
+                ('name', models.TextField(null=True, blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('instructions', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
+                ('cardinality', models.TextField(blank=True, default='n')),
             ],
             options={
                 'db_table': 'cards',
@@ -295,7 +296,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('ontologyproperty', models.TextField(blank=True, null=True)),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
             ],
             options={
                 'db_table': 'edges',
@@ -384,7 +385,7 @@ class Migration(migrations.Migration):
                 ('istopnode', models.BooleanField()),
                 ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
-                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.Graph')),
+                ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
             ],
             options={
                 'db_table': 'nodes',
@@ -395,7 +396,6 @@ class Migration(migrations.Migration):
             name='NodeGroup',
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('cardinality', models.TextField(blank=True, default='n')),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
                 ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
             ],
@@ -655,7 +655,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
         ),
         migrations.AddField(
-            model_name='graph',
+            model_name='graphmodel',
             name='ontology',
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
         ),

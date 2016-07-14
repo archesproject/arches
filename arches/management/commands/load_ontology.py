@@ -39,7 +39,7 @@ class Command(BaseCommand):
             help='An XML file of describing an ontology graph')
         parser.add_argument('-vn', '--vernum', action='store', dest='version', default=None,
             help='The version of the ontology being loaded')
-        parser.add_argument('-n', '--name', action='store', dest='name', default='',
+        parser.add_argument('-n', '--name', action='store', dest='ontology_name', default=None,
             help='Name to use to identify the ontology')
         parser.add_argument('-id', '--id', action='store', dest='id', default=None,
             help='UUID to use as the primary key to the ontology')
@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['source'] is not None:
-            self.run_loader(data_source=options['source'], version=options['version'], id=options['id'], extensions=options['extensions'])
+            self.run_loader(data_source=options['source'], name=options['ontology_name'], version=options['version'], id=options['id'], extensions=options['extensions'])
             return
 
         if options['extensions'] is not None:

@@ -1,6 +1,6 @@
 define([
     'views/list',
-    'views/graph-manager/graph-base',
+    'views/graph/graph-manager/graph-base',
     'models/graph',
     'knockout'
 ], function(ListView, GraphBase, GraphModel , ko) {
@@ -20,44 +20,47 @@ define([
         * @param {boolean} options.branches - an observableArray of branches
         */
         initialize: function(options) {
+            var self = this;
             ListView.prototype.initialize.apply(this, arguments);
 
             this.loading = options.loading || ko.observable(false);
             this.failed = options.failed || ko.observable(false);
+            this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
-            this.items = options.branches;
-            this.items().forEach(function (branch) {
+            options.branches.forEach(function (branch) {
+                branch.selected = ko.observable(false);
+                branch.filtered = ko.observable(false);
                 branch.graphModel = new GraphModel({
-                    data: branch.graph
+                    data: branch
                 })
-            });
+                this.items.push(branch);
+            }, this);
             this.selectedBranch = ko.observable(null);
             this.viewMetadata = ko.observable(false);
 
-            var nodelistener = function(node){
+            var valueListener = ko.computed(function() {
+                var node = self.selectedNode;
+                if(!!node()){
+                    var oc = node().ontologyclass();
+                    var datatype = node().datatype();
+                    return true;
+                }
+                return false;
+            });
+
+            var updateList = function(){
                 if(this.selectedNode()){
-                    if (typeof node !== 'string'){
-                        if(this.alreadysubscribed){
-                            this.alreadysubscribed.dispose();
-                        }
-                        this.alreadysubscribed = this.selectedNode().ontologyclass.subscribe(nodelistener, this);
-                    }
                     _.each(this.items(), function(branch){
                         branch.filtered(true);
-                        var found = _.find(branch.graph.domain_connections, function(domain_connection){
-                            return _.find(domain_connection.ontology_classes, function(ontology_class){
-                                return ontology_class === this.selectedNode().ontologyclass();
-                            }, this)
-                        }, this);
-                        if(found){
+                        if(this.graphModel.canAppend(branch.graphModel)){
                             branch.filtered(false);
                         }
                     }, this);
                 }
             }
-            this.selectedNode.subscribe(nodelistener, this);
-            nodelistener.call(this, this.selectedNode());
+            valueListener.subscribe(updateList, this);
+            updateList.call(this);
         },
 
         /**
@@ -92,22 +95,17 @@ define([
             var self = this;
             if(this.selectedNode()){
                 this.loading(true);
-                var ontology_connection = _.find(item.graph.domain_connections, function(domain_connection){
-                    return _.find(domain_connection.ontology_classes, function(ontology_class){
-                        return ontology_class === this.selectedNode().ontologyclass();
-                    }, this)
-                }, this);
-                if(ontology_connection){
-                    this.graphModel.appendBranch(this.selectedNode().nodeid, ontology_connection.ontology_property, item.graphid, function(response, status){
-                        self.failed(status !== 'success');
-                        self.loading(false);
-                    }, this)
-                }else{
+                this.failed(false);
+                this.graphModel.appendBranch(this.selectedNode().nodeid, null, item.graphModel, function(response, status){
                     this.loading(false);
-                    this.failed(true);
-                }
+                    _.delay(_.bind(function(){
+                        this.failed(status !== 'success');
+                        if(!(this.failed())){
+                            this.closeForm();
+                        }
+                    }, this), 300, true);
+                }, this)
             }
-            this.closeForm();
         },
 
         /**
@@ -118,6 +116,8 @@ define([
             this.clearSelection();
             this.selectedBranch(null);
             this.viewMetadata(false);
+
+            this.trigger('close');
         },
 
 

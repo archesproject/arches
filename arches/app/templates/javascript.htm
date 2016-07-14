@@ -22,7 +22,7 @@
             'backbone': '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
             'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
             'jquery-validate': '//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
-            'd3': '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min',
+            'd3': '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min',
             'dropzone': '//cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
             'summernote': '//cdnjs.cloudflare.com/ajax/libs/summernote/0.5.10/summernote.min',
             'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min',
@@ -122,7 +122,19 @@
                 id: 'AerialWithLabels',
                 name: "{% trans 'Streets & Satellite' %}",
                 icon: "{% static 'img/map/bing_hybrid.png' %}"
-            }]
+            }],
+            confirmNav: {
+                title: "{% trans 'Edits pending...' %}",
+                text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
+            },
+            confirmGraphDelete: {
+                title: "{% trans 'Delete Graph/Resource?' %}",
+                text: "{% trans 'Deleting this graph/resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
+            },
+            requestFailed: {
+                title: "{% trans 'Request Failed...' %}",
+                text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            }
         };
     });
 

@@ -151,20 +151,20 @@ INSERT INTO widgets(widgetid, name, component)
 INSERT INTO widgets(widgetid, name, component)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker');
 
--- Node branch
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
-    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f');
+-- Node graph
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 'f', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'string', '22000000-0000-0000-0000-000000000000');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-100000000000', 'n', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid)
+    VALUES ('20000000-0000-0000-0000-100000000000', '');
+-- End Node graph
 
-
--- Node/NodeType branch
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
-    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  'f');
+-- Node/NodeType graph
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  'f', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -176,13 +176,18 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
     VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'domain',
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-100000000001', 'n', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid)
+    VALUES ('20000000-0000-0000-0000-100000000001', '');
 
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type Card', 'A common pattern used frequently to match a value with a type', '', 'n', '20000000-0000-0000-0000-100000000001');
+-- End Node/NodeType graph
 
+
+-- Arches Configuration graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
     VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
 
@@ -223,32 +228,28 @@ INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000004', 'P1_is_identified_by');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-000000000000', 'n', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid)
+    VALUES ('20000000-0000-0000-0000-000000000000', '');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('20000000-0000-0000-0000-000000000001', 'n', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid)
+    VALUES ('20000000-0000-0000-0000-000000000001', '');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('99999999-0000-0000-0000-000000000001', 'n', '');
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here', 'n', '20000000-0000-0000-0000-000000000001');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('32999999-0000-0000-0000-000000000000', 'n', '');
+INSERT INTO cards(cardid, name, description, instructions, cardinality, nodegroupid)
+    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '', 'n', '20000000-0000-0000-0000-000000000000');
+-- End Arches Configuration graph
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('19999999-0000-0000-0000-000000000000', 'n', '');
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('21111111-0000-0000-0000-000000000000', '1', '');
+-- for forms.py -- remove when done developing forms
 
-INSERT INTO node_groups(nodegroupid, cardinality, legacygroupid)
-    VALUES ('11111111-0000-0000-0000-000000000000', 'n', '');
+INSERT INTO cards(cardid, name, description, instructions, cardinality)
+    VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '', 'n');
 
-INSERT INTO cards(cardid, name, title, subtitle)
-    VALUES ('30000000-0000-0000-0000-000000000000', 'Keys', 'Keys', '');
-
-INSERT INTO cards(cardid, name, title, subtitle)
-    VALUES ('50000000-0000-0000-0000-000000000000', 'test card group', 'A card group title', '');
+INSERT INTO node_groups(nodegroupid, legacygroupid)
+    VALUES ('11111111-0000-0000-0000-000000000000', '');
+-- end for forms.py
 
 INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
     VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');

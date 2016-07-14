@@ -3,8 +3,11 @@ define([
     'underscore',
     'backbone',
     'knockout',
+    'arches',
+    'viewmodels/alert',
+    'bindings/scrollTo',
     'bootstrap-nifty'
-], function($, _, Backbone, ko) {
+], function($, _, Backbone, ko, arches,  AlertViewModel) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -33,6 +36,7 @@ define([
             this.viewModel = (options && options.viewModel) ? options.viewModel : {};
 
             _.defaults(this.viewModel, {
+                alert: ko.observable(null),
                 loading: ko.observable(false),
                 showTabs: ko.observable(false),
                 tabsActive: ko.observable(false),
@@ -43,17 +47,21 @@ define([
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
-                        self.viewModel.showConfirmNav(true);
+                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                            self.viewModel.showConfirmNav(false);
+                        }, function() {
+                            self.viewModel.navigate(self.viewModel.navDestination(), true);
+                        }));
                         return;
                     }
-                    self.viewModel.showConfirmNav(false);
+                    self.viewModel.alert(null)
                     self.viewModel.loading(true);
                     window.location = url;
                 }
             });
 
-            this.viewModel.showConfirmNav.subscribe(function(val) {
-                $('#confirm-nav-modal').modal(val?'show':'hide')
+            window.addEventListener("beforeunload", function (event) {
+                self.viewModel.loading(true);
             });
 
             Backbone.View.apply(this, arguments);

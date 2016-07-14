@@ -17,52 +17,67 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import uuid
-from copy import copy
+from copy import copy, deepcopy
 from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
-class Graph(object):
+
+class Graph(models.GraphModel):
     """
     Used for mapping complete resource graph objects to and from the database
 
     """
 
+    class Meta:
+        proxy = True
+
     def __init__(self, *args, **kwargs):
+        super(Graph, self).__init__(*args, **kwargs)
+        # from models.GraphModel
+        # self.graphid = None
+        # self.name = ''
+        # self.description = ''
+        # self.deploymentfile = ''
+        # self.author = ''
+        # self.deploymentdate = None
+        # self.version = ''
+        # self.isresource = False
+        # self.isactive = False
+        # self.iconclass = ''
+        # self.subtitle = ''
+        # self.ontology = None
+        # end from models.GraphModel
         self.root = None
         self.nodes = {}
         self.edges = {}
-        self.nodegroups = {}
-        self.metadata = {}
+        self._nodegroups_to_delete = set()
 
         if args:
             if isinstance(args[0], dict):
-                self.metadata = models.Graph()
+
+                for key, value in args[0].iteritems():
+                    if not (key == 'root' or key == 'nodes' or key == 'edges'):
+                        setattr(self, key, value)
+
                 for node in args[0]["nodes"]:
-                    newNode = self.add_node(node)
-                    if node['istopnode']:
-                        self.root = newNode
+                    self.add_node(node)
 
                 for edge in args[0]["edges"]:
                     self.add_edge(edge)
 
                 self.populate_null_nodegroups()
 
-                metadata_dict = args[0]["metadata"]
-                for key, value in metadata_dict.iteritems():
-                    setattr(self.metadata, key, value)
             else:
-                if (isinstance(args[0], basestring) or
-                   isinstance(args[0], uuid.UUID)):
-                    self.metadata = models.Graph.objects.get(pk=args[0])
-                elif isinstance(args[0], models.Graph):
-                    self.metadata = args[0]
-                elif isinstance(args[0], models.Node):
-                    self.metadata = args[0].graph
-                self.root = self.metadata.node_set.get(istopnode=True)
-                nodes = self.metadata.node_set.all()
-                edges = self.metadata.edge_set.all()
+                if (len(args) == 1 and (isinstance(args[0], basestring) or isinstance(args[0], uuid.UUID))):
+                    for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.iteritems():
+                        setattr(self, key, value)
+
+                nodes = self.node_set.all()
+                edges = self.edge_set.all()
+
                 for node in nodes:
                     self.add_node(node)
                 for edge in edges:
@@ -70,14 +85,20 @@ class Graph(object):
                     edge.rangenode = self.nodes[edge.rangenode.pk]
                     self.add_edge(edge)
 
+                self.populate_null_nodegroups()
+
     @staticmethod
-    def new(name="",is_resource=False,author=""):
+    def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
-        group = models.NodeGroup.objects.create(
-            pk=newid,
-            cardinality='n'
-        )
-        metadata = models.Graph.objects.create(
+        nodegroup = None
+        if not is_resource:
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
+            models.Card.objects.create(
+                nodegroup=nodegroup,
+            )
+        metadata = models.GraphModel.objects.create(
             name=name,
             subtitle="",
             author=author,
@@ -85,20 +106,21 @@ class Graph(object):
             version="",
             isresource=is_resource,
             isactive=False,
-            iconclass=""
+            iconclass="",
+            ontology=None
         )
         root = models.Node.objects.create(
             pk=newid,
-            name=name,
+            name=_("Top Node"),
             description='',
             istopnode=True,
-            ontologyclass=settings.DEFAULT_GRAPH_CLASS_ID,
+            ontologyclass=None,
             datatype='semantic',
-            nodegroup=group,
+            nodegroup=nodegroup,
             graph=metadata
         )
 
-        return Graph(metadata)
+        return Graph.objects.get(pk=metadata.graphid)
 
     def add_node(self, node):
         """
@@ -121,19 +143,22 @@ class Graph(object):
             node.validations.set(nodeobj.get('validations', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
+                node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 try:
-                    node.nodegroup = models.NodeGroup.objects.get(pk=uuid.UUID(node.nodegroup_id))
+                    node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
                 except models.NodeGroup.DoesNotExist:
-                    node.nodegroup = models.NodeGroup(pk=uuid.UUID(node.nodegroup_id), cardinality='n')
+                    node.nodegroup = models.NodeGroup(pk=node.nodegroup_id)
             else:
                 node.nodegroup = None
 
-        node.graph = self.metadata
+        node.graph = self
 
+        if self.ontology == None:
+            node.ontologyclass = None
         if node.pk == None:
             node.pk = uuid.uuid1()
-        if node.nodegroup != None:
-            self.nodegroups[node.nodegroup.pk] = node.nodegroup
+        if node.istopnode:
+            self.root = node
         self.nodes[node.pk] = node
         return node
 
@@ -156,31 +181,57 @@ class Graph(object):
             edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
-        edge.graph = self.metadata
+        edge.graph = self
 
         if edge.pk == None:
             edge.pk = uuid.uuid1()
+        if self.ontology == None:
+            edge.ontologyproperty = None
         self.edges[edge.pk] = edge
         return edge
 
     def save(self):
         """
-        Saves an entity back to the db, returns a DB model instance, not an instance of self
+        Saves an a graph and it's nodes, edges, and nodegroups back to the db
+        creates associated card objects if any of the nodegroups don't already have a card
 
         """
 
+        self.validate()
+
         with transaction.atomic():
-            self.metadata.save()
+            super(Graph, self).save()
 
-            for nodegroup_id, nodegroup in self.nodegroups.iteritems():
+            for nodegroup in self._nodegroups_to_delete:
+                nodegroup.delete()
+
+            for nodegroup in self.get_nodegroups():
                 nodegroup.save()
+                if nodegroup.card_set.count() == 0:
+                    models.Card.objects.create(
+                        nodegroup=nodegroup,
+                    )
 
-            for node_id, node in self.nodes.iteritems():
+            for node in self.nodes.itervalues():
                 node.save()
 
-            for edge_id, edge in self.edges.iteritems():
+            for edge in self.edges.itervalues():
                 edge.save()
 
+        return self
+
+    def delete(self):
+        with transaction.atomic():
+            for nodegroup in self.get_nodegroups():
+                nodegroup.delete()
+
+            for edge in self.edges.itervalues():
+                edge.delete()
+
+            for node in self.nodes.itervalues():
+                node.delete()
+
+            super(Graph, self).delete()
 
     def get_tree(self, root=None):
         """
@@ -193,7 +244,8 @@ class Graph(object):
 
         tree = {
             'node': root if root else self.root,
-            'children': []
+            'children': [],
+            'parent_edge': None
         }
 
         def find_child_edges(tree):
@@ -201,7 +253,8 @@ class Graph(object):
                 if edge.domainnode == tree['node']:
                     tree['children'].append(find_child_edges({
                         'node': edge.rangenode,
-                        'children':[]
+                        'children':[],
+                        'parent_edge': edge
                     }))
 
             return tree
@@ -217,21 +270,23 @@ class Graph(object):
         tree = self.get_tree()
 
         def traverse_tree(tree, current_nodegroup=None):
-            if tree['node'].nodegroup == None:
-                tree['node'].nodegroup = current_nodegroup
-            else:
-                current_nodegroup = models.NodeGroup(
+            if tree['node'].is_collector:
+                 current_nodegroup = models.NodeGroup(
                     pk=tree['node'].nodegroup_id,
                     parentnodegroup=current_nodegroup
                 )
+
+            tree['node'].nodegroup = current_nodegroup
 
             for child in tree['children']:
                 traverse_tree(child, current_nodegroup)
             return tree
 
-        return traverse_tree(tree)
+        traverse_tree(tree)
 
-    def append_branch(self, property, nodeid=None, graphid=None):
+        return tree
+
+    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False):
         """
         Appends a branch onto this graph
 
@@ -243,27 +298,51 @@ class Graph(object):
         append the branch to the root of this graph
 
         graphid -- get the branch to append based on the graphid
+
+        skip_validation -- don't validate the resultant graph (post append), defaults to False
+
         """
+
         branch_graph = Graph(graphid)
+        nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
 
-        branch_copy = branch_graph.copy()
-        branch_copy.root.istopnode = False
+        if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
+            branch_copy = branch_graph.copy()
+            branch_copy.root.istopnode = False
 
-        with transaction.atomic():
             newEdge = models.Edge(
-                domainnode = (self.nodes[uuid.UUID(nodeid)] if nodeid else self.root),
+                domainnode = nodeToAppendTo,
                 rangenode = branch_copy.root,
                 ontologyproperty = property,
-                graph = self.metadata
+                graph = self
             )
             branch_copy.add_edge(newEdge)
-        for key, node in branch_copy.nodes.iteritems():
-            self.add_node(node)
-        for key, edge in branch_copy.edges.iteritems():
-            self.add_edge(edge)
 
-        self.populate_null_nodegroups()
-        return branch_copy
+            for key, node in branch_copy.nodes.iteritems():
+                self.add_node(node)
+            for key, edge in branch_copy.edges.iteritems():
+                self.add_edge(edge)
+
+            self.populate_null_nodegroups()
+
+            if self.ontology is None:
+                branch_copy.clear_ontology_references()
+
+            return branch_copy
+
+    def clear_ontology_references(self):
+        """
+        removes any references to ontolgoy classes and properties in a graph
+
+        """
+
+        for node_id, node in self.nodes.iteritems():
+            node.ontologyclass = None
+
+        for edge_id, edge in self.edges.iteritems():
+            edge.ontologyproperty = None
+
+        self.ontology = None
 
     def copy(self):
         """
@@ -273,39 +352,38 @@ class Graph(object):
 
         new_nodegroups = {}
 
-        copy_of_self = Graph(self.metadata.pk)
-        node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector(), reverse=True)
+        copy_of_self = deepcopy(self)
+        # returns a list of node ids sorted by nodes that are collector nodes first and then others last
+        node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
-        copy_of_self.metadata.pk = uuid.uuid1()
+        copy_of_self.pk = uuid.uuid1()
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
             if node == self.root:
                 copy_of_self.root = node
-            node.graph = copy_of_self.metadata
-            is_collector = node.is_collector()
+            node.graph = copy_of_self
+            is_collector = node.is_collector
             node.pk = uuid.uuid1()
             if is_collector:
-                new_nodegroups[node.nodegroup.pk] = node.nodegroup
-                node.nodegroup_id = node.nodegroup.pk = node.pk
-            elif node.nodegroup and node.nodegroup.pk in new_nodegroups:
-                node.nodegroup_id = new_nodegroups[node.nodegroup.pk].pk
-                node.nodegroup = new_nodegroups[node.nodegroup.pk]
+                node.nodegroup = models.NodeGroup(pk=node.pk)
+            else:
+                node.nodegroup = None
+
+        copy_of_self.populate_null_nodegroups()
 
         copy_of_self.nodes = {node.pk:node for node_id, node in copy_of_self.nodes.iteritems()}
 
         for edge_id, edge in copy_of_self.edges.iteritems():
             edge.pk = uuid.uuid1()
-            edge.graph = copy_of_self.metadata
+            edge.graph = copy_of_self
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
 
         copy_of_self.edges = {edge.pk:edge for edge_id, edge in copy_of_self.edges.iteritems()}
 
-        copy_of_self.nodegroups = new_nodegroups
-
         return copy_of_self
 
-    def move_node(self, nodeid, property, newparentnodeid):
+    def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
         move a node and it's children to a different location within this graph
 
@@ -316,42 +394,60 @@ class Graph(object):
 
         newparentnodeid -- the parent node id that the node is being moved to
 
+        skip_validation -- don't validate the resultant graph (post move), defaults to False
+
         """
 
         ret = {'nodes':[], 'edges':[]}
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
-        if not node.is_collector():
-            nodegroup = node.nodegroup
 
-            child_nodes, child_edges = node.get_child_nodes_and_edges()
-            child_nodes.append(node)
-            for child_node in child_nodes:
-                if child_node.nodegroup == nodegroup:
-                    self.nodes[child_node.pk].nodegroup = None
-                    ret['nodes'].append(child_node)
+        graph_dict = self.serialize()
+        graph_dict['nodes'] = []
+        graph_dict['edges'] = []
+        def traverse_tree(tree):
+            graph_dict['nodes'].append(tree['node'])
+            for child in tree['children']:
+                graph_dict['edges'].append({'domainnodeid':tree['node']['nodeid'],'rangenodeid':child['node']['nodeid']})
+                traverse_tree(child)
+        tree = JSONSerializer().serializeToPython(self.get_tree(node))
+        tree['node']['istopnode'] = True
+        traverse_tree(tree)
 
-        for edge_id, edge in self.edges.iteritems():
-            if edge.rangenode == node:
-                edge.domainnode = self.nodes[uuid.UUID(str(newparentnodeid))]
-                ret['edges'].append(edge)
+        if skip_validation or self.can_append(Graph(graph_dict), self.nodes[uuid.UUID(str(newparentnodeid))]):
+            if not node.is_collector:
+                nodegroup = node.nodegroup
 
-        self.populate_null_nodegroups()
-        return ret
+                child_nodes, child_edges = node.get_child_nodes_and_edges()
+                child_nodes.append(node)
+                for child_node in child_nodes:
+                    if child_node.nodegroup == nodegroup:
+                        self.nodes[child_node.pk].nodegroup = None
+                        ret['nodes'].append(child_node)
+
+            for edge_id, edge in self.edges.iteritems():
+                if edge.rangenode == node:
+                    edge.domainnode = self.nodes[uuid.UUID(str(newparentnodeid))]
+                    ret['edges'].append(edge)
+
+            self.populate_null_nodegroups()
+            return ret
 
     def update_node(self, node):
         """
         updates a node in the graph
 
         Arguments:
-        node -- the node object to update
+        node -- a python dictionary representing a node object to be used to update the graph
 
         """
 
-        node['nodeid'] = uuid.UUID(node.get('nodeid'))
-        self.nodes.pop(node['nodeid'], None)
+        node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
+        old_nodegroups = set(self.get_nodegroups())
+        old_node = self.nodes.pop(node['nodeid'])
         new_node = self.add_node(node)
-        
+        new_nodegroups = set(self.get_nodegroups())
+
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
                 edge.domainnode = new_node
@@ -359,8 +455,118 @@ class Graph(object):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty')
 
+        #if str(old_node.nodegroup_id) != str(node.get('nodegroup_id', None)):
         self.populate_null_nodegroups()
+        self._nodegroups_to_delete = old_nodegroups.difference(new_nodegroups)
+
         return self
+
+    def delete_node(self, node=None):
+        """
+        deletes a node and all if it's children from a graph
+
+        Arguments:
+        node -- a node id or Node model to delete from the graph
+
+        """
+
+        if node is not None:
+            if not isinstance(node, models.Node):
+                node = self.nodes[uuid.UUID(str(node))]
+
+            nodes = []
+            edges = []
+            nodegroups = []
+
+            tree = self.get_tree(root=node)
+            def traverse_tree(tree):
+                nodes.append(tree['node'])
+                if tree['node'].is_collector:
+                    nodegroups.append(tree['node'].nodegroup)
+                for child in tree['children']:
+                    edges.append(child['parent_edge'])
+                    traverse_tree(child)
+            traverse_tree(tree)
+
+            with transaction.atomic():
+                [nodegroup.delete() for nodegroup in nodegroups]
+                [edge.delete() for edge in edges]
+                [node.delete() for node in nodes]
+
+    def can_append(self, graphToAppend, nodeToAppendTo):
+        """
+        can_append - test to see whether or not a graph can be appened to this graph at a specific location
+
+        returns true if the graph can be appended, false otherwise
+
+        Arguments:
+        graphToAppend -- the Graph to test appending on to this graph
+        nodeToAppendTo -- the node from which to append the graph
+
+        """
+
+        typeOfGraphToAppend = graphToAppend.is_type()
+
+        found = False
+        if self.ontology is not None and graphToAppend.ontology is None:
+            raise ValidationError(_('The graph you wish to append needs to define an ontology'))
+
+        if self.ontology is not None and graphToAppend.ontology is not None:
+            for domain_connection in graphToAppend.get_valid_domain_ontology_classes():
+                for ontology_class in domain_connection['ontology_classes']:
+                    if ontology_class == nodeToAppendTo.ontologyclass:
+                        found = True
+                        break
+
+                if found:
+                    break
+
+            if not found:
+                raise ValidationError(_('Ontology rules don\'t allow this graph to be appended'))
+        if self.isresource:
+            if(nodeToAppendTo != self.root):
+                raise ValidationError(_('Can\'t append a graph to a resource except at the root'))
+            else:
+                if typeOfGraphToAppend == 'undefined':
+                    raise ValidationError(_('Can\'t append an undefined graph to a resource graph'))
+        else: # self graph is a Graph
+            graph_type = self.is_type()
+            if graph_type == 'undefined':
+                if typeOfGraphToAppend == 'undefined':
+                    raise ValidationError(_('Can\'t append an undefined graph to an undefined graph'))
+            elif graph_type == 'card':
+                if typeOfGraphToAppend == 'card':
+                    if nodeToAppendTo == self.root:
+                        if not self.is_group_semantic(nodeToAppendTo):
+                            raise ValidationError(_('Can only append a card type graph to a semantic group'))
+                    else:
+                        raise ValidationError(_('Can only append to the root of the graph'))
+                elif typeOfGraphToAppend == 'card_collector':
+                    raise ValidationError(_('Can\'t append a card collector type graph to a card type graph'))
+            elif graph_type == 'card_collector':
+                if typeOfGraphToAppend == 'card_collector':
+                    raise ValidationError(_('Can\'t append a card collector type graph to a card collector type graph'))
+                if self.is_node_in_child_group(nodeToAppendTo):
+                    if typeOfGraphToAppend == 'card':
+                        raise ValidationError(_('Can only append an undefined type graph to a child within a card collector type graph'))
+        return True
+
+    def is_type(self):
+        """
+        does this graph contain a card, a collection of cards, or no cards
+
+        returns either 'card', 'card_collector', or 'undefined'
+
+        """
+
+        count = self.get_nodegroups()
+
+        if len(count) == 0:
+            return 'undefined'
+        elif len(count) == 1:
+            return 'card'
+        else:
+            return 'card_collector'
 
     def get_parent_node(self, nodeid):
         """
@@ -378,13 +584,28 @@ class Graph(object):
                 return edge.domainnode
         return None
 
+    def get_child_nodes(self, nodeid):
+        """
+        get the child nodes of a node with the given nodeid
+
+        Arguments:
+        nodeid -- the node we want to find the children of
+
+        """
+
+        ret = []
+        for edge in self.get_out_edges(nodeid):
+            ret.append(edge.rangenode)
+            ret.extend(self.get_child_nodes(edge.rangenode.nodeid))
+        return ret
+
     def get_out_edges(self, nodeid):
         """
         get all the edges of a node with the given nodeid where that node is the domainnode
 
         Arguments:
         nodeid -- the nodeid of the node we want to find the edges of
-        
+
         """
 
         ret = []
@@ -393,19 +614,113 @@ class Graph(object):
                 ret.append(edge)
         return ret
 
-    def get_valid_domain_connections(self):
+    def is_node_in_child_group(self, node):
         """
-        gets the ontology properties (and related classes) this graph can have with a parent node 
+        test to see if the node is in a group that is a child to another group
+
+        return true if the node is in a child group, false otherwise
+
+        Arguments:
+        node -- the node to test
 
         """
 
-        ontology_classes = models.OntologyClass.objects.get(source=self.root.ontologyclass)
-        return ontology_classes.target['up']
+        hasParentGroup = False
+        nodegroup_id = node.nodegroup_id
+        if not nodegroup_id:
+            return False
+
+        for node in self.get_parent_nodes_and_edges(node)['nodes']:
+            if node.nodegroup is not None and node.nodegroup_id != nodegroup_id:
+                hasParentGroup = True
+
+        return hasParentGroup
+
+    def get_parent_nodes_and_edges(self, node):
+        """
+        given a node, get all the parent nodes and edges
+
+        returns an object with a list of nodes and edges
+
+        Arguments:
+        node -- the node from which to get the node's parents
+
+        """
+
+        nodes = []
+        edges = []
+        for edge in self.edges.itervalues():
+            if edge.rangenode_id == node.nodeid:
+                edges.append(edge)
+                nodes.append(edge.domainnode)
+
+                nodesAndEdges = self.get_parent_nodes_and_edges(edge.domainnode)
+                nodes.extend(nodesAndEdges['nodes'])
+                edges.extend(nodesAndEdges['edges'])
+
+        return {
+            'nodes': nodes,
+            'edges': edges
+        }
+
+    def is_group_semantic(self, node):
+        """
+        test to see if all the nodes in a group are semantic
+
+        returns true if the group contains only semantic nodes, otherwise false
+
+        Arguments:
+        node -- the node to use as a basis of finding the group
+
+        """
+
+        for node in self.get_grouped_nodes(node):
+            if node.datatype != 'semantic':
+                return False
+
+        return True
+
+    def get_grouped_nodes(self, node):
+        """
+        given a node, get any other nodes that share the same group
+
+        returns a list of nodes
+
+        Arguments:
+        node -- the node to use as a basis of finding the group
+
+        """
+
+        ret = []
+        nodegroup_id = node.nodegroup_id;
+        if (nodegroup_id == ''):
+            return [node];
+
+        for node in self.nodes.itervalues():
+            if node.nodegroup_id == nodegroup_id:
+                ret.append(node)
+
+        return ret
+
+    def get_valid_domain_ontology_classes(self, nodeid=None):
+        """
+        gets the ontology properties (and related classes) this graph can have with a parent node
+
+        Keyword Arguments:
+        nodeid -- {default=root node id} the id of the node to use as the lookup for valid ontologyclasses
+
+        """
+        if self.ontology is not None:
+            source = self.nodes[uuid.UUID(str(nodeid))].ontologyclass if nodeid is not None else self.root.ontologyclass
+            ontology_classes = models.OntologyClass.objects.get(source=source, ontology=self.ontology)
+            return ontology_classes.target['up']
+        else:
+            return []
 
     def get_valid_ontology_classes(self, nodeid=None):
         """
-        get possible ontology properties (and related classes) a node with the given nodeid can have 
-        taking into consideration it's current position in the graph 
+        get possible ontology properties (and related classes) a node with the given nodeid can have
+        taking into consideration it's current position in the graph
 
         Arguments:
         nodeid -- the id of the node in question
@@ -413,14 +728,14 @@ class Graph(object):
         """
 
         ret = []
-        if nodeid:
+        if nodeid and self.ontology_id is not None:
             parent_node = self.get_parent_node(nodeid)
             out_edges = self.get_out_edges(nodeid)
 
             ontology_classes = set()
             if len(out_edges) > 0:
                 for edge in out_edges:
-                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass).target['up']:
+                    for ontology_property in models.OntologyClass.objects.get(source=edge.rangenode.ontologyclass, ontology_id=self.ontology_id).target['up']:
                         if edge.ontologyproperty == ontology_property['ontology_property']:
                             if len(ontology_classes) == 0:
                                 ontology_classes = set(ontology_property['ontology_classes'])
@@ -429,12 +744,12 @@ class Graph(object):
 
                             if len(ontology_classes) == 0:
                                 break
-        
+
             # get a list of properties (and corresponding classes) that could be used to relate to my parent node
-            # limit the list of properties based on the intersection between the property's classes and the list of 
+            # limit the list of properties based on the intersection between the property's classes and the list of
             # ontology classes we found above
             if parent_node:
-                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass).target['down']
+                range_ontologies = models.OntologyClass.objects.get(source=parent_node.ontologyclass, ontology_id=self.ontology_id).target['down']
                 if len(out_edges) == 0:
                     return range_ontologies
                 else:
@@ -449,7 +764,7 @@ class Graph(object):
                 if len(out_edges) == 0:
                     ret = [{
                         'ontology_property':'',
-                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True)
+                        'ontology_classes':models.OntologyClass.objects.values_list('source', flat=True).filter(ontology_id=self.ontology_id)
                     }]
                 else:
                     # if no parent node then just use the list of ontology classes from above, there will be no properties to return
@@ -457,8 +772,43 @@ class Graph(object):
                         'ontology_property':'',
                         'ontology_classes':list(ontology_classes)
                     }]
-               
+
         return ret
+
+    def get_nodegroups(self):
+        """
+        get the nodegroups associated with this graph
+
+        """
+
+        nodegroups = []
+        for node in self.nodes.itervalues():
+            if node.is_collector:
+                nodegroups.append(node.nodegroup)
+        return nodegroups
+
+    def get_cards(self):
+        """
+        get the card data (if any) associated with this graph
+
+        """
+
+        cards = []
+        for nodegroup in self.get_nodegroups():
+            for card in nodegroup.card_set.all():
+                if not card.name:
+                    if nodegroup.parentnodegroup is None:
+                        card.name = self.name
+                    else:
+                        card.name = self.nodes[nodegroup.pk].name
+                if not card.description:
+                    if nodegroup.parentnodegroup is None:
+                        card.description = self.description
+                    else:
+                        card.description = self.nodes[nodegroup.pk].description
+                cards.append(card)
+
+        return cards
 
     def serialize(self):
         """
@@ -469,14 +819,14 @@ class Graph(object):
 
         """
 
-        ret = {}
-        ret['root'] = self.root;
-        ret['metadata'] = self.metadata
-        ret['nodegroups'] = [nodegroup for key, nodegroup in self.nodegroups.iteritems()]
-        ret['domain_connections'] = self.get_valid_domain_connections()
-
+        ret = JSONSerializer().handle_model(self)
+        ret['root'] = self.root
+        ret['cards'] = self.get_cards()
+        ret['nodegroups'] = self.get_nodegroups()
+        ret['domain_connections'] = self.get_valid_domain_ontology_classes()
         ret['edges'] = [edge for key, edge in self.edges.iteritems()]
         ret['nodes'] = []
+
         parentproperties = {
             self.root.nodeid: ''
         }
@@ -488,3 +838,67 @@ class Graph(object):
             ret['nodes'].append(nodeobj)
 
         return ret
+
+
+    def validate(self):
+
+        # validates that the top node of a resource graph is semantic
+
+        if self.isresource == True:
+            for node_id, node in self.nodes.iteritems():
+                if node.graph_id == self.graphid and node.istopnode == True:
+                    if node.datatype != 'semantic':
+                        raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
+                        ###copout
+                    if node.nodegroup != None:
+                        raise ValidationError("The top node of your resource graph can't be a collector. Hint: check that nodegroup_id of your resource node(s) are null.")
+
+
+
+        # validates that a node group that has child node groups is not itself a child node group
+        # 20160609 can't implement this without changing our default resource graph --REA
+
+        # parentnodegroups = []
+        # for nodegroup in self.get_nodegroups():
+        #     if nodegroup.parentnodegroup:
+        #         parentnodegroups.append(nodegroup)
+
+        # for parent in parentnodegroups:
+        #     for child in parentnodegroups:
+        #         if parent.parentnodegroup_id == child.nodegroupid:
+        #             raise ValidationError("A parent node group cannot be a child of another node group.")
+
+
+
+        # validates that a all parent node groups that are not root nodegroup only contain semantic nodes.
+
+        for nodegroup in self.get_nodegroups():
+            if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
+                for node_id, node in self.nodes.iteritems():
+                    if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
+                        raise ValidationError("A parent node group must only contain semantic nodes.")
+
+                # find all nodes that have the same parentnode groupid and confirm they are all semantic
+
+
+        # # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
+
+        if self.ontology is not None:
+            ontology_classes = []
+            for ontology in self.ontology.ontologyclasses.all():
+                ontology_classes.append(ontology.source)
+
+            for node_id, node in self.nodes.iteritems():
+                if node.ontologyclass not in ontology_classes:
+                    raise ValidationError("{0} is not a valid {1} ontology class".format(node.ontologyclass, self.ontology.ontologyid))
+        else:
+            for node_id, node in self.nodes.iteritems():
+                if node.ontologyclass is not None:
+                    raise ValidationError("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph.")
+
+
+class ValidationError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)

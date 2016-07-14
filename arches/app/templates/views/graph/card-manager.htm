@@ -1,0 +1,177 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Data Entry Cards" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_tools %}
+<!-- Card Filter Widget -->
+<div id="card-grid-tools" class="">
+    <div class="ep-card-search">
+        <select id="" class="resources" style="display: none;" data-placeholder="Choose a Function..." tabindex="-1">
+            <option value="r1">Condition Assessment</option>
+            <option value="r2">Classifications</option>
+            <option value="r3">Measurements</option>
+            <option value="r4">Names</option>
+        </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Condition Assessment</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div><ul class="chosen-results"></ul></div></div>                                       
+    </div>
+</div>
+{% endblock graph_header_tools %}
+
+
+{% block content %}
+<div class="card-library relative fade in" style="">
+
+    <!-- Card (Tile) Listing -->
+    <div class="crud-menu relative hide-card-library" data-bind="css: cardLibraryStatus">
+        <div class="panel crud-menu-panel data-widget-library relative" style="">
+
+            <!-- Menu Title -->
+            <div class="panel-heading">
+                <div class="ep-menu-list-title">
+                    <h3 id="" class="panel-title card-main-title">Data Widget Library</h3>
+                    <span class="dismiss-card-library" data-bind="click: toggleCardLibrary"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+            
+            <!-- Menu List -->
+            <div class="panel-body">
+               <ul class="list-group ep-menu-list data-widget-library menu-title-shim">
+                    <!-- Menu Item -->
+                    <li id="" class="resource-selector">
+                        <select class="design" data-bind="options: availableGraphs, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Choose a card" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                    </li>
+
+                    <!-- Data Widget Library -->
+                    <li class="data-widget-container">
+                        <!-- Isotope Layout -->
+                        <div id="report-image-grid" class="report-image-grid" data-bind="foreach: availableGraphs">
+                            
+                            <!-- card -->
+                            <div class="data-widget-grid-item relative" style="">
+                                <div class="panel mar-no">
+
+                                    <!-- card Name -->
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title library-card-panel-title" data-bind="text:card.name"></h3>
+                                    </div>
+                                    
+                                    <!-- Abstract -->
+                                    <div class="panel-body library-card-body">
+                                        <p class="library-item-subtitle" data-bind="text:card.description"></p>
+                                    </div>
+
+                                    <!-- Selectable -->
+                                    <div class="selectable" style="display: none;">
+                                        <i class="ion-ios-checkmark"></i>
+                                    </div>
+
+                                    <!-- card Tools -->
+                                    <div class="panel-footer" style="height: 40px;">
+                                        <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+                                        <i class="ion-plus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Add Data Widget"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Grid -->
+    <div class="card-grid relative ep-form-content new-card-indent">
+        <div class="">
+            <!-- Isotope Layout -->
+            <div id="report-image-grid" class="report-image-grid">
+
+                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card" data-bind="click: toggleCardLibrary">
+                    <a id="add-card" href="" data-toggle="modal" class="" style="">
+                        <h3 class="text-thin" style="margin-top: 10px;"> Add Card</h3>
+
+                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+                        </span>
+
+                        <h5 class="" style="font-weight: 200;"> Drag and drop a data widget onto your resource </h5>
+                    </a>
+                </div>
+                
+                <!-- card -->
+                <div class="card-grid-item" style="display: none">
+                    <div class="panel mar-no">
+
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" style="">Condition Assessment</h3>
+                        </div>
+                        
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body" style="">
+                            <p class="library-item-subtitle">Condition, Date Assessed, Description</p>
+                            <p class="library-item-subtitle">Images</p>
+                            <p class="library-item-subtitle">Threats</p>
+                            <p class="library-item-subtitle">Disturbances</p>
+                            <p class="library-item-subtitle">Management Recommendations</p>
+                        </div>
+
+                        <!-- card Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+                            <a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
+                                <ul class="dropdown-menu pull-right">
+                                <li><a href="#"><i class="fa fa-lock"></i> Disable Card</a>
+                                </li>
+                                <li><a href="#"><i class="fa fa-copy"></i> Clone Card</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="#"><i class="fa fa-edit"></i> Edit Card</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Card Grid -->
+
+</div>
+
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-cards-data', [], function () {
+    return {
+        branches: {{branches}},
+        graph: {{graphJSON}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

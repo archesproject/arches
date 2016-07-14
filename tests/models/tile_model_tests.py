@@ -35,6 +35,39 @@ from arches.app.models import models
 
 class TileTests(ArchesTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        sql = """
+        INSERT INTO node_groups(nodegroupid, legacygroupid)
+            VALUES ('99999999-0000-0000-0000-000000000001', '');
+
+        INSERT INTO node_groups(nodegroupid, legacygroupid)
+            VALUES ('32999999-0000-0000-0000-000000000000', '');
+
+        INSERT INTO node_groups(nodegroupid, legacygroupid)
+            VALUES ('19999999-0000-0000-0000-000000000000', '');
+
+        INSERT INTO node_groups(nodegroupid, legacygroupid)
+            VALUES ('21111111-0000-0000-0000-000000000000', '');
+        """
+
+        cursor = connection.cursor()
+        cursor.execute(sql)
+
+    @classmethod
+    def tearDownClass(cls):
+        sql = """
+        DELETE FROM public.node_groups
+        WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR 
+        nodegroupid = '32999999-0000-0000-0000-000000000000' OR 
+        nodegroupid = '19999999-0000-0000-0000-000000000000' OR 
+        nodegroupid = '21111111-0000-0000-0000-000000000000'
+
+        """
+
+        cursor = connection.cursor()
+        cursor.execute(sql)
+
     def setUp(self):
         cursor = connection.cursor()
         cursor.execute("Truncate public.tiles Cascade;")

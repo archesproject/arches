@@ -1,9 +1,10 @@
 define([
     'backbone',
-    'views/graph-manager/graph-base',
+    'views/graph/graph-manager/graph-base',
+    'models/graph',
     'knockout',
     'd3'
-], function(Backbone, GraphBase, ko, d3) {
+], function(Backbone, GraphBase, GraphModel, ko, d3) {
     var GraphView = GraphBase.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -16,6 +17,9 @@ define([
             this.graphModel = options.graphModel;
             this.selectedNode = options.graphModel.get('selectedNode');
             GraphBase.prototype.initialize.apply(this, arguments);
+            
+            options = _.defaults(options, {nodeSizeOver: this.nodeSize});
+            this.nodeSizeOver = options.nodeSizeOver;
 
             this.addNodeListeners();
             this.nodes.subscribe(function() {
@@ -30,6 +34,7 @@ define([
                 this.selectedNode();
                 this.render();
             }, this);
+
         },
 
         /**
@@ -42,7 +47,6 @@ define([
         renderNodes: function(){
             GraphBase.prototype.renderNodes.apply(this, arguments);
             var self = this;
-            var nodeMouseOver = 8;
             var getNodeClass = function (d, className) {
                 className += d.selected() ? ' node-selected' : '';
                 className += d.filtered() ? ' node-filtered' : '';
@@ -58,7 +62,7 @@ define([
                 .on("mouseover", function(d) {
                     self.overNode = d3.select(this.parentElement);
                     d3.select(this)
-                        .attr("r", nodeMouseOver)
+                        .attr("r", self.nodeSizeOver)
                         .attr("class", function (d) {
                             return getNodeClass(d, 'node-over');
                         })
@@ -69,7 +73,7 @@ define([
                 .on("mouseout", function(d) {
                     self.overNode = null;
                     d3.select(this)
-                        .attr("r", self.nodesize)
+                        .attr("r", self.nodeSize)
                         .attr("class", function (d) {
                             return getNodeClass(d, '');
                         });
@@ -142,31 +146,67 @@ define([
         */
         initDragDrop: function(){
             var self = this;
+            var cache = {};
             var dragging = false;
             var draggingNode = null;
 
-            var getTargetNodes = function(relatableclasses){
-                var allowed_target_ontologies = ['E1', 'E2'];
-                self.allNodes.property('canDrop', false);
-                return self.allNodes.filter(function(node){
-                    return _.find(relatableclasses, function(ontologyclass){
-                        return ontologyclass.id === node.ontologyclass();
-                    })
-                }, self);
+            var getTargetNodes = function(node, callback){
+                if(_.has(cache, node.ontologyclass())){
+                    callback(cache[node.ontologyclass()]);
+                }else{
+                    self.graphModel.getValidDomainClasses(node.nodeid, function(response){
+                        cache[node.ontologyclass()] = response;
+                        callback(response);
+                    }, self);
+                }
             };
+
+            var testCanAppend = function(d, node, allowed_target_ontologies){
+                var data = self.graphModel.getChildNodesAndEdges(d);
+                data.nodes.push(d);
+                data.nodes = _.map(data.nodes, function(node){
+                    return node.toJSON();
+                });
+                data.ontology_id = self.graphModel.get('ontology_id');
+                data.domain_connections = [{
+                    ontology_classes: allowed_target_ontologies
+                }]
+
+                var draggedGraph = new GraphModel({
+                    data: data
+                });
+   
+                if(self.graphModel.canAppend(draggedGraph, node)){
+                    return true;
+                }
+
+                return false;
+            }
 
             var initiateDrag = function(d, draggedNodeElement) {
                 var nodes = self.tree.nodes(d);
                 draggingNode = d;
 
-                // style possible drop targets
-                getTargetNodes(d.relatableclasses)[0].forEach(function(node){
-                    var d3node = d3.select(node);
-                    if (d3node.data()[0].id != draggingNode.id){
-                        d3node.attr('class', 'target-node')
-                        .property('canDrop', true);
-                    }
-                }, this);
+                getTargetNodes(d, function(response){
+                    var allowed_target_ontologies = []
+                    _.each(response, function(item){
+                        allowed_target_ontologies = allowed_target_ontologies.concat(item.ontology_classes)
+                    }, this)
+                    allowed_target_ontologies = _.uniq(allowed_target_ontologies);
+                    self.allNodes.property('canDrop', false);
+                    nodes = self.allNodes.filter(function(node){
+                        return testCanAppend(d, node, allowed_target_ontologies);
+                    }, self);
+                    nodes[0].forEach(function(node){
+                        var d3node = d3.select(node);
+                        if (d3node.data()[0].id != draggingNode.id){
+                            d3node.attr('class', 'target-node')
+                            .property('canDrop', true);
+                        }
+                    }, this);
+                });
+
+                
 
                 // remove the text of the dragged node
                 draggedNodeElement.nextSibling.remove();
@@ -206,8 +246,10 @@ define([
 
             var endDrag = function() {
                 self.redraw(true);
+                self.graphModel.selectNode(draggingNode);
                 draggingNode = null;
                 dragging = false;
+                self.loading(false);
             };
 
             // Define the drag listeners for drag/drop behaviour of nodes.
@@ -217,22 +259,20 @@ define([
                         return;
                     }
                     //console.log('drag start');
-                    dragStarted = true;
+                    //dragStarted = true;
                     d3.event.sourceEvent.stopPropagation();
                     // it's important that we suppress the mouseover event on the node being dragged. 
                     // Otherwise it will absorb the mouseover event and the underlying node will not 
                     // detect it 
                     d3.select(this).attr('pointer-events', 'none');
+                    initiateDrag(d, this);
                 })
                 .on("drag", function(d) {
                     if (d.istopnode || d3.event.sourceEvent.shiftKey === false) {
                         return;
                     }
                     //console.log('dragging');
-                    if (dragStarted) {
-                        dragging = true;
-                        initiateDrag(d, this);
-                    }
+                    dragging = true;
 
                     if (isNaN(d.x)) {
                         d.x = 0;
@@ -244,16 +284,17 @@ define([
                     d.y = mouse_location[0] / 180 * Math.PI;
                     node.attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
                     //updateTempConnector();
+
                 }).on("dragend", function(d) {
                     //console.log('drag end');
                     if (dragging){
-                        if (d3.event.sourceEvent.shiftKey === false || !self.selectedNode || self.selectedNode.property('canDrop') === false) {
+                        self.loading(true);
+                        if (d3.event.sourceEvent.shiftKey === false || !self.overNode || self.overNode.property('canDrop') === false) {
                             endDrag();
-                            return;
                         }else{
-                            self.graphModel.moveNode(draggingNode, 'P1', self.selectedNode.data()[0], function(){
+                            self.graphModel.moveNode(draggingNode, 'P1', self.overNode.data()[0], function(){
+                                endDrag();
                             }, self);
-                            endDrag();
                         }
                     }
                 });

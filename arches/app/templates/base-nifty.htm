@@ -26,14 +26,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endif %}
 
 <head>
-    <title>{% block title %}{{ APP_NAME }} {{ VERSION }} - {% endblock %}</title>
+    <title>{% block title %}{{ APP_NAME }} {{ VERSION }} - {% endblock title %}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    
+
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
 	{% block css %}
@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
-<body {% block body_attributes %}class="scroll-y"{% endblock %}>
+<body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
     {% block body %}
 
     <div class="wrapper">
@@ -195,113 +195,119 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endblock content %}
                 </div>
 
-                <nav id="mainnav-container" class="mainnav-patch" style="position: fixed;">
+                <nav id="mainnav-container">
                     <div id="mainnav">
                         {% block navbar %}
-                        <ul id="mainnav-menu" class="list-group">
+                        <div id="mainnav-menu-wrap">
+                            <div class="nano">
+                                <div class="nano-content" tabindex="0">
+                                    <ul id="mainnav-menu" class="list-group">
 
-                            <!-- Tools -->
-                            <li class="list-header">Tools</li>
+                                        <!-- Tools -->
+                                        <li class="list-header">Tools</li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-tachometer"></i>
-                                    <span class="menu-title">
-                                        <strong>Dashboard</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-tachometer"></i>
+                                                <span class="menu-title">
+                                                    <strong>Dashboard</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-building-o"></i>
-                                    <span class="menu-title">
-                                        <strong>Add New Resource</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-building-o"></i>
+                                                <span class="menu-title">
+                                                    <strong>Add New Resource</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="{% url 'config' %}">
-                                    <i class="ti-alarm-clock"></i>
-                                    <span class="menu-title">
-                                        <strong>System Settings</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="{% url 'config' %}">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>System Settings</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
-                                <a href="{% url 'graph' '' %}">
-                                    <i class="fa fa-bookmark"></i>
-                                    <span class="menu-title">
-                                        <strong>Resource Designer</strong>
-                                    </span>
-                                </a>
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'graph' '' %}">
+                                                <i class="fa fa-bookmark"></i>
+                                                <span class="menu-title">
+                                                    <strong>Resource Designer</strong>
+                                                </span>
+                                            </a>
 
-                            </li>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-server"></i>
-                                    <span class="menu-title">
-                                        <strong>Map Server Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-server"></i>
+                                                <span class="menu-title">
+                                                    <strong>Map Server Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="menu-title">
-                                        <strong>Field Project Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-globe"></i>
+                                                <span class="menu-title">
+                                                    <strong>Field Project Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-cloud-upload"></i>
-                                    <span class="menu-title">
-                                        <strong>Import/Export Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-cloud-upload"></i>
+                                                <span class="menu-title">
+                                                    <strong>Import/Export Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <!--Menu list item-->
-                            <li>
-                                <a href="#">
-                                    <i class="fa fa-user-md"></i>
-                                    <span class="menu-title">
-                                        <strong>Profile Manager</strong>
-                                    </span>
-                                </a>
-                            </li>
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user-md"></i>
+                                                <span class="menu-title">
+                                                    <strong>Profile Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                            <li class="list-divider-dark"></li>
+                                        <li class="list-divider-dark"></li>
 
-                            <!-- Tools -->
-                            <li class="list-header">Modules</li>
+                                        <!-- Tools -->
+                                        <li class="list-header">Modules</li>
 
-                            <!--Menu list item-->
-                            <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
-                                <a href="{% url 'rdm' '' %}">
-                                    <i class="fa fa-align-left"></i>
-                                    <span class="menu-title">
-                                        RDM
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'rdm' '' %}">
+                                                <i class="fa fa-align-left"></i>
+                                                <span class="menu-title">
+                                                    RDM
 
-                                    </span>
-                                </a>
-                            </li>
+                                                </span>
+                                            </a>
+                                        </li>
 
-                        </ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         {% endblock navbar %}
                     </div>
                 </nav>
@@ -325,40 +331,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     {% endblock body %}
-
-    <div class="modal fade" id="confirm-nav-modal" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-
-                <!--Modal header-->
-                <div class="modal-header">
-                    <button data-dismiss="modal" class="close" type="button">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">{% trans "Edits pending..." %}</h4>
-                </div>
-
-                <!--Modal body-->
-                <div class="modal-body">
-
-                    <!-- New Project Tools -->
-                    <div class="row">
-                        <div class="col-sm-12">
-                            {% trans "You have edits pending on this page, are you sure you'd like to proceed (and discard any pending edits)?" %}
-                        </div>
-                    </div>
-
-                </div>
-
-                <!--Modal footer-->
-                <div class="modal-footer">
-                    <button data-dismiss="modal" class="btn btn-danger btn-labeled fa fa-times" data-bind="click: function () { showConfirmNav(false) }" type="button">{% trans "Nevermind" %}</button>
-                    <button class="btn btn-primary btn-labeled fa fa-check" data-bind="click: function() { navigate(navDestination(), true) }">{% trans "Continue and discard changes" %}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>
 
 {% block javascript %}

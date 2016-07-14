@@ -36,33 +36,15 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class Graph(models.Model):
-    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    deploymentfile = models.TextField(blank=True, null=True)
-    author = models.TextField(blank=True, null=True)
-    deploymentdate = models.DateTimeField(blank=True, null=True)
-    version = models.TextField(blank=True, null=True)
-    isresource = models.BooleanField()
-    isactive = models.BooleanField()
-    iconclass = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
-    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
-
-    class Meta:
-        managed = True
-        db_table = 'graphs'
-
-
 class Card(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    instructions = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
     parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
+    cardinality = models.TextField(blank=True, default='n')
 
     class Meta:
         managed = True
@@ -149,7 +131,7 @@ class Edge(models.Model):
     ontologyproperty = models.TextField(blank=True, null=True)
     domainnode = models.ForeignKey('Node', db_column='domainnodeid', related_name='edge_domains')
     rangenode = models.ForeignKey('Node', db_column='rangenodeid', related_name='edge_ranges')
-    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
+    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -211,6 +193,25 @@ class Function(models.Model):
         db_table = 'functions'
 
 
+class GraphModel(models.Model):
+    graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    deploymentfile = models.TextField(blank=True, null=True)
+    author = models.TextField(blank=True, null=True)
+    deploymentdate = models.DateTimeField(blank=True, null=True)
+    version = models.TextField(blank=True, null=True)
+    isresource = models.BooleanField()
+    isactive = models.BooleanField()
+    iconclass = models.TextField(blank=True, null=True)
+    subtitle = models.TextField(blank=True, null=True)
+    ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = 'graphs'
+
+
 class Icon(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField(blank=True, null=True)
@@ -223,7 +224,6 @@ class Icon(models.Model):
 
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    cardinality = models.TextField(blank=True, default='n')
     legacygroupid = models.TextField(blank=True, null=True)
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
@@ -245,7 +245,7 @@ class Node(models.Model):
     ontologyclass = models.TextField(blank=True, null=True)
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
-    graph = models.ForeignKey(Graph, db_column='graphid', blank=True, null=True)
+    graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
 
     def get_child_nodes_and_edges(self):
@@ -266,8 +266,9 @@ class Node(models.Model):
             edges.extend(child_edges)
         return (nodes, edges)
 
+    @property
     def is_collector(self):
-        return self.nodeid == self.nodegroup_id
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
 
     def get_relatable_resources(self):
         relatable_resource_ids = [r2r.resourceclassfrom for r2r in Resource2ResourceConstraint.objects.filter(resourceclassto_id=self.nodeid)]
@@ -283,38 +284,6 @@ class Node(models.Model):
             if new_id not in old_ids:
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
-
-    def toggle_is_collector(self):
-        nodes, edges = self.get_child_nodes_and_edges()
-        collectors = [node_ for node_ in nodes if node_.is_collector()]
-        node_ids = [id_node.nodeid for id_node in nodes]
-        group_nodes = [node_ for node_ in nodes if (node_.nodegroup_id not in node_ids)]
-        if self.istopnode:
-            parent_group = None
-        else:
-            edge = Edge.objects.get(rangenode_id=self.pk)
-            parent_group = edge.domainnode.nodegroup
-
-        updated_models = []
-        if not self.is_collector():
-            new_group, created = NodeGroup.objects.get_or_create(nodegroupid=self.pk, defaults={'cardinality': 'n', 'legacygroupid': None, 'parentnodegroup': None})
-            new_group.parentnodegroup = parent_group
-            parent_group = new_group
-            updated_models.append(new_group)
-        else:
-            new_group = parent_group
-
-        for collector in collectors:
-            collector.nodegroup.parentnodegroup = parent_group
-            updated_models.append(collector.nodegroup)
-
-        for group_node in group_nodes:
-            group_node.nodegroup = new_group
-            updated_models.append(group_node)
-
-        self.nodegroup = new_group
-
-        return updated_models
 
     class Meta:
         managed = True
@@ -334,6 +303,42 @@ class Ontology(models.Model):
 
 
 class OntologyClass(models.Model):
+    """
+    the target JSONField has this schema:
+
+    values are dictionaries with 2 properties, 'down' and 'up' and within each of those another 2 properties,
+    'ontology_property' and 'ontology_classes'
+
+    "down" assumes a known domain class, while "up" assumes a known range class
+
+    .. code-block:: python
+
+        "down":[
+            {
+                "ontology_property": "P1_is_identified_by",
+                "ontology_classes": [
+                    "E51_Contact_Point",
+                    "E75_Conceptual_Object_Appellation",
+                    "E42_Identifier",
+                    "E45_Address",
+                    "E41_Appellation",
+                    ....
+                ]
+            }
+        ]
+        "up":[
+                "ontology_property": "P1i_identifies",
+                "ontology_classes": [
+                    "E51_Contact_Point",
+                    "E75_Conceptual_Object_Appellation",
+                    "E42_Identifier"
+                    ....
+                ]
+            }
+        ]
+
+    """
+
     ontologyclassid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     source = models.TextField()
     target = JSONField(null=True)
@@ -427,6 +432,27 @@ class ResourceInstance(models.Model):
 
 
 class Tile(models.Model): #Tile
+    """
+    the data JSONField has this schema:
+
+    values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
+
+    .. code-block:: python
+
+        {
+            nodeid: node value,
+            nodeid: node value,
+            ...
+        }
+
+        {
+            "20000000-0000-0000-0000-000000000002": "John",
+            "20000000-0000-0000-0000-000000000003": "Smith",
+            "20000000-0000-0000-0000-000000000004": "Primary"
+        }
+
+    """
+
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceinstance = models.ForeignKey(ResourceInstance, db_column='resourceinstanceid')
     parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)

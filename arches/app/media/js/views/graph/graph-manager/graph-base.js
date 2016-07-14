@@ -19,12 +19,21 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            this.size = 1000;
+            options = _.defaults(options, {nodeSize: 11, labelOffset: 2, loading: ko.observable(false)});
+            this.loading = options.loading;
+            this.nodeSize = options.nodeSize;
+            this.labelOffset = options.labelOffset;
+            this.nodeLabelOffset = this.nodeSize + this.labelOffset;
             this.currentOffset = [0,0];
             this.currentScale = 1;
             this.graphModel = options.graphModel;
             this.nodes = options.graphModel.get('nodes') || ko.observableArray([]);
             this.edges = options.graphModel.get('edges') || ko.observableArray([]);
+            this.getsize = function(){
+                return 1000;
+                // console.log((this.nodes().length * 5) + 500)
+                // return (this.nodes().length * 30) + 500;
+            };
 
             var diameter = this.$el.width() < this.$el.height() ? this.$el.width() : this.$el.height();
 
@@ -41,22 +50,24 @@ define([
                             });
                         });
                 })
-                .size([360, this.size])
-                .separation(function(a, b) { 
-                    return (a.parent == b.parent ? 1 : 2) / a.depth;  
+                .size([360, this.getsize()])
+                .separation(function(a, b) {
+                    return (a.parent == b.parent ? 1 : 2) / a.depth;
                 });
 
             this.diagonal = d3.svg.diagonal.radial()
-                .projection(function(d) { 
-                    return [d.y, d.x / 180 * Math.PI];   
+                .projection(function(d) {
+                    return [d.y, d.x / 180 * Math.PI];
+                });
+
+            this.zoom = d3.behavior.zoom().on("zoom", function() {
+                    self.redraw();
                 });
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
                 .attr("height", this.$el.height())
-                .call(d3.behavior.zoom().on("zoom", function() {
-                    self.redraw();
-                }))
+                .call(this.zoom)
                 .append("g")
 
             this.render();
@@ -70,7 +81,7 @@ define([
         render: function () {
             var self = this;
             this.root = undefined;
-            this.nodesize = 6;
+
             this.nodes().forEach(function (node) {
                 if (node.istopnode) {
                     this.root = node;
@@ -98,13 +109,13 @@ define([
 
             this.node = this.allNodes.enter().append("g")
                 .attr("class", 'node')
-                .attr("transform", function(d) { 
-                    return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; 
+                .attr("transform", function(d) {
+                    return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
                 });
-                
+
             this.node.append("circle")
-                .attr("r", this.nodesize)
-            
+                .attr("r", this.nodeSize)
+
             this.renderNodeText();
         },
 
@@ -115,10 +126,10 @@ define([
         renderNodeText: function(){
             var self = this;
             this.node.append("text")
-                .attr("dy", ".31em")
-                .attr("class", "node-text")
+                .attr("dy", function(d){return d.children ? "-.31em" : ".31em"})
+                .attr("class", 'graph-node-text')
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+                .attr("transform", function(d) { return d.x < 180 ? "translate(" + self.nodeLabelOffset + ")" : "rotate(180)translate(-" + self.nodeLabelOffset + ")"; })
                 .text(function (d) {
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
@@ -146,14 +157,14 @@ define([
         /**
         * Redraw the graph based on the current D3 scale and translate events
         * @memberof GraphBase.prototype
-        * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph, 
+        * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph,
         * used after adding/removing nodes from the graph
         */
         redraw: function (force) {
             var self = this;
             var previousScale = this.currentScale;
             force = force || false;
-            
+
             if (d3.event){
                 this.currentScale = d3.event.scale || this.currentScale;
                 this.currentOffset = d3.event.translate || this.currentOffset;
@@ -186,9 +197,9 @@ define([
                                 });
                             });
                     })
-                    .size([360, this.size * this.currentScale])
-                    .separation(function(a, b) { 
-                        return (a.parent == b.parent ? 1 : 2) / (a.depth);  
+                    .size([360, this.getsize() * this.currentScale])
+                    .separation(function(a, b) {
+                        return (a.parent == b.parent ? 1 : 2) / (a.depth);
                     });
                 this.render();
             }
@@ -207,12 +218,22 @@ define([
             this.center = [(this.$el.width() / 2), this.$el.height() / 2];
             var xt = this.currentOffset[0] + this.center[0];
             var yt = this.currentOffset[1] + this.center[1];
-            
-            this.svg.attr("transform", 
+
+            this.svg.attr("transform",
                 "translate(" + xt + "," + yt + ")" +
                 " scale(" + this.currentScale + ")");
+        },
+
+        zoomTo: function (node) {
+            var x = -node.y * Math.cos((node.x - 90) / 180 * Math.PI)*this.currentScale;
+            var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI)*this.currentScale;
+
+            var trans = this.zoom
+                .translate([x+117, y]);
+            this.svg.transition()
+                .duration(1000)
+                .call(trans.event);
         }
     });
     return GraphBase;
 });
-
