@@ -797,12 +797,12 @@ class Graph(models.GraphModel):
         for nodegroup in self.get_nodegroups():
             for card in nodegroup.card_set.all():
                 if not card.name:
-                    if nodegroup.parentnodegroup is None:
+                    if nodegroup.parentnodegroup is None and not self.isresource:
                         card.name = self.name
                     else:
                         card.name = self.nodes[nodegroup.pk].name
                 if not card.description:
-                    if nodegroup.parentnodegroup is None:
+                    if nodegroup.parentnodegroup is None and not self.isresource:
                         card.description = self.description
                     else:
                         card.description = self.nodes[nodegroup.pk].description

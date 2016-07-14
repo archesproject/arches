@@ -67,7 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="report-image-grid" class="report-image-grid" data-bind="foreach: availableGraphs">
                             
                             <!-- card -->
-                            <div class="data-widget-grid-item relative" style="">
+                            <div class="data-widget-grid-item relative" style="" data-bind="click: $parent.appendBranch.bind($parent)">
                                 <div class="panel mar-no">
 
                                     <!-- card Name -->
@@ -120,39 +120,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 
                 <!-- card -->
-                <div class="card-grid-item" style="display: none">
+                <!-- ko foreach: graph_cards -->
+                <div class="card-grid-item" style="display: block">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
                         <div class="panel-heading">
-                            <h3 class="panel-title library-card-panel-title" style="">Condition Assessment</h3>
+                            <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
                         </div>
                         
                         <!-- Abstract -->
-                        <div class="panel-body library-card-body" style="">
-                            <p class="library-item-subtitle">Condition, Date Assessed, Description</p>
-                            <p class="library-item-subtitle">Images</p>
-                            <p class="library-item-subtitle">Threats</p>
-                            <p class="library-item-subtitle">Disturbances</p>
-                            <p class="library-item-subtitle">Management Recommendations</p>
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle" data-bind="text:description"></p>
+                        </div>
+
+                        <!-- Selectable -->
+                        <div class="selectable" style="display: none;">
+                            <i class="ion-ios-checkmark"></i>
                         </div>
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
                             <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
-                            <a href="" class="pull-right" style="margin-top: 3px;" data-toggle="dropdown"><i class="fa fa-ellipsis-h" style="color: #666;"></i></a>
-                                <ul class="dropdown-menu pull-right">
-                                <li><a href="#"><i class="fa fa-lock"></i> Disable Card</a>
-                                </li>
-                                <li><a href="#"><i class="fa fa-copy"></i> Clone Card</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li><a href="#"><i class="fa fa-edit"></i> Edit Card</a>
-                                </li>
-                            </ul>
+                            <i class="ion-plus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Add Data Widget"></i>
                         </div>
+
                     </div>
                 </div>
+                <!-- /ko -->
 
             </div>
         </div>

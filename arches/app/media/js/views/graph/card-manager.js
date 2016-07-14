@@ -3,20 +3,24 @@ require([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'models/graph',
     'views/graph/graph-page-view',
     'graph-cards-data'
-], function($, _, ko, koMapping, PageView, data) {
+], function($, _, ko, koMapping, GraphModel, PageView, data) {
 
     /**
     * a GraphPageView representing the graph cards page
     */
     var self = this;
     var viewModel = {
+        graphModel: new GraphModel({
+            data: data.graph
+        }),
         showCardLibrary: ko.observable(false),
         toggleCardLibrary: function(){
             this.showCardLibrary(!this.showCardLibrary());
         }
-    }
+    };
     viewModel.cardLibraryStatus = ko.pureComputed(function() {
         return this.showCardLibrary() ? 'show-card-library' : 'hide-card-library';
     }, viewModel);
@@ -27,17 +31,46 @@ require([
         return _.find(branch.cards, function(card){
             return card.nodegroup_id === nodegroupid;
         })
-    }
+    };
     data.branches.forEach(function(branch){
         branch.nodegroups.forEach(function(nodegroup){
-            var card = findCard(branch, nodegroup.nodegroupid);
             if (!(nodegroup.parentnodegroup_id)){
-                branch.card = card;
+                branch.card = findCard(branch, nodegroup.nodegroupid);;
+                viewModel.availableGraphs.push(branch);
             }
         })
-        
-        viewModel.availableGraphs.push(branch);
     });
+
+    viewModel.appendBranch = function(item, evt){
+        var self = this;
+        this.loading(true);
+        //this.failed(false);
+        var branch_graph = new GraphModel({
+            data: item
+        });
+        this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, branch_graph, function(response, status){
+            this.loading(false);
+            // _.delay(_.bind(function(){
+            //     //this.failed(status !== 'success');
+            //     // if(!(this.failed())){
+            //     //     this.closeForm();
+            //     // }
+            // }, this), 300, true);
+        }, this)
+    };
+
+    viewModel.graph_cards = ko.computed(function(){
+        var parentCards = [];
+        var allCards = this.graphModel.get('cards')();
+        this.graphModel.get('nodegroups').filter(function(nodegroup){
+            return !!nodegroup.parentnodegroup_id === false;
+        }, this).forEach(function(nodegroup){
+            parentCards = parentCards.concat(allCards.filter(function(card){
+                return card.nodegroup_id === nodegroup.nodegroupid;
+            }, this))
+        }, this);
+        return parentCards;
+    }, viewModel);
 
     // data.graph.cards.forEach(function(card){
         

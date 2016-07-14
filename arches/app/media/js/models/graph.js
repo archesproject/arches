@@ -163,6 +163,9 @@ define(['arches',
                     response.responseJSON.edges.forEach(function(edge){
                         self.get('edges').push(edge);
                     }, this);
+                    response.responseJSON.cards.forEach(function(card){
+                        self.get('cards').push(card);
+                    }, this);
 
                     if(!self.get('isresource')){
                         self.get('nodes')().forEach(function (node) {
@@ -394,7 +397,8 @@ define(['arches',
             _.each(attributes.data, function(value, key){
                 switch(key) {
                     case 'edges':
-                        this.set('edges', ko.observableArray(value));
+                    case 'cards':
+                        this.set(key, ko.observableArray(value));
                         break;
                     case 'nodes':
                         attributes.data.nodes.forEach(function (node, i) {
