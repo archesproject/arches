@@ -1657,13 +1657,11 @@ ul .collapse li:last-of-type {
     background: #f9f9f9;
 }
 .resource-grid-title {
-    font-weight: 400;
+    font-weight: normal;
+    padding: 3px 20px 0 20px;
     font-size: 1.416em;
     line-height: 50px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 20px;
+    display: inline-block;
 }
 .resource-grid-subtitle {
     padding-left: 69px;
@@ -1855,9 +1853,10 @@ ul .collapse li:last-of-type {
 }
 .find-widget {
     position: absolute;
-    left: 85px;
-    top: 13px;
-    width: 400px;
+    left: 100px;
+    top: 10px;
+    width: 450px;
+    z-index: 10;
 }
 .clear-find {
     position: absolute;
@@ -3533,8 +3532,52 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     border-top: 1px solid #eee;
     border-bottom: 1px solid #ddd;
 }
-
-
+.resource-tools {
+	margin-left: 120px;
+	margin-top: 0px;
+    margin-bottom: 15px;
+}
+.resource-grid-title {
+    font-weight: normal;
+    padding: 3px 20px 0 20px;
+    font-size: 1.416em;
+    line-height: 50px;
+    display: inline-block;
+}
+.resource-tools a.resource-grid-title.active {
+	color: #333;
+}
+.resource-tools a.resource-grid-title {
+	color: #999;
+}
+.resource-tools a.resource-grid-title:hover {
+	color: #666;
+}
+.resource-tools a.resource-grid-title.active:hover {
+	color: #333;
+	cursor: default;
+}
+.resource-grid-title:nth-child(2) {
+	padding-left: 0px;
+}
+.graph-find {
+	margin-top: 0px;
+	font-size: 19px;
+	color: #999;
+	padding-top: 5px;
+	padding-bottom: 3px;
+	padding-left: 25px;
+	width: 80px;
+	border-right: 1px solid #ccc;
+}
+.btn-add-group {
+	position: absolute;
+	right: 70px;
+	top: 12px;
+}
+.btn-add-graph {
+	width: 73px;
+}
 .switch-section {
     position: relative;
 }

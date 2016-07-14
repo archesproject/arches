@@ -42,13 +42,13 @@
         <!-- ko if: node() -->
         <div class="node-section">
 
-            <div style="padding-bottom: 25px;">
+            <div>
 
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "Node Name" %}
                     </div>
-                    <div class="col-sm-12 pad-no node-attribute-label node-input-widget">
+                    <div class="pad-no node-attribute-label node-input-widget">
                         <input type="text" placeholder="{% trans "Enter node name here..." %}"class="form-control library-search" style="" placeholder="{% trans "node name" %}" data-bind="value:node().name, valueUpdate: 'keyup'">
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                     <div class="control-label">
                         {% trans "CRM Class" %}
                     </div>
-                    <div class="col-sm-12 pad-no node-attribute-label">
+                    <div class="pad-no node-attribute-label">
                         <select class="design" data-bind="value: node().ontologyclass, options: node().validclasses, valueAllowUnset: true, optionsCaption: '{% trans "Choose a class" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                     <div class="control-label">
                         {% trans "Relation to parent" %}
                     </div>
-                    <div class="col-sm-12 pad-no node-attribute-label">
+                    <div class="pad-no node-attribute-label">
                         <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                     <div class="control-label">
                         {% trans "Data type" %}
                     </div>
-                    <div class="col-sm-12 pad-no node-attribute-label">
+                    <div class="pad-no node-attribute-label">
                         <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans "Choose a data type" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
                     <div class="control-label">
                         {% trans "Validations" %}
                     </div>
-                    <div class="col-sm-12 pad-no node-attribute-label">
+                    <div class="pad-no node-attribute-label">
                         <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
