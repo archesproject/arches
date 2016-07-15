@@ -67,7 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="report-image-grid" class="report-image-grid" data-bind="foreach: availableGraphs">
 
                             <!-- card -->
-                            <div class="data-widget-grid-item relative">
+                            <div class="data-widget-grid-item relative" data-bind="drag: {value: $data}">
                                 <div class="panel mar-no">
 
                                     <!-- card Name -->
@@ -101,7 +101,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Card Grid -->
-    <div class="card-grid relative ep-form-content new-card-indent">
+    <div class="card-grid relative ep-form-content new-card-indent" data-bind="drop: {value: newCard}">
         <div class="">
             <!-- Isotope Layout -->
             <div id="report-image-grid" class="report-image-grid">
