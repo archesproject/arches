@@ -5,11 +5,12 @@ require([
     'knockout-mapping',
     'models/graph',
     'views/graph/graph-page-view',
-    'graph-cards-data'
+    'graph-cards-data',
+    'bindings/dragDrop'
 ], function($, _, ko, koMapping, GraphModel, PageView, data) {
 
     /**
-    * a GraphPageView representing the graph cards page
+    * a PageView representing the graph cards page
     */
     var self = this;
     var viewModel = {
@@ -41,7 +42,7 @@ require([
         })
     });
 
-    viewModel.appendBranch = function(item, evt){
+    viewModel.appendBranch = function(item){
         var self = this;
         this.loading(true);
         var branch_graph = new GraphModel({
@@ -65,6 +66,7 @@ require([
         }
     };
 
+
     viewModel.graphCards = ko.computed(function(){
         var parentCards = [];
         var allCards = this.graphModel.get('cards')();
@@ -78,6 +80,14 @@ require([
         return parentCards;
     }, viewModel);
 
+    viewModel.newCard = ko.computed({
+        read: function() {
+            return viewModel.graphCards().length ? viewModel.graphCards()[0] : null;
+        },
+        write: function(value) {
+            viewModel.appendBranch(value);
+        }
+    });
     // data.graph.cards.forEach(function(card){
 
     //     viewModel.appliedGraphs.push(branch);
