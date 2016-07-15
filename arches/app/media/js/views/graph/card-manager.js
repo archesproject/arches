@@ -44,22 +44,28 @@ require([
     viewModel.appendBranch = function(item, evt){
         var self = this;
         this.loading(true);
-        //this.failed(false);
         var branch_graph = new GraphModel({
             data: item
         });
         this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, branch_graph, function(response, status){
             this.loading(false);
-            // _.delay(_.bind(function(){
-            //     //this.failed(status !== 'success');
-            //     // if(!(this.failed())){
-            //     //     this.closeForm();
-            //     // }
-            // }, this), 300, true);
         }, this)
     };
 
-    viewModel.graph_cards = ko.computed(function(){
+    viewModel.deleteCard = function (card) {
+        var self = this
+        var node = _.find(this.graphModel.get('nodes')(), function(node) {
+            return node.nodeid === card.nodegroup_id;
+        });
+        if (node) {
+            this.loading(true);
+            this.graphModel.deleteNode(node, function(response, status){
+                self.loading(false);
+            });
+        }
+    };
+
+    viewModel.graphCards = ko.computed(function(){
         var parentCards = [];
         var allCards = this.graphModel.get('cards')();
         this.graphModel.get('nodegroups').filter(function(nodegroup){
@@ -73,7 +79,7 @@ require([
     }, viewModel);
 
     // data.graph.cards.forEach(function(card){
-        
+
     //     viewModel.appliedGraphs.push(branch);
     // });
     var pageView = new PageView({
