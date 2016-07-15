@@ -42,9 +42,9 @@ class Card(models.Model):
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
-    nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid', blank=True, null=True)
-    parentcard = models.ForeignKey('self', db_column='parentcardid', blank=True, null=True) #Allows for cards within cards (ie cardgroups)
     cardinality = models.TextField(blank=True, default='n')
+    nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
+    graph = models.ForeignKey('GraphModel', db_column='graphid')
 
     class Meta:
         managed = True

@@ -642,12 +642,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='card',
             name='nodegroup',
-            field=models.ForeignKey(blank=True, db_column='nodegroupid', null=True, to='models.NodeGroup'),
+            field=models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup'),
         ),
         migrations.AddField(
             model_name='card',
-            name='parentcard',
-            field=models.ForeignKey(blank=True, db_column='parentcardid', null=True, to='models.Card'),
+            name='graph',
+            field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
         ),
         migrations.AddField(
             model_name='node',

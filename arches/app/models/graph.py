@@ -53,13 +53,14 @@ class Graph(models.GraphModel):
         self.root = None
         self.nodes = {}
         self.edges = {}
-        self._nodegroups_to_delete = set()
+        self.cards = {}
+        self._nodegroups_to_delete = []
 
         if args:
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges'):
+                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards'):
                         setattr(self, key, value)
 
                 for node in args[0]["nodes"]:
@@ -67,6 +68,9 @@ class Graph(models.GraphModel):
 
                 for edge in args[0]["edges"]:
                     self.add_edge(edge)
+
+                for card in args[0]["cards"]:
+                    self.add_card(card)
 
                 self.populate_null_nodegroups()
 
@@ -77,9 +81,12 @@ class Graph(models.GraphModel):
 
                 nodes = self.node_set.all()
                 edges = self.edge_set.all()
+                cards = self.card_set.all()
 
                 for node in nodes:
                     self.add_node(node)
+                for card in cards:
+                    self.add_card(card)
                 for edge in edges:
                     edge.domainnode = self.nodes[edge.domainnode.pk]
                     edge.rangenode = self.nodes[edge.rangenode.pk]
@@ -91,14 +98,7 @@ class Graph(models.GraphModel):
     def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
         nodegroup = None
-        if not is_resource:
-            nodegroup = models.NodeGroup.objects.create(
-                pk=newid
-            )
-            models.Card.objects.create(
-                nodegroup=nodegroup,
-            )
-        metadata = models.GraphModel.objects.create(
+        graph = models.GraphModel.objects.create(
             name=name,
             subtitle="",
             author=author,
@@ -109,6 +109,15 @@ class Graph(models.GraphModel):
             iconclass="",
             ontology=None
         )
+        if not is_resource:
+            nodegroup = models.NodeGroup.objects.create(
+                pk=newid
+            )
+            models.Card.objects.create(
+                nodegroup=nodegroup,
+                name=name,
+                graph=graph
+            )
         root = models.Node.objects.create(
             pk=newid,
             name=_("Top Node"),
@@ -117,10 +126,10 @@ class Graph(models.GraphModel):
             ontologyclass=None,
             datatype='semantic',
             nodegroup=nodegroup,
-            graph=metadata
+            graph=graph
         )
 
-        return Graph.objects.get(pk=metadata.graphid)
+        return Graph.objects.get(pk=graph.graphid)
 
     def add_node(self, node):
         """
@@ -130,6 +139,7 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Node instance or an actual models.Node instance
 
         """
+
         if not isinstance(node, models.Node):
             nodeobj = node.copy()
             node = models.Node()
@@ -144,6 +154,8 @@ class Graph(models.GraphModel):
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
+                # node.nodegroup = self.get_nodegroups(nodegroupid=node.nodegroup_id)
+                # if node.nodegroup is None:
                 try:
                     node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
                 except models.NodeGroup.DoesNotExist:
@@ -190,6 +202,40 @@ class Graph(models.GraphModel):
         self.edges[edge.pk] = edge
         return edge
 
+    def add_card(self, card):
+        """
+        Adds a card to this graph
+
+        Arguments:
+        node -- a dictionary representing a Card instance or an actual models.Card instance
+
+        """
+
+        if not isinstance(card, models.Card):
+            cardobj = card.copy()
+            card = models.Card()
+            card.cardid = cardobj.get('cardid', None)
+            card.name = cardobj.get('name', '')
+            card.description = cardobj.get('description','')
+            card.instructions = cardobj.get('instructions','')
+            card.helptext = cardobj.get('helptext','')
+            card.cardinality = cardobj.get('cardinality','')
+            card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id','')))
+            # card.nodegroup = self.get_nodegroups(nodegroupid=card.nodegroup_id)
+            # if card.nodegroup is None:
+            try:
+                card.nodegroup = models.NodeGroup.objects.get(pk=card.nodegroup_id)
+            except models.NodeGroup.DoesNotExist:
+                card.nodegroup = models.NodeGroup(pk=card.nodegroup_id)
+
+        card.graph = self
+
+        if card.pk == None:
+            card.pk = uuid.uuid1()
+
+        self.cards[card.pk] = card
+        return card
+
     def save(self):
         """
         Saves an a graph and it's nodes, edges, and nodegroups back to the db
@@ -202,21 +248,21 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             super(Graph, self).save()
 
-            for nodegroup in self._nodegroups_to_delete:
-                nodegroup.delete()
-
             for nodegroup in self.get_nodegroups():
                 nodegroup.save()
-                if nodegroup.card_set.count() == 0:
-                    models.Card.objects.create(
-                        nodegroup=nodegroup,
-                    )
 
             for node in self.nodes.itervalues():
                 node.save()
 
             for edge in self.edges.itervalues():
                 edge.save()
+
+            for card in self.cards.itervalues():
+                card.save()
+
+            for nodegroup in self._nodegroups_to_delete:
+                nodegroup.delete()
+            self._nodegroups_to_delete = []
 
         return self
 
@@ -230,6 +276,9 @@ class Graph(models.GraphModel):
 
             for node in self.nodes.itervalues():
                 node.delete()
+
+            for card in self.cards.itervalues():
+                card.delete()
 
             super(Graph, self).delete()
 
@@ -318,9 +367,14 @@ class Graph(models.GraphModel):
             )
             branch_copy.add_edge(newEdge)
 
-            for key, node in branch_copy.nodes.iteritems():
+            for node in branch_copy.nodes.itervalues():
                 self.add_node(node)
-            for key, edge in branch_copy.edges.iteritems():
+            for card in branch_copy.cards.itervalues():
+                if card.nodegroup.parentnodegroup is None:
+                    card.name = branch_copy.name
+                    card.description = branch_copy.description
+                self.add_card(card)
+            for edge in branch_copy.edges.itervalues():
                 self.add_edge(edge)
 
             self.populate_null_nodegroups()
@@ -356,6 +410,13 @@ class Graph(models.GraphModel):
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
+        def find_cards_by_nodegroup(old_nodegroup):
+            cards = []
+            for card in copy_of_self.cards.itervalues():
+                if card.nodegroup_id == old_nodegroup.pk:
+                    cards.append(card)
+            return cards
+
         copy_of_self.pk = uuid.uuid1()
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
@@ -365,6 +426,9 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector
             node.pk = uuid.uuid1()
             if is_collector:
+                for card in find_cards_by_nodegroup(node.nodegroup):
+                    card.pk = uuid.uuid1()
+                    card.nodegroup = models.NodeGroup(pk=node.pk)
                 node.nodegroup = models.NodeGroup(pk=node.pk)
             else:
                 node.nodegroup = None
@@ -443,10 +507,8 @@ class Graph(models.GraphModel):
         """
 
         node['nodeid'] = uuid.UUID(str(node.get('nodeid')))
-        old_nodegroups = set(self.get_nodegroups())
         old_node = self.nodes.pop(node['nodeid'])
         new_node = self.add_node(node)
-        new_nodegroups = set(self.get_nodegroups())
 
         for edge_id, edge in self.edges.iteritems():
             if edge.domainnode_id == new_node.nodeid:
@@ -455,10 +517,23 @@ class Graph(models.GraphModel):
                 edge.rangenode = new_node
                 edge.ontologyproperty = node.get('parentproperty')
 
-        #if str(old_node.nodegroup_id) != str(node.get('nodegroup_id', None)):
         self.populate_null_nodegroups()
-        self._nodegroups_to_delete = old_nodegroups.difference(new_nodegroups)
 
+        # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
+        # will populate the nodegroup id with the parent nodegroup
+        # add/remove a card if a nodegroup was added/removed
+        if new_node.nodegroup_id is not old_node.nodegroup_id:
+            if new_node.is_collector:
+                # add a card
+                self.add_card(models.Card(name=new_node.name, nodegroup=new_node.nodegroup))
+            else:
+                self._nodegroups_to_delete = [old_node.nodegroup]
+                # remove a card
+                self.cards = {
+                    card_id: card for card_id, card in self.cards.iteritems() 
+                        if card.nodegroup_id is not old_node.nodegroup_id
+                }
+                
         return self
 
     def delete_node(self, node=None):
@@ -775,17 +850,23 @@ class Graph(models.GraphModel):
 
         return ret
 
-    def get_nodegroups(self):
+    def get_nodegroups(self, nodegroupid=None):
         """
-        get the nodegroups associated with this graph
+        get the nodegroups associated with this graph, or just a single nodegroup
+
+        Keyword Arguments
+
+        nodegroupid -- if specified, return just the nodegroup that has this id
 
         """
 
         nodegroups = []
         for node in self.nodes.itervalues():
             if node.is_collector:
+                if nodegroupid and str(node.nodegroup_id) == str(nodegroupid):
+                    return node.nodegroup
                 nodegroups.append(node.nodegroup)
-        return nodegroups
+        return None if nodegroupid else nodegroups
 
     def get_cards(self):
         """
@@ -794,19 +875,21 @@ class Graph(models.GraphModel):
         """
 
         cards = []
-        for nodegroup in self.get_nodegroups():
-            for card in nodegroup.card_set.all():
+        for card in self.cards.itervalues():
+            if self.isresource:
                 if not card.name:
-                    if nodegroup.parentnodegroup is None and not self.isresource:
-                        card.name = self.name
-                    else:
-                        card.name = self.nodes[nodegroup.pk].name
+                    card.name = self.nodes[card.nodegroup.pk].name
                 if not card.description:
-                    if nodegroup.parentnodegroup is None and not self.isresource:
-                        card.description = self.description
-                    else:
-                        card.description = self.nodes[nodegroup.pk].description
-                cards.append(card)
+                    card.description = self.nodes[card.nodegroup.pk].description
+            else:
+                if card.nodegroup.parentnodegroup is None:
+                    card.name = self.name
+                    card.description = self.description
+                else:
+                    card.name = self.nodes[card.nodegroup.pk].name
+                    card.description = self.nodes[card.nodegroup.pk].description
+            
+            cards.append(card)
 
         return cards
 
@@ -838,7 +921,6 @@ class Graph(models.GraphModel):
             ret['nodes'].append(nodeobj)
 
         return ret
-
 
     def validate(self):
 

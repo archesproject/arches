@@ -43,31 +43,24 @@ class GraphTests(ArchesTestCase):
     def setUp(self):
         newid = uuid.uuid1()
         nodegroup = None
-        metadata = models.GraphModel.objects.create(
-            name="TEST GRAPH",
-            subtitle="ARCHES TEST GRAPH",
-            author="Arches",
-            description="ARCHES TEST GRAPH",
-            ontology_id="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-            version="v1.0.0",
-            isresource=False,
-            isactive=False,
-            iconclass="fa fa-building"
-        )
-        if not metadata.isresource:
-            nodegroup = models.NodeGroup.objects.create(
-                pk=newid
-            )
-        self.rootNode = models.Node.objects.create(
-            pk=newid,
-            name='ROOT NODE',
-            description='Test Root Node',
-            istopnode=True,
-            ontologyclass='E1_CRM_Entity',
-            datatype='semantic',
-            nodegroup=nodegroup,
-            graph=metadata
-        )
+        graph = Graph.new()
+        graph.name = "TEST GRAPH"
+        graph.subtitle = "ARCHES TEST GRAPH"
+        graph.author = "Arches"
+        graph.description = "ARCHES TEST GRAPH"
+        graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        graph.version = "v1.0.0"
+        graph.isactive = False
+        graph.iconclass = "fa fa-building"
+        graph.save()
+
+        graph.root.name = 'ROOT NODE'
+        graph.root.description = 'Test Root Node'
+        graph.root.ontologyclass = 'E1_CRM_Entity'
+        graph.root.datatype = 'semantic'
+        graph.root.save()
+
+        self.rootNode = graph.root
 
     def tearDown(self):
         self.deleteGraph(self.rootNode)
@@ -81,8 +74,8 @@ class GraphTests(ArchesTestCase):
         self.assertTrue(graph.isresource)
         self.assertFalse(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.cards), 0)
         self.assertEqual(len(graph.get_nodegroups()), 0)
-        self.assertEqual(len(graph.get_cards()), 0)
 
         graph = Graph.new(name=name,is_resource=False,author=author)
         self.assertEqual(graph.name, name)
@@ -90,8 +83,8 @@ class GraphTests(ArchesTestCase):
         self.assertFalse(graph.isresource)
         self.assertTrue(graph.root.is_collector)
         self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
-        self.assertEqual(len(graph.get_cards()), 1)
 
     def test_graph_doesnt_polute_db(self):
         """
@@ -134,17 +127,27 @@ class GraphTests(ArchesTestCase):
                 "domainnodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
                 "ontologyproperty": "P2",
                 "description": ""
+            }],
+            'cards':[{
+                "name": "NODE_NAME",
+                "description": "",
+                "instructions": "",
+                "helptext": "",
+                "cardinality": "n",
+                "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c"
             }]
         }
 
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
+        cards_count_before = models.Card.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph(graph_obj)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 0)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 0)
+        self.assertEqual(models.Card.objects.count()-cards_count_before, 0)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 0)
         self.assertEqual(graph_obj['name'], graph.name)
         self.assertEqual(graph_obj['subtitle'], graph.subtitle)
@@ -187,21 +190,53 @@ class GraphTests(ArchesTestCase):
 
         """
 
-        graph = Graph.new()
+        graph = Graph.new(name='TEST RESOURCE')
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph_copy = graph.copy()
 
+        self.assertEqual(len(graph_copy.nodes), 3)
+        self.assertEqual(len(graph_copy.edges), 2)
+        self.assertEqual(len(graph_copy.cards), 2)
+        self.assertEqual(len(graph_copy.get_nodegroups()), 2)
         self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
         self.assertEqual(len(graph.edges), len(graph_copy.edges))
+        self.assertEqual(len(graph.cards), len(graph_copy.cards))
         self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
 
+        for nodegroup in graph_copy.get_nodegroups():
+            if graph_copy.nodes[nodegroup.pk] is graph_copy.root:
+                parentnodegroup_copy = nodegroup;
+            else:
+                childnodegroup_copy = nodegroup
+        self.assertTrue(parentnodegroup_copy.parentnodegroup is None)
+        self.assertEqual(childnodegroup_copy.parentnodegroup, parentnodegroup_copy)
+        self.assertFalse(parentnodegroup_copy.parentnodegroup_id)
+        self.assertEqual(childnodegroup_copy.parentnodegroup_id, parentnodegroup_copy.pk)
+
+        for nodegroup in graph.get_nodegroups():
+            if graph.nodes[nodegroup.pk] is graph.root:
+                parentnodegroup = nodegroup;
+            else:
+                childnodegroup = nodegroup
+
+        self.assertNotEqual(parentnodegroup, parentnodegroup_copy)
+        self.assertNotEqual(parentnodegroup.pk, parentnodegroup_copy.pk)
+        self.assertNotEqual(childnodegroup, childnodegroup_copy)
+        self.assertNotEqual(childnodegroup.pk, childnodegroup_copy.pk)
+
         def findNodeByName(graph, name):
-            for key, node in graph.nodes.iteritems():
+            for node in graph.nodes.itervalues():
                 if node.name == name:
                     return node
             return None
 
-        for key, node in graph.nodes.iteritems():
+        def findCardByName(graph, name):
+            for card in graph.cards.itervalues():
+                if card.name == name:
+                    return card
+            return None
+
+        for node in graph.nodes.itervalues():
             node_copy = findNodeByName(graph_copy, node.name)
             self.assertIsNotNone(node_copy)
             self.assertNotEqual(node.pk, node_copy.pk)
@@ -210,19 +245,20 @@ class GraphTests(ArchesTestCase):
             if node.nodegroup != None:
                 self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
 
-        for key, newedge in graph_copy.edges.iteritems():
+        for card in graph.cards.itervalues():
+            card_copy = findCardByName(graph_copy, card.name)
+            self.assertIsNotNone(card_copy)
+            self.assertNotEqual(card.pk, card_copy.pk)
+            self.assertNotEqual(id(card), id(card_copy))
+            self.assertNotEqual(card.nodegroup, card_copy.nodegroup)
+
+        for newedge in graph_copy.edges.itervalues():
             self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
             self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
             self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
             self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
-
-        # cards are created on demand only during the save event
-        graph.save()
-        graph_copy.save()
-        self.assertEqual(len(graph.get_cards()), len(graph_copy.get_cards()))
-        self.assertTrue(len(set(graph.get_cards()).intersection(set(graph_copy.get_cards()))) == 0)
 
     def test_branch_append_with_ontology(self):
         """
@@ -232,18 +268,34 @@ class GraphTests(ArchesTestCase):
 
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
+        cards_count_before = models.Card.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.edges), 0)
+        self.assertEqual(len(graph.cards), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
+
+        appended_graph = graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
         graph.save()
 
         self.assertEqual(len(graph.nodes), 3)
         self.assertEqual(len(graph.edges), 2)
+        self.assertEqual(len(graph.cards), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
+        self.assertEqual(models.Card.objects.count()-cards_count_before, 1)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
+
+        # test the card values from the appened graph are copied over to main graph
+        #appended_graph = Graph.objects.get(pk=self.NODE_NODETYPE_GRAPHID)
+        for card in graph.cards.itervalues():
+            if card.nodegroup.pk != graph.root.pk:
+                self.assertEqual(card.name, appended_graph.name)
+                self.assertEqual(card.description, appended_graph.description)
 
         for key, edge in graph.edges.iteritems():
             self.assertIsNotNone(graph.nodes[edge.domainnode_id])
@@ -258,16 +310,19 @@ class GraphTests(ArchesTestCase):
                 self.assertEqual(node, self.rootNode)
 
 
+        # confirm that a non-grouped node takes on the parent group when appended
         appended_branch = graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
-        graph.save()
         self.assertEqual(len(graph.nodes), 4)
         self.assertEqual(len(graph.edges), 3)
+        self.assertEqual(len(graph.cards), 2)
+        self.assertEqual(len(graph.get_nodegroups()), 2)
+        self.assertEqual(appended_branch.root.nodegroup, self.rootNode.nodegroup)
 
+        graph.save()
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
+        self.assertEqual(models.Card.objects.count()-cards_count_before, 1)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
-
-        self.assertEqual(appended_branch.root.nodegroup,self.rootNode.nodegroup)
 
     def test_rules_for_appending(self):
         """
@@ -332,9 +387,10 @@ class GraphTests(ArchesTestCase):
                 with self.assertRaises(ValidationError):
                     collector_graph.append_branch('P1_is_identified_by', graphid=graph.graphid, nodeid=node.nodeid)
 
-    def test_manage_nodegroups_during_node_update(self):
+    def test_node_update(self):
         """
-        test to make sure that node groups are properly managed when changing a nodegroup value on a node being updated
+        test to make sure that node groups and card are properly managed 
+        when changing a nodegroup value on a node being updated
 
         """
 
@@ -343,10 +399,7 @@ class GraphTests(ArchesTestCase):
         # the proper number of groups are properly relfected in the graph
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
-
-		# test to confirm that a grouped set of nodes maintains their group after being appended onto a node with a different group
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(len(graph.get_nodegroups()), 2)
 
         node_to_update = None
         for node_id, node in graph.nodes.iteritems():
@@ -359,16 +412,12 @@ class GraphTests(ArchesTestCase):
         node_to_update['nodegroup_id'] = None
         graph.update_node(node_to_update)
         self.assertEqual(len(graph.get_nodegroups()), 1)
-        for node_id, node in graph.nodes.iteritems():
+        self.assertEqual(len(graph.cards), 1)
+        for node in graph.nodes.itervalues():
             self.assertEqual(graph.root.nodegroup, node.nodegroup)
 
-        # confirm that a non-grouped node takes on the parent group when appended
         graph.append_branch('P1_is_identified_by', nodeid=node_type_node['nodeid'], graphid=self.SINGLE_NODE_GRAPHID)
-        self.assertEqual(len(graph.get_nodegroups()), 1)
-        for node_id, node in graph.nodes.iteritems():
-            self.assertEqual(graph.root.nodegroup, node.nodegroup)
-
-        for edge_id, edge in graph.edges.iteritems():
+        for edge in graph.edges.itervalues():
             if str(edge.domainnode_id) == str(node_type_node['nodeid']):
                 child_nodegroup_node = JSONDeserializer().deserialize(JSONSerializer().serialize(edge.rangenode))
 
@@ -557,8 +606,8 @@ class GraphTests(ArchesTestCase):
 
     def test_save_and_update_dont_orphan_records_in_the_db(self):
         """
-        test that the proper number of nodes, edges, and nodegroups are persisted to the database
-        during save and update opertaions
+        test that the proper number of nodes, edges, nodegroups, and cards are persisted 
+        to the database during save and update opertaions
 
         """
 
@@ -602,7 +651,7 @@ class GraphTests(ArchesTestCase):
                 node_to_update = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
 
         node_to_update['nodegroup_id'] = None
-        graph.update_node(node_to_update)
+        graph.update_node(node_to_update.copy())
         graph.save()
 
         nodegroups_count_after = models.NodeGroup.objects.count()
@@ -685,7 +734,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=graph.pk)
         self.assertEqual(len(graph.nodes), 1)
         self.assertEqual(len(graph.edges), 0)
-        self.assertEqual(len(graph.get_cards()), 1)
+        self.assertEqual(len(graph.cards), 1)
         self.assertEqual(len(graph.get_nodegroups()), 1)
 
         graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
@@ -695,7 +744,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=graph.pk)
         self.assertEqual(len(graph.nodes), 2)
         self.assertEqual(len(graph.edges), 1)
-        self.assertEqual(len(graph.get_cards()), 2)
+        self.assertEqual(len(graph.cards), 2)
         self.assertEqual(len(graph.get_nodegroups()), 2)
 
     def test_derive_card_values(self):
@@ -704,11 +753,11 @@ class GraphTests(ArchesTestCase):
 
         """
 
+        # TESTING A GRAPH
         graph = Graph.new(name='TEST',is_resource=False,author='TEST')
         graph.description = 'A test description'
-        graph.save()
 
-        self.assertEqual(len(graph.get_cards()), 1)
+        self.assertEqual(len(graph.cards), 1)
         for card in graph.get_cards():
             self.assertEqual(card.name, graph.name)
             self.assertEqual(card.description, graph.description)
@@ -717,8 +766,8 @@ class GraphTests(ArchesTestCase):
             card.save()
 
         for card in graph.get_cards():
-            self.assertEqual(card.name, 'TEST card name')
-            self.assertEqual(card.description, 'TEST card description')
+            self.assertEqual(card.name, 'TEST')
+            self.assertEqual(card.description, 'A test description')
 
         graph.append_branch('P1_is_identified_by', graphid=self.SINGLE_NODE_GRAPHID)
         graph.save()
@@ -730,8 +779,29 @@ class GraphTests(ArchesTestCase):
                              
         graph.save()
 
-        self.assertEqual(len(graph.get_cards()), 2)
+        self.assertEqual(len(graph.cards), 2)
         for card in graph.get_cards():
-            if card.nodegroup is not graph.root.nodegroup:
+            if card.nodegroup_id != graph.root.nodegroup_id:
                 self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
                 self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
+
+        graph.delete()
+
+        # TESTING A RESOURCE
+        graph = Graph.new(name='TEST',is_resource=True,author='TEST')
+        graph.description = 'A test description'
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
+
+        self.assertEqual(len(graph.cards), 1)
+        the_card = graph.cards.itervalues().next()
+        for card in graph.get_cards():
+            self.assertEqual(card.name, the_card.name)
+            self.assertEqual(card.description, the_card.description)
+        
+        # after removing the card name and description, the cards should take on the node name and description
+        the_card.name = ''
+        the_card.description = ''
+        for card in graph.get_cards():
+            self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
+            self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
