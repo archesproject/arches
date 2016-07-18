@@ -6,9 +6,11 @@ require([
     'models/graph',
     'views/graph/graph-page-view',
     'views/list',
+    'viewmodels/alert',
     'graph-cards-data',
+    'arches',
     'bindings/dragDrop'
-], function($, _, ko, koMapping, GraphModel, PageView, ListView, data) {
+], function($, _, ko, koMapping, GraphModel, PageView, ListView, AlertViewModel, data, arches) {
 
     /**
     * a PageView representing the graph cards page
@@ -49,6 +51,10 @@ require([
         items: viewModel.availableGraphs
     });
 
+    var alertFailure = function () {
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+    };
+
     viewModel.appendBranch = function(item){
         var self = this;
         this.loading(true);
@@ -56,7 +62,9 @@ require([
             data: item
         });
         this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, branch_graph, function(response, status){
+            var success = (status === 'success');
             this.loading(false);
+            if (!success) alertFailure();
         }, this)
     };
 
@@ -68,7 +76,9 @@ require([
         if (node) {
             this.loading(true);
             this.graphModel.deleteNode(node, function(response, status){
+                var success = (status === 'success');
                 self.loading(false);
+                if (!success) alertFailure();
             });
         }
     };
@@ -95,10 +105,7 @@ require([
             viewModel.appendBranch(value);
         }
     });
-    // data.graph.cards.forEach(function(card){
 
-    //     viewModel.appliedGraphs.push(branch);
-    // });
     var pageView = new PageView({
         viewModel: viewModel
     });
