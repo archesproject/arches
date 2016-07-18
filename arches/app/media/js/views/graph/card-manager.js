@@ -14,17 +14,18 @@ require([
     * a PageView representing the graph cards page
     */
     var self = this;
+    var showCardLibrary = ko.observable(false);
     var viewModel = {
         graphModel: new GraphModel({
             data: data.graph
         }),
-        showCardLibrary: ko.observable(false),
+        showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
-            this.showCardLibrary(!this.showCardLibrary());
+            showCardLibrary(!showCardLibrary());
         }
     };
     viewModel.cardLibraryStatus = ko.pureComputed(function() {
-        return this.showCardLibrary() ? 'show-card-library' : 'hide-card-library';
+        return showCardLibrary() ? 'show-card-library' : 'hide-card-library';
     }, viewModel);
     viewModel.appliedGraphs = ko.observableArray();
     viewModel.availableGraphs = ko.observableArray();
