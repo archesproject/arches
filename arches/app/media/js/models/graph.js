@@ -409,18 +409,20 @@ define(['arches',
                         this.set(key, ko.observableArray(value));
                         break;
                     case 'nodes':
+                        var nodes = [];
                         attributes.data.nodes.forEach(function (node, i) {
-                            attributes.data.nodes[i] = new NodeModel({
+                            var nodeModel = new NodeModel({
                                 source: node,
                                 datatypelookup: datatypelookup,
                                 graph: self
                             });
                             if(node.istopnode){
-                                this.set('root', attributes.data.nodes[i]);
-                                attributes.data.nodes[i].selected(true);
+                                this.set('root', nodeModel);
+                                nodeModel.selected(true);
                             }
+                            nodes.push(nodeModel);
                         }, this);
-                        this.set('nodes', ko.observableArray(value));
+                        this.set('nodes', ko.observableArray(nodes));
                         break;
                     default:
                         this.set(key, value)
