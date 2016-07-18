@@ -5,9 +5,10 @@ require([
     'knockout-mapping',
     'models/graph',
     'views/graph/graph-page-view',
+    'views/list',
     'graph-cards-data',
     'bindings/dragDrop'
-], function($, _, ko, koMapping, GraphModel, PageView, data) {
+], function($, _, ko, koMapping, GraphModel, PageView, ListView, data) {
 
     /**
     * a PageView representing the graph cards page
@@ -40,6 +41,11 @@ require([
                 viewModel.availableGraphs.push(branch);
             }
         })
+    });
+
+    viewModel.cardList = new ListView({
+        el: $('#card-listing'),
+        items: viewModel.availableGraphs
     });
 
     viewModel.appendBranch = function(item){

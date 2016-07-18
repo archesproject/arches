@@ -28,15 +28,15 @@ define([
         * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
         */
         initialize: function(options) {
-            ListView.prototype.initialize.apply(this, arguments);
             this.graphModel = options.graphModel;
             this.items = options.graphModel.get('nodes');
+            ListView.prototype.initialize.apply(this, arguments);
         },
 
         /**
         * Selects the passed in node
         * @memberof NodeList.prototype
-        * @param {object} item - the node to be selected via {@link GraphModel#selectNode} 
+        * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
