@@ -522,7 +522,7 @@ class Graph(models.GraphModel):
         # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
         # will populate the nodegroup id with the parent nodegroup
         # add/remove a card if a nodegroup was added/removed
-        if new_node.nodegroup_id is not old_node.nodegroup_id:
+        if new_node.nodegroup_id != old_node.nodegroup_id:
             if new_node.is_collector:
                 # add a card
                 self.add_card(models.Card(name=new_node.name, nodegroup=new_node.nodegroup))
@@ -531,7 +531,7 @@ class Graph(models.GraphModel):
                 # remove a card
                 self.cards = {
                     card_id: card for card_id, card in self.cards.iteritems() 
-                        if card.nodegroup_id is not old_node.nodegroup_id
+                        if card.nodegroup_id != old_node.nodegroup_id
                 }
                 
         return self

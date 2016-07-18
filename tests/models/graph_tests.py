@@ -774,8 +774,9 @@ class GraphTests(ArchesTestCase):
 
         for node in graph.nodes.itervalues():
             if node is not graph.root:
-                node.nodegroup = models.NodeGroup(pk=node.pk)
-                graph.update_node(JSONSerializer().serializeToPython(node))   
+                nodeJson = JSONSerializer().serializeToPython(node)
+                nodeJson['nodegroup_id'] = nodeJson['nodeid']
+                graph.update_node(nodeJson)   
                              
         graph.save()
 
