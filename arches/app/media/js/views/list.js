@@ -33,6 +33,9 @@ define([
             var filter = this.filter().toLowerCase();
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
+                if (!item.filtered) {
+                    item.filter = ko.observable();
+                }
                 item.filtered(true);
                 if(name.toLowerCase().indexOf(filter) !== -1){
                     item.filtered(false);
@@ -46,12 +49,21 @@ define([
         * @param {object} options - optional parameters to pass in during initialization, currently unused
         */
         initialize: function(options) {
+            if (options.items) {
+                this.items = options.items;
+            }
+            this.items().forEach(function (item) {
+                if (!item.filtered) {
+                    item.filtered = ko.observable();
+                }
+            })
             this.filter = ko.observable('');
             this.filter.subscribe(this.filter_function, this, 'change');
+            this.filter_function();
         },
 
         /**
-        * Toggles the selected status of a single list item, if {@link ListView#single_select} is 
+        * Toggles the selected status of a single list item, if {@link ListView#single_select} is
         *   true clear the selected status of all other list items
         * @memberof ListView.prototype
         * @param {object} item - the item to be selected or unselected
