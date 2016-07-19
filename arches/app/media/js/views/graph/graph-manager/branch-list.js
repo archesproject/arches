@@ -44,7 +44,8 @@ define([
                 if(!!node()){
                     var oc = node().ontologyclass();
                     var datatype = node().datatype();
-                    return true;
+                    var collector = node().isCollector();
+                    return oc + datatype + collector;
                 }
                 return false;
             });
