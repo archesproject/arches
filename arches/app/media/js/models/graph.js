@@ -352,9 +352,7 @@ define(['arches',
             }else{ // this graph is a Graph
                 switch(this.isType()) {
                     case 'undefined':
-                        if(typeOfGraphToAppend === 'undefined'){
-                            return false;
-                        }
+                        return false;
                         break;
                     case 'card':
                         if(typeOfGraphToAppend === 'card'){
@@ -423,6 +421,8 @@ define(['arches',
                             nodes.push(nodeModel);
                         }, this);
                         this.set('nodes', ko.observableArray(nodes));
+                        break;
+                    case 'root':
                         break;
                     default:
                         this.set(key, value)

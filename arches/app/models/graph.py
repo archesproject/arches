@@ -607,8 +607,7 @@ class Graph(models.GraphModel):
         else: # self graph is a Graph
             graph_type = self.is_type()
             if graph_type == 'undefined':
-                if typeOfGraphToAppend == 'undefined':
-                    raise ValidationError(_('Can\'t append an undefined graph to an undefined graph'))
+                raise ValidationError(_('Can\'t append any graph to an undefined graph'))
             elif graph_type == 'card':
                 if typeOfGraphToAppend == 'card':
                     if nodeToAppendTo == self.root:

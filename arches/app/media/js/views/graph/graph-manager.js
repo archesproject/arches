@@ -105,6 +105,8 @@ require([
         }
     });
 
+    graphModel.selectNode(graphModel.get('root'));
+
     /**
     * update the sizing of elements on window resize
     */
