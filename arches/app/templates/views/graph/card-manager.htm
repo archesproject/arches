@@ -25,14 +25,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_tools %}
 <!-- Card Filter Widget -->
-<div id="card-grid-tools" class="">
+<div id="card-grid-tools" style="display: none;" data-bind="visible: graphCards">
     <div class="ep-card-search">
-        <select id="" class="resources" style="display: none;" data-placeholder="Choose a Function..." tabindex="-1">
-            <option value="r1">Condition Assessment</option>
-            <option value="r2">Classifications</option>
-            <option value="r3">Measurements</option>
-            <option value="r4">Names</option>
-        </select><div class="chosen-container chosen-container-single resources chosen-container-single-nosearch" style="width: 100%;" title=""><a class="chosen-single" tabindex="-1"><span>Condition Assessment</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="4"></div><ul class="chosen-results"></ul></div></div>
+        <select data-placeholder="{% trans "Select a card..." %}" class="design" data-bind="value: selectedCardId, options: graphCardOptions, optionsText: 'name', optionsValue: 'cardid', chosen: {width: '100%'}">
+
+        </select>
     </div>
 </div>
 {% endblock graph_header_tools %}
@@ -50,7 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Card Grid -->
     <div class="card-grid relative ep-form-content new-card-indent" data-bind="drop: {value: newCard}">
-        <div class="">
+        <div data-bind="visible: graphCards" style="display:none;">
             <!-- Isotope Layout -->
             <div id="report-image-grid" class="report-image-grid">
 
@@ -68,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- card -->
                 <!-- ko foreach: graphCards -->
-                <div class="card-grid-item" style="display: block">
+                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
@@ -88,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }"><i class="ion-minus-circled"></i> Remove Card</a>
+                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i> Remove Card</a>
                         </div>
 
                     </div>
