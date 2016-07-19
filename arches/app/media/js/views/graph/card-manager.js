@@ -24,7 +24,8 @@ require([
         showCardLibrary: showCardLibrary,
         toggleCardLibrary: function(){
             showCardLibrary(!showCardLibrary());
-        }
+        },
+        selectedCardId: ko.observable(null)
     };
     viewModel.cardLibraryStatus = ko.pureComputed(function() {
         return showCardLibrary() ? 'show-card-library' : 'hide-card-library';
@@ -55,13 +56,13 @@ require([
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
 
-    viewModel.appendBranch = function(item){
+    viewModel.addCard = function(data){
         var self = this;
         this.loading(true);
-        var branch_graph = new GraphModel({
-            data: item
+        var cardGraph = new GraphModel({
+            data: data
         });
-        this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, branch_graph, function(response, status){
+        this.graphModel.appendBranch(this.graphModel.get('root').nodeid, null, cardGraph, function(response, status){
             var success = (status === 'success');
             this.loading(false);
             if (!success) alertFailure();
@@ -83,6 +84,16 @@ require([
         }
     };
 
+    viewModel.openCard = function (cardId) {
+        // TODO navigate to card editor page here
+        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', 'under construction...', 'Make me work, please!'));
+    };
+
+    viewModel.selectedCardId.subscribe(function(cardId) {
+        if (cardId) {
+            viewModel.openCard(cardId);
+        }
+    });
 
     viewModel.graphCards = ko.computed(function(){
         var parentCards = [];
@@ -97,12 +108,21 @@ require([
         return parentCards;
     }, viewModel);
 
+    viewModel.graphCardOptions = ko.computed(function () {
+        var options = [{
+            name: null,
+            graphId: null,
+            disabled: true
+        }]
+        return options.concat(viewModel.graphCards());
+    });
+
     viewModel.newCard = ko.computed({
         read: function() {
             return viewModel.graphCards().length ? viewModel.graphCards()[0] : null;
         },
         write: function(value) {
-            viewModel.appendBranch(value);
+            viewModel.addCard(value);
         }
     });
 
