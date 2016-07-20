@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="panel-body">
                <ul class="list-group ep-menu-list">
                     <!-- Menu Item -->
-                    <li id="" class="resource-selector">
+                    <li id="" class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
                         <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: graphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
                     </li>
 
