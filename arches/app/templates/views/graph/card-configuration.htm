@@ -43,18 +43,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div style="display: flex; flex-direction: column;">
                         <div style="display: flex; flex: 1;">
-                            <div style="flex: 0 0 200px; width: 200px;">
+                            <div style="flex: 0 0 200px; width: 200px;" data-bind="with: cardComponentForm">
         					   {% include 'views/graph/card-configuration/card-components-tree.htm' %}
                             </div>
-                            <div style="flex: 0 0 200px; background: #f8f8f8;">
+                            <div style="flex: 0 0 200px; background: #f8f8f8;" data-bind="with: cardComponentsTree">
                                 {% include 'views/graph/card-configuration/card-component-form.htm' %}
                             </div>
-                            <div style="flex:1">
+                            <div style="flex:1" data-bind="with: cardFormPreview">
                                 {% include 'views/graph/card-configuration/card-form-preview.htm' %}
                             </div>
                         </div>
                     </div>
-					
+
 	<!-- 			</div>
 			</div>
 		</div> -->
