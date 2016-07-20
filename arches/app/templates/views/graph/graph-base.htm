@@ -27,13 +27,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
 <div class="loading-mask" data-bind="visible:loading()"></div>
 
-<div id="edit-panel" class="pt-page fade relative in">
+<div id="edit-panel" class="pt-page fade relative in" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
     <div class="ep-toolbar">
 
         <!-- Tools Menu -->
-        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }">
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
             <div class="">{% trans "Manage" %}
                 <i class="ion-more"></i>
             </div>
