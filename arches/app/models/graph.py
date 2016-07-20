@@ -922,18 +922,30 @@ class Graph(models.GraphModel):
         return ret
 
     def validate(self):
+        """      
+        validates certain aspects of resource graphs according to defined rules:
+            - The root node of a "Resource" can only be a semantic node, and must be a collector
+            - A node group that has child node groups may not itself be a child node group
+            - A node group can only have child node groups if the node group only contains semantic nodes
+            - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
+            - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
+        
+        """
 
-        # validates that the top node of a resource graph is semantic
+        # validates that the top node of a resource graph is semantic and a collector
+
+        if self.root.datatype != 'semantic': 
+            raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."))
 
         if self.isresource == True:
-            for node_id, node in self.nodes.iteritems():
-                if node.graph_id == self.graphid and node.istopnode == True:
-                    if node.datatype != 'semantic':
-                        raise ValidationError("The top node of your resource graph must have a datatype of 'semantic'.")
-                        ###copout
-                    if node.nodegroup != None:
-                        raise ValidationError("The top node of your resource graph can't be a collector. Hint: check that nodegroup_id of your resource node(s) are null.")
-
+            if self.root.is_collector == True:
+                raise ValidationError(_("The top node of your resource graph needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null."))
+        else:
+            if self.root.is_collector == False:
+                if len(self.nodes) > 1:
+                    print '*'*40
+                    print self.root.name
+                    raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."))
 
 
         # validates that a node group that has child node groups is not itself a child node group
@@ -947,7 +959,7 @@ class Graph(models.GraphModel):
         # for parent in parentnodegroups:
         #     for child in parentnodegroups:
         #         if parent.parentnodegroup_id == child.nodegroupid:
-        #             raise ValidationError("A parent node group cannot be a child of another node group.")
+        #             raise ValidationError(_("A parent node group cannot be a child of another node group."))
 
 
 
@@ -957,25 +969,21 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup and nodegroup.parentnodegroup_id != self.root.nodeid:
                 for node_id, node in self.nodes.iteritems():
                     if str(node.nodegroup_id) == str(nodegroup.parentnodegroup_id) and node.datatype != 'semantic':
-                        raise ValidationError("A parent node group must only contain semantic nodes.")
-
-                # find all nodes that have the same parentnode groupid and confirm they are all semantic
+                        raise ValidationError(_("A parent node group must only contain semantic nodes."))
 
 
-        # # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
+        # validate that nodes in a resource graph belong to the ontology assigned to the resource graph
 
         if self.ontology is not None:
-            ontology_classes = []
-            for ontology in self.ontology.ontologyclasses.all():
-                ontology_classes.append(ontology.source)
+            ontology_classes = self.ontology.ontologyclasses.values_list('source', flat=True)
 
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass not in ontology_classes:
-                    raise ValidationError("{0} is not a valid {1} ontology class".format(node.ontologyclass, self.ontology.ontologyid))
+                    raise ValidationError(_("{0} is not a valid {1} ontology class".format(node.ontologyclass, self.ontology.ontologyid)))
         else:
             for node_id, node in self.nodes.iteritems():
                 if node.ontologyclass is not None:
-                    raise ValidationError("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph.")
+                    raise ValidationError(_("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."))
 
 
 class ValidationError(Exception):

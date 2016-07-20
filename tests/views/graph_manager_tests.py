@@ -163,16 +163,11 @@ class GraphManagerViewTests(ArchesTestCase):
         self.client.login(username='admin', password='admin')
         graphid = Node.objects.get(nodeid=self.ROOT_ID).graph.pk
         url = reverse('clone_graph', kwargs={'graphid':graphid})
-        post_data = JSONSerializer().serialize({'name': 'test cloned graph'})
+        post_data = {}
         content_type = 'application/x-www-form-urlencoded'
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
         self.assertEqual(len(response_json['nodes']), self.NODE_COUNT+1)
-
-        post_data = JSONSerializer().serialize({'isresource': False})
-        response = self.client.post(url, post_data, content_type)
-        response_json = json.loads(response.content)
-        self.assertFalse(response_json['isresource'])
 
     def test_new_graph(self):
         """

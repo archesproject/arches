@@ -204,16 +204,6 @@ def clone(request, graphid):
     if request.method == 'POST':
         data = JSONDeserializer().deserialize(request.body)
         graph = Graph.objects.get(graphid=graphid).copy()
-        if 'isresource' in data:
-            graph.isresource = data['isresource']
-
-        if 'name' in data:
-            name = data['name']
-        else:
-            name = _('New Resource') if graph.isresource else _('New Graph')
-        graph.root.name = name
-        graph.name = name
-
         graph.save()
         return JSONResponse(graph)
 
