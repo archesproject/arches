@@ -3056,6 +3056,21 @@ li.card-tree-list:last-of-type {
     border-right: 1px solid #ddd;
     padding: 7px 0px;
 }
+.ep-card-crud-container {
+    margin: 10px;
+}
+.card-component-tree-container{
+    flex: 0 0 200px; 
+    width: 200px;
+}
+.card-component-form-container{
+    flex: 0 0 200px; 
+    background: #f8f8f8;
+}
+.card-form-preview-container{
+    flex: 1; 
+    background: #ebeef0
+}
 .title-block-title {
     font-size: 15px;
     font-weight: 400;
