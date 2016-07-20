@@ -85,8 +85,7 @@ require([
     };
 
     viewModel.openCard = function (cardId) {
-        // TODO navigate to card editor page here
-        pageView.viewModel.alert(new AlertViewModel('ep-alert-red', 'under construction...', 'Make me work, please!'));
+        pageView.viewModel.navigate(arches.urls.card + cardId);
     };
 
     viewModel.selectedCardId.subscribe(function(cardId) {

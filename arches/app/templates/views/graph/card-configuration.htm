@@ -1,0 +1,73 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block body_attributes %}style="overflow:hidden;"{% endblock %}
+
+{% block graph_header_title %}
+{% trans "Graph Designer" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+<!-- <span data-bind="if: false nodeForm.node() && nodeForm.node().dirty()"> -->
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:function () {  }">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:function () {  }">{% trans "Save Edits" %}</button>
+<!-- </span> -->
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
+{% block content %}
+<div id="card-container">
+
+	<div class="panel" style="border: 1px solid #ddd;margin:0px;">
+	<!-- 	<div class="eq-height clearfix">
+			<div class="row mar-no">
+				<div class="eq-box-md eq-no-panel"> -->
+
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="display: flex; flex: 1;">
+                            <div style="flex: 0 0 200px; width: 200px;">
+        					   {% include 'views/graph/card-configuration/card-components-tree.htm' %}
+                            </div>
+                            <div style="flex: 0 0 200px; background: #f8f8f8;">
+                                {% include 'views/graph/card-configuration/card-component-form.htm' %}
+                            </div>
+                            <div style="flex:1">
+                                {% include 'views/graph/card-configuration/card-form-preview.htm' %}
+                            </div>
+                        </div>
+                    </div>
+					
+	<!-- 			</div>
+			</div>
+		</div> -->
+	</div>
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('card-configuration-data', [], function () {
+    return {
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

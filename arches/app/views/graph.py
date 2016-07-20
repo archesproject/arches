@@ -142,6 +142,19 @@ def card_manager(request, graphid):
     })
 
 @group_required('edit')
+def card(request, cardid):
+    card = models.Card.objects.get(cardid=cardid)
+    return render(request, 'views/graph/card-configuration.htm', {
+        'main_script': 'views/graph/card-configuration',
+        'graphid': card.graph_id,
+        # 'graph': graph,
+        # 'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        # 'branches': JSONSerializer().serialize(branch_graphs)
+    })
+    pass
+
+@group_required('edit')
 def node(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     if data:
