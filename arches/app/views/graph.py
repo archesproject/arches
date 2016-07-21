@@ -144,13 +144,25 @@ def card_manager(request, graphid):
 @group_required('edit')
 def card(request, cardid):
     card = models.Card.objects.get(cardid=cardid)
+    sub_cards = []
+    for group in models.NodeGroup.objects.filter(parentnodegroup=card.nodegroup):
+        for card in group.card_set.all():
+            sub_cards.append(card)
+    nodegroups = [sub_card.nodegroup for sub_card in sub_cards]
+    nodegroups.append(card.nodegroup)
+    nodes = []
+    for nodegroup in nodegroups:
+        for node in nodegroup.node_set.all():
+            nodes.append(node)
+
     return render(request, 'views/graph/card-configuration.htm', {
         'main_script': 'views/graph/card-configuration',
         'graphid': card.graph_id,
-        # 'graph': graph,
-        # 'graphJSON': JSONSerializer().serialize(graph),
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        # 'branches': JSONSerializer().serialize(branch_graphs)
+        'card': JSONSerializer().serialize(card),
+        'sub_cards': JSONSerializer().serialize(sub_cards),
+        'nodegroups': JSONSerializer().serialize(nodegroups),
+        'nodes': JSONSerializer().serialize(nodes),
     })
     pass
 
