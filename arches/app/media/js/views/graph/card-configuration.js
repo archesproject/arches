@@ -22,6 +22,8 @@ require([
             card.cards.forEach(function(card) {
                 setupCard(card);
             });
+        } else {
+            card.cards = [];
         }
     };
     setupCard(data.card);
