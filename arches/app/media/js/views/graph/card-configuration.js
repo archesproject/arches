@@ -18,9 +18,11 @@ require([
         card.nodes = data.nodes.filter(function (node) {
             return node.nodegroup_id === card.nodegroup_id;
         });
-        card.cards.forEach(function(card) {
-            setupCard(card);
-        });
+        if (card.cards) {
+            card.cards.forEach(function(card) {
+                setupCard(card);
+            });
+        }
     };
     setupCard(data.card);
 
@@ -28,7 +30,7 @@ require([
         data: data.card,
         datatypes: data.datatypes
     });
-    
+
     var viewModel = {
         cardComponentForm: new CardComponentForm(),
         cardComponentsTree: new CardComponentsTree({

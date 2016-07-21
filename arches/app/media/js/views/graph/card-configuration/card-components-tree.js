@@ -14,7 +14,7 @@ define([
         * @memberof CardComponentsTree.prototype
         */
         initialize: function(options) {
-
+            _.extend(this, _.pick(options, 'card'));
         }
     });
     return CardComponentsTree;
