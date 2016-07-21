@@ -1687,13 +1687,14 @@ ul .collapse li:last-of-type {
     color: #959595;
 }
 .content-panel{
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column;
-    align-items: stretch;
-    align-content: stretch;
     width: 100%;
     height: 100vh;
-    justify-content: flex-start;
 }
 .edit-panel {
     position: absolute;
@@ -1716,6 +1717,8 @@ ul .collapse li:last-of-type {
     border-bottom: 1px solid #ddd;
 }
 .edit-content {
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
     flex: 1;
 }
@@ -2834,7 +2837,11 @@ ul.jqtree_common li.jqtree-folder {
     padding: 7px 12px;
 }
 .ep-toolbar {
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
     align-items: center;
     width: 100%;
     height: 50px;
@@ -2879,7 +2886,11 @@ ul.jqtree_common li.jqtree-folder {
     cursor: pointer;
     border-right: 1px solid #ddd;
     height: 50px;
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
     align-items: center;
     padding-left: 10px;
     padding-right: 20px;
@@ -2931,7 +2942,11 @@ ul.jqtree_common li.jqtree-folder {
     transition: all .25s ease;
 }
 .ep-form-toolbar {
+    display: -ms-flexbox;
+    display: -webkit-flex;
     display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
     align-items: center;
     width: 100%;
     height: 50px;
@@ -3212,6 +3227,7 @@ li.card-tree-list:last-of-type {
 }
 .card-library {
     display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
     width: 100%;
 }
