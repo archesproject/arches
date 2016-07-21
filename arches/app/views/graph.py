@@ -148,13 +148,14 @@ def card(request, cardid):
     sub_groups = models.NodeGroup.objects.filter(parentnodegroup=card.nodegroup)
     card_sets = [group.card_set.all() for group in sub_groups]
     sub_cards = list(itertools.chain.from_iterable(card_sets))
-    
+
     nodegroups = [sub_card.nodegroup for sub_card in sub_cards]
     nodegroups.append(card.nodegroup)
 
     node_sets = [group.node_set.all() for group in nodegroups]
     nodes = list(itertools.chain.from_iterable(node_sets))
 
+    datatypes = models.DDataType.objects.all()
     return render(request, 'views/graph/card-configuration.htm', {
         'main_script': 'views/graph/card-configuration',
         'graphid': card.graph_id,
@@ -163,6 +164,7 @@ def card(request, cardid):
         'sub_cards': JSONSerializer().serialize(sub_cards),
         'nodegroups': JSONSerializer().serialize(nodegroups),
         'nodes': JSONSerializer().serialize(nodes),
+        'datatypes': JSONSerializer().serialize(datatypes),
     })
     pass
 
