@@ -140,14 +140,14 @@ class GraphTests(ArchesTestCase):
 
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
-        cards_count_before = models.Card.objects.count()
+        cards_count_before = models.CardModel.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph(graph_obj)
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 0)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 0)
-        self.assertEqual(models.Card.objects.count()-cards_count_before, 0)
+        self.assertEqual(models.CardModel.objects.count()-cards_count_before, 0)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 0)
         self.assertEqual(graph_obj['name'], graph.name)
         self.assertEqual(graph_obj['subtitle'], graph.subtitle)
@@ -268,7 +268,7 @@ class GraphTests(ArchesTestCase):
 
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
-        cards_count_before = models.Card.objects.count()
+        cards_count_before = models.CardModel.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
 
         graph = Graph.objects.get(pk=self.rootNode.graph.graphid)
@@ -287,7 +287,7 @@ class GraphTests(ArchesTestCase):
 
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 2)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
-        self.assertEqual(models.Card.objects.count()-cards_count_before, 1)
+        self.assertEqual(models.CardModel.objects.count()-cards_count_before, 1)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
 
         # test the card values from the appened graph are copied over to main graph
@@ -321,7 +321,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
         self.assertEqual(models.Node.objects.count()-nodes_count_before, 3)
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 3)
-        self.assertEqual(models.Card.objects.count()-cards_count_before, 1)
+        self.assertEqual(models.CardModel.objects.count()-cards_count_before, 1)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
 
     def test_rules_for_appending(self):
@@ -614,7 +614,7 @@ class GraphTests(ArchesTestCase):
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
-        card_count_before = models.Card.objects.count()
+        card_count_before = models.CardModel.objects.count()
         
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
@@ -622,7 +622,7 @@ class GraphTests(ArchesTestCase):
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
 
         self.assertEqual(nodes_count_after-nodes_count_before, 1)
         self.assertEqual(edges_count_after-edges_count_before, 0)
@@ -636,7 +636,7 @@ class GraphTests(ArchesTestCase):
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
 
         self.assertEqual(nodes_count_after-nodes_count_before, 3)
         self.assertEqual(edges_count_after-edges_count_before, 2)
@@ -655,7 +655,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
 
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
         
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 1)
         self.assertEqual(card_count_after-card_count_before, 1)
@@ -666,7 +666,7 @@ class GraphTests(ArchesTestCase):
         graph.save()
 
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
         
         self.assertEqual(nodegroups_count_after-nodegroups_count_before, 2)
         self.assertEqual(card_count_after-card_count_before, 2)
@@ -685,14 +685,14 @@ class GraphTests(ArchesTestCase):
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
-        card_count_before = models.Card.objects.count()
+        card_count_before = models.CardModel.objects.count()
         
         graph.delete()
 
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
 
         self.assertEqual(nodes_count_before-nodes_count_after, 2)
         self.assertEqual(edges_count_before-edges_count_after, 1)
@@ -717,14 +717,14 @@ class GraphTests(ArchesTestCase):
         nodes_count_before = models.Node.objects.count()
         edges_count_before = models.Edge.objects.count()
         nodegroups_count_before = models.NodeGroup.objects.count()
-        card_count_before = models.Card.objects.count()
+        card_count_before = models.CardModel.objects.count()
         
         graph.delete_node(node)
 
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
-        card_count_after = models.Card.objects.count()
+        card_count_after = models.CardModel.objects.count()
 
         self.assertEqual(nodes_count_before-nodes_count_after, 2)
         self.assertEqual(edges_count_before-edges_count_after, 2)

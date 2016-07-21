@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import itertools
 from django.conf import settings as app_settings
 from django.db import transaction
 from django.shortcuts import render
@@ -26,8 +27,8 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
+from arches.app.models.card import Card
 from arches.app.models import models
-import itertools
 
 def test(request, graphid):
     #graph = Graph.objects.filter(isresource=True)
@@ -144,25 +145,13 @@ def card_manager(request, graphid):
 
 @group_required('edit')
 def card(request, cardid):
-    card = models.Card.objects.get(cardid=cardid)
-    sub_groups = models.NodeGroup.objects.filter(parentnodegroup=card.nodegroup)
-    card_sets = [group.card_set.all() for group in sub_groups]
-    sub_cards = list(itertools.chain.from_iterable(card_sets))
-    
-    nodegroups = [sub_card.nodegroup for sub_card in sub_cards]
-    nodegroups.append(card.nodegroup)
-
-    node_sets = [group.node_set.all() for group in nodegroups]
-    nodes = list(itertools.chain.from_iterable(node_sets))
+    card = Card.objects.get(cardid=cardid)
 
     return render(request, 'views/graph/card-configuration.htm', {
         'main_script': 'views/graph/card-configuration',
         'graphid': card.graph_id,
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'card': JSONSerializer().serialize(card),
-        'sub_cards': JSONSerializer().serialize(sub_cards),
-        'nodegroups': JSONSerializer().serialize(nodegroups),
-        'nodes': JSONSerializer().serialize(nodes),
     })
     pass
 

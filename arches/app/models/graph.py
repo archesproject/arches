@@ -81,7 +81,7 @@ class Graph(models.GraphModel):
 
                 nodes = self.node_set.all()
                 edges = self.edge_set.all()
-                cards = self.card_set.all()
+                cards = self.cardmodel_set.all()
 
                 for node in nodes:
                     self.add_node(node)
@@ -113,7 +113,7 @@ class Graph(models.GraphModel):
             nodegroup = models.NodeGroup.objects.create(
                 pk=newid
             )
-            models.Card.objects.create(
+            models.CardModel.objects.create(
                 nodegroup=nodegroup,
                 name=name,
                 graph=graph
@@ -207,13 +207,13 @@ class Graph(models.GraphModel):
         Adds a card to this graph
 
         Arguments:
-        node -- a dictionary representing a Card instance or an actual models.Card instance
+        node -- a dictionary representing a Card instance or an actual models.CardModel instance
 
         """
 
-        if not isinstance(card, models.Card):
+        if not isinstance(card, models.CardModel):
             cardobj = card.copy()
-            card = models.Card()
+            card = models.CardModel()
             card.cardid = cardobj.get('cardid', None)
             card.name = cardobj.get('name', '')
             card.description = cardobj.get('description','')
@@ -525,7 +525,7 @@ class Graph(models.GraphModel):
         if new_node.nodegroup_id != old_node.nodegroup_id:
             if new_node.is_collector:
                 # add a card
-                self.add_card(models.Card(name=new_node.name, nodegroup=new_node.nodegroup))
+                self.add_card(models.CardModel(name=new_node.name, nodegroup=new_node.nodegroup))
             else:
                 self._nodegroups_to_delete = [old_node.nodegroup]
                 # remove a card

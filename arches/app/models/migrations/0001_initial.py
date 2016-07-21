@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Card',
+            name='CardModel',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
                 ('name', models.TextField(null=True, blank=True)),
@@ -208,7 +208,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CardXNodeXWidget',
             fields=[
-                ('card', models.ForeignKey(to='models.Card', db_column='cardid')),
+                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('inputmask', models.TextField(blank=True, null=True)),
                 ('inputlabel', models.TextField(blank=True, null=True)),
@@ -342,7 +342,7 @@ class Migration(migrations.Migration):
             name='FormXCard',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('card', models.ForeignKey(db_column='cardid', to='models.Card')),
+                ('card', models.ForeignKey(db_column='cardid', to='models.CardModel')),
                 ('form', models.ForeignKey(db_column='formid', to='models.Form')),
             ],
             options={
@@ -640,12 +640,12 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(db_column='widgetid', to='models.Widget'),
         ),
         migrations.AddField(
-            model_name='card',
+            model_name='cardmodel',
             name='nodegroup',
             field=models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup'),
         ),
         migrations.AddField(
-            model_name='card',
+            model_name='cardmodel',
             name='graph',
             field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
         ),
