@@ -27,6 +27,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models import models
+import itertools
 
 def test(request, graphid):
     #graph = Graph.objects.filter(isresource=True)
@@ -144,16 +145,15 @@ def card_manager(request, graphid):
 @group_required('edit')
 def card(request, cardid):
     card = models.Card.objects.get(cardid=cardid)
-    sub_cards = []
-    for group in models.NodeGroup.objects.filter(parentnodegroup=card.nodegroup):
-        for card in group.card_set.all():
-            sub_cards.append(card)
+    sub_groups = models.NodeGroup.objects.filter(parentnodegroup=card.nodegroup)
+    card_sets = [group.card_set.all() for group in sub_groups]
+    sub_cards = list(itertools.chain.from_iterable(card_sets))
+    
     nodegroups = [sub_card.nodegroup for sub_card in sub_cards]
     nodegroups.append(card.nodegroup)
-    nodes = []
-    for nodegroup in nodegroups:
-        for node in nodegroup.node_set.all():
-            nodes.append(node)
+
+    node_sets = [group.node_set.all() for group in nodegroups]
+    nodes = list(itertools.chain.from_iterable(node_sets))
 
     return render(request, 'views/graph/card-configuration.htm', {
         'main_script': 'views/graph/card-configuration',
