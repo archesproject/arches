@@ -34,34 +34,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div id="graph-container">
-
-	<div class="panel" style="border: 1px solid #ddd;margin:0px;">
-		<div class="eq-height clearfix">
-			<div class="row mar-no">
-				<div class="eq-box-md eq-no-panel">
-					<!--Node Listing -->
-					<div class="ep-card-tools" id="node-listing" data-bind="with: nodeList">
-                        {% include 'views/graph/graph-manager/node-list.htm' %}
-					</div>
-
-					<!-- Node Editor -->
-					<div id="node-crud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
-                        <div class="panel ep-card-crud-panel relative">
-                            {% include 'views/graph/graph-manager/node-form.htm' %}
-    						<!-- Graph Metadata -->
-                        </div>
-					</div>
-                    <div id="branch-panel" class="library ep-card-crud-panel" style="display: none;" data-bind="visible: nodeForm.branchListView.viewMetadata, with: nodeForm.branchListView">
-                        {% include 'views/graph/graph-manager/branch-info.htm' %}
-                    </div>
-
-					<!-- Graph -->
-					<div id="graph" style="margin-left:200px;"></div>
-				</div>
-			</div>
-		</div>
+<div style="display: flex; border: 1px solid #ddd;margin:0px; flex: 1">
+	<!--Node Listing -->
+	<div class="ep-card-tools" id="node-listing" data-bind="with: nodeList">
+        {% include 'views/graph/graph-manager/node-list.htm' %}
 	</div>
+
+	<!-- Node Editor -->
+	<div id="node-crud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+        <div class="ep-card-crud-panel">
+            {% include 'views/graph/graph-manager/node-form.htm' %}
+			<!-- Graph Metadata -->
+        </div>
+	</div>
+    <div class="ep-card-crud-panel branch-panel" style="display: none;" data-bind="visible: nodeForm.branchListView.viewMetadata, with: nodeForm.branchListView">
+        {% include 'views/graph/graph-manager/branch-info.htm' %}
+    </div>
+
+	<!-- Graph -->
+	<div id="graph" style="flex: 1"></div>
+
+
 </div>
 {% endblock content %}
 

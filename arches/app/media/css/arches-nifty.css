@@ -1510,14 +1510,6 @@ div.dropdown-menu.open {
     height: 40px;
     width: 40px;
 }
-#branch-panel, #permissions-panel {
-    position: absolute;
-    top: 0;
-    left: 450px;
-    padding-left: 7px;
-    padding-right: 5px;
-    overflow-y: scroll;
-}
 .node .node-collected, .link.link-collected {
     stroke-width: 3px;
 }
@@ -1694,6 +1686,15 @@ ul .collapse li:last-of-type {
     font-size: 12px;
     color: #959595;
 }
+.content-panel{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-content: stretch;
+    width: 100%;
+    height: 100vh;
+    justify-content: flex-start;
+}
 .edit-panel {
     position: absolute;
     top: 0;
@@ -1715,14 +1716,8 @@ ul .collapse li:last-of-type {
     border-bottom: 1px solid #ddd;
 }
 .edit-content {
-    display: block;
-    overflow-y: scroll;
-    height: 100vh;
-    position: absolute;
-    top: 80px;
-    z-index: 1000;
-    width: 100%;
-    padding: 0 0 100px;
+    display: flex;
+    flex: 1;
 }
 .edit-panel-search-bar {
     position: absolute;
@@ -2960,6 +2955,7 @@ ul.jqtree_common li.jqtree-folder {
     z-index: 10;
     padding: 12px;
     transition: all .30s ease;
+    flex: 1;
 }
 .alert-active .ep-form-content {
     top: 140px;
@@ -3007,11 +3003,6 @@ ul.jqtree_common li.jqtree-folder {
     padding: 10px;
 }
 .ep-card-tools {
-    position: absolute;
-    overflow: auto;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
     width: 200px;
 }
 .ep-card-tools-panel {
@@ -3062,14 +3053,20 @@ li.card-tree-list:last-of-type {
 .card-component-tree-container{
     flex: 0 0 200px; 
     width: 200px;
+    padding: 7px;
 }
 .card-component-form-container{
     flex: 0 0 200px; 
     background: #f8f8f8;
+    padding: 7px;
 }
 .card-form-preview-container{
     flex: 1; 
     background: #ebeef0
+}
+.branch-panel {
+    padding-left: 7px;
+    padding-right: 5px;
 }
 .title-block-title {
     font-size: 15px;
@@ -3203,11 +3200,6 @@ li.card-tree-list:last-of-type {
     width: 249px;
 }
 .ep-node-card {
-    overflow: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 200px;
     width: 250px;
 }
 .footer-tools {
