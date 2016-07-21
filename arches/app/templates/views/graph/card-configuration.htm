@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div style="display: flex; border: 1px solid #ddd;margin:0px; flex: 1">
+<div class="flex" style="border: 1px solid #ddd; margin: 0px;">
     <div class="card-component-tree-container" data-bind="with: cardComponentsTree">
         {% include 'views/graph/card-configuration/card-components-tree.htm' %}
     </div>

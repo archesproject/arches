@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div style="display: flex; border: 1px solid #ddd;margin:0px; flex: 1">
+<div class="flex" style="border: 1px solid #ddd; margin:0px;">
 	<!--Node Listing -->
 	<div class="ep-card-tools" id="node-listing" data-bind="with: nodeList">
         {% include 'views/graph/graph-manager/node-list.htm' %}

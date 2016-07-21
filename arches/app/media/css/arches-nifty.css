@@ -1686,6 +1686,14 @@ ul .collapse li:last-of-type {
     font-size: 12px;
     color: #959595;
 }
+.flex{
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;    
+    -ms-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+}
 .content-panel{
     display: -ms-flexbox;
     display: -webkit-flex;
@@ -1715,12 +1723,6 @@ ul .collapse li:last-of-type {
     padding-left: 0;
     background: #fafafa;
     border-bottom: 1px solid #ddd;
-}
-.edit-content {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex: 1;
 }
 .edit-panel-search-bar {
     position: absolute;
@@ -2609,6 +2611,7 @@ textarea:placeholder {
     margin: 3px;
 }
 .card-grid{
+    -ms-flex: 1;
     -webkit-flex: 1;
     flex: 1;
     margin: 5px
@@ -2970,6 +2973,8 @@ ul.jqtree_common li.jqtree-folder {
     z-index: 10;
     padding: 12px;
     transition: all .30s ease;
+    -ms-flex: 1;
+    -webkit-flex: 1;
     flex: 1;
 }
 .alert-active .ep-form-content {
@@ -3066,16 +3071,22 @@ li.card-tree-list:last-of-type {
     margin: 10px;
 }
 .card-component-tree-container{
+    -ms-flex: 0 0 200px;
+    -webkit-flex: 0 0 200px;
     flex: 0 0 200px; 
     width: 200px;
     padding: 7px;
 }
 .card-component-form-container{
+    -ms-flex: 0 0 200px;
+    -webkit-flex: 0 0 200px;
     flex: 0 0 200px; 
     background: #f8f8f8;
     padding: 7px;
 }
 .card-form-preview-container{
+    -ms-flex: 1;
+    -webkit-flex: 1;
     flex: 1; 
     background: #ebeef0
 }
