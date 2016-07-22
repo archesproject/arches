@@ -1,38 +1,50 @@
 {% load i18n %}
 <script type="text/html" id="cardTree">
-    <li class="card-tree-list">
+    <li class="card-tree-list"data-bind="css: {
+        'active': self.selection() === card
+    }">
         <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-                'card-container-link': isContainer(),
-                'card-link': !isContainer()
+            'card-container-link': card.isContainer(),
+            'card-link': !card.isContainer(),
+            'active': self.selection() === card
+        }, click: function () {
+            self.selection(card);
         }">
             <i class="card-tree-list-icon" data-bind="css: {
-                'ion-ios-folder-outline': isContainer(),
-                'ion-ios-list-outline': !isContainer()
+                'ion-ios-folder-outline': card.isContainer(),
+                'ion-ios-list-outline': !card.isContainer()
             }"></i>
-            <span data-bind="text: get('name')"></span>
+            <span data-bind="text: card.get('name')"></span>
         </a>
 
         <ul class="card-tree-list-item" aria-expanded="true">
             <!-- ko template: {
-                name: isContainer() ? 'cardTree' : 'cardTreeNodes',
-                foreach: isContainer() ? get('cards') : get('nodes')
+                name: card.isContainer() ? 'cardTree' : 'cardTreeNodes',
+                foreach: card.isContainer() ? get('cards') : get('nodes'),
+                as: card.isContainer() ? 'card' : 'node'
             } --> <!-- /ko -->
         </ul>
     </li>
 </script>
 
 <script type="text/html" id="cardTreeNodes">
-    <!-- ko if: datatype() !== 'semantic' -->
-    <li class="card-tree-list">
-        <a href="#" class="cc-link card-widget-link">
+    <!-- ko if: node.datatype() !== 'semantic' -->
+    <li class="card-tree-list" data-bind="css: {
+        'active': self.selection() === node
+    }">
+        <a href="#" class="cc-link card-widget-link" data-bind="click: function () {
+            self.selection(node);
+        }, css: {
+            'active': self.selection() === node
+        }">
             <i class="ion-ios-paper card-tree-list-icon"></i>
-            <span data-bind="text: name"></span>
+            <span data-bind="text: node.name"></span>
         </a>
     </li>
     <!-- /ko -->
 </script>
 
-<!-- Card Manager Tree -->
+<!-- ko foreach: { data: [$data], as: 'self' } -->
 <div id="ep-card-tools">
 
     <!-- Toggle form/report TOC -->
@@ -43,6 +55,7 @@
 
     <!-- TOC Cards/Widgets -->
     <div id="card-management-forms" class="panel ep-card-tools-panel">
-        <!-- ko template: { name: 'cardTree', data: card } --> <!-- /ko -->
+        <!-- ko template: { name: 'cardTree', foreach: [card], as: 'card' } --> <!-- /ko -->
     </div>
 </div>
+<!-- /ko -->
