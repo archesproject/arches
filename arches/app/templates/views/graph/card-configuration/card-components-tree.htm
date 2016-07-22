@@ -1,4 +1,36 @@
 {% load i18n %}
+<script type="text/html" id="cardTree">
+    <li class="card-tree-list">
+        <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+                'card-container-link': isContainer(),
+                'card-link': !isContainer()
+        }">
+            <i class="card-tree-list-icon" data-bind="css: {
+                'ion-ios-folder-outline': isContainer(),
+                'ion-ios-list-outline': !isContainer()
+            }"></i>
+            <span data-bind="text: get('name')"></span>
+        </a>
+
+        <ul class="card-tree-list-item" aria-expanded="true">
+            <!-- ko template: {
+                name: isContainer() ? 'cardTree' : 'cardTreeNodes',
+                foreach: isContainer() ? get('cards') : get('nodes')
+            } --> <!-- /ko -->
+        </ul>
+    </li>
+</script>
+
+<script type="text/html" id="cardTreeNodes">
+    <!-- ko if: datatype() !== 'semantic' -->
+    <li class="card-tree-list">
+        <a href="#" class="cc-link card-widget-link">
+            <i class="ion-ios-paper card-tree-list-icon"></i>
+            <span data-bind="text: name"></span>
+        </a>
+    </li>
+    <!-- /ko -->
+</script>
 
 <!-- Card Manager Tree -->
 <div id="ep-card-tools">
@@ -8,32 +40,6 @@
         <h4 class="title-block-title"> {% trans "Card Manager" %}</h4>
     </div>
 
-    <script type="text/html" id="cardTreeNodes">
-        <!-- ko if: datatype() !== 'semantic' -->
-        <li class="card-tree-list">
-            <a href="#" class="cc-link card-widget-link">
-                <i class="ion-ios-paper card-tree-list-icon"></i>
-                <span data-bind="text: name"></span>
-            </a>
-        </li>
-        <!-- /ko -->
-    </script>
-
-    <script type="text/html" id="cardTree">
-        <li class="card-tree-list">
-            <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {'card-container-link': isContainer(), 'card-link': !isContainer()}">
-                <i class="card-tree-list-icon" data-bind="css: {'ion-ios-folder-outline': isContainer(), 'ion-ios-list-outline': !isContainer()}"></i>
-                <span data-bind="text: get('name')"></span>
-            </a>
-
-            <ul class="card-tree-list-item" aria-expanded="true">
-                <!-- ko template: {
-                    name: isContainer() ? 'cardTree' : 'cardTreeNodes',
-                    foreach: isContainer() ? get('cards') : get('nodes')
-                } --> <!-- /ko -->
-            </ul>
-        </li>
-    </script>
 
     <!-- TOC Cards/Widgets -->
     <div id="card-management-forms" class="panel ep-card-tools-panel">
