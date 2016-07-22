@@ -2495,7 +2495,7 @@ a.selected {
 }
 .form-divider {
     border-top: 1px solid #eee;
-    margin-top: 40px;
+    margin-top: 10px;
 }
 .cd-dark .panel-body .form-divider {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
