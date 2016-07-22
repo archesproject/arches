@@ -82,7 +82,7 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, 'serialize'):
-                return getattr(object, 'serialize')()  
+                return self.handle_object(getattr(object, 'serialize')())
             else:
                 return self.handle_model(object)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']

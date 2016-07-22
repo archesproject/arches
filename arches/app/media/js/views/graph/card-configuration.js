@@ -7,26 +7,6 @@ require([
     'views/graph/card-configuration/card-form-preview',
     'card-configuration-data'
 ], function(ko, CardModel, PageView, CardComponentForm, CardComponentsTree, CardFormPreview, data) {
-    /**
-    * set up the page view model with the related sub views
-    */
-    data.card.cards = data.subCards;
-    var setupCard = function (card) {
-        card.nodegroup = data.nodeGroups.find(function (nodegroup) {
-            return nodegroup.nodegroupid === card.nodegroup_id;
-        });
-        card.nodes = data.nodes.filter(function (node) {
-            return node.nodegroup_id === card.nodegroup_id;
-        });
-        if (card.cards) {
-            card.cards.forEach(function(card) {
-                setupCard(card);
-            });
-        } else {
-            card.cards = [];
-        }
-    };
-    setupCard(data.card);
 
     var cardModel = new CardModel({
         data: data.card,
@@ -34,11 +14,15 @@ require([
     });
 
     var viewModel = {
-        cardComponentForm: new CardComponentForm(),
+        cardComponentForm: new CardComponentForm({
+            card: cardModel
+        }),
         cardComponentsTree: new CardComponentsTree({
             card: cardModel
         }),
-        cardFormPreview: new CardFormPreview()
+        cardFormPreview: new CardFormPreview({
+            card: cardModel
+        })
     };
 
     var pageView = new PageView({

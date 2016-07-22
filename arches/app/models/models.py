@@ -36,7 +36,7 @@ class Address(models.Model):
         db_table = 'addresses'
 
 
-class Card(models.Model):
+class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -54,7 +54,7 @@ class Card(models.Model):
 class CardXNodeXWidget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     node = models.ForeignKey('Node', db_column='nodeid')
-    card = models.ForeignKey('Card', db_column='cardid')
+    card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
     function = models.ForeignKey('Function', db_column='functionid')
     inputmask = models.TextField(blank=True, null=True)
@@ -173,7 +173,7 @@ class Form(models.Model):
 class FormXCard(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1)
     form = models.ForeignKey(Form, db_column='formid')
-    card = models.ForeignKey(Card, db_column='cardid')
+    card = models.ForeignKey(CardModel, db_column='cardid')
 
     class Meta:
         managed = True
