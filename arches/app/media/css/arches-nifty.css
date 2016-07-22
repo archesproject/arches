@@ -2781,9 +2781,9 @@ ul.jqtree_common li.jqtree-folder {
 }
 .library-title-block {
     height: 65px;
-    background: #fff;
     color: #666;
     border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
 }
 .library-tools {
     padding-left: 15px;
@@ -3078,11 +3078,13 @@ li.card-tree-list:last-of-type {
     padding: 7px;
 }
 .card-component-form-container{
-    -ms-flex: 0 0 200px;
-    -webkit-flex: 0 0 200px;
-    flex: 0 0 200px; 
+    -ms-flex: 0 0 250px;
+    -webkit-flex: 0 0 250px;
+    flex: 0 0 250px; 
     background: #f8f8f8;
     padding: 7px;
+    color: #666;
+    border-right: solid 1px #dddddd;
 }
 .card-form-preview-container{
     -ms-flex: 1;
