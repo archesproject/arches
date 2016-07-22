@@ -571,23 +571,17 @@ class Migration(migrations.Migration):
                 ('defaultlabel', models.TextField(blank=True, null=True)),
                 ('defaultmask', models.TextField(blank=True, null=True)),
                 ('helptext', models.TextField(blank=True, null=True)),
+                ('datatype', models.ForeignKey(db_column='datatype', to='models.DDataType')),
             ],
             options={
                 'db_table': 'widgets',
                 'managed': True,
             },
         ),
-        migrations.CreateModel(
-            name='WidgetXDataType',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('widget', models.ForeignKey(db_column='widgetid', to='models.Widget')),
-                ('datatype', models.ForeignKey(db_column='datatypeid', to='models.DDataType')),
-            ],
-            options={
-                'db_table': 'widgets_x_datatypes',
-                'managed': True,
-            },
+        migrations.AddField(
+            model_name='ddatatype',
+            name='defaultwidget',
+            field=models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True),
         ),
         migrations.AddField(
             model_name='resourcexresource',
