@@ -46,14 +46,17 @@ class Card(models.CardModel):
 
             else:
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
-                card_sets = [group.cardmodel_set.all() for group in sub_groups]
-                self.sub_cards = list(itertools.chain.from_iterable(card_sets))
+                for sub_group in sub_groups:
+                    self.sub_cards.extend(Card.objects.filter(nodegroup=sub_group))
+                # card_sets = [group.cardmodel_set.all() for group in sub_groups]
+                # self.sub_cards = list(itertools.chain.from_iterable(card_sets))
                 
-                nodegroups = [sub_card.nodegroup for sub_card in self.sub_cards]
-                self.nodegroups.append(self.nodegroup)
+                # nodegroups = [sub_card.nodegroup for sub_card in self.sub_cards]
+                # self.nodegroups.append(self.nodegroup)
 
-                node_sets = [group.node_set.all() for group in self.nodegroups]
-                self.nodes = list(itertools.chain.from_iterable(node_sets))
+                #node_sets = [group.node_set.all() for group in self.nodegroups]
+                #self.nodes = list(itertools.chain.from_iterable(node_sets))
+                self.nodes = list(self.nodegroup.node_set.all())
 
     def serialize(self):
         """
@@ -62,8 +65,8 @@ class Card(models.CardModel):
         """
 
         ret = JSONSerializer().handle_model(self)
-        ret['sub_cards'] = self.sub_cards
-        ret['nodegroups'] = self.nodegroups
+        ret['sub_cards'] = JSONSerializer().serializeToPython(self.sub_cards)
+        # ret['nodegroups'] = self.nodegroups
         ret['nodes'] = self.nodes
 
         return ret
