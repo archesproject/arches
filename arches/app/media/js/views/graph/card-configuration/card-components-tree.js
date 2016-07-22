@@ -1,6 +1,7 @@
 define([
-    'backbone'
-], function(Backbone) {
+    'backbone',
+    'knockout',
+], function(Backbone, ko) {
     var CardComponentsTree = Backbone.View.extend({
         /**
         * A backbone view representing a card components tree
@@ -14,7 +15,8 @@ define([
         * @memberof CardComponentsTree.prototype
         */
         initialize: function(options) {
-
+            _.extend(this, _.pick(options, 'card'));
+            this.selection = ko.observable(this.card);
         }
     });
     return CardComponentsTree;

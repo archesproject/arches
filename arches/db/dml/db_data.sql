@@ -182,9 +182,9 @@ INSERT INTO node_groups(nodegroupid, legacygroupid)
 INSERT INTO edges(graphid, domainnodeid, rangenodeid, ontologyproperty)
     VALUES ('22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '20000000-0000-0000-0000-100000000002', 'P2_has_type');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, 
+INSERT INTO cards(cardid, name, description, instructions, cardinality,
         nodegroupid, graphid)
-    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type Card', 'A common pattern used frequently to match a value with a type', '', 'n', 
+    VALUES (public.uuid_generate_v1mc(), 'Node/Node Type', 'Represents a node and node type pairing', '', 'n',
         '20000000-0000-0000-0000-100000000001', '22000000-0000-0000-0000-000000000001');
 -- End Node/NodeType graph
 
@@ -236,14 +236,14 @@ INSERT INTO node_groups(nodegroupid, legacygroupid)
 INSERT INTO node_groups(nodegroupid, legacygroupid)
     VALUES ('20000000-0000-0000-0000-000000000001', '');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, 
+INSERT INTO cards(cardid, name, description, instructions, cardinality,
         nodegroupid, graphid)
-    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here', 'n', 
+    VALUES (public.uuid_generate_v1mc(), 'Keys', 'For map keys and the like', 'Enter any keys here', 'n',
         '20000000-0000-0000-0000-000000000001', '22000000-0000-0000-0000-000000000002');
 
-INSERT INTO cards(cardid, name, description, instructions, cardinality, 
+INSERT INTO cards(cardid, name, description, instructions, cardinality,
         nodegroupid, graphid)
-    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '', 'n', 
+    VALUES (public.uuid_generate_v1mc(), 'Arches Configuration', 'Basic settings for Arches', '', 'n',
         '20000000-0000-0000-0000-000000000000', '22000000-0000-0000-0000-000000000002');
 -- End Arches Configuration graph
 
