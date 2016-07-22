@@ -60,10 +60,11 @@ class Card(models.CardModel):
 
         """
 
-
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
+        ret['visible'] = True
+        ret['active'] = True
         
         graph = Graph.objects.get(graphid=self.graph_id)
         if graph.ontology:

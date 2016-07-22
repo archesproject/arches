@@ -60,26 +60,11 @@
             </div>
 
             <!-- Card Visibility -->
-            <div class="toggle-container">
-                <input id="card-container-visibility" class="arches-switch" type="checkbox" checked data-switchery="true" style="display: none;">
-                <p class="arches-toggle-sm">
-                    Make Card Visible
-                </p>
-                <span class="arches-toggle-subtitle">
-                    Show this card by default
-                </span>
-            </div>
+            <div data-bind="component: { name: 'switch-widget', params: {value: card.get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
             <!-- Active -->
-            <div class="toggle-container">
-                <input id="card-container-active" class="arches-switch" type="checkbox" checked data-switchery="true" style="display: none;">
-                <p class="arches-toggle-sm">
-                    Make Card Active
-                </p>
-                <span class="arches-toggle-subtitle">
-                    This card is active and can be used for data entry
-                </span>
-            </div>
+            <div data-bind="component: { name: 'switch-widget', params: {value: card.get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>
+
         </div>    
     </div>
 

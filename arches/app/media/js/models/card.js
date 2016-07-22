@@ -65,6 +65,8 @@ define(['arches',
                     case 'instructions':
                     case 'helptext':
                     case 'cardinality':
+                    case 'visible':
+                    case 'active':
                     case 'ontologyproperty':
                         this.set(key, ko.observable(value));
                         break;

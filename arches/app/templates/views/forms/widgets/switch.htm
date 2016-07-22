@@ -1,9 +1,6 @@
 {% load i18n %}
-<div class="row mar-btm">
-    <div class="form-group">
-        <label class="col-xs-12 control-label widget-input-label" data-bind="text:label"></label>
-        <div class="col-xs-12 col-md-9 switch-container">
-            <span class="switch switch-small" data-bind="css: {\'on\': value()}, click: function() { value(!value()); }"><small></small></span>
-        </div>
-    </div>
+<div class="toggle-container">
+    <span class="switch switch-small" data-bind="css: {'on': value()}, click: function() { value(!value()); }"><small></small></span>
+    <p class="arches-toggle-sm" data-bind="text:label"></p>
+    <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
 </div>

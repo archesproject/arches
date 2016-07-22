@@ -5,7 +5,8 @@ require([
     'views/graph/card-configuration/card-component-form',
     'views/graph/card-configuration/card-components-tree',
     'views/graph/card-configuration/card-form-preview',
-    'card-configuration-data'
+    'card-configuration-data',
+    'widgets/switch'
 ], function(ko, CardModel, PageView, CardComponentForm, CardComponentsTree, CardFormPreview, data) {
     var viewModel = {};
 
