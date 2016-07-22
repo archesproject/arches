@@ -16,14 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid
-import itertools
-from copy import copy, deepcopy
-from django.db import transaction
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.conf import settings
-from django.utils.translation import ugettext as _
 
 class Card(models.CardModel):
     """
@@ -56,7 +50,7 @@ class Card(models.CardModel):
         """
 
         ret = JSONSerializer().handle_model(self)
-        ret['cards'] = JSONSerializer().serializeToPython(self.cards)
+        ret['cards'] = self.cards
         ret['nodes'] = self.nodes
 
         return ret
