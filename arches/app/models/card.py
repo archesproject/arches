@@ -65,6 +65,6 @@ class Card(models.CardModel):
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
-        ret['domain_connections'] = graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)
+        ret['ontology_properties'] = [item['ontology_property'] for item in graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret

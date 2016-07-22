@@ -29,12 +29,7 @@
                         Relation to Resource
                     </div>
                     <div class="col-sm-12 pad-no crud-widget-container">
-                        <select id="" class="resources" style="" data-placeholder="Choose a relation..." tabindex="4">
-                            <option value="r1">P34i_was_assessed_by</option>
-                            <option value="r2">P46i_xxxx</option>
-                            <option value="r3">P58_xxx</option>
-                            <option value="r4">P80_xxxxxx</option>
-                        </select> 
+                        <select class="resources" data-bind="value: '', options: card.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
 

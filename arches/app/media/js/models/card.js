@@ -67,6 +67,9 @@ define(['arches',
                     case 'cardinality':
                         this.set(key, ko.observable(value));
                         break;
+                    case 'ontology_properties':
+                        this.set(key, ko.observableArray(value));
+                        break;
                     default:
                         this.set(key, value);
                 }
