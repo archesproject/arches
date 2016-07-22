@@ -14,7 +14,7 @@ define([
         * @memberof CardFormPreview.prototype
         */
         initialize: function(options) {
-
+            this.card = options.card;
         }
     });
     return CardFormPreview;

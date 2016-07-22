@@ -60,11 +60,16 @@ class Card(models.CardModel):
 
         """
 
-        graph = Graph.objects.get(graphid=self.graph_id)
 
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
-        ret['domain_connections'] = graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)
+        
+        graph = Graph.objects.get(graphid=self.graph_id)
+        if graph.ontology:
+            ret['ontology_properties'] = [item['ontology_property'] for item in graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
+            for edge in graph.edges.itervalues():
+                if edge.rangenode_id == self.nodegroup_id:
+                    ret['ontologyproperty'] = edge.ontologyproperty
 
         return ret

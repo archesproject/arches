@@ -14,7 +14,7 @@ define([
         * @memberof CardComponentForm.prototype
         */
         initialize: function(options) {
-
+            this.card = options.card;
         }
     });
     return CardComponentForm;
