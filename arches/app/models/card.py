@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Card(models.CardModel):
@@ -30,6 +31,16 @@ class Card(models.CardModel):
 
     def __init__(self, *args, **kwargs):
         super(Card, self).__init__(*args, **kwargs)
+        # from models.CardModel
+        # self.cardid
+        # self.name
+        # self.description
+        # self.instructions
+        # self.helptext
+        # self.cardinality
+        # self.nodegroup
+        # self.graph
+        # end from models.CardModel
         self.cards = []
         self.nodes = []
 
@@ -49,8 +60,11 @@ class Card(models.CardModel):
 
         """
 
+        graph = Graph.objects.get(graphid=self.graph_id)
+
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
+        ret['domain_connections'] = graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)
 
         return ret
