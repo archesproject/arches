@@ -14,11 +14,15 @@ require([
     });
     
     var viewModel = {
-        cardComponentForm: new CardComponentForm(),
+        cardComponentForm: new CardComponentForm({
+            card: cardModel
+        }),
         cardComponentsTree: new CardComponentsTree({
             card: cardModel
         }),
-        cardFormPreview: new CardFormPreview()
+        cardFormPreview: new CardFormPreview({
+            card: cardModel
+        })
     };
 
     var pageView = new PageView({
