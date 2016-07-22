@@ -370,9 +370,6 @@ class Graph(models.GraphModel):
             for node in branch_copy.nodes.itervalues():
                 self.add_node(node)
             for card in branch_copy.cards.itervalues():
-                if card.nodegroup.parentnodegroup is None:
-                    card.name = branch_copy.name
-                    card.description = branch_copy.description
                 self.add_card(card)
             for edge in branch_copy.edges.itervalues():
                 self.add_edge(edge)
@@ -530,10 +527,10 @@ class Graph(models.GraphModel):
                 self._nodegroups_to_delete = [old_node.nodegroup]
                 # remove a card
                 self.cards = {
-                    card_id: card for card_id, card in self.cards.iteritems() 
+                    card_id: card for card_id, card in self.cards.iteritems()
                         if card.nodegroup_id != old_node.nodegroup_id
                 }
-                
+
         return self
 
     def delete_node(self, node=None):
@@ -887,7 +884,7 @@ class Graph(models.GraphModel):
                 else:
                     card.name = self.nodes[card.nodegroup.pk].name
                     card.description = self.nodes[card.nodegroup.pk].description
-            
+
             cards.append(card)
 
         return cards
@@ -922,19 +919,19 @@ class Graph(models.GraphModel):
         return ret
 
     def validate(self):
-        """      
+        """
         validates certain aspects of resource graphs according to defined rules:
             - The root node of a "Resource" can only be a semantic node, and must be a collector
             - A node group that has child node groups may not itself be a child node group
             - A node group can only have child node groups if the node group only contains semantic nodes
             - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
-        
+
         """
 
         # validates that the top node of a resource graph is semantic and a collector
 
-        if self.root.datatype != 'semantic': 
+        if self.root.datatype != 'semantic':
             raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."))
 
         if self.isresource == True:

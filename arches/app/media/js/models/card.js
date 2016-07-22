@@ -75,6 +75,10 @@ define(['arches',
                         this.set(key, value);
                 }
             }, this);
+
+            this.isContainer = ko.computed(function() {
+                return !!self.get('cards')().length;
+            });
         }
     });
     return CardModel;
