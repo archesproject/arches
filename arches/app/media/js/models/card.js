@@ -61,6 +61,12 @@ define(['arches',
                         }, this);
                         this.set('nodes', ko.observableArray(nodes));
                         break;
+                    case 'name':
+                    case 'instructions':
+                    case 'helptext':
+                    case 'cardinality':
+                        this.set(key, ko.observable(value));
+                        break;
                     default:
                         this.set(key, value);
                 }

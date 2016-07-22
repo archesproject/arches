@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- Card Container CRUD -->
 <div id="ep-card-container-crud">
     <div class="panel ep-card-crud-panel relative">
@@ -43,7 +44,7 @@
                         Name
                     </div>
                     <div class="col-sm-12 pad-no crud-widget-container">
-                        <input type="" placeholder="Card name" id="" class="form-control input-md widget-input" value="Resource Locations">
+                        <input type="" placeholder="{% trans "Card name" %}" id="" class="form-control input-md widget-input" data-bind="value: card.get('name')">
                     </div>
                 </div>
 
