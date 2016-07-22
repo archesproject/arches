@@ -146,12 +146,13 @@ def card_manager(request, graphid):
 @group_required('edit')
 def card(request, cardid):
     card = Card.objects.get(cardid=cardid)
-
+    datatypes = models.DDataType.objects.all()
     return render(request, 'views/graph/card-configuration.htm', {
         'main_script': 'views/graph/card-configuration',
         'graphid': card.graph_id,
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'card': JSONSerializer().serialize(card),
+        'datatypes': JSONSerializer().serialize(datatypes),
     })
     pass
 
