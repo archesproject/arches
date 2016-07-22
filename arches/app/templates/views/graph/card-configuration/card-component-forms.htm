@@ -1,0 +1,18 @@
+{% load i18n %}
+<!-- Card Container CRUD -->
+<div id="ep-card-container-crud">
+
+    <div id="card-container-configuration">
+        {% include 'views/graph/card-configuration/component-forms/card-container-configuration.htm' %}
+    </div>
+
+    <div id="card-configuration" style="display: none;">
+        {% include 'views/graph/card-configuration/component-forms/card-configuration.htm' %}
+    </div>
+
+      <!-- Widget CRUD -->
+    <div id="widget-configuration" style="display: none;">
+        {% include 'views/graph/card-configuration/component-forms/widget-configuration.htm' %}
+    </div>
+
+</div>

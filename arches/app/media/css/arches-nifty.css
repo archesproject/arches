@@ -558,7 +558,8 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     cursor: pointer;
 }
 #branch-library .library-card {
-    width: 300px;
+    width: 100%;
+    margin-left: 1px;
 }
 .library-icon {
     width: 30px;
@@ -1011,12 +1012,6 @@ input[type="search"] {
     margin: 0;
     padding: 50px;
 }
-.listing-container {
-    margin-top: 10px;
-    padding-left: 7px;
-    padding-right: 7px;
-    overflow:auto;
-}
 .mainnav-patch {
     background: #2d3c4b;
 }
@@ -1166,10 +1161,6 @@ ul.nav.nav-tabs.nav-justified {
 .node-widget-label {
     padding: 0 0 15px;
 }
-.node-attribute-label {
-    margin-bottom: 15px;
-    margin-top: 2px;
-}
 .node-attribute-widget {
     width: 100%;
     background: #3c4d5e;
@@ -1177,9 +1168,6 @@ ul.nav.nav-tabs.nav-justified {
     padding-left: 5px;
     color: #bbb;
     border-width: 0;
-}
-.node-input-widget {
-    padding: 0 0 10px;
 }
 .arches-user-icon-col {
     width: 40px;
@@ -2781,13 +2769,14 @@ ul.jqtree_common li.jqtree-folder {
 }
 .library-title-block {
     height: 65px;
-    background: #fff;
     color: #666;
     border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
 }
 .library-tools {
     padding-left: 15px;
     margin-top: -3px;
+    border-bottom: none;
 }
 .library-tools-icon:hover {
     cursor: pointer;
@@ -3078,11 +3067,13 @@ li.card-tree-list:last-of-type {
     padding: 7px;
 }
 .card-component-form-container{
-    -ms-flex: 0 0 200px;
-    -webkit-flex: 0 0 200px;
-    flex: 0 0 200px; 
+    -ms-flex: 0 0 250px;
+    -webkit-flex: 0 0 250px;
+    flex: 0 0 250px; 
     background: #f8f8f8;
     padding: 7px;
+    color: #666;
+    border-right: solid 1px #dddddd;
 }
 .card-form-preview-container{
     -ms-flex: 1;
@@ -3114,7 +3105,7 @@ li.card-tree-list:last-of-type {
     width: 250px;
 }
 .crud-widget-container {
-    padding: 0 15px 15px 0;
+    padding-bottom: 15px;
 }
 .editable-widget:hover {
     background: #fcfcfc;
