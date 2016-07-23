@@ -28,7 +28,7 @@ define(['arches',
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
-
+            
             attributes =_.extend({datatypes:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
@@ -61,6 +61,8 @@ define(['arches',
                         }, this);
                         this.set('nodes', ko.observableArray(nodes));
                         break;
+                    case 'cardid':
+                        this.set('id', value);
                     case 'name':
                     case 'instructions':
                     case 'helptext':
@@ -81,6 +83,20 @@ define(['arches',
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
             });
+        },
+
+        toJSON: function(){
+            var ret = {};
+            for(key in this.attributes){
+                if(key !== 'datatypelookup'){
+                    if(ko.isObservable(this.attributes[key])){
+                        ret[key] = this.attributes[key]();
+                    }else{
+                        ret[key] = this.attributes[key];
+                    }
+                }
+            }
+            return ret;
         }
     });
     return CardModel;

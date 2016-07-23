@@ -15,6 +15,8 @@ require([
         datatypes: data.datatypes
     });
 
+    viewModel.card = cardModel;
+
     viewModel.cardComponentsTree = new CardComponentsTree({
         card: cardModel
     });
@@ -23,7 +25,8 @@ require([
     viewModel.selection = viewModel.cardComponentsTree.selection;
 
     viewModel.cardComponentForm = new CardComponentForm({
-        card: cardModel
+        card: cardModel,
+        selection: viewModel.selection
     });
 
     viewModel.cardFormPreview = new CardFormPreview({
