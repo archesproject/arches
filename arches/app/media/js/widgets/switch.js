@@ -5,7 +5,7 @@ define(['knockout', 'underscore'], function (ko, _) {
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
             this.value = params.value;
-            _.extend(this, _.pick(params.config, 'label', 'placeholder'));
+            _.extend(this, _.pick(params.config, 'label', 'subtitle'));
         },
         template: { require: 'text!widget-templates/switch' }
     });

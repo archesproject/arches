@@ -15,6 +15,7 @@ define([
         */
         initialize: function(options) {
             this.card = options.card;
+            this.selection = options.selection;
         }
     });
     return CardComponentForm;

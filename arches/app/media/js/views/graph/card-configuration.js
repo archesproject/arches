@@ -5,7 +5,8 @@ require([
     'views/graph/card-configuration/card-component-form',
     'views/graph/card-configuration/card-components-tree',
     'views/graph/card-configuration/card-form-preview',
-    'card-configuration-data'
+    'card-configuration-data',
+    'widgets/switch'
 ], function(ko, CardModel, PageView, CardComponentForm, CardComponentsTree, CardFormPreview, data) {
     var viewModel = {};
 
@@ -13,6 +14,8 @@ require([
         data: data.card,
         datatypes: data.datatypes
     });
+
+    viewModel.card = cardModel;
 
     viewModel.cardComponentsTree = new CardComponentsTree({
         card: cardModel
@@ -22,7 +25,8 @@ require([
     viewModel.selection = viewModel.cardComponentsTree.selection;
 
     viewModel.cardComponentForm = new CardComponentForm({
-        card: cardModel
+        card: cardModel,
+        selection: viewModel.selection
     });
 
     viewModel.cardFormPreview = new CardFormPreview({
