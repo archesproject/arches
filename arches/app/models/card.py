@@ -43,6 +43,7 @@ class Card(models.CardModel):
         # end from models.CardModel
         self.cards = []
         self.nodes = []
+        self.widgets = []
 
         if args:
             if isinstance(args[0], dict):
@@ -53,6 +54,7 @@ class Card(models.CardModel):
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
                 self.nodes = list(self.nodegroup.node_set.all())
+                self.widgets = list(self.cardxnodexwidget_set.all())
 
     def serialize(self):
         """
@@ -64,7 +66,8 @@ class Card(models.CardModel):
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
-        
+        ret['widgets'] = self.widgets
+
         graph = Graph.objects.get(graphid=self.graph_id)
         if graph.ontology:
             ret['ontology_properties'] = [item['ontology_property'] for item in graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
