@@ -7,9 +7,7 @@
             'card-container-link': card.isContainer(),
             'card-link': !card.isContainer(),
             'active': self.selection() === card
-        }, click: function () {
-            self.selection(card);
-        }">
+        }, click: self.selection">
             <i class="card-tree-list-icon" data-bind="css: {
                 'ion-ios-folder-outline': card.isContainer(),
                 'ion-ios-list-outline': !card.isContainer()
@@ -32,9 +30,7 @@
     <li class="card-tree-list" data-bind="css: {
         'active': self.selection() === node
     }">
-        <a href="#" class="cc-link card-widget-link" data-bind="click: function () {
-            self.selection(node);
-        }, css: {
+        <a href="#" class="cc-link card-widget-link" data-bind="click: self.selection, css: {
             'active': self.selection() === node
         }">
             <i class="ion-ios-paper card-tree-list-icon"></i>

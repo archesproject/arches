@@ -1,9 +1,10 @@
 define(['arches',
     'models/abstract',
     'models/node',
+    'models/card-widget',
     'knockout',
     'underscore'
-], function (arches, AbstractModel, NodeModel, ko, _) {
+], function (arches, AbstractModel, NodeModel, CardWidgetModel, ko, _) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage graph data
@@ -57,9 +58,19 @@ define(['arches',
                                 datatypelookup: datatypelookup,
                                 graph: undefined
                             });
+                            var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                                return widget.node_id === nodeModel.nodeid;
+                            });
+                            nodeModel.widget = new CardWidgetModel(cardWidgetData, {
+                                node: nodeModel,
+                                card: self,
+                                datatypes: attributes.datatypes
+                            });
                             nodes.push(nodeModel);
                         }, this);
                         this.set('nodes', ko.observableArray(nodes));
+                        break;
+                    case 'widgets':
                         break;
                     case 'cardid':
                         this.set('id', value);
