@@ -37,6 +37,7 @@ define(['arches',
             }, this)
             this.set('datatypelookup', datatypelookup);
 
+            var widgets = [];
             _.each(attributes.data, function(value, key){
                 switch(key) {
                     case 'cards':
@@ -58,14 +59,20 @@ define(['arches',
                                 datatypelookup: datatypelookup,
                                 graph: undefined
                             });
-                            var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
-                                return widget.node_id === nodeModel.nodeid;
+                            var datatype = _.find(attributes.datatypes, function(datatype) {
+                                return datatype.datatype === node.datatype;
                             });
-                            nodeModel.widget = new CardWidgetModel(cardWidgetData, {
-                                node: nodeModel,
-                                card: self,
-                                datatypes: attributes.datatypes
-                            });
+                            if (datatype.defaultwidget_id) {
+                                var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                                    return widget.node_id === nodeModel.nodeid;
+                                });
+                                nodeModel.widget = new CardWidgetModel(cardWidgetData, {
+                                    node: nodeModel,
+                                    card: self,
+                                    datatype: datatype
+                                });
+                                widgets.push(nodeModel.widget);
+                            }
                             nodes.push(nodeModel);
                         }, this);
                         this.set('nodes', ko.observableArray(nodes));
@@ -86,6 +93,8 @@ define(['arches',
                         this.set(key, value);
                 }
             }, this);
+
+            this.set('widgets', ko.observableArray(widgets));
 
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
