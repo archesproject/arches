@@ -1,5 +1,5 @@
 {% load i18n %}
-<script type="text/html" id="cardTree">
+<template id="card-tree">
     <li class="card-tree-list"data-bind="css: {
         'active': self.selection() === card
     }">
@@ -17,15 +17,15 @@
 
         <ul class="card-tree-list-item" aria-expanded="true">
             <!-- ko template: {
-                name: card.isContainer() ? 'cardTree' : 'cardTreeWidgets',
+                name: card.isContainer() ? 'card-tree' : 'card-tree-widgets',
                 foreach: card.isContainer() ? get('cards') : get('widgets'),
                 as: card.isContainer() ? 'card' : 'widget'
             } --> <!-- /ko -->
         </ul>
     </li>
-</script>
+</template>
 
-<script type="text/html" id="cardTreeWidgets">
+<template id="card-tree-widgets">
     <li class="card-tree-list" data-bind="css: {
         'active': self.selection() === widget
     }">
@@ -36,7 +36,7 @@
             <span data-bind="text: widget.get('inputlabel')"></span>
         </a>
     </li>
-</script>
+</template>
 
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div id="ep-card-tools">
@@ -49,7 +49,7 @@
 
     <!-- TOC Cards/Widgets -->
     <div id="card-management-forms" class="panel ep-card-tools-panel">
-        <!-- ko template: { name: 'cardTree', foreach: [card], as: 'card' } --> <!-- /ko -->
+        <!-- ko template: { name: 'card-tree', foreach: [card], as: 'card' } --> <!-- /ko -->
     </div>
 </div>
 <!-- /ko -->
