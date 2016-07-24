@@ -17,27 +17,25 @@
 
         <ul class="card-tree-list-item" aria-expanded="true">
             <!-- ko template: {
-                name: card.isContainer() ? 'cardTree' : 'cardTreeNodes',
-                foreach: card.isContainer() ? get('cards') : get('nodes'),
-                as: card.isContainer() ? 'card' : 'node'
+                name: card.isContainer() ? 'cardTree' : 'cardTreeWidgets',
+                foreach: card.isContainer() ? get('cards') : get('widgets'),
+                as: card.isContainer() ? 'card' : 'widget'
             } --> <!-- /ko -->
         </ul>
     </li>
 </script>
 
-<script type="text/html" id="cardTreeNodes">
-    <!-- ko if: node.datatype() !== 'semantic' -->
+<script type="text/html" id="cardTreeWidgets">
     <li class="card-tree-list" data-bind="css: {
-        'active': self.selection() === node
+        'active': self.selection() === widget
     }">
         <a href="#" class="cc-link card-widget-link" data-bind="click: self.selection, css: {
-            'active': self.selection() === node
+            'active': self.selection() === widget
         }">
             <i class="ion-ios-paper card-tree-list-icon"></i>
-            <span data-bind="text: node.name"></span>
+            <span data-bind="text: widget.get('inputlabel')"></span>
         </a>
     </li>
-    <!-- /ko -->
 </script>
 
 <!-- ko foreach: { data: [$data], as: 'self' } -->

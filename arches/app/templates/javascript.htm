@@ -163,5 +163,9 @@
         return resourceTypes;;
     });
 
-    define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {return});
+    define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
+        return {{% for widget in widgets %}
+            '{{ widget.pk }}': '{{ widget.name }}',
+        {% endfor %}};
+    });
 </script>
