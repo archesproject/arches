@@ -20,10 +20,7 @@ define([
             this.card = options.card;
             this.selection = options.selection;
 
-            this.widgetLookup = {};
-            _.each(widgets, function (widget, id) {
-                self.widgetLookup[id] = widget;
-            });
+            this.widgetLookup = widgets;
         }
     });
     return CardFormPreview;
