@@ -57,8 +57,8 @@ class CardXNodeXWidget(models.Model):
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
     function = models.ForeignKey('Function', db_column='functionid')
-    inputmask = models.TextField(blank=True, null=True)
-    inputlabel = models.TextField(blank=True, null=True)
+    config = JSONField(blank=True, null=True, db_column='config')
+    label = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -493,8 +493,7 @@ class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField()
     component = models.TextField()
-    defaultlabel = models.TextField(blank=True, null=True)
-    defaultmask = models.TextField(blank=True, null=True)
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
     datatype = models.ForeignKey(db_column='datatype', to='models.DDataType')
 
