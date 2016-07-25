@@ -36,6 +36,7 @@
         <div id="" class="" style="padding-bottom: 5px;">
 
             <!-- Card Container Property -->
+            <!-- ko if: !!card.get('ontology') -->
             <div class="node-widget-label" style="">
                 <div class="control-label">
                     Relation to Resource
@@ -44,6 +45,7 @@
                     <select class="resources" data-bind="value: card.get('ontologyproperty'), options: card.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                 </div>
             </div>
+            <!-- /ko -->
 
             <!-- Card Container Name -->
             <div class="node-widget-label" style="">
@@ -74,16 +76,6 @@
 
             <!-- Card Container Settings -->
             <div id="" class="" style="padding-bottom: 5px;">
-
-                <!-- Card Container Name -->
-                <div class="node-widget-label" style="">
-                    <div class="control-label">
-                        Name
-                    </div>
-                    <div>
-                        <input type="" placeholder="Card name" id="" class="form-control input-md widget-input" value="Resource Locations">
-                    </div>
-                </div>
 
                 <!-- Cancel Button Title -->
                 <div class="node-widget-label" style="">
