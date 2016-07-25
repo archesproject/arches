@@ -44,6 +44,15 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     this.set(key, ko.observable(value));
                 }
             }, this);
+
+            this.configJSON = ko.computed(function () {
+                var configJSON = {};
+                var config = self.get('config');
+                _.each(self.configKeys, function(key) {
+                    configJSON[key] = config[key]();
+                });
+                return configJSON;
+            });
         }
     });
 });
