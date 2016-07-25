@@ -47,14 +47,33 @@ class Card(models.CardModel):
 
         if args:
             if isinstance(args[0], dict):
-                pass
+                for key, value in args[0].iteritems():
+                    if not (key == 'cards' or key == 'nodes' or key == 'widgets'):
+                        setattr(self, key, value)
+
+                for card in args[0]["cards"]:
+                    self.cards.append(Card(card))
+                
+                # for node in args[0]["nodes"]:
+                #     self.add_node(node)
+
+                # for edge in args[0]["widgets"]:
+                #     self.add_edge(edge)
+
 
             else:
+                self.widgets = list(self.cardxnodexwidget_set.all())
+                
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
-                self.nodes = list(self.nodegroup.node_set.all())
-                self.widgets = list(self.cardxnodexwidget_set.all())
+
+            self.nodes = list(self.nodegroup.node_set.all())
+
+    def save(self):
+        super(Card, self).save()
+        for card in self.cards:
+            card.save()
 
     def serialize(self):
         """

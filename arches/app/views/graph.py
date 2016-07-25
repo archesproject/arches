@@ -145,19 +145,28 @@ def card_manager(request, graphid):
 
 @group_required('edit')
 def card(request, cardid):
-    card = Card.objects.get(cardid=cardid)
-    datatypes = models.DDataType.objects.all()
-    widgets = models.Widget.objects.all()
-    return render(request, 'views/graph/card-configuration.htm', {
-        'main_script': 'views/graph/card-configuration',
-        'graphid': card.graph_id,
-        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'card': JSONSerializer().serialize(card),
-        'datatypes': JSONSerializer().serialize(datatypes),
-        'widgets': widgets,
-        'widgets_json': JSONSerializer().serialize(widgets),
-    })
-    pass
+    if request.method == 'POST':
+        data = JSONDeserializer().deserialize(request.body)
+        if data:
+            card = Card(data)
+            card.save()
+            return JSONResponse(card)
+            
+    if request.method == 'GET':
+        card = Card.objects.get(cardid=cardid)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        return render(request, 'views/graph/card-configuration.htm', {
+            'main_script': 'views/graph/card-configuration',
+            'graphid': card.graph_id,
+            'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+            'card': JSONSerializer().serialize(card),
+            'datatypes': JSONSerializer().serialize(datatypes),
+            'widgets': widgets,
+            'widgets_json': JSONSerializer().serialize(widgets),
+        })
+
+    return HttpResponseNotFound()
 
 @group_required('edit')
 def node(request, graphid):

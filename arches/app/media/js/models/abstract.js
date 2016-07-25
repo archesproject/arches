@@ -13,12 +13,13 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
         */
         read: function (callback, scope) {
+            var method = "GET";
             this._doRequest({
-                type: "GET",
+                type: method,
                 data: {
                     'format': 'json'
                 },
-                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
+                url: this._getURL(method),
             }, callback, scope, 'read');
         },
 
@@ -29,9 +30,10 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
         */
         save: function (callback, scope) {
+            var method = "POST";
             this._doRequest({
-                type: "POST",
-                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
+                type: method,
+                url: this._getURL(method),
                 data: JSON.stringify(this.toJSON())
             }, callback, scope, 'save');
         },
@@ -43,11 +45,26 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
         */
         delete: function (callback, scope) {
+            var method = "DELETE";
             this._doRequest({
-                type: "DELETE",
-                url: this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
+                type: method,
+                url: this._getURL(method),
                 data: JSON.stringify(this.toJSON())
             }, callback, scope, 'delete');
+        },
+
+        /**
+         * Returns the url of the model to use in requests to the server, replaces the placeholder 
+         * id 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', if it exists in the url, with the model id, otherwise appends the model id
+         * @memberof AbstractModel.prototype
+         * @param  {string} method - the type of request being made either "GET", "POST", "DELETE"
+        */
+        _getURL: function(method){
+            if(this.url.indexOf('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') > -1){
+                return this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id'));
+            }else{
+                return this.url + this.get('id');
+            }
         },
 
         /**
