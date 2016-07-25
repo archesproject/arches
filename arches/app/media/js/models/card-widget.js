@@ -6,8 +6,8 @@ define(['underscore', 'knockout', 'models/abstract'], function (_, ko, AbstractM
                 'node_id': '',
                 'card_id': '',
                 'widget_id': '',
-                'inputmask': '',
-                'inputlabel': ''
+                'config': {},
+                'label': ''
             };
             options || (options = {});
             attributes || (attributes = {});
@@ -19,7 +19,7 @@ define(['underscore', 'knockout', 'models/abstract'], function (_, ko, AbstractM
                 defaults.widget_id = this.datatype.defaultwidget_id;
             }
             if (this.node) {
-                defaults.inputlabel = this.node.name();
+                defaults.label = this.node.name();
             }
 
             attributes = _.defaults(attributes, defaults);

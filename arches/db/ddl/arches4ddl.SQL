@@ -24,7 +24,7 @@ CREATE TABLE "nodes"(
  "crmclass" Text NOT NULL,
  "datatype" Text NOT NULL,
  "validation" Text,
- "inputlabel" Text,
+ "label" Text,
  "inputmask" Text,
  "status" Bigint,
  "nodegroupid" UUID,
