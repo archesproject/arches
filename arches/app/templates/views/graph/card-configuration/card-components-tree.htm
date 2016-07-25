@@ -1,4 +1,24 @@
 {% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<div id="ep-card-tools">
+
+    <!-- Toggle form/report TOC -->
+    <div class="toc-title-block">
+        <h4 class="title-block-title"> {% trans "Card Manager" %}</h4>
+    </div>
+
+
+    <!-- TOC Cards/Widgets -->
+    <div id="card-management-forms" class="panel ep-card-tools-panel">
+        <!-- ko template: {
+            name: 'card-tree',
+            foreach: [card],
+            as: 'card'
+        } --> <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->
+
 <template id="card-tree">
     <li class="card-tree-list"data-bind="css: {
         'active': self.selection() === card
@@ -7,7 +27,8 @@
             'card-container-link': card.isContainer(),
             'card-link': !card.isContainer(),
             'active': self.selection() === card
-        }, click: self.selection">
+        },
+        click: self.selection">
             <i class="card-tree-list-icon" data-bind="css: {
                 'ion-ios-folder-outline': card.isContainer(),
                 'ion-ios-list-outline': !card.isContainer()
@@ -29,27 +50,12 @@
     <li class="card-tree-list" data-bind="css: {
         'active': self.selection() === widget
     }">
-        <a href="#" class="cc-link card-widget-link" data-bind="click: self.selection, css: {
+        <a href="#" class="cc-link card-widget-link" data-bind="css: {
             'active': self.selection() === widget
-        }">
+        },
+        click: self.selection">
             <i class="ion-ios-paper card-tree-list-icon"></i>
-            <span data-bind="text: widget.get('inputlabel')"></span>
+            <span data-bind="text: widget.get('label')"></span>
         </a>
     </li>
 </template>
-
-<!-- ko foreach: { data: [$data], as: 'self' } -->
-<div id="ep-card-tools">
-
-    <!-- Toggle form/report TOC -->
-    <div class="toc-title-block">
-        <h4 class="title-block-title"> {% trans "Card Manager" %}</h4>
-    </div>
-
-
-    <!-- TOC Cards/Widgets -->
-    <div id="card-management-forms" class="panel ep-card-tools-panel">
-        <!-- ko template: { name: 'card-tree', foreach: [card], as: 'card' } --> <!-- /ko -->
-    </div>
-</div>
-<!-- /ko -->

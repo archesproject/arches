@@ -139,17 +139,17 @@ INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff
 INSERT INTO auth_user(username, first_name, last_name, email, password, is_staff, is_active, is_superuser, last_login, date_joined)
     VALUES ('anonymous', '', '', '', '!S9npj7MhUqm30gT5ldm4TposL8jU5jDL4Ab02uuK', 'f', 't', 'f', '2012-03-15 15:29:31.211-07', '2012-03-15 15:29:31.211-07');
 
-INSERT INTO widgets(widgetid, name, component, datatype)
-    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text"}');
 
-INSERT INTO widgets(widgetid, name, component, datatype)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select', 'domain');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select', 'domain', '{ "placeholder": "Select an option", "options": [] }');
 
-INSERT INTO widgets(widgetid, name, component, datatype)
-    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
 
-INSERT INTO widgets(widgetid, name, component, datatype)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date');
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date', '{ "placeholder": "Enter date"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)

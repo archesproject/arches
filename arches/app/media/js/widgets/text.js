@@ -5,7 +5,8 @@ define(['knockout', 'underscore'], function (ko, _) {
     return ko.components.register('text-widget', {
         viewModel: function(params) {
             this.value = params.value;
-            _.extend(this, _.pick(params.config, 'label', 'placeholder'));
+            this.label = params.label;
+            _.extend(this, _.pick(params.config, 'placeholder'));
         },
         template: { require: 'text!widget-templates/text' }
     });

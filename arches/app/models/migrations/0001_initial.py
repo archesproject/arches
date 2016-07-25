@@ -210,8 +210,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('inputmask', models.TextField(blank=True, null=True)),
-                ('inputlabel', models.TextField(blank=True, null=True)),
+                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('label', models.TextField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'cards_x_nodes_x_widgets',
@@ -568,8 +568,7 @@ class Migration(migrations.Migration):
                 ('widgetid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('component', models.TextField()),
-                ('defaultlabel', models.TextField(blank=True, null=True)),
-                ('defaultmask', models.TextField(blank=True, null=True)),
+                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('helptext', models.TextField(blank=True, null=True)),
                 ('datatype', models.ForeignKey(db_column='datatype', to='models.DDataType')),
             ],
