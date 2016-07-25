@@ -23,7 +23,7 @@
                             as: 'card'
                         } -->
                         <li id="summary-group" data-bind="css: {
-                            'active': self.selection() === card
+                            'active': self.currentTabIndex()===$index()
                         }, click: self.selection">
                             <a id="summary-tab" href="#" class="card-tab-title">
                                 <!-- Editable Span -->
@@ -46,7 +46,7 @@
                         } -->
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
-                            'active in': self.selection() === card
+                            'active in': self.currentTabIndex()===$index()
                         }">
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
@@ -61,7 +61,11 @@
                                             } -->
                                             <div data-bind='component: {
                                                 name: self.widgetLookup[widget.get("widget_id")()].name,
-                                                params: { config: widget.configJSON(), label: widget.get("label")(), value: ko.observable(null) }
+                                                params: {
+                                                    config: widget.configJSON(),
+                                                    label: widget.get("label")(),
+                                                    value: ko.observable(null)
+                                                }
                                             }'></div>
                                             <!-- /ko -->
                                         </form>
