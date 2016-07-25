@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'models/abstract'], function (_, ko, AbstractModel) {
+define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko, AbstractModel, widgets) {
     return AbstractModel.extend({
         constructor: function(attributes, options){
             var defaults = {
@@ -17,6 +17,7 @@ define(['underscore', 'knockout', 'models/abstract'], function (_, ko, AbstractM
             this.datatype = (options.datatype || null);
             if (this.datatype && this.datatype.defaultwidget_id) {
                 defaults.widget_id = this.datatype.defaultwidget_id;
+                defaults.config = widgets[defaults.widget_id].defaultconfig;
             }
             if (this.node) {
                 defaults.label = this.node.name();
@@ -30,7 +31,18 @@ define(['underscore', 'knockout', 'models/abstract'], function (_, ko, AbstractM
             var self = this;
 
             _.each(attributes, function(value, key){
-                this.set(key, ko.observable(value));
+                if (key === 'config' && typeof value === 'string') {
+                    value = JSON.parse(value);
+                    var configKeys = [];
+                    _.each(value, function(configVal, configKey) {
+                        value[configKey] = ko.observable(configVal);
+                        configKeys.push(configKey);
+                    });
+                    this.set(key, value);
+                    this.configKeys = configKeys;
+                } else {
+                    this.set(key, ko.observable(value));
+                }
             }, this);
         }
     });
