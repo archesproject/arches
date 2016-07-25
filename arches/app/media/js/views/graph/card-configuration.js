@@ -30,7 +30,8 @@ require([
     });
 
     viewModel.cardFormPreview = new CardFormPreview({
-        card: cardModel
+        card: cardModel,
+        selection: viewModel.selection
     });
 
     var pageView = new PageView({
