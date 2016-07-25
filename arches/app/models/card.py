@@ -68,9 +68,11 @@ class Card(models.CardModel):
         ret['visible'] = True
         ret['active'] = True
         ret['widgets'] = self.widgets
+        ret['ontology'] = None
 
         graph = Graph.objects.get(graphid=self.graph_id)
         if graph.ontology:
+            ret['ontology'] = graph.ontology
             ret['ontology_properties'] = [item['ontology_property'] for item in graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
             for edge in graph.edges.itervalues():
                 if edge.rangenode_id == self.nodegroup_id:
