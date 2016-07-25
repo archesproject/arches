@@ -46,6 +46,8 @@ class CardModel(models.Model):
     cardinality = models.TextField(blank=True, default='n')
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
     graph = models.ForeignKey('GraphModel', db_column='graphid')
+    active = models.BooleanField(default=True)
+    visible = models.BooleanField(default=True)
 
     class Meta:
         managed = True

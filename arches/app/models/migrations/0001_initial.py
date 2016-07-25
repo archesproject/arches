@@ -199,6 +199,8 @@ class Migration(migrations.Migration):
                 ('instructions', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
                 ('cardinality', models.TextField(blank=True, default='n')),
+                ('active', models.BooleanField(default=True)),
+                ('visible', models.BooleanField(default=True)),
             ],
             options={
                 'db_table': 'cards',

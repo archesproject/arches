@@ -84,8 +84,8 @@ class Card(models.CardModel):
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
         ret['nodes'] = self.nodes
-        ret['visible'] = True
-        ret['active'] = True
+        ret['visible'] = self.visible
+        ret['active'] = self.active
         ret['widgets'] = self.widgets
         ret['ontology'] = None
 
