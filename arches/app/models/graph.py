@@ -370,6 +370,8 @@ class Graph(models.GraphModel):
             for node in branch_copy.nodes.itervalues():
                 self.add_node(node)
             for card in branch_copy.cards.itervalues():
+                card.name = branch_copy.name
+                card.description = branch_copy.description
                 self.add_card(card)
             for edge in branch_copy.edges.itervalues():
                 self.add_edge(edge)
