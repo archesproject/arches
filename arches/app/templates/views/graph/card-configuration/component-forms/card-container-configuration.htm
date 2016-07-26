@@ -33,7 +33,7 @@
     <div id="cc-settings" class="tab-pane fade in active">
     
         <!-- Card Container Property -->
-        <!-- ko if: !!card.get('ontology') -->
+        <!-- ko if: !!card.get('ontologyproperty') -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 Relation to Resource
@@ -50,7 +50,7 @@
                 Name
             </div>
             <div>
-                <input type="" placeholder="{% trans "Card name" %}" id="" class="form-control input-md widget-input" data-bind="value: card.get('name')">
+                <input type="" placeholder="{% trans "Card name" %}" id="" class="form-control input-md widget-input" data-bind="value: card.get('name'), valueUpdate: 'keyup'">
             </div>
         </div>
 
