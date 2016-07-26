@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from django.db import transaction
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -42,18 +43,20 @@ class Card(models.CardModel):
         # self.graph
         # end from models.CardModel
         self.cards = []
-        self.nodes = []
         self.widgets = []
+        self.ontologyproperty = None
 
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].iteritems():
-                    if not (key == 'cards' or key == 'nodes' or key == 'widgets'):
+                    if not (key == 'cards' or key == 'widgets' or key == 'nodes'):
                         setattr(self, key, value)
 
                 for card in args[0]["cards"]:
                     self.cards.append(Card(card))
                 
+                self.graph = Graph.objects.get(graphid=self.graph_id)
+
                 # for node in args[0]["nodes"]:
                 #     self.add_node(node)
 
@@ -68,12 +71,28 @@ class Card(models.CardModel):
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
 
-            self.nodes = list(self.nodegroup.node_set.all())
+                self.graph = Graph.objects.get(graphid=self.graph_id)
+
+                if self.graph.ontology:
+                    self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
+
 
     def save(self):
-        super(Card, self).save()
-        for card in self.cards:
-            card.save()
+        with transaction.atomic():
+            if self.graph.ontology:
+                edge = self.get_edge_to_parent()
+                edge.ontologyproperty = self.ontologyproperty
+                edge.save()
+
+            super(Card, self).save()
+            for card in self.cards:
+                card.save()
+        return self
+
+    def get_edge_to_parent(self):
+        for edge in self.graph.edges.itervalues():
+            if str(edge.rangenode_id) == str(self.nodegroup_id):
+                return edge
 
     def serialize(self):
         """
@@ -83,18 +102,13 @@ class Card(models.CardModel):
 
         ret = JSONSerializer().handle_model(self)
         ret['cards'] = self.cards
-        ret['nodes'] = self.nodes
+        ret['nodes'] = list(self.nodegroup.node_set.all())
         ret['visible'] = self.visible
         ret['active'] = self.active
         ret['widgets'] = self.widgets
-        ret['ontology'] = None
+        ret['ontologyproperty'] = self.ontologyproperty
 
-        graph = Graph.objects.get(graphid=self.graph_id)
-        if graph.ontology:
-            ret['ontology'] = graph.ontology
-            ret['ontology_properties'] = [item['ontology_property'] for item in graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
-            for edge in graph.edges.itervalues():
-                if edge.rangenode_id == self.nodegroup_id:
-                    ret['ontologyproperty'] = edge.ontologyproperty
+        if self.ontologyproperty:
+            ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret
