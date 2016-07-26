@@ -31,6 +31,31 @@ class Card(models.CardModel):
         proxy = True
 
     def __init__(self, *args, **kwargs):
+        """
+        Init a Card from a dictionary representation of from a model method call
+
+        init this object by using Django query syntax, eg:
+        .. code-block:: python
+
+            Card.objects.get(pk=some_card_id)
+            # or
+            Card.objects.filter(name=some_value_to_filter_by)
+
+        OR, init this object with a dictionary, eg:
+        .. code-block:: python
+
+            Card({
+                name:'some name',
+                cardid: '12341234-1234-1234-1324-1234123433433',
+                ...
+            })
+
+        Arguments:
+        args -- a dictionary of properties repsenting a Card object
+        kwargs -- unused
+
+        """
+
         super(Card, self).__init__(*args, **kwargs)
         # from models.CardModel
         # self.cardid
@@ -57,13 +82,6 @@ class Card(models.CardModel):
                 
                 self.graph = Graph.objects.get(graphid=self.graph_id)
 
-                # for node in args[0]["nodes"]:
-                #     self.add_node(node)
-
-                # for edge in args[0]["widgets"]:
-                #     self.add_edge(edge)
-
-
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
                 
@@ -78,6 +96,11 @@ class Card(models.CardModel):
 
 
     def save(self):
+        """
+        Saves an a card and it's parent ontology property back to the db
+
+        """
+
         with transaction.atomic():
             if self.graph.ontology:
                 edge = self.get_edge_to_parent()
@@ -90,6 +113,11 @@ class Card(models.CardModel):
         return self
 
     def get_edge_to_parent(self):
+        """
+        Finds the edge model that relates this card to it's parent node
+
+        """
+
         for edge in self.graph.edges.itervalues():
             if str(edge.rangenode_id) == str(self.nodegroup_id):
                 return edge
