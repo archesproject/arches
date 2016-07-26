@@ -100,6 +100,12 @@ define(['arches',
 
             this.set('widgets', ko.observableArray(widgets));
 
+            this._card = JSON.stringify(this.toJSON());
+
+            this.dirty = ko.computed(function(){
+                return JSON.stringify(_.extend(JSON.parse(self._card),self.toJSON())) !== self._card;
+            })
+
             this.isContainer = ko.computed(function() {
                 return !!self.get('cards')().length;
             });
@@ -108,7 +114,7 @@ define(['arches',
         toJSON: function(){
             var ret = {};
             for(key in this.attributes){
-                if(key !== 'datatypelookup'){
+                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'){
                     if(ko.isObservable(this.attributes[key])){
                         ret[key] = this.attributes[key]();
                     }else{
