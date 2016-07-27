@@ -6,12 +6,12 @@
         {% include 'views/graph/card-configuration/component-forms/card-container-configuration.htm' %}
     </div>
 
-    <div id="card-configuration" data-bind="visible: 'isContainer' in selection() && !(selection().isContainer())">
+    <div id="card-configuration" data-bind="visible: 'isContainer' in selection() && !(selection().isContainer())" style="display: none;">
         {% include 'views/graph/card-configuration/component-forms/card-configuration.htm' %}
     </div>
 
       <!-- Widget CRUD -->
-    <div id="widget-configuration" data-bind="visible: ('node' in selection())">
+    <div id="widget-configuration" data-bind="visible: ('node' in selection())" style="display: none;">
         {% include 'views/graph/card-configuration/component-forms/widget-configuration.htm' %}
     </div>
 
