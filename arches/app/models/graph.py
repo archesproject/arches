@@ -154,12 +154,7 @@ class Graph(models.GraphModel):
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
-                # node.nodegroup = self.get_nodegroups(nodegroupid=node.nodegroup_id)
-                # if node.nodegroup is None:
-                try:
-                    node.nodegroup = models.NodeGroup.objects.get(pk=node.nodegroup_id)
-                except models.NodeGroup.DoesNotExist:
-                    node.nodegroup = models.NodeGroup(pk=node.nodegroup_id)
+                node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
             else:
                 node.nodegroup = None
 
@@ -221,12 +216,7 @@ class Graph(models.GraphModel):
             card.helptext = cardobj.get('helptext','')
             card.cardinality = cardobj.get('cardinality','')
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id','')))
-            # card.nodegroup = self.get_nodegroups(nodegroupid=card.nodegroup_id)
-            # if card.nodegroup is None:
-            try:
-                card.nodegroup = models.NodeGroup.objects.get(pk=card.nodegroup_id)
-            except models.NodeGroup.DoesNotExist:
-                card.nodegroup = models.NodeGroup(pk=card.nodegroup_id)
+            card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
 
         card.graph = self
 
@@ -320,10 +310,9 @@ class Graph(models.GraphModel):
 
         def traverse_tree(tree, current_nodegroup=None):
             if tree['node'].is_collector:
-                 current_nodegroup = models.NodeGroup(
-                    pk=tree['node'].nodegroup_id,
-                    parentnodegroup=current_nodegroup
-                )
+                nodegroup = self.get_or_create_nodegroup(nodegroupid=tree['node'].nodegroup_id)
+                nodegroup.parentnodegroup = current_nodegroup
+                current_nodegroup = nodegroup
 
             tree['node'].nodegroup = current_nodegroup
 
@@ -369,9 +358,7 @@ class Graph(models.GraphModel):
 
             for node in branch_copy.nodes.itervalues():
                 self.add_node(node)
-            for card in branch_copy.cards.itervalues():
-                card.name = branch_copy.name
-                card.description = branch_copy.description
+            for card in branch_copy.get_cards():
                 self.add_card(card)
             for edge in branch_copy.edges.itervalues():
                 self.add_edge(edge)
@@ -409,13 +396,6 @@ class Graph(models.GraphModel):
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
-        def find_cards_by_nodegroup(old_nodegroup):
-            cards = []
-            for card in copy_of_self.cards.itervalues():
-                if card.nodegroup_id == old_nodegroup.pk:
-                    cards.append(card)
-            return cards
-
         copy_of_self.pk = uuid.uuid1()
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
@@ -425,10 +405,12 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector
             node.pk = uuid.uuid1()
             if is_collector:
-                for card in find_cards_by_nodegroup(node.nodegroup):
-                    card.pk = uuid.uuid1()
-                    card.nodegroup = models.NodeGroup(pk=node.pk)
+                old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk)
+                for card in copy_of_self.cards.itervalues():
+                    if str(card.nodegroup_id) == str(old_nodegroup_id):
+                        card.pk = uuid.uuid1()
+                        card.nodegroup = node.nodegroup
             else:
                 node.nodegroup = None
 
@@ -468,6 +450,7 @@ class Graph(models.GraphModel):
         graph_dict = self.serialize()
         graph_dict['nodes'] = []
         graph_dict['edges'] = []
+        graph_dict['cards'] = []
         def traverse_tree(tree):
             graph_dict['nodes'].append(tree['node'])
             for child in tree['children']:
@@ -850,21 +833,36 @@ class Graph(models.GraphModel):
 
     def get_nodegroups(self, nodegroupid=None):
         """
-        get the nodegroups associated with this graph, or just a single nodegroup
-
-        Keyword Arguments
-
-        nodegroupid -- if specified, return just the nodegroup that has this id
+        get the nodegroups associated with this graph
 
         """
 
-        nodegroups = []
+        nodegroups =set()
         for node in self.nodes.itervalues():
             if node.is_collector:
-                if nodegroupid and str(node.nodegroup_id) == str(nodegroupid):
-                    return node.nodegroup
-                nodegroups.append(node.nodegroup)
-        return None if nodegroupid else nodegroups
+                nodegroups.add(node.nodegroup)
+        for card in self.cards.itervalues():
+            nodegroups.add(card.nodegroup)
+        return list(nodegroups)
+
+    def get_or_create_nodegroup(self, nodegroupid):
+        """
+        get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
+        if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
+
+        Keyword Arguments
+
+        nodegroupid -- return a nodegroup with this id
+
+        """
+
+        for nodegroup in self.get_nodegroups():
+            if str(nodegroup.nodegroupid) == str(nodegroupid):
+                return nodegroup
+        try:
+            return models.NodeGroup.objects.get(pk=nodegroupid)
+        except models.NodeGroup.DoesNotExist:
+            return models.NodeGroup(pk=nodegroupid)
 
     def get_cards(self):
         """

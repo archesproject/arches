@@ -41,8 +41,6 @@ class GraphTests(ArchesTestCase):
         cls.deleteGraph(root)
 
     def setUp(self):
-        newid = uuid.uuid1()
-        nodegroup = None
         graph = Graph.new()
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
@@ -203,6 +201,7 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(len(graph.cards), len(graph_copy.cards))
         self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
 
+        # assert the copied nodegroup heirarchy is maintained
         for nodegroup in graph_copy.get_nodegroups():
             if graph_copy.nodes[nodegroup.pk] is graph_copy.root:
                 parentnodegroup_copy = nodegroup;
@@ -213,6 +212,7 @@ class GraphTests(ArchesTestCase):
         self.assertFalse(parentnodegroup_copy.parentnodegroup_id)
         self.assertEqual(childnodegroup_copy.parentnodegroup_id, parentnodegroup_copy.pk)
 
+        # assert the copied node groups are not equal to the originals
         for nodegroup in graph.get_nodegroups():
             if graph.nodes[nodegroup.pk] is graph.root:
                 parentnodegroup = nodegroup;
@@ -223,6 +223,20 @@ class GraphTests(ArchesTestCase):
         self.assertNotEqual(parentnodegroup.pk, parentnodegroup_copy.pk)
         self.assertNotEqual(childnodegroup, childnodegroup_copy)
         self.assertNotEqual(childnodegroup.pk, childnodegroup_copy.pk)
+
+        # assert the nodegroups attached to the cards are heirarchically correct
+        for card in graph_copy.cards.itervalues():
+            if str(card.nodegroup_id) == str(graph_copy.root.nodeid):
+                parentcard_copy = card
+            else:
+                childcard_copy = card
+
+        self.assertTrue(parentcard_copy.nodegroup is not None)
+        self.assertTrue(childcard_copy.nodegroup is not None)
+        self.assertTrue(parentcard_copy.nodegroup.parentnodegroup is None)
+        self.assertTrue(childcard_copy.nodegroup.parentnodegroup is not None)
+        self.assertEqual(parentcard_copy.nodegroup, childcard_copy.nodegroup.parentnodegroup)
+
 
         def findNodeByName(graph, name):
             for node in graph.nodes.itervalues():
@@ -289,13 +303,6 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(models.Edge.objects.count()-edges_count_before, 2)
         self.assertEqual(models.CardModel.objects.count()-cards_count_before, 1)
         self.assertEqual(models.NodeGroup.objects.count()-nodegroups_count_before, 1)
-
-        # test the card values from the appened graph are copied over to main graph
-        #appended_graph = Graph.objects.get(pk=self.NODE_NODETYPE_GRAPHID)
-        for card in graph.cards.itervalues():
-            if card.nodegroup.pk != graph.root.pk:
-                self.assertEqual(card.name, appended_graph.name)
-                self.assertEqual(card.description, appended_graph.description)
 
         for key, edge in graph.edges.iteritems():
             self.assertIsNotNone(graph.nodes[edge.domainnode_id])
@@ -780,29 +787,66 @@ class GraphTests(ArchesTestCase):
                              
         graph.save()
 
-        self.assertEqual(len(graph.cards), 2)
+        self.assertEqual(len(graph.get_cards()), 2)
         for card in graph.get_cards():
-            if card.nodegroup_id != graph.root.nodegroup_id:
+            if str(card.nodegroup_id) == str(graph.root.nodegroup_id):
+                self.assertEqual(card.name, graph.name)
+                self.assertEqual(card.description, graph.description)
+            else:
+                self.assertTrue(len(graph.nodes[card.nodegroup.pk].name) > 0)
+                self.assertTrue(len(graph.nodes[card.nodegroup.pk].description) > 0)
                 self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
                 self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
 
-        graph.delete()
 
         # TESTING A RESOURCE
-        graph = Graph.new(name='TEST',is_resource=True,author='TEST')
-        graph.description = 'A test description'
-        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
-        graph.save()
+        resource_graph = Graph.new(name='TEST RESOURCE',is_resource=True,author='TEST')
+        resource_graph.description = 'A test resource description'
+        resource_graph.append_branch('P1_is_identified_by', graphid=graph.graphid)
+        resource_graph.save()
 
-        self.assertEqual(len(graph.cards), 1)
-        the_card = graph.cards.itervalues().next()
-        for card in graph.get_cards():
+        self.assertEqual(len(resource_graph.get_cards()), 2)
+        for card in resource_graph.get_cards():
+            if card.nodegroup.parentnodegroup is None:
+                self.assertEqual(card.name, graph.name)
+                self.assertEqual(card.description, graph.description)
+                card.name = 'altered root card name'
+                card.description = 'altered root card description'
+            else:
+                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].name) > 0)
+                self.assertTrue(len(resource_graph.nodes[card.nodegroup.pk].description) > 0)
+                self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
+                self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
+                card.name = 'altered child card name'
+                card.description = 'altered child card description'
+
+        # loop through the cards again now looking for the updated desctiptions
+        for card in resource_graph.get_cards():
+            if card.nodegroup.parentnodegroup is None:
+                self.assertEqual(card.name, 'altered root card name')
+                self.assertEqual(card.description, 'altered root card description')
+            else:
+                self.assertEqual(card.name, 'altered child card name')
+                self.assertEqual(card.description, 'altered child card description')
+
+        resource_graph.delete()
+
+
+        # TESTING A RESOURCE
+        resource_graph = Graph.new(name='TEST',is_resource=True,author='TEST')
+        resource_graph.description = 'A test description'
+        resource_graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+        resource_graph.save()
+
+        self.assertEqual(len(resource_graph.cards), 1)
+        the_card = resource_graph.cards.itervalues().next()
+        for card in resource_graph.get_cards():
             self.assertEqual(card.name, the_card.name)
             self.assertEqual(card.description, the_card.description)
         
         # after removing the card name and description, the cards should take on the node name and description
         the_card.name = ''
         the_card.description = ''
-        for card in graph.get_cards():
-            self.assertEqual(card.name, graph.nodes[card.nodegroup.pk].name)
-            self.assertEqual(card.description, graph.nodes[card.nodegroup.pk].description)
+        for card in resource_graph.get_cards():
+            self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
+            self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
