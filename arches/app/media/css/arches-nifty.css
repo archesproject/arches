@@ -3022,14 +3022,14 @@ ul.jqtree_common li.jqtree-folder {
 #node-listing .panel {
     box-shadow: none;
 }
+.card-tree-container {
+    margin-right: -9px;
+}
 .card-tree-list {
     list-style: none;
     font-size: 13px;
     color: #999;
     padding-top: 2px;
-    margin-left: -10px;
-    margin-right: -3px;
-    padding-left: 10px;
 }
 ul.card-tree-list-item {
     margin-left: -20px;
@@ -3265,23 +3265,19 @@ li.card-tree-list:last-of-type {
 }
 .cc-link {
     display: inline-block;
-    border: 1px solid #f8f8f8;
-    width: 250px;
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 1px;
 }
-.card-container-link.active {
+.cc-link.active {
     color: #666;
     font-weight: 600;
     background: #f8f8f8;
-    padding-right: 60px;
-    margin-right: -50px;
     border: 1px solid #ddd;
 }
-.card-link {
-    width: 240px;
+/*.card-link {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3290,18 +3286,14 @@ li.card-tree-list:last-of-type {
     color: #666;
     font-weight: 600;
     background: #f8f8f8;
-    padding-right: 95px;
-    margin-right: -80px;
     border: 1px solid #ddd;
 }
 .card-widget-link.active {
     color: #666;
     font-weight: 600;
     background: #f8f8f8;
-    padding-right: 15px;
-    margin-right: -10px;
     border: 1px solid #ddd;
-}
+}*/
 .tertiary-panel {
     position: absolute;
     top: 0;
