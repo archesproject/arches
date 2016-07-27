@@ -14,11 +14,6 @@
             </a>
         </li>
         <li>
-            <a href="#cc-advanced-settings" class="nav-library-tab-link" data-toggle="tab">
-                <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
-            </a>
-        </li>
-         <li>
             <a href="#cc-validation" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
@@ -63,30 +58,6 @@
 
         <!-- Active -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card.get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>   
-    </div>
-
-    <!-- Card Container ADVANCED Settings Form -->
-    <div id="cc-advanced-settings" class="tab-pane fade">
-        <!-- Cancel Button Title -->
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                Cancel Button Text
-            </div>
-            <div>
-                <input type="" placeholder="Cancel" id="" class="form-control input-md widget-input" value="">
-            </div>
-        </div>
-
-        <!-- Save Button Title -->
-        <div class="node-widget-label" style="">
-            <div class="control-label">
-                Save Button Text
-            </div>
-            <div>
-                <input type="" placeholder="Save" id="" class="form-control input-md widget-input" value="">
-            </div>
-        </div>
-
     </div>
 
     <!-- Card CRUD Validation/Functions Form -->
