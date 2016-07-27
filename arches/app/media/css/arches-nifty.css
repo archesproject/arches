@@ -3270,6 +3270,7 @@ li.card-tree-list:last-of-type {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 1px;
+    border: 1px solid rgba(255, 255, 255, 0);
 }
 .cc-link.active {
     color: #666;
@@ -3277,23 +3278,6 @@ li.card-tree-list:last-of-type {
     background: #f8f8f8;
     border: 1px solid #ddd;
 }
-/*.card-link {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.card-link.active {
-    color: #666;
-    font-weight: 600;
-    background: #f8f8f8;
-    border: 1px solid #ddd;
-}
-.card-widget-link.active {
-    color: #666;
-    font-weight: 600;
-    background: #f8f8f8;
-    border: 1px solid #ddd;
-}*/
 .tertiary-panel {
     position: absolute;
     top: 0;
