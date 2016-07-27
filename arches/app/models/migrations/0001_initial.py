@@ -197,10 +197,14 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(null=True, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
                 ('instructions', models.TextField(null=True, blank=True)),
+                ('helpenabled', models.BooleanField(default=False)),
+                ('helptitle', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
                 ('cardinality', models.TextField(blank=True, default='n')),
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
+                ('itemtext', models.TextField(null=True, blank=True)),
             ],
             options={
                 'db_table': 'cards',
@@ -214,6 +218,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
                 ('label', models.TextField(blank=True, null=True)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'cards_x_nodes_x_widgets',
@@ -643,6 +648,11 @@ class Migration(migrations.Migration):
             model_name='cardmodel',
             name='graph',
             field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
+        ),
+        migrations.AddField(
+            model_name='cardmodel',
+            name='function',
+            field=models.ForeignKey(db_column='functionid', to='models.Function', blank=True, null=True),
         ),
         migrations.AddField(
             model_name='node',
