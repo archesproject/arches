@@ -98,9 +98,6 @@ define(['arches',
                         break;
                     case 'sortorder':
                             this.set(key, ko.observable(value));
-                            this.get(key).subscribe(function() {
-                                console.log('adsas');
-                            });
                             break;
                     case 'ontology_properties':
                         this.set(key, ko.observableArray(value));
@@ -117,7 +114,6 @@ define(['arches',
             this.get('widgets').subscribe(function (widgets) {
                 _.each(widgets, function(widget, i) {
                     widget.get('sortorder')(i);
-                    console.log(widget.get('sortorder')());
                 });
             });
 
