@@ -84,6 +84,8 @@ define(['arches',
                     case 'name':
                     case 'instructions':
                     case 'helptext':
+                    case 'helpenabled':
+                    case 'helptitle':
                     case 'cardinality':
                     case 'visible':
                     case 'active':

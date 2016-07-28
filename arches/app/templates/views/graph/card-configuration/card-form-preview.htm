@@ -37,6 +37,7 @@
 
                     <div id="db-arches-app-alert" class="panel data-card-alert"></div>
 
+
                     <!--Tabs Content-->
                     <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
@@ -50,6 +51,15 @@
                         }">
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
+
+                                    <div>
+                                        <span data-bind="text: card.get('instructions')"></span>
+                                        
+                                        <!-- Help link -->
+                                        <span>  
+                                            <a id="card-help-link" href="" class="pull-right card-help help editable-help" data-bind="visible: card.get('enable_" style="display: none;"> Help <i class="fa fa-question-circle"></i></a>
+                                        </span>
+                                    </div>
 
                                     <!-- Form -->
                                     <div class="col-lg-9" style="padding-bottom: 10px;">

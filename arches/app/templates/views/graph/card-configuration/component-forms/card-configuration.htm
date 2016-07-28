@@ -106,176 +106,143 @@
 
     <!-- Card CRUD Validation/Functions Form -->
     <div id="card-crud-validation" class="tab-pane fade">
-        <div id="" class="">
-
-            <!-- Card Container Settings -->
-            <div id="" class="" style="padding-bottom: 5px;">
-
-                <!-- Card Container Name -->
-                <div class="node-widget-label" style="">
-                    <div class="control-label">
-                        Validation Functions
-                    </div>
-                    <div class="col-xs-12 pad-no crud-widget-container">
-                        <select id="" class="resources" style="" multiple data-placeholder="Choose a Function..." tabindex="4">
-                            <option value="r1">Name is required</option>
-                            <option value="r2">Address is required</option>
-                            <option value="r3">Spatial Coordindates are required</option>
-                        </select>    
-                    </div>
-                </div>
+        <!-- Functions -->
+        <div class="node-widget-label">
+            <div class="control-label">
+                {% trans "Validation Functions" %}
             </div>
+            <div>
+                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
 
-            <div id="" class="" style="padding-bottom: 5px;">
-                <div class="node-widget-label" style="">
-                    <div class="control-label">
-                        Processing Functions
-                    </div>
-                    <div class="col-xs-12 pad-no crud-widget-container">
-                        <select id="" class="resources" style="" multiple data-placeholder="Choose a Function..." tabindex="4">
-                            <option value="r1">Find Admin Area</option>
-                            <option value="r2">Geocode Address</option>
-                        </select>    
-                    </div>
-                </div>   
+        <!-- Functions -->
+        <div class="node-widget-label">
+            <div class="control-label">
+                {% trans "Processing Functions" %}
+            </div>
+            <div>
+                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
 
     <!-- Card CRUD Permissions Form -->
     <div id="card-crud-permissions" class="tab-pane fade">
-        <div id="" class="">
 
-            <!-- Card Container Settings -->
-            <div id="" class="" style="padding-bottom: 5px; margin-top: -14px; margin-left: -7px;">
-
-                <!-- Group/User Grid -->
-                <div id="user-grid" class="grid" style="">
-
-                    <!-- Card -->                                   
-                    <div id="all" class="library-card permissions all library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                All accounts
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle none" style="">
-                            Permission: ---
-                        </div>
-                    </div>
-                
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide" style="">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                Guest
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle text-muted full" style="">
-                            N - No Access
-                        </div>
-                    </div>
-
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                Crowd Source
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle full" style="">
-                            RW - Read/Write
-                        </div>
-                    </div>
-
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                Editor
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle full" style="">
-                            F -Full Access
-                        </div>
-                    </div>
-
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                RDM Admin
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle read" style="">
-                            R -Read Only
-                        </div>
-                    </div>
-
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                rgaston@realsuperuser.com
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle full" style="">
-                            F - Full Access
-                        </div>
-                    </div>
-
-                    <!-- Card -->                                   
-                    <div class="library-card permissions library-card-wide">
-                        <div class="library-icon" style="">
-                            <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
-                        </div>
-                        <div class="library-card-main" style="">
-                            <a id="" class="" style="" href="#">
-                                adalgity@gci.edu
-                            </a>
-                        </div>
-                        <div class="library-card-subtitle delete" style="">
-                            D - Delete
-                        </div>
-                    </div>
-
-                </div>
-
+        <!-- Group/User -->                                   
+        <div id="all" class="library-card permissions all library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    All accounts
+                </a>
+            </div>
+            <div class="library-card-subtitle none" style="">
+                Permission: ---
             </div>
         </div>
+    
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide" style="">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    Guest
+                </a>
+            </div>
+            <div class="library-card-subtitle text-muted full" style="">
+                N - No Access
+            </div>
+        </div>
+
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    Crowd Source
+                </a>
+            </div>
+            <div class="library-card-subtitle full" style="">
+                RW - Read/Write
+            </div>
+        </div>
+
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    Editor
+                </a>
+            </div>
+            <div class="library-card-subtitle full" style="">
+                F -Full Access
+            </div>
+        </div>
+
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    RDM Admin
+                </a>
+            </div>
+            <div class="library-card-subtitle read" style="">
+                R -Read Only
+            </div>
+        </div>
+
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    rgaston@realsuperuser.com
+                </a>
+            </div>
+            <div class="library-card-subtitle full" style="">
+                F - Full Access
+            </div>
+        </div>
+
+        <!-- Group/User -->                                   
+        <div class="library-card permissions library-card-wide">
+            <div class="library-icon" style="">
+                <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
+            </div>
+            <div class="library-card-main" style="">
+                <a id="" class="" style="" href="#">
+                    adalgity@gci.edu
+                </a>
+            </div>
+            <div class="library-card-subtitle delete" style="">
+                D - Delete
+            </div>
+        </div>
+
     </div>
 
     <!-- Card CRUD HELP Form -->
     <div id="card-crud-help" class="tab-pane fade">
 
         <!-- Enable help -->
-        <div class="toggle-container">
-            <input id="enable-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
-            <p class="arches-toggle-sm">
-                Enable Card-level help
-            </p>
-            <span class="arches-toggle-subtitle">
-                Provide specific user guidance for this card
-            </span>
-        </div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+    
     </div>
 
     <!-- Tertiary Panel For Card Help Text-->
