@@ -96,6 +96,7 @@ define(['arches',
                     case 'visible':
                     case 'active':
                     case 'ontologyproperty':
+                    case 'sortorder':
                         this.set(key, ko.observable(value));
                         break;
                     case 'ontology_properties':
