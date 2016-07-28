@@ -90,6 +90,8 @@ define(['arches',
                     case 'name':
                     case 'instructions':
                     case 'helptext':
+                    case 'helpenabled':
+                    case 'helptitle':
                     case 'cardinality':
                     case 'visible':
                     case 'active':
@@ -117,10 +119,10 @@ define(['arches',
                 });
             });
 
-            this._card = JSON.stringify(this.toJSON());
+            this._card = ko.observable(JSON.stringify(this.toJSON()));
 
             this.dirty = ko.computed(function(){
-                return JSON.stringify(_.extend(JSON.parse(self._card),self.toJSON())) !== self._card;
+                return JSON.stringify(_.extend(JSON.parse(self._card()),self.toJSON())) !== self._card();
             })
 
             this.isContainer = ko.computed(function() {
@@ -140,6 +142,14 @@ define(['arches',
                 }
             }
             return ret;
+        },
+
+        save: function(){
+            AbstractModel.prototype.save.call(this, function(request, status, self){
+                if(status === 'success'){
+                    this._card(JSON.stringify(this.toJSON()));
+                }
+            }, this);
         }
     });
     return CardModel;

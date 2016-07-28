@@ -85,8 +85,7 @@ define(['backbone', 'jquery'], function (Backbone, $) {
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
                     }
-                    if (status === 'success' &&  request.responseJSON) {
-                        self.set(request.responseJSON);
+                    if (status === 'success') {
                         self.trigger(eventname, self);
                     }
                 }

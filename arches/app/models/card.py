@@ -58,14 +58,21 @@ class Card(models.CardModel):
 
         super(Card, self).__init__(*args, **kwargs)
         # from models.CardModel
-        # self.cardid
-        # self.name
-        # self.description
-        # self.instructions
-        # self.helptext
-        # self.cardinality
-        # self.nodegroup
-        # self.graph
+        # self.cardid       
+        # self.name     
+        # self.description      
+        # self.instructions     
+        # self.helpenabled      
+        # self.helptitle        
+        # self.helptext     
+        # self.cardinality      
+        # self.nodegroup        
+        # self.graph        
+        # self.active       
+        # self.visible      
+        # self.sortorder        
+        # self.function     
+        # self.itemtext     
         # end from models.CardModel
         self.cards = []
         self.widgets = []
