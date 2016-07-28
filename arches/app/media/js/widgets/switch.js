@@ -2,11 +2,11 @@ define(['knockout', 'underscore'], function (ko, _) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
+    * @see http://knockoutjs.com/documentation/component-binding.html
     */
 
     /**
     * registers a switch-widget component for use in forms
-    * @extends ko.components
     * @function external:"ko.components".switch-widget
     * @param {object} params
     * @param {boolean} params.value - the value being managed

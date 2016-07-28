@@ -1,7 +1,6 @@
 define(['knockout', 'underscore', 'plugins/knockout-select2'], function (ko, _) {
     /**
     * registers a select-widget component for use in forms
-    * @extends ko.components
     * @function external:"ko.components".select-widget
     * @param {object} params
     * @param {boolean} params.value - the value being managed

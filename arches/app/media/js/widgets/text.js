@@ -1,7 +1,6 @@
 define(['knockout', 'underscore'], function (ko, _) {
     /**
     * registers a text-widget component for use in forms
-    * @extends ko.components
     * @function external:"ko.components".text-widget
     * @param {object} params
     * @param {boolean} params.value - the value being managed

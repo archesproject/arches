@@ -1,7 +1,6 @@
 define(['knockout', 'underscore', 'bindings/datepicker'], function (ko, _) {
     /**
     * registers a datepicker-widget component for use in forms
-    * @extends ko.components
     * @function external:"ko.components".datepicker-widget
     * @param {object} params
     * @param {boolean} params.value - the value being managed
