@@ -55,6 +55,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 _.each(self.configKeys, function(key) {
                     configJSON[key] = config[key]();
                 });
+                configJSON.label = self.get('label')();
                 return configJSON;
             });
         }
