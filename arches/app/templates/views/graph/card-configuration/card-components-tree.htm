@@ -35,11 +35,12 @@
         </a>
 
         <ul class="card-tree-list-item" aria-expanded="true">
-            <!-- ko template: {
-                name: card.isContainer() ? 'card-tree' : 'card-tree-widgets',
-                foreach: card.isContainer() ? get('cards') : get('widgets'),
-                as: card.isContainer() ? 'card' : 'widget'
-            } --> <!-- /ko -->
+            <div data-bind="sortable: {
+                template: card.isContainer() ? 'card-tree' : 'card-tree-widgets',
+                data: card.isContainer() ? get('cards') : get('widgets') ,
+                as: card.isContainer() ? 'card' : 'widget',
+                beforeMove: self.beforeMove
+            }"></div>
         </ul>
     </li>
 </template>

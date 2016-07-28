@@ -29,7 +29,7 @@ define(['arches',
         parse: function(attributes){
             var self = this;
             var datatypelookup = {};
-            
+
             attributes =_.extend({datatypes:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
@@ -42,7 +42,8 @@ define(['arches',
                 switch(key) {
                     case 'cards':
                         var cards = [];
-                        value.forEach(function (card) {
+                        var cardData = _.sortBy(value, 'sortorder');
+                        cardData.forEach(function (card) {
                             var cardModel = new CardModel({
                                 data: card,
                                 datatypes: attributes.datatypes
@@ -50,6 +51,11 @@ define(['arches',
                             cards.push(cardModel);
                         }, this);
                         this.set('cards', ko.observableArray(cards));
+                        this.get('cards').subscribe(function (cards) {
+                            _.each(cards, function(card, i) {
+                                card.get('sortorder')(i);
+                            })
+                        });
                         break;
                     case 'nodes':
                         var nodes = [];
@@ -90,6 +96,12 @@ define(['arches',
                     case 'ontologyproperty':
                         this.set(key, ko.observable(value));
                         break;
+                    case 'sortorder':
+                            this.set(key, ko.observable(value));
+                            this.get(key).subscribe(function() {
+                                console.log('adsas');
+                            });
+                            break;
                     case 'ontology_properties':
                         this.set(key, ko.observableArray(value));
                         break;
@@ -99,6 +111,15 @@ define(['arches',
             }, this);
 
             this.set('widgets', ko.observableArray(widgets));
+            this.get('widgets').sort(function (w, ww) {
+                return w.get('sortorder')() > ww.get('sortorder')()
+            });
+            this.get('widgets').subscribe(function (widgets) {
+                _.each(widgets, function(widget, i) {
+                    widget.get('sortorder')(i);
+                    console.log(widget.get('sortorder')());
+                });
+            });
 
             this._card = JSON.stringify(this.toJSON());
 

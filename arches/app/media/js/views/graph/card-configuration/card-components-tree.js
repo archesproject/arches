@@ -1,6 +1,7 @@
 define([
     'backbone',
     'knockout',
+    'bindings/sortable'
 ], function(Backbone, ko) {
     var CardComponentsTree = Backbone.View.extend({
         /**
@@ -17,6 +18,10 @@ define([
         initialize: function(options) {
             _.extend(this, _.pick(options, 'card'));
             this.selection = ko.observable(this.card);
+        },
+
+        beforeMove: function (e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
     });
     return CardComponentsTree;

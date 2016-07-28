@@ -7,7 +7,8 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'card_id': '',
                 'widget_id': '',
                 'config': {},
-                'label': ''
+                'label': '',
+                'sortorder': null
             };
             options || (options = {});
             attributes || (attributes = {});
