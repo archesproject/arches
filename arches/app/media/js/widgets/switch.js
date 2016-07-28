@@ -1,12 +1,38 @@
 define(['knockout', 'underscore'], function (ko, _) {
     /**
+    * knockout components namespace used in arches
+    * @external "ko.components"
+    */
+
+    /**
     * registers a switch-widget component for use in forms
+    * @extends ko.components
+    * @function external:"ko.components".switch-widget
+    * @param {object} params
+    * @param {boolean} params.value - the value being managed
+    * @param {object} params.config -
+    * @param {string} params.config.label - label to use alongside the select input
+    * @param {string} params.config.subtitle - subtitle to use alongside the select input
+    * @param {string|true} [params.config.on=true] - the value to use for the "on" state of the switch
+    * @param {string|false} [params.config.off=false] - the value to use for the "off" state of the switch
     */
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
             this.value = params.value;
-            this.label = params.label;
-            _.extend(this, _.pick(params.config, 'subtitle'));
+            this.label = params.config.label;
+            this.subtitle = params.config.subtitle;
+            this.on = params.config.on || true;
+            this.off = params.config.off || false;
+            this.setvalue = params.config.setvalue || function(self, evt){
+                if(self.value() === self.on){
+                    self.value(self.off);
+                }else{
+                    self.value(self.on);
+                }
+            }
+            this.getvalue = params.config.getvalue || ko.computed(function(){
+                return this.value() === this.on;
+            }, this);
         },
         template: { require: 'text!widget-templates/switch' }
     });
