@@ -2,7 +2,8 @@ define([
     'backbone',
     'underscore',
     'knockout',
-    'widgets'
+    'widgets',
+    'bindings/sortable'
 ], function(Backbone, _, ko, widgets) {
     var CardFormPreview = Backbone.View.extend({
         /**
@@ -32,6 +33,10 @@ define([
                 var index = self.card.get('cards')().indexOf(card);
                 return index;
             });
+        },
+
+        beforeMove: function (e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
     });
     return CardFormPreview;
