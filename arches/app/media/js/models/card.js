@@ -108,11 +108,10 @@ define(['arches',
                         this.set(key, value);
                 }
             }, this);
-
-            this.set('widgets', ko.observableArray(widgets));
-            this.get('widgets').sort(function (w, ww) {
-                return w.get('sortorder')() > ww.get('sortorder')()
+            widgets = ko.observableArray(widgets).sort(function (w, ww) {
+                return w.get('sortorder')() > ww.get('sortorder')();
             });
+            this.set('widgets', widgets);
             this.get('widgets').subscribe(function (widgets) {
                 _.each(widgets, function(widget, i) {
                     widget.get('sortorder')(i);
