@@ -15,24 +15,21 @@
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
                 <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
-
                     <!--Nav Tabs-->
-                    <ul class="nav nav-tabs card-nav-container">
-                        <!-- ko foreach: {
-                            data: card.isContainer() ? card.get('cards') : [card],
-                            as: 'card'
-                        } -->
+                    <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
+                        data: card.isContainer() ? card.get('cards') : [card],
+                        beforeMove: self.beforeMove
+                    }">
                         <li id="summary-group" data-bind="css: {
                             'active': self.currentTabIndex()===$index()
                         }, click: self.selection">
                             <a id="summary-tab" href="#" class="card-tab-title">
                                 <!-- Editable Span -->
                                 <span class="editable-card">
-                                    <i class="fa fa-align-justify"></i> <span data-bind="text: card.get('name')"></span>
+                                    <i class="fa fa-align-justify"></i> <span data-bind="text: get('name')"></span>
                                 </span>
                             </a>
                         </li>
-                        <!-- /ko -->
                     </ul>
 
                     <div id="db-arches-app-alert" class="panel data-card-alert"></div>
@@ -65,19 +62,19 @@
                                     <div class="col-lg-9" style="padding-bottom: 10px;">
 
                                         <form class="widgets" style="margin-bottom: 20px;">
-                                            <!-- ko foreach: {
-                                                data: card.get('widgets'),
-                                                as: 'widget'
-                                            } -->
-                                            <div data-bind='component: {
-                                                name: self.widgetLookup[widget.get("widget_id")()].name,
-                                                params: {
-                                                    config: widget.configJSON(),
-                                                    label: widget.get("label")(),
-                                                    value: ko.observable(null)
-                                                }
-                                            }'></div>
-                                            <!-- /ko -->
+                                            <div data-bind="sortable: {
+                                                data:card.get('widgets'),
+                                                beforeMove: self.beforeMove
+                                            }">
+                                                <div data-bind='component: {
+                                                    name: self.widgetLookup[get("widget_id")()].name,
+                                                    params: {
+                                                        config: configJSON(),
+                                                        label: get("label")(),
+                                                        value: ko.observable(null)
+                                                    }
+                                                }'></div>
+                                            </div>
                                         </form>
 
                                         <!-- Save/Add Button -->
