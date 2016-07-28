@@ -15,6 +15,10 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             this.node = (options.node || null);
             this.card = (options.card || null);
             this.datatype = (options.datatype || null);
+            this.icon = 'ion-ios-paper';
+            if (this.datatype) {
+                this.icon = this.datatype.iconclass;
+            }
             if (this.datatype && this.datatype.defaultwidget_id) {
                 defaults.widget_id = this.datatype.defaultwidget_id;
                 defaults.config = widgets[defaults.widget_id].defaultconfig;

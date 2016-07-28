@@ -52,7 +52,7 @@
             'active': self.selection() === widget
         },
         click: self.selection">
-            <i class="ion-ios-paper card-tree-list-icon"></i>
+            <i data-bind="css: widget.icon + ' card-tree-list-icon'"></i>
             <span data-bind="text: widget.get('label')"></span>
         </a>
     </li>
