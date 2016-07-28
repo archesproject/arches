@@ -164,11 +164,19 @@ USE_TZ = False
 # Default Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 
-# see https://docs.djangoproject.com/en/1.6/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
+#
+# make sure to uncomment the Middleware class 'LocaleMiddleware'
+#
+# https://docs.djangoproject.com/en/1.9/ref/django-admin/#makemessages
+#
+# run
+# django-admin.py makemessages --ignore=virtualenv/* --local=en --extension=htm,py
+# django-admin.py compilemessages
 LANGUAGE_CODE = 'en-US'
 
 # the path where your translation strings are stored

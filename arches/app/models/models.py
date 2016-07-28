@@ -42,12 +42,17 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
+    helpenabled = models.BooleanField(default=True)
+    helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     cardinality = models.TextField(blank=True, default='n')
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
     graph = models.ForeignKey('GraphModel', db_column='graphid')
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+    function = models.ForeignKey('Function', blank=True, null=True, db_column='functionid')
+    itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -62,6 +67,7 @@ class CardXNodeXWidget(models.Model):
     function = models.ForeignKey('Function', db_column='functionid')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         managed = True

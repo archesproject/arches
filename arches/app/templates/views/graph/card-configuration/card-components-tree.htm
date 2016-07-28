@@ -9,7 +9,7 @@
 
 
     <!-- TOC Cards/Widgets -->
-    <div id="card-management-forms">
+    <div class="card-tree-container">
         <!-- ko template: {
             name: 'card-tree',
             foreach: [card],
@@ -24,8 +24,6 @@
         'active': self.selection() === card
     }">
         <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
-            'card-container-link': card.isContainer(),
-            'card-link': !card.isContainer(),
             'active': self.selection() === card
         },
         click: self.selection">
@@ -50,7 +48,7 @@
     <li class="card-tree-list" data-bind="css: {
         'active': self.selection() === widget
     }">
-        <a href="#" class="cc-link card-widget-link" data-bind="css: {
+        <a href="#" class="cc-link" data-bind="css: {
             'active': self.selection() === widget
         },
         click: self.selection">

@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="toggle-container">
-    <span class="switch switch-small" data-bind="css: {'on': value()}, click: function() { value(!value()); }"><small></small></span>
+    <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
     <p class="arches-toggle-sm" data-bind="text:label"></p>
     <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
 </div>
