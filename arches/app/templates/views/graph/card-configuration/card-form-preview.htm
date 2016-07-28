@@ -49,12 +49,12 @@
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
 
-                                    <div>
+                                    <div style="height: 32px;">
                                         <span data-bind="text: card.get('instructions')"></span>
                                         
                                         <!-- Help link -->
                                         <span>  
-                                            <a id="card-help-link" href="" class="pull-right card-help help editable-help" data-bind="visible: card.get('enable_" style="display: none;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: card.get('helpenabled')" style="display: none;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -78,10 +78,14 @@
                                         </form>
 
                                         <!-- Save/Add Button -->
-                                        <div id="card-save-tile-btn" class="install-buttons" style="display: none;">
-                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus"> Add</button>
+                                        <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus">{% trans "Add" %}</button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n'">
+                                <div class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250); height: 40px;" data-bind="text: card.get('itemtext')">
                                 </div>
                             </div>
                         </div>
