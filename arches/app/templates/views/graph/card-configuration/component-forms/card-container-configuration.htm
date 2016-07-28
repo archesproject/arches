@@ -28,13 +28,13 @@
     <div id="cc-settings" class="tab-pane fade in active">
     
         <!-- Card Container Property -->
-        <!-- ko if: !!card.get('ontologyproperty') -->
+        <!-- ko if: !!$data.get('ontologyproperty')() -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Relation to Resource" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card.get('ontologyproperty'), options: card.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: $data.get('ontologyproperty'), options: $data.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
         <!-- /ko -->
@@ -45,7 +45,7 @@
                 {% trans "Name" %}
             </div>
             <div>
-                <input type="" placeholder="{% trans "Card name" %}" id="" class="form-control input-md widget-input" data-bind="value: card.get('name'), valueUpdate: 'keyup'">
+                <input type="" placeholder="{% trans "Card name" %}" id="" class="form-control input-md widget-input" data-bind="value: $data.get('name'), valueUpdate: 'keyup'">
             </div>
         </div>
 
@@ -54,10 +54,10 @@
         </div>
 
         <!-- Card Visibility -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
         <!-- Active -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>   
+        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>   
     </div>
 
     <!-- Card CRUD Validation/Functions Form -->
@@ -69,7 +69,7 @@
                 {% trans "Validation Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -79,7 +79,7 @@
                 {% trans "Processing Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
