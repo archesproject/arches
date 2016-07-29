@@ -214,7 +214,6 @@ class Graph(models.GraphModel):
             card.description = cardobj.get('description','')
             card.instructions = cardobj.get('instructions','')
             card.helptext = cardobj.get('helptext','')
-            card.cardinality = cardobj.get('cardinality','')
             card.nodegroup_id = uuid.UUID(str(cardobj.get('nodegroup_id','')))
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
 
