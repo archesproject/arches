@@ -1,4 +1,4 @@
-define(['knockout', 'underscore'], function (ko, _) {
+define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -18,8 +18,8 @@ define(['knockout', 'underscore'], function (ko, _) {
     */
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
-            this.value = params.value;
-            this.label = params.config.label;
+            WidgetViewModel.apply(this, [params]);
+
             this.subtitle = params.config.subtitle;
             this.on = params.config.on || true;
             this.off = params.config.off || false;
