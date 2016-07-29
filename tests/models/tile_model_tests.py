@@ -38,17 +38,17 @@ class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         sql = """
-        INSERT INTO node_groups(nodegroupid, legacygroupid)
-            VALUES ('99999999-0000-0000-0000-000000000001', '');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid)
-            VALUES ('32999999-0000-0000-0000-000000000000', '');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('32999999-0000-0000-0000-000000000000', '', 'n');
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid)
-            VALUES ('19999999-0000-0000-0000-000000000000', '');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('19999999-0000-0000-0000-000000000000', '', 'n');
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid)
-            VALUES ('21111111-0000-0000-0000-000000000000', '');
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
         """
 
         cursor = connection.cursor()
