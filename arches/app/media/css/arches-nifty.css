@@ -64,7 +64,7 @@
     border-bottom-width: 0;
 }
 .card-body {
-    padding: 0 20px 0 10px;
+    padding: 0 20px 0 20px;
 }
 .card-content-container {
     border: 0 solid #eee;
@@ -3594,6 +3594,12 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 .graph-base-content .alert-active .ep-form-content.card-grid {
     top: 0px;
+}
+.wizard-card-tools {
+    float: right;
+    padding-left: 10px;
+    margin-top: 7px;
+    font-size: 19px;
 }
 @keyframes loader {
 	0% { background: #ddd; }
