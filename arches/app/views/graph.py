@@ -153,7 +153,11 @@ def card(request, cardid):
             return JSONResponse(card)
             
     if request.method == 'GET':
-        card = Card.objects.get(cardid=cardid)
+        try:
+            card = Card.objects.get(cardid=cardid)
+        except(Card.DoesNotExist):
+            # assume this is a graph id
+            card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         return render(request, 'views/graph/card-configuration.htm', {

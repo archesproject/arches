@@ -864,6 +864,26 @@ class Graph(models.GraphModel):
         except models.NodeGroup.DoesNotExist:
             return models.NodeGroup(pk=nodegroupid)
 
+    def get_root_nodegroup(self):
+        """
+        gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
+
+        """
+
+        for nodegroup in self.get_nodegroups():
+            if nodegroup.parentnodegroup is None:
+                return nodegroup
+
+    def get_root_card(self):
+        """
+        gets the top level card/card container
+
+        """
+
+        for card in self.cards.itervalues():
+            if card.nodegroup.parentnodegroup is None:
+                return card
+
     def get_cards(self):
         """
         get the card data (if any) associated with this graph

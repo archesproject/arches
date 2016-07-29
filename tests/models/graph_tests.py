@@ -850,3 +850,30 @@ class GraphTests(ArchesTestCase):
         for card in resource_graph.get_cards():
             self.assertEqual(card.name, resource_graph.nodes[card.nodegroup.pk].name)
             self.assertEqual(card.description, resource_graph.nodes[card.nodegroup.pk].description)
+
+    def test_get_root_nodegroup(self):
+        """
+        test we can get the right parent NodeGroup
+
+        """
+
+        graph = Graph.new(name='TEST',is_resource=False,author='TEST')
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        for node in graph.nodes.itervalues():
+            if node.is_collector:
+                if node.nodegroup.parentnodegroup is None:
+                    self.assertEqual(graph.get_root_nodegroup(), node.nodegroup)
+
+    def test_get_root_card(self):
+        """
+        test we can get the right parent card
+
+        """
+
+        graph = Graph.new(name='TEST',is_resource=False,author='TEST')
+        graph.append_branch('P1_is_identified_by', graphid=self.NODE_NODETYPE_GRAPHID)
+
+        for card in graph.cards.itervalues():
+            if card.nodegroup.parentnodegroup is None:
+                self.assertEqual(graph.get_root_card(), card)

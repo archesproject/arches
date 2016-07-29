@@ -98,7 +98,7 @@ class Card(models.CardModel):
 
                 self.graph = Graph.objects.get(graphid=self.graph_id)
 
-                if self.graph.ontology:
+                if self.graph.ontology and self.graph.isresource:
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
 
@@ -109,7 +109,7 @@ class Card(models.CardModel):
         """
 
         with transaction.atomic():
-            if self.graph.ontology:
+            if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
                 edge.ontologyproperty = self.ontologyproperty
                 edge.save()
