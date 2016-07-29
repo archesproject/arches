@@ -45,7 +45,6 @@ class CardModel(models.Model):
     helpenabled = models.BooleanField(default=True)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
-    cardinality = models.TextField(blank=True, default='n')
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
     graph = models.ForeignKey('GraphModel', db_column='graphid')
     active = models.BooleanField(default=True)
@@ -235,6 +234,7 @@ class Icon(models.Model):
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     legacygroupid = models.TextField(blank=True, null=True)
+    cardinality = models.TextField(blank=True, default='n')
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
     class Meta:

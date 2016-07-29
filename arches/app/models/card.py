@@ -65,7 +65,6 @@ class Card(models.CardModel):
         # self.helpenabled      
         # self.helptitle        
         # self.helptext     
-        # self.cardinality      
         # self.nodegroup        
         # self.graph        
         # self.active       
@@ -74,6 +73,7 @@ class Card(models.CardModel):
         # self.function     
         # self.itemtext     
         # end from models.CardModel
+        self.cardinality = ''
         self.cards = []
         self.widgets = []
         self.ontologyproperty = None
@@ -101,6 +101,8 @@ class Card(models.CardModel):
                 if self.graph.ontology and self.graph.isresource:
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
+                self.cardinality = self.nodegroup.cardinality
+
 
     def save(self):
         """
@@ -113,6 +115,9 @@ class Card(models.CardModel):
                 edge = self.get_edge_to_parent()
                 edge.ontologyproperty = self.ontologyproperty
                 edge.save()
+
+            self.nodegroup.cardinality = self.cardinality
+            self.nodegroup.save()
 
             super(Card, self).save()
             for card in self.cards:
@@ -136,6 +141,7 @@ class Card(models.CardModel):
         """
 
         ret = JSONSerializer().handle_model(self)
+        ret['cardinality'] = self.cardinality
         ret['cards'] = self.cards
         ret['nodes'] = list(self.nodegroup.node_set.all())
         ret['visible'] = self.visible
