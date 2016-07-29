@@ -51,9 +51,9 @@
 
                                     <div style="height: 32px;">
                                         <span data-bind="text: card.get('instructions')"></span>
-                                        
+
                                         <!-- Help link -->
-                                        <span>  
+                                        <span>
                                             <a class="pull-right card-help help editable-help" data-bind="visible: card.get('helpenabled')" style="display: none;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
@@ -61,20 +61,18 @@
                                     <!-- Form -->
                                     <div class="col-lg-9" style="padding-bottom: 10px;">
 
-                                        <form class="widgets" style="margin-bottom: 20px;">
-                                            <div data-bind="sortable: {
+                                        <form class="widgets" style="margin-bottom: 20px;" data-bind="sortable: {
                                                 data:card.get('widgets'),
                                                 beforeMove: self.beforeMove
                                             }">
-                                                <div data-bind='component: {
-                                                    name: self.widgetLookup[get("widget_id")()].name,
-                                                    params: {
-                                                        config: configJSON(),
-                                                        label: get("label")(),
-                                                        value: ko.observable(null)
-                                                    }
-                                                }'></div>
-                                            </div>
+                                            <div data-bind='component: {
+                                                name: self.widgetLookup[get("widget_id")()].name,
+                                                params: {
+                                                    config: configJSON(),
+                                                    label: get("label")(),
+                                                    value: ko.observable(null)
+                                                }
+                                            }, click: self.selection'></div>
                                         </form>
 
                                         <!-- Save/Add Button -->
