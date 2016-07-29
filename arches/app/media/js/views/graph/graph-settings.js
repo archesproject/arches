@@ -57,22 +57,6 @@ require([
                 return ontologyClass.ontology_id === graph.ontology_id();
             });
         }),
-        isResource: ko.computed({
-            read: function() {
-                return graph.isresource().toString();
-            },
-            write: function(value) {
-                graph.isresource(value === "true");
-            }
-        }),
-        isActive: ko.computed({
-            read: function() {
-                return graph.isactive().toString();
-            },
-            write: function(value) {
-                graph.isactive(value === "true");
-            }
-        }),
         save: function () {
             pageView.viewModel.loading(true);
             $.ajax({
