@@ -14,6 +14,11 @@
             </a>
         </li>
         <li>
+            <a href="#cc-advanced" class="nav-library-tab-link" data-toggle="tab">
+                <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
+            </a>
+        </li>
+        <li>
             <a href="#cc-validation" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
@@ -58,6 +63,29 @@
 
         <!-- Active -->
         <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>   
+    </div>
+
+     <!-- Card CRUD ADVANCED SETTINGS Form -->
+    <div id="cc-advanced" class="tab-pane fade">
+
+        <!-- Set Cardinaltiy -->
+        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
+
+        <!-- Multiple values tools -->
+        <div class="cardinality-form" data-bind="visible: $data.get('cardinality')() === 'n'" style="display: none;">
+
+            <div class="form-divider" style="margin-top: 0px; margin-bottom: 10px;"></div>
+
+            <!-- Cardinlity Tools: Tile Header -->
+            <div class="node-widget-label" style="">
+                <div class="control-label">
+                    {% trans "Tile Name" %}
+                </div>
+                <div class="col-sm-12 pad-no crud-widget-container">
+                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: $data.get('itemtext'), valueUpdate: 'keyup'">
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Card CRUD Validation/Functions Form -->

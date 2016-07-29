@@ -14,7 +14,7 @@
 
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-                <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+                <div id="cards" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
                         data: card.isContainer() ? card.get('cards') : [card],
@@ -97,11 +97,38 @@
                 </div>
 
                 <!-- Wizard Level Buttons -->
-                <div class="wizard-buttons pull-right">
+                <div class="wizard-buttons">
                     <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt"> Discard
                     </button><button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check"> Save</button>
                 </div>
+
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+
+                    <!-- Wizard Tile -->
+                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
+
+                        <ul class="nav nav-tabs card-nav-container" data-bind="sortable: {data: card.isContainer() ? card.get('cards') : [card], 
+                            beforeMove: function (e) {
+                                e.cancelDrop = true;
+                            }}" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === 0}" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title">
+                                    <!-- Editable Span -->
+                                    <span class="card-tab-title">
+                                        <span data-bind="text: get('name')"></span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="wizard-card-tools" data-bind="if: $index() === ($parent.card.isContainer() ? ($parent.card.get('cards')().length - 1) : 0) ">
+                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                                <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
             </div>
+
 
         </div>
     </div>

@@ -200,7 +200,6 @@ class Migration(migrations.Migration):
                 ('helpenabled', models.BooleanField(default=False)),
                 ('helptitle', models.TextField(null=True, blank=True)),
                 ('helptext', models.TextField(null=True, blank=True)),
-                ('cardinality', models.TextField(blank=True, default='n')),
                 ('active', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
@@ -404,6 +403,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
+                ('cardinality', models.TextField(blank=True, default='n')),
                 ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
             ],
             options={
