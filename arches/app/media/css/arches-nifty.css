@@ -3610,6 +3610,9 @@ div.row.widget-wrapper {
 .widget-preview {
     border: 1px solid transparent;
 }
+.widget-preview * {
+    cursor: pointer;
+}
 .widget-preview.active {
     background: #f8f8f8;
     border: 1px solid #ddd;
