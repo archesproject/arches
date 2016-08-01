@@ -80,7 +80,7 @@
 
                                         <!-- Save/Add Button -->
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus">{% trans "Add" %}</button>
+                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled>{% trans "Add" %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -100,8 +100,8 @@
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                     <div class="ep-form-toolbar-tools flex">
                         <span>
-                            <button class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button disabled class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                            <button disabled class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
