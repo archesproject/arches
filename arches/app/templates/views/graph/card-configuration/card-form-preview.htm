@@ -107,12 +107,9 @@
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="sortable: {data: card.isContainer() ? card.get('cards') : [card], 
-                            beforeMove: function (e) {
-                                e.cancelDrop = true;
-                            }}" style="margin-bottom: 0px;">
-                            <li id="summary-group" data-bind="css: {'active': $index() === 0}" style="margin-bottom: 0px;">
-                                <a id="summary-tab" href="#" class="card-tab-title">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.isContainer() ? card.get('cards') : [card]" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
                                     <!-- Editable Span -->
                                     <span class="card-tab-title">
                                         <span data-bind="text: get('name')"></span>
