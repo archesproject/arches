@@ -184,8 +184,8 @@ class Graph(models.GraphModel):
             egdeobj = edge.copy()
             edge = models.Edge()
             edge.edgeid = egdeobj.get('edgeid', None)
-            edge.rangenode = self.nodes[egdeobj.get('rangenodeid')]
-            edge.domainnode = self.nodes[egdeobj.get('domainnodeid')]
+            edge.rangenode = self.nodes[egdeobj.get('rangenode_id')]
+            edge.domainnode = self.nodes[egdeobj.get('domainnode_id')]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self
@@ -955,7 +955,7 @@ class Graph(models.GraphModel):
 
         if self.isresource == True:
             if self.root.is_collector == True:
-                raise ValidationError(_("The top node of your resource graph needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null."))
+                raise ValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)))
         else:
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:

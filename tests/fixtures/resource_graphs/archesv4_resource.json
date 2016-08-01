@@ -6053,1000 +6053,1111 @@
       "edges": [
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9a356cac-3855-461a-bfff-c56bbfb0d644",
+            "rangenode_id": "9a356cac-3855-461a-bfff-c56bbfb0d644",
             "name": "",
             "edgeid": "05ed7d63-d50f-11e5-a888-80e6500ee4e4",
-            "domainnodeid": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
+            "
+            ": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
+            "rangenode_id": "fb94f6c1-b1e1-4ce8-891f-8c0a2931a3bf",
             "name": "",
             "edgeid": "05edffa8-d50f-11e5-aca1-80e6500ee4e4",
-            "domainnodeid": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
+            "
+            ": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
+            "rangenode_id": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
             "name": "",
             "edgeid": "05eeb0ee-d50f-11e5-9e20-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P1_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "aecb48b7-73ba-4171-936b-ee749709d5e5",
+            "rangenode_id": "aecb48b7-73ba-4171-936b-ee749709d5e5",
             "name": "",
             "edgeid": "05efffba-d50f-11e5-ba6c-80e6500ee4e4",
-            "domainnodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
+            "
+            ": "891d06ab-202a-42f6-945f-ff0670cbcccc",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "bc1a350d-0c7d-448c-8d67-270029777669",
+            "rangenode_id": "bc1a350d-0c7d-448c-8d67-270029777669",
             "name": "",
             "edgeid": "05f08978-d50f-11e5-b195-80e6500ee4e4",
-            "domainnodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
+            "
+            ": "891d06ab-202a-42f6-945f-ff0670cbcccc",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "891d06ab-202a-42f6-945f-ff0670cbcccc",
+            "rangenode_id": "891d06ab-202a-42f6-945f-ff0670cbcccc",
             "name": "",
             "edgeid": "05f0d6a6-d50f-11e5-9a52-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "74f6b547-a3cd-4c9b-a470-7f8880212612",
+            "rangenode_id": "74f6b547-a3cd-4c9b-a470-7f8880212612",
             "name": "",
             "edgeid": "05f194a6-d50f-11e5-b4bb-80e6500ee4e4",
-            "domainnodeid": "612d3407-e679-486b-a119-a9d87558aef8",
+            "
+            ": "612d3407-e679-486b-a119-a9d87558aef8",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "612d3407-e679-486b-a119-a9d87558aef8",
+            "rangenode_id": "612d3407-e679-486b-a119-a9d87558aef8",
             "name": "",
             "edgeid": "05f1da78-d50f-11e5-a59a-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "ff142283-70e6-4202-84f7-ec5d47ac43e1",
+            "rangenode_id": "ff142283-70e6-4202-84f7-ec5d47ac43e1",
             "name": "",
             "edgeid": "05f292f3-d50f-11e5-94c3-80e6500ee4e4",
-            "domainnodeid": "d6d6e299-a42d-4424-9069-af2e5a647907",
+            "
+            ": "d6d6e299-a42d-4424-9069-af2e5a647907",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d6d6e299-a42d-4424-9069-af2e5a647907",
+            "rangenode_id": "d6d6e299-a42d-4424-9069-af2e5a647907",
             "name": "",
             "edgeid": "05f2da5c-d50f-11e5-be98-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "60b8fcc5-9be5-403f-95de-b721c26f5de6",
+            "rangenode_id": "60b8fcc5-9be5-403f-95de-b721c26f5de6",
             "name": "",
             "edgeid": "05f38b3a-d50f-11e5-b096-80e6500ee4e4",
-            "domainnodeid": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
+            "
+            ": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
+            "rangenode_id": "f56f8caa-9bbb-40b6-ad46-e125b1eef06b",
             "name": "",
             "edgeid": "05f3d05e-d50f-11e5-b94a-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "175c1de9-25a1-4948-bd05-701ad3bc1dbf",
+            "rangenode_id": "175c1de9-25a1-4948-bd05-701ad3bc1dbf",
             "name": "",
             "edgeid": "05f48140-d50f-11e5-9c46-80e6500ee4e4",
-            "domainnodeid": "8b1dc471-bf24-421c-a02e-a830bd2158de",
+            "
+            ": "8b1dc471-bf24-421c-a02e-a830bd2158de",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "8b1dc471-bf24-421c-a02e-a830bd2158de",
+            "rangenode_id": "8b1dc471-bf24-421c-a02e-a830bd2158de",
             "name": "",
             "edgeid": "05f4c89e-d50f-11e5-a11c-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b732d9d2-de7a-45d4-9fbc-2368a5a21b90",
+            "rangenode_id": "b732d9d2-de7a-45d4-9fbc-2368a5a21b90",
             "name": "",
             "edgeid": "05f57f82-d50f-11e5-abd0-80e6500ee4e4",
-            "domainnodeid": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
+            "
+            ": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
+            "rangenode_id": "8bf7c6c7-0fd0-48d6-b54e-d3c883910cb2",
             "name": "",
             "edgeid": "05f5c5b3-d50f-11e5-8754-80e6500ee4e4",
-            "domainnodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "
+            ": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
+            "rangenode_id": "1f6a968b-714b-4328-9610-e1b6bdbcacb0",
             "name": "",
             "edgeid": "05f60b8a-d50f-11e5-bde2-80e6500ee4e4",
-            "domainnodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
+            "
+            ": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
             "ontologyproperty": "P41i_was_classified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b8cfc362-ae59-4344-8377-8e745ed30eb0",
+            "rangenode_id": "b8cfc362-ae59-4344-8377-8e745ed30eb0",
             "name": "",
             "edgeid": "05f6f7a3-d50f-11e5-a836-80e6500ee4e4",
-            "domainnodeid": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
+            "
+            ": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
+            "rangenode_id": "43a7f646-3d4f-431a-ba6a-c712bffae3b2",
             "name": "",
             "edgeid": "05f7427d-d50f-11e5-937d-80e6500ee4e4",
-            "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
+            "
+            ": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "7bd3f3ee-945a-4217-baef-5bfd49ee9cb3",
+            "rangenode_id": "7bd3f3ee-945a-4217-baef-5bfd49ee9cb3",
             "name": "",
             "edgeid": "05f7f7ba-d50f-11e5-905b-80e6500ee4e4",
-            "domainnodeid": "9505a004-f327-471b-ace3-f549f895a6e6",
+            "
+            ": "9505a004-f327-471b-ace3-f549f895a6e6",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9505a004-f327-471b-ace3-f549f895a6e6",
+            "rangenode_id": "9505a004-f327-471b-ace3-f549f895a6e6",
             "name": "",
             "edgeid": "05f83f0f-d50f-11e5-9e64-80e6500ee4e4",
-            "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
+            "
+            ": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
             "ontologyproperty": "P45_consists_of",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "692c3a1c-3172-4ea9-b55b-7f385442af5b",
+            "rangenode_id": "692c3a1c-3172-4ea9-b55b-7f385442af5b",
             "name": "",
             "edgeid": "05f95c2e-d50f-11e5-a65a-80e6500ee4e4",
-            "domainnodeid": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
+            "
+            ": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
+            "rangenode_id": "8bf6b446-d20a-4ef2-9083-74bb84831df1",
             "name": "",
             "edgeid": "05f9a205-d50f-11e5-bfd8-80e6500ee4e4",
-            "domainnodeid": "179c4a57-0547-425c-bf54-f5d92f4db89e",
+            "
+            ": "179c4a57-0547-425c-bf54-f5d92f4db89e",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "179c4a57-0547-425c-bf54-f5d92f4db89e",
+            "rangenode_id": "179c4a57-0547-425c-bf54-f5d92f4db89e",
             "name": "",
             "edgeid": "05f9ea87-d50f-11e5-b701-80e6500ee4e4",
-            "domainnodeid": "1a113bf2-e066-41f3-a670-8f44995ac849",
+            "
+            ": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "ontologyproperty": "P33_used_specific_technique",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1a113bf2-e066-41f3-a670-8f44995ac849",
+            "rangenode_id": "1a113bf2-e066-41f3-a670-8f44995ac849",
             "name": "",
             "edgeid": "05fa3270-d50f-11e5-acf5-80e6500ee4e4",
-            "domainnodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
+            "
+            ": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
             "ontologyproperty": "P108i_was_produced_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
+            "rangenode_id": "4b87b62c-b13f-4da1-a2bb-4f0ad7135280",
             "name": "",
             "edgeid": "05fa7a63-d50f-11e5-9b4e-80e6500ee4e4",
-            "domainnodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
+            "
+            ": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
             "ontologyproperty": "P108_has_produced",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
+            "rangenode_id": "425cf49c-5691-4dc8-a7d1-1f73bd1ea2c0",
             "name": "",
             "edgeid": "05fac5e6-d50f-11e5-a867-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P108i_was_produced_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "6765184d-51d7-4f21-bd5b-6ed26ba8c5ab",
+            "rangenode_id": "6765184d-51d7-4f21-bd5b-6ed26ba8c5ab",
             "name": "",
             "edgeid": "05fbb140-d50f-11e5-b260-80e6500ee4e4",
-            "domainnodeid": "7802f774-ee02-4964-81a3-756680f5c572",
+            "
+            ": "7802f774-ee02-4964-81a3-756680f5c572",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d4662866-77cd-4298-8a29-3227923307c4",
+            "rangenode_id": "d4662866-77cd-4298-8a29-3227923307c4",
             "name": "",
             "edgeid": "05fc2fd9-d50f-11e5-a8b8-80e6500ee4e4",
-            "domainnodeid": "7802f774-ee02-4964-81a3-756680f5c572",
+            "
+            ": "7802f774-ee02-4964-81a3-756680f5c572",
             "ontologyproperty": "P90_has_value",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "7802f774-ee02-4964-81a3-756680f5c572",
+            "rangenode_id": "7802f774-ee02-4964-81a3-756680f5c572",
             "name": "",
             "edgeid": "05fc7580-d50f-11e5-8d18-80e6500ee4e4",
-            "domainnodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
+            "
+            ": "656d23ae-f357-4709-81e8-cb6606333bad",
             "ontologyproperty": "P91_has_unit",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9d29b9ab-1291-45bf-a71f-a69c75e9f59f",
+            "rangenode_id": "9d29b9ab-1291-45bf-a71f-a69c75e9f59f",
             "name": "",
             "edgeid": "05fcee8f-d50f-11e5-9966-80e6500ee4e4",
-            "domainnodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
+            "
+            ": "656d23ae-f357-4709-81e8-cb6606333bad",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "656d23ae-f357-4709-81e8-cb6606333bad",
+            "rangenode_id": "656d23ae-f357-4709-81e8-cb6606333bad",
             "name": "",
             "edgeid": "05fd361e-d50f-11e5-b357-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P43_has_dimension",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "5b992665-3d77-482b-9792-1e8fd78adbd5",
+            "rangenode_id": "5b992665-3d77-482b-9792-1e8fd78adbd5",
             "name": "",
             "edgeid": "05fe227a-d50f-11e5-a552-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "df0a91d8-4a37-4546-8364-6454cc9316be",
+            "rangenode_id": "df0a91d8-4a37-4546-8364-6454cc9316be",
             "name": "",
             "edgeid": "05fed64a-d50f-11e5-86d3-80e6500ee4e4",
-            "domainnodeid": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
+            "
+            ": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
+            "rangenode_id": "cce06f0f-9629-4498-a775-5eb48e0b22ea",
             "name": "",
             "edgeid": "05ff1be6-d50f-11e5-b205-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d7c05eed-77f2-48b0-bbad-2252078762d3",
+            "rangenode_id": "d7c05eed-77f2-48b0-bbad-2252078762d3",
             "name": "",
             "edgeid": "05ffd126-d50f-11e5-ab97-80e6500ee4e4",
-            "domainnodeid": "6aa4d889-157b-40a6-be96-1e52846517c9",
+            "
+            ": "6aa4d889-157b-40a6-be96-1e52846517c9",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "6aa4d889-157b-40a6-be96-1e52846517c9",
+            "rangenode_id": "6aa4d889-157b-40a6-be96-1e52846517c9",
             "name": "",
             "edgeid": "06001699-d50f-11e5-bb85-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "90277642-bab2-4040-9f2c-fc7a86a39528",
+            "rangenode_id": "90277642-bab2-4040-9f2c-fc7a86a39528",
             "name": "",
             "edgeid": "0600c8c2-d50f-11e5-b067-80e6500ee4e4",
-            "domainnodeid": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
+            "
+            ": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
+            "rangenode_id": "cca2a77a-f721-4a80-a078-e4196d0ad7ad",
             "name": "",
             "edgeid": "06010f8a-d50f-11e5-a52f-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "17498d45-a87d-4a2a-a823-c1b7021b07c0",
+            "rangenode_id": "17498d45-a87d-4a2a-a823-c1b7021b07c0",
             "name": "",
             "edgeid": "06020111-d50f-11e5-a20a-80e6500ee4e4",
-            "domainnodeid": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
+            "
+            ": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
+            "rangenode_id": "c88d44b5-f713-47cb-a996-18b7a7b0311f",
             "name": "",
             "edgeid": "06024635-d50f-11e5-9b5c-80e6500ee4e4",
-            "domainnodeid": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
+            "
+            ": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
+            "rangenode_id": "0d5e7bb4-4d35-4bc0-9514-b18827406658",
             "name": "",
             "edgeid": "06028a7d-d50f-11e5-ad2f-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P67i_is_referred_to_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "c7b1f120-f224-4c33-8a78-f247c475094a",
+            "rangenode_id": "c7b1f120-f224-4c33-8a78-f247c475094a",
             "name": "",
             "edgeid": "060304f5-d50f-11e5-9472-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "3dbf24ea-be9d-43ab-97b5-848068807990",
+            "rangenode_id": "3dbf24ea-be9d-43ab-97b5-848068807990",
             "name": "",
             "edgeid": "0603bf21-d50f-11e5-9059-80e6500ee4e4",
-            "domainnodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
+            "
+            ": "e3f03b1b-e932-402b-b29e-088eace4645d",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "c591f44c-4f55-492d-a609-7f6d09fd0ead",
+            "rangenode_id": "c591f44c-4f55-492d-a609-7f6d09fd0ead",
             "name": "",
             "edgeid": "06043e6e-d50f-11e5-8d94-80e6500ee4e4",
-            "domainnodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
+            "
+            ": "e3f03b1b-e932-402b-b29e-088eace4645d",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "e3f03b1b-e932-402b-b29e-088eace4645d",
+            "rangenode_id": "e3f03b1b-e932-402b-b29e-088eace4645d",
             "name": "",
             "edgeid": "060484e6-d50f-11e5-b573-80e6500ee4e4",
-            "domainnodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "
+            ": "dd487332-7cba-4001-8ad0-c637794c339e",
             "ontologyproperty": "P138i_has_representation",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "dd487332-7cba-4001-8ad0-c637794c339e",
+            "rangenode_id": "dd487332-7cba-4001-8ad0-c637794c339e",
             "name": "",
             "edgeid": "0604ca51-d50f-11e5-813c-80e6500ee4e4",
-            "domainnodeid": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
+            "
+            ": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
             "ontologyproperty": "P35_has_identified",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
+            "rangenode_id": "b694bfdd-ff2d-46f9-ab1a-fa78e40dcdbd",
             "name": "",
             "edgeid": "06051000-d50f-11e5-addc-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P34i_was_assessed_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "15acefea-a73c-463b-b56b-03281f8b993b",
+            "rangenode_id": "15acefea-a73c-463b-b56b-03281f8b993b",
             "name": "",
             "edgeid": "0605bfb3-d50f-11e5-9c54-80e6500ee4e4",
-            "domainnodeid": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
+            "
+            ": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
+            "rangenode_id": "c7d85e2d-d285-4ccb-a09f-cff4b4910613",
             "name": "",
             "edgeid": "060605e3-d50f-11e5-932d-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "94b50ff6-e4ee-4351-b7ff-536385bd3dc9",
+            "rangenode_id": "94b50ff6-e4ee-4351-b7ff-536385bd3dc9",
             "name": "",
             "edgeid": "060723d7-d50f-11e5-a5bf-80e6500ee4e4",
-            "domainnodeid": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
+            "
+            ": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
+            "rangenode_id": "db0bc174-593e-4aab-b45b-c3d93fcd494b",
             "name": "",
             "edgeid": "060768dc-d50f-11e5-96da-80e6500ee4e4",
-            "domainnodeid": "f55061bc-2371-41ab-8f90-45219e604499",
+            "
+            ": "f55061bc-2371-41ab-8f90-45219e604499",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "acbb237d-3894-4983-a919-f0a79f478774",
+            "rangenode_id": "acbb237d-3894-4983-a919-f0a79f478774",
             "name": "",
             "edgeid": "06081c0a-d50f-11e5-a99c-80e6500ee4e4",
-            "domainnodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
+            "
+            ": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d009c619-e78b-4bbc-966d-f931abca7975",
+            "rangenode_id": "d009c619-e78b-4bbc-966d-f931abca7975",
             "name": "",
             "edgeid": "0608a378-d50f-11e5-a71d-80e6500ee4e4",
-            "domainnodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
+            "
+            ": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
+            "rangenode_id": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
             "name": "",
             "edgeid": "061ea1dc-d50f-11e5-b659-80e6500ee4e4",
-            "domainnodeid": "9324ab23-2896-463a-9fcb-04a1447fc279",
+            "
+            ": "9324ab23-2896-463a-9fcb-04a1447fc279",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
+            "rangenode_id": "ab9ee135-08af-472a-bb6d-00afeaeaeefa",
             "name": "",
             "edgeid": "0608eb07-d50f-11e5-b9e5-80e6500ee4e4",
-            "domainnodeid": "f55061bc-2371-41ab-8f90-45219e604499",
+            "
+            ": "f55061bc-2371-41ab-8f90-45219e604499",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "f55061bc-2371-41ab-8f90-45219e604499",
+            "rangenode_id": "f55061bc-2371-41ab-8f90-45219e604499",
             "name": "",
             "edgeid": "06093414-d50f-11e5-a92e-80e6500ee4e4",
-            "domainnodeid": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
+            "
+            ": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
             "ontologyproperty": "P94i_was_created_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
+            "rangenode_id": "7a5f1736-4ee7-4e65-8591-3021b20b9a98",
             "name": "",
             "edgeid": "06097e57-d50f-11e5-b2c2-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P104_is_subject_to",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "8c1423c7-73c3-4e86-a5d6-d4f9affe9462",
+            "rangenode_id": "8c1423c7-73c3-4e86-a5d6-d4f9affe9462",
             "name": "",
             "edgeid": "060ade4a-d50f-11e5-aaaf-80e6500ee4e4",
-            "domainnodeid": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
+            "
+            ": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
+            "rangenode_id": "a0ecc5de-3340-49d6-a5ed-5e708302dbe0",
             "name": "",
             "edgeid": "060b2917-d50f-11e5-bd14-80e6500ee4e4",
-            "domainnodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
+            "
+            ": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
+            "rangenode_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
             "name": "",
             "edgeid": "060b704f-d50f-11e5-aed1-80e6500ee4e4",
-            "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "
+            ": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "ontologyproperty": "P87_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b66d8f0c-746b-4856-abd7-e812feef9b68",
+            "rangenode_id": "b66d8f0c-746b-4856-abd7-e812feef9b68",
             "name": "",
             "edgeid": "060c57ca-d50f-11e5-9d40-80e6500ee4e4",
-            "domainnodeid": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
+            "
+            ": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
+            "rangenode_id": "def7f669-2006-41f0-b9db-e0e3bda4aa7b",
             "name": "",
             "edgeid": "060c9ba3-d50f-11e5-9a9a-80e6500ee4e4",
-            "domainnodeid": "d72362cb-3c6d-450f-9da8-3bb894073333",
+            "
+            ": "d72362cb-3c6d-450f-9da8-3bb894073333",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d72362cb-3c6d-450f-9da8-3bb894073333",
+            "rangenode_id": "d72362cb-3c6d-450f-9da8-3bb894073333",
             "name": "",
             "edgeid": "060ce0d1-d50f-11e5-922f-80e6500ee4e4",
-            "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "
+            ": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "ontologyproperty": "P87_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "3d6c2c79-ed19-4cc6-bd95-bf5f47f149a5",
+            "rangenode_id": "3d6c2c79-ed19-4cc6-bd95-bf5f47f149a5",
             "name": "",
             "edgeid": "060dc39e-d50f-11e5-82fd-80e6500ee4e4",
-            "domainnodeid": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
+            "
+            ": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
+            "rangenode_id": "11e0ad91-4cbd-4ab9-909a-84a91748ae5d",
             "name": "",
             "edgeid": "060e08de-d50f-11e5-ae1a-80e6500ee4e4",
-            "domainnodeid": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
+            "
+            ": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
+            "rangenode_id": "40504ffd-fe8f-4e38-87d8-b668b6df287d",
             "name": "",
             "edgeid": "060e4d1e-d50f-11e5-8c24-80e6500ee4e4",
-            "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "
+            ": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "ontologyproperty": "P45_consists_of",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "78814316-478f-4ff8-835c-316a2cc48090",
+            "rangenode_id": "78814316-478f-4ff8-835c-316a2cc48090",
             "name": "",
             "edgeid": "060f082e-d50f-11e5-967a-80e6500ee4e4",
-            "domainnodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
+            "
+            ": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "f1f672c0-5c48-459a-80fe-4dd7265d25e8",
+            "rangenode_id": "f1f672c0-5c48-459a-80fe-4dd7265d25e8",
             "name": "",
             "edgeid": "060fbb85-d50f-11e5-b418-80e6500ee4e4",
-            "domainnodeid": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
+            "
+            ": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
+            "rangenode_id": "3f7d4058-c19f-44b6-b671-9c6c2333c39c",
             "name": "",
             "edgeid": "061004c5-d50f-11e5-8e7e-80e6500ee4e4",
-            "domainnodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
+            "
+            ": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "87f1c557-2d70-4384-9241-c9d01d976d1e",
+            "rangenode_id": "87f1c557-2d70-4384-9241-c9d01d976d1e",
             "name": "",
             "edgeid": "06104a68-d50f-11e5-99e8-80e6500ee4e4",
-            "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "
+            ": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "ontologyproperty": "P87_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "61d11030-0d24-47ab-ba10-fb029b4ce18a",
+            "rangenode_id": "61d11030-0d24-47ab-ba10-fb029b4ce18a",
             "name": "",
             "edgeid": "061137a3-d50f-11e5-a2ad-80e6500ee4e4",
-            "domainnodeid": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
+            "
+            ": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
             "ontologyproperty": "P87_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
+            "rangenode_id": "1a7937aa-03f5-4b65-a4b9-88e0fcfc71de",
             "name": "",
             "edgeid": "06117f97-d50f-11e5-8e34-80e6500ee4e4",
-            "domainnodeid": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
+            "
+            ": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
             "ontologyproperty": "P89_falls_within",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
+            "rangenode_id": "bdb9e075-7fa9-43ce-a00a-786c0003bb84",
             "name": "",
             "edgeid": "0611c5b5-d50f-11e5-8a42-80e6500ee4e4",
-            "domainnodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "
+            ": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "ontologyproperty": "P87_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
+            "rangenode_id": "9b35fd39-6668-4b44-80fb-d50d0e5211a2",
             "name": "",
             "edgeid": "06120a07-d50f-11e5-947f-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P53_has_former_or_current_location",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "14fa3da6-c131-46b2-a33e-181d8d2a2bf9",
+            "rangenode_id": "14fa3da6-c131-46b2-a33e-181d8d2a2bf9",
             "name": "",
             "edgeid": "06132c30-d50f-11e5-8d7d-80e6500ee4e4",
-            "domainnodeid": "28979130-7500-42f5-98ee-977b6cb1caba",
+            "
+            ": "28979130-7500-42f5-98ee-977b6cb1caba",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "28979130-7500-42f5-98ee-977b6cb1caba",
+            "rangenode_id": "28979130-7500-42f5-98ee-977b6cb1caba",
             "name": "",
             "edgeid": "06137230-d50f-11e5-9405-80e6500ee4e4",
-            "domainnodeid": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
+            "
+            ": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
+            "rangenode_id": "9cb0666d-8326-4bbb-a09a-04e9480aed57",
             "name": "",
             "edgeid": "0613b7e8-d50f-11e5-92da-80e6500ee4e4",
-            "domainnodeid": "0656d4cc-bb98-4187-9485-9f49950a18b3",
+            "
+            ": "0656d4cc-bb98-4187-9485-9f49950a18b3",
             "ontologyproperty": "P1_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "0656d4cc-bb98-4187-9485-9f49950a18b3",
+            "rangenode_id": "0656d4cc-bb98-4187-9485-9f49950a18b3",
             "name": "",
             "edgeid": "06140007-d50f-11e5-99a7-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "BM.PX_is_related_to",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "37193249-2da8-4f2a-b97c-c445c1f60a19",
+            "rangenode_id": "37193249-2da8-4f2a-b97c-c445c1f60a19",
             "name": "",
             "edgeid": "061761cc-d50f-11e5-9e16-80e6500ee4e4",
-            "domainnodeid": "d2788b73-9485-462a-abcb-79f8afdb511d",
+            "
+            ": "d2788b73-9485-462a-abcb-79f8afdb511d",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d2788b73-9485-462a-abcb-79f8afdb511d",
+            "rangenode_id": "d2788b73-9485-462a-abcb-79f8afdb511d",
             "name": "",
             "edgeid": "0617b8b8-d50f-11e5-b770-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "931e7ae5-695b-44f2-8f84-fb9dac806903",
+            "rangenode_id": "931e7ae5-695b-44f2-8f84-fb9dac806903",
             "name": "",
             "edgeid": "06187bcc-d50f-11e5-b2fc-80e6500ee4e4",
-            "domainnodeid": "17beaae7-5635-4073-86ca-0fc00877d9a6",
+            "
+            ": "17beaae7-5635-4073-86ca-0fc00877d9a6",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "17beaae7-5635-4073-86ca-0fc00877d9a6",
+            "rangenode_id": "17beaae7-5635-4073-86ca-0fc00877d9a6",
             "name": "",
             "edgeid": "0618c461-d50f-11e5-947f-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "45ce0539-6c17-4b16-a1fa-809aae4a84be",
+            "rangenode_id": "45ce0539-6c17-4b16-a1fa-809aae4a84be",
             "name": "",
             "edgeid": "061943d7-d50f-11e5-bda3-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9a38c9da-8237-466d-8b11-edf3d540255d",
+            "rangenode_id": "9a38c9da-8237-466d-8b11-edf3d540255d",
             "name": "",
             "edgeid": "0619facc-d50f-11e5-9d39-80e6500ee4e4",
-            "domainnodeid": "10988901-c874-4bcd-a86f-e8dde8841341",
+            "
+            ": "10988901-c874-4bcd-a86f-e8dde8841341",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "10988901-c874-4bcd-a86f-e8dde8841341",
+            "rangenode_id": "10988901-c874-4bcd-a86f-e8dde8841341",
             "name": "",
             "edgeid": "061a40d7-d50f-11e5-a050-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "483825b8-7f69-44dd-9576-a23c2d34fb2b",
+            "rangenode_id": "483825b8-7f69-44dd-9576-a23c2d34fb2b",
             "name": "",
             "edgeid": "061af5ab-d50f-11e5-9b25-80e6500ee4e4",
-            "domainnodeid": "1f99e703-5adc-4145-9df8-cc523311d9d3",
+            "
+            ": "1f99e703-5adc-4145-9df8-cc523311d9d3",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1f99e703-5adc-4145-9df8-cc523311d9d3",
+            "rangenode_id": "1f99e703-5adc-4145-9df8-cc523311d9d3",
             "name": "",
             "edgeid": "061b3c51-d50f-11e5-b10d-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P42_assigned",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "2d5eb21d-2cf1-4f39-9b39-ac7099a49d73",
+            "rangenode_id": "2d5eb21d-2cf1-4f39-9b39-ac7099a49d73",
             "name": "",
             "edgeid": "061bee9c-d50f-11e5-b51d-80e6500ee4e4",
-            "domainnodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
+            "
+            ": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "5c92ae97-fb6f-460d-b5d7-281420e0d882",
+            "rangenode_id": "5c92ae97-fb6f-460d-b5d7-281420e0d882",
             "name": "",
             "edgeid": "061c6aca-d50f-11e5-bdfb-80e6500ee4e4",
-            "domainnodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
+            "
+            ": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
+            "rangenode_id": "1cc8adb1-4c86-4667-ac4b-14f0750655df",
             "name": "",
             "edgeid": "061cb1ae-d50f-11e5-9bd6-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b00fb3e9-cc1b-4d8e-ac26-f9efc5742415",
+            "rangenode_id": "b00fb3e9-cc1b-4d8e-ac26-f9efc5742415",
             "name": "",
             "edgeid": "061d3005-d50f-11e5-876b-80e6500ee4e4",
-            "domainnodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "
+            ": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
+            "rangenode_id": "75626be5-0f98-4d4e-92f9-2b61c1dcbea6",
             "name": "",
             "edgeid": "061d75bd-d50f-11e5-9620-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P140i_was_attributed_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "602dec39-ece3-4433-b88a-fce44c6a050c",
+            "rangenode_id": "602dec39-ece3-4433-b88a-fce44c6a050c",
             "name": "",
             "edgeid": "061e5c70-d50f-11e5-8da2-80e6500ee4e4",
-            "domainnodeid": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
+            "
+            ": "2d6f14ab-21ef-45bd-9b0e-1fe450b6932d",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "9324ab23-2896-463a-9fcb-04a1447fc279",
+            "rangenode_id": "9324ab23-2896-463a-9fcb-04a1447fc279",
             "name": "",
             "edgeid": "061ee80f-d50f-11e5-97bc-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "5b2c103c-98b3-4ded-b9ce-cb3388cc8ec5",
+            "rangenode_id": "5b2c103c-98b3-4ded-b9ce-cb3388cc8ec5",
             "name": "",
             "edgeid": "061f9a91-d50f-11e5-a8e1-80e6500ee4e4",
-            "domainnodeid": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
+            "
+            ": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
+            "rangenode_id": "33b15f3e-8b6d-436f-8555-b9d5d1310c50",
             "name": "",
             "edgeid": "061fe073-d50f-11e5-86b2-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "e9f55677-fd8d-4910-878c-5dd8dce51e09",
+            "rangenode_id": "e9f55677-fd8d-4910-878c-5dd8dce51e09",
             "name": "",
             "edgeid": "0620c85e-d50f-11e5-bf17-80e6500ee4e4",
-            "domainnodeid": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
+            "
+            ": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
+            "rangenode_id": "f073e3ef-3d4c-4c90-8799-cefb675f271d",
             "name": "",
             "edgeid": "06212145-d50f-11e5-9fcb-80e6500ee4e4",
-            "domainnodeid": "d6586394-3124-4657-bfd7-07fad3788083",
+            "
+            ": "d6586394-3124-4657-bfd7-07fad3788083",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "17cae0c1-5b68-49c2-b25f-d4681f0b4818",
+            "rangenode_id": "17cae0c1-5b68-49c2-b25f-d4681f0b4818",
             "name": "",
             "edgeid": "0621a8e6-d50f-11e5-b230-80e6500ee4e4",
-            "domainnodeid": "d6586394-3124-4657-bfd7-07fad3788083",
+            "
+            ": "d6586394-3124-4657-bfd7-07fad3788083",
             "ontologyproperty": "P3_has_note",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d6586394-3124-4657-bfd7-07fad3788083",
+            "rangenode_id": "d6586394-3124-4657-bfd7-07fad3788083",
             "name": "",
             "edgeid": "0621f454-d50f-11e5-8165-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P31i_was_modified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "693e71c6-acd1-47d3-92eb-e2cd75d0217c",
+            "rangenode_id": "693e71c6-acd1-47d3-92eb-e2cd75d0217c",
             "name": "",
             "edgeid": "0622e268-d50f-11e5-b121-80e6500ee4e4",
-            "domainnodeid": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
+            "
+            ": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
+            "rangenode_id": "cb336a28-0e23-41fa-8ae6-471cc75215dc",
             "name": "",
             "edgeid": "06232d38-d50f-11e5-8967-80e6500ee4e4",
-            "domainnodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
+            "
+            ": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "a4b3f194-7b26-4a90-8547-8b62e9fc5f0e",
+            "rangenode_id": "a4b3f194-7b26-4a90-8547-8b62e9fc5f0e",
             "name": "",
             "edgeid": "0623e74f-d50f-11e5-93df-80e6500ee4e4",
-            "domainnodeid": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
+            "
+            ": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
+            "rangenode_id": "d8c4439a-f45b-46f0-b8e5-5ffe6cc75574",
             "name": "",
             "edgeid": "06242b28-d50f-11e5-b402-80e6500ee4e4",
-            "domainnodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
+            "
+            ": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
+            "rangenode_id": "4745c0dd-ffb0-4dbe-9466-8497789fa702",
             "name": "",
             "edgeid": "06247026-d50f-11e5-9921-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P92i_was_brought_into_existence_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "766311c8-2e6c-4150-8cda-9daf9c2ed2ea",
+            "rangenode_id": "766311c8-2e6c-4150-8cda-9daf9c2ed2ea",
             "name": "",
             "edgeid": "062562a6-d50f-11e5-b9a1-80e6500ee4e4",
-            "domainnodeid": "a3c20479-fcce-4bf5-9517-5b3df4780429",
+            "
+            ": "a3c20479-fcce-4bf5-9517-5b3df4780429",
             "ontologyproperty": "P71i_is_listed_in",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "a3c20479-fcce-4bf5-9517-5b3df4780429",
+            "rangenode_id": "a3c20479-fcce-4bf5-9517-5b3df4780429",
             "name": "",
             "edgeid": "0625a82e-d50f-11e5-ba24-80e6500ee4e4",
-            "domainnodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
+            "
+            ": "c0439baa-f897-4f96-b45f-191ab104bb17",
             "ontologyproperty": "P2_has_type",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "89e966f4-767f-42e6-b35e-26abc123e819",
+            "rangenode_id": "89e966f4-767f-42e6-b35e-26abc123e819",
             "name": "",
             "edgeid": "06266442-d50f-11e5-8a55-80e6500ee4e4",
-            "domainnodeid": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
+            "
+            ": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
             "ontologyproperty": "P78_is_identified_by",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
+            "rangenode_id": "b6cfff07-dc6e-480c-a389-2a0f287dcc57",
             "name": "",
             "edgeid": "0626b29e-d50f-11e5-84ee-80e6500ee4e4",
-            "domainnodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
+            "
+            ": "c0439baa-f897-4f96-b45f-191ab104bb17",
             "ontologyproperty": "P4_has_time-span",
             "description": ""
         },
         {
             "graphid": "11111111-0000-0000-0000-191919191919",
-            "rangenodeid": "c0439baa-f897-4f96-b45f-191ab104bb17",
+            "rangenode_id": "c0439baa-f897-4f96-b45f-191ab104bb17",
             "name": "",
             "edgeid": "0626fcc5-d50f-11e5-af78-80e6500ee4e4",
-            "domainnodeid": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
+            "
+            ": "d8f4db21-343e-4af3-8857-f7322dc9eb4b",
             "ontologyproperty": "P93i_was_taken_out_of_existence_by",
             "description": ""
         }

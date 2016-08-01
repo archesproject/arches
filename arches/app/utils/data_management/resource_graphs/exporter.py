@@ -3,6 +3,8 @@
 import csv
 from pprint import pprint as pp
 import os
+from arches.app.models.graph import Graph
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def export(export_dir):
     """
@@ -41,3 +43,18 @@ def write_edges(export_dir):
             writer.writerow(['Source','Target','Type','Id','Label','Weight'])
             for node in v:
                 writer.writerow(node)
+
+def get_graphs_for_export(resource_list=None):
+    if resource_list == None:
+        graphs = Graph.objects.all().exclude(name='Arches configuration')
+    else:
+        graphs = Graph.objects.filter(graphid__in=resource_list)
+    return graphs
+
+def write_graph(export_dir, resource_list):
+    resource_graphs = get_graphs_for_export(resource_list)
+    graph = {}
+    graph['graph'] = resource_graphs
+
+    with open(os.path.join(export_dir, 'graph_export.json'), 'w') as graph_json:
+        graph_json.write(JSONSerializer().serialize(graph))

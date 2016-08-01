@@ -16,10 +16,32 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from arches.app.models.graph import Graph
+import os
+import sys
+import json
+from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.conf import settings
+from arches.app.utils.data_management.resource_graphs.exporter import write_graph as resourceGraphExporter
 
-def import_graph(graphs):
-	for resource in graphs:
-		graph = Graph(resource)
-		graph.save()
+class ArchesFileExporter(object):
+
+	def __init__(self, file=None):
+		pass
+
+	def export_graphs(self, data_dir, resource_list):
+		"""
+		Wrapper around arches.app.utils.data_management.resource_graphs.exporter method
+		"""
+		resourceGraphExporter(data_dir, resource_list)
+
+	def export_concepts(self):
+		pass
+
+	def export_business_data(self):
+		pass
+
+	def export_all(self):
+		pass
+
+# ArchesFile(path).import_graph
