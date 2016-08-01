@@ -79,8 +79,8 @@
                                         </form>
 
                                         <!-- Save/Add Button -->
-                                        <div id="card-save-tile-btn" class="install-buttons row" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus">{% trans "Add" %}</button>
+                                        <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled>{% trans "Add" %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -100,8 +100,8 @@
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                     <div class="ep-form-toolbar-tools flex">
                         <span>
-                            <button class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button disabled class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                            <button disabled class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
@@ -111,12 +111,9 @@
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="sortable: {data: card.isContainer() ? card.get('cards') : [card], 
-                            beforeMove: function (e) {
-                                e.cancelDrop = true;
-                            }}" style="margin-bottom: 0px;">
-                            <li id="summary-group" data-bind="css: {'active': $index() === 0}" style="margin-bottom: 0px;">
-                                <a id="summary-tab" href="#" class="card-tab-title">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.isContainer() ? card.get('cards') : [card]" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
                                     <!-- Editable Span -->
                                     <span class="card-tab-title">
                                         <span data-bind="text: get('name')"></span>

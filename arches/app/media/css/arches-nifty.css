@@ -1677,7 +1677,7 @@ ul .collapse li:last-of-type {
 .flex{
     display: -ms-flexbox;
     display: -webkit-flex;
-    display: flex;    
+    display: flex;
     -ms-flex: 1;
     -webkit-flex: 1;
     flex: 1;
@@ -3065,14 +3065,14 @@ li.card-tree-list:last-of-type {
 .card-component-tree-container{
     -ms-flex: 0 0 200px;
     -webkit-flex: 0 0 200px;
-    flex: 0 0 200px; 
+    flex: 0 0 200px;
     width: 200px;
     padding: 7px;
 }
 .card-component-form-container{
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
-    flex: 0 0 250px; 
+    flex: 0 0 250px;
     background: #f8f8f8;
     padding: 7px;
     color: #666;
@@ -3081,7 +3081,7 @@ li.card-tree-list:last-of-type {
 .card-form-preview-container{
     -ms-flex: 1;
     -webkit-flex: 1;
-    flex: 1; 
+    flex: 1;
     background: #ebeef0
 }
 .branch-panel {
@@ -3603,6 +3603,17 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
     padding-left: 10px;
     margin-top: 7px;
     font-size: 19px;
+}
+div.row.widget-wrapper {
+    margin: 0;
+    padding: 5px;
+}
+.widget-preview {
+    border: 1px solid transparent;
+}
+.widget-preview.active {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
 }
 @keyframes loader {
 	0% { background: #ddd; }
