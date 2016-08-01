@@ -2957,6 +2957,9 @@ ul.jqtree_common li.jqtree-folder {
 }
 .ep-form-toolbar-tools {
     margin-right: 10px;
+    -ms-justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
 }
 .ep-form-content {
     z-index: 10;
