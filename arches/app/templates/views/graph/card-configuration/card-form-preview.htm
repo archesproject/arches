@@ -49,7 +49,7 @@
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
 
-                                    <div style="height: 32px;">
+                                    <div>
                                         <span data-bind="text: card.get('instructions')"></span>
 
                                         <!-- Help link -->
@@ -61,22 +61,25 @@
                                     <!-- Form -->
                                     <div class="col-lg-9" style="padding-bottom: 10px;">
 
-                                        <form class="widgets" style="margin-bottom: 20px;" data-bind="sortable: {
+                                        <form class="widgets row" style="margin-bottom: 20px;" data-bind="sortable: {
                                                 data:card.get('widgets'),
                                                 beforeMove: self.beforeMove
                                             }">
-                                            <div data-bind='component: {
+                                            <div class='widget-preview' data-bind='component: {
                                                 name: self.widgetLookup[get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON(),
                                                     label: get("label")(),
-                                                    value: ko.observable(null)
+                                                    value: ko.observable(null),
+                                                    disabled: true
                                                 }
+                                            }, css:{
+                                                "active": self.selection() === $data
                                             }, click: self.selection'></div>
                                         </form>
 
                                         <!-- Save/Add Button -->
-                                        <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                        <div id="card-save-tile-btn" class="install-buttons row" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                             <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus">{% trans "Add" %}</button>
                                         </div>
                                     </div>

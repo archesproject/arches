@@ -1,4 +1,4 @@
-define(['knockout', 'underscore'], function (ko, _) {
+define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -10,8 +10,8 @@ define(['knockout', 'underscore'], function (ko, _) {
     */
     return ko.components.register('text-widget', {
         viewModel: function(params) {
-            this.value = params.value;
-            this.label = params.config.label;
+            WidgetViewModel.apply(this, [params]);
+
             this.placeholder = params.config.placeholder
         },
         template: { require: 'text!widget-templates/text' }

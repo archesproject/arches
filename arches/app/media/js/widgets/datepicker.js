@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'bindings/datepicker'], function (ko, _) {
+define(['knockout', 'underscore', 'bindings/datepicker', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
     /**
     * registers a datepicker-widget component for use in forms
     * @function external:"ko.components".datepicker-widget
@@ -10,9 +10,9 @@ define(['knockout', 'underscore', 'bindings/datepicker'], function (ko, _) {
     */
     return ko.components.register('datepicker-widget', {
         viewModel: function(params) {
-            this.value = params.value;
-            this.label = params.label;
-            this.placeholder = params.config.placeholder
+            WidgetViewModel.apply(this, [params]);
+
+            this.placeholder = params.config.placeholder;
         },
         template: { require: 'text!widget-templates/datepicker' }
     });
