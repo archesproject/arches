@@ -94,7 +94,7 @@
 }
 .card-content {
     margin: -20px -35px 20px -20px;
-    padding: 20px 0;
+    padding: 0;
 }
 .card-tab-title {
     font-size: 14px;
@@ -2554,7 +2554,6 @@ textarea:placeholder {
     padding-bottom: 0;
 }
 .editable-card {
-    border: 1px solid #4682B4;
     margin-left: -10px;
     margin-right: -10px;
     padding: 5px 15px;
