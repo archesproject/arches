@@ -34,18 +34,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div class="flex" style="border: 1px solid #ddd; margin:0px;">
+<div class="flex">
 	<!--Node Listing -->
-	<div class="ep-card-tools" id="node-listing" data-bind="with: nodeList">
+	<div class="left-column-container" id="node-listing" data-bind="with: nodeList">
         {% include 'views/graph/graph-manager/node-list.htm' %}
 	</div>
 
 	<!-- Node Editor -->
-	<div id="node-crud" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
-        <div class="ep-card-crud-panel">
-            {% include 'views/graph/graph-manager/node-form.htm' %}
-			<!-- Graph Metadata -->
-        </div>
+	<div id="node-crud" class="middle-column-container" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+        {% include 'views/graph/graph-manager/node-form.htm' %}
 	</div>
     <div class="ep-card-crud-panel branch-panel" style="display: none;" data-bind="visible: nodeForm.branchListView.viewMetadata, with: nodeForm.branchListView">
         {% include 'views/graph/graph-manager/branch-info.htm' %}
