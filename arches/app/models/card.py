@@ -20,6 +20,8 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from guardian.shortcuts import get_user_perms, get_group_perms
+from django.contrib.auth.models import User, Group
 
 class Card(models.CardModel):
     """
@@ -102,6 +104,8 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
+                self.groups = [{'name': group.name, 'perms': get_group_perms(group, self.nodegroup), 'type': 'group'} for group in Group.objects.all()]
+                self.users = [{'username': user.username, 'email': user.email, 'perms': get_user_perms(user, self.nodegroup), 'type': 'user'} for user in User.objects.all()]
 
 
     def save(self):
@@ -148,6 +152,8 @@ class Card(models.CardModel):
         ret['active'] = self.active
         ret['widgets'] = self.widgets
         ret['ontologyproperty'] = self.ontologyproperty
+        ret['groups'] = self.groups
+        ret['users'] = self.users
 
         if self.ontologyproperty:
             ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]

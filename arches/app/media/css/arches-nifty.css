@@ -403,6 +403,8 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .grid {
     background: #DDD;
     max-width: 1200px;
+    margin-left: -7px;
+    margin-right: -7px;
 }
 .grid-item {
     float: left;
@@ -533,15 +535,13 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     padding: 15px;
 }
 .library-card {
-    float: left;
-    width: 200px;
     height: 58px;
-    margin: 0px -7px;
+    /*margin: 0px -7px;*/
     position: relative;
     padding: 5px;
     color: #666;
     border-bottom: 1px solid #ddd;
-    border-right: 1px solid #e9e9e9;
+    /*border-right: 1px solid #e9e9e9;*/
     background: #fdfdfd;
 }
 .library-card:first-of-type {
@@ -557,7 +557,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background-color: #f8f8f8;
     cursor: pointer;
 }
-#branch-library .library-card {
+#branch-library, #card-crud-permissions .library-card {
     width: 100%;
     margin-left: 1px;
 }

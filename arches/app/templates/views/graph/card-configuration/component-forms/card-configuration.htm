@@ -57,7 +57,7 @@
                 {% trans "Card Tab Title" %}
             </div>
             <div>
-                <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="value: $data.get('name'), valueUpdate: 'keyup'">
+                <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="value: card.get('name'), valueUpdate: 'keyup'">
             </div>
         </div>  
 
@@ -66,7 +66,7 @@
                 {% trans "Instructions" %}
             </div>
             <div>
-                <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: $data.get('instructions'), valueUpdate: 'keyup'">
+                <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: card.get('instructions'), valueUpdate: 'keyup'">
             </div>
         </div> 
     </div>
@@ -75,10 +75,10 @@
     <div id="card-crud-advanced" class="tab-pane fade">
 
         <!-- Set Cardinaltiy -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
         <!-- Multiple values tools -->
-        <div class="cardinality-form" data-bind="visible: $data.get('cardinality')() === 'n'" style="display: none;">
+        <div class="cardinality-form" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
 
             <div class="form-divider" style="margin-top: 0px; margin-bottom: 10px;"></div>
 
@@ -88,7 +88,7 @@
                     {% trans "Tile Name" %}
                 </div>
                 <div class="col-sm-12 pad-no crud-widget-container">
-                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: $data.get('itemtext'), valueUpdate: 'keyup'">
+                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: card.get('itemtext'), valueUpdate: 'keyup'">
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
                 {% trans "Validation Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -112,16 +112,18 @@
                 {% trans "Processing Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: $data.get('applied_functions'), options: $data.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
 
     <!-- Card CRUD Permissions Form -->
-    <div id="card-crud-permissions" class="tab-pane fade">
+    <div id="card-crud-permissions" class="tab-pane fade" data-bind="with: permissionsList">
+
+        {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
 
         <!-- Group/User -->                                   
-        <div id="all" class="library-card permissions all library-card-wide">
+<!--         <div id="all" class="library-card permissions all library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
             </div>
@@ -134,84 +136,10 @@
                 Permission: ---
             </div>
         </div>
-    
-        <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide" style="">
-            <div class="library-icon" style="">
-                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-            </div>
-            <div class="library-card-main" style="">
-                <a class="" style="" href="#">
-                    Guest
-                </a>
-            </div>
-            <div class="library-card-subtitle text-muted full" style="">
-                N - No Access
-            </div>
-        </div>
+ -->
 
         <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide">
-            <div class="library-icon" style="">
-                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-            </div>
-            <div class="library-card-main" style="">
-                <a class="" style="" href="#">
-                    Crowd Source
-                </a>
-            </div>
-            <div class="library-card-subtitle full" style="">
-                RW - Read/Write
-            </div>
-        </div>
-
-        <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide">
-            <div class="library-icon" style="">
-                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-            </div>
-            <div class="library-card-main" style="">
-                <a class="" style="" href="#">
-                    Editor
-                </a>
-            </div>
-            <div class="library-card-subtitle full" style="">
-                F -Full Access
-            </div>
-        </div>
-
-        <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide">
-            <div class="library-icon" style="">
-                <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
-            </div>
-            <div class="library-card-main" style="">
-                <a class="" style="" href="#">
-                    RDM Admin
-                </a>
-            </div>
-            <div class="library-card-subtitle read" style="">
-                R -Read Only
-            </div>
-        </div>
-
-        <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide">
-            <div class="library-icon" style="">
-                <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
-            </div>
-            <div class="library-card-main" style="">
-                <a class="" style="" href="#">
-                    rgaston@realsuperuser.com
-                </a>
-            </div>
-            <div class="library-card-subtitle full" style="">
-                F - Full Access
-            </div>
-        </div>
-
-        <!-- Group/User -->                                   
-        <div class="library-card permissions library-card-wide">
+       <!--  <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
             </div>
@@ -223,7 +151,7 @@
             <div class="library-card-subtitle delete" style="">
                 D - Delete
             </div>
-        </div>
+        </div> -->
 
     </div>
 
@@ -231,7 +159,7 @@
     <div id="card-crud-help" class="tab-pane fade">
 
         <!-- Enable help -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
     
     </div>
 
