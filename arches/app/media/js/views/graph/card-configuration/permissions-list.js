@@ -9,6 +9,8 @@ define([
         * @name NodeList
         */
 
+        single_select: false,
+
         /**
         * initializes the view with optional parameters
         * @memberof PermissionsList.prototype
@@ -32,9 +34,9 @@ define([
         * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} evt - click event object
         */
-        selectItem: function(item, evt){
+        // selectItem: function(item, evt){
            
-        },
+        // },
 
     });
     return PermissionsList;
