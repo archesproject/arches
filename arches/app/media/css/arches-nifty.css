@@ -403,8 +403,8 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 .grid {
     background: #DDD;
     max-width: 1200px;
-    margin-left: -7px;
-    margin-right: -7px;
+    margin-left: -8px;
+    margin-right: -6px;
     border-top: 1px solid #ddd;
 }
 .grid-item {
