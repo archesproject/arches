@@ -453,7 +453,7 @@ class Graph(models.GraphModel):
         def traverse_tree(tree):
             graph_dict['nodes'].append(tree['node'])
             for child in tree['children']:
-                graph_dict['edges'].append({'domainnodeid':tree['node']['nodeid'],'rangenodeid':child['node']['nodeid']})
+                graph_dict['edges'].append({'domainnode_id':tree['node']['nodeid'],'rangenode_id':child['node']['nodeid']})
                 traverse_tree(child)
         tree = JSONSerializer().serializeToPython(self.get_tree(node))
         tree['node']['istopnode'] = True

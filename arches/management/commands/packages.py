@@ -337,7 +337,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        # ArchesFileImporter(data_source).import_concepts()        
+        ArchesFileImporter(data_source).import_concepts()        
         ArchesFileImporter(data_source).import_graphs()
 
     def export_json(self, package_name, data_dest=None, resources=None):
