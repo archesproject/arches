@@ -14,31 +14,31 @@
         <i id="card-crud-permissions" class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Permissions"></i>
         <i id="card-crud-help" class="ion-ios-help add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Help Text"></i>
     </div> -->
-        
+
     <!-- nav bar -->
     <ul class="nav nav-tabs library-tools">
         <li class="active">
-            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-settings add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Permissions" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(true) }">
                 <i class="ion-ios-help add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help Text" %}"></i>
             </a>
         </li>
@@ -59,7 +59,7 @@
             <div>
                 <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="value: $data.get('name'), valueUpdate: 'keyup'">
             </div>
-        </div>  
+        </div>
 
         <div class="node-widget-label" style="">
             <div class="control-label">
@@ -68,7 +68,7 @@
             <div>
                 <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: $data.get('instructions'), valueUpdate: 'keyup'">
             </div>
-        </div> 
+        </div>
     </div>
 
     <!-- Card CRUD ADVANCED SETTINGS Form -->
@@ -120,7 +120,7 @@
     <!-- Card CRUD Permissions Form -->
     <div id="card-crud-permissions" class="tab-pane fade">
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div id="all" class="library-card permissions all library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
@@ -134,8 +134,8 @@
                 Permission: ---
             </div>
         </div>
-    
-        <!-- Group/User -->                                   
+
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide" style="">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
@@ -165,7 +165,7 @@
             </div>
         </div>
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
@@ -180,7 +180,7 @@
             </div>
         </div>
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-purple"><i class="fa fa-group"></i></span>
@@ -195,7 +195,7 @@
             </div>
         </div>
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
@@ -210,7 +210,7 @@
             </div>
         </div>
 
-        <!-- Group/User -->                                   
+        <!-- Group/User -->
         <div class="library-card permissions library-card-wide">
             <div class="library-icon" style="">
                 <span class="icon-wrap icon-wrap-sm icon-circle bg-mint"><i class="fa fa-user"></i></span>
@@ -232,11 +232,11 @@
 
         <!-- Enable help -->
         <div data-bind="component: { name: 'switch-widget', params: {value: $data.get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
-    
+
     </div>
 
     <!-- Tertiary Panel For Card Help Text-->
-    <div id="help-text-crud" class="tertiary-panel" style="display: none;">
+    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:$parent.helpTabActive() && $data.get('helpenabled')">
         <div class="tertiary-panel-content">
             <div class="">
                 <h4 class="title-block-title" style=""> Card-Level Help </h4>
@@ -249,27 +249,22 @@
                         Help Panel Title
                     </div>
                     <div class="col-sm-12 pad-no crud-widget-container">
-                        <input type="" placeholder="Card name" class="form-control input-md widget-input" value="Title">
+                        <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: $data.get("helptitle")'>
                     </div>
                 </div>
 
                 <!--Summernote-->
                 <div class="node-widget-label" style="">
                     <div class="control-label">
-                        Help Content
+                        {% trans "Help Content" %}
                     </div>
-                    <div id="help-editor"></div>
+                    <div class="summernote" data-bind='summernote: {value: $data.get("helptext")}'></div>
                 </div>
 
                 <!-- Preview help -->
+                <div data-bind="component: { name: 'switch-widget', params: {value: $parent.helpPreviewActive, config:{label: '{% trans "Preview Help Panel" %}', subtitle: '{% trans "Display help panel, confirm content" %}'}}}"></div>
                 <div class="toggle-container">
                     <input id="preview-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
-                    <p class="arches-toggle-sm">
-                        Preview Help Panel
-                    </p>
-                    <span class="arches-toggle-subtitle">
-                        Display help panel, confirm content
-                    </span>
                 </div>
             </div>
         </div>
@@ -287,7 +282,7 @@
                     <p class="library-instructions" style=""> Set permissions for this data entry card.  Update the Groups/User accounts you selected with the following permissions:</p>
                 </div>
             </div>
-         
+
             <!-- Premission Selector -->
             <div style="margin-top: 8px;">
                 <select class="resources" data-placeholder="" id="permissions" tabindex="0">
@@ -307,7 +302,7 @@
 
             <!-- Premission Key -->
             <div id="confirm-permissions" class="key" style="display: none;">
-                
+
                 <h4 class="node-title" style="font-size: 13px;"> Applying F- Full Access permissions: </h4>
 
                 <!-- Alert -->

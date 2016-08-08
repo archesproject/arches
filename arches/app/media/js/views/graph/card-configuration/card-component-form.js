@@ -1,6 +1,8 @@
 define([
-    'backbone'
-], function(Backbone) {
+    'backbone',
+    'knockout',
+    'bindings/summernote'
+], function(Backbone,  ko) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -14,8 +16,15 @@ define([
         * @memberof CardComponentForm.prototype
         */
         initialize: function(options) {
+            var self = this;
             this.card = options.card;
             this.selection = options.selection;
+            this.helpPreviewActive = ko.observable(false);
+            this.helpTabActive = ko.observable(false);
+            this.selection.subscribe(function () {
+                self.helpTabActive(false);
+                self.helpPreviewActive(false);
+            })
         }
     });
     return CardComponentForm;
