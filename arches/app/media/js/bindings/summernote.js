@@ -31,8 +31,7 @@ define([
                         options.value = value;
                     }
                 }
-            }
-
+            };
 
             $element.summernote(options);
 
