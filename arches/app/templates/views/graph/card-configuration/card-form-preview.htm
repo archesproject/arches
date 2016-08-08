@@ -106,12 +106,12 @@
                     </div>
                 </div>
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
 
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.isContainer() ? card.get('cards') : [card]" style="margin-bottom: 0px;">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
                             <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
                                 <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
                                     <!-- Editable Span -->

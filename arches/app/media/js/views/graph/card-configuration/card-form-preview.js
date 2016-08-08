@@ -35,6 +35,13 @@ define([
             });
         },
 
+        /**
+        * beforeMove - prevents dropping of widgets/tabs into other cards
+        * this provides for sorting within preview and tabs, but prevents
+        * moving of cards/widgets between containers/cards
+        * @memberof CardFormPreview.prototype
+        * @param  {object} e - the ko.sortable event object
+        */
         beforeMove: function (e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
