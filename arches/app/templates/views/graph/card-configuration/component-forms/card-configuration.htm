@@ -249,16 +249,16 @@
                         Help Panel Title
                     </div>
                     <div class="col-sm-12 pad-no crud-widget-container">
-                        <input type="" placeholder="Card name" class="form-control input-md widget-input" value="Title">
+                        <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: $data.get("helptitle")'>
                     </div>
                 </div>
 
                 <!--Summernote-->
                 <div class="node-widget-label" style="">
                     <div class="control-label">
-                        Help Content
+                        {% trans "Help Content" %}
                     </div>
-                    <div id="help-editor"></div>
+                    <div class="summernote" data-bind='summernote: {value: $data.get("helptext")}'></div>
                 </div>
 
                 <!-- Preview help -->

@@ -8,6 +8,7 @@
 @import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css);
 
 
 .navbar-top-links:last-child>li {
@@ -3616,6 +3617,9 @@ div.row.widget-wrapper {
 .widget-preview.active {
     background: #f8f8f8;
     border: 1px solid #ddd;
+}
+.panel-heading.note-toolbar {
+    height: auto;
 }
 @keyframes loader {
 	0% { background: #ddd; }

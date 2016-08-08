@@ -1,5 +1,6 @@
 define([
-    'backbone'
+    'backbone',
+    'bindings/summernote'
 ], function(Backbone) {
     var CardComponentForm = Backbone.View.extend({
         /**
