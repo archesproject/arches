@@ -25,7 +25,6 @@ define([
 
             options.callbacks = {
                 onChange: function(value) {
-                    console.log(value);
                     if (ko.isObservable(options.value)) {
                         options.value(value);
                     } else {
