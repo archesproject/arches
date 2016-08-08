@@ -3282,15 +3282,15 @@ li.card-tree-list:last-of-type {
 }
 .tertiary-panel {
     position: absolute;
-    top: 0;
-    left: 250px;
+    top: 101px;
+    left: 452px;
     bottom: 0;
     z-index: 50;
 }
 .tertiary-panel-content {
     background: #f5f5f5;
     border-right: 1px solid #ddd;
-    height: 100vh;
+    height: 100%;
     width: 450px;
     opacity: .95;
     padding: 10px;
