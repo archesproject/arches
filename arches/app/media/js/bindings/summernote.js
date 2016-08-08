@@ -23,13 +23,16 @@ define([
                 value: ko.observable('')
             });
 
-            options.callbacks = {
-                onChange: function(value) {
-                    if (ko.isObservable(options.value)) {
-                        options.value(value);
-                    } else {
-                        options.value = value;
-                    }
+            options.callbacks = options.callbacks ? options.callbacks : {};
+            var userChange = options.callbacks.onChange ? options.callbacks.onChange : null;
+            options.callbacks.onChange = function(value) {
+                if (ko.isObservable(options.value)) {
+                    options.value(value);
+                } else {
+                    options.value = value;
+                }
+                if (userChange && typeof userChange === 'function') {
+                    userChange.apply($element, arguments);
                 }
             };
 
