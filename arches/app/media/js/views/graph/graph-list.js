@@ -35,6 +35,20 @@ require([
         });
     }
 
+    var exportGraph = function(url) {
+        pageView.viewModel.loading(true);
+        // $.ajax({
+        //     type: "POST",
+        //     url: url,
+        //     success: function(response) {
+        //         pageView.viewModel.loading(false);
+        //     },
+        //     failure: function(response) {
+        //         pageView.viewModel.loading(false);
+        //     }
+        // });
+    }
+
 
     /**
     * sets up the graphs for the page's view model
@@ -43,6 +57,9 @@ require([
         graph.hover = ko.observable(false);
         graph.clone = function() {
             newGraph('clone/' + graph.graphid);
+        };
+        graph.exportGraph = function(model) {
+            window.open('export/' + graph.graphid, '_blank');
         };
         graph.deleteGraph = function () {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
