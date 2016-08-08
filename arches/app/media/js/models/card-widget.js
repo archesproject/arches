@@ -1,5 +1,11 @@
 define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko, AbstractModel, widgets) {
     return AbstractModel.extend({
+        /**
+        * A backbone model to manage cards_x_nodes_x_widgets records
+        * @augments AbstractModel
+        * @constructor
+        * @name CardWidgetModel
+        */
         constructor: function(attributes, options){
             var defaults = {
                 'id': null,
@@ -32,6 +38,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             return AbstractModel.prototype.constructor.call(this, attributes, options);
         },
 
+        /**
+         * parse - parses the passed in attributes into a {@link CardWidgetModel}
+         * @memberof CardWidgetModel.prototype
+         * @param  {object} attributes - the properties to seed a {@link CardWidgetModel} with
+         */
         parse: function(attributes){
             var self = this;
 

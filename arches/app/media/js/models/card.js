@@ -7,7 +7,7 @@ define(['arches',
 ], function (arches, AbstractModel, NodeModel, CardWidgetModel, ko, _) {
     var CardModel = AbstractModel.extend({
         /**
-        * A backbone model to manage graph data
+        * A backbone model to manage card data
         * @augments AbstractModel
         * @constructor
         * @name CardModel
