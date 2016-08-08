@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.db import transaction
-from arches.app.models import models
+from arches import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from guardian.shortcuts import get_user_perms, get_group_perms
+from guardian.shortcuts import get_user_perms, get_group_perms, get_perms_for_model
+
 from django.contrib.auth.models import User, Group
 
 class Card(models.CardModel):
@@ -104,9 +105,26 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
-                self.groups = [{'name': group.name, 'perms': get_group_perms(group, self.nodegroup), 'type': 'group'} for group in Group.objects.all()]
-                self.users = [{'username': user.username, 'email': user.email, 'perms': get_user_perms(user, self.nodegroup), 'type': 'user'} for user in User.objects.all()]
+                print get_perms_for_model(self.nodegroup)
+                for group in Group.objects.all():
+                    if group.name == 'edit':
+                        x = group.permissions #get_group_perms(group, self.nodegroup)
+                self.groups = [{'name': group.name, 'perms': self.get_group_permissions(group, self.nodegroup), 'type': 'group'} for group in Group.objects.all()]
+                self.users = [{'username': user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user'} for user in User.objects.all()]
 
+    def get_group_permissions(self, group, nodegroup=None):
+        ret = get_group_perms(group, nodegroup)
+        if len(ret) == 0:
+            ret = [item.name for item in group.permissions.all()]
+
+        return ret
+
+    def get_user_permissions(self, user, nodegroup=None):
+        ret = get_user_perms(user, nodegroup)
+        if len(ret) == 0:
+            ret = list(user.get_all_permissions())
+
+        return ret
 
     def save(self):
         """

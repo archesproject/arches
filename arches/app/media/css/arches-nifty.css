@@ -3280,8 +3280,8 @@ li.card-tree-list:last-of-type {
 }
 .tertiary-panel {
     position: absolute;
-    top: 0;
-    left: 250px;
+    top: 100px;
+    left: 450px;
     bottom: 0;
     z-index: 50;
 }

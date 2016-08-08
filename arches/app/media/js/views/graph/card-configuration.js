@@ -26,6 +26,7 @@ require([
 
     viewModel.cardComponentForm = new CardComponentForm({
         card: cardModel,
+        permissions: data.permissions,
         selection: viewModel.selection
     });
 

@@ -33,7 +33,8 @@ define([
             this.updateSelection(this.selection());
 
             this.permissionsList = new PermissionsList({
-                card: this.card
+                card: this.card,
+                permissions: options.permissions
             });
         }
     });

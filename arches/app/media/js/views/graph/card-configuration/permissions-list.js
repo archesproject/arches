@@ -1,6 +1,7 @@
 define([
-    'views/list'
-], function(ListView) {
+    'views/list',
+    'views/graph/card-configuration/permissions-form'
+], function(ListView, PermissionsForm) {
     var PermissionsList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -26,6 +27,10 @@ define([
                 this.items.push({'name': group.name, 'perms': group.perms, 'type': group.type})
             }, this);
             ListView.prototype.initialize.apply(this, arguments);
+
+            this.permissionsForm = new PermissionsForm({
+                permissions: options.permissions
+            })
         },
 
         /**
@@ -34,9 +39,9 @@ define([
         * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
         * @param {object} evt - click event object
         */
-        // selectItem: function(item, evt){
-           
-        // },
+        selectItem: function(item, evt){
+            
+        },
 
     });
     return PermissionsList;

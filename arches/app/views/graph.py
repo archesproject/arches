@@ -29,6 +29,7 @@ from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from arches.app.models import models
+from guardian.shortcuts import get_perms_for_model
 
 def test(request, graphid):
     #graph = Graph.objects.filter(isresource=True)
@@ -165,6 +166,7 @@ def card(request, cardid):
             'graphid': card.graph_id,
             'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
             'card': JSONSerializer().serialize(card),
+            'permissions': JSONSerializer().serialize([permission.name for permission in get_perms_for_model(card.nodegroup)]),
             'datatypes': JSONSerializer().serialize(datatypes),
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),
