@@ -40,7 +40,8 @@ define([
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
-            
+            ListView.prototype.selectItem.apply(this, arguments);
+            this.permissionsForm.showing(true);
         },
 
     });
