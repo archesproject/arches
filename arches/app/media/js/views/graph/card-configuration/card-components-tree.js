@@ -20,6 +20,13 @@ define([
             this.selection = ko.observable(this.card);
         },
 
+        /**
+        * beforeMove - prevents dropping of tree nodes into other lists
+        * this provides for sorting within cards and card containers, but
+        * prevents moving of cards/widgets between containers/cards
+        * @memberof CardComponentsTree.prototype
+        * @param  {object} e - the ko.sortable event object
+        */
         beforeMove: function (e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
