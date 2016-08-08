@@ -235,9 +235,10 @@ def export(request, graphid):
     if request.method == 'GET':
         graph = get_graphs_for_export([graphid])
         f = JSONSerializer().serialize(graph)
+        graph_name = JSONDeserializer().deserialize(f)[0]['name']
 
         response = HttpResponse(f, content_type='json/plain')
-        response['Content-Disposition'] = 'attachment; filename="graph_export.json"'
+        response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
         return response
 
     return HttpResponseNotFound()
