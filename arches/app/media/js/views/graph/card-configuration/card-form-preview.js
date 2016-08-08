@@ -21,6 +21,7 @@ define([
             var self = this;
             this.card = options.card;
             this.selection = options.selection;
+            this.helpPreviewActive = options.helpPreviewActive;
             this.widgetLookup = widgets;
             this.currentTabIndex = ko.computed(function () {
                 if (!self.card.isContainer() || self.selection() === self.card) {
@@ -32,6 +33,9 @@ define([
                 }
                 var index = self.card.get('cards')().indexOf(card);
                 return index;
+            });
+            this.currentTabCard = ko.computed(function () {
+                return self.card.get('cards')()[self.currentTabIndex()];
             });
         },
 

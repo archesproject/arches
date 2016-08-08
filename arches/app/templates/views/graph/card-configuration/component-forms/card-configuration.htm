@@ -18,27 +18,27 @@
     <!-- nav bar -->
     <ul class="nav nav-tabs library-tools">
         <li class="active">
-            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-settings add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(false) }">
                 <i class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Permissions" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab">
+            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { $parent.helpTabActive(true) }">
                 <i class="ion-ios-help add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help Text" %}"></i>
             </a>
         </li>
@@ -236,7 +236,7 @@
     </div>
 
     <!-- Tertiary Panel For Card Help Text-->
-    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:$data.get('helpenabled')">
+    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:$parent.helpTabActive() && $data.get('helpenabled')">
         <div class="tertiary-panel-content">
             <div class="">
                 <h4 class="title-block-title" style=""> Card-Level Help </h4>
@@ -262,13 +262,14 @@
                 </div>
 
                 <!-- Preview help -->
+                <div data-bind="component: { name: 'switch-widget', params: {value: $parent.helpPreviewActive, config:{label: '{% trans "Preview Help Panel" %}', subtitle: '{% trans "Display help panel, confirm content" %}'}}}"></div>
                 <div class="toggle-container">
                     <input id="preview-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
                     <p class="arches-toggle-sm">
-                        Preview Help Panel
+
                     </p>
                     <span class="arches-toggle-subtitle">
-                        Display help panel, confirm content
+
                     </span>
                 </div>
             </div>
