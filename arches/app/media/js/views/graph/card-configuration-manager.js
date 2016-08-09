@@ -13,6 +13,7 @@ require([
             data: data.card,
             datatypes: data.datatypes
         }),
+        permissions: data.permissions,
         helpPreviewActive: ko.observable(false)
     };
 

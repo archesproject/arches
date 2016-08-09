@@ -2,8 +2,6 @@
 {% load staticfiles %}
 {% load i18n %}
 
-{% block main_attributes %}{% endblock %}
-
 {% block header %}
 <div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
     <span>{% trans "We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}</span>
