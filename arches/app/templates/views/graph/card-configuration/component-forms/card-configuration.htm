@@ -18,27 +18,27 @@
     <!-- nav bar -->
     <ul class="nav nav-tabs library-tools">
         <li class="active">
-            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { helpTabActive(false) }">
+            <a href="#card-crud-settings" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-settings add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { helpTabActive(false) }">
+            <a href="#card-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { helpTabActive(false) }">
+            <a href="#card-crud-validation" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { helpTabActive(false) }">
+            <a href="#card-crud-permissions" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Permissions" %}"></i>
             </a>
         </li>
         <li>
-            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab" data-bind="click: function () { helpTabActive(true) }">
+            <a href="#card-crud-help" class="nav-library-tab-link" data-toggle="tab">
                 <i class="ion-ios-help add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help Text" %}"></i>
             </a>
         </li>
@@ -135,42 +135,40 @@
         <!-- Enable help -->
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
-    </div>
-
-    <!-- Tertiary Panel For Card Help Text-->
-    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:helpTabActive() && card().get('helpenabled')">
-        <div class="tertiary-panel-content">
-            <div class="">
-                <h4 class="title-block-title" style=""> Card-Level Help </h4>
-            </div>
-
-            <!-- Help CRUD -->
-            <div class="pad-all">
-                <div class="node-widget-label" style="">
-                    <div class="control-label">
-                        Help Panel Title
-                    </div>
-                    <div class="col-sm-12 pad-no crud-widget-container">
-                        <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card().get("helptitle")'>
-                    </div>
+        <!-- Tertiary Panel For Card Help Text-->
+        <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible: card().get('helpenabled')">
+            <div class="tertiary-panel-content">
+                <div class="">
+                    <h4 class="title-block-title" style=""> Card-Level Help </h4>
                 </div>
 
-                <!--Summernote-->
-                <div class="node-widget-label" style="">
-                    <div class="control-label">
-                        {% trans "Help Content" %}
+                <!-- Help CRUD -->
+                <div class="pad-all">
+                    <div class="node-widget-label" style="">
+                        <div class="control-label">
+                            Help Panel Title
+                        </div>
+                        <div class="col-sm-12 pad-no crud-widget-container">
+                            <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card().get("helptitle")'>
+                        </div>
                     </div>
-                    <div class="summernote" data-bind='summernote: {value: card().get("helptext")}'></div>
-                </div>
 
-                <!-- Preview help -->
-                <div data-bind="component: { name: 'switch-widget', params: {value: helpPreviewActive, config:{label: '{% trans "Preview Help Panel" %}', subtitle: '{% trans "Display help panel, confirm content" %}'}}}"></div>
-                <div class="toggle-container">
-                    <input id="preview-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
+                    <!--Summernote-->
+                    <div class="node-widget-label" style="">
+                        <div class="control-label">
+                            {% trans "Help Content" %}
+                        </div>
+                        <div class="summernote" data-bind='summernote: {value: card().get("helptext")}'></div>
+                    </div>
+
+                    <!-- Preview help -->
+                    <div data-bind="component: { name: 'switch-widget', params: {value: helpPreviewActive, config:{label: '{% trans "Preview Help Panel" %}', subtitle: '{% trans "Display help panel, confirm content" %}'}}}"></div>
+                    <div class="toggle-container">
+                        <input id="preview-card-help" class="arches-switch" type="checkbox" data-switchery="true" style="display: none;">
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
-
-
 </div>

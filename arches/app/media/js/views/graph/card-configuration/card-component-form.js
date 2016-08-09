@@ -32,9 +32,8 @@ define([
                 }
             };
 
-            this.helpTabActive = ko.observable(false);
+            this.helpPreviewActive = ko.observable(false);
             this.selection.subscribe(function (selection) {
-                this.helpTabActive(false);
                 this.helpPreviewActive(false);
                 this.updateSelection(selection);
             }, this);
