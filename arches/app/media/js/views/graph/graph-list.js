@@ -35,21 +35,33 @@ require([
         });
     }
 
+    /**
+    * creates a request to get and export a graph instance to the file
+    * system
+    */
     var exportGraph = function(url) {
         pageView.viewModel.loading(true);
-        // $.ajax({
-        //     type: "POST",
-        //     url: url,
-        //     success: function(response) {
-        //         pageView.viewModel.loading(false);
-        //     },
-        //     failure: function(response) {
-        //         pageView.viewModel.loading(false);
-        //     }
-        // });
     }
 
+    var importGraph = function(url, data, e) {
+        var formData = new FormData();
+        formData.append("importedGraph", e.target.files[0]);
 
+        $.ajax({
+            type: "POST",
+            url: url,
+            processData: false,
+            data: formData,
+            cache: false,
+            contentType: false,
+            success: function(response) {
+                window.location.reload(true);
+            },
+            failure: function(response) {
+                pageView.viewModel.loading(false);
+            }
+        });
+    }
     /**
     * sets up the graphs for the page's view model
     */
@@ -119,6 +131,9 @@ require([
             },
             newGraph: function () {
                 newGraph('new', {isresource: false});
+            },
+            importGraph: function (data, e) {
+                importGraph('import/', data, e)
             }
         }
     });
