@@ -17,11 +17,12 @@ define([
         * @memberof CardComponentForm.prototype
         */
         initialize: function(options) {
-            //this.card = options.card;
-            this.selection = options.selection;
+            this.card = options.card;
+            this.selection = options.selection || ko.observable(this.card);
+            this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
             this.node = ko.observable();
-            
+
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);
@@ -31,7 +32,6 @@ define([
                 }
             };
 
-            this.helpPreviewActive = ko.observable(false);
             this.helpTabActive = ko.observable(false);
             this.selection.subscribe(function (selection) {
                 this.helpTabActive(false);

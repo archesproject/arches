@@ -17,7 +17,7 @@ define([
         */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'card'));
-            this.selection = ko.observable(this.card);
+            this.selection = options.selection || ko.observable(this.card);
         },
 
         /**
