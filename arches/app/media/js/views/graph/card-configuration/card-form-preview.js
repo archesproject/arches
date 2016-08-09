@@ -35,8 +35,12 @@ define([
                 return index;
             });
             this.currentTabCard = ko.computed(function () {
-                return self.card.get('cards')()[self.currentTabIndex()];
-            });
+                if(this.card.get('cards')().length === 0){
+                    return this.card;
+                }else{
+                    return this.card.get('cards')()[this.currentTabIndex()];
+                }
+            }, this);
         },
 
         /**

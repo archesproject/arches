@@ -259,6 +259,11 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -270,6 +275,7 @@ INSTALLED_APPS = (
     'arches',
     'arches.app.models',
     'arches.management',
+    'guardian',
 )
 
 MIDDLEWARE_CLASSES = (

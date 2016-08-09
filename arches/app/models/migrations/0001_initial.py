@@ -409,6 +409,13 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'node_groups',
                 'managed': True,
+                'permissions': (
+                    ('none', 'No Access'),
+                    ('read', 'Read'),
+                    ('write', 'Create/Update'),
+                    ('delete', 'Delete'),
+                    ('full', 'Full Access'),
+                )
             },
         ),
         migrations.CreateModel(

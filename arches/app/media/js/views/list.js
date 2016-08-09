@@ -56,6 +56,9 @@ define([
                 if (!item.filtered) {
                     item.filtered = ko.observable();
                 }
+                if (!item.selected) {
+                    item.selected = ko.observable();
+                }
             })
             this.filter = ko.observable('');
             this.filter.subscribe(this.filter_function, this, 'change');

@@ -241,6 +241,14 @@ class NodeGroup(models.Model):
         managed = True
         db_table = 'node_groups'
 
+        permissions = (
+            ('none', 'No Access'),
+            ('read', 'Read'),
+            ('write', 'Create/Update'),
+            ('delete', 'Delete'),
+            ('full', 'Full Access'),
+        )
+
 
 class Node(models.Model):
     """

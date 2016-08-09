@@ -1,8 +1,9 @@
 define([
     'backbone',
     'knockout',
+    'views/graph/card-configuration/permissions-list',
     'bindings/summernote'
-], function(Backbone,  ko) {
+], function(Backbone,  ko, PermissionsList) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -16,15 +17,34 @@ define([
         * @memberof CardComponentForm.prototype
         */
         initialize: function(options) {
-            var self = this;
-            this.card = options.card;
+            //this.card = options.card;
             this.selection = options.selection;
+            this.card = ko.observable();
+            this.node = ko.observable();
+            
+            this.updateSelection = function(selection) {
+                if('isContainer' in selection){
+                    this.card(selection);
+                }
+                if('node' in selection){
+                    this.node(selection);
+                }
+            };
+
             this.helpPreviewActive = ko.observable(false);
             this.helpTabActive = ko.observable(false);
-            this.selection.subscribe(function () {
-                self.helpTabActive(false);
-                self.helpPreviewActive(false);
-            })
+            this.selection.subscribe(function (selection) {
+                this.helpTabActive(false);
+                this.helpPreviewActive(false);
+                this.updateSelection(selection);
+            }, this);
+
+            this.updateSelection(this.selection());
+
+            this.permissionsList = new PermissionsList({
+                card: this.card,
+                permissions: options.permissions
+            });
         }
     });
     return CardComponentForm;
