@@ -34,9 +34,9 @@ define([
             this.selection.subscribe(function (selection) {
                 this.helpTabActive(false);
                 this.helpPreviewActive(false);
-				this.updateSelection(selection);
+                this.updateSelection(selection);
             }, this);
-            
+
             this.updateSelection(this.selection());
 
             this.permissionsList = new PermissionsList({
