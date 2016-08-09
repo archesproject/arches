@@ -634,7 +634,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='function',
-            field=models.ForeignKey(db_column='functionid', to='models.Function'),
+            field=models.ForeignKey(db_column='functionid', to='models.Function', null=True),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
