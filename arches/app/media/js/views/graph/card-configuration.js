@@ -8,33 +8,21 @@ require([
     'card-configuration-data',
     'widgets/switch'
 ], function(ko, CardModel, PageView, CardComponentForm, CardComponentsTree, CardFormPreview, data) {
-    var viewModel = {};
+    var viewModel = {
+        card: new CardModel({
+            data: data.card,
+            datatypes: data.datatypes
+        }),
+        helpPreviewActive: ko.observable(false)
+    };
 
-    var cardModel = new CardModel({
-        data: data.card,
-        datatypes: data.datatypes
-    });
+    viewModel.selection = ko.observable(viewModel.card);
 
-    viewModel.card = cardModel;
+    viewModel.cardComponentsTree = new CardComponentsTree(viewModel);
 
-    viewModel.cardComponentsTree = new CardComponentsTree({
-        card: cardModel
-    });
+    viewModel.cardComponentForm = new CardComponentForm(viewModel);
 
-    var selection = viewModel.cardComponentsTree.selection;
-    viewModel.cardComponentForm = new CardComponentForm({
-        card: cardModel,
-        selection: selection
-    });
+    viewModel.cardFormPreview = new CardFormPreview(viewModel);
 
-    var helpPreviewActive = viewModel.cardComponentForm.helpPreviewActive;
-    viewModel.cardFormPreview = new CardFormPreview({
-        card: cardModel,
-        selection: selection,
-        helpPreviewActive: helpPreviewActive
-    });
-
-    var pageView = new PageView({
-        viewModel: viewModel
-    });
+    var pageView = new PageView({viewModel: viewModel});
 });
