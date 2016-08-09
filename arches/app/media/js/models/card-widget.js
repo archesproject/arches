@@ -82,7 +82,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 if (key !== 'config') {
                     ret[key] = this.attributes[key]();
                 } else {
-                    ret[key] = this.configJSON()
+                    ret[key] = JSON.stringify(this.configJSON())
                 }
             }
             return ret;
