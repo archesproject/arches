@@ -9,7 +9,7 @@ define([
     * - pass options to summernote using the following syntax in the knockout
     * data-bind attribute
     * @example
-    * summernote: {height: 250}"
+    * summernote: {height: 250}
     * @constructor
     * @name summernote
     */
@@ -50,7 +50,7 @@ define([
                 $element.summernote('code', options.value);
             }
         }
-    }
+    };
 
     return ko.bindingHandlers.summernote;
 });
