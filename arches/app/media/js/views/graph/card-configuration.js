@@ -21,20 +21,17 @@ require([
         card: cardModel
     });
 
-    // global observable for selected component
-    viewModel.selection = viewModel.cardComponentsTree.selection;
-
+    var selection = viewModel.cardComponentsTree.selection;
     viewModel.cardComponentForm = new CardComponentForm({
         card: cardModel,
-        selection: viewModel.selection
+        selection: selection
     });
 
-    viewModel.helpPreviewActive = viewModel.cardComponentForm.helpPreviewActive;
-
+    var helpPreviewActive = viewModel.cardComponentForm.helpPreviewActive;
     viewModel.cardFormPreview = new CardFormPreview({
         card: cardModel,
-        selection: viewModel.selection,
-        helpPreviewActive: viewModel.helpPreviewActive
+        selection: selection,
+        helpPreviewActive: helpPreviewActive
     });
 
     var pageView = new PageView({

@@ -18,8 +18,8 @@ define([
         initialize: function(options) {
             var self = this;
             this.card = options.card;
-            this.selection = options.selection;
-            this.helpPreviewActive = ko.observable(false);
+            this.selection = options.selection || ko.observable(this.card);
+            this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.helpTabActive = ko.observable(false);
             this.selection.subscribe(function () {
                 self.helpTabActive(false);

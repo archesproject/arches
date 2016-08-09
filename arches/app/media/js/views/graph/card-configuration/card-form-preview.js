@@ -20,8 +20,8 @@ define([
         initialize: function(options) {
             var self = this;
             this.card = options.card;
-            this.selection = options.selection;
-            this.helpPreviewActive = options.helpPreviewActive;
+            this.selection = options.selection || ko.observable(this.card);
+            this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.widgetLookup = widgets;
             this.currentTabIndex = ko.computed(function () {
                 if (!self.card.isContainer() || self.selection() === self.card) {
