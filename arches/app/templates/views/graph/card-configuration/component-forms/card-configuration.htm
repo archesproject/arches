@@ -57,7 +57,7 @@
                 {% trans "Card Tab Title" %}
             </div>
             <div>
-                <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="value: card.get('name'), valueUpdate: 'keyup'">
+                <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="value: card().get('name'), valueUpdate: 'keyup'">
             </div>
         </div>
 
@@ -66,7 +66,7 @@
                 {% trans "Instructions" %}
             </div>
             <div>
-                <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: card.get('instructions'), valueUpdate: 'keyup'">
+                <input type="" placeholder="{% trans "" %}" class="form-control input-md widget-input" data-bind="value: card().get('instructions'), valueUpdate: 'keyup'">
             </div>
         </div>
     </div>
@@ -75,10 +75,10 @@
     <div id="card-crud-advanced" class="tab-pane fade">
 
         <!-- Set Cardinaltiy -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('cardinality'), config:{on: 'n', off: '1', label: '{% trans "Allow multiple values" %}', subtitle: '{% trans "Let users enter multiple values for this data entry card" %}'}}}"></div>
 
         <!-- Multiple values tools -->
-        <div class="cardinality-form" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+        <div class="cardinality-form" data-bind="visible: card().get('cardinality')() === 'n'" style="display: none;">
 
             <div class="form-divider" style="margin-top: 0px; margin-bottom: 10px;"></div>
 
@@ -88,7 +88,7 @@
                     {% trans "Tile Name" %}
                 </div>
                 <div class="col-sm-12 pad-no crud-widget-container">
-                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: card.get('itemtext'), valueUpdate: 'keyup'">
+                    <input type="" placeholder="Tile name" class="form-control input-md widget-input" data-bind="value: card().get('itemtext'), valueUpdate: 'keyup'">
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
                 {% trans "Validation Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -112,7 +112,7 @@
                 {% trans "Processing Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card.get('applied_functions'), options: card.get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
@@ -133,12 +133,12 @@
     <div id="card-crud-help" class="tab-pane fade">
 
         <!-- Enable help -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card.get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
+        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('helpenabled'), config:{label: '{% trans "Enable Card-level help" %}', subtitle: '{% trans "Provide specific user guidance for this card" %}'}}}"></div>
 
     </div>
 
     <!-- Tertiary Panel For Card Help Text-->
-    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:helpTabActive() && card.get('helpenabled')">
+    <div id="help-text-crud" class="tertiary-panel" style="display: none;" data-bind="visible:helpTabActive() && card().get('helpenabled')">
         <div class="tertiary-panel-content">
             <div class="">
                 <h4 class="title-block-title" style=""> Card-Level Help </h4>
@@ -151,7 +151,7 @@
                         Help Panel Title
                     </div>
                     <div class="col-sm-12 pad-no crud-widget-container">
-                        <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card.get("helptitle")'>
+                        <input type="" placeholder="{% trans "Help title" %}" class="form-control input-md widget-input" data-bind='value: card().get("helptitle")'>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@
                     <div class="control-label">
                         {% trans "Help Content" %}
                     </div>
-                    <div class="summernote" data-bind='summernote: {value: card.get("helptext")}'></div>
+                    <div class="summernote" data-bind='summernote: {value: card().get("helptext")}'></div>
                 </div>
 
                 <!-- Preview help -->

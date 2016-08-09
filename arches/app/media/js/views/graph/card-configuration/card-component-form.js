@@ -19,15 +19,17 @@ define([
         initialize: function(options) {
             //this.card = options.card;
             this.selection = options.selection;
-			
-			this.updateSelection = function(selection) {
+            this.card = ko.observable();
+            this.node = ko.observable();
+            
+            this.updateSelection = function(selection) {
                 if('isContainer' in selection){
-                    this.card = selection;
+                    this.card(selection);
                 }
                 if('node' in selection){
-                    this.node = selection;
+                    this.node(selection);
                 }
-            }
+            };
 
             this.helpPreviewActive = ko.observable(false);
             this.helpTabActive = ko.observable(false);

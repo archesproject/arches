@@ -20,10 +20,10 @@ define([
         */
         initialize: function(options) {
             this.card = options.card;
-            this.card.get('users').forEach(function(user){
+            this.card().get('users').forEach(function(user){
                 this.items.push({'name': user.username, 'perms': user.perms, 'type': user.type})
             }, this);
-            this.card.get('groups').forEach(function(group){
+            this.card().get('groups').forEach(function(group){
                 this.items.push({'name': group.name, 'perms': group.perms, 'type': group.type})
             }, this);
             ListView.prototype.initialize.apply(this, arguments);
