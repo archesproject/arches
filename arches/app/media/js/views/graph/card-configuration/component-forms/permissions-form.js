@@ -5,21 +5,24 @@ define([
     var PermissionsForm = Backbone.View.extend({
         /**
         * initializes the view with optional parameters
-        * @memberof PermissionsList.prototype
+        * @memberof PermissionsForm.prototype
         * @param {object} options
-        * @param {boolean} options.card - a reference to the selected {@link CardModel}
+        * @param {boolean} options.permissions - a list of allowable permissions
+        * @param {boolean} options.selectedItems - a reference to the selected items in the {@link PermissionsList}
         */
         initialize: function(options) {
             this.permissions = options.permissions;
-            this.showing = ko.observable(false);
+            this.selectedItems = options.selectedItems;
         },
 
         /**
-        * Closes the form and deselects the currently selected branch
-        * @memberof BranchList.prototype
+        * Closes the form and deselects the currently selected items
+        * @memberof PermissionsForm.prototype
         */
         close: function(){
-            this.showing(false);
+            this.selectedItems().forEach(function(item){
+                item.selected(false);
+            }, this);
         },
 
     });

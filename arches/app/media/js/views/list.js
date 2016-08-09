@@ -46,23 +46,33 @@ define([
         /**
         * initializes the view with optional parameters
         * @memberof ListView.prototype
-        * @param {object} options - optional parameters to pass in during initialization, currently unused
+        * @param {object} options - optional parameters to pass in during initialization
         */
         initialize: function(options) {
             if (options.items) {
                 this.items = options.items;
             }
-            this.items().forEach(function (item) {
+            var initializeItem = function(item){
                 if (!item.filtered) {
-                    item.filtered = ko.observable();
+                    item.filtered = ko.observable(false);
                 }
                 if (!item.selected) {
-                    item.selected = ko.observable();
+                    item.selected = ko.observable(false);
                 }
-            })
+            }
+            this.items.subscribe(function (items) {
+                items.forEach(initializeItem, this);
+            }, this);
             this.filter = ko.observable('');
             this.filter.subscribe(this.filter_function, this, 'change');
             this.filter_function();
+            
+            this.selectedItems = ko.computed(function(){
+                return this.items().filter(function(item){
+                    initializeItem(item);
+                    return item.selected();
+                }, this);
+            }, this);
         },
 
         /**

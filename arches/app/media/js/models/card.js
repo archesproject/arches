@@ -101,6 +101,8 @@ define(['arches',
                         this.set(key, ko.observable(value));
                         break;
                     case 'ontology_properties':
+                    case 'users':
+                    case 'groups':
                         this.set(key, ko.observableArray(value));
                         break;
                     default:

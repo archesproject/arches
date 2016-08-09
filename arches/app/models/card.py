@@ -105,10 +105,6 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
-                print get_perms_for_model(self.nodegroup)
-                for group in Group.objects.all():
-                    if group.name == 'edit':
-                        x = group.permissions #get_group_perms(group, self.nodegroup)
                 self.groups = [{'name': group.name, 'perms': self.get_group_permissions(group, self.nodegroup), 'type': 'group'} for group in Group.objects.all()]
                 self.users = [{'username': user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user'} for user in User.objects.all()]
 
