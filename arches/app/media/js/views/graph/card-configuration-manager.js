@@ -16,7 +16,7 @@ require([
         permissions: data.permissions,
         helpPreviewActive: ko.observable(false)
     };
-
+    viewModel.dirty = viewModel.card.dirty;
     viewModel.selection = ko.observable(viewModel.card);
 
     viewModel.cardComponentsTree = new CardComponentsTree(viewModel);

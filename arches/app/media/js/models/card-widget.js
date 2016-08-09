@@ -70,6 +70,18 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 configJSON.label = self.get('label')();
                 return configJSON;
             });
+        },
+
+        toJSON: function () {
+            var ret = {};
+            for(key in this.attributes){
+                if (key !== 'config') {
+                    ret[key] = this.attributes[key]();
+                } else {
+                    ret[key] = this.configJSON()
+                }
+            }
+            return ret;
         }
     });
 });
