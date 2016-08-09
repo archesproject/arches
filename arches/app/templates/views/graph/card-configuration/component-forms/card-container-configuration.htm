@@ -23,6 +23,11 @@
                 <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
             </a>
         </li>
+        <li>
+            <a href="#cc-permissions" class="nav-library-tab-link" data-toggle="tab">
+                <i class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Permissions" %}"></i>
+            </a>
+        </li>
     </ul>
 </div>
 
@@ -95,6 +100,18 @@
                 <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
+    </div>
+
+    <!-- Card CRUD Permissions Form -->
+    <div id="cc-permissions" class="tab-pane fade" data-bind="with: permissionsList">
+
+        {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
+        
+        <!-- Tertiary Panel For Permissions -->
+        <div id="permissions-crud" class="tertiary-panel" style="display: none;" data-bind="with: permissionsForm, visible: permissionsForm.selectedItems().length > 0">
+            {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}
+        </div>
+
     </div>
 
 </div>
