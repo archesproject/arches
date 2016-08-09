@@ -76,11 +76,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource" %}</a></li>
                     <li><a href="#" data-bind="click: newGraph">{% trans "New Graph" %}</a></li>
-                    <li class="file-upload">
-                            <a href="#" class="arches-tool-item file-upload">{% trans "Import Graph/Resource" %}</a>
+                    <li class="file-upload upload">
                             <form id="data">
-                            <input type="file" class="upload" data-bind="event: {change: importGraph}"` accept=".json"/>  
+                                <input type="file" class="upload" data-bind="event: {change: importGraph}" accept=".json"/>  
                             </form>
+                            <a href="#" class="arches-tool-item file-upload" data-bind="{click: importButtonClick}">{% trans "Import Graph/Resource" %}</a>
                     </li>
                 </ul>
             </div>

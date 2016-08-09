@@ -134,6 +134,9 @@ require([
             },
             importGraph: function (data, e) {
                 importGraph('import/', data, e)
+            },
+            importButtonClick: function () {
+                $(".upload").trigger('click');
             }
         }
     });
