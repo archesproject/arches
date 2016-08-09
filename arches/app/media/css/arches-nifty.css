@@ -8,6 +8,7 @@
 @import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css);
 
 
 .navbar-top-links:last-child>li {
@@ -3288,7 +3289,7 @@ li.card-tree-list:last-of-type {
 .tertiary-panel-content {
     background: #f5f5f5;
     border-right: 1px solid #ddd;
-    height: 100vh;
+    height: 100%;
     width: 450px;
     opacity: .95;
     padding: 10px;
@@ -3614,6 +3615,9 @@ div.row.widget-wrapper {
 .widget-preview.active {
     background: #f8f8f8;
     border: 1px solid #ddd;
+}
+.panel-heading.note-toolbar {
+    height: auto;
 }
 @keyframes loader {
 	0% { background: #ddd; }

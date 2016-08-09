@@ -119,10 +119,10 @@ class GraphTests(ArchesTestCase):
                 "datatype": "string"
             }],
             'edges':[{
-                "rangenodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                "rangenode_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
                 "name": "",
                 "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",
-                "domainnodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                "domainnode_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
                 "ontologyproperty": "P2",
                 "description": ""
             }],

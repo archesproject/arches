@@ -30,9 +30,12 @@ require([
         selection: viewModel.selection
     });
 
+    viewModel.helpPreviewActive = viewModel.cardComponentForm.helpPreviewActive;
+
     viewModel.cardFormPreview = new CardFormPreview({
         card: cardModel,
-        selection: viewModel.selection
+        selection: viewModel.selection,
+        helpPreviewActive: viewModel.helpPreviewActive
     });
 
     var pageView = new PageView({

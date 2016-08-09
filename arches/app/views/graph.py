@@ -22,14 +22,17 @@ from django.db import transaction
 from django.shortcuts import render
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.http import HttpResponseNotFound, QueryDict
+from django.http import HttpResponseNotFound, QueryDict, HttpResponse
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from arches.app.models import models
+from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
+from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
+
 
 def test(request, graphid):
     #graph = Graph.objects.filter(isresource=True)
@@ -226,6 +229,19 @@ def clone(request, graphid):
         graph = Graph.objects.get(graphid=graphid).copy()
         graph.save()
         return JSONResponse(graph)
+
+    return HttpResponseNotFound()
+
+@group_required('edit')
+def export(request, graphid):
+    if request.method == 'GET':
+        graph = get_graphs_for_export([graphid])
+        f = JSONSerializer().serialize(graph)
+        graph_name = JSONDeserializer().deserialize(f)[0]['name']
+
+        response = HttpResponse(f, content_type='json/plain')
+        response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
+        return response
 
     return HttpResponseNotFound()
 

@@ -14,7 +14,7 @@
 
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-                <div id="cards" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 20px; margin-top: -2px;">
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
                         data: card.isContainer() ? card.get('cards') : [card],
@@ -54,7 +54,7 @@
 
                                         <!-- Help link -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: card.get('helpenabled')" style="display: none;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -94,6 +94,23 @@
 
                     </div>
 
+                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: self.helpPreviewActive">
+                        <div class="relative">
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { self.helpPreviewActive(false) }"></a>
+                        </div>
+                        <div id="add-basemap-wizard-help-content">
+                            <div>
+                                <div class="panel-heading">
+                                    <h3 class="panel-title" style="padding: 0 10px 0 10px;">
+                                        <span class="help-text-small">Help</span>
+                                        <span data-bind="text: self.currentTabCard().get('helptitle')"></span>
+                                    </h3>
+                                </div>
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard().get('helptext')">
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
                 </div>
 
                 <!-- Wizard Level Buttons -->
@@ -106,12 +123,12 @@
                     </div>
                 </div>
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
 
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.isContainer() ? card.get('cards') : [card]" style="margin-bottom: 0px;">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
                             <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
                                 <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
                                     <!-- Editable Span -->

@@ -35,7 +35,8 @@ from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.models import models
 import csv
-from arches.app.utils.data_management.arches_file import ArchesFile
+from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
+from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 
 class Command(BaseCommand):
     """
@@ -45,7 +46,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources', 'import_json'],
+            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources', 'import_json', 'export_json'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -65,6 +66,9 @@ class Command(BaseCommand):
 
         parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
             help='Directory where you want to save exported files.')
+
+        parser.add_argument('-r', '--resources', action='store', dest='resources',
+            help='A comma separated list of the names of the resources you would like to export.')
 
 
     def handle(self, *args, **options):
@@ -113,6 +117,9 @@ class Command(BaseCommand):
 
         if options['operation'] == 'import_json':
             self.import_json(package_name, options['source'])
+
+        if options['operation'] == 'export_json':
+            self.export_json(package_name, options['dest_dir'], options['resources'])
 
     def setup(self, package_name):
         """
@@ -330,8 +337,16 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        ArchesFile(data_source).import_concepts()        
-        ArchesFile(data_source).import_graphs()
+        ArchesFileImporter(data_source).import_concepts()        
+        ArchesFileImporter(data_source).import_graphs()
+
+    def export_json(self, package_name, data_dest=None, resources=None):
+        """
+        Export objects to arches.json
+        """
+        if resources != None:
+            resources = [x.strip(' ') for x in resources.split(",")]
+        ArchesFileExporter().export_graphs(data_dest, resources)
 
     def start_livereload(self):
         from livereload import Server
