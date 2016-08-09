@@ -32,7 +32,6 @@ define([
                 }
             };
 
-            this.helpPreviewActive = ko.observable(false);
             this.selection.subscribe(function (selection) {
                 this.helpPreviewActive(false);
                 this.updateSelection(selection);
