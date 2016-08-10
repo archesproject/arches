@@ -29,7 +29,7 @@ require([
             success: function(response) {
                 window.location = response.graphid + '/settings';
             },
-            failure: function(response) {
+            error: function(response) {
                 pageView.viewModel.loading(false);
             }
         });
@@ -43,6 +43,9 @@ require([
         pageView.viewModel.loading(true);
     }
 
+    /**
+    * creates a request to import an arches json file;
+    */
     var importGraph = function(url, data, e) {
         var formData = new FormData();
         formData.append("importedGraph", e.target.files[0]);
@@ -55,13 +58,16 @@ require([
             cache: false,
             contentType: false,
             success: function(response) {
+                console.log(response)
                 window.location.reload(true);
             },
-            failure: function(response) {
+            error: function(response) {
+                alert('Something went wrong. Make sure your file is properly formatted arches json. \n\n For more details please contact your system administrator.');
                 pageView.viewModel.loading(false);
-            }
+            },
         });
     }
+
     /**
     * sets up the graphs for the page's view model
     */
@@ -136,7 +142,7 @@ require([
                 importGraph('import/', data, e)
             },
             importButtonClick: function () {
-                $(".upload").trigger('click');
+                $("#fileupload").trigger('click');
             }
         }
     });

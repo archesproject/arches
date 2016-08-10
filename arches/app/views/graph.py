@@ -254,9 +254,8 @@ def import_graph(request):
         for graph in graphs:
             new_graph = Graph(graph)
             new_graph.save()
-
-        #Not sure what I should return here.
-        return JSONResponse(request.FILES)
+        
+        return JSONResponse({})
 
     return HttpResponseNotFound()
 
