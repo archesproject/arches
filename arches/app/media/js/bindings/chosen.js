@@ -36,7 +36,7 @@ define([
                 }
             });
         }
-    }
+    };
 
     return ko.bindingHandlers.chosen;
 });

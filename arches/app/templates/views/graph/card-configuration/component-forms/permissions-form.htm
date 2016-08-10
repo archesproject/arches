@@ -2,12 +2,12 @@
 {% load i18n %}
 <div class="tertiary-panel-content">
     <div class="">
-        <h4 class="title-block-title" style=""> Card Permissions </h4>
+        <h4 class="title-block-title" style="">{% trans "Card Permissions" %}</h4>
         <div class="relative">
             <a id="permissions-close" href="" class="library-close-btn fa fa-times fa-lg" style="" data-bind="click: close"></a>
         </div>
         <div class="" style="padding-top: 20px; position: relative;">
-            <p class="library-instructions" style=""> Set permissions for this data entry card.  Update the Groups/User accounts you selected with the following permissions:</p>
+            <p class="library-instructions" style="">{% trans "Set permissions for this data entry card.  Update the Groups/User accounts you selected with the following permissions:" %}</p>
         </div>
     </div>
  
@@ -16,9 +16,9 @@
         <!-- Functions -->
         <div class="node-widget-label">
             <div>
-                <select style="min-width: 200px;" class="resources" multiple data-bind="value: '', options: permissions, valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select style="min-width: 200px;" class="resources" multiple data-bind="selectedOptions: selectedPermissions, options: permissions, optionsText: 'name', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
-            <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;"> Apply permissions</button>
+            <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;" data-bind="click: applyPermissions">{% trans "Apply permissions" %}</button>
         </div>
 
     </div>
@@ -26,21 +26,15 @@
     <!-- Premission Key -->
     <div id="confirm-permissions">
         
-        <h4 class="node-title" style="font-size: 13px;"> Applying F- Full Access permissions: </h4>
-
-        <!-- Alert -->
-        <div id="permission-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
-
+        <h4 class="node-title" style="font-size: 13px;">{% trans "Applying permissions to the following users/groups:" %}</h4>
 
         <div class="panel-body" style="padding: 0 10px 10px 10px;">
             <dl>
                 <!-- ko foreach: selectedItems -->
-                <dd data-bind="text: $data.name + ' - ' + $data.perms"></dd>
+                <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)()"></dd>
                 <!-- /ko -->
             </dl>
         </div>
-        <div class="" style="">
-            <dt>Permission updates completed!</dt>
-        </div>
+
     </div>
 </div>

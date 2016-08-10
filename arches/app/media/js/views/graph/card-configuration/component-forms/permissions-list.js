@@ -1,7 +1,8 @@
 define([
+    'knockout',
     'views/list',
     'views/graph/card-configuration/component-forms/permissions-form'
-], function(ListView, PermissionsForm) {
+], function(ko, ListView, PermissionsForm) {
     var PermissionsList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -26,6 +27,14 @@ define([
                 this.parseItems(card);
             }, this);
             this.parseItems(this.card());
+        
+            this.getPermsForDisplay = function(){
+                var ret = [];
+                this.perms().forEach(function(perm){
+                    ret.push(ko.unwrap(perm.name));
+                }); 
+                return ret; 
+            };
 
             this.permissionsForm = new PermissionsForm({
                 permissions: options.permissions,
