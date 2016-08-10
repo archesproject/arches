@@ -1,6 +1,10 @@
 {% load i18n %}
-<div class="toggle-container">
+<div class="toggle-container" data-bind="if: !configForm">
     <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
     <p class="arches-toggle-sm" data-bind="text:label"></p>
     <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
+</div>
+
+<div data-bind="if: configForm">
+    form here
 </div>

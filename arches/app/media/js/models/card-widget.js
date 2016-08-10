@@ -39,7 +39,34 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             }
 
             attributes = _.defaults(attributes, defaults);
-            return AbstractModel.prototype.constructor.call(this, attributes, options);
+
+            AbstractModel.prototype.constructor.call(this, attributes, options);
+
+            this.configJSON = ko.computed({
+                read: function () {
+                    var configJSON = {};
+                    var config = this.get('config');
+                    _.each(this.configKeys, function(key) {
+                        configJSON[key] = config[key]();
+                    });
+                    configJSON.label = this.get('label')();
+                    return configJSON;
+                },
+                write: function (value) {
+                    var config = this.get('config');
+                    _.each(this.configKeys, function(key) {
+                        if (config[key]() !== value[key]) {
+                            config[key](value[key]);
+                        }
+                    });
+                    if (value.label) {
+                        this.get('label')(value.label);
+                    }
+                },
+                owner: this
+            });
+
+            return this;
         },
 
         /**
@@ -64,16 +91,6 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     this.set(key, ko.observable(value));
                 }
             }, this);
-
-            this.configJSON = ko.computed(function () {
-                var configJSON = {};
-                var config = self.get('config');
-                _.each(self.configKeys, function(key) {
-                    configJSON[key] = config[key]();
-                });
-                configJSON.label = self.get('label')();
-                return configJSON;
-            });
         },
 
         toJSON: function () {
