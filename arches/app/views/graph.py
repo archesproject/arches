@@ -32,6 +32,7 @@ from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
+import json
 
 
 def test(request, graphid):
@@ -233,15 +234,28 @@ def clone(request, graphid):
     return HttpResponseNotFound()
 
 @group_required('edit')
-def export(request, graphid):
+def export_graph(request, graphid):
     if request.method == 'GET':
         graph = get_graphs_for_export([graphid])
         f = JSONSerializer().serialize(graph)
-        graph_name = JSONDeserializer().deserialize(f)[0]['name']
+        graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 
         response = HttpResponse(f, content_type='json/plain')
         response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
         return response
+
+    return HttpResponseNotFound()
+
+@group_required('edit')
+def import_graph(request):
+    if request.method == 'POST':
+        graph_file = request.FILES.get('importedGraph').read()
+        graphs = JSONDeserializer().deserialize(graph_file)['graph']
+        for graph in graphs:
+            new_graph = Graph(graph)
+            new_graph.save()
+        
+        return JSONResponse({})
 
     return HttpResponseNotFound()
 

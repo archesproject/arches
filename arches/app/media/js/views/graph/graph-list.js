@@ -29,26 +29,44 @@ require([
             success: function(response) {
                 window.location = response.graphid + '/settings';
             },
-            failure: function(response) {
+            error: function(response) {
                 pageView.viewModel.loading(false);
             }
         });
     }
 
+    /**
+    * creates a request to get and export a graph instance to the file
+    * system
+    */
     var exportGraph = function(url) {
         pageView.viewModel.loading(true);
-        // $.ajax({
-        //     type: "POST",
-        //     url: url,
-        //     success: function(response) {
-        //         pageView.viewModel.loading(false);
-        //     },
-        //     failure: function(response) {
-        //         pageView.viewModel.loading(false);
-        //     }
-        // });
     }
 
+    /**
+    * creates a request to import an arches json file;
+    */
+    var importGraph = function(url, data, e) {
+        var formData = new FormData();
+        formData.append("importedGraph", e.target.files[0]);
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            processData: false,
+            data: formData,
+            cache: false,
+            contentType: false,
+            success: function(response) {
+                console.log(response)
+                window.location.reload(true);
+            },
+            error: function(response) {
+                alert('Something went wrong. Make sure your file is properly formatted arches json. \n\n For more details please contact your system administrator.');
+                pageView.viewModel.loading(false);
+            },
+        });
+    }
 
     /**
     * sets up the graphs for the page's view model
@@ -119,6 +137,12 @@ require([
             },
             newGraph: function () {
                 newGraph('new', {isresource: false});
+            },
+            importGraph: function (data, e) {
+                importGraph('import/', data, e)
+            },
+            importButtonClick: function () {
+                $("#fileupload").trigger('click');
             }
         }
     });
