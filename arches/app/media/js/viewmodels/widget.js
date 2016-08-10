@@ -20,31 +20,20 @@ define(['knockout'], function (ko) {
         this.label = this.config().label || ko.observable('');
 
         this.configKeys.forEach(function(key) {
-            self[key] = ko.observable(self.config()[key])
-                .extend({
-                    updateConfig: {
-                        config: self.config,
-                        key: key
-                    }
-                });
-        });
-        
-    };
+            self[key] = ko.observable(self.config()[key]);
 
-    ko.extenders.updateConfig = function(target, opts) {
-        target.subscribe(function(val) {
-            var configObj = opts.config();
-            configObj[opts.key] = val;
-            opts.config(configObj);
-        });
+            self[key].subscribe(function(val) {
+                var configObj = self.config();
+                configObj[key] = val;
+                self.config(configObj);
+            });
 
-        opts.config.subscribe(function(val) {
-            if (val[opts.key] !== target()) {
-                target(val[opts.key]);
-            }
+            self.config.subscribe(function(val) {
+                if (val[key] !== self[key]()) {
+                    self[key](val[key]);
+                }
+            });
         });
-
-        return target;
     };
     return WidgetViewModel;
 });
