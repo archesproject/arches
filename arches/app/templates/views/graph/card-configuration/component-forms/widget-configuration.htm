@@ -3,79 +3,35 @@
 <!-- Title Block -->
 <div class="library-title-block">
     <div class="">
-        <h4 class="title-block-title" style=""> Widget Manager </h4>
+        <h4 class="title-block-title" style=""> {% trans "Widget Manager" %} </h4>
     </div>
 
-    <!-- Panel Tools -->
-    <div class="library-tools">
-        <i id="widget-settings-btn" class="ion-settings add-tooltip library-tools-icon active" data-placement="bottom" data-toggle="tooltip" data-original-title="Settings"></i>
-        <i id="widget-advanced-btn" class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Advanced Settings"></i>
-        <i id="widget-validation-btn" class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Validations"></i>
-    </div>
+    <!-- nav bar -->
+    <ul class="nav nav-tabs library-tools">
+        <li class="active">
+            <a href="#widget-crud-settings" class="nav-library-tab-link" data-toggle="tab">
+                <i class="ion-settings add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
+            </a>
+        </li>
+    </ul>
+
 </div>
 
-<!-- Card Container Base Settings Form -->
-<div id="widget-settings">
-    
-    <!-- Card Container Settings -->
-    <div id="" class="" style="padding-bottom: 5px;">
+<!-- Tabs Content -->
+<div class="tab-content listing-container">
 
-        <!-- Widget Label -->
-        <div class="node-widget-label">
+    <!-- Card Container Base Settings Form -->
+    <div id="card-crud-settings" class="tab-pane fade in active">
+
+        <div class="node-widget-label" style="">
             <div class="control-label">
                 Widget Label
             </div>
             <div class="col-sm-12 pad-no crud-widget-container">
-                <input type="" placeholder="Widget Label" id="" class="form-control input-md widget-input" value="Address">
+                <input type="" placeholder="Widget Label" id="" class="form-control input-md widget-input" data-bind="value: widget().get('label'), valueUpdate: 'keyup'">
             </div>
         </div>
 
-        <!-- Widget Label -->
-        <div class="node-widget-label">
-            <div class="control-label">
-                Placeholder
-            </div>
-            <div class="col-sm-12 pad-no crud-widget-container">
-                <input type="" placeholder="Address" id="" class="form-control input-md widget-input" value="Enter an address">
-            </div>
-        </div>
-
-        <!-- Domain Selection -->
-        <div class="node-widget-label">
-            <div class="control-label">
-                Controlled Vocabulary (domain only)
-            </div>
-            <div class="col-sm-12 pad-no crud-widget-container">
-                <select class="resources" data-placeholder="" id="permissions" tabindex="0">
-                    <option>Top Concept Name 1</option>
-                    <option>Top Concept Name 2</option>
-                    <option>Top Concept Name 3</option>
-                    <option>Top Concept Name 4</option>
-                    <option>Top Concept Name 5</option>
-                </select>
-            </div>
-        </div>
-    </div>    
-</div>
-
-<!-- Widget ADVANCED Settings Form -->
-<div id="widget-advanced-settings" class="library-crud-container" style="display: none;">
-    <div id="" class="">
-
-        <!-- Widget Advanced Settings -->
-        <div id="" class="" style="padding-bottom: 5px;">
-
-            <!-- Widget Templates -->
-            <div class="node-widget-label" style="">
-                <div class="control-label">
-                    Template
-                </div>
-                <div class="col-sm-12 pad-no crud-widget-container">
-                    <select id="" class="functions" style="" data-placeholder="Choose a Function..." tabindex="4">
-                        <option>Arches String Default</option>
-                    </select>
-                </div>
-            </div>
-        </div>
     </div>
+
 </div>

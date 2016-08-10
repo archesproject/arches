@@ -21,14 +21,14 @@ define([
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
-            this.node = ko.observable();
+            this.widget = ko.observable();
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);
                 }
                 if('node' in selection){
-                    this.node(selection);
+                    this.widget(selection);
                 }
             };
 
