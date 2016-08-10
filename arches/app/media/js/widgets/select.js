@@ -13,8 +13,8 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'plugins/knockout-select2
         viewModel: function(params) {
             WidgetViewModel.apply(this, [params]);
 
-            this.placeholder = params.config.placeholder;
-            this.options = params.config.options;
+            this.placeholder = this.config().placeholder;
+            this.options = this.config().options;
         },
         template: { require: 'text!widget-templates/select' }
     });
