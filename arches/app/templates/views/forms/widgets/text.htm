@@ -1,9 +1,18 @@
 {% load i18n %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="if: !configForm">
     <div class="form-group">
         <label class="col-xs-12 control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12 col-md-9">
             <input type="text" data-bind="value: value, attr: {placeholder: placeholder}, disable: disabled" class="form-control input-lg widget-input">
         </div>
+    </div>
+</div>
+
+<div data-bind="if: configForm">
+    <div class="control-label">
+        {% trans "Placeholder" %}
+    </div>
+    <div class="col-sm-12 pad-no crud-widget-container">
+        <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
     </div>
 </div>

@@ -12,7 +12,7 @@ define(['knockout', 'underscore', 'bindings/datepicker', 'viewmodels/widget'], f
         viewModel: function(params) {
             WidgetViewModel.apply(this, [params]);
 
-            this.placeholder = params.config.placeholder;
+            this.placeholder = params.config().placeholder;
         },
         template: { require: 'text!widget-templates/datepicker' }
     });

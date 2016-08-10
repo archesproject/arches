@@ -2,8 +2,9 @@ define([
     'backbone',
     'knockout',
     'views/graph/card-configuration/permissions-list',
+    'widgets',
     'bindings/summernote'
-], function(Backbone,  ko, PermissionsList) {
+], function(Backbone,  ko, PermissionsList, widgets) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -22,6 +23,7 @@ define([
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
             this.widget = ko.observable();
+            this.widgetLookup = widgets;
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){

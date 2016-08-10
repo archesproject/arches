@@ -32,6 +32,16 @@
             </div>
         </div>
 
+        <div class='widget-config-form' data-bind='component: {
+            name: widgetLookup[widget().get("widget_id")()].name,
+            params: {
+                config: widget().configJSON,
+                label: widget().get("label")(),
+                configForm: true,
+                value: ko.observable(null)
+            }
+        }'></div>
+
     </div>
 
 </div>

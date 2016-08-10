@@ -20,17 +20,17 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         viewModel: function(params) {
             WidgetViewModel.apply(this, [params]);
 
-            this.subtitle = params.config.subtitle;
-            this.on = params.config.on || true;
-            this.off = params.config.off || false;
-            this.setvalue = params.config.setvalue || function(self, evt){
+            this.subtitle = this.config().subtitle;
+            this.on = this.config().on || true;
+            this.off = this.config().off || false;
+            this.setvalue = this.config().setvalue || function(self, evt){
                 if(self.value() === self.on){
                     self.value(self.off);
                 }else{
                     self.value(self.on);
                 }
             }
-            this.getvalue = params.config.getvalue || ko.computed(function(){
+            this.getvalue = this.config().getvalue || ko.computed(function(){
                 return this.value() === this.on;
             }, this);
         },
