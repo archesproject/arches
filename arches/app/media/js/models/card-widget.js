@@ -31,7 +31,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 defaults.config = widgets[defaults.widget_id].defaultconfig;
             }
             if (this.node) {
+                defaults.node_id = this.node.nodeid;
                 defaults.label = this.node.name();
+            }
+            if (this.card) {
+                defaults.card_id = this.card.get('id');
             }
 
             attributes = _.defaults(attributes, defaults);
@@ -70,6 +74,18 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 configJSON.label = self.get('label')();
                 return configJSON;
             });
+        },
+
+        toJSON: function () {
+            var ret = {};
+            for(key in this.attributes){
+                if (key !== 'config') {
+                    ret[key] = this.attributes[key]();
+                } else {
+                    ret[key] = JSON.stringify(this.configJSON())
+                }
+            }
+            return ret;
         }
     });
 });
