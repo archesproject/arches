@@ -12,7 +12,7 @@ define(['knockout'], function (ko) {
         this.value = params.value || ko.observable(null);
         this.disabled = params.disabled || ko.observable(false);
         this.configForm = params.configForm || false;
-        this.config = params.config || ko.observable({});
+        this.config = params.config || ko.observable({}); 
         this.configKeys = params.configKeys || [];
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
