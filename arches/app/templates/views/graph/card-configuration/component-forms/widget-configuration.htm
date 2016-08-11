@@ -13,6 +13,16 @@
                 <i class="ion-settings add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Settings" %}"></i>
             </a>
         </li>
+        <li>
+            <a href="#widget-crud-advanced" class="nav-library-tab-link" data-toggle="tab">
+                <i class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Advanced Settings" %}"></i>
+            </a>
+        </li>
+        <li>
+            <a href="#widget-crud-validation" class="nav-library-tab-link" data-toggle="tab">
+                <i class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Validations" %}"></i>
+            </a>
+        </li>
     </ul>
 
 </div>
@@ -20,8 +30,7 @@
 <!-- Tabs Content -->
 <div class="tab-content listing-container">
 
-    <!-- Card Container Base Settings Form -->
-    <div id="card-crud-settings" class="tab-pane fade in active">
+    <div id="widget-crud-settings" class="tab-pane fade in active">
 
         <div class="node-widget-label" style="">
             <div class="control-label">
@@ -41,6 +50,22 @@
                 value: ko.observable(null)
             }
         }'></div>
+
+    </div>
+
+    <div id="widget-crud-advanced" class="tab-pane fade">
+
+        <div class="node-widget-label" style="">
+            advanced
+        </div>
+
+    </div>
+
+    <div id="widget-crud-validation" class="tab-pane fade">
+
+        <div class="node-widget-label" style="">
+            validation
+        </div>
 
     </div>
 
