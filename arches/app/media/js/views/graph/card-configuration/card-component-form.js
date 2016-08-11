@@ -18,12 +18,28 @@ define([
         * @memberof CardComponentForm.prototype
         */
         initialize: function(options) {
+            var self = this;
             this.card = options.card;
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
             this.widget = ko.observable();
             this.widgetLookup = widgets;
+            this.widgetList = ko.computed(function() {
+                var cardWidget = self.widget();
+                if (cardWidget) {
+                    var widgets = _.map(self.widgetLookup, function(widget, id) {
+                            widget.id = id;
+                            return widget;
+                        })
+                    return _.filter(widgets, function(widget) {
+                        return widget.datatype === cardWidget.datatype.datatype
+                    })
+
+                } else {
+                    return [];
+                }
+            });
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
@@ -44,6 +60,18 @@ define([
             this.permissionsList = new PermissionsList({
                 card: this.card,
                 permissions: options.permissions
+            });
+
+            this.widgetId = ko.computed({
+                read: function () {
+                    return self.widget() ? self.widget().get('widget_id')() : null;
+                },
+                write: function (value) {
+                    if (self.widget()) {
+                        self.widget().get('widget_id')(value);
+                    }
+                },
+                owner: this
             });
         }
     });

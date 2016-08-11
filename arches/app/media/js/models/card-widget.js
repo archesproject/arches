@@ -46,7 +46,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 read: function () {
                     var configJSON = {};
                     var config = this.get('config');
-                    _.each(this.configKeys, function(key) {
+                    _.each(this.configKeys(), function(key) {
                         configJSON[key] = config[key]();
                     });
                     configJSON.label = this.get('label')();
@@ -54,13 +54,12 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 },
                 write: function (value) {
                     var config = this.get('config');
-                    _.each(this.configKeys, function(key) {
-                        if (config[key]() !== value[key]) {
+                    for (key in value) {
+                        if (key === 'label') {
+                            this.get('label')(value[key]);
+                        } else if (config[key]() !== value[key]) {
                             config[key](value[key]);
                         }
-                    });
-                    if (value.label) {
-                        this.get('label')(value.label);
                     }
                 },
                 owner: this
@@ -86,7 +85,27 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                         configKeys.push(configKey);
                     });
                     this.set(key, value);
-                    this.configKeys = configKeys;
+                    this.configKeys = ko.observableArray(configKeys);
+                } else if (key==='widget_id') {
+                    var widgetId = ko.observable(value);
+                    this.set(key, ko.computed({
+                        read: function () {
+                            return widgetId();
+                        },
+                        write: function (value) {
+                            var defaultConfig = JSON.parse(widgets[value].defaultconfig);
+                            for (key in defaultConfig) {
+                                defaultConfig[key] = ko.observable(defaultConfig[key]);
+                            }
+                            var currentConfig = this.get('config');
+                            this.set('config', _.defaults(currentConfig, defaultConfig));
+                            for (key in defaultConfig) {
+                                self.configKeys.push(key)
+                            }
+                            widgetId(value);
+                        },
+                        owner: this
+                    }));
                 } else {
                     this.set(key, ko.observable(value));
                 }

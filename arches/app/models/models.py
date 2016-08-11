@@ -512,7 +512,7 @@ class Widget(models.Model):
     component = models.TextField()
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
-    datatype = models.ForeignKey(db_column='datatype', to='models.DDataType')
+    datatype = models.TextField()
 
     @property
     def defaultconfig_json(self):
