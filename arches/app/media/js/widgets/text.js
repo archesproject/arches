@@ -10,7 +10,11 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('text-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder', 'width'];
+            var config = params.config();
+            params.configObservables = {
+                'placeholder': ko.observable(config['placeholder']),
+                'width': ko.observable(config['width'])
+            };
 
             WidgetViewModel.apply(this, [params]);
         },

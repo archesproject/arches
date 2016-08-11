@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'underscore'], function (ko, _) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -12,15 +12,15 @@ define(['knockout'], function (ko) {
         this.value = params.value || ko.observable(null);
         this.disabled = params.disabled || ko.observable(false);
         this.configForm = params.configForm || false;
-        this.config = params.config || ko.observable({}); 
-        this.configKeys = params.configKeys || [];
+        this.config = params.config || ko.observable({});
+        this.configObservables = params.configObservables || {};
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
         }
         this.label = this.config().label || ko.observable('');
 
-        this.configKeys.forEach(function(key) {
-            self[key] = ko.observable(self.config()[key]);
+        _.each(this.configObservables, function (obs, key) {
+            self[key] = obs;
 
             self[key].subscribe(function(val) {
                 var configObj = self.config();
