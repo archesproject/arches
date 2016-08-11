@@ -54,7 +54,7 @@
 
                                         <!-- Help link -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -103,10 +103,10 @@
                                 <div class="panel-heading">
                                     <h3 class="panel-title" style="padding: 0 10px 0 10px;">
                                         <span class="help-text-small">Help</span>
-                                        <span data-bind="text: self.currentTabCard().get('helptitle')"></span>
+                                        <span data-bind="text: self.currentTabCard() ? self.currentTabCard().get('helptitle') : ''"></span>
                                     </h3>
                                 </div>
-                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard().get('helptext')">
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard() ? self.currentTabCard().get('helptext') : ''">
                                 </div>
                             </div>
                         </div>
