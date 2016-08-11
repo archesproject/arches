@@ -14,12 +14,13 @@ define(['knockout', 'underscore'], function (ko, _) {
         this.configForm = params.configForm || false;
         this.config = params.config || ko.observable({});
         this.configObservables = params.configObservables || {};
+        this.configKeys = params.configKeys || [];
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
         }
         this.label = this.config().label || ko.observable('');
 
-        _.each(this.configObservables, function (obs, key) {
+        var subscribeConfigObservable = function (obs, key) {
             self[key] = obs;
 
             self[key].subscribe(function(val) {
@@ -33,6 +34,11 @@ define(['knockout', 'underscore'], function (ko, _) {
                     self[key](val[key]);
                 }
             });
+        };
+        _.each(this.configObservables, subscribeConfigObservable);
+        _.each(this.configKeys, function(key) {
+            var obs = ko.observable(self.config()[key]);
+            subscribeConfigObservable(obs, key);
         });
     };
     return WidgetViewModel;
