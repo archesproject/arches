@@ -14,7 +14,7 @@
 
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-                <div id="cards" class="tab-base outline relative" style="margin-bottom: 20px; margin-top: -2px;">
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
                         data: card.isContainer() ? card.get('cards') : [card],
@@ -49,7 +49,7 @@
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
 
-                                    <div>
+                                    <div class="card-instructions">
                                         <span data-bind="text: card.get('instructions')"></span>
 
                                         <!-- Help link -->
@@ -114,11 +114,11 @@
                 </div>
 
                 <!-- Wizard Level Buttons -->
-                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
-                    <div class="ep-form-toolbar-tools flex">
+                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
+                    <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
-                            <button disabled class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button disabled class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button disabled class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                            <button disabled class="btn btn-primary btn-lg btn-labeled fa fa-check">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
