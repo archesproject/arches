@@ -36,6 +36,8 @@ define([
                     });
                     if (!first && self.widgetId() !== cardWidget.get('widget_id')()) {
                         bypassIdUpdate = true;
+                    } else {
+                        bypassIdUpdate = false;
                     }
                     first = false;
                     return _.filter(widgets, function(widget) {
