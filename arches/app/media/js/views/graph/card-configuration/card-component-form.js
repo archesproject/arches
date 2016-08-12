@@ -25,16 +25,22 @@ define([
             this.card = ko.observable();
             this.widget = ko.observable();
             this.widgetLookup = widgets;
+            var bypassIdUpdate = false;
+            var first = true;
             this.widgetList = ko.computed(function() {
                 var cardWidget = self.widget();
                 if (cardWidget) {
                     var widgets = _.map(self.widgetLookup, function(widget, id) {
-                            widget.id = id;
-                            return widget;
-                        })
+                        widget.id = id;
+                        return widget;
+                    });
+                    if (!first && self.widgetId() !== cardWidget.get('widget_id')()) {
+                        bypassIdUpdate = true;
+                    }
+                    first = false;
                     return _.filter(widgets, function(widget) {
                         return widget.datatype === cardWidget.datatype.datatype
-                    })
+                    });
 
                 } else {
                     return [];
@@ -67,9 +73,10 @@ define([
                     return self.widget() ? self.widget().get('widget_id')() : null;
                 },
                 write: function (value) {
-                    if (self.widget()) {
+                    if (self.widget() && !bypassIdUpdate) {
                         self.widget().get('widget_id')(value);
                     }
+                    bypassIdUpdate = false;
                 },
                 owner: this
             });
