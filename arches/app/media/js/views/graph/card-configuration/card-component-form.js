@@ -41,11 +41,13 @@ define([
                 }
             });
 
+            var widgetUpdating = false;
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);
                 }
                 if('node' in selection){
+                    widgetUpdating = true;
                     this.widget(selection);
                 }
             };
@@ -67,9 +69,10 @@ define([
                     return self.widget() ? self.widget().get('widget_id')() : null;
                 },
                 write: function (value) {
-                    if (self.widget()) {
+                    if (self.widget() && !widgetUpdating) {
                         self.widget().get('widget_id')(value);
                     }
+                    widgetUpdating = false;
                 },
                 owner: this
             });
