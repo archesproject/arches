@@ -527,7 +527,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     position: relative;
     background-color: #314151;
     margin-bottom: 5px;
-    margin-right: 20px;
+    margin-right: 0px;
 }
 .key {
     margin-top: 98px;
@@ -3296,7 +3296,7 @@ li.card-tree-list:last-of-type {
 .tertiary-panel {
     position: absolute;
     top: 100px;
-    left: 450px;
+    left: 469px;
     bottom: 0;
     z-index: 50;
 }
