@@ -47,7 +47,9 @@ define([
                     this.card(selection);
                 }
                 if('node' in selection){
-                    widgetUpdating = true;
+                    if (this.widget()) {
+                        widgetUpdating = true;
+                    }
                     this.widget(selection);
                 }
             };

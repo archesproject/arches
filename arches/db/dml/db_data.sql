@@ -151,6 +151,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date', '{ "placeholder": "Enter date"}');
 
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000991', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
+
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');

@@ -8,8 +8,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-    return ko.components.register('shmext-widget', {
+    return ko.components.register('rich-text-widget', {
         viewModel: WidgetViewModel,
-        template: { require: 'text!widget-templates/shmext' }
+        template: { require: 'text!widget-templates/rich-text' }
     });
 });
