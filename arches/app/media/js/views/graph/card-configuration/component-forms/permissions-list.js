@@ -30,12 +30,11 @@ define([
         
             this.getPermsForDisplay = function(){
                 var ret = {'default': [], 'local': []};
-                this.perms().forEach(function(perm){
-                    if(('default' in perm)){
-                        ret.default.push(ko.unwrap(perm.name));
-                    }else{
-                        ret.local.push(ko.unwrap(perm.name));
-                    }
+                this.perms.local().forEach(function(perm){
+                    ret.local.push(ko.unwrap(perm.name));
+                }); 
+                this.perms.default().forEach(function(perm){
+                    ret.default.push(ko.unwrap(perm.name));
                 }); 
                 return ret; 
             };
@@ -43,6 +42,7 @@ define([
             this.permissionsForm = new PermissionsForm({
                 permissions: options.permissions,
                 selectedItems: this.selectedItems,
+                getPermsForDisplay: this.getPermsForDisplay
             })
         },
 

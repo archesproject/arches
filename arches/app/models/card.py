@@ -124,21 +124,21 @@ class Card(models.CardModel):
 
     def get_group_permissions(self, group, nodegroup=None):
         checker = ObjectPermissionChecker(group)
-        ret = list(checker.get_group_perms(nodegroup))
+        ret = {'local': list(checker.get_group_perms(nodegroup))}
         print group
         print ret
         #if len(ret) == 0:
         print 'make di here'
-        ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in group.permissions.all()])
+        ret['default'] = [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
         checker = ObjectPermissionChecker(user)
-        ret = list(checker.get_user_perms(nodegroup))
+        ret = {'local': list(checker.get_user_perms(nodegroup)), 'default': []}
         #if len(ret) == 0:
-        ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in user.user_permissions.all()])
+        ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()])
         for group in user.groups.all():
-            ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in group.permissions.all()])
+            ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
         return ret
 
     def save(self):
@@ -169,7 +169,7 @@ class Card(models.CardModel):
                     remove_perm(perm, groupModel, self.nodegroup)
                 # then add the new permissions
                 print group
-                for perm in group['perms']:
+                for perm in group['perms']['local']:
                     print 'assigning perm: ' + perm['codename']
                     if 'default' not in perm:
                         assign_perm(perm['codename'], groupModel, self.nodegroup)

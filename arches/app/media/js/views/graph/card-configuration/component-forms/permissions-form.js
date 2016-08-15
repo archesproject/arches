@@ -14,18 +14,7 @@ define([
             this.permissions = options.permissions;
             this.selectedItems = options.selectedItems;
             this.selectedPermissions = ko.observableArray();
-
-            this.getPermsForDisplay = function(){
-                var ret = {'default': [], 'local': []};
-                this.perms().forEach(function(perm){
-                    if(('default' in perm)){
-                        ret.default.push(ko.unwrap(perm.name));
-                    }else{
-                        ret.local.push(ko.unwrap(perm.name));
-                    }
-                }); 
-                return ret; 
-            };
+            this.getPermsForDisplay = options.getPermsForDisplay;
         },
 
         /**
@@ -46,7 +35,7 @@ define([
             this.resetPermissions();
             this.selectedItems().forEach(function(item){
                 this.selectedPermissions().forEach(function(perm){
-                    item.perms.push(perm);
+                    item.perms.local.push(perm);
                 }, this);
             }, this);
         },
@@ -58,9 +47,7 @@ define([
         */
         resetPermissions: function(){
             this.selectedItems().forEach(function(item){
-                item.perms.remove(function(perm){
-                    return !('default' in perm);
-                });
+                item.perms.local.removeAll();
             }, this);
         }
 
