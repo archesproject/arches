@@ -17,8 +17,10 @@
             <div>
                 <select style="min-width: 200px;" class="resources" multiple data-bind="selectedOptions: selectedPermissions, options: permissions, optionsText: 'name', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
-            <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;" data-bind="click: applyPermissions">{% trans "Apply permissions" %}</button>
-            <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;" data-bind="click: resetPermissions">{% trans "Reset permissions" %}</button>
+            <div class="flex">
+                <button id="apply-permissions" class="btn btn-primary btn-block btn-labeled fa fa-plus" style="margin: 10px;" data-bind="click: applyPermissions">{% trans "Apply permissions" %}</button>
+                <button id="apply-permissions" class="btn btn-mint btn-block btn-labeled fa fa-repeat" style="margin: 10px;" data-bind="click: resetPermissions">{% trans "Reset permissions" %}</button>
+            </div>
         </div>
     </div>
 
