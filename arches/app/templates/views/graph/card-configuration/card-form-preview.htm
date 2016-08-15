@@ -86,6 +86,13 @@
                                 </div>
                             </div>
                             <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n'">
+
+                                <!-- Title -->
+                                <div class="card-tab-title mar-btm">
+                                    Saved <span data-bind="text: card.get('name')"/>
+                                </div>
+
+                                <!-- Tiles -->
                                 <div class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250); height: 40px;" data-bind="text: card.get('itemtext')">
                                 </div>
                             </div>
@@ -124,6 +131,11 @@
                 </div>
 
                 <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
+
+                    <!-- Title -->
+                    <div class="card-tab-title mar-btm">
+                        Saved <span data-bind="text: card.get('name')"/>
+                    </div>
 
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
