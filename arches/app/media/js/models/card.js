@@ -142,6 +142,9 @@ define(['arches',
                     ret[key] = _.map(widgets, function (widget) {
                         return widget.toJSON();
                     });
+                    ret['nodes'] = _.map(widgets, function (widget) {
+                        return widget.node.toJSON();
+                    });
                 }
             }
             return ret;

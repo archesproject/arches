@@ -34,7 +34,7 @@
         <!-- ko if: selection() === widget() -->
         <div class="node-widget-label" style="">
             <div class="control-label">
-                Widget Label
+                {% trans "Widget Label" %}
             </div>
             <div class="col-sm-12 pad-no crud-widget-container">
                 <input type="" placeholder="Widget Label" id="" class="form-control input-md widget-input" data-bind="value: widget().get('label'), valueUpdate: 'keyup'">
@@ -58,7 +58,7 @@
         <div class="node-widget-label" style="">
             <div class="
             control-label">
-                Template
+                {% trans "Template" %}
             </div>
             <div class="col-sm-12 pad-no crud-widget-container">
                 <select class="design" data-bind="value: widgetId, options: widgetList, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
@@ -68,11 +68,16 @@
     </div>
 
     <div id="widget-crud-validation" class="tab-pane fade">
-
+        <!-- ko if: selection() === widget() -->
         <div class="node-widget-label" style="">
-            validation
+            <div class="control-label">
+                {% trans "Validations" %}
+            </div>
+            <div>
+                <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: widget().node.validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
         </div>
-
+        <!-- /ko -->
     </div>
 
 </div>
