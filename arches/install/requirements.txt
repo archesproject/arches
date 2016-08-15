@@ -11,4 +11,4 @@ django-guardian
 
 # Leave the following line commented so that pip install will ignore this
 # The installer uses the following line to download the proper version of ES
-# https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.2.0/elasticsearch-2.2.0.zip
+# https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.3.5/elasticsearch-2.3.5.zip
