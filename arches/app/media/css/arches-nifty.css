@@ -3637,7 +3637,7 @@ div.row.widget-wrapper {
     padding: 5px 5px 15px 5px;
 }
 div.row.widget-wrapper:hover {
-    background: #fcfcfc;
+    background: #fafafa;
 }
 .widget-preview {
     border: 1px solid transparent;
@@ -3646,8 +3646,11 @@ div.row.widget-wrapper:hover {
     cursor: pointer;
 }
 .widget-preview.active {
-    background: #fdfdfd;
+    background: #fcfcfc;
     border: 1px solid #ddd;
+}
+.select2-container.select2-container-disabled .select2-choice {
+    background: #eee;
 }
 .panel-heading.note-toolbar {
     height: auto;
