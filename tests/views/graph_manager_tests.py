@@ -209,7 +209,19 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse('export_graph', kwargs={'graphid':graphid})
         response = self.client.get(url)
         graph_json = json.loads(response._container[0])
-        node_count = len(graph_json[0]['nodes'])
+        node_count = len(graph_json['graph'][0]['nodes'])
         self.assertTrue(response._container[0])
         self.assertEqual(node_count, self.NODE_COUNT+1)
         self.assertEqual(list(response._headers['content-type'])[1], 'json/plain')
+
+    def test_graph_import(self):
+        """
+        test graph import method
+
+        """
+
+        self.client.login(username='admin', password='admin')
+        url = reverse('import_graph')
+        with open(os.path.join(list(test_settings.RESOURCE_GRAPH_LOCATIONS)[0], 'archesv4_resource.json')) as f:
+            response = self.client.post(url, {'importedGraph': f})
+        self.assertEqual(response.content, '{}')

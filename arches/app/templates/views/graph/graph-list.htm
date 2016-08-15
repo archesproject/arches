@@ -69,14 +69,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">Graph Library</a>
             </div>
 
-            <div class="btn-group" style="position: absolute; right: 50px; top: 12px;">
+            <div class="btn-group" style="position: absolute; right: 70px; top: 12px;">
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                     Add <i class="ion-more"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource" %}</a></li>
                     <li><a href="#" data-bind="click: newGraph">{% trans "New Graph" %}</a></li>
-                    <li><a href="#">{% trans "Import Graph/Resource" %}</a></li>
+                    <li class="file-upload upload">
+                            <form id="data">
+                                <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>  
+                            </form>
+                            <a href="#" class="arches-tool-item file-upload" data-bind="{click: importButtonClick}">{% trans "Import Graph/Resource" %}</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -106,7 +111,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Default Page content-->
-    <div id="page-content" style="overflow: auto; padding: 0 50px 160px; margin-top: -1px;">
+    <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
 
         <div id="report-image-grid" class="report-image-grid">
 

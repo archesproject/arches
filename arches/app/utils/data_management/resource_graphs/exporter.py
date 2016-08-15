@@ -45,10 +45,11 @@ def write_edges(export_dir):
                 writer.writerow(node)
 
 def get_graphs_for_export(resource_list=None):
+    graphs = {}
     if resource_list == None:
-        graphs = Graph.objects.all().exclude(name='Arches configuration')
+        graphs['graph'] = Graph.objects.all().exclude(name='Arches configuration')
     else:
-        graphs = Graph.objects.filter(graphid__in=resource_list)
+        graphs['graph'] = Graph.objects.filter(graphid__in=resource_list)
     return graphs
 
 def write_graph(export_dir, resource_list):

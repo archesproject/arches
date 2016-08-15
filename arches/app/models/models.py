@@ -63,7 +63,7 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    function = models.ForeignKey('Function', db_column='functionid')
+    function = models.ForeignKey('Function', db_column='functionid', null=True)
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -512,7 +512,7 @@ class Widget(models.Model):
     component = models.TextField()
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     helptext = models.TextField(blank=True, null=True)
-    datatype = models.ForeignKey(db_column='datatype', to='models.DDataType')
+    datatype = models.TextField()
 
     @property
     def defaultconfig_json(self):

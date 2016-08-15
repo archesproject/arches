@@ -31,11 +31,41 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 defaults.config = widgets[defaults.widget_id].defaultconfig;
             }
             if (this.node) {
+                defaults.node_id = this.node.nodeid;
                 defaults.label = this.node.name();
+            }
+            if (this.card) {
+                defaults.card_id = this.card.get('id');
             }
 
             attributes = _.defaults(attributes, defaults);
-            return AbstractModel.prototype.constructor.call(this, attributes, options);
+
+            AbstractModel.prototype.constructor.call(this, attributes, options);
+
+            this.configJSON = ko.computed({
+                read: function () {
+                    var configJSON = {};
+                    var config = this.get('config');
+                    _.each(this.configKeys(), function(key) {
+                        configJSON[key] = config[key]();
+                    });
+                    configJSON.label = this.get('label')();
+                    return configJSON;
+                },
+                write: function (value) {
+                    var config = this.get('config');
+                    for (key in value) {
+                        if (key === 'label') {
+                            this.get('label')(value[key]);
+                        } else if (config[key]() !== value[key]) {
+                            config[key](value[key]);
+                        }
+                    }
+                },
+                owner: this
+            });
+
+            return this;
         },
 
         /**
@@ -55,21 +85,43 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                         configKeys.push(configKey);
                     });
                     this.set(key, value);
-                    this.configKeys = configKeys;
+                    this.configKeys = ko.observableArray(configKeys);
+                } else if (key==='widget_id') {
+                    var widgetId = ko.observable(value);
+                    this.set(key, ko.computed({
+                        read: function () {
+                            return widgetId();
+                        },
+                        write: function (value) {
+                            var defaultConfig = JSON.parse(widgets[value].defaultconfig);
+                            for (key in defaultConfig) {
+                                defaultConfig[key] = ko.observable(defaultConfig[key]);
+                            }
+                            var currentConfig = this.get('config');
+                            this.set('config', _.defaults(currentConfig, defaultConfig));
+                            for (key in defaultConfig) {
+                                self.configKeys.push(key)
+                            }
+                            widgetId(value);
+                        },
+                        owner: this
+                    }));
                 } else {
                     this.set(key, ko.observable(value));
                 }
             }, this);
+        },
 
-            this.configJSON = ko.computed(function () {
-                var configJSON = {};
-                var config = self.get('config');
-                _.each(self.configKeys, function(key) {
-                    configJSON[key] = config[key]();
-                });
-                configJSON.label = self.get('label')();
-                return configJSON;
-            });
+        toJSON: function () {
+            var ret = {};
+            for(key in this.attributes){
+                if (key !== 'config') {
+                    ret[key] = this.attributes[key]();
+                } else {
+                    ret[key] = JSON.stringify(this.configJSON())
+                }
+            }
+            return ret;
         }
     });
 });

@@ -62,20 +62,20 @@ class Card(models.CardModel):
 
         super(Card, self).__init__(*args, **kwargs)
         # from models.CardModel
-        # self.cardid       
-        # self.name     
-        # self.description      
-        # self.instructions     
-        # self.helpenabled      
-        # self.helptitle        
-        # self.helptext     
-        # self.nodegroup        
-        # self.graph        
-        # self.active       
-        # self.visible      
-        # self.sortorder        
-        # self.function     
-        # self.itemtext     
+        # self.cardid
+        # self.name
+        # self.description
+        # self.instructions
+        # self.helpenabled
+        # self.helptitle
+        # self.helptext
+        # self.nodegroup
+        # self.graph
+        # self.active
+        # self.visible
+        # self.sortorder
+        # self.function
+        # self.itemtext
         # end from models.CardModel
         self.cardinality = ''
         self.cards = []
@@ -92,12 +92,23 @@ class Card(models.CardModel):
 
                 for card in args[0]["cards"]:
                     self.cards.append(Card(card))
-                
+
+                for widget in args[0]["widgets"]:
+                    widget_model = models.CardXNodeXWidget()
+                    widget_model.id = widget.get('id', None)
+                    widget_model.node_id = widget.get('node_id', None)
+                    widget_model.card_id = widget.get('card_id', None)
+                    widget_model.widget_id = widget.get('widget_id', None)
+                    widget_model.config = widget.get('config', {})
+                    widget_model.label = widget.get('label', '')
+                    widget_model.sortorder = widget.get('sortorder', None)
+                    self.widgets.append(widget_model)
+
                 self.graph = Graph.objects.get(graphid=self.graph_id)
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
-                
+
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
                     self.cards.extend(Card.objects.filter(nodegroup=sub_group))
@@ -143,6 +154,8 @@ class Card(models.CardModel):
             self.nodegroup.save()
 
             super(Card, self).save()
+            for widget in self.widgets:
+                widget.save()
             for card in self.cards:
                 card.save()
 

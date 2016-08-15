@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from arches.app.models.graph import Graph
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def import_graph(graphs):
 	for resource in graphs:

@@ -2,8 +2,9 @@ define([
     'backbone',
     'knockout',
     'views/graph/card-configuration/component-forms/permissions-list',
+    'widgets',
     'bindings/summernote'
-], function(Backbone,  ko, PermissionsList) {
+], function(Backbone,  ko, PermissionsList, widgets) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -18,18 +19,35 @@ define([
         * @param {boolean} options.selection - the selected item, either a {@link CardModel} or a {@link NodeModel}
         */
         initialize: function(options) {
+            var self = this;
             this.card = options.card;
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
-            this.node = ko.observable();
+            this.widget = ko.observable();
+            this.widgetLookup = widgets;
+            this.widgetList = ko.computed(function() {
+                var cardWidget = self.widget();
+                if (cardWidget) {
+                    var widgets = _.map(self.widgetLookup, function(widget, id) {
+                        widget.id = id;
+                        return widget;
+                    });
+                    return _.filter(widgets, function(widget) {
+                        return widget.datatype === cardWidget.datatype.datatype
+                    });
+                } else {
+                    return [];
+                }
+            });
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
                     this.card(selection);
                 }
                 if('node' in selection){
-                    this.node(selection);
+                    this.widget(null);
+                    this.widget(selection);
                 }
             };
 
@@ -45,6 +63,17 @@ define([
                 permissions: options.permissions
             });
 
+            this.widgetId = ko.computed({
+                read: function () {
+                    return self.widget() ? self.widget().get('widget_id')() : null;
+                },
+                write: function (value) {
+                    if (self.widget()) {
+                        self.widget().get('widget_id')(value);
+                    }
+                },
+                owner: this
+            });
         }
     });
     return CardComponentForm;

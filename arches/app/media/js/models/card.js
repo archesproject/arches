@@ -134,7 +134,7 @@ define(['arches',
         toJSON: function(){
             var ret = {};
             for(key in this.attributes){
-                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'){
+                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' && key !== 'widgets'){
                     if(ko.isObservable(this.attributes[key])){
                         if(key === 'users' || key === 'groups'){
                             ret[key] = koMapping.toJS(this.attributes[key]);
@@ -144,6 +144,11 @@ define(['arches',
                     }else{
                         ret[key] = this.attributes[key];
                     }
+                } else if (key === 'widgets') {
+                    var widgets = this.attributes[key]();
+                    ret[key] = _.map(widgets, function (widget) {
+                        return widget.toJSON();
+                    });
                 }
             }
             return ret;

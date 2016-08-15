@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'underscore'], function (ko, _) {
     /**
     * A viewmodel used for generic widgets
     *
@@ -8,9 +8,38 @@ define(['knockout'], function (ko) {
     * @param  {string} params - a configuration object
     */
     var WidgetViewModel = function(params) {
-        this.value = params.value;
-        this.disabled = params.disabled;
-        this.label = params.config.label;
+        var self = this;
+        this.value = params.value || ko.observable(null);
+        this.disabled = params.disabled || ko.observable(false);
+        this.configForm = params.configForm || false;
+        this.config = params.config || ko.observable({});
+        this.configObservables = params.configObservables || {};
+        this.configKeys = params.configKeys || [];
+        if (typeof this.config !== 'function') {
+            this.config = ko.observable(this.config);
+        }
+        this.label = this.config().label || ko.observable('');
+
+        var subscribeConfigObservable = function (obs, key) {
+            self[key] = obs;
+
+            self[key].subscribe(function(val) {
+                var configObj = self.config();
+                configObj[key] = val;
+                self.config(configObj);
+            });
+
+            self.config.subscribe(function(val) {
+                if (val[key] !== self[key]()) {
+                    self[key](val[key]);
+                }
+            });
+        };
+        _.each(this.configObservables, subscribeConfigObservable);
+        _.each(this.configKeys, function(key) {
+            var obs = ko.observable(self.config()[key]);
+            subscribeConfigObservable(obs, key);
+        });
     };
     return WidgetViewModel;
 });

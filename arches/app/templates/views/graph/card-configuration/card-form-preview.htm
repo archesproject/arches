@@ -14,7 +14,7 @@
 
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-                <div id="cards" class="tab-base outline relative" style="margin-bottom: 20px; margin-top: -2px;">
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
                         data: card.isContainer() ? card.get('cards') : [card],
@@ -49,12 +49,12 @@
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
 
-                                    <div>
+                                    <div class="card-instructions">
                                         <span data-bind="text: card.get('instructions')"></span>
 
                                         <!-- Help link -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -68,7 +68,7 @@
                                             <div class='widget-preview' data-bind='component: {
                                                 name: self.widgetLookup[get("widget_id")()].name,
                                                 params: {
-                                                    config: configJSON(),
+                                                    config: configJSON,
                                                     label: get("label")(),
                                                     value: ko.observable(null),
                                                     disabled: true
@@ -86,6 +86,13 @@
                                 </div>
                             </div>
                             <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n'">
+
+                                <!-- Title -->
+                                <div class="card-tab-title mar-btm">
+                                    Saved <span data-bind="text: card.get('name')"/>
+                                </div>
+
+                                <!-- Tiles -->
                                 <div class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250); height: 40px;" data-bind="text: card.get('itemtext')">
                                 </div>
                             </div>
@@ -103,10 +110,10 @@
                                 <div class="panel-heading">
                                     <h3 class="panel-title" style="padding: 0 10px 0 10px;">
                                         <span class="help-text-small">Help</span>
-                                        <span data-bind="text: self.currentTabCard().get('helptitle')"></span>
+                                        <span data-bind="text: self.currentTabCard() ? self.currentTabCard().get('helptitle') : ''"></span>
                                     </h3>
                                 </div>
-                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard().get('helptext')">
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard() ? self.currentTabCard().get('helptext') : ''">
                                 </div>
                             </div>
                         </div>
@@ -114,16 +121,21 @@
                 </div>
 
                 <!-- Wizard Level Buttons -->
-                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
-                    <div class="ep-form-toolbar-tools flex">
+                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
+                    <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
-                            <button disabled class="btn btn-sm btn-danger btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button disabled class="btn btn-sm btn-primary btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button disabled class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                            <button disabled class="btn btn-primary btn-lg btn-labeled fa fa-check">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
 
                 <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
+
+                    <!-- Title -->
+                    <div class="card-tab-title mar-btm">
+                        Saved <span data-bind="text: card.get('name')"/>
+                    </div>
 
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
