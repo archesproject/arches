@@ -156,7 +156,7 @@ def card(request, cardid):
             card = Card(data)
             card.save()
             return JSONResponse(card)
-            
+
     if request.method == 'GET':
         try:
             card = Card.objects.get(cardid=cardid)
@@ -165,6 +165,7 @@ def card(request, cardid):
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        validations = models.Validation.objects.all()
         return render(request, 'views/graph/card-configuration-manager.htm', {
             'main_script': 'views/graph/card-configuration-manager',
             'graphid': card.graph_id,
@@ -174,6 +175,7 @@ def card(request, cardid):
             'datatypes': JSONSerializer().serialize(datatypes),
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),
+            'validations': JSONSerializer().serialize(validations),
         })
 
     return HttpResponseNotFound()
@@ -254,7 +256,7 @@ def import_graph(request):
         for graph in graphs:
             new_graph = Graph(graph)
             new_graph.save()
-        
+
         return JSONResponse({})
 
     return HttpResponseNotFound()

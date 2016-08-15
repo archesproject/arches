@@ -5,8 +5,7 @@ require([
     'views/graph/card-configuration/card-component-form',
     'views/graph/card-configuration/card-components-tree',
     'views/graph/card-configuration/card-form-preview',
-    'card-configuration-data',
-    'widgets/switch'
+    'card-configuration-data'
 ], function(ko, CardModel, PageView, CardComponentForm, CardComponentsTree, CardFormPreview, data) {
     var viewModel = {
         card: new CardModel({
@@ -14,6 +13,7 @@ require([
             datatypes: data.datatypes
         }),
         permissions: data.permissions,
+        validations: data.validations,
         helpPreviewActive: ko.observable(false)
     };
     viewModel.dirty = viewModel.card.dirty;

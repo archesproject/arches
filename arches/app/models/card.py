@@ -80,6 +80,7 @@ class Card(models.CardModel):
         self.cardinality = ''
         self.cards = []
         self.widgets = []
+        self.nodes = []
         self.ontologyproperty = None
         self.groups = []
         self.users = []
@@ -103,6 +104,13 @@ class Card(models.CardModel):
                     widget_model.label = widget.get('label', '')
                     widget_model.sortorder = widget.get('sortorder', None)
                     self.widgets.append(widget_model)
+
+                for node in args[0]["nodes"]:
+                    nodeid = node.get('nodeid', None)
+                    if nodeid is not None:
+                        node_model = models.Node.objects.get(nodeid=nodeid)
+                        node_model.validations.set(node.get('validations', []))
+                        self.nodes.append(node_model)
 
                 self.graph = Graph.objects.get(graphid=self.graph_id)
 
@@ -158,6 +166,8 @@ class Card(models.CardModel):
             super(Card, self).save()
             for widget in self.widgets:
                 widget.save()
+            for node in self.nodes:
+                node.save()
             for card in self.cards:
                 card.save()
 
