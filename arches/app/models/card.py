@@ -120,23 +120,22 @@ class Card(models.CardModel):
 
                 self.cardinality = self.nodegroup.cardinality
                 self.groups = [{'name': group.name, 'perms': self.get_group_permissions(group, self.nodegroup), 'type': 'group', 'id': group.pk} for group in Group.objects.all()]
-                self.users = [{'username': user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user', 'id': user.pk} for user in User.objects.all()]
+                self.users = [{'username': user.email or user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user', 'id': user.pk} for user in User.objects.all()]
 
     def get_group_permissions(self, group, nodegroup=None):
         checker = ObjectPermissionChecker(group)
-        ret = {'local': list(checker.get_group_perms(nodegroup))}
-        print group
-        print ret
-        #if len(ret) == 0:
-        print 'make di here'
-        ret['default'] = [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+        ret = {
+            'local': list(checker.get_group_perms(nodegroup)), 
+            'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+        }
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
         checker = ObjectPermissionChecker(user)
-        ret = {'local': list(checker.get_user_perms(nodegroup)), 'default': []}
-        #if len(ret) == 0:
-        ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()])
+        ret = {
+            'local': list(checker.get_user_perms(nodegroup)), 
+            'default': [{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()]
+        }
         for group in user.groups.all():
             ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
         return ret
@@ -168,21 +167,18 @@ class Card(models.CardModel):
                 for perm in get_perms(groupModel, self.nodegroup):
                     remove_perm(perm, groupModel, self.nodegroup)
                 # then add the new permissions
-                print group
                 for perm in group['perms']['local']:
-                    print 'assigning perm: ' + perm['codename']
-                    if 'default' not in perm:
-                        assign_perm(perm['codename'], groupModel, self.nodegroup)
+                    assign_perm(perm['codename'], groupModel, self.nodegroup)
 
-            # for user in self.users: 
-            #     userModel = User.objects.get(pk=user['id'])
-            #     # first remove all the current permissions
-            #     for perm in get_perms(userModel, self.nodegroup):
-            #         remove_perm(perm, userModel, self.nodegroup)
-            #     # then add the new permissions
-            #     for perm in user['perms']:
-            #         print perm
-            #         assign_perm(perm['codename'], userModel, self.nodegroup)
+            for user in self.users: 
+                userModel = User.objects.get(pk=user['id'])
+                # first remove all the current permissions
+                for perm in get_perms(userModel, self.nodegroup):
+                    remove_perm(perm, userModel, self.nodegroup)
+                # then add the new permissions
+                for perm in user['perms']['local']:
+                    print perm
+                    assign_perm(perm['codename'], userModel, self.nodegroup)
         return self
 
     def get_edge_to_parent(self):
