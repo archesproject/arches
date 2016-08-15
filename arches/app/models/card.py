@@ -127,8 +127,16 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
-                self.groups = [{'name': group.name, 'perms': self.get_group_permissions(group, self.nodegroup), 'type': 'group', 'id': group.pk} for group in Group.objects.all()]
-                self.users = [{'username': user.email or user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user', 'id': user.pk} for user in User.objects.all()]
+
+                for group in Group.objects.all():
+                    perms = self.get_group_permissions(group, self.nodegroup)
+                    if len(perms['default']) > 0:
+                        self.groups.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
+                
+                for user in User.objects.all():
+                    perms = self.get_user_permissions(user, self.nodegroup)
+                    if len(perms['default']) > 0:
+                        self.users.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
 
     def get_group_permissions(self, group, nodegroup=None):
         checker = ObjectPermissionChecker(group)
