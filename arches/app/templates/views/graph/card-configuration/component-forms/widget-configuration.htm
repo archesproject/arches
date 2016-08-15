@@ -29,10 +29,9 @@
 
 <!-- Tabs Content -->
 <div class="tab-content listing-container">
-    <!-- ko if: selection() === widget() -->
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
-
+        <!-- ko if: selection() === widget() -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 Widget Label
@@ -51,20 +50,21 @@
                 value: ko.observable(null)
             }
         }'></div>
-
+        <!-- /ko -->
     </div>
 
     <div id="widget-crud-advanced" class="tab-pane fade">
-
+        <!-- ko if: selection() === widget() -->
         <div class="node-widget-label" style="">
-            <div class="control-label">
+            <div class="
+            control-label">
                 Template
             </div>
             <div class="col-sm-12 pad-no crud-widget-container">
                 <select class="design" data-bind="value: widgetId, options: widgetList, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
-
+        <!-- /ko -->
     </div>
 
     <div id="widget-crud-validation" class="tab-pane fade">
@@ -75,5 +75,4 @@
 
     </div>
 
-    <!-- /ko -->
 </div>
