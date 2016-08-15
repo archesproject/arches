@@ -25,8 +25,6 @@ define([
             this.card = ko.observable();
             this.widget = ko.observable();
             this.widgetLookup = widgets;
-            var bypassIdUpdate = false;
-            var first = true;
             this.widgetList = ko.computed(function() {
                 var cardWidget = self.widget();
                 if (cardWidget) {
@@ -34,16 +32,9 @@ define([
                         widget.id = id;
                         return widget;
                     });
-                    if (!first && self.widgetId() !== cardWidget.get('widget_id')()) {
-                        bypassIdUpdate = true;
-                    } else {
-                        bypassIdUpdate = false;
-                    }
-                    first = false;
                     return _.filter(widgets, function(widget) {
                         return widget.datatype === cardWidget.datatype.datatype
                     });
-
                 } else {
                     return [];
                 }
@@ -54,6 +45,7 @@ define([
                     this.card(selection);
                 }
                 if('node' in selection){
+                    this.widget(null);
                     this.widget(selection);
                 }
             };
@@ -75,10 +67,9 @@ define([
                     return self.widget() ? self.widget().get('widget_id')() : null;
                 },
                 write: function (value) {
-                    if (self.widget() && !bypassIdUpdate) {
+                    if (self.widget()) {
                         self.widget().get('widget_id')(value);
                     }
-                    bypassIdUpdate = false;
                 },
                 owner: this
             });
