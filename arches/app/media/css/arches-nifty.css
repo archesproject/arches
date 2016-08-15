@@ -3306,7 +3306,6 @@ li.card-tree-list:last-of-type {
     border-left: 1px solid #ddd;
     height: 100%;
     width: 450px;
-    opacity: .95;
     padding: 10px;
 }
 .toggle-container {
