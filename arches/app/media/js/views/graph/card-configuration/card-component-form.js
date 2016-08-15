@@ -19,7 +19,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            this.card = options.card;
+            _.extend(this, _.pick(options, 'card', 'validations'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
