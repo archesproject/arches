@@ -17,6 +17,11 @@
         </a>
     </div>
 
-    <div class="library-card-subtitle" data-bind="text: $parent.getPermsForDisplay.bind($data)()"></div>
+    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length > 0 -->
+        <div class="library-card-subtitle" data-bind="text: $parent.getPermsForDisplay.bind($data)().local"></div>
+    <!-- /ko -->
+    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length == 0 -->
+        <div class="library-card-subtitle" data-bind="text: '({% trans "default" %}) - ' + $parent.getPermsForDisplay.bind($data)().default"></div>
+    <!-- /ko -->
 
 {% endblock %}

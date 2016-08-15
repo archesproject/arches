@@ -29,9 +29,13 @@ define([
             this.parseItems(this.card());
         
             this.getPermsForDisplay = function(){
-                var ret = [];
+                var ret = {'default': [], 'local': []};
                 this.perms().forEach(function(perm){
-                    ret.push(ko.unwrap(perm.name));
+                    if(('default' in perm)){
+                        ret.default.push(ko.unwrap(perm.name));
+                    }else{
+                        ret.local.push(ko.unwrap(perm.name));
+                    }
                 }); 
                 return ret; 
             };

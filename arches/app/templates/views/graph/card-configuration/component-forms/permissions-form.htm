@@ -13,14 +13,13 @@
  
     <!-- Premission Selector -->
     <div style="margin-top: 8px;">
-        <!-- Functions -->
         <div class="node-widget-label">
             <div>
                 <select style="min-width: 200px;" class="resources" multiple data-bind="selectedOptions: selectedPermissions, options: permissions, optionsText: 'name', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
             <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;" data-bind="click: applyPermissions">{% trans "Apply permissions" %}</button>
+            <button id="apply-permissions" class="btn btn-primary btn btn-block btn-labeled fa fa-plus" style="margin-top: 10px; margin-bottom: 10px;" data-bind="click: resetPermissions">{% trans "Reset permissions" %}</button>
         </div>
-
     </div>
 
     <!-- Premission Key -->
@@ -31,7 +30,12 @@
         <div class="panel-body" style="padding: 0 10px 10px 10px;">
             <dl>
                 <!-- ko foreach: selectedItems -->
-                <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)()"></dd>
+                    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length > 0 -->
+                    <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)().local"></dd>
+                    <!-- /ko -->
+                    <!-- ko if: $parent.getPermsForDisplay.bind($data)().local.length == 0 -->
+                    <dd data-bind="text: $data.name() + ' - ' + $parent.getPermsForDisplay.bind($data)().default + ' ({% trans "default" %})'"></dd>
+                    <!-- /ko -->
                 <!-- /ko -->
             </dl>
         </div>

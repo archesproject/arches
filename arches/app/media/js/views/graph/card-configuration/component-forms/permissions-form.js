@@ -16,9 +16,13 @@ define([
             this.selectedPermissions = ko.observableArray();
 
             this.getPermsForDisplay = function(){
-                var ret = [];
+                var ret = {'default': [], 'local': []};
                 this.perms().forEach(function(perm){
-                    ret.push(ko.unwrap(perm.name));
+                    if(('default' in perm)){
+                        ret.default.push(ko.unwrap(perm.name));
+                    }else{
+                        ret.local.push(ko.unwrap(perm.name));
+                    }
                 }); 
                 return ret; 
             };
@@ -34,14 +38,32 @@ define([
             }, this);
         },
 
+        /**
+        * Associates the selected permissions with the selected users/groups
+        * @memberof PermissionsForm.prototype
+        */
         applyPermissions: function(){
+            this.resetPermissions();
             this.selectedItems().forEach(function(item){
-                item.perms.removeAll();
                 this.selectedPermissions().forEach(function(perm){
                     item.perms.push(perm);
                 }, this);
             }, this);
+        },
+
+        /**
+        * Resets the permissions associated with the selected users/groups 
+        * back to their default state
+        * @memberof PermissionsForm.prototype
+        */
+        resetPermissions: function(){
+            this.selectedItems().forEach(function(item){
+                item.perms.remove(function(perm){
+                    return !('default' in perm);
+                });
+            }, this);
         }
+
 
     });
     return PermissionsForm;

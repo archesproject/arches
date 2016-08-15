@@ -124,18 +124,21 @@ class Card(models.CardModel):
 
     def get_group_permissions(self, group, nodegroup=None):
         checker = ObjectPermissionChecker(group)
-        ret = checker.get_group_perms(nodegroup)
-        if len(ret) == 0:
-            ret = [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+        ret = list(checker.get_group_perms(nodegroup))
+        print group
+        print ret
+        #if len(ret) == 0:
+        print 'make di here'
+        ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in group.permissions.all()])
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
         checker = ObjectPermissionChecker(user)
-        ret = checker.get_user_perms(nodegroup)
-        if len(ret) == 0:
-            ret = [{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()]
-            for group in user.groups.all():
-                ret.extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
+        ret = list(checker.get_user_perms(nodegroup))
+        #if len(ret) == 0:
+        ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in user.user_permissions.all()])
+        for group in user.groups.all():
+            ret.extend([{'codename': item.codename, 'name': item.name, 'default': True} for item in group.permissions.all()])
         return ret
 
     def save(self):
@@ -167,9 +170,9 @@ class Card(models.CardModel):
                 # then add the new permissions
                 print group
                 for perm in group['perms']:
-
                     print 'assigning perm: ' + perm['codename']
-                    assign_perm(perm['codename'], groupModel, self.nodegroup)
+                    if 'default' not in perm:
+                        assign_perm(perm['codename'], groupModel, self.nodegroup)
 
             # for user in self.users: 
             #     userModel = User.objects.get(pk=user['id'])
