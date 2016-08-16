@@ -138,6 +138,23 @@ class Card(models.CardModel):
                         self.users.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
 
     def get_group_permissions(self, group, nodegroup=None):
+        """
+        get's a list of object level permissions allowed for a given group
+    
+        returns an object of the form:
+        .. code-block:: python
+            {
+                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
+                'default': {'codename': permssion codename, 'name': permission name} # A list of model level permissions
+            }
+
+        Keyword Arguments:
+        group -- the group to get the permissions for 
+
+        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
+
+        """
+
         ret = {
             'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)], 
             'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
@@ -145,18 +162,43 @@ class Card(models.CardModel):
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
+        """
+        get's a list of object level permissions allowed for a given user
+
+        returns an object of the form:
+        .. code-block:: python
+            {
+                'local':  {'codename': permssion codename, 'name': permission name} # A list of object level permissions
+                'default': {'codename': permssion codename, 'name': permission name} # A list of group based object level permissions or model level permissions
+            }
+
+        Keyword Arguments:
+        user -- the user to get the permissions for 
+
+        nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
+
+        """
+
         ret = {
             'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],  
-            'default': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(user, nodegroup)]
+            'default': set()
         }
-        if len(ret['default']) == 0:
-            for group in user.groups.all():
-                ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
+        for group in user.groups.all():
+            codenames = set(get_group_perms(group, nodegroup))
+            if len(codenames) == 0:
+                codenames = set([item.codename for item in group.permissions.all()])
+            ret['default'].update(codenames)
+        ret['default'] = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in ret['default']]
         return ret
 
     def get_perm_name(self, codename):
         if codename not in self.perm_cache:
-            self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+            try:
+                self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+                return self.perm_cache[codename]
+            except:
+                return None
+                # codename for nodegroup probably doesn't exist
         return self.perm_cache[codename]
 
     def save(self):
