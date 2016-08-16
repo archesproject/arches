@@ -17,13 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.db import transaction
+from django.contrib.auth.models import User, Group,Permission 
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.models.permissions import ObjectPermissionChecker
-from guardian.shortcuts import assign_perm, get_perms, remove_perm
-
-from django.contrib.auth.models import User, Group
+from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
 class Card(models.CardModel):
     """
@@ -84,6 +82,7 @@ class Card(models.CardModel):
         self.ontologyproperty = None
         self.groups = []
         self.users = []
+        self.perm_cache = {}
 
         if args:
             if isinstance(args[0], dict):
@@ -139,22 +138,26 @@ class Card(models.CardModel):
                         self.users.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
 
     def get_group_permissions(self, group, nodegroup=None):
-        checker = ObjectPermissionChecker(group)
         ret = {
-            'local': list(checker.get_group_perms(nodegroup)), 
+            'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)], 
             'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
         }
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
-        checker = ObjectPermissionChecker(user)
         ret = {
-            'local': list(checker.get_user_perms(nodegroup)), 
-            'default': [{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()]
+            'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],  
+            'default': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(user, nodegroup)]
         }
-        for group in user.groups.all():
-            ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
+        if len(ret['default']) == 0:
+            for group in user.groups.all():
+                ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
         return ret
+
+    def get_perm_name(self, codename):
+        if codename not in self.perm_cache:
+            self.perm_cache[codename] = Permission.objects.get(codename=codename, content_type__app_label='models', content_type__model='nodegroup')
+        return self.perm_cache[codename]
 
     def save(self):
         """

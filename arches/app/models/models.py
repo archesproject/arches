@@ -243,9 +243,9 @@ class NodeGroup(models.Model):
 
         default_permissions = ()
         permissions = (
-            ('read', 'Read'),
-            ('write', 'Create/Update'),
-            ('delete', 'Delete'),
+            ('read_nodegroup', 'Read'),
+            ('write_nodegroup', 'Create/Update'),
+            ('delete_nodegroup', 'Delete'),
         )
 
 

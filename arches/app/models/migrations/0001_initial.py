@@ -49,9 +49,9 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     User = apps.get_model("auth", "User")
     Permission = apps.get_model("auth", "Permission")
     try:
-        read_perm = Permission.objects.get(codename='read', content_type__app_label='models', content_type__model='nodegroup')
-        write_perm = Permission.objects.using(db_alias).get(codename='write', content_type__app_label='models', content_type__model='nodegroup')
-        delete_perm = Permission.objects.using(db_alias).get(codename='delete', content_type__app_label='models', content_type__model='nodegroup')
+        read_perm = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        write_perm = Permission.objects.using(db_alias).get(codename='write_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+        delete_perm = Permission.objects.using(db_alias).get(codename='delete_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
     except Permission.DoesNotExist:
         if with_create_permissions:
             # Manually run create_permissions
@@ -434,9 +434,9 @@ class Migration(migrations.Migration):
                 'managed': True,
                 'default_permissions': (),
                 'permissions': (
-                    ('read', 'Read'),
-                    ('write', 'Create/Update'),
-                    ('delete', 'Delete'),
+                    ('read_nodegroup', 'Read'),
+                    ('write_nodegroup', 'Create/Update'),
+                    ('delete_nodegroup', 'Delete'),
                 )
             },
         ),
