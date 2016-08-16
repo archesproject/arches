@@ -26,20 +26,6 @@ def forwards_func(apps, schema_editor):
     # We get the model from the versioned app registry;
     # if we directly import it, it'll be the wrong version
 
-    Group = apps.get_model("auth", "Group")
-    User = apps.get_model("auth", "User")
-    db_alias = schema_editor.connection.alias
-
-    edit_group = Group.objects.using(db_alias).create(name='edit')
-    read_group = Group.objects.using(db_alias).create(name='read')
-
-    admin_user = User.objects.using(db_alias).get(username='admin')
-    admin_user.groups.add(edit_group)
-    admin_user.groups.add(read_group)
-
-    anonymous_user = User.objects.using(db_alias).get(username='anonymous')
-    anonymous_user.groups.add(read_group)
-
     path_to_ontologies = os.path.join(settings.ROOT_DIR, 'db', 'ontologies', 'cidoc_crm')
     extensions = [
         os.path.join(path_to_ontologies, 'CRMsci_v1.2.3.rdfs.xml'),
@@ -51,9 +37,46 @@ def forwards_func(apps, schema_editor):
     management.call_command('load_ontology', source=os.path.join(path_to_ontologies, 'cidoc_crm_v6.2.xml'),
         version='6.2', ontology_name='CIDOC CRM v6.2', id='e6e8db47-2ccf-11e6-927e-b8f6b115d7dd', extensions=','.join(extensions))
 
-
 def reverse_func(apps, schema_editor):
-    models.Ontology.objects.filter(version='6.2').delete()
+    Ontology = apps.get_model("models", "Ontology")
+    Ontology.objects.filter(version='6.2').delete()
+
+# a work around for not being able to create permissions during an initial migration
+# from https://code.djangoproject.com/ticket/23422#comment:6
+def make_permissions(apps, schema_editor, with_create_permissions=True):
+    db_alias = schema_editor.connection.alias
+    Group = apps.get_model("auth", "Group")
+    User = apps.get_model("auth", "User")
+    Permission = apps.get_model("auth", "Permission")
+    try:
+        read_perm = Permission.objects.get(codename='read', content_type__app_label='models', content_type__model='nodegroup')
+        write_perm = Permission.objects.using(db_alias).get(codename='write', content_type__app_label='models', content_type__model='nodegroup')
+        delete_perm = Permission.objects.using(db_alias).get(codename='delete', content_type__app_label='models', content_type__model='nodegroup')
+    except Permission.DoesNotExist:
+        if with_create_permissions:
+            # Manually run create_permissions
+            from django.contrib.auth.management import create_permissions
+            assert not getattr(apps, 'models_module', None)
+            apps.models_module = True
+            create_permissions(apps, verbosity=0)
+            apps.models_module = None
+            return make_permissions(
+                apps, schema_editor, with_create_permissions=False)
+        else:
+            raise
+
+    edit_group = Group.objects.using(db_alias).create(name='edit')
+    edit_group.permissions.add(read_perm, write_perm, delete_perm)
+    
+    read_group = Group.objects.using(db_alias).create(name='read')
+    read_group.permissions.add(read_perm)
+
+    admin_user = User.objects.using(db_alias).get(username='admin')
+    admin_user.groups.add(edit_group)
+    admin_user.groups.add(read_group)
+
+    anonymous_user = User.objects.using(db_alias).get(username='anonymous')
+    anonymous_user.groups.add(read_group)
 
 class Migration(migrations.Migration):
 
@@ -409,12 +432,11 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'node_groups',
                 'managed': True,
+                'default_permissions': (),
                 'permissions': (
-                    ('none', 'No Access'),
                     ('read', 'Read'),
                     ('write', 'Create/Update'),
                     ('delete', 'Delete'),
-                    ('full', 'Full Access'),
                 )
             },
         ),
@@ -709,4 +731,5 @@ class Migration(migrations.Migration):
 
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(make_permissions,reverse_code=lambda *args,**kwargs: True),
     ]

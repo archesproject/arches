@@ -3,8 +3,9 @@ define(['arches',
     'models/node',
     'models/card-widget',
     'knockout',
+    'knockout-mapping',
     'underscore'
-], function (arches, AbstractModel, NodeModel, CardWidgetModel, ko, _) {
+], function (arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, _) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -101,7 +102,9 @@ define(['arches',
                         this.set(key, ko.observable(value));
                         break;
                     case 'ontology_properties':
-                        this.set(key, ko.observableArray(value));
+                    case 'users':
+                    case 'groups':
+                        this.set(key, koMapping.fromJS(value));
                         break;
                     default:
                         this.set(key, value);
@@ -133,7 +136,11 @@ define(['arches',
             for(key in this.attributes){
                 if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' && key !== 'widgets'){
                     if(ko.isObservable(this.attributes[key])){
-                        ret[key] = this.attributes[key]();
+                        if(key === 'users' || key === 'groups'){
+                            ret[key] = koMapping.toJS(this.attributes[key]);
+                        }else{
+                            ret[key] = this.attributes[key]();
+                        }
                     }else{
                         ret[key] = this.attributes[key];
                     }

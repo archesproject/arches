@@ -1,7 +1,7 @@
 define([
     'backbone',
     'knockout',
-    'views/graph/card-configuration/permissions-list',
+    'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'bindings/summernote'
 ], function(Backbone,  ko, PermissionsList, widgets) {
@@ -16,6 +16,7 @@ define([
         /**
         * Initializes the view with optional parameters
         * @memberof CardComponentForm.prototype
+        * @param {boolean} options.selection - the selected item, either a {@link CardModel} or a {@link NodeModel}
         */
         initialize: function(options) {
             var self = this;

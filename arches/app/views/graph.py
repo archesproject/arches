@@ -171,7 +171,7 @@ def card(request, cardid):
             'graphid': card.graph_id,
             'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
             'card': JSONSerializer().serialize(card),
-            'permissions': JSONSerializer().serialize([permission.name for permission in get_perms_for_model(card.nodegroup)]),
+            'permissions': JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
             'datatypes': JSONSerializer().serialize(datatypes),
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),

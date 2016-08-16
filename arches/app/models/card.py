@@ -20,7 +20,8 @@ from django.db import transaction
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from guardian.shortcuts import get_user_perms, get_group_perms, get_perms_for_model
+from arches.app.models.permissions import ObjectPermissionChecker
+from guardian.shortcuts import assign_perm, get_perms, remove_perm
 
 from django.contrib.auth.models import User, Group
 
@@ -81,6 +82,8 @@ class Card(models.CardModel):
         self.widgets = []
         self.nodes = []
         self.ontologyproperty = None
+        self.groups = []
+        self.users = []
 
         if args:
             if isinstance(args[0], dict):
@@ -124,25 +127,33 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
-                print get_perms_for_model(self.nodegroup)
+
                 for group in Group.objects.all():
-                    if group.name == 'edit':
-                        x = group.permissions #get_group_perms(group, self.nodegroup)
-                self.groups = [{'name': group.name, 'perms': self.get_group_permissions(group, self.nodegroup), 'type': 'group'} for group in Group.objects.all()]
-                self.users = [{'username': user.username, 'email': user.email, 'perms': self.get_user_permissions(user, self.nodegroup), 'type': 'user'} for user in User.objects.all()]
+                    perms = self.get_group_permissions(group, self.nodegroup)
+                    if len(perms['default']) > 0:
+                        self.groups.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
+                
+                for user in User.objects.all():
+                    perms = self.get_user_permissions(user, self.nodegroup)
+                    if len(perms['default']) > 0:
+                        self.users.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
 
     def get_group_permissions(self, group, nodegroup=None):
-        ret = get_group_perms(group, nodegroup)
-        if len(ret) == 0:
-            ret = [item.name for item in group.permissions.all()]
-
+        checker = ObjectPermissionChecker(group)
+        ret = {
+            'local': list(checker.get_group_perms(nodegroup)), 
+            'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+        }
         return ret
 
     def get_user_permissions(self, user, nodegroup=None):
-        ret = get_user_perms(user, nodegroup)
-        if len(ret) == 0:
-            ret = list(user.get_all_permissions())
-
+        checker = ObjectPermissionChecker(user)
+        ret = {
+            'local': list(checker.get_user_perms(nodegroup)), 
+            'default': [{'codename': item.codename, 'name': item.name} for item in user.user_permissions.all()]
+        }
+        for group in user.groups.all():
+            ret['default'].extend([{'codename': item.codename, 'name': item.name} for item in group.permissions.all()])
         return ret
 
     def save(self):
@@ -167,6 +178,25 @@ class Card(models.CardModel):
                 node.save()
             for card in self.cards:
                 card.save()
+
+            for group in self.groups: 
+                groupModel = Group.objects.get(pk=group['id'])
+                # first remove all the current permissions
+                for perm in get_perms(groupModel, self.nodegroup):
+                    remove_perm(perm, groupModel, self.nodegroup)
+                # then add the new permissions
+                for perm in group['perms']['local']:
+                    assign_perm(perm['codename'], groupModel, self.nodegroup)
+
+            for user in self.users: 
+                userModel = User.objects.get(pk=user['id'])
+                # first remove all the current permissions
+                for perm in get_perms(userModel, self.nodegroup):
+                    remove_perm(perm, userModel, self.nodegroup)
+                # then add the new permissions
+                for perm in user['perms']['local']:
+                    print perm
+                    assign_perm(perm['codename'], userModel, self.nodegroup)
         return self
 
     def get_edge_to_parent(self):
