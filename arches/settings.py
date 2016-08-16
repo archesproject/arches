@@ -94,6 +94,9 @@ RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
+# from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = None
+
 def RESOURCE_TYPE_CONFIGS():
     return {
         # override this setting in your packages settings.py file
