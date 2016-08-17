@@ -126,20 +126,12 @@ class Card(models.CardModel):
                     self.ontologyproperty = self.get_edge_to_parent().ontologyproperty
 
                 self.cardinality = self.nodegroup.cardinality
-
-                for group in Group.objects.all():
-                    perms = self.get_group_permissions(group, self.nodegroup)
-                    if len(perms['default']) > 0:
-                        self.groups.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
+                self.groups = self.get_group_permissions(self.nodegroup)
+                self.users = self.get_user_permissions(self.nodegroup)
                 
-                for user in User.objects.all():
-                    perms = self.get_user_permissions(user, self.nodegroup)
-                    if len(perms['default']) > 0:
-                        self.users.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
-
-    def get_group_permissions(self, group, nodegroup=None):
+    def get_group_permissions(self, nodegroup=None):
         """
-        get's a list of object level permissions allowed for a given group
+        get's a list of object level permissions allowed for a all groups
     
         returns an object of the form:
         .. code-block:: python
@@ -149,21 +141,23 @@ class Card(models.CardModel):
             }
 
         Keyword Arguments:
-        group -- the group to get the permissions for 
-
         nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
 
         """
 
-        ret = {
-            'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)], 
-            'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
-        }
+        ret = []
+        for group in Group.objects.all():
+            perms = {
+                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)], 
+                'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
+            }
+            if len(perms['default']) > 0:
+                ret.append({'name': group.name, 'perms': perms, 'type': 'group', 'id': group.pk})
         return ret
 
-    def get_user_permissions(self, user, nodegroup=None):
+    def get_user_permissions(self, nodegroup=None):
         """
-        get's a list of object level permissions allowed for a given user
+        get's a list of object level permissions allowed for a all users
 
         returns an object of the form:
         .. code-block:: python
@@ -173,22 +167,25 @@ class Card(models.CardModel):
             }
 
         Keyword Arguments:
-        user -- the user to get the permissions for 
-
         nodegroup -- the NodeGroup object instance to use to check for permissions on that particular object
 
         """
 
-        ret = {
-            'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],  
-            'default': set()
-        }
-        for group in user.groups.all():
-            codenames = set(get_group_perms(group, nodegroup))
-            if len(codenames) == 0:
-                codenames = set([item.codename for item in group.permissions.all()])
-            ret['default'].update(codenames)
-        ret['default'] = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in ret['default']]
+        ret = []
+        for user in User.objects.all():
+            perms = {
+                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],  
+                'default': set()
+            }
+            for group in user.groups.all():
+                codenames = set(get_group_perms(group, nodegroup))
+                if len(codenames) == 0:
+                    codenames = set([item.codename for item in group.permissions.all()])
+                perms['default'].update(codenames)
+            perms['default'] = [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in perms['default']]
+
+            if len(perms['default']) > 0:
+                ret.append({'username': user.email or user.username, 'email': user.email, 'perms': perms, 'type': 'user', 'id': user.pk})
         return ret
 
     def get_perm_name(self, codename):
@@ -240,8 +237,12 @@ class Card(models.CardModel):
                     remove_perm(perm, userModel, self.nodegroup)
                 # then add the new permissions
                 for perm in user['perms']['local']:
-                    print perm
                     assign_perm(perm['codename'], userModel, self.nodegroup)
+
+            # permissions for a user can vary based on the groups the user belongs to without 
+            # ever having changed the users permissions directly, which is why the users
+            # permissions status needs to be updated after groups are updated
+            self.users = self.get_user_permissions(self.nodegroup)
         return self
 
     def get_edge_to_parent(self):
