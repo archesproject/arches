@@ -112,6 +112,11 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
             }, this);
         },
 
+
+        /**
+         * toJSON - casts the model as a JSON object
+         * @return {object} a JSON object representation of the model
+         */
         toJSON: function () {
             var ret = {};
             for(key in this.attributes){

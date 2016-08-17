@@ -46,6 +46,13 @@ define([
                     this.card(selection);
                 }
                 if('node' in selection){
+                    // first set this.widget to null before updating, this
+                    // prevents the chosen binding from updating this.widgetId
+                    // (value) when this.widgetList (options) is updated.
+                    //
+                    // by setting this.widget to null, we remove the chosen
+                    // elements from the DOM entirely and force them to be
+                    // rebuilt each time the selection changes.
                     this.widget(null);
                     this.widget(selection);
                 }
