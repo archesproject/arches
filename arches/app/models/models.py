@@ -50,7 +50,7 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    function = models.ForeignKey('Function', blank=True, null=True, db_column='functionid')
+    functions = models.ManyToManyField(to='Function', db_table='cards_x_functions')
     itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -63,7 +63,7 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    function = models.ForeignKey('Function', db_column='functionid', null=True)
+    functions = models.ManyToManyField(to='Function', db_table='widgets_x_functions')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
