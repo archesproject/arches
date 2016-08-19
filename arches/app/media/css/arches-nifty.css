@@ -121,6 +121,10 @@
     font-size: 13px;
     margin-top: -3px;
 }
+.card-form-container {
+    padding-bottom: 10px; 
+    padding-right: 20px;
+}
 .card-help-panel {
     width: 40%;
     max-width: 275px;
@@ -3633,6 +3637,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 }
 div.row.widget-wrapper {
     margin: 0;
+    margin-right: 10px;
     padding: 5px 5px 15px 5px;
 }
 div.row.widget-wrapper:hover {
@@ -3647,6 +3652,7 @@ div.row.widget-wrapper:hover {
 .widget-preview.active {
     background: #fcfcfc;
     border: 1px solid #ddd;
+    margin-right: 11px;
 }
 .select2-container.select2-container-disabled .select2-choice {
     background: #eee;
