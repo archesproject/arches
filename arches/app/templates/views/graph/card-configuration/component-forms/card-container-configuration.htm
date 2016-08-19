@@ -36,7 +36,7 @@
 
     <!-- Card Container Base Settings Form -->
     <div id="cc-settings" class="tab-pane fade in active">
-    
+
         <!-- Card Container Property -->
         <!-- ko if: !!card().get('ontologyproperty')() -->
         <div class="node-widget-label" style="">
@@ -67,7 +67,7 @@
         <div data-bind="component: { name: 'switch-widget', params: {value: card().get('visible'), config:{label: '{% trans "Make Card Visible" %}', subtitle: '{% trans "Show this card by default" %}'}}}"></div>
 
         <!-- Active -->
-        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>   
+        <div data-bind="component: { name: 'switch-widget', params: {value: card().get('active'), config:{label: '{% trans "Make Card Active" %}', subtitle: '{% trans "This card is active and can be used for data entry" %}'}}}"></div>
     </div>
 
      <!-- Card CRUD ADVANCED SETTINGS Form -->
@@ -80,24 +80,12 @@
 
     <!-- Card CRUD Validation/Functions Form -->
     <div id="cc-validation"  class="tab-pane fade">
-
-        <!-- Functions -->
-        <div class="node-widget-label">
+        <div class="node-widget-label" style="">
             <div class="control-label">
-                {% trans "Validation Functions" %}
+                {% trans "Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
-
-        <!-- Functions -->
-        <div class="node-widget-label">
-            <div class="control-label">
-                {% trans "Processing Functions" %}
-            </div>
-            <div>
-                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: card().get('functions'), options: functions, optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
@@ -106,7 +94,7 @@
     <div id="cc-permissions" class="tab-pane fade" data-bind="with: permissionsList">
 
         {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
-        
+
         <!-- Tertiary Panel For Permissions -->
         <div id="permissions-crud" class="tertiary-panel" style="display: none;" data-bind="with: permissionsForm, visible: permissionsForm.selectedItems().length > 0">
             {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}
