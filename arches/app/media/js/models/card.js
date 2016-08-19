@@ -106,6 +106,9 @@ define(['arches',
                     case 'groups':
                         this.set(key, koMapping.fromJS(value));
                         break;
+                    case 'functions':
+                        this.set(key, ko.observableArray(value));
+                        break;
                     default:
                         this.set(key, value);
                 }
@@ -160,18 +163,18 @@ define(['arches',
         save: function(){
             AbstractModel.prototype.save.call(this, function(request, status, self){
                 if(status === 'success'){
-                    // only user permissions data needs to be updated from the response because it's value can 
+                    // only user permissions data needs to be updated from the response because it's value can
                     // vary based on the groups (and their permissions) to which the users belong
                     var users = this.get('users')();
                     users.forEach(function(user){
                         var updatedUser = _.find(request.responseJSON.users, function(item){
                             return item.id === user.id();
                         })
-                        user.perms.local.removeAll(); 
+                        user.perms.local.removeAll();
                         updatedUser.perms.local.forEach(function(perm){
                             user.perms.local.push(perm);
                         });
-                        user.perms.default.removeAll(); 
+                        user.perms.default.removeAll();
                         updatedUser.perms.default.forEach(function(perm){
                             user.perms.default.push(perm);
                         });

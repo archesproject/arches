@@ -166,6 +166,7 @@ def card(request, cardid):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         validations = models.Validation.objects.all()
+        functions = models.Function.objects.all()
         return render(request, 'views/graph/card-configuration-manager.htm', {
             'main_script': 'views/graph/card-configuration-manager',
             'graphid': card.graph_id,
@@ -176,6 +177,7 @@ def card(request, cardid):
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),
             'validations': JSONSerializer().serialize(validations),
+            'functions': JSONSerializer().serialize(functions),
         })
 
     return HttpResponseNotFound()

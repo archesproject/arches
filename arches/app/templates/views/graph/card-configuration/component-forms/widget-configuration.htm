@@ -77,6 +77,15 @@
                 <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: widget().node.validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
+
+        <div class="node-widget-label" style="">
+            <div class="control-label">
+                {% trans "Functions" %}
+            </div>
+            <div>
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: widget().get('functions'), options: functions, optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
         <!-- /ko -->
     </div>
 

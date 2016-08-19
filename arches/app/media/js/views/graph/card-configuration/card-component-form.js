@@ -1,10 +1,11 @@
 define([
+    'underscore',
     'backbone',
     'knockout',
     'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'bindings/summernote'
-], function(Backbone,  ko, PermissionsList, widgets) {
+], function(_, Backbone,  ko, PermissionsList, widgets) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -39,6 +40,19 @@ define([
                 } else {
                     return [];
                 }
+            });
+
+            this.functions = ko.computed(function () {
+                var selection = self.selection();
+                var card = self.card();
+                var widget = self.widget();
+                var filterString = 'card';
+                if (selection === widget) {
+                    filterString = widget.datatype.datatype;
+                }
+                return _.filter(options.functions, function(fn) {
+                    return fn.functiontype === filterString;
+                })
             });
 
             this.updateSelection = function(selection) {
