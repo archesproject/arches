@@ -1,8 +1,8 @@
 {% load i18n %}
 <div class="row widget-wrapper" data-bind="if: !configForm">
     <div class="form-group">
-        <label class="col-xs-12 control-label widget-input-label" for="" data-bind="text:label"></label>
-        <div class="col-xs-12 col-md-9">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <div class="col-xs-12">
             <input class="select2 arches-select2-crud-form" data-bind="disable: disabled, select2: {value: value, select2Config: {data: options}, placeholder: placeholder}"></input>
         </div>
     </div>
