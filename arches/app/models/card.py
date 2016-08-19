@@ -22,6 +22,7 @@ from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from django.forms import ModelForm
 
 class Card(models.CardModel):
     """
@@ -94,18 +95,9 @@ class Card(models.CardModel):
                     self.cards.append(Card(card))
 
                 for widget in args[0]["widgets"]:
-                    widget_model = models.CardXNodeXWidget()
-                    widget_model.pk = widget.get('id', None)
-                    widget_model.node_id = widget.get('node_id', None)
-                    widget_model.card_id = widget.get('card_id', None)
-                    widget_model.widget_id = widget.get('widget_id', None)
-                    widget_model.config = widget.get('config', {})
-                    widget_model.label = widget.get('label', '')
-                    widget_model.sortorder = widget.get('sortorder', None)
-                    if widget_model.pk == None:
-                        widget_model.save()
-                    widget_model.functions.set(widget.get('functions', []))
-                    self.widgets.append(widget_model)
+                    widget_form = CardXNodeXWidgetForm(widget)
+                    if(widget_form.is_valid()):
+                        self.widgets.append(widget_form)
 
                 for node in args[0]["nodes"]:
                     nodeid = node.get('nodeid', None)
@@ -279,3 +271,9 @@ class Card(models.CardModel):
             ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret
+
+
+class CardXNodeXWidgetForm(ModelForm):
+    class Meta:
+        model = models.CardXNodeXWidget
+        fields = '__all__'
