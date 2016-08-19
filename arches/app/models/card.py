@@ -15,13 +15,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
-
+import uuid
 from django.db import transaction
-from django.contrib.auth.models import User, Group,Permission 
+from django.contrib.auth.models import User, Group,Permission
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from django.forms import ModelForm
 
 class Card(models.CardModel):
     """
@@ -72,7 +73,7 @@ class Card(models.CardModel):
         # self.active
         # self.visible
         # self.sortorder
-        # self.function
+        # self.functions
         # self.itemtext
         # end from models.CardModel
         self.cardinality = ''
@@ -95,13 +96,16 @@ class Card(models.CardModel):
 
                 for widget in args[0]["widgets"]:
                     widget_model = models.CardXNodeXWidget()
-                    widget_model.id = widget.get('id', None)
+                    widget_model.pk = widget.get('id', None)
                     widget_model.node_id = widget.get('node_id', None)
                     widget_model.card_id = widget.get('card_id', None)
                     widget_model.widget_id = widget.get('widget_id', None)
                     widget_model.config = widget.get('config', {})
                     widget_model.label = widget.get('label', '')
                     widget_model.sortorder = widget.get('sortorder', None)
+                    if widget_model.pk == None:
+                        widget_model.save()
+                    widget_model.functions.set(widget.get('functions', []))
                     self.widgets.append(widget_model)
 
                 for node in args[0]["nodes"]:
@@ -128,11 +132,11 @@ class Card(models.CardModel):
                 self.cardinality = self.nodegroup.cardinality
                 self.groups = self.get_group_permissions(self.nodegroup)
                 self.users = self.get_user_permissions(self.nodegroup)
-                
+
     def get_group_permissions(self, nodegroup=None):
         """
         get's a list of object level permissions allowed for a all groups
-    
+
         returns an object of the form:
         .. code-block:: python
             {
@@ -148,7 +152,7 @@ class Card(models.CardModel):
         ret = []
         for group in Group.objects.all():
             perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)], 
+                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_group_perms(group, nodegroup)],
                 'default': [{'codename': item.codename, 'name': item.name} for item in group.permissions.all()]
             }
             if len(perms['default']) > 0:
@@ -174,7 +178,7 @@ class Card(models.CardModel):
         ret = []
         for user in User.objects.all():
             perms = {
-                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],  
+                'local': [{'codename': codename, 'name': self.get_perm_name(codename).name} for codename in get_user_perms(user, nodegroup)],
                 'default': set()
             }
             for group in user.groups.all():
@@ -221,7 +225,7 @@ class Card(models.CardModel):
             for card in self.cards:
                 card.save()
 
-            for group in self.groups: 
+            for group in self.groups:
                 groupModel = Group.objects.get(pk=group['id'])
                 # first remove all the current permissions
                 for perm in get_perms(groupModel, self.nodegroup):
@@ -230,7 +234,7 @@ class Card(models.CardModel):
                 for perm in group['perms']['local']:
                     assign_perm(perm['codename'], groupModel, self.nodegroup)
 
-            for user in self.users: 
+            for user in self.users:
                 userModel = User.objects.get(pk=user['id'])
                 # first remove all the current permissions
                 for perm in get_perms(userModel, self.nodegroup):
@@ -239,7 +243,7 @@ class Card(models.CardModel):
                 for perm in user['perms']['local']:
                     assign_perm(perm['codename'], userModel, self.nodegroup)
 
-            # permissions for a user can vary based on the groups the user belongs to without 
+            # permissions for a user can vary based on the groups the user belongs to without
             # ever having changed the users permissions directly, which is why the users
             # permissions status needs to be updated after groups are updated
             self.users = self.get_user_permissions(self.nodegroup)
@@ -276,3 +280,9 @@ class Card(models.CardModel):
             ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
         return ret
+
+
+class CardXNodeXWidgetForm(ModelForm):
+    class Meta:
+        model = models.CardXNodeXWidget
+        fields = '__all__'

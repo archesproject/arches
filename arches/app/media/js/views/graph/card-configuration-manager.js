@@ -14,6 +14,7 @@ require([
         }),
         permissions: data.permissions,
         validations: data.validations,
+        functions: data.functions,
         helpPreviewActive: ko.observable(false)
     };
     viewModel.dirty = viewModel.card.dirty;

@@ -5,7 +5,7 @@ Pillow==3.1.0
 rdflib
 unicodecsv
 pyyaml
-pyshp
+pyshp==1.2.3
 networkx
 django-guardian
 

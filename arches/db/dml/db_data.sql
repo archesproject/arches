@@ -2058,3 +2058,14 @@ INSERT INTO icons(name, cssclass)
 --                 "20000000-0000-0000-0000-000000000004": "23984ll2399494"
 --             }', '30000000-0000-0000-0000-000000000000',
 --             '20000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000');
+
+-- TODO: these are purely for testing, replace with real data
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 1', 'Card Function 1');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 2', 'Card Function 2');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 3', 'Card Function 3');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 1', 'Domain Function 1');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 2', 'Domain Function 2');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 3', 'Domain Function 3');

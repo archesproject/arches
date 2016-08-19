@@ -1,10 +1,11 @@
 define([
+    'underscore',
     'backbone',
     'knockout',
     'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
     'bindings/summernote'
-], function(Backbone,  ko, PermissionsList, widgets) {
+], function(_, Backbone,  ko, PermissionsList, widgets) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -20,7 +21,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'card', 'validations'));
+            _.extend(this, _.pick(options, 'card', 'validations', 'functions'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();

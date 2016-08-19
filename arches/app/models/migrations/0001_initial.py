@@ -67,7 +67,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
     edit_group = Group.objects.using(db_alias).create(name='edit')
     edit_group.permissions.add(read_perm, write_perm, delete_perm)
-    
+
     read_group = Group.objects.using(db_alias).create(name='read')
     read_group.permissions.add(read_perm)
 
@@ -655,11 +655,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
-            name='function',
-            field=models.ForeignKey(db_column='functionid', to='models.Function', null=True),
-        ),
-        migrations.AddField(
-            model_name='cardxnodexwidget',
             name='node',
             field=models.ForeignKey(db_column='nodeid', to='models.Node'),
         ),
@@ -679,14 +674,19 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(db_column='graphid', to='models.GraphModel'),
         ),
         migrations.AddField(
-            model_name='cardmodel',
-            name='function',
-            field=models.ForeignKey(db_column='functionid', to='models.Function', blank=True, null=True),
-        ),
-        migrations.AddField(
             model_name='node',
             name='validations',
             field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
+        ),
+        migrations.AddField(
+            model_name='cardmodel',
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', db_table='cards_x_functions'),
+        ),
+        migrations.AddField(
+            model_name='cardxnodexwidget',
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', db_table='widgets_x_functions'),
         ),
         migrations.AddField(
             model_name='graphmodel',

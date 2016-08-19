@@ -96,23 +96,12 @@
 
     <!-- Card CRUD Validation/Functions Form -->
     <div id="card-crud-validation" class="tab-pane fade">
-        <!-- Functions -->
-        <div class="node-widget-label">
+        <div class="node-widget-label" style="">
             <div class="control-label">
-                {% trans "Validation Functions" %}
+                {% trans "Functions" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div>
-        </div>
-
-        <!-- Functions -->
-        <div class="node-widget-label">
-            <div class="control-label">
-                {% trans "Processing Functions" %}
-            </div>
-            <div>
-                <select class="resources" data-bind="value: card().get('applied_functions'), options: card().get('functions'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a function..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: card().get('functions'), options: functions.filter(function(fn) { return fn.functiontype === 'card'; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
@@ -121,7 +110,7 @@
     <div id="card-crud-permissions" class="tab-pane fade" data-bind="with: permissionsList">
 
         {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
-        
+
         <!-- Tertiary Panel For Permissions -->
         <div id="permissions-crud" class="tertiary-panel" style="display: none;" data-bind="with: permissionsForm, visible: permissionsForm.selectedItems().length > 0">
             {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}

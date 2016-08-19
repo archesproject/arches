@@ -34,7 +34,7 @@ define([
             this.items().forEach(function(item){
                 var name = typeof item.name === 'string' ? item.name : item.name();
                 if (!item.filtered) {
-                    item.filter = ko.observable();
+                    item.filtered = ko.observable();
                 }
                 item.filtered(true);
                 if(name.toLowerCase().indexOf(filter) !== -1){
@@ -66,7 +66,7 @@ define([
             this.filter = ko.observable('');
             this.filter.subscribe(this.filter_function, this, 'change');
             this.filter_function();
-            
+
             this.selectedItems = ko.computed(function(){
                 return this.items().filter(function(item){
                     initializeItem(item);
