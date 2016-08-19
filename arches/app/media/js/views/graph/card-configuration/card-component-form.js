@@ -21,7 +21,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'card', 'validations'));
+            _.extend(this, _.pick(options, 'card', 'validations', 'functions'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
@@ -40,19 +40,6 @@ define([
                 } else {
                     return [];
                 }
-            });
-
-            this.functions = ko.computed(function () {
-                var selection = self.selection();
-                var card = self.card();
-                var widget = self.widget();
-                var filterString = 'card';
-                if (selection === widget) {
-                    filterString = widget.datatype.datatype;
-                }
-                return _.filter(options.functions, function(fn) {
-                    return fn.functiontype === filterString;
-                })
             });
 
             this.updateSelection = function(selection) {

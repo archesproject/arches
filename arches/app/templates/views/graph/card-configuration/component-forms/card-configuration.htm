@@ -101,7 +101,7 @@
                 {% trans "Functions" %}
             </div>
             <div>
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: card().get('functions'), options: functions, optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: card().get('functions'), options: functions.filter(function(fn) { return fn.functiontype === 'card'; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>

@@ -95,9 +95,18 @@ class Card(models.CardModel):
                     self.cards.append(Card(card))
 
                 for widget in args[0]["widgets"]:
-                    widget_form = CardXNodeXWidgetForm(widget)
-                    if(widget_form.is_valid()):
-                        self.widgets.append(widget_form)
+                    widget_model = models.CardXNodeXWidget()
+                    widget_model.pk = widget.get('id', None)
+                    widget_model.node_id = widget.get('node_id', None)
+                    widget_model.card_id = widget.get('card_id', None)
+                    widget_model.widget_id = widget.get('widget_id', None)
+                    widget_model.config = widget.get('config', {})
+                    widget_model.label = widget.get('label', '')
+                    widget_model.sortorder = widget.get('sortorder', None)
+                    if widget_model.pk == None:
+                        widget_model.save()
+                    widget_model.functions.set(widget.get('functions', []))
+                    self.widgets.append(widget_model)
 
                 for node in args[0]["nodes"]:
                     nodeid = node.get('nodeid', None)
