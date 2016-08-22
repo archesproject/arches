@@ -89,7 +89,7 @@ class DDataType(models.Model):
     defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget')
     config = JSONField(blank=True, null=True, db_column='config')
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_datatypes')
-
+    
     class Meta:
         managed = True
         db_table = 'd_data_types'
@@ -490,7 +490,6 @@ class Validation(models.Model):
     validationtype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    datatype = models.ForeignKey('DDataType', db_column='datatype', related_name='datatype_x_validations')
 
     class Meta:
         managed = True
