@@ -234,7 +234,7 @@ class Icon(models.Model):
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     legacygroupid = models.TextField(blank=True, null=True)
-    cardinality = models.TextField(blank=True, default='n')
+    cardinality = models.TextField(blank=True, default='1')
     parentnodegroup = models.ForeignKey('self', db_column='parentnodegroupid', blank=True, null=True)  #Allows nodegroups within nodegroups
 
     class Meta:
