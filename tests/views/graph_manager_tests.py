@@ -92,7 +92,7 @@ class GraphManagerViewTests(ArchesTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        graph = json.loads(response.context['graph'])
+        graph = json.loads(response.context['graph_json'])
 
         graph['name'] = 'new graph name'
         post_data = {'graph':graph, 'relatable_resource_ids': [self.ARCHES_CONFIG_ID]}

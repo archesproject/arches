@@ -122,7 +122,8 @@ def settings(request, graphid):
     return render(request, 'views/graph/graph-settings.htm', {
         'main_script': 'views/graph/graph-settings',
         'icons': JSONSerializer().serialize(icons),
-        'graph': JSONSerializer().serialize(graph),
+        'graph_json': JSONSerializer().serialize(graph),
+        'graph': JSONSerializer().serializeToPython(graph),
         'node_json': node_json,
         'graphs': JSONSerializer().serialize(graphs),
         'ontologies': JSONSerializer().serialize(ontologies),

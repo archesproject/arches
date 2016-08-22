@@ -91,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li id="card-manager" class="edit-menu-item {% if main_script == "views/graph/card-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% elif not graph.isresource %}{% url 'card' graphid %}{% endif %}'); }">
+                        <a href="#" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }">
 
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
