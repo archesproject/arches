@@ -87,9 +87,9 @@ class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
     defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget')
-    config = JSONField(blank=True, null=True, db_column='config')
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_datatypes')
-    
+
     class Meta:
         managed = True
         db_table = 'd_data_types'

@@ -108,6 +108,14 @@ INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, '1000
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
+-- data type validations
+INSERT INTO validations_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (3, 'domain', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');

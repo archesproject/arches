@@ -263,7 +263,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('validation', models.TextField(blank=True, null=True)),
             ],
             options={
@@ -580,7 +580,9 @@ class Migration(migrations.Migration):
                 ('validation', models.TextField(blank=True, null=True)),
                 ('validationtype', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),            ],
+                ('description', models.TextField(blank=True, null=True)),
+
+                ],
             options={
                 'db_table': 'validations',
                 'managed': True,
