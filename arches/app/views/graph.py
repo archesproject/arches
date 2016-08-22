@@ -142,11 +142,13 @@ def card_manager(request, graphid):
     return render(request, 'views/graph/card-manager.htm', {
         'main_script': 'views/graph/card-manager',
         'graphid': graphid,
-        'graph': graph,
+        'graph': JSONSerializer().serializeToPython(graph),
         'graphJSON': JSONSerializer().serialize(graph),
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'branches': JSONSerializer().serialize(branch_graphs)
     })
+    graph = Graph.objects.get(graphid=graphid)
+    validations = models.Validation.objects.all()
 
 @group_required('edit')
 def card(request, cardid):
@@ -167,9 +169,11 @@ def card(request, cardid):
         widgets = models.Widget.objects.all()
         validations = models.Validation.objects.all()
         functions = models.Function.objects.all()
+        graph = Graph.objects.get(graphid=card.graph_id)
         return render(request, 'views/graph/card-configuration-manager.htm', {
             'main_script': 'views/graph/card-configuration-manager',
             'graphid': card.graph_id,
+            'graph': JSONSerializer().serializeToPython(graph),
             'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
             'card': JSONSerializer().serialize(card),
             'permissions': JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
