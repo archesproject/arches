@@ -87,6 +87,8 @@ class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
     defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget')
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+    validations = models.ManyToManyField(to='Validation', db_table='validations_x_datatypes')
 
     class Meta:
         managed = True
@@ -264,6 +266,7 @@ class Node(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
     validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
+    config = JSONField(blank=True, null=True, db_column='config')
 
     def get_child_nodes_and_edges(self):
         """

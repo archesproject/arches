@@ -263,6 +263,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
+                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+                ('validation', models.TextField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'd_data_types',
@@ -415,6 +417,7 @@ class Migration(migrations.Migration):
                 ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
+                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
             ],
             options={
                 'db_table': 'nodes',
@@ -578,7 +581,8 @@ class Migration(migrations.Migration):
                 ('validationtype', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-            ],
+
+                ],
             options={
                 'db_table': 'validations',
                 'managed': True,
@@ -677,6 +681,11 @@ class Migration(migrations.Migration):
             model_name='node',
             name='validations',
             field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
+        ),
+        migrations.AddField(
+            model_name='ddatatype',
+            name='validations',
+            field=models.ManyToManyField(to='models.Validation', db_table='validations_x_datatypes'),
         ),
         migrations.AddField(
             model_name='cardmodel',
