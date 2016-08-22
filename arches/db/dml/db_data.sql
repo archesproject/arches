@@ -99,12 +99,12 @@ INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 
 --Data types
-INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', '10000000-0000-0000-0000-000000000001');
+INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, '10000000-0000-0000-0000-000000000001');
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
-INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', '10000000-0000-0000-0000-000000000004');
+INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, '10000000-0000-0000-0000-000000000004');
 INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
-INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul', '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', '10000000-0000-0000-0000-000000000003');
+INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul', null, null, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, '10000000-0000-0000-0000-000000000003');
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
