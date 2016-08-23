@@ -112,7 +112,7 @@
         {% include 'views/graph/card-configuration/component-forms/permissions-list.htm' %}
 
         <!-- Tertiary Panel For Permissions -->
-        <div id="permissions-crud" class="tertiary-panel" style="display: none;" data-bind="with: permissionsForm, visible: permissionsForm.selectedItems().length > 0">
+        <div id="permissions-crud" class="tertiary-panel" data-bind="with: permissionsForm">
             {% include 'views/graph/card-configuration/component-forms/permissions-form.htm' %}
         </div>
 
