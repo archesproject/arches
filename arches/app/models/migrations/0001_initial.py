@@ -440,6 +440,7 @@ class Migration(migrations.Migration):
                     ('read_nodegroup', 'Read'),
                     ('write_nodegroup', 'Create/Update'),
                     ('delete_nodegroup', 'Delete'),
+                    ('no_access_to_nodegroup', 'No Access'),
                 )
             },
         ),
