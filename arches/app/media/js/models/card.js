@@ -136,11 +136,16 @@ define(['arches',
 
         toJSON: function(){
             var ret = {};
-            for(key in this.attributes){
+            for(var key in this.attributes){
                 if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' && key !== 'widgets'){
                     if(ko.isObservable(this.attributes[key])){
                         if(key === 'users' || key === 'groups'){
                             ret[key] = koMapping.toJS(this.attributes[key]);
+                        }else if(key === 'cards'){
+                            ret[key] = [];
+                            this.attributes[key]().forEach(function(card){
+                                ret[key].push(card.toJSON());
+                            }, this)
                         }else{
                             ret[key] = this.attributes[key]();
                         }

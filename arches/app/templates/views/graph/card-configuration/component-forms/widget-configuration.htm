@@ -31,7 +31,7 @@
 <div class="tab-content listing-container">
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
-        <!-- ko if: selection() === widget() -->
+
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Widget Label" %}
@@ -50,31 +50,31 @@
                 value: ko.observable(null)
             }
         }'></div>
-        <!-- /ko -->
+
     </div>
 
     <div id="widget-crud-advanced" class="tab-pane fade">
-        <!-- ko if: selection() === widget() -->
+
         <div class="node-widget-label" style="">
             <div class="
             control-label">
                 {% trans "Template" %}
             </div>
-            <div class="col-sm-12 pad-no crud-widget-container">
-                <select class="design" data-bind="value: widgetId, options: widgetList, optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div class="col-sm-12 pad-no crud-widget-container" data-bind="with: widget">
+                <select class="design" data-bind="value: $data.get('widget_id'), options: $parent.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
-        <!-- /ko -->
+
     </div>
 
     <div id="widget-crud-validation" class="tab-pane fade">
-        <!-- ko if: selection() === widget() -->
+       
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Validations" %}
             </div>
-            <div>
-                <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: widget().node.validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div data-bind="with: widget">
+                <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node.validations, options: $parent.validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -82,11 +82,11 @@
             <div class="control-label">
                 {% trans "Functions" %}
             </div>
-            <div>
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: widget().get('functions'), options: functions.filter(function(fn) { return fn.functiontype === widget().datatype.datatype; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div data-bind="with: widget">
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options:$parent.functions.filter(function(fn) { return fn.functiontype === datatype.datatype; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
-        <!-- /ko -->
+     
     </div>
 
 </div>

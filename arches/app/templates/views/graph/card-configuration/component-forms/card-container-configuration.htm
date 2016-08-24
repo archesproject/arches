@@ -33,16 +33,14 @@
     <div id="cc-settings" class="tab-pane fade in active">
 
         <!-- Card Container Property -->
-        <!-- ko if: !!card().get('ontologyproperty')() -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Relation to Resource" %}
             </div>
-            <div>
-                <select class="resources" data-bind="value: card().get('ontologyproperty'), options: card().get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div data-bind="with: card">
+                <select class="resources" data-bind="value: $data.get('ontologyproperty'), options: $data.get('ontology_properties'), valueAllowUnset: true, optionsCaption: '{% trans "Choose a relation..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
-        <!-- /ko -->
 
         <!-- Card Container Name -->
         <div class="node-widget-label" style="">
@@ -73,8 +71,8 @@
             <div class="control-label">
                 {% trans "Functions" %}
             </div>
-            <div>
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: card().get('functions'), options: functions.filter(function(fn) { return fn.functiontype === 'card'; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            <div data-bind="with: card">
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.functions.filter(function(fn) { return fn.functiontype === 'card'; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
