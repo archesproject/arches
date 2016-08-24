@@ -2,11 +2,11 @@ define([
     'underscore',
     'backbone',
     'knockout',
-    'knockout-mapping',
     'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
-    'bindings/summernote'
-], function(_, Backbone,  ko, koMapping, PermissionsList, widgets) {
+    'bindings/summernote',
+    'plugins/knockstrap'
+], function(_, Backbone,  ko, PermissionsList, widgets) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
