@@ -103,7 +103,7 @@ INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, '100
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
 INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, '10000000-0000-0000-0000-000000000004');
 INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
-INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul', null, null, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul', '{"topConcept": null}', null, '10000000-0000-0000-0000-000000000002');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, '10000000-0000-0000-0000-000000000003');
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
@@ -183,9 +183,9 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
+            graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'domain',
-            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
+            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '{"topConcept": null}');
 
 INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
     VALUES ('20000000-0000-0000-0000-100000000001', '', 'n');
@@ -205,9 +205,9 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
     VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
+            graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
-        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
+        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"topConcept": null}');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
