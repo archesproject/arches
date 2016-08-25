@@ -7,6 +7,7 @@
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
+            'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '//cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
             'text': '//cdnjs.cloudflare.com/ajax/libs/require-text/2.0.12/text.min',
@@ -173,4 +174,9 @@
             },
         {% endfor %}{% endautoescape %}};
     });
+
+
+    define('datatype-config-components',
+        [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
+        function () { return });
 </script>

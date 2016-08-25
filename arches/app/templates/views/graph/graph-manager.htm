@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	<div id="node-crud" class="middle-column-container" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
         {% include 'views/graph/graph-manager/node-form.htm' %}
 	</div>
-    
+
     <div class="ep-card-crud-panel branch-panel" style="display: none;" data-bind="visible: nodeForm.branchListView.viewMetadata, with: nodeForm.branchListView">
         {% include 'views/graph/graph-manager/branch-info.htm' %}
     </div>
@@ -63,7 +63,7 @@ define('graph-manager-data', [], function () {
     return {
         graph: {{graph_json}},
         validations: {{validations}},
-        datatypes: {{datatypes}},
+        datatypes: {{datatypes_json}},
         branches: {{branches}}
     };
 });

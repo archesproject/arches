@@ -10,7 +10,8 @@ require([
     'models/graph',
     'viewmodels/alert',
     'arches',
-    'graph-manager-data'
+    'graph-manager-data',
+    'datatype-config-components'
 ], function($, _, ko, PageView, GraphView, NodeListView, NodeFormView, NodeModel, GraphModel, AlertViewModel, arches, data) {
     /**
     * create graph model

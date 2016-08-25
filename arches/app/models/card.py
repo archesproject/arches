@@ -113,6 +113,7 @@ class Card(models.CardModel):
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
                         node_model.validations.set(node.get('validations', []))
+                        node_model.config = node.get('config', None)
                         self.nodes.append(node_model)
 
                 self.graph = Graph.objects.get(graphid=self.graph_id)

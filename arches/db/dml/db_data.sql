@@ -99,19 +99,19 @@ INSERT INTO d_node_types VALUES ('Collection', 'skos');
 INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 
 --Data types
-INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, '10000000-0000-0000-0000-000000000001');
+INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, null, null, '10000000-0000-0000-0000-000000000001');
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
-INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, '10000000-0000-0000-0000-000000000004');
+INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, null, '10000000-0000-0000-0000-000000000004');
 INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
-INSERT INTO d_data_types VALUES ('domain', 'fa fa-list-ul', null, null, '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, '10000000-0000-0000-0000-000000000003');
+INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', null, '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, null, '10000000-0000-0000-0000-000000000003');
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
 -- data type validations
 INSERT INTO validations_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
 INSERT INTO validations_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (3, 'domain', '60000000-0000-0000-0000-000000000000');
+INSERT INTO validations_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
 INSERT INTO validations_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
 INSERT INTO validations_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
 INSERT INTO validations_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
@@ -151,7 +151,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select', 'domain', '{ "placeholder": "Select an option", "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
@@ -183,9 +183,9 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'domain',
-            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001');
+            graphid, nodegroupid, config)
+    VALUES ('20000000-0000-0000-0000-100000000002', 'Node Type', '', 'f', 'E55_Type', 'concept',
+            '22000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-100000000001', '{"topConcept": null}');
 
 INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
     VALUES ('20000000-0000-0000-0000-100000000001', '', 'n');
@@ -205,9 +205,9 @@ INSERT INTO graphs(graphid, name, author, version, description, isresource, isac
     VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
-            graphid, nodegroupid)
+            graphid, nodegroupid, config)
     VALUES ('20000000-0000-0000-0000-000000000000', 'ARCHES_CONFIG', 'Base configuration settings for Arches', 't', 'E1_CRM_Entity', 'semantic',
-        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000');
+        '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000000', '{"topConcept": null}');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -221,7 +221,7 @@ INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
-    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'domain',
+    VALUES ('20000000-0000-0000-0000-000000000003', 'KEY_TYPE', 'Type of key', 'f', 'E55_Type', 'concept',
             '22000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
@@ -2074,6 +2074,6 @@ INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Fun
 INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
 INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
 INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 1', 'Domain Function 1');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 2', 'Domain Function 2');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'domain', '', 'Domain Function 3', 'Domain Function 3');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 1', 'Domain Function 1');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
+INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');

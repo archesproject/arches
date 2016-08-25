@@ -264,6 +264,8 @@ class Migration(migrations.Migration):
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
                 ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+                ('configcomponent', models.TextField(blank=True, null=True)),
+                ('configname', models.TextField(blank=True, null=True)),
                 ('validation', models.TextField(blank=True, null=True)),
             ],
             options={

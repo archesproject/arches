@@ -30,11 +30,40 @@ define([
             self.filtered = ko.observable(false);
             self.name = ko.observable('');
             self.nodeGroupId = ko.observable('');
-            self.datatype = ko.observable('');
+            var datatype = ko.observable('');
+            self.datatype = ko.computed({
+                read: function () {
+                    return datatype();
+                },
+                write: function (value) {
+                    var datatypeRecord = self.datatypelookup[value];
+                    if (datatypeRecord) {
+                        var defaultConfig = datatypeRecord.defaultconfig;
+                        self.configKeys.removeAll();
+                        _.each(defaultConfig, function(configVal, configKey) {
+                            self.config[configKey] = ko.observable(configVal);
+                            self.configKeys.push(configKey);
+                        });
+                    }
+                    datatype(value);
+                },
+                owner: this
+            });
+            self.datatypeConfigComponent = ko.computed(function() {
+                var component = null;
+                var datatype = self.datatypelookup[self.datatype()];
+                if (datatype && datatype.configname) {
+                    component = datatype.configname;
+                }
+                return component;
+            });
             self.validations = ko.observableArray();
             self.ontologyclass = ko.observable('');
             self.parentproperty = ko.observable('');
             self.ontology_cache = ko.observableArray().extend({ deferred: true });
+            self.configKeys = ko.observableArray();
+            self.config = {};
+
 
             self.parse(options.source);
 
@@ -89,17 +118,30 @@ define([
             }
 
             self.iconclass = ko.computed(function() {
-                return self.datatypelookup[self.datatype()];
+                var datatypeRecord = self.datatypelookup[self.datatype()];
+                if (!datatypeRecord) {
+                    return '';
+                }
+                return datatypeRecord.iconclass;
             });
 
             self.json = ko.computed(function() {
+                var keys = self.configKeys();
+                var config = null;
+                if (keys.length > 0) {
+                    config = {};
+                    _.each(keys, function(key) {
+                        config[key] = self.config[key]();
+                    });
+                }
                 return JSON.stringify(_.extend(JSON.parse(self._node()), {
                     name: self.name(),
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
                     validations: self.validations(),
                     ontologyclass: self.ontologyclass(),
-                    parentproperty: self.parentproperty()
+                    parentproperty: self.parentproperty(),
+                    config: config
                 }))
             });
 
@@ -135,6 +177,14 @@ define([
             source.validations.forEach(function(validation) {
                 self.validations.push(validation);
             });
+
+            if (source.config) {
+                self.configKeys.removeAll();
+                _.each(source.config, function(configVal, configKey) {
+                    self.config[configKey] = ko.observable(configVal);
+                    self.configKeys.push(configKey);
+                });
+            }
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;

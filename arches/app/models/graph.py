@@ -150,6 +150,7 @@ class Graph(models.GraphModel):
             node.ontologyclass = nodeobj.get('ontologyclass','')
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
+            node.config = nodeobj.get('config', None)
             node.validations.set(nodeobj.get('validations', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':

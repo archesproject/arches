@@ -396,7 +396,7 @@ define(['arches',
             attributes =_.extend({datatypes:[], domain_connections:[]}, attributes);
 
             _.each(attributes.datatypes, function(datatype){
-                datatypelookup[datatype.datatype] = datatype.iconclass;
+                datatypelookup[datatype.datatype] = datatype;
             }, this)
             this.set('datatypelookup', datatypelookup);
 
