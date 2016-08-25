@@ -70,7 +70,8 @@ def manager(request, graphid):
         'graph_json': JSONSerializer().serialize(graph),
         'validations': JSONSerializer().serialize(validations),
         'branches': JSONSerializer().serialize(branch_graphs),
-        'datatypes': JSONSerializer().serialize(datatypes),
+        'datatypes_json': JSONSerializer().serialize(datatypes),
+        'datatypes': datatypes,
         'node_list': {
             'title': _('Node List'),
             'search_placeholder': _('Find a node...')
@@ -178,7 +179,8 @@ def card(request, cardid):
             'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
             'card': JSONSerializer().serialize(card),
             'permissions': JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
-            'datatypes': JSONSerializer().serialize(datatypes),
+            'datatypes_json': JSONSerializer().serialize(datatypes),
+            'datatypes': datatypes,
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),
             'validations': JSONSerializer().serialize(validations),
@@ -290,3 +292,6 @@ def get_valid_domain_nodes(request, graphid):
     data = JSONDeserializer().deserialize(request.body)
     graph = Graph.objects.get(graphid=graphid)
     return JSONResponse(graph.get_valid_domain_ontology_classes(nodeid=data['nodeid']))
+
+def datatype_template(request, template="text"):
+    return render(request, 'views/graph/datatypes/%s.htm' % template)

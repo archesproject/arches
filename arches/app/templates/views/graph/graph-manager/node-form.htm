@@ -84,6 +84,13 @@
                     </div>
                 </div>
 
+                <!-- ko if: node().datatypeConfigComponent -->
+                <div class='datatype-config-form' data-bind='component: {
+                    name: node().datatypeConfigComponent,
+                    params: node()
+                }'></div>
+                <!-- /ko -->
+
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "Validations" %}

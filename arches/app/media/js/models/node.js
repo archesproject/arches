@@ -49,6 +49,14 @@ define([
                 },
                 owner: this
             });
+            self.datatypeConfigComponent = ko.computed(function() {
+                var component = null;
+                var datatype = self.datatypelookup[self.datatype()];
+                if (datatype && datatype.configname) {
+                    component = datatype.configname;
+                }
+                return component;
+            });
             self.validations = ko.observableArray();
             self.ontologyclass = ko.observable('');
             self.parentproperty = ko.observable('');

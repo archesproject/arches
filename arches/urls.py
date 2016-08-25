@@ -67,6 +67,7 @@ urlpatterns = [
     url(r'^graph/clone/(?P<graphid>%s)$' % uuid_regex, graph.clone, name='clone_graph'),
     url(r'^graph/export/(?P<graphid>%s)$' % uuid_regex, graph.export_graph, name='export_graph'),
     url(r'^graph/import/', graph.import_graph, name='import_graph'),
+    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', graph.datatype_template, name="datatype_template"),
     url(r'^graph/new$', graph.new, name='new_graph'),
     url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, graph.get_valid_domain_nodes, name='get_valid_domain_nodes'),
