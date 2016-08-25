@@ -1,2 +1,9 @@
 {% load i18n %}
-<div>form here</div>
+<div class="node-widget-label">
+    <div class="control-label">
+        {% trans "Top Concept" %}
+    </div>
+    <div>
+        <input type="" placeholder="{% trans "Top Concept" %}" id="" class="form-control input-md widget-input" data-bind="value: topConcept, valueUpdate: 'keyup'">
+    </div>
+</div>
