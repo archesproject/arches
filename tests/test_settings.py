@@ -42,6 +42,8 @@ BUSISNESS_DATA_FILES = (
 # Use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+RUN_TESTS_LOCAL = False
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
