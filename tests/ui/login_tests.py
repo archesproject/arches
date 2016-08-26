@@ -7,7 +7,7 @@ from tests import test_settings
 from selenium import webdriver
 from django.test import LiveServerTestCase
 
-RUN_LOCAL = test_settings.RUN_TESTS_LOCAL  || True
+RUN_LOCAL = test_settings.RUN_TESTS_LOCAL or True
 
 if RUN_LOCAL:
     # could add Chrome, PhantomJS etc... here
