@@ -19,15 +19,16 @@ else:
     sauce = SauceClient(USERNAME, ACCESS_KEY)
 
     browsers = [
-        {"platform": "Mac OS X 10.9",
-         "browserName": "chrome",
-         "version": "44"},
         {"platform": "Windows 8.1",
          "browserName": "internet explorer",
          "version": "11"},
+        {"platform": "Mac OS X 10.9",
+         "browserName": "chrome",
+         "version": "44"},
         {"platform": "Linux",
          "browserName": "firefox",
-         "version": "43"}]
+         "version": "43"}
+    ]
 
 
 def on_platforms(platforms, local):
