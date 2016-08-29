@@ -214,6 +214,15 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Graph',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('models.GraphModel',),
+        ),
+        migrations.CreateModel(
             name='CardModel',
             fields=[
                 ('cardid', models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
@@ -232,6 +241,15 @@ class Migration(migrations.Migration):
                 'db_table': 'cards',
                 'managed': True,
             },
+        ),
+        migrations.CreateModel(
+            name='Card',
+            fields=[
+            ],
+            options={
+                'proxy': True,
+            },
+            bases=('models.CardModel',),
         ),
         migrations.CreateModel(
             name='CardXNodeXWidget',
@@ -266,7 +284,6 @@ class Migration(migrations.Migration):
                 ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
-                ('validation', models.TextField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'd_data_types',
@@ -431,7 +448,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('nodegroupid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('legacygroupid', models.TextField(blank=True, null=True)),
-                ('cardinality', models.TextField(blank=True, default='n')),
+                ('cardinality', models.TextField(blank=True, default='1')),
                 ('parentnodegroup', models.ForeignKey(blank=True, db_column='parentnodegroupid', null=True, to='models.NodeGroup')),
             ],
             options={
@@ -613,7 +630,7 @@ class Migration(migrations.Migration):
                 ('component', models.TextField()),
                 ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('helptext', models.TextField(blank=True, null=True)),
-                ('datatype', models.ForeignKey(db_column='datatype', to='models.DDataType')),
+                ('datatype', models.TextField()),
             ],
             options={
                 'db_table': 'widgets',

@@ -42,7 +42,7 @@ class CardModel(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
-    helpenabled = models.BooleanField(default=True)
+    helpenabled = models.BooleanField(default=False)
     helptitle = models.TextField(blank=True, null=True)
     helptext = models.TextField(blank=True, null=True)
     nodegroup = models.ForeignKey('NodeGroup', db_column='nodegroupid')
@@ -86,7 +86,7 @@ class Concept(models.Model):
 class DDataType(models.Model):
     datatype = models.TextField(primary_key=True)
     iconclass = models.TextField()
-    defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget')
+    defaultwidget = models.ForeignKey(db_column='defaultwidget', to='models.Widget', null=True)
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
