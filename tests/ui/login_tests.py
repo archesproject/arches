@@ -60,6 +60,11 @@ class LoginTest(LiveServerTestCase):
 
     """
 
+    #serialized_rollback = True
+
+    def _fixture_teardown(self):
+        pass
+
     def setUp(self):
         if RUN_LOCAL:
             self.setUpLocal()
