@@ -6,6 +6,9 @@ import sys
 from tests import test_settings
 from selenium import webdriver
 from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from tests.ui.pages.login_page import LoginPage
+from tests.ui.pages.graph_page import GraphPage
 
 RUN_LOCAL = test_settings.RUN_TESTS_LOCAL
 
@@ -54,7 +57,7 @@ def on_platforms(platforms, local):
 
 
 @on_platforms(browsers, RUN_LOCAL)
-class LoginTest(LiveServerTestCase):
+class UITest(StaticLiveServerTestCase):
     """
     Runs a test using travis-ci and saucelabs
 
@@ -97,6 +100,7 @@ class LoginTest(LiveServerTestCase):
         self.driver.implicitly_wait(3)
 
     def tearDownLocal(self):
+        #pass
         self.driver.quit()
 
     def tearDownSauce(self):
@@ -111,14 +115,16 @@ class LoginTest(LiveServerTestCase):
             self.driver.quit()
 
     def test_login(self):
-        self.driver.get(self.live_server_url)
-        login_link = self.driver.find_element_by_id("auth-link")
-        login_link.click()
-        username_input = self.driver.find_element_by_name("username")
-        password_input = self.driver.find_element_by_name("password")
-        username_input.send_keys('admin')
-        password_input.send_keys('admin')
-        submit_button = self.driver.find_element_by_xpath("//button[@type='submit']")
-        submit_button.click()
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
 
-        self.assertEqual(self.driver.current_url, self.live_server_url + '/graph/')
+        self.assertEqual(self.driver.current_url, self.live_server_url + '/index.htm')
+
+    def test_make_graph(self):
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
+
+        page = GraphPage(self.driver, self.live_server_url)
+        graph_id = page.add_new_graph()
+        
+        self.assertEqual(self.driver.current_url, '%s/graph/%s/settings' % (self.live_server_url, graph_id))
