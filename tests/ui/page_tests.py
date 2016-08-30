@@ -10,29 +10,13 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.graph_page import GraphPage
 
-RUN_LOCAL = test_settings.RUN_TESTS_LOCAL
 
-if RUN_LOCAL:
-    # could add Chrome, PhantomJS etc... here
-    browsers = ['Firefox']
+if test_settings.RUN_LOCAL:
+    browsers = test_settings.LOCAL_BROWSERS
 else:
     from sauceclient import SauceClient
-    USERNAME = os.environ.get('SAUCE_USERNAME')
-    ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
-    sauce = SauceClient(USERNAME, ACCESS_KEY)
-
-    browsers = [
-        {"platform": "Windows 8.1",
-         "browserName": "internet explorer",
-         "version": "11"},
-        {"platform": "Mac OS X 10.9",
-         "browserName": "chrome",
-         "version": "44"},
-        {"platform": "Linux",
-         "browserName": "firefox",
-         "version": "43"}
-    ]
-
+    sauce = SauceClient(test_settings.SAUCE_USERNAME, test_settings.SAUCE_ACCESS_KEY)
+    browsers = test_settings.REMOTE_BROWSERS
 
 def on_platforms(platforms, local):
     if local:
@@ -56,7 +40,7 @@ def on_platforms(platforms, local):
     return decorator
 
 
-@on_platforms(browsers, RUN_LOCAL)
+@on_platforms(browsers, test_settings.RUN_LOCAL)
 class UITest(StaticLiveServerTestCase):
     """
     Runs a test using travis-ci and saucelabs
@@ -69,13 +53,13 @@ class UITest(StaticLiveServerTestCase):
         pass
 
     def setUp(self):
-        if RUN_LOCAL:
+        if test_settings.RUN_LOCAL:
             self.setUpLocal()
         else:
             self.setUpSauce()
 
     def tearDown(self):
-        if RUN_LOCAL:
+        if test_settings.RUN_LOCAL:
             self.tearDownLocal()
         else:
             self.tearDownSauce()
@@ -91,7 +75,7 @@ class UITest(StaticLiveServerTestCase):
         sauce_url = "http://%s:%s@ondemand.saucelabs.com:80/wd/hub"
         self.driver = webdriver.Remote(
             desired_capabilities=self.desired_capabilities,
-            command_executor=sauce_url % (USERNAME, ACCESS_KEY)
+            command_executor=sauce_url % (test_settings.SAUCE_USERNAME, test_settings.SAUCE_ACCESS_KEY)
         )
         self.driver.implicitly_wait(5)
 
