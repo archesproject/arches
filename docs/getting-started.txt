@@ -27,7 +27,20 @@ We've written this guide to streamline the installation of Arches Server in the 
 System Requirements
 ===================
 
-There are a few things to know about Arches before we get started.
+To begin development on a basic installation of Arches, you will need the following:
+
+**Disk Space**
+
+    * 1.5gb for all dependencies (Postgres/PostGIS, Python, GEOS, etc.)
+    * 300mb for all Arches code with a basic app installed (Arches-HIP, for example)
+    
+Ultimately, the amount of disk space you need will depend on the number of resources in your database.
+    
+**Memory (RAM)**
+
+    * 1gb in development, 4-16gb in production (primarily to support ElasticSearch)
+
+Loading a .arches file uses RAM, and you may need to increase your RAM to successfully complete that process if you have a large number of resources.
 
 Please note that Arches has been developed for modern browsers. It supports:
 
@@ -36,13 +49,6 @@ Please note that Arches has been developed for modern browsers. It supports:
     * Safari
     * Opera
     * Internet Explorer 10 or higher.
-
-Minimum system requirements:
-
-    * At least 4GB of RAM for evaluation and testing, or 8 to 16GB for production.
-    * 10GB minimum to install the code base and test dataset, but disk space requirements will vary greatly depending on the size of your dataset
-
-
 
 Dependencies
 ============
