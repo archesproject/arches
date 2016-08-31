@@ -21,10 +21,12 @@ require([
         datatypes: data.datatypes
     });
 
+    var nextSelection = null;
     graphModel.on('changed', function(model, options){
         viewModel.graphView.redraw(true);
     });
-    graphModel.on('select-node', function(model, options){
+    graphModel.on('select-node', function(node){
+        nextSelection = node;
         viewModel.nodeForm.closeClicked(true);
     });
 
@@ -87,9 +89,15 @@ require([
         var node = viewModel.nodeForm.node();
         if (closeClicked && node && node.dirty()) {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function () {
-                viewModel.nodeForm.cancel();
+                viewModel.nodeForm.closeClicked(false);
+                nextSelection = null;
             }, function () {
-                viewModel.nodeForm.save();
+                viewModel.nodeForm.cancel();
+                viewModel.nodeForm.closeClicked(false);
+                if (nextSelection) {
+                    graphModel.selectNode(nextSelection);
+                }
+                nextSelection = null;
             }));
         } else {
             pageView.viewModel.alert(null);
