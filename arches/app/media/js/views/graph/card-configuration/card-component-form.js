@@ -22,7 +22,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'card', 'validations', 'functions'));
+            _.extend(this, _.pick(options, 'card', 'functions'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
@@ -42,6 +42,16 @@ define([
                     return [];
                 }
             };
+
+            this.validations = ko.computed(function () {
+                var validationIDs = [];
+                if (self.widget()) {
+                    validationIDs = self.widget().datatype.validations;
+                }
+                return _.filter(options.validations, function(validation) {
+                    return _.contains(validationIDs, validation.validationid);
+                })
+            });
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
