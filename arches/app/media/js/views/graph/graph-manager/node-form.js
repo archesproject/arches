@@ -23,13 +23,24 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'graphModel', 'validations', 'branches'));
+            _.extend(this, _.pick(options, 'graphModel', 'branches'));
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.hasOntolgoy = this.graphModel.get('ontology_id') ? true: false;
             this.node = this.graphModel.get('selectedNode');
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
+            this.validations = ko.computed(function () {
+                var validationIDs = [];
+                if (self.node()) {
+                    var datatypes = self.graphModel.get('datatypelookup')
+                    var datatype = datatypes[self.node().datatype()];
+                    validationIDs = datatype.validations;
+                }
+                return _.filter(options.validations, function(validation) {
+                    return _.contains(validationIDs, validation.validationid);
+                })
+            });
             this.isResourceTopNode = ko.computed(function() {
                 var node = self.node();
                 return self.graphModel.get('isresource') && node && node.istopnode;
