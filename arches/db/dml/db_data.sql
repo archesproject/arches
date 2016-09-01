@@ -2068,12 +2068,39 @@ INSERT INTO icons(name, cssclass)
 --             '20000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000');
 
 -- TODO: these are purely for testing, replace with real data
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 1', 'Card Function 1');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 2', 'Card Function 2');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 3', 'Card Function 3');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 1', 'Domain Function 1');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
-INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 1', 'Card Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 2', 'Card Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 3', 'Card Function 3');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 1', 'Domain Function 1');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
+-- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');
+
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000001', 'Card Function 1', 'nodegroup', 'Card Function 1', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000002', 'Card Function 2', 'nodegroup', 'Card Function 2', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000003', 'Card Function 3', 'nodegroup', 'Card Function 3', 'A dummy function for testing');
+
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000004', 'String Function 1', 'user_selectable', 'String Function 1', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000005', 'String Function 2', 'user_selectable', 'String Function 2', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000006', 'String Function 3', 'user_selectable', 'String Function 3', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000007', 'Domain Function 1', 'user_selectable', 'Domain Function 1', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000008', 'Domain Function 2', 'user_selectable', 'Domain Function 2', 'A dummy function for testing');
+INSERT INTO validations(validationid, validation, validationtype, name, description)
+    VALUES ('60000000-0000-0000-0000-000000000009', 'Domain Function 3', 'user_selectable', 'Domain Function 3', 'A dummy function for testing');
+
+INSERT INTO validations_x_datatypes VALUES (8, 'string', '60000000-0000-0000-0000-000000000004');
+INSERT INTO validations_x_datatypes VALUES (9, 'string', '60000000-0000-0000-0000-000000000005');
+INSERT INTO validations_x_datatypes VALUES (10, 'string', '60000000-0000-0000-0000-000000000006');
+INSERT INTO validations_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-0000-000000000007');
+INSERT INTO validations_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
+INSERT INTO validations_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
