@@ -50,7 +50,7 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    functions = models.ManyToManyField(to='Function', db_table='cards_x_functions')
+    functions = models.ManyToManyField(to='Validation', db_table='cards_x_validations')
     itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -63,7 +63,7 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    functions = models.ManyToManyField(to='Function', db_table='widgets_x_functions')
+    functions = models.ManyToManyField(to='Validation', db_table='widgets_x_validations')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -192,19 +192,7 @@ class FormXCard(models.Model):
         managed = True
         db_table = 'forms_x_card'
         unique_together = (('form', 'card'),)
-
-
-class Function(models.Model):
-    functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    functiontype = models.TextField(blank=True, null=True)
-    function = models.TextField()
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'functions'
-
+        
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.

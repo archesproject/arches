@@ -401,20 +401,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Function',
-            fields=[
-                ('functionid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('functiontype', models.TextField(blank=True, null=True)),
-                ('function', models.TextField()),
-                ('name', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-            ],
-            options={
-                'db_table': 'functions',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
             name='Icon',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=True)),
@@ -710,12 +696,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cardmodel',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='cards_x_functions'),
+            field=models.ManyToManyField(to='models.Validation', db_table='cards_x_validations'),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='widgets_x_functions'),
+            field=models.ManyToManyField(to='models.Validation', db_table='widgets_x_validations'),
         ),
         migrations.AddField(
             model_name='graphmodel',
