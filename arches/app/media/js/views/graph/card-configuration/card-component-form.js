@@ -61,21 +61,11 @@ define([
                 return _.filter(options.validations, function(validation) {
                     return (_.contains(validationIDs, validation.validationid) && validation.validationtype === 'user_selectable');
                 })
-            });
+            }).extend({ rateLimit: 500 });
 
             this.cardfunctions = options.validations.filter(function(fn) { 
                 return fn.validationtype === 'nodegroup'; 
             });
-
-            // this.functions = ko.computed(function () {
-            //     var validationIDs = [];
-            //     if (self.widget()) {
-            //         validationIDs = self.widget().datatype.validations;
-            //     }
-            //     return _.filter(options.validations, function(validation) {
-            //         return _.contains(validationIDs, validation.validationid);
-            //     })
-            // });
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){

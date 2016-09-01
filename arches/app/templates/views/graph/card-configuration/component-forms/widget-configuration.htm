@@ -92,9 +92,6 @@
             <div data-bind="with: widget">
                 <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.functions, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
-            <!-- <div data-bind="with: widget">
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options:$parent.functions().filter(function(fn) { return fn.validationtype === 'general'; }), optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
-            </div> -->
         </div>
 
     </div>
