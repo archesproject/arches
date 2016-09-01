@@ -50,7 +50,7 @@ class CardModel(models.Model):
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-    functions = models.ManyToManyField(to='Validation', db_table='cards_x_validations')
+    functions = models.ManyToManyField(to='Function', db_table='cards_x_functions')
     itemtext = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -63,7 +63,7 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey('Node', db_column='nodeid')
     card = models.ForeignKey('CardModel', db_column='cardid')
     widget = models.ForeignKey('Widget', db_column='widgetid')
-    functions = models.ManyToManyField(to='Validation', db_table='widgets_x_validations')
+    functions = models.ManyToManyField(to='Function', db_table='widgets_x_functions')
     config = JSONField(blank=True, null=True, db_column='config')
     label = models.TextField(blank=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
@@ -90,7 +90,7 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
-    validations = models.ManyToManyField(to='Validation', db_table='validations_x_datatypes')
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_datatypes')
 
     class Meta:
         managed = True
@@ -192,7 +192,19 @@ class FormXCard(models.Model):
         managed = True
         db_table = 'forms_x_card'
         unique_together = (('form', 'card'),)
-        
+
+
+class Function(models.Model):
+    functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    function = models.TextField(blank=True, null=True)
+    functiontype = models.TextField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'functions'
+
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -256,7 +268,7 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid', blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column='graphid', blank=True, null=True)
-    validations = models.ManyToManyField(to='Validation', db_table='validations_x_nodes')
+    functions = models.ManyToManyField(to='Function', db_table='functions_x_nodes')
     config = JSONField(blank=True, null=True, db_column='config')
 
     def get_child_nodes_and_edges(self):
@@ -473,18 +485,6 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
-
-
-class Validation(models.Model):
-    validationid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    validation = models.TextField(blank=True, null=True)
-    validationtype = models.TextField(blank=True, null=True)
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'validations'
 
 
 class Value(models.Model):

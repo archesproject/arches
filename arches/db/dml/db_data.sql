@@ -108,14 +108,14 @@ INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null,
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
--- data type validations
-INSERT INTO validations_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
-INSERT INTO validations_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
+-- data type functions
+INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
 
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000001', 'ConceptScheme', 'ARCHES');
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000003', 'GroupingNode', 'DROPDOWNS');
@@ -272,10 +272,10 @@ INSERT INTO cards(cardid, name, description, instructions,
 INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
     VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
 
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
 
-INSERT INTO validations_x_nodes(validation_id, node_id)
+INSERT INTO functions_x_nodes(function_id, node_id)
     VALUES ('60000000-0000-0000-0000-000000000000', '20000000-0000-0000-0000-000000000004');
 
 INSERT INTO icons(name, cssclass)
@@ -2078,29 +2078,29 @@ INSERT INTO icons(name, cssclass)
 -- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
 -- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');
 
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000001', 'Card Function 1', 'nodegroup', 'Card Function 1', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000002', 'Card Function 2', 'nodegroup', 'Card Function 2', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000003', 'Card Function 3', 'nodegroup', 'Card Function 3', 'A dummy function for testing');
 
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000004', 'String Function 1', 'user_selectable', 'String Function 1', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000005', 'String Function 2', 'user_selectable', 'String Function 2', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000006', 'String Function 3', 'user_selectable', 'String Function 3', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000007', 'Domain Function 1', 'user_selectable', 'Domain Function 1', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000008', 'Domain Function 2', 'user_selectable', 'Domain Function 2', 'A dummy function for testing');
-INSERT INTO validations(validationid, validation, validationtype, name, description)
+INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000009', 'Domain Function 3', 'user_selectable', 'Domain Function 3', 'A dummy function for testing');
 
-INSERT INTO validations_x_datatypes VALUES (8, 'string', '60000000-0000-0000-0000-000000000004');
-INSERT INTO validations_x_datatypes VALUES (9, 'string', '60000000-0000-0000-0000-000000000005');
-INSERT INTO validations_x_datatypes VALUES (10, 'string', '60000000-0000-0000-0000-000000000006');
-INSERT INTO validations_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-0000-000000000007');
-INSERT INTO validations_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
-INSERT INTO validations_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
+INSERT INTO functions_x_datatypes VALUES (8, 'string', '60000000-0000-0000-0000-000000000004');
+INSERT INTO functions_x_datatypes VALUES (9, 'string', '60000000-0000-0000-0000-000000000005');
+INSERT INTO functions_x_datatypes VALUES (10, 'string', '60000000-0000-0000-0000-000000000006');
+INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-0000-000000000007');
+INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
+INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
