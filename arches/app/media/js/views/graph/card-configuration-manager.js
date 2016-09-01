@@ -15,7 +15,6 @@ require([
             datatypes: data.datatypes
         }),
         permissions: data.permissions,
-        validations: data.validations,
         functions: data.functions,
         helpPreviewActive: ko.observable(false)
     };

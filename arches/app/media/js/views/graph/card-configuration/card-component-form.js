@@ -44,27 +44,27 @@ define([
             };
 
             this.validations = ko.computed(function () {
-                var validationIDs = [];
+                var functionIDs = [];
                 if (self.widget()) {
-                    validationIDs = self.widget().datatype.validations;
+                    functionIDs = self.widget().datatype.functions;
                 }
-                return _.filter(options.validations, function(validation) {
-                    return (_.contains(validationIDs, validation.validationid) && validation.validationtype !== 'user_selectable');
+                return _.filter(options.functions, function(fn) {
+                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype !== 'user_selectable');
                 })
             });
 
             this.functions = ko.computed(function () {
-                var validationIDs = [];
+                var functionIDs = [];
                 if (self.widget()) {
-                    validationIDs = self.widget().datatype.validations;
+                    functionIDs = self.widget().datatype.functions;
                 }
-                return _.filter(options.validations, function(validation) {
-                    return (_.contains(validationIDs, validation.validationid) && validation.validationtype === 'user_selectable');
+                return _.filter(options.functions, function(fn) {
+                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype === 'user_selectable');
                 })
             }).extend({ rateLimit: 500 });
 
-            this.cardfunctions = options.validations.filter(function(fn) { 
-                return fn.validationtype === 'nodegroup'; 
+            this.cardfunctions = options.functions.filter(function(fn) { 
+                return fn.functiontype === 'nodegroup'; 
             });
 
             this.updateSelection = function(selection) {

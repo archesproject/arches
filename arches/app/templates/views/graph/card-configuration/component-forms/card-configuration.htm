@@ -6,15 +6,6 @@
         <h4 class="title-block-title" style=""> Card Manager </h4>
     </div>
 
-    <!-- Panel Tools -->
-<!--     <div class="library-tools">
-        <i id="card-crud-settings" class="ion-settings add-tooltip library-tools-icon active" data-placement="bottom" data-toggle="tooltip" data-original-title="Settings"></i>
-        <i id="card-crud-advanced" class="ion-ios-gear add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Advanced Settings"></i>
-        <i id="card-crud-validation" class="ion-wand add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Validations"></i>
-        <i id="card-crud-permissions" class="ion-ios-people add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Permissions"></i>
-        <i id="card-crud-help" class="ion-ios-help add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Help Text"></i>
-    </div> -->
-
     <!-- nav bar -->
     <ul class="nav nav-tabs library-tools">
         <li class="active">
@@ -101,7 +92,7 @@
                 {% trans "Functions" %}
             </div>
             <div data-bind="with: card">
-                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.cardfunctions, optionsText: 'name', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select data-placeholder="{% trans "Select functions..." %}" class="design" multiple data-bind="selectedOptions: $data.get('functions'), options: $parent.cardfunctions, optionsText: 'name', optionsValue: 'functionid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
     </div>
