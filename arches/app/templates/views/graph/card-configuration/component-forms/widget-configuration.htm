@@ -76,6 +76,7 @@
 
     <div id="widget-crud-validation" class="tab-pane fade">
 
+        <!-- ko if: $parent.validations().length > 0 -->
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Validations" %}
@@ -84,6 +85,7 @@
                 <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node.validations, options: $parent.validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
+        <!-- /ko -->
 
         <div class="node-widget-label" style="">
             <div class="control-label">

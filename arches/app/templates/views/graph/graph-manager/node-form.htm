@@ -66,12 +66,19 @@
                 <!-- ko if: !node().istopnode -->
                 <div class="node-widget-label">
                     <div class="control-label">
-                        {% trans "Relation to parent" %}
+                        {% trans "Relationship from" %} <span data-bind="text: graphModel.getParentNode(node()).name"></span>
                     </div>
                     <div>
                         <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+
+                <div style="margin-bottom:10px;">
+                    (<strong data-bind="text: graphModel.getParentNode(node()).name"></strong>
+                    <em data-bind="text: node().parentproperty"></em>
+                    <strong data-bind="text: node().name"></strong>)
+                </div>
+
                 <!-- /ko -->
                 <!-- /ko -->
 
@@ -91,6 +98,7 @@
                 }'></div>
                 <!-- /ko -->
 
+                <!-- ko if: validations().length > 0 -->
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "Validations" %}
@@ -99,6 +107,7 @@
                         <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+                <!-- /ko -->
 
             </div>
 
