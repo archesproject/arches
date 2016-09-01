@@ -38,7 +38,7 @@ define([
                     validationIDs = datatype.validations;
                 }
                 return _.filter(options.validations, function(validation) {
-                    return _.contains(validationIDs, validation.validationid);
+                    return (_.contains(validationIDs, validation.validationid) && validation.validationtype !== 'user_selectable');
                 })
             });
             this.isResourceTopNode = ko.computed(function() {

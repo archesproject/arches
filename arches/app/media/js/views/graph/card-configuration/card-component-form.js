@@ -22,7 +22,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'card', 'functions'));
+            _.extend(this, _.pick(options, 'card'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
@@ -49,9 +49,33 @@ define([
                     validationIDs = self.widget().datatype.validations;
                 }
                 return _.filter(options.validations, function(validation) {
-                    return _.contains(validationIDs, validation.validationid);
+                    return (_.contains(validationIDs, validation.validationid) && validation.validationtype !== 'user_selectable');
                 })
             });
+
+            this.functions = ko.computed(function () {
+                var validationIDs = [];
+                if (self.widget()) {
+                    validationIDs = self.widget().datatype.validations;
+                }
+                return _.filter(options.validations, function(validation) {
+                    return (_.contains(validationIDs, validation.validationid) && validation.validationtype === 'user_selectable');
+                })
+            });
+
+            this.cardfunctions = options.validations.filter(function(fn) { 
+                return fn.validationtype === 'nodegroup'; 
+            });
+
+            // this.functions = ko.computed(function () {
+            //     var validationIDs = [];
+            //     if (self.widget()) {
+            //         validationIDs = self.widget().datatype.validations;
+            //     }
+            //     return _.filter(options.validations, function(validation) {
+            //         return _.contains(validationIDs, validation.validationid);
+            //     })
+            // });
 
             this.updateSelection = function(selection) {
                 if('isContainer' in selection){
