@@ -91,6 +91,7 @@
                 }'></div>
                 <!-- /ko -->
 
+                <!-- ko if: validations().length > 0 -->
                 <div class="node-widget-label">
                     <div class="control-label">
                         {% trans "Validations" %}
@@ -99,6 +100,7 @@
                         <select data-placeholder="{% trans "Select validations..." %}" class="design" multiple data-bind="selectedOptions: node().validations, options: validations, optionsText: 'validation', optionsValue: 'validationid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
                     </div>
                 </div>
+                <!-- /ko -->
 
             </div>
 
