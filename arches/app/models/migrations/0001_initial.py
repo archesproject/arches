@@ -696,12 +696,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cardmodel',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='cards_x_functions'),
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_cards'),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='widgets_x_functions'),
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_widgets'),
         ),
         migrations.AddField(
             model_name='graphmodel',
