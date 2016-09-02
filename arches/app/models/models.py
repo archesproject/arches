@@ -177,6 +177,9 @@ class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     title = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
+    iconclass = models.TextField(blank=True, null=True)
+    status = models.BooleanField(default=True)
+    visible = models.BooleanField(default=True)
 
     class Meta:
         managed = True
