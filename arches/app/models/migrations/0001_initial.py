@@ -382,6 +382,9 @@ class Migration(migrations.Migration):
                 ('formid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('title', models.TextField(blank=True, null=True)),
                 ('subtitle', models.TextField(blank=True, null=True)),
+                ('iconclass', models.TextField(blank=True, null=True)),
+                ('status', models.BooleanField(default=True)),
+                ('visible', models.BooleanField(default=True)),
             ],
             options={
                 'db_table': 'forms',
