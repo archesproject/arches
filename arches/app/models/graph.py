@@ -151,7 +151,7 @@ class Graph(models.GraphModel):
             node.datatype = nodeobj.get('datatype','')
             node.nodegroup_id = nodeobj.get('nodegroup_id','')
             node.config = nodeobj.get('config', None)
-            node.validations.set(nodeobj.get('validations', []))
+            node.functions.set(nodeobj.get('functions', []))
 
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))

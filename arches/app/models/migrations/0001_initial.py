@@ -403,12 +403,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Function',
             fields=[
-                ('functionid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('functionid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                ('function', models.TextField(blank=True, null=True)),
                 ('functiontype', models.TextField(blank=True, null=True)),
-                ('function', models.TextField()),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-            ],
+
+                ],
             options={
                 'db_table': 'functions',
                 'managed': True,
@@ -594,21 +595,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Validation',
-            fields=[
-                ('validationid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('validation', models.TextField(blank=True, null=True)),
-                ('validationtype', models.TextField(blank=True, null=True)),
-                ('name', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-
-                ],
-            options={
-                'db_table': 'validations',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
             name='Value',
             fields=[
                 ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
@@ -699,23 +685,23 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='node',
-            name='validations',
-            field=models.ManyToManyField(to='models.Validation', db_table='validations_x_nodes'),
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_nodes'),
         ),
         migrations.AddField(
             model_name='ddatatype',
-            name='validations',
-            field=models.ManyToManyField(to='models.Validation', db_table='validations_x_datatypes'),
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_datatypes'),
         ),
         migrations.AddField(
             model_name='cardmodel',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='cards_x_functions'),
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_cards'),
         ),
         migrations.AddField(
             model_name='cardxnodexwidget',
             name='functions',
-            field=models.ManyToManyField(to='models.Function', db_table='widgets_x_functions'),
+            field=models.ManyToManyField(to='models.Function', db_table='functions_x_widgets'),
         ),
         migrations.AddField(
             model_name='graphmodel',

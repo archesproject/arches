@@ -22,7 +22,7 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            _.extend(this, _.pick(options, 'card', 'functions'));
+            _.extend(this, _.pick(options, 'card'));
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
@@ -44,13 +44,27 @@ define([
             };
 
             this.validations = ko.computed(function () {
-                var validationIDs = [];
+                var functionIDs = [];
                 if (self.widget()) {
-                    validationIDs = self.widget().datatype.validations;
+                    functionIDs = self.widget().datatype.functions;
                 }
-                return _.filter(options.validations, function(validation) {
-                    return _.contains(validationIDs, validation.validationid);
+                return _.filter(options.functions, function(fn) {
+                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype !== 'user_selectable');
                 })
+            });
+
+            this.functions = ko.computed(function () {
+                var functionIDs = [];
+                if (self.widget()) {
+                    functionIDs = self.widget().datatype.functions;
+                }
+                return _.filter(options.functions, function(fn) {
+                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype === 'user_selectable');
+                })
+            }).extend({ rateLimit: 500 });
+
+            this.cardfunctions = options.functions.filter(function(fn) { 
+                return fn.functiontype === 'nodegroup'; 
             });
 
             this.updateSelection = function(selection) {

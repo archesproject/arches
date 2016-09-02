@@ -57,7 +57,7 @@ define([
                 }
                 return component;
             });
-            self.validations = ko.observableArray();
+            self.functions = ko.observableArray();
             self.ontologyclass = ko.observable('');
             self.parentproperty = ko.observable('');
             self.ontology_cache = ko.observableArray().extend({ deferred: true });
@@ -138,7 +138,7 @@ define([
                     name: self.name(),
                     datatype: self.datatype(),
                     nodegroup_id: self.nodeGroupId(),
-                    validations: self.validations(),
+                    functions: self.functions(),
                     ontologyclass: self.ontologyclass(),
                     parentproperty: self.parentproperty(),
                     config: config
@@ -173,9 +173,9 @@ define([
             self.datatype(source.datatype);
             self.ontologyclass(source.ontologyclass);
             self.parentproperty(source.parentproperty);
-            self.validations.removeAll();
-            source.validations.forEach(function(validation) {
-                self.validations.push(validation);
+            self.functions.removeAll();
+            source.functions.forEach(function(fn) {
+                self.functions.push(fn);
             });
 
             if (source.config) {

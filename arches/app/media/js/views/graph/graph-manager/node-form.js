@@ -18,7 +18,7 @@ define([
         * @memberof NodeFormView.prototype
         * @param {object} options
         * @param {object} options.graphModel - a reference to the selected {@link GraphModel}
-        * @param {array} options.validations - an array of validation objects
+        * @param {array} options.functions - an array of function objects
         * @param {array} options.branches - an array of branch objects
         */
         initialize: function(options) {
@@ -30,15 +30,15 @@ define([
             this.closeClicked = ko.observable(false);
             this.loading = options.loading || ko.observable(false);
             this.failed = ko.observable(false);
-            this.validations = ko.computed(function () {
-                var validationIDs = [];
+            this.functions = ko.computed(function () {
+                var functionIDs = [];
                 if (self.node()) {
                     var datatypes = self.graphModel.get('datatypelookup')
                     var datatype = datatypes[self.node().datatype()];
-                    validationIDs = datatype.validations;
+                    functionIDs = datatype.functions;
                 }
-                return _.filter(options.validations, function(validation) {
-                    return _.contains(validationIDs, validation.validationid);
+                return _.filter(options.functions, function(fn) {
+                    return (_.contains(functionIDs, fn.functionid) && fn.functiontype !== 'user_selectable');
                 })
             });
             this.isResourceTopNode = ko.computed(function() {

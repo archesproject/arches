@@ -112,7 +112,7 @@ class Card(models.CardModel):
                     nodeid = node.get('nodeid', None)
                     if nodeid is not None:
                         node_model = models.Node.objects.get(nodeid=nodeid)
-                        node_model.validations.set(node.get('validations', []))
+                        node_model.functions.set(node.get('functions', []))
                         node_model.config = node.get('config', None)
                         self.nodes.append(node_model)
 

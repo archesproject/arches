@@ -57,7 +57,7 @@ def manager(request, graphid):
         })
 
     graph = Graph.objects.get(graphid=graphid)
-    validations = models.Validation.objects.all()
+    functions = models.Function.objects.all()
     branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
     if graph.ontology is not None:
         branch_graphs = branch_graphs.filter(ontology=graph.ontology)
@@ -68,7 +68,7 @@ def manager(request, graphid):
         'graphs': JSONSerializer().serialize(graphs),
         'graph': JSONSerializer().serializeToPython(graph),
         'graph_json': JSONSerializer().serialize(graph),
-        'validations': JSONSerializer().serialize(validations),
+        'functions': JSONSerializer().serialize(functions),
         'branches': JSONSerializer().serialize(branch_graphs),
         'datatypes_json': JSONSerializer().serialize(datatypes),
         'datatypes': datatypes,
@@ -150,7 +150,7 @@ def card_manager(request, graphid):
         'branches': JSONSerializer().serialize(branch_graphs)
     })
     graph = Graph.objects.get(graphid=graphid)
-    validations = models.Validation.objects.all()
+    functions = models.Function.objects.all()
 
 @group_required('edit')
 def card(request, cardid):
@@ -169,7 +169,6 @@ def card(request, cardid):
             card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        validations = models.Validation.objects.all()
         functions = models.Function.objects.all()
         graph = Graph.objects.get(graphid=card.graph_id)
         return render(request, 'views/graph/card-configuration-manager.htm', {
@@ -183,7 +182,6 @@ def card(request, cardid):
             'datatypes': datatypes,
             'widgets': widgets,
             'widgets_json': JSONSerializer().serialize(widgets),
-            'validations': JSONSerializer().serialize(validations),
             'functions': JSONSerializer().serialize(functions),
         })
 
