@@ -40,7 +40,7 @@ class Group(object):
             details = args[0]
             self.resource_id = details['RESOURCEID'].strip()
             self.group_id = details['GROUPID'].strip()
-            self.rows = []   
+            self.rows = []
 
 class Resource(object):
     def __init__(self, *args):
@@ -95,8 +95,8 @@ class Validator(object):
     def get_resource_attributes(self):
         cursor = connection.cursor()
         sql = """
-            SELECT m.entitytypeidfrom, m.entitytypeidto, et.businesstablename FROM ontology.mappings m
-            JOIN data.entity_types et ON et.entitytypeid = m.entitytypeidto
+            SELECT m.entitytypeidfrom, m.entitytypeidto, et.businesstablename FROM mappings m
+            JOIN entity_types et ON et.entitytypeid = m.entitytypeidto
         """
         cursor.execute(sql)
         resource_types = []
@@ -185,7 +185,7 @@ class Validator(object):
         date_formats = settings.DATE_PARSING_FORMAT
         valid = False
         for format in date_formats:
-            if valid == False: 
+            if valid == False:
                 try:
                     if datetime.strptime(row['ATTRIBUTEVALUE'], format):
                         valid = True
@@ -208,7 +208,7 @@ class Validator(object):
 
             if bbox.contains(geom) == False:
                 self.append_error('ERROR ROW: {0} - {1} does not fall within the bounding box of the selected coordinate system. Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
-            
+
         except:
             self.append_error('ERROR ROW: {0} - {1} is not a properly formatted geometry.'.format(rownum, row['ATTRIBUTEVALUE']), 'geometry_errors')
 
@@ -232,7 +232,7 @@ class Validator(object):
         relations_file = arches_file.replace('.arches', '.relations')
         with open(relations_file, 'rU') as f:
             fieldnames = ['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES']
-            rows = unicodecsv.DictReader(f, fieldnames=fieldnames, 
+            rows = unicodecsv.DictReader(f, fieldnames=fieldnames,
                 encoding='utf-8-sig', delimiter='|', restkey='ADDITIONAL', restval='MISSING')
             rows.next()
             rownum = 2
@@ -265,7 +265,7 @@ class ArchesReader():
         validator = Validator()
         with open(arches_file, 'rU') as f:
             fieldnames = ['RESOURCEID','RESOURCETYPE','ATTRIBUTENAME','ATTRIBUTEVALUE','GROUPID']
-            rows = unicodecsv.DictReader(f, fieldnames=fieldnames, 
+            rows = unicodecsv.DictReader(f, fieldnames=fieldnames,
                 encoding='utf-8-sig', delimiter='|', restkey='ADDITIONAL', restval='MISSING')
             rows.next() # skip header row
             rownum = 2
@@ -317,7 +317,7 @@ class ArchesReader():
 
         for row in resource_info:
             # print row
-            
+
             group_val = row['GROUPID'].strip()
             resource_type_val = row['RESOURCETYPE'].strip()
             resource_id_val = row['RESOURCEID'].strip()
@@ -330,7 +330,7 @@ class ArchesReader():
                     resource_list.append(resource)
                     resource_id = resource_id_val
                     group_id = ''
-                
+
                 if group_val != group_id:  #create a new group of resouces
                     resource.groups.append(Group(row))
                     group_id = group_val
