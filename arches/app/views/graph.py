@@ -149,8 +149,6 @@ def card_manager(request, graphid):
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'branches': JSONSerializer().serialize(branch_graphs)
     })
-    graph = Graph.objects.get(graphid=graphid)
-    functions = models.Function.objects.all()
 
 @group_required('edit')
 def card(request, cardid):
@@ -186,6 +184,18 @@ def card(request, cardid):
         })
 
     return HttpResponseNotFound()
+
+@group_required('edit')
+def form_manager(request, graphid):
+    graph = Graph.objects.get(graphid=graphid)
+
+    return render(request, 'views/graph/form-manager.htm', {
+        'main_script': 'views/graph/form-manager',
+        'graphid': graphid,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all())
+    })
 
 @group_required('edit')
 def node(request, graphid):

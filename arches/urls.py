@@ -60,6 +60,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, graph.manager, name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, graph.settings, name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, graph.card_manager, name='card_manager'),
+    url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, graph.form_manager, name='form_manager'),
     url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, graph.append_branch, name='append_branch'),
     url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, graph.move_node, name='move_node'),
     url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='update_node'),

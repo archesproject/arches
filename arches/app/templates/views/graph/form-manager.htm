@@ -1,0 +1,56 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Data Entry Forms" %}
+{% endblock graph_header_title %}
+
+
+{% block content %}
+<div class="card-library relative fade in" style="">
+
+    <!-- Card Grid -->
+    <div class="card-grid relative ep-form-content new-card-indent">
+        <div style="display:none;">
+            <!-- Isotope Layout -->
+            <div id="report-image-grid" class="report-image-grid">
+
+
+            </div>
+        </div>
+    </div>
+    <!-- End Card Grid -->
+
+</div>
+
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-forms-data', [], function () {
+    return {
+        graph: {{graphJSON}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
