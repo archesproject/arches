@@ -195,7 +195,8 @@ def form_manager(request, graphid):
         'graph': JSONSerializer().serializeToPython(graph),
         'graphJSON': JSONSerializer().serialize(graph),
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'forms': JSONSerializer().serialize(graph.form_set.all())
+        'forms': JSONSerializer().serialize(graph.form_set.all()),
+        'cards': JSONSerializer().serialize(models.CardModel.objects.filter(graph=graph)),
     })
 
 @group_required('edit')
