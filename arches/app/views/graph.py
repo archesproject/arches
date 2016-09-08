@@ -149,8 +149,6 @@ def card_manager(request, graphid):
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'branches': JSONSerializer().serialize(branch_graphs)
     })
-    graph = Graph.objects.get(graphid=graphid)
-    functions = models.Function.objects.all()
 
 @group_required('edit')
 def card(request, cardid):
@@ -184,6 +182,42 @@ def card(request, cardid):
             'widgets_json': JSONSerializer().serialize(widgets),
             'functions': JSONSerializer().serialize(functions),
         })
+
+    return HttpResponseNotFound()
+
+@group_required('edit')
+def form_manager(request, graphid):
+    graph = Graph.objects.get(graphid=graphid)
+
+    return render(request, 'views/graph/form-manager.htm', {
+        'main_script': 'views/graph/form-manager',
+        'graphid': graphid,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'forms': JSONSerializer().serialize(graph.form_set.all())
+    })
+
+@group_required('edit')
+def form_configuration(request, formid):
+    form = models.Form.objects.get(formid=formid)
+    graph = Graph.objects.get(graphid=form.graph.pk)
+    return render(request, 'views/graph/form-configuration.htm', {
+        'main_script': 'views/graph/form-configuration',
+        'graphid': graph.pk,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'form': JSONSerializer().serialize(form)
+    })
+
+@group_required('edit')
+def add_form(request, graphid):
+    if request.method == 'POST':
+        graph = models.GraphModel.objects.get(graphid=graphid)
+        form = models.Form(title=_('New Form'), graph=graph)
+        form.save()
+        return JSONResponse(form)
 
     return HttpResponseNotFound()
 
