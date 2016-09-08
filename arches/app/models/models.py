@@ -180,6 +180,7 @@ class Form(models.Model):
     iconclass = models.TextField(blank=True, null=True)
     status = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
+    graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
     cards = models.ManyToManyField(to='CardModel', db_table='forms_x_cards')
 
     class Meta:
@@ -212,7 +213,6 @@ class GraphModel(models.Model):
     iconclass = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
-    forms = models.ManyToManyField(to='Form', db_table='graphs_x_forms')
 
     class Meta:
         managed = True

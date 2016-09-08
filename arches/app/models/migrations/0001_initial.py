@@ -687,9 +687,9 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(to='models.CardModel', db_table='forms_x_cards'),
         ),
         migrations.AddField(
-            model_name='graphmodel',
-            name='forms',
-            field=models.ManyToManyField(to='models.Form', db_table='graphs_x_forms'),
+            model_name='form',
+            name='graph',
+            field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False),
         ),
         migrations.AddField(
             model_name='graphmodel',

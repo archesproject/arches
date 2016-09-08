@@ -194,8 +194,32 @@ def form_manager(request, graphid):
         'graphid': graphid,
         'graph': JSONSerializer().serializeToPython(graph),
         'graphJSON': JSONSerializer().serialize(graph),
-        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all())
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'forms': JSONSerializer().serialize(graph.form_set.all())
     })
+
+@group_required('edit')
+def form_configuration(request, formid):
+    form = models.Form.objects.get(formid=formid)
+    graph = Graph.objects.get(graphid=form.graph.pk)
+    return render(request, 'views/graph/form-configuration.htm', {
+        'main_script': 'views/graph/form-configuration',
+        'graphid': graph.pk,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'form': JSONSerializer().serialize(form)
+    })
+
+@group_required('edit')
+def add_form(request, graphid):
+    if request.method == 'POST':
+        graph = models.GraphModel.objects.get(graphid=graphid)
+        form = models.Form(title=_('New Form'), graph=graph)
+        form.save()
+        return JSONResponse(form)
+
+    return HttpResponseNotFound()
 
 @group_required('edit')
 def node(request, graphid):

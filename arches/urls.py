@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, graph.settings, name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, graph.card_manager, name='card_manager'),
     url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, graph.form_manager, name='form_manager'),
+    url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, graph.add_form, name='add_form'),
     url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, graph.append_branch, name='append_branch'),
     url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, graph.move_node, name='move_node'),
     url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='update_node'),
@@ -73,6 +74,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, graph.get_valid_domain_nodes, name='get_valid_domain_nodes'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, graph.card, name='card'),
+    url(r'^form_configuration/(?P<formid>%s|())$' % uuid_regex, graph.form_configuration, name='form_configuration'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='node'),
     url(r'^test/(?P<graphid>%s)$' % uuid_regex, graph.test, name='test'),
 

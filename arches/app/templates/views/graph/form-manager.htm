@@ -23,16 +23,53 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Data Entry Forms" %}
 {% endblock graph_header_title %}
 
+{% block graph_header_tools %}
+<!-- Card Filter Widget -->
+<div id="card-grid-tools" style="display: none;">
+    <div class="ep-card-search">
+
+    </div>
+</div>
+{% endblock graph_header_tools %}
 
 {% block content %}
 <div class="card-library relative fade in" style="">
 
     <!-- Card Grid -->
-    <div class="card-grid relative ep-form-content new-card-indent">
-        <div style="display:none;">
+    <div class="card-grid relative ep-form-content new-card-indent" style="display:none;" data-bind="visible:forms">
+        <div>
             <!-- Isotope Layout -->
             <div id="report-image-grid" class="report-image-grid">
 
+                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card">
+                    <a id="add-card" href="#" data-toggle="modal" data-bind="click: addForm">
+                        <h3 class="text-thin" style="margin-top: 10px;"> {% trans "Add Form" %}</h3>
+
+                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+                        </span>
+
+                        <h5 class="" style="font-weight: 200;"> {% trans "Group data entry cards into thematic forms" %} </h5>
+                    </a>
+                </div>
+
+                <!-- ko foreach: forms -->
+                <div class="card-grid-item" data-bind="click: function () { $parent.openForm(formid) }">
+                    <div class="panel mar-no">
+
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" data-bind="text:title"></h3>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle" data-bind="text:subtitle"></p>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /ko -->
 
             </div>
         </div>
@@ -49,7 +86,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('graph-forms-data', [], function () {
     return {
-        graph: {{graphJSON}}
+        graph: {{graphJSON}},
+        forms: {{forms}}
     };
 });
 {% endautoescape %}</script>
