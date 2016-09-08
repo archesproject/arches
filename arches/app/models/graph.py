@@ -959,8 +959,6 @@ class Graph(models.GraphModel):
         else:
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:
-                    print '*'*40
-                    print self.root.name
                     raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."))
 
 
