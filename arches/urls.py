@@ -21,6 +21,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
+from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -57,23 +58,22 @@ urlpatterns = [
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
-    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, graph.manager, name='graph'),
-    url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, graph.settings, name='graph_settings'),
+    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
+    url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
     url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, graph.card_manager, name='card_manager'),
-    url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, graph.append_branch, name='append_branch'),
-    url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, graph.move_node, name='move_node'),
-    url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='update_node'),
-    url(r'^graph/delete_node/(?P<graphid>%s)$' % uuid_regex, graph.delete_node, name='delete_node'),
-    url(r'^graph/clone/(?P<graphid>%s)$' % uuid_regex, graph.clone, name='clone_graph'),
-    url(r'^graph/export/(?P<graphid>%s)$' % uuid_regex, graph.export_graph, name='export_graph'),
-    url(r'^graph/import/', graph.import_graph, name='import_graph'),
-    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', graph.datatype_template, name="datatype_template"),
-    url(r'^graph/new$', graph.new, name='new_graph'),
-    url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, graph.get_related_nodes, name='get_related_nodes'),
-    url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, graph.get_valid_domain_nodes, name='get_valid_domain_nodes'),
+    url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
+    url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
+    url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
+    url(r'^graph/delete_node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
+    url(r'^graph/clone/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='clone_graph'), name='clone_graph'),
+    url(r'^graph/export/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
+    url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
+    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
+    url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
+    url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
+    url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, graph.card, name='card'),
-    url(r'^node/(?P<graphid>%s)$' % uuid_regex, graph.node, name='node'),
-    url(r'^test/(?P<graphid>%s)$' % uuid_regex, graph.test, name='test'),
+    url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
 
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
 
