@@ -392,18 +392,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='FormXCard',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('card', models.ForeignKey(db_column='cardid', to='models.CardModel')),
-                ('form', models.ForeignKey(db_column='formid', to='models.Form')),
-            ],
-            options={
-                'db_table': 'forms_x_card',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
             name='Function',
             fields=[
                 ('functionid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
@@ -542,19 +530,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'resource_2_resource_constraints',
-                'managed': True,
-            },
-        ),
-        migrations.CreateModel(
-            name='ResourceClassXForm',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('status', models.TextField(blank=True, null=True)),
-                ('form', models.ForeignKey(db_column='formid', to='models.Form')),
-                ('resourceclass', models.ForeignKey(blank=True, db_column='resourceclassid', null=True, to='models.Node')),
-            ],
-            options={
-                'db_table': 'resource_classes_x_forms',
                 'managed': True,
             },
         ),
@@ -707,17 +682,19 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(to='models.Function', db_table='functions_x_widgets'),
         ),
         migrations.AddField(
+            model_name='form',
+            name='cards',
+            field=models.ManyToManyField(to='models.CardModel', db_table='forms_x_cards'),
+        ),
+        migrations.AddField(
+            model_name='graphmodel',
+            name='forms',
+            field=models.ManyToManyField(to='models.Form', db_table='graphs_x_forms'),
+        ),
+        migrations.AddField(
             model_name='graphmodel',
             name='ontology',
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
-        ),
-        migrations.AlterUniqueTogether(
-            name='resourceclassxform',
-            unique_together=set([('resourceclass', 'form')]),
-        ),
-        migrations.AlterUniqueTogether(
-            name='formxcard',
-            unique_together=set([('form', 'card')]),
         ),
         migrations.AlterUniqueTogether(
             name='edge',
