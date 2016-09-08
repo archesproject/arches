@@ -109,7 +109,7 @@ class GraphDataView(GraphBaseView):
 
     action = 'update_node'
 
-    def get(self, request, graphid):
+    def get(self, request, graphid, nodeid=None):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
             f = JSONSerializer().serialize(graph)
@@ -118,6 +118,15 @@ class GraphDataView(GraphBaseView):
             response = HttpResponse(f, content_type='json/plain')
             response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
             return response
+        else:
+            graph = Graph.objects.get(graphid=graphid)
+            if self.action == 'get_related_nodes':
+                ret = graph.get_valid_ontology_classes(nodeid=nodeid)
+
+            elif self.action == 'get_valid_domain_nodes':
+                ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
+                
+            return JSONResponse(ret)
 
         return HttpResponseNotFound()
 
@@ -152,13 +161,7 @@ class GraphDataView(GraphBaseView):
 
                     elif self.action == 'clone_graph':
                         ret = graph.copy()
-
-                    elif self.action == 'get_related_nodes':
-                        ret = graph.get_valid_ontology_classes(nodeid=data['nodeid'])
-
-                    elif self.action == 'get_valid_domain_nodes':
-                        ret = graph.get_valid_domain_ontology_classes(nodeid=data['nodeid'])
-
+                        
                     graph.save()
                 return JSONResponse(ret)
 
@@ -213,7 +216,9 @@ class GraphSettingsView(GraphBaseView):
                 setattr(graph, key, value)
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))
-        node.ontologyclass = data.get('ontology_class') if graph.ontology is not None else None
+        print data.get('graph').get('ontology_id')
+        node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
+        print node.ontologyclass
         with transaction.atomic():
             graph.save()
             node.save()
@@ -244,8 +249,6 @@ def card_manager(request, graphid):
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
         'branches': JSONSerializer().serialize(branch_graphs)
     })
-    graph = Graph.objects.get(graphid=graphid)
-    functions = models.Function.objects.all()
 
 @group_required('edit')
 def card(request, cardid):
@@ -279,6 +282,42 @@ def card(request, cardid):
             'widgets_json': JSONSerializer().serialize(widgets),
             'functions': JSONSerializer().serialize(functions),
         })
+
+    return HttpResponseNotFound()
+
+@group_required('edit')
+def form_manager(request, graphid):
+    graph = Graph.objects.get(graphid=graphid)
+
+    return render(request, 'views/graph/form-manager.htm', {
+        'main_script': 'views/graph/form-manager',
+        'graphid': graphid,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'forms': JSONSerializer().serialize(graph.form_set.all())
+    })
+
+@group_required('edit')
+def form_configuration(request, formid):
+    form = models.Form.objects.get(formid=formid)
+    graph = Graph.objects.get(graphid=form.graph.pk)
+    return render(request, 'views/graph/form-configuration.htm', {
+        'main_script': 'views/graph/form-configuration',
+        'graphid': graph.pk,
+        'graph': JSONSerializer().serializeToPython(graph),
+        'graphJSON': JSONSerializer().serialize(graph),
+        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+        'form': JSONSerializer().serialize(form)
+    })
+
+@group_required('edit')
+def add_form(request, graphid):
+    if request.method == 'POST':
+        graph = models.GraphModel.objects.get(graphid=graphid)
+        form = models.Form(title=_('New Form'), graph=graph)
+        form.save()
+        return JSONResponse(form)
 
     return HttpResponseNotFound()
 

@@ -70,9 +70,12 @@ urlpatterns = [
     url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
     url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
     url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
-    url(r'^graph/(?P<graphid>%s)/get_related_nodes$' % uuid_regex, GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
+    url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
+    url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, graph.form_manager, name='form_manager'),
+    url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, graph.add_form, name='add_form'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, graph.card, name='card'),
+    url(r'^form_configuration/(?P<formid>%s|())$' % uuid_regex, graph.form_configuration, name='form_configuration'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
 
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),

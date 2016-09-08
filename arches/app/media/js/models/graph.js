@@ -269,9 +269,8 @@ define(['arches',
          */
         getValidNodesEdges: function(nodeid, callback, scope){
             this._doRequest({
-                type: "POST",
-                url: this.url + this.get('graphid') + '/get_related_nodes',
-                data: JSON.stringify({'nodeid': nodeid})
+                type: "GET",
+                url: this.url + this.get('graphid') + '/get_related_nodes/' + nodeid,
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
             }, this);
@@ -287,9 +286,8 @@ define(['arches',
          */
         getValidDomainClasses: function(nodeid, callback, scope){
             this._doRequest({
-                type: "POST",
-                url: this.url + this.get('graphid') + '/get_valid_domain_nodes',
-                data: JSON.stringify({'nodeid': nodeid})
+                type: "GET",
+                url: this.url + this.get('graphid') + '/get_valid_domain_nodes/' + nodeid,
             }, function(response, status, self){
                 callback.call(scope, response.responseJSON);
             }, this);
