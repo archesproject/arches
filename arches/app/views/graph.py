@@ -49,15 +49,55 @@ class GraphBaseView(BaseNiftyView):
             pass
         return context
 
-    # def set_graph_context(self, graphid):
-    #     self.graph = Graph.objects.get(graphid=graphid)
-    #     return self.graph
 
-    # def get(self, request, graphid):
-    #     return self.set_graph_context(graphid)
+@method_decorator(group_required('edit'), name='dispatch')
+class GraphSettingsView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+        icons = models.Icon.objects.order_by('name')
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
+        resource_data = []
+        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        relatable_resources = node.get_relatable_resources()
+        for res in resource_graphs:
+            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
+                node_model = models.Node.objects.get(graph=res, istopnode=True)
+                resource_data.append({
+                    'id': node_model.nodeid,
+                    'graph': res,
+                    'is_relatable': (node_model in relatable_resources)
+                })
+        ontologies = models.Ontology.objects.filter(parentontology=None)
+        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
+        context = self.get_context_data(
+            main_script='views/graph/graph-settings',
+            icons=JSONSerializer().serialize(icons),
+            node_json=JSONSerializer().serialize(node),
+            ontologies=JSONSerializer().serialize(ontologies),
+            ontology_classes=JSONSerializer().serialize(ontology_classes),
+            resource_data=JSONSerializer().serialize(resource_data),
+            node_count=models.Node.objects.filter(graph=self.graph).count()
+        )
+        return render(request, 'views/graph/graph-settings.htm', context)
 
-    # def get(self, request, graphid):
-    #     return self.set_graph_context(graphid)
+    def post(self, request, graphid):
+        graph = Graph.objects.get(graphid=graphid)
+        data = JSONDeserializer().deserialize(request.body)
+        for key, value in data.get('graph').iteritems():
+            if key in ['iconclass', 'name', 'author', 'description', 'isresource', 
+                'ontology_id', 'version',  'subtitle', 'isactive']:
+                setattr(graph, key, value)
+        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
+        node.set_relatable_resources(data.get('relatable_resource_ids'))
+        node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
+        with transaction.atomic():
+            graph.save()
+            node.save()
+        return JSONResponse({
+            'success': True,
+            'graph': graph,
+            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
+        })
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -161,7 +201,7 @@ class GraphDataView(GraphBaseView):
 
                     elif self.action == 'clone_graph':
                         ret = graph.copy()
-                        
+
                     graph.save()
                 return JSONResponse(ret)
 
@@ -175,58 +215,6 @@ class GraphDataView(GraphBaseView):
             return JSONResponse({})
 
         return HttpResponseNotFound()
-
-
-@method_decorator(group_required('edit'), name='dispatch')
-class GraphSettingsView(GraphBaseView):
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        icons = models.Icon.objects.order_by('name')
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True), ~Q(graphid=graphid))
-        resource_data = []
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        relatable_resources = node.get_relatable_resources()
-        for res in resource_graphs:
-            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
-                node_model = models.Node.objects.get(graph=res, istopnode=True)
-                resource_data.append({
-                    'id': node_model.nodeid,
-                    'graph': res,
-                    'is_relatable': (node_model in relatable_resources)
-                })
-        ontologies = models.Ontology.objects.filter(parentontology=None)
-        ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-        context = self.get_context_data(
-            main_script='views/graph/graph-settings',
-            icons=JSONSerializer().serialize(icons),
-            node_json=JSONSerializer().serialize(node),
-            ontologies=JSONSerializer().serialize(ontologies),
-            ontology_classes=JSONSerializer().serialize(ontology_classes),
-            resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count()
-        )
-        return render(request, 'views/graph/graph-settings.htm', context)
-
-    def post(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
-        data = JSONDeserializer().deserialize(request.body)
-        for key, value in data.get('graph').iteritems():
-            if key in ['iconclass', 'name', 'author', 'description', 'isresource', 
-                'ontology_id', 'version',  'subtitle', 'isactive']:
-                setattr(graph, key, value)
-        node = models.Node.objects.get(graph_id=graphid, istopnode=True)
-        node.set_relatable_resources(data.get('relatable_resource_ids'))
-        print data.get('graph').get('ontology_id')
-        node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
-        print node.ontologyclass
-        with transaction.atomic():
-            graph.save()
-            node.save()
-        return JSONResponse({
-            'success': True,
-            'graph': graph,
-            'relatable_resource_ids': [res.nodeid for res in node.get_relatable_resources()]
-        })
 
 
 class DatatypeTemplateView(TemplateView):
@@ -320,110 +308,3 @@ def add_form(request, graphid):
         return JSONResponse(form)
 
     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def node(request, graphid):
-#     data = JSONDeserializer().deserialize(request.body)
-#     if data:
-#         if request.method == 'POST':
-#             graph = Graph.objects.get(graphid=graphid)
-#             graph.update_node(data)
-#             graph.save()
-#             return JSONResponse(graph)
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def delete_node(request, graphid):
-#     data = JSONDeserializer().deserialize(request.body)
-#     if data:
-#         if request.method == 'DELETE':
-#             graph = Graph.objects.get(graphid=graphid)
-#             graph.delete_node(node=data.get('nodeid', None))
-#             return JSONResponse({})
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def append_branch(request, graphid):
-#     if request.method == 'POST':
-#         data = JSONDeserializer().deserialize(request.body)
-#         graph = Graph.objects.get(graphid=graphid)
-#         new_branch = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
-#         graph.save()
-#         return JSONResponse(new_branch)
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def move_node(request, graphid):
-#     if request.method == 'POST':
-#         data = JSONDeserializer().deserialize(request.body)
-#         graph = Graph.objects.get(graphid=graphid)
-#         updated_nodes_and_edges = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
-#         graph.save()
-#         return JSONResponse(updated_nodes_and_edges)
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def clone(request, graphid):
-#     if request.method == 'POST':
-#         data = JSONDeserializer().deserialize(request.body)
-#         graph = Graph.objects.get(graphid=graphid).copy()
-#         graph.save()
-#         return JSONResponse(graph)
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def export_graph(request, graphid):
-#     if request.method == 'GET':
-#         graph = get_graphs_for_export([graphid])
-#         f = JSONSerializer().serialize(graph)
-#         graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
-
-#         response = HttpResponse(f, content_type='json/plain')
-#         response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
-#         return response
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def import_graph(request):
-#     if request.method == 'POST':
-#         graph_file = request.FILES.get('importedGraph').read()
-#         graphs = JSONDeserializer().deserialize(graph_file)['graph']
-#         for graph in graphs:
-#             new_graph = Graph(graph)
-#             new_graph.save()
-
-#         return JSONResponse({})
-
-#     return HttpResponseNotFound()
-
-# @group_required('edit')
-# def new(request):
-#     if request.method == 'POST':
-#         data = JSONDeserializer().deserialize(request.body)
-#         isresource = data['isresource'] if 'isresource' in data else False
-#         name = _('New Resource') if isresource else _('New Graph')
-#         author = request.user.first_name + ' ' + request.user.last_name
-#         graph = Graph.new(name=name,is_resource=isresource,author=author)
-#         graph.save()
-#         return JSONResponse(graph)
-
-#     return HttpResponseNotFound()
-
-# def get_related_nodes(request, graphid):
-#     data = JSONDeserializer().deserialize(request.body)
-#     graph = Graph.objects.get(graphid=graphid)
-#     return JSONResponse(graph.get_valid_ontology_classes(nodeid=data['nodeid']))
-
-# def get_valid_domain_nodes(request, graphid):
-#     data = JSONDeserializer().deserialize(request.body)
-#     graph = Graph.objects.get(graphid=graphid)
-#     return JSONResponse(graph.get_valid_domain_ontology_classes(nodeid=data['nodeid']))
-
-# def datatype_template(request, template="text"):
-#     return render(request, 'views/graph/datatypes/%s.htm' % template)
