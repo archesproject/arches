@@ -23,7 +23,7 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from arches.management.commands.package_utils import resource_graphs
 from arches.app.models.models import Node, NodeGroup, GraphModel, Edge
-from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
 class GraphManagerViewTests(ArchesTestCase):
@@ -224,4 +224,7 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse('import_graph')
         with open(os.path.join(list(test_settings.RESOURCE_GRAPH_LOCATIONS)[0], 'archesv4_resource.json')) as f:
             response = self.client.post(url, {'importedGraph': f})
-        self.assertEqual(response.content, '{}')
+        self.assertIsNotNone(response.content)
+
+        imported_json = JSONDeserializer().deserialize(response.content)
+        self.assertEqual(imported_json['graphid'], "11111111-0000-0000-0000-191919191919")

@@ -21,7 +21,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
-from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView
+from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -60,7 +60,7 @@ urlpatterns = [
     url(r'^config/', config.manager, name='config'),
     url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
     url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
-    url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, graph.card_manager, name='card_manager'),
+    url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
     url(r'^graph/append_branch/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
     url(r'^graph/move_node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
     url(r'^graph/update_node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
@@ -74,7 +74,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes$' % uuid_regex, GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, graph.form_manager, name='form_manager'),
     url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, graph.add_form, name='add_form'),
-    url(r'^card/(?P<cardid>%s|())$' % uuid_regex, graph.card, name='card'),
+    url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form_configuration/(?P<formid>%s|())$' % uuid_regex, graph.form_configuration, name='form_configuration'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
 

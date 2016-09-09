@@ -110,15 +110,13 @@ class GraphManagerView(GraphBaseView):
             return render(request, 'views/graph/graph-list.htm', context)
             
         self.graph = Graph.objects.get(graphid=graphid)
-        functions = models.Function.objects.all()
+        datatypes = models.DDataType.objects.all()
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        datatypes = models.DDataType.objects.all()
-
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
-            functions=JSONSerializer().serialize(functions),
+            functions=JSONSerializer().serialize(models.Function.objects.all()),
             branches=JSONSerializer().serialize(branch_graphs),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
@@ -171,41 +169,43 @@ class GraphDataView(GraphBaseView):
         return HttpResponseNotFound()
 
     def post(self, request, graphid=None):
+        ret = {}
         if self.action == 'import_graph':
             graph_file = request.FILES.get('importedGraph').read()
             graphs = JSONDeserializer().deserialize(graph_file)['graph']
             for graph in graphs:
                 new_graph = Graph(graph)
                 new_graph.save()
-
-            return JSONResponse({})
+                ret = new_graph
         else:
+            if graphid is not None:
+                graph = Graph.objects.get(graphid=graphid)
             data = JSONDeserializer().deserialize(request.body)
-            if data:
-                if self.action == 'new_graph':
-                    isresource = data['isresource'] if 'isresource' in data else False
-                    name = _('New Resource') if isresource else _('New Graph')
-                    author = request.user.first_name + ' ' + request.user.last_name
-                    ret = Graph.new(name=name,is_resource=isresource,author=author)
-                else:
-                    graph = Graph.objects.get(graphid=graphid)
-                    if self.action == 'update_node':
-                        graph.update_node(data)
-                        ret = graph
 
-                    elif self.action == 'append_branch':
-                        ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+            if self.action == 'new_graph':
+                isresource = data['isresource'] if 'isresource' in data else False
+                name = _('New Resource') if isresource else _('New Graph')
+                author = request.user.first_name + ' ' + request.user.last_name
+                ret = Graph.new(name=name,is_resource=isresource,author=author)
+            
+            elif self.action == 'update_node':
+                graph.update_node(data)
+                ret = graph
+                graph.save()
 
-                    elif self.action == 'move_node':
-                        ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+            elif self.action == 'append_branch':
+                ret = graph.append_branch(data['property'], nodeid=data['nodeid'], graphid=data['graphid'])
+                graph.save()
 
-                    elif self.action == 'clone_graph':
-                        ret = graph.copy()
+            elif self.action == 'move_node':
+                ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
+                graph.save()
+            
+            elif self.action == 'clone_graph':
+                ret = graph.copy()
+                ret.save()
 
-                    graph.save()
-                return JSONResponse(ret)
-
-        return HttpResponseNotFound()
+        return JSONResponse(ret)
 
     def delete(self, request, graphid):
         data = JSONDeserializer().deserialize(request.body)
@@ -217,61 +217,61 @@ class GraphDataView(GraphBaseView):
         return HttpResponseNotFound()
 
 
-class DatatypeTemplateView(TemplateView):
-    def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+@method_decorator(group_required('edit'), name='dispatch')
+class CardManagerView(GraphBaseView):
+    def get(self, request, graphid):
+        graph = Graph.objects.get(graphid=graphid)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
+        if graph.ontology is not None:
+            branch_graphs = branch_graphs.filter(ontology=graph.ontology)
+
+        return render(request, 'views/graph/card-manager.htm', {
+            'main_script': 'views/graph/card-manager',
+            'graphid': graphid,
+            'graph': JSONSerializer().serializeToPython(graph),
+            'graphJSON': JSONSerializer().serialize(graph),
+            'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
+            'branches': JSONSerializer().serialize(branch_graphs)
+        })
 
 
-@group_required('edit')
-def card_manager(request, graphid):
-    graph = Graph.objects.get(graphid=graphid)
-    branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
-    if graph.ontology is not None:
-        branch_graphs = branch_graphs.filter(ontology=graph.ontology)
+@method_decorator(group_required('edit'), name='dispatch')
+class CardView(GraphBaseView):
+    def get(self, request, cardid):
+        try:
+            card = Card.objects.get(cardid=cardid)
+        except(Card.DoesNotExist):
+            # assume this is a graph id
+            card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
+        self.graph = Graph.objects.get(graphid=card.graph_id)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        context = self.get_context_data(
+            main_script='views/graph/card-configuration-manager',
+            card=JSONSerializer().serialize(card),
+            permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            datatypes=datatypes,
+            widgets=widgets,
+            widgets_json=JSONSerializer().serialize(widgets),
+            functions=JSONSerializer().serialize(models.Function.objects.all()),
+        )
+        return render(request, 'views/graph/card-configuration-manager.htm', context)
 
-    return render(request, 'views/graph/card-manager.htm', {
-        'main_script': 'views/graph/card-manager',
-        'graphid': graphid,
-        'graph': JSONSerializer().serializeToPython(graph),
-        'graphJSON': JSONSerializer().serialize(graph),
-        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'branches': JSONSerializer().serialize(branch_graphs)
-    })
-
-@group_required('edit')
-def card(request, cardid):
-    if request.method == 'POST':
+    def post(self, request, cardid):
         data = JSONDeserializer().deserialize(request.body)
         if data:
             card = Card(data)
             card.save()
             return JSONResponse(card)
 
-    if request.method == 'GET':
-        try:
-            card = Card.objects.get(cardid=cardid)
-        except(Card.DoesNotExist):
-            # assume this is a graph id
-            card = Card.objects.get(cardid=Graph.objects.get(graphid=cardid).get_root_card().cardid)
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        functions = models.Function.objects.all()
-        graph = Graph.objects.get(graphid=card.graph_id)
-        return render(request, 'views/graph/card-configuration-manager.htm', {
-            'main_script': 'views/graph/card-configuration-manager',
-            'graphid': card.graph_id,
-            'graph': JSONSerializer().serializeToPython(graph),
-            'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-            'card': JSONSerializer().serialize(card),
-            'permissions': JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
-            'datatypes_json': JSONSerializer().serialize(datatypes),
-            'datatypes': datatypes,
-            'widgets': widgets,
-            'widgets_json': JSONSerializer().serialize(widgets),
-            'functions': JSONSerializer().serialize(functions),
-        })
+        return HttpResponseNotFound()
 
-    return HttpResponseNotFound()
+
+class DatatypeTemplateView(TemplateView):
+    def get(sefl, request, template='text'):
+        return render(request, 'views/graph/datatypes/%s.htm' % template)
+
 
 @group_required('edit')
 def form_manager(request, graphid):
