@@ -25,15 +25,92 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_tools %}
 <!-- Card Filter Widget -->
-<div id="card-grid-tools" style="display: none;">
+<div id="card-grid-tools" style="display: none;" data-bind="visible: formOptions">
     <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a form..." %}" class="design" data-bind="value: selectedFormId, options: formOptions, optionsText: 'title', optionsValue: 'formid', chosen: {width: '100%'}">
 
+        </select>
     </div>
 </div>
 {% endblock graph_header_tools %}
 
+
 {% block content %}
-<div>Form config content...</div>
+<div class="card-library relative fade in">
+    <!-- Card (Tile) Listing -->
+    <div class="crud-menu relative hide-card-library show-card-library" style="display: none;" data-bind="visible: cardList">
+        <div class="panel crud-menu-panel data-widget-library relative" id="node-listing" data-bind="with: cardList">
+            {% include 'views/graph/form-manager/card-list.htm' %}
+        </div>
+    </div>
+
+    <div class="selected-cards-container">
+
+        <!-- Drag Panel -->
+        <div class="relative">
+
+            <!-- Target -->
+            <div class="relative card-drag-panel-target">
+
+                <div class="add-card-icon-placement">
+                    <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
+                        <i class="add-card-icon fa fa-plus fa-4x"></i>
+                    </span>
+                </div>
+
+                <!-- Message -->
+                <div class="add-card-message-placement">
+                    <h3 class="text-thin text-center">
+                        Drag and drop cards here.
+                    </h3>
+                    <p class="text-center add-card-message-subtitle">
+                        Order your cards as you want them to appear to your users.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Added Cards Panel -->
+        <div class="dragged-card-panel" style="">
+
+            <!-- Isotope Layout -->
+            <div id="report-image-grid" class="report-image-grid">
+
+                <!-- card -->
+                <div class="data-widget-grid-item relative" style="">
+                    <div class="panel mar-no">
+
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" style="">Evaluations
+                             <span class="badge badge-success pull-right mar-top">1</span>
+                            </h3>
+
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body" style="">
+                            <p class="library-item-subtitle">Evaluation, Evaluation Date Assessed</p>
+                            <p class="library-item-subtitle">Description</p>
+                            <p class="library-item-subtitle">Images</p>
+                        </div>
+
+                        <!-- Selectable -->
+                        <div class="selectable" style="display: none;">
+                            <i class="ion-ios-checkmark"></i>
+                        </div>
+
+                        <!-- card Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
+                            <i class="ion-minus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Remove"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block pre_require_js %}
@@ -42,7 +119,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('form-configuration-data', [], function () {
     return {
         graph: {{graph_json}},
-        form: {{form}}
+        form: {{form}},
+        forms: {{forms}},
+        cards: {{cards}},
     };
 });
 {% endautoescape %}</script>

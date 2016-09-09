@@ -45,7 +45,7 @@ class GraphBaseView(BaseNiftyView):
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
             context['graph_json'] = JSONSerializer().serialize(self.graph)
-        except: 
+        except:
             pass
         return context
 
@@ -69,7 +69,7 @@ class GraphSettingsView(GraphBaseView):
                 })
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
-        
+
         context = self.get_context_data(
             main_script='views/graph/graph-settings',
             icons=JSONSerializer().serialize(icons),
@@ -85,18 +85,18 @@ class GraphSettingsView(GraphBaseView):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
-            if key in ['iconclass', 'name', 'author', 'description', 'isresource', 
+            if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                 'ontology_id', 'version',  'subtitle', 'isactive']:
                 setattr(graph, key, value)
-        
+
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
-        
+
         with transaction.atomic():
             graph.save()
             node.save()
-        
+
         return JSONResponse({
             'success': True,
             'graph': graph,
@@ -112,13 +112,13 @@ class GraphManagerView(GraphBaseView):
                 main_script='views/graph/graph-list',
             )
             return render(request, 'views/graph/graph-list.htm', context)
-            
+
         self.graph = Graph.objects.get(graphid=graphid)
         datatypes = models.DDataType.objects.all()
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        
+
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
             functions=JSONSerializer().serialize(models.Function.objects.all()),
@@ -168,7 +168,7 @@ class GraphDataView(View):
 
             elif self.action == 'get_valid_domain_nodes':
                 ret = graph.get_valid_domain_ontology_classes(nodeid=nodeid)
-                
+
             return JSONResponse(ret)
 
         return HttpResponseNotFound()
@@ -192,7 +192,7 @@ class GraphDataView(View):
                 name = _('New Resource') if isresource else _('New Graph')
                 author = request.user.first_name + ' ' + request.user.last_name
                 ret = Graph.new(name=name,is_resource=isresource,author=author)
-            
+
             elif self.action == 'update_node':
                 graph.update_node(data)
                 ret = graph
@@ -205,7 +205,7 @@ class GraphDataView(View):
             elif self.action == 'move_node':
                 ret = graph.move_node(data['nodeid'], data['property'], data['newparentnodeid'])
                 graph.save()
-            
+
             elif self.action == 'clone_graph':
                 ret = graph.copy()
                 ret.save()
@@ -249,7 +249,7 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        
+
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
             card=JSONSerializer().serialize(card),
@@ -298,10 +298,13 @@ class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
         self.graph = Graph.objects.get(graphid=form.graph.pk)
+        cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
         context = self.get_context_data(
             main_script='views/graph/form-configuration',
-            form=JSONSerializer().serialize(form)
+            form=JSONSerializer().serialize(form),
+            forms=JSONSerializer().serialize(self.graph.form_set.all()),
+            cards=JSONSerializer().serialize(cards)
         )
 
         return render(request, 'views/graph/form-configuration.htm', context)
@@ -310,4 +313,3 @@ class FormView(GraphBaseView):
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
-
