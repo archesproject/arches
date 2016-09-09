@@ -1,4 +1,4 @@
-<!--
+'''
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,36 +14,18 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
-{% extends "views/graph/graph-base.htm" %}
-{% load staticfiles %}
-{% load i18n %}
+'''
 
-{% block graph_header_title %}
-{% trans "Data Entry Forms" %}
-{% endblock graph_header_title %}
 
-{% block graph_header_tools %}
-<!-- Card Filter Widget -->
-<div id="card-grid-tools" style="display: none;">
-    <div class="ep-card-search">
+from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.views.generic import TemplateView
 
-    </div>
-</div>
-{% endblock graph_header_tools %}
+class BaseNiftyView(TemplateView):
 
-{% block content %}
-<div>Form config content...</div>
-{% endblock content %}
+    template_name = ''
 
-{% block pre_require_js %}
-{{ block.super }}
-<script>{% autoescape off %}
-define('form-configuration-data', [], function () {
-    return {
-        graph: {{graph_json}},
-        form: {{form}}
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}
+    def get_context_data(self, **kwargs):
+        context = super(BaseNiftyView, self).get_context_data(**kwargs)
+        context['graphs'] = JSONSerializer().serialize(models.GraphModel.objects.all())
+        return context
