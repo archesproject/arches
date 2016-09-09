@@ -25,15 +25,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_tools %}
 <!-- Card Filter Widget -->
-<div id="card-grid-tools" style="display: none;">
+<div id="card-grid-tools" style="display: none;" data-bind="visible: forms">
     <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a form..." %}" class="design" data-bind="value: selectedFormId, options: formOptions, optionsText: 'title', optionsValue: 'formid', chosen: {width: '100%'}">
 
+        </select>
     </div>
 </div>
 {% endblock graph_header_tools %}
 
 {% block content %}
-<div class="card-library relative fade in" style="">
+<div class="card-library relative fade in">
 
     <!-- Card Grid -->
     <div class="card-grid relative ep-form-content new-card-indent" style="display:none;" data-bind="visible:forms">
@@ -54,19 +56,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- ko foreach: forms -->
-                <div class="card-grid-item" data-bind="click: function () { $parent.openForm(formid) }">
+                <div class="card-grid-item form-grid-item" data-bind="click: function () { $parent.openForm(formid) }">
                     <div class="panel mar-no">
 
-                        <!-- card Name -->
+                        <!-- Form Name -->
                         <div class="panel-heading">
-                            <h3 class="panel-title library-card-panel-title" data-bind="text:title"></h3>
+                            <h3 class="panel-title library-card-panel-title">
+                                <i data-bind="css: iconclass || 'fa fa-question'"></i>
+                                <span data-bind="text:title"></span>
+                            </h3>
                         </div>
 
                         <!-- Abstract -->
                         <div class="panel-body library-card-body">
-                            <p class="library-item-subtitle" data-bind="text:subtitle"></p>
+                            <!-- ko foreach: cards -->
+                            <p class="library-item-subtitle" data-bind="text:name"></p>
+                            <!-- /ko -->
                         </div>
 
+                        <!-- Form Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <span data-bind="if:status">
+                                <i class="fa fa-check-circle"></i> Active
+                            </span>
+                            <span data-bind="if:!status">
+                                <i class="fa fa-minus-circle"></i> Inactive
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <!-- /ko -->
@@ -87,7 +103,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('graph-forms-data', [], function () {
     return {
         graph: {{graph_json}},
-        forms: {{forms}}
+        forms: {{forms}},
+        cards: {{cards}}
     };
 });
 {% endautoescape %}</script>

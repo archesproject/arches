@@ -280,7 +280,8 @@ class FormManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/form-manager',
-            forms=JSONSerializer().serialize(self.graph.form_set.all())
+            forms=JSONSerializer().serialize(self.graph.form_set.all()),
+			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
         )
 
         return render(request, 'views/graph/form-manager.htm', context)
