@@ -203,13 +203,16 @@ def form_manager(request, graphid):
 def form_configuration(request, formid):
     form = models.Form.objects.get(formid=formid)
     graph = Graph.objects.get(graphid=form.graph.pk)
+    cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=graph)
     return render(request, 'views/graph/form-configuration.htm', {
         'main_script': 'views/graph/form-configuration',
         'graphid': graph.pk,
         'graph': JSONSerializer().serializeToPython(graph),
         'graphJSON': JSONSerializer().serialize(graph),
         'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'form': JSONSerializer().serialize(form)
+        'forms': JSONSerializer().serialize(graph.form_set.all()),
+        'form': JSONSerializer().serialize(form),
+        'cards': JSONSerializer().serialize(cards)
     })
 
 @group_required('edit')
