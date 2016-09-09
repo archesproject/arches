@@ -24,12 +24,12 @@ require([
         cardList: new ListView({
             items: ko.observableArray(data.cards)
         }),
-        selectedFormId: ko.observable(null),
+        selectedFormId: ko.observable(data.form.formid),
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
         addCard: function() {
-            
+
         }
     };
 
