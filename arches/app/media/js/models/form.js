@@ -1,11 +1,10 @@
 define(['arches',
     'models/abstract',
     'models/node',
-    'models/card-widget',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function (arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, _) {
+], function (arches, AbstractModel, NodeModel, ko, koMapping, _) {
     var FormModel = AbstractModel.extend({
         /**
         * A backbone model to manage form data
@@ -37,7 +36,7 @@ define(['arches',
                 console.log(key)
             }
             return ret;
-        },
-
+        }
+    });
     return FormModel;
 });

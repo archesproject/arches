@@ -2,10 +2,12 @@ require([
     'knockout',
     'arches',
     'models/graph',
+    'models/form',
+    'views/graph/form-settings',
     'views/graph/graph-page-view',
     'views/list',
     'form-configuration-data'
-], function(ko, arches, GraphModel, PageView, ListView, data) {
+], function(ko, arches, GraphModel, FormModel, FormSettings, PageView, ListView, data) {
     /**
     * a PageView representing the form configuration page
     */
@@ -29,7 +31,7 @@ require([
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
         addCard: function() {
-            
+
         }
     };
 
