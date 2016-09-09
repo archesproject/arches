@@ -224,8 +224,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>Add New Resource</strong>
                                                 </span>
                                             </a>
+                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                                <!-- ko foreach: resources -->
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#">
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                </li>
+                                                <!-- /ko -->
+                                            </ul>
                                         </li>
-
 
                                         <!--Menu list item-->
                                         <li>

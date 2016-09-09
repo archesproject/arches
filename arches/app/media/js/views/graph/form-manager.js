@@ -33,7 +33,7 @@ require([
         forms: data.forms,
         formOptions: options.concat(data.forms),
         openForm: function (formId) {
-            pageView.viewModel.navigate(arches.urls.form_configuration + formId);
+            pageView.viewModel.navigate(arches.urls.form + formId);
         },
         addForm: function () {
             pageView.viewModel.loading(true);
