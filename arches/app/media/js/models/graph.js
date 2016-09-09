@@ -50,7 +50,7 @@ define(['arches',
         deleteNode: function(node, callback, scope){
             this._doRequest({
                 type: "DELETE",
-                url: this.url + 'delete_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/delete_node',
                 data: JSON.stringify({nodeid:node.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -153,7 +153,7 @@ define(['arches',
 
             this._doRequest({
                 type: "POST",
-                url: this.url + 'append_branch/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/append_branch',
                 data: JSON.stringify({nodeid:nodeid, property: property, graphid: branch_graph.get('graphid')})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -204,7 +204,7 @@ define(['arches',
         moveNode: function(node, property, newParentNode, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'move_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/move_node',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
@@ -241,7 +241,7 @@ define(['arches',
         updateNode: function(node, callback, scope){
             this._doRequest({
                 type: "POST",
-                url: this.url + 'update_node/' + this.get('graphid'),
+                url: this.url + this.get('graphid') + '/update_node',
                 data: JSON.stringify(node.toJSON())
             }, function(response, status, self){
                 if (status === 'success' &&  response.responseJSON) {
