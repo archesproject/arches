@@ -25,7 +25,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator, classonlymethod
 from django.http import HttpResponseNotFound, QueryDict, HttpResponse
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.JSONResponse import JSONResponse
@@ -69,6 +69,7 @@ class GraphSettingsView(GraphBaseView):
                 })
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values('source', 'ontology_id')
+        
         context = self.get_context_data(
             main_script='views/graph/graph-settings',
             icons=JSONSerializer().serialize(icons),
@@ -87,12 +88,15 @@ class GraphSettingsView(GraphBaseView):
             if key in ['iconclass', 'name', 'author', 'description', 'isresource', 
                 'ontology_id', 'version',  'subtitle', 'isactive']:
                 setattr(graph, key, value)
+        
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))
         node.ontologyclass = data.get('ontology_class') if data.get('graph').get('ontology_id') is not None else None
+        
         with transaction.atomic():
             graph.save()
             node.save()
+        
         return JSONResponse({
             'success': True,
             'graph': graph,
@@ -114,6 +118,7 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+        
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
             functions=JSONSerializer().serialize(models.Function.objects.all()),
@@ -143,7 +148,7 @@ class GraphManagerView(GraphBaseView):
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class GraphDataView(GraphBaseView):
+class GraphDataView(View):
 
     action = 'update_node'
 
@@ -220,19 +225,17 @@ class GraphDataView(GraphBaseView):
 @method_decorator(group_required('edit'), name='dispatch')
 class CardManagerView(GraphBaseView):
     def get(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
+        self.graph = Graph.objects.get(graphid=graphid)
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
-        if graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=graph.ontology)
+        if self.graph.ontology is not None:
+            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
-        return render(request, 'views/graph/card-manager.htm', {
-            'main_script': 'views/graph/card-manager',
-            'graphid': graphid,
-            'graph': JSONSerializer().serializeToPython(graph),
-            'graphJSON': JSONSerializer().serialize(graph),
-            'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-            'branches': JSONSerializer().serialize(branch_graphs)
-        })
+        context = self.get_context_data(
+            main_script='views/graph/card-manager',
+            branches=JSONSerializer().serialize(branch_graphs)
+        )
+
+        return render(request, 'views/graph/card-manager.htm', context)
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -246,6 +249,7 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
             card=JSONSerializer().serialize(card),
@@ -256,6 +260,7 @@ class CardView(GraphBaseView):
             widgets_json=JSONSerializer().serialize(widgets),
             functions=JSONSerializer().serialize(models.Function.objects.all()),
         )
+
         return render(request, 'views/graph/card-configuration-manager.htm', context)
 
     def post(self, request, cardid):
@@ -268,43 +273,40 @@ class CardView(GraphBaseView):
         return HttpResponseNotFound()
 
 
-class DatatypeTemplateView(TemplateView):
-    def get(sefl, request, template='text'):
-        return render(request, 'views/graph/datatypes/%s.htm' % template)
+@method_decorator(group_required('edit'), name='dispatch')
+class FormManagerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
 
+        context = self.get_context_data(
+            main_script='views/graph/form-manager',
+            forms=JSONSerializer().serialize(self.graph.form_set.all())
+        )
 
-@group_required('edit')
-def form_manager(request, graphid):
-    graph = Graph.objects.get(graphid=graphid)
+        return render(request, 'views/graph/form-manager.htm', context)
 
-    return render(request, 'views/graph/form-manager.htm', {
-        'main_script': 'views/graph/form-manager',
-        'graphid': graphid,
-        'graph': JSONSerializer().serializeToPython(graph),
-        'graphJSON': JSONSerializer().serialize(graph),
-        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'forms': JSONSerializer().serialize(graph.form_set.all())
-    })
-
-@group_required('edit')
-def form_configuration(request, formid):
-    form = models.Form.objects.get(formid=formid)
-    graph = Graph.objects.get(graphid=form.graph.pk)
-    return render(request, 'views/graph/form-configuration.htm', {
-        'main_script': 'views/graph/form-configuration',
-        'graphid': graph.pk,
-        'graph': JSONSerializer().serializeToPython(graph),
-        'graphJSON': JSONSerializer().serialize(graph),
-        'graphs': JSONSerializer().serialize(models.GraphModel.objects.all()),
-        'form': JSONSerializer().serialize(form)
-    })
-
-@group_required('edit')
-def add_form(request, graphid):
-    if request.method == 'POST':
+    def post(self, request, graphid):
         graph = models.GraphModel.objects.get(graphid=graphid)
         form = models.Form(title=_('New Form'), graph=graph)
         form.save()
         return JSONResponse(form)
 
-    return HttpResponseNotFound()
+
+@method_decorator(group_required('edit'), name='dispatch')
+class FormView(GraphBaseView):
+    def get(self, request, formid):
+        form = models.Form.objects.get(formid=formid)
+        self.graph = Graph.objects.get(graphid=form.graph.pk)
+
+        context = self.get_context_data(
+            main_script='views/graph/form-configuration',
+            form=JSONSerializer().serialize(form)
+        )
+
+        return render(request, 'views/graph/form-configuration.htm', context)
+
+
+class DatatypeTemplateView(TemplateView):
+    def get(sefl, request, template='text'):
+        return render(request, 'views/graph/datatypes/%s.htm' % template)
+
