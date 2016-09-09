@@ -298,10 +298,13 @@ class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
         self.graph = Graph.objects.get(graphid=form.graph.pk)
+        cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
         context = self.get_context_data(
             main_script='views/graph/form-configuration',
-            form=JSONSerializer().serialize(form)
+            form=JSONSerializer().serialize(form),
+            forms=JSONSerializer().serialize(self.graph.form_set.all()),
+            cards=JSONSerializer().serialize(cards)
         )
 
         return render(request, 'views/graph/form-configuration.htm', context)
