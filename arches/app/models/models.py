@@ -181,11 +181,21 @@ class Form(models.Model):
     status = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
-    cards = models.ManyToManyField(to='CardModel', db_table='forms_x_cards')
 
     class Meta:
         managed = True
         db_table = 'forms'
+
+
+class FormXCard(models.Model):
+    id = models.AutoField(primary_key=True, serialize=True)
+    card = models.ForeignKey('CardModel', db_column='cardid')
+    form = models.ForeignKey('Form', db_column='formid')
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
+
+    class Meta:
+        managed = True
+        db_table = 'forms_x_cards'
 
 
 class Function(models.Model):

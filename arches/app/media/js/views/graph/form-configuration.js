@@ -4,7 +4,8 @@ require([
     'models/graph',
     'views/graph/graph-page-view',
     'views/list',
-    'form-configuration-data'
+    'form-configuration-data',
+    'bindings/sortable'
 ], function(ko, arches, GraphModel, PageView, ListView, data) {
     /**
     * a PageView representing the form configuration page
@@ -16,20 +17,36 @@ require([
         disabled: true
     }];
 
+    var addedCards = ko.observableArray(_.map(data.forms_x_cards, function (formXCard) {
+        return _.find(data.cards, function(card) {
+            return card.cardid === formXCard.card_id;
+        });
+    }));
+    var availableCards = ko.observableArray();
+    var addedCardIds = _.map(data.forms_x_cards, function (formXCard) {
+        return formXCard.card_id;
+    });
+    _.each(data.cards, function (card) {
+        if (!_.contains(addedCardIds, card.cardid)) {
+            availableCards.push(card);
+        }
+    });
+
     var viewModel = {
         formOptions: options.concat(data.forms),
         graphModel: new GraphModel({
             data: data.graph
         }),
         cardList: new ListView({
-            items: ko.observableArray(data.cards)
+            items: availableCards
         }),
-        selectedFormId: ko.observable(null),
+        addedCards: addedCards,
+        selectedFormId: ko.observable(data.form.formid),
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
         addCard: function() {
-            
+
         }
     };
 

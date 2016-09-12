@@ -392,6 +392,19 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='FormXCard',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=True)),
+                ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
+                ('form', models.ForeignKey(to='models.Form', db_column='formid')),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
+            ],
+            options={
+                'db_table': 'forms_x_cards',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Function',
             fields=[
                 ('functionid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
@@ -680,11 +693,6 @@ class Migration(migrations.Migration):
             model_name='cardxnodexwidget',
             name='functions',
             field=models.ManyToManyField(to='models.Function', db_table='functions_x_widgets'),
-        ),
-        migrations.AddField(
-            model_name='form',
-            name='cards',
-            field=models.ManyToManyField(to='models.CardModel', db_table='forms_x_cards'),
         ),
         migrations.AddField(
             model_name='form',

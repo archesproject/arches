@@ -38,8 +38,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block content %}
 <div class="card-library relative fade in">
     <!-- Card (Tile) Listing -->
-    <div class="crud-menu relative hide-card-library show-card-library" style="display: none;" data-bind="visible: cardList">
-        <div class="panel crud-menu-panel data-widget-library relative" id="node-listing" data-bind="with: cardList">
+    <div class="crud-menu hide-card-library show-card-library" style="display: none;" data-bind="visible: cardList">
+        <div class="panel crud-menu-panel data-widget-library" id="node-listing" data-bind="with: cardList">
             {% include 'views/graph/form-manager/card-list.htm' %}
         </div>
     </div>
@@ -71,28 +71,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <!-- Added Cards Panel -->
-        <div class="dragged-card-panel" style="">
+        <div class="dragged-card-panel" style="display: none" data-bind="visible: addedCards">
 
             <!-- Isotope Layout -->
-            <div id="report-image-grid" class="report-image-grid">
+            <div id="report-image-grid" class="report-image-grid" data-bind="sortable: { data: addedCards }">
 
                 <!-- card -->
-                <div class="data-widget-grid-item relative" style="">
+                <div class="data-widget-grid-item relative">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
                         <div class="panel-heading">
-                            <h3 class="panel-title library-card-panel-title" style="">Evaluations
-                             <span class="badge badge-success pull-right mar-top">1</span>
-                            </h3>
-
+                            <h3 class="panel-title library-card-panel-title" data-bind="text: name"></h3>
                         </div>
 
                         <!-- Abstract -->
-                        <div class="panel-body library-card-body" style="">
-                            <p class="library-item-subtitle">Evaluation, Evaluation Date Assessed</p>
-                            <p class="library-item-subtitle">Description</p>
-                            <p class="library-item-subtitle">Images</p>
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle" data-bind="text: description"></p>
                         </div>
 
                         <!-- Selectable -->
@@ -102,8 +97,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="" class="" style=""><i class="fa fa-check-circle"></i> Active</a>
-                            <i class="ion-minus-circled add-tooltip pull-right" data-placement="bottom" data-toggle="tooltip" data-original-title="Remove"></i>
+                            <a href="#" class="pull-right" data-bind="click: $root.addCard.bind($root)"><i class="ion-minus-circled"></i> Remove Card</a>
                         </div>
                     </div>
                 </div>
@@ -122,6 +116,7 @@ define('form-configuration-data', [], function () {
         form: {{form}},
         forms: {{forms}},
         cards: {{cards}},
+        forms_x_cards: {{forms_x_cards}}
     };
 });
 {% endautoescape %}</script>

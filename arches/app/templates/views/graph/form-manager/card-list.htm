@@ -24,7 +24,7 @@
         <!-- Data Widget Library -->
         <li class="data-widget-container">
             <!-- Isotope Layout -->
-            <div id="report-image-grid" class="report-image-grid" data-bind="foreach: items">
+            <div id="report-image-grid" class="report-image-grid" data-bind="sortable: { data: items }">
 
                 <!-- card -->
                 <div class="data-widget-grid-item relative" data-bind="drag: {value: $data}, visible: $data.filtered() == false">
