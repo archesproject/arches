@@ -3853,7 +3853,7 @@ div.row.widget-wrapper:hover {
 	position: absolute;
 	background: transparent;
 	top: 10px;
-	left: 345px;
+	left: 330px;
 }
 @keyframes loader {
 	0% { background: #ddd; }
