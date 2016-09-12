@@ -51,7 +51,7 @@ class Group(object):
             details = args[0]
             self.resource_id = details['resource_id'].strip()
             self.group_id = details['group_id'].strip()
-            self.rows = []   
+            self.rows = []
 
 
 class Resource(object):
@@ -92,8 +92,8 @@ class ShapeReader():
                     key, mapping = self.get_e55_concept_legacyoids(entitytypeid)
                     self.concept_value_mappings[key] = mapping
                 else:
-                    pass      
-            
+                    pass
+
             self.auth_map = self.convert_uuid_map_to_conceptid_map(self.convert_aux_map_to_uuid_map(self.configs['AUXILIARY_MAP']))
             self.entitytypeid = self.configs['RESOURCE_TYPE']
             self.geom_type = self.configs['GEOM_TYPE']
@@ -109,7 +109,7 @@ class ShapeReader():
 
             resource_id = ''
             group_id = ''
-                
+
             for count, shp_dictionary in enumerate(shp_resource_info):
                 if (settings.LIMIT_ENTITY_TYPES_TO_LOAD == None or self.entitytypeid in settings.LIMIT_ENTITY_TYPES_TO_LOAD):
                     resource = Resource()
@@ -136,23 +136,23 @@ class ShapeReader():
         '''
         shp_file = DataSource(os.path.abspath(path))
         return shp_file
-        
+
 
     def get_layer_details(self, shp_file):
         '''
         Returns layer details of the given shapefile.
-        Note that, we return a list even though 
+        Note that, we return a list even though
             shapefiles are only allowed to have one layer
         '''
         layer_list = []
         for layer in shp_file:
             layer_list.append(layer)
         return layer_list
-    
+
 
     def get_field_names(self, shp_file):
         '''
-        return available fields of the passed shp file 
+        return available fields of the passed shp file
         '''
         fields = []
         # we get fields for all the layers
@@ -161,7 +161,7 @@ class ShapeReader():
             fields.append(layer.fields)
         # returns a list of lists
         return fields
-    
+
 
     def get_values(self, shp_file):
         '''
@@ -171,16 +171,16 @@ class ShapeReader():
         field_names = self.get_field_names(shp_file)
         layer_0 = self.get_layer_details(shp_file)[0]
         field_values = []
-    
+
         for field in field_names[0]: #consider the 0th layer
             field_values.append(layer_0.get_fields(field))
         return field_values
-    
+
 
     def get_wkt_values(self, shp_file):
         '''
         returns geographic data associated with the shapefile(shapes) in WKT format.
-        These value will be added to the json file 
+        These value will be added to the json file
         '''
         wkt_list=[]
         #return geo_data in wkt format
@@ -222,7 +222,7 @@ class ShapeReader():
             print "No Concept found with the name %s"%concept_name
         if concept is not None:
             concept_graph = Concept().get(id=concept.pk, include_subconcepts=True, include=['label'])
-   
+
             if concept_graph.subconcepts:
                 for subconcept  in concept_graph.subconcepts[0].subconcepts:
                     for value in subconcept.values:
@@ -232,7 +232,7 @@ class ShapeReader():
 
                 print '[ERROR]: %s is not found in %s'%(concept_value,concept_name)
             return
-        
+
 
     def convert_aux_map_to_uuid_map(self,aux_map):
         '''
@@ -243,23 +243,23 @@ class ShapeReader():
             value = self.get_concept_uuid_for_aux_map_entry(entry, aux_map[entry])
             if value is not None:
                 converted_aux_map[entry] = value
-        
-        return converted_aux_map  
-    
+
+        return converted_aux_map
+
 
     def convert_uuid_map_to_conceptid_map(self,uuid_map):
         '''
         convert an uuid dictionary into conceptId dictionary because
         data.domains should be populated with conceptId values
-        ''' 
+        '''
         conceptid_map = {}
-        sql_template = """'SELECT concepts.legacyoid FROM concepts.concepts WHERE concepts.conceptid = '"""
+        sql_template = """'SELECT legacyoid FROM concepts WHERE conceptid = '"""
         cursor = connection.cursor()
         for key in uuid_map.keys():
             cursor.execute(sql_template+uuid_map[key]+"'")
             conceptid_map[key] = cursor.fetchone()[0]
-            
-        return conceptid_map  
+
+        return conceptid_map
 
 
     def get_e55_concept_legacyoids(self, e55_type, lang=settings.LANGUAGE_CODE):
@@ -286,10 +286,10 @@ class ShapeReader():
 
         '''
         first, add the attribute values to the dictionary
-        and then add authority details. Because shapefile data does not 
+        and then add authority details. Because shapefile data does not
         contain authority details, the authority mapping
         is defined by the user and passed in a separate dictionary
-        '''      
+        '''
         errors = []
         for record_index in range (0, len(attr_vals[0])): #len(attr_vals[0]) equals to the number of records
             record_dictionary= {} # i th dictionary
@@ -313,12 +313,12 @@ class ShapeReader():
                             errors.append('shapefile record {0}: "{1}", Does not match any available {2} concept value\n'.format(str(record_index), label, entitytypeid))
                         else:
                             print str(record_index), label, entitytypeid
-                        
+
                 record_dictionary[entitytypeid] = label
-            
+
             record_dictionary.update(auth_mapping)
 
-            record_dictionary[geom_type] = geom_values[record_index] 
+            record_dictionary[geom_type] = geom_values[record_index]
             dict_list.append(record_dictionary)
 
         if len(errors) > 0:
@@ -339,10 +339,10 @@ class ShapeReader():
         field_names = self.get_field_names(shapefile)
         field_values_and_geom_wkt = self.get_values(shapefile)
         geom_wkt_values = self.get_wkt_values(shapefile)
-        
+
         # since it is desirable to pass field_values and wkt data in a single list, we combine the two lists
         field_values_and_geom_wkt.append(geom_wkt_values) #the last item of field_values is a list containing wkt geom values
-        
+
         return (field_names, field_values_and_geom_wkt)
 
 
@@ -396,10 +396,10 @@ class ShpWriter(Writer):
 
     def create_shapefiles(self, feature_collection, shp_name, resource_export_configs):
         '''
-        Takes a geojson-like (geojson-like because it has a geos geometry rather than a geojson geometry, allowing us to modify the 
+        Takes a geojson-like (geojson-like because it has a geos geometry rather than a geojson geometry, allowing us to modify the
         geometry to be a centroid or hull if necessary.) feature collection, groups the data by resource type and creates a shapefile
         for each resource. Returns a .zip file with each of the shapefiles. An arches export configuration file is needed to map shapefile
-        fields to resorce entitytypeids and specify the shapefile column datatypes (fiona schema). 
+        fields to resorce entitytypeids and specify the shapefile column datatypes (fiona schema).
         '''
 
         features_by_geom_type = {'point':[], 'line':[], 'poly':[]}
@@ -411,11 +411,11 @@ class ShpWriter(Writer):
                 features_by_geom_type['line'].append(feature)
 
             elif feature['geometry'].geom_typeid == 6:
-                features_by_geom_type['poly'].append(feature)    
+                features_by_geom_type['poly'].append(feature)
 
         shapefiles_for_export = []
         geos_datatypes_to_pyshp_types = {'str':'C', 'datetime':'D', 'float':'F'}
-        
+
         for geom_type, features in features_by_geom_type.iteritems():
              if len(features) > 0:
 
@@ -451,7 +451,7 @@ class ShpWriter(Writer):
                     {'name':shp_name + geom_type + '.shx', 'outputfile': shx},
                     {'name':shp_name + geom_type + '.prj', 'outputfile': prj}
                     ]
-        
+
         return shapefiles_for_export
 
     def write_resources(self, resources, resource_export_configs):
@@ -494,5 +494,5 @@ class ShpWriter(Writer):
         feature_collection = {'type':'FeatureCollection', 'features': features}
         iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         file_name = os.path.join('{0}_{1}_'.format(name_prefix, iso_date))
-        
+
         return self.create_shapefiles(feature_collection, file_name, resource_export_configs)
