@@ -37,7 +37,7 @@ def load_authority_files(source=None, break_on_error=True):
     authority_files_path = list(settings.CONCEPT_SCHEME_LOCATIONS)
 
     if source != None:
-        authority_files_path.append(source)
+        authority_files_path = [source]
 
     for path in authority_files_path:
         if os.path.exists(path):

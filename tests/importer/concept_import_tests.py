@@ -16,12 +16,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 from operator import itemgetter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from arches.app.models.concept import Concept
+from arches.app.models.models import Concept as django_concept_model
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.management.commands.package_utils import authority_files
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -30,7 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class conceptImportTests(ArchesTestCase):
 	@classmethod
 	def setUpClass(cls):
-		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json') 
+		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
 	@classmethod
 	def tearDownClass(cls):
@@ -47,3 +50,12 @@ class conceptImportTests(ArchesTestCase):
 		result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='32d8ca56-2aa1-3890-b95b-3fbb119460ad', include_subconcepts=True, depth_limit=1)))
 		values = len(result['values'])
 		self.assertEqual(values, 5)
+
+
+	def test_authority_file_import(self):
+		og_concept_count = len(django_concept_model.objects.all())
+		# path_to_files = '/Users/ryan/projects/archesv4/tests/fixtures/authority_files'
+		path_to_files = os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'authority_files')
+		authority_files.load_authority_files(path_to_files, break_on_error=True)
+		new_concept_count = len(django_concept_model.objects.all())
+		self.assertEqual(new_concept_count - og_concept_count, 13)
