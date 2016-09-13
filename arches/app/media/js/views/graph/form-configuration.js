@@ -54,8 +54,13 @@ require([
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
-        addCard: function() {
-
+        addCard: function(card) {
+            availableCards.remove(card);
+            addedCards.push(card);
+        },
+        removeCard: function(card) {
+            addedCards.remove(card);
+            availableCards.push(card);
         }
     };
 
