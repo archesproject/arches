@@ -1,54 +1,36 @@
-require([
+define([
     'jquery',
     'underscore',
+    'backbone',
     'knockout',
     'knockout-mapping',
-    'views/graph/graph-page-view',
     'form-settings-data'
-], function($, _, ko, koMapping, PageView, data) {
-    /**
-    * prep data for models
-    */
-    // var srcJSON = JSON.stringify(data.form);
+], function($, _, Backbone, ko, koMapping, data) {
 
-    /**
-    * setting up page view model
-    */
-    // var srcJSON = JSON.stringify(data.form);
+    var FormSettingsView = Backbone.View.extend({
+        /**
+        * A backbone view representing a form settings form
+        * @augments Backbone.View
+        * @constructor
+        * @name FormSettingsView
+        */
 
-    /**
-    * setting up page view model
-    */
-    var iconFilter = {}//ko.observable('');
-    // var jsonData = ko.computed(function() {
-    //     var relatableResourceIds = _.filter(data.resources, function(resource){
-    //         return resource.isRelatable();
-    //     }).map(function(resource){
-    //         return resource.id
-    //     });
-    //     // if (graph.ontology_id() === undefined) {
-    //     //     graph.ontology_id(null);
-    //     // }
-    //     return JSON.stringify({
-    //         // graph: koMapping.toJS(graph),
-    //         relatable_resource_ids: relatableResourceIds,
-    //         ontology_class: ontologyClass()
-    //     });
-    // });
-    // var jsonCache = ko.observable(jsonData());
-    // var dirty = ko.computed(function () {
-    //     return jsonData() !== jsonCache();
-    // });
-    var viewModel = {
-        // dirty: dirty,
-        iconFilter: iconFilter,
-        icons: [1,2]
-    };
-
-    /**
-    * a GraphPageView representing the graph settings page
-    */
-    // var pageView = new PageView({
-    //     viewModel: viewModel
-    // });
+        /**
+        * Initializes the view with optional parameters
+        * @param {object} options
+        * @param {object} options.formModel - a reference to the selected {@link FormModel}
+        */
+        initialize: function(options) {
+            var self = this;
+            // this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
+            this.formModel = options.formModel;
+            this.iconFilter = ko.observable('');
+            this.icons = ko.computed(function () {
+                return _.filter(data.icons, function (icon) {
+                    return icon.name.indexOf(self.iconFilter()) >= 0;
+                });
+            })
+        }
+    });
+    return FormSettingsView;
 });

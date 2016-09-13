@@ -3683,14 +3683,16 @@ div.row.widget-wrapper:hover {
 }
 
 .form-settings-container {
+  width:100%;
+  background-color: rgb(246, 247, 248);
 	-ms-flex: 0 0 calc(100% - 650px);
-    -webkit-flex: 0 0 calc(100% - 650px);
-    flex: 0 0 calc(100% - 650px);
-    margin-bottom: 0px;
-    margin-left: -1px;
-    padding: 10px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  -webkit-flex: 0 0 calc(100% - 650px);
+  flex: 0 0 calc(100% - 650px);
+  margin-bottom: 0px;
+  margin-left: -1px;
+  padding: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 .ep-card-manager-content {
 	position: absolute;

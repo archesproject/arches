@@ -7,7 +7,7 @@ require([
     'views/graph/graph-page-view',
     'views/list',
     'form-configuration-data'
-], function(ko, arches, GraphModel, FormModel, FormSettings, PageView, ListView, data) {
+], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, data) {
     /**
     * a PageView representing the form configuration page
     */
@@ -18,11 +18,15 @@ require([
         disabled: true
     }];
 
+    var formModel = new FormModel({data:data.form});
+
     var viewModel = {
         formOptions: options.concat(data.forms),
+        formSettings: new FormSettingsView({formModel:formModel}),
         graphModel: new GraphModel({
             data: data.graph
         }),
+
         cardList: new ListView({
             items: ko.observableArray(data.cards)
         }),
