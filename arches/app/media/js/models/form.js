@@ -58,15 +58,28 @@ define([
         },
 
         parse: function(data) {
+            var self = this;
+
             this.formid = data.formid;
             this._json(JSON.stringify(data));
+
             this.iconclass(data.iconclass);
             this.title(data.title);
             this.subtitle(data.subtitle);
             this.status(data.status);
             this.visible(data.visible);
             this.cards(data.cards);
-            this.resetAvailableCards();
+            
+            var addedCardIds = _.map(this.cards(), function (card) {
+                return card.cardid;
+            });
+            this.availableCards.removeAll();
+            _.each(this._cards, function (card) {
+                if (!_.contains(addedCardIds, card.cardid)) {
+                    self.availableCards.push(card);
+                }
+            });
+
             this.set('id', data.formid)
         },
 
@@ -76,19 +89,6 @@ define([
         */
         reset: function () {
             this.parse(JSON.parse(this._json()), self);
-        },
-
-        resetAvailableCards: function () {
-            var self = this;
-            var addedCardIds = _.map(this.cards(), function (card) {
-                return card.cardid;
-            });
-            self.availableCards.removeAll();
-            _.each(this._cards, function (card) {
-                if (!_.contains(addedCardIds, card.cardid)) {
-                    self.availableCards.push(card);
-                }
-            });
         },
 
         /**

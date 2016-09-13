@@ -6,9 +6,10 @@ require([
     'views/graph/form-settings',
     'views/graph/graph-page-view',
     'views/list',
+    'viewmodels/alert',
     'form-configuration-data',
     'bindings/sortable'
-], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, data) {
+], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, AlertViewModel, data) {
     /**
     * a PageView representing the form configuration page
     */
@@ -52,7 +53,13 @@ require([
             formModel.availableCards.push(card);
         },
         save: function () {
-
+            pageView.viewModel.loading(true);
+            formModel.save(function(request, status, self){
+                pageView.viewModel.loading(false);
+                if(status !== 'success'){
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                }
+            });
         },
         cancel: function () {
             formModel.reset();
