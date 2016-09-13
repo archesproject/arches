@@ -71,7 +71,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                   </div>
 
                                                   <div class="col-xs-12 col-lg-9">
-                                                      <input type="" placeholder="Name" id="" class="form-control input-lg widget-input">
+                                                      <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="value:formModel.title, valueUpdate: 'keyup'">
                                                   </div>
                                               </div>
                                           </div>
@@ -83,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                   </div>
 
                                                   <div class="col-xs-12 col-lg-9">
-                                                      <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input">
+                                                      <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input" data-bind="value:formModel.subtitle, valueUpdate: 'keyup'">
                                                   </div>
                                               </div>
                                           </div>
@@ -149,7 +149,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <!-- ko foreach: { data: [$data], as: 'self' } -->
 
                                                           <!-- ko foreach: icons -->
-                                                          <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font"  data-bind="css: {'selected': (cssclass === self.formModel.iconclass())}, click: function() { self.formModel.iconclass(cssclass) }">
+                                                          <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font"  data-bind="css: {'selected': (cssclass === self.formModel.iconclass())}, click: function() { self.formModel.iconclass(cssclass); }">
                                                               <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                           </div>
                                                           <!-- /ko -->
@@ -188,11 +188,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                               <div class="col-xs-12">
                                                   <div class="pad-hor">
-                                                      <label class="form-radio form-normal active form-text">
-                                                          <input type="radio" name="type-w-label" checked=""> Visible
+                                                      <label data-bind="css: { 'active': formModel.visible() }, click: function () { formModel.visible(true) }" class="form-radio form-normal form-text">
+                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="true"> {% trans "Visible" %}
                                                       </label>
-                                                      <label class="form-radio form-normal form-text">
-                                                          <input type="radio" name="type-w-label"> Hidden
+                                                      <label data-bind="css: { 'active': !formModel.visible() }, click: function () { formModel.visible(false) }" class="form-radio form-normal form-text">
+                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="false"> {% trans "Hidden" %}
                                                       </label>
                                                   </div>
                                               </div>
@@ -207,11 +207,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                               <div class="col-xs-12">
                                                   <div class="pad-hor">
-                                                      <label class="form-radio form-normal active form-text">
-                                                          <input type="radio" name="stat-w-label" checked=""> Active
+                                                      <label data-bind="css: { 'active': formModel.status() }, click: function () { formModel.status(true) }" class="form-radio form-normal form-text">
+                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="true"> {% trans "Active" %}
                                                       </label>
-                                                      <label class="form-radio form-normal form-text">
-                                                          <input type="radio" name="stat-w-label"> Inactive
+                                                      <label data-bind="css: { 'active': !formModel.status() }, click: function () { formModel.status(false) }" class="form-radio form-normal form-text">
+                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="false"> {% trans "Inactive" %}
                                                       </label>
                                                   </div>
                                               </div>

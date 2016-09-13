@@ -22,7 +22,6 @@ define([
         */
         initialize: function(options) {
             var self = this;
-            // this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.formModel = options.formModel;
             this.iconFilter = ko.observable('');
             this.icons = ko.computed(function () {

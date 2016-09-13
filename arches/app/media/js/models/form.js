@@ -23,9 +23,13 @@ define(['arches',
          * @memberof FormModel.prototype
          * @param  {object} attributes - the properties to seed a {@link FormModel} with
          */
-        parse: function(attributes){
+        initialize: function(attributes) {
+          this.formid = attributes.data.formid;
           this.iconclass = ko.observable(attributes.data.iconclass);
-          return attributes.data
+          this.title = ko.observable(attributes.data.title);
+          this.subtitle = ko.observable(attributes.data.subtitle);
+          this.status = ko.observable(attributes.data.status);
+          this.visible = ko.observable(attributes.data.visible);
         },
         toJSON: function(){
             var ret = {};
