@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load staticfiles %}
 {% load i18n %}
-{% block content %}
 <div data-bind="visible: formModel" style="display:none;">
     <div class="panel card-panel">
         <div class="panel-heading">
@@ -226,16 +225,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 </div>
-{% endblock content %}
-{% block pre_require_js %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
-
-<script>{% autoescape off %}
-define('form-settings-data', [], function () {
-    return {
-        icons: {{icons}},
-        form: {{form}}
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}
