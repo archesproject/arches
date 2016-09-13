@@ -34,6 +34,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock graph_header_tools %}
 
+{% block graph_header_buttons %}
+<span data-bind="visible: dirty()" style="display: none;">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
 
 {% block content %}
 <div class="card-library relative fade in">

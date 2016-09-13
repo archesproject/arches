@@ -29,6 +29,15 @@ define([
             this.subtitle = ko.observable();
             this.status = ko.observable();
             this.visible = ko.observable();
+            this.cards = ko.observableArray();
+            this.availableCards = ko.observableArray();
+            this._cards = options.cards;
+
+            options.data.cards = _.map(options.forms_x_cards, function (formXCard) {
+                return _.find(options.cards, function(card) {
+                    return card.cardid === formXCard.card_id;
+                });
+            });
 
             this.parse(options.data);
 
@@ -38,7 +47,8 @@ define([
                     title: self.title(),
                     subtitle: self.subtitle(),
                     status: self.status(),
-                    visible: self.visible()
+                    visible: self.visible(),
+                    cards: self.cards()
                 }))
             });
 
@@ -48,13 +58,28 @@ define([
         },
 
         parse: function(data) {
+            var self = this;
+
             this.formid = data.formid;
             this._json(JSON.stringify(data));
+
             this.iconclass(data.iconclass);
             this.title(data.title);
             this.subtitle(data.subtitle);
             this.status(data.status);
             this.visible(data.visible);
+            this.cards(data.cards);
+            
+            var addedCardIds = _.map(this.cards(), function (card) {
+                return card.cardid;
+            });
+            this.availableCards.removeAll();
+            _.each(this._cards, function (card) {
+                if (!_.contains(addedCardIds, card.cardid)) {
+                    self.availableCards.push(card);
+                }
+            });
+
             this.set('id', data.formid)
         },
 
@@ -63,7 +88,7 @@ define([
         * @memberof FormModel.prototype
         */
         reset: function () {
-            this.parse(JSON.parse(this._node()), self);
+            this.parse(JSON.parse(this._json()), self);
         },
 
         /**

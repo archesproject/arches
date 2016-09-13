@@ -4,7 +4,6 @@ define([
     'backbone',
     'knockout'
 ], function($, _, Backbone, ko) {
-
     var FormSettingsView = Backbone.View.extend({
         /**
         * A backbone view representing a form settings form
