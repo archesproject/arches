@@ -58,6 +58,8 @@ require([
                 pageView.viewModel.loading(false);
                 if(status !== 'success'){
                     pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                } else {
+                    formModel.parse(JSON.parse(request.responseText));
                 }
             });
         },
