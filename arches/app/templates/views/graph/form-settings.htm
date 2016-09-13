@@ -17,225 +17,211 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load staticfiles %}
 {% load i18n %}
-{% block content %}
 <div>
-      <div class="panel card-panel">
-          <div class="panel-heading">
-              <div class="" style="">
-                  <h3 id="" class="panel-title card-main-title">Form Settings</h3>
-              </div>
-          </div>
+    <div class="panel card-panel">
+        <div class="panel-heading">
+            <div class="" style="">
+                <h3 id="" class="panel-title card-main-title">Form Settings</h3>
+            </div>
+        </div>
 
-          <!-- Data Entry -->
-          <div id="ep-settings-form-crud" class="panel-body card-body fade in" style="">
-              <div id="cards" class="tab-base card-content-container outline">
+        <!-- Data Entry -->
+        <div id="ep-settings-form-crud" class="panel-body card-body fade in" style="">
+            <div id="cards" class="tab-base card-content-container outline">
 
-                  <!--Nav Tabs-->
-                  <ul class="nav nav-tabs card-nav-container">
-                      <li id="xx-id-group" class="active">
-                          <a id="xx-id-tab" data-toggle="tab" href="#form-id-card" class="card-tab-title" aria-expanded="true">
-                              Form Identifiers
-                          </a>
-                      </li>
-                      <li id="xx-icon-group" class="">
-                          <a id="xx-icon-tab" data-toggle="tab" href="#form-icon-card" class="card-tab-title" aria-expanded="false">
-                              Icon
-                          </a>
-                      </li>
-                      <li id="xx-status-group" class="">
-                          <a id="xx-status-tab" data-toggle="tab" href="#form-status-card" class="card-tab-title" aria-expanded="false">
-                              Status
-                          </a>
-                      </li>
-                  </ul>
+                <!--Nav Tabs-->
+                <ul class="nav nav-tabs card-nav-container">
+                    <li id="xx-id-group" class="active">
+                        <a id="xx-id-tab" data-toggle="tab" href="#form-id-card" class="card-tab-title" aria-expanded="true">
+                            Form Identifiers
+                        </a>
+                    </li>
+                    <li id="xx-icon-group" class="">
+                        <a id="xx-icon-tab" data-toggle="tab" href="#form-icon-card" class="card-tab-title" aria-expanded="false">
+                            Icon
+                        </a>
+                    </li>
+                    <li id="xx-status-group" class="">
+                        <a id="xx-status-tab" data-toggle="tab" href="#form-status-card" class="card-tab-title" aria-expanded="false">
+                            Status
+                        </a>
+                    </li>
+                </ul>
 
-                  <!--Tabs Content-->
-                  <div class="tab-content card-content-tab" style="margin-left: 0px;">
+                <!--Tabs Content-->
+                <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
-                      <!-- Card -->
-                      <div id="form-id-card" class="tab-pane fade active in" style="display: block;">
-                          <div class="panel-body card-panel-body">
-                              <div id="" class="card-content">
+                    <!-- Card -->
+                    <div id="form-id-card" class="tab-pane fade active in" style="display: block;">
+                        <div class="panel-body card-panel-body">
+                            <div id="" class="card-content">
 
-                                  <!-- Card Level Alert -->
-                                  <div id="summary-card-alert" class="panel install-card-alert"></div>
+                                <!-- Card Level Alert -->
+                                <div id="summary-card-alert" class="panel install-card-alert"></div>
 
-                                  <!-- Form -->
-                                  <div class="col-xs-12 no-instructions-shim">
+                                <!-- Form -->
+                                <div class="col-xs-12 no-instructions-shim">
 
-                                      <form class="widgets">
-                                          <div class="row widget-container">
-                                              <div class="form-group">
-                                                  <div class="relative">
-                                                      <label class="col-xs-12 col-lg-9 control-label widget-input-label" for=""> Form Name <i class="ion-ios-checkmark-outline"></i></label>
-                                                  </div>
+                                    <form class="widgets">
+                                        <div class="row widget-container">
+                                            <div class="form-group">
+                                                <div class="relative">
+                                                    <label class="col-xs-12 col-lg-9 control-label widget-input-label" for=""> Form Name <i class="ion-ios-checkmark-outline"></i></label>
+                                                </div>
 
-                                                  <div class="col-xs-12 col-lg-9">
-                                                      <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="value:formModel.title, valueUpdate: 'keyup'">
-                                                  </div>
-                                              </div>
-                                          </div>
+                                                <div class="col-xs-12 col-lg-9">
+                                                    <input type="" placeholder="Name" id="" class="form-control input-lg widget-input" data-bind="value:formModel.title, valueUpdate: 'keyup'">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                          <div class="row widget-container">
-                                              <div class="form-group">
-                                                  <div class="relative" style="">
-                                                      <label class="col-xs-12 col-lg-9 control-label widget-input-label" for=""> Form Subtitle <i class="ion-ios-checkmark-outline"></i></label>
-                                                  </div>
+                                        <div class="row widget-container">
+                                            <div class="form-group">
+                                                <div class="relative" style="">
+                                                    <label class="col-xs-12 col-lg-9 control-label widget-input-label" for=""> Form Subtitle <i class="ion-ios-checkmark-outline"></i></label>
+                                                </div>
 
-                                                  <div class="col-xs-12 col-lg-9">
-                                                      <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input" data-bind="value:formModel.subtitle, valueUpdate: 'keyup'">
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </form>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+                                                <div class="col-xs-12 col-lg-9">
+                                                    <input type="" placeholder="Subtitle" id="" class="form-control input-lg widget-input" data-bind="value:formModel.subtitle, valueUpdate: 'keyup'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                      <!-- Icon Card -->
+                    <!-- Icon Card -->
 
-                      <div id="form-icon-card" class="tab-pane fade">
-                          <div class="panel-body card-panel-body">
-                              <div class="card-content">
+                    <div id="form-icon-card" class="tab-pane fade">
+                        <div class="panel-body card-panel-body">
+                            <div class="card-content">
 
-                                  <!-- Card Level Alert -->
-                                  <div id="summary-card-alert" class="panel install-card-alert"></div>
+                                <!-- Card Level Alert -->
+                                <div id="summary-card-alert" class="panel install-card-alert"></div>
 
-                                  <!-- Card Instruction -->
-                                  <p id="install-instructions" class="content-instructions">
-                                      {% trans "Pick an icon for your form" %}
+                                <!-- Card Instruction -->
+                                <p id="install-instructions" class="content-instructions">
+                                    {% trans "Pick an icon for your form" %}
 
-                                      <!-- Help link -->
-                                      <span>
-                                          <a id="card-help" class="pull-right card-help help"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
-                                      </span>
-                                  </p>
+                                    <!-- Help link -->
+                                    <span>
+                                        <a id="card-help" class="pull-right card-help help"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                                    </span>
+                                </p>
 
-                                  <!-- Form -->
-                                  <div class="col-xs-12">
+                                <!-- Form -->
+                                <div class="col-xs-12">
 
-                                      <form class="widgets">
-                                          <div class="row widget-container">
-                                              <div class="form-group">
-                                                  <div>
-                                                      <label class="col-xs-12 control-label widget-input-label"> {% trans "Form Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                  </div>
+                                    <form class="widgets">
+                                        <div class="row widget-container">
+                                            <div class="form-group">
+                                                <div>
+                                                    <label class="col-xs-12 control-label widget-input-label"> {% trans "Form Icon" %} <i class="ion-ios-checkmark-outline"></i></label>
+                                                </div>
 
-                                                  <!-- Icon search -->
-                                                  <div style="padding-left: 10px;">
-                                                      <div class="relative" style="padding: 10px 0px;">
+                                                <!-- Icon search -->
+                                                <div style="padding-left: 10px;">
+                                                    <div class="relative" style="padding: 10px 0px;">
 
-                                                          <!-- Currently selected icon -->
-                                                          <div>
-                                                              {% trans "Selected icon:" %}
-                                                              <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + formModel.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                                          </div>
+                                                        <!-- Currently selected icon -->
+                                                        <div>
+                                                            {% trans "Selected icon:" %}
+                                                            <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + formModel.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
+                                                        </div>
 
-                                                          <div style="position: absolute; left: 130px; top: 21px;">
-                                                              <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                        <div style="position: absolute; left: 130px; top: 21px;">
+                                                            <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
-                                                              <!-- Remove Search -->
-                                                              <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
-                                                          </div>
-                                                      </div>
-                                                  </div>
+                                                            <!-- Remove Search -->
+                                                            <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                                  <!-- Icon List -->
-                                                  <div style="height: 300px; overflow-y: scroll; padding-top: 15px; padding-left: 20px; border: 1px solid #e9e9e9; margin-left: 10px; margin-right: 30px;">
+                                                <!-- Icon List -->
+                                                <div style="height: 300px; overflow-y: scroll; padding-top: 15px; padding-left: 20px; border: 1px solid #e9e9e9; margin-left: 10px; margin-right: 30px;">
 
-                                                      <div class="row">
+                                                    <div class="row">
 
                                                         <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-                                                          <!-- ko foreach: icons -->
-                                                          <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font"  data-bind="css: {'selected': (cssclass === self.formModel.iconclass())}, click: function() { self.formModel.iconclass(cssclass); }">
-                                                              <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
-                                                          </div>
-                                                          <!-- /ko -->
-                                                      <!-- /ko -->
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </form>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+                                                        <!-- ko foreach: icons -->
+                                                        <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font"  data-bind="css: {'selected': (cssclass === self.formModel.iconclass())}, click: function() { self.formModel.iconclass(cssclass); }">
+                                                            <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+                                                        </div>
+                                                        <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                      <!-- Card -->
-                      <div id="form-status-card" class="tab-pane fade">
-                          <div class="panel-body card-panel-body" style="">
-                              <div id="" class="card-content" style="">
+                    <!-- Card -->
+                    <div id="form-status-card" class="tab-pane fade">
+                        <div class="panel-body card-panel-body" style="">
+                            <div id="" class="card-content" style="">
 
-                                  <!-- Card Level Alert -->
-                                  <div id="meta-card-alert" class="panel install-card-alert" style=""></div>
+                                <!-- Card Level Alert -->
+                                <div id="meta-card-alert" class="panel install-card-alert" style=""></div>
 
-                                  <!-- Card Instruction -->
-                                  <p id="install-instructions" class="content-instructions">
-                                      Define this form's status
-                                  </p>
+                                <!-- Card Instruction -->
+                                <p id="install-instructions" class="content-instructions">
+                                    Define this form's status
+                                </p>
 
-                                  <!-- Form -->
-                                  <div class="col-xs-12" style="padding-bottom: 10px;">
+                                <!-- Form -->
+                                <div class="col-xs-12" style="padding-bottom: 10px;">
 
-                                      <div class="row widget-container">
-                                          <div class="form-group">
-                                              <div class="relative" style="">
-                                                  <label class="col-xs-12 control-label widget-input-label" for=""> Default Visibility <i class="ion-ios-checkmark-outline"></i></label>
-                                              </div>
+                                    <div class="row widget-container">
+                                        <div class="form-group">
+                                            <div class="relative" style="">
+                                                <label class="col-xs-12 control-label widget-input-label" for=""> Default Visibility <i class="ion-ios-checkmark-outline"></i></label>
+                                            </div>
 
-                                              <div class="col-xs-12">
-                                                  <div class="pad-hor">
-                                                      <label data-bind="css: { 'active': formModel.visible() }, click: function () { formModel.visible(true) }" class="form-radio form-normal form-text">
-                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="true"> {% trans "Visible" %}
-                                                      </label>
-                                                      <label data-bind="css: { 'active': !formModel.visible() }, click: function () { formModel.visible(false) }" class="form-radio form-normal form-text">
-                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="false"> {% trans "Hidden" %}
-                                                      </label>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
+                                            <div class="col-xs-12">
+                                                <div class="pad-hor">
+                                                    <label data-bind="css: { 'active': formModel.visible() }, click: function () { formModel.visible(true) }" class="form-radio form-normal form-text">
+                                                        <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="true"> {% trans "Visible" %}
+                                                    </label>
+                                                    <label data-bind="css: { 'active': !formModel.visible() }, click: function () { formModel.visible(false) }" class="form-radio form-normal form-text">
+                                                        <input type="radio" name="stat-w-label" data-bind="checked: formModel.visible" value="false"> {% trans "Hidden" %}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                      <div class="row widget-container">
-                                          <div class="form-group">
-                                              <div class="relative" style="">
-                                                  <label class="col-xs-12 control-label widget-input-label" for=""> Status <i class="ion-ios-checkmark-outline"></i></label>
-                                              </div>
+                                    <div class="row widget-container">
+                                        <div class="form-group">
+                                            <div class="relative" style="">
+                                                <label class="col-xs-12 control-label widget-input-label" for=""> Status <i class="ion-ios-checkmark-outline"></i></label>
+                                            </div>
 
-                                              <div class="col-xs-12">
-                                                  <div class="pad-hor">
-                                                      <label data-bind="css: { 'active': formModel.status() }, click: function () { formModel.status(true) }" class="form-radio form-normal form-text">
-                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="true"> {% trans "Active" %}
-                                                      </label>
-                                                      <label data-bind="css: { 'active': !formModel.status() }, click: function () { formModel.status(false) }" class="form-radio form-normal form-text">
-                                                          <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="false"> {% trans "Inactive" %}
-                                                      </label>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-{% endblock content %}
-{% block pre_require_js %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
-
-<script>{% autoescape off %}
-define('form-settings-data', [], function () {
-    return {
-        icons: {{icons}},
-        form: {{form}}
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}
+                                            <div class="col-xs-12">
+                                                <div class="pad-hor">
+                                                    <label data-bind="css: { 'active': formModel.status() }, click: function () { formModel.status(true) }" class="form-radio form-normal form-text">
+                                                        <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="true"> {% trans "Active" %}
+                                                    </label>
+                                                    <label data-bind="css: { 'active': !formModel.status() }, click: function () { formModel.status(false) }" class="form-radio form-normal form-text">
+                                                        <input type="radio" name="stat-w-label" data-bind="checked: formModel.status" value="false"> {% trans "Inactive" %}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
