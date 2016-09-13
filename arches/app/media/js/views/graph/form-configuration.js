@@ -19,12 +19,11 @@ require([
         disabled: true
     }];
 
-    var formModel = new FormModel({data:data.form});
-    var addedCards = ko.observableArray(_.map(data.forms_x_cards, function (formXCard) {
-        return _.find(data.cards, function(card) {
-            return card.cardid === formXCard.card_id;
-        });
-    }));
+    var formModel = new FormModel({
+        data: data.form,
+        forms_x_cards: data.forms_x_cards,
+        cards: data.cards
+    });
     var availableCards = ko.observableArray();
     var addedCardIds = _.map(data.forms_x_cards, function (formXCard) {
         return formXCard.card_id;
@@ -48,17 +47,17 @@ require([
         cardList: new ListView({
             items: availableCards
         }),
-        addedCards: addedCards,
+        addedCards: formModel.cards,
         selectedFormId: ko.observable(data.form.formid),
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
         addCard: function(card) {
             availableCards.remove(card);
-            addedCards.push(card);
+            formModel.cards.push(card);
         },
         removeCard: function(card) {
-            addedCards.remove(card);
+            formModel.cards.remove(card);
             availableCards.push(card);
         },
         save: function () {

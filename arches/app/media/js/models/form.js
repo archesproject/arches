@@ -29,6 +29,13 @@ define([
             this.subtitle = ko.observable();
             this.status = ko.observable();
             this.visible = ko.observable();
+            this.cards = ko.observableArray();
+
+            options.data.cards = _.map(options.forms_x_cards, function (formXCard) {
+                return _.find(options.cards, function(card) {
+                    return card.cardid === formXCard.card_id;
+                });
+            });
 
             this.parse(options.data);
 
@@ -38,7 +45,8 @@ define([
                     title: self.title(),
                     subtitle: self.subtitle(),
                     status: self.status(),
-                    visible: self.visible()
+                    visible: self.visible(),
+                    cards: self.cards()
                 }))
             });
 
@@ -55,6 +63,7 @@ define([
             this.subtitle(data.subtitle);
             this.status(data.status);
             this.visible(data.visible);
+            this.cards(data.cards);
             this.set('id', data.formid)
         },
 
