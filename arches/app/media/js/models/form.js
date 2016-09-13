@@ -63,7 +63,7 @@ define([
         * @memberof FormModel.prototype
         */
         reset: function () {
-            this.parse(JSON.parse(this._node()), self);
+            this.parse(JSON.parse(this._json()), self);
         },
 
         /**

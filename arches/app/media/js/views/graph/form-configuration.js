@@ -45,7 +45,6 @@ require([
         graphModel: new GraphModel({
             data: data.graph
         }),
-
         cardList: new ListView({
             items: availableCards
         }),
@@ -61,6 +60,12 @@ require([
         removeCard: function(card) {
             addedCards.remove(card);
             availableCards.push(card);
+        },
+        save: function () {
+
+        },
+        cancel: function () {
+            formModel.reset();
         }
     };
 
