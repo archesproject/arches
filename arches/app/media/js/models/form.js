@@ -30,6 +30,8 @@ define([
             this.status = ko.observable();
             this.visible = ko.observable();
             this.cards = ko.observableArray();
+            this.availableCards = ko.observableArray();
+            this._cards = options.cards;
 
             options.data.cards = _.map(options.forms_x_cards, function (formXCard) {
                 return _.find(options.cards, function(card) {
@@ -64,6 +66,7 @@ define([
             this.status(data.status);
             this.visible(data.visible);
             this.cards(data.cards);
+            this.resetAvailableCards();
             this.set('id', data.formid)
         },
 
@@ -73,6 +76,19 @@ define([
         */
         reset: function () {
             this.parse(JSON.parse(this._json()), self);
+        },
+
+        resetAvailableCards: function () {
+            var self = this;
+            var addedCardIds = _.map(this.cards(), function (card) {
+                return card.cardid;
+            });
+            self.availableCards.removeAll();
+            _.each(this._cards, function (card) {
+                if (!_.contains(addedCardIds, card.cardid)) {
+                    self.availableCards.push(card);
+                }
+            });
         },
 
         /**
