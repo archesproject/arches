@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="row widget-wrapper"  data-bind="if: !configForm">
+          <p class="control-label widget-input-label" data-bind="text:label"></p>
+            <label class="form-radio form-normal form-text active">
+                <input type="radio" name="type-w-label" checked=""> Yes
+            </label>
+            <label class="form-radio form-normal form-text">
+                <input type="radio" name="type-w-label"> No
+            </label>
+</div>
+
+<div data-bind="if: configForm">
+    form here
+</div>
