@@ -104,6 +104,8 @@ class GraphSettingsView(GraphBaseView):
         })
 
 
+
+
 @method_decorator(group_required('edit'), name='dispatch')
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
@@ -293,16 +295,17 @@ class FormManagerView(GraphBaseView):
         form.save()
         return JSONResponse(form)
 
-
 @method_decorator(group_required('edit'), name='dispatch')
 class FormView(GraphBaseView):
     def get(self, request, formid):
         form = models.Form.objects.get(formid=formid)
         self.graph = Graph.objects.get(graphid=form.graph.pk)
+        icons = models.Icon.objects.order_by('name')
         cards = models.CardModel.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
 
         context = self.get_context_data(
             main_script='views/graph/form-configuration',
+            icons=JSONSerializer().serialize(icons),
             form=JSONSerializer().serialize(form),
             forms=JSONSerializer().serialize(self.graph.form_set.all()),
             cards=JSONSerializer().serialize(cards),
