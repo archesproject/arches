@@ -1,8 +1,8 @@
 define(['arches',
-    'models/abstract',
-    'knockout',
-    'knockout-mapping',
-    'underscore'
+'models/abstract',
+'knockout',
+'knockout-mapping',
+'underscore'
 ], function (arches, AbstractModel, ko, koMapping, _) {
 
     var FormModel = AbstractModel.extend({
@@ -13,31 +13,66 @@ define(['arches',
         * @name FormModel
         */
         url: arches.urls.form,
-        constructor: function(attributes, options){
-            options || (options = {});
-            options.parse = true;
-            AbstractModel.prototype.constructor.call(this, attributes, options);
-        },
+
         /**
-         * parse - parses the passed in attributes into a {@link FormModel}
-         * @memberof FormModel.prototype
-         * @param  {object} attributes - the properties to seed a {@link FormModel} with
-         */
-        initialize: function(attributes) {
-          this.formid = attributes.data.formid;
-          this.iconclass = ko.observable(attributes.data.iconclass);
-          this.title = ko.observable(attributes.data.title);
-          this.subtitle = ko.observable(attributes.data.subtitle);
-          this.status = ko.observable(attributes.data.status);
-          this.visible = ko.observable(attributes.data.visible);
+        * parse - parses the passed in attributes into a {@link FormModel}
+        * @memberof FormModel.prototype
+        * @param  {object} attributes - the properties to seed a {@link FormModel} with
+        */
+        initialize: function(options) {
+            var self = this;
+            this.formid = options.data.formid;
+            this._json = ko.observable('');
+            this.iconclass = ko.observable();
+            this.title = ko.observable();
+            this.subtitle = ko.observable();
+            this.status = ko.observable();
+            this.visible = ko.observable();
+
+            this.parse(options.data);
+
+            this.json = ko.computed(function() {
+                return JSON.stringify(_.extend(JSON.parse(self._json()), {
+                    iconclass: self.iconclass(),
+                    title: self.title(),
+                    subtitle: self.subtitle(),
+                    status: self.status(),
+                    visible: self.visible()
+                }))
+            });
+
+            self.dirty = ko.computed(function() {
+                return self.json() !== self._json();
+            });
         },
-        toJSON: function(){
-            var ret = {};
-            for(var key in this.attributes){
-                console.log(key)
-            }
-            return ret;
-        }
+
+        parse: function(data) {
+            this.formid = data.formid;
+            this._json(JSON.stringify(data));
+            this.iconclass(data.iconclass);
+            this.title(data.title);
+            this.subtitle(data.subtitle);
+            this.status(data.status);
+            this.visible(data.visible);
+            this.set('id', data.formid)
+        },
+
+        /**
+        * discards unsaved model changes and resets the model data
+        * @memberof FormModel.prototype
+        */
+        reset: function () {
+            this.parse(JSON.parse(this._node()), self);
+        },
+
+        /**
+        * returns a JSON object containing model data
+        * @memberof FormModel.prototype
+        * @return {object} a JSON object containing model data
+        */
+        toJSON: function () {
+            return JSON.parse(this.json());
+        },
     });
     return FormModel;
 });

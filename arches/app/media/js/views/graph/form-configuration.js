@@ -36,8 +36,12 @@ require([
     });
 
     var viewModel = {
+        dirty: formModel.dirty,
         formOptions: options.concat(data.forms),
-        formSettings: new FormSettingsView({formModel:formModel}),
+        formSettings: new FormSettingsView({
+            formModel: formModel,
+            icons: data.icons
+        }),
         graphModel: new GraphModel({
             data: data.graph
         }),
