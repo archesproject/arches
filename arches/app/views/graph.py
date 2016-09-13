@@ -111,9 +111,9 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
             context = self.get_context_data(
-                main_script='views/graph/graph-list',
+                main_script='views/graph',
             )
-            return render(request, 'views/graph/graph-list.htm', context)
+            return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)
         datatypes = models.DDataType.objects.all()
