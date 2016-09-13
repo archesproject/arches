@@ -1,8 +1,9 @@
-define(['arches',
-'models/abstract',
-'knockout',
-'knockout-mapping',
-'underscore'
+define([
+    'arches',
+    'models/abstract',
+    'knockout',
+    'knockout-mapping',
+    'underscore'
 ], function (arches, AbstractModel, ko, koMapping, _) {
 
     var FormModel = AbstractModel.extend({
