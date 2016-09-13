@@ -13,10 +13,15 @@ require([
     var self = this;
 
     _.each(data.forms, function(form) {
-        form.cards = _.map(form.cards, function (cardId) {
-            return _.find(data.cards, function (card) {
-                return card.cardid === cardId;
+        form.cards = [];
+        _.each(data.forms_x_cards, function (form_x_card) {
+            if (form_x_card.form_id !== form.formid) {
+                return;
+            }
+            var card = _.find(data.cards, function (card) {
+                return card.cardid === form_x_card.card_id;
             });
+            form.cards.push(card);
         });
     });
 

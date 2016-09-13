@@ -284,6 +284,7 @@ class FormManagerView(GraphBaseView):
             main_script='views/graph/form-manager',
             forms=JSONSerializer().serialize(self.graph.form_set.all()),
 			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
+            forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
         )
 
         return render(request, 'views/graph/form-manager.htm', context)
@@ -307,7 +308,8 @@ class FormView(GraphBaseView):
             icons=JSONSerializer().serialize(icons),
             form=JSONSerializer().serialize(form),
             forms=JSONSerializer().serialize(self.graph.form_set.all()),
-            cards=JSONSerializer().serialize(cards)
+            cards=JSONSerializer().serialize(cards),
+            forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form=form).order_by('sortorder')),
         )
 
         return render(request, 'views/graph/form-configuration.htm', context)

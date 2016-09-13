@@ -301,7 +301,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        load = import_string('%s.setup.load_authority_files' % package_name)
+        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
         load(data_source)
 
     def index_database(self, package_name):

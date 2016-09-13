@@ -3854,8 +3854,10 @@ div.row.widget-wrapper:hover {
 .dragged-card-panel {
 	position: absolute;
 	background: transparent;
-	top: 10px;
-	left: 345px;
+    height: 100%;
+    width: 350px;
+    top: 0px;
+    padding: 45px;
 }
 @keyframes loader {
 	0% { background: #ddd; }
