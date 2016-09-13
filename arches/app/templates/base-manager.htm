@@ -1,0 +1,380 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+{% if debug %}
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
+{% endif %}
+
+<head>
+    <title>{% block title %}{{ APP_NAME }} {{ VERSION }} - {% endblock title %}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+	{% block css %}
+    <link href="{% static 'css/arches-nifty.css' %}" rel="stylesheet">
+    {% endblock css%}
+
+</head>
+
+<body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
+    {% block body %}
+
+    <div class="wrapper">
+        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'aside-in': tabsActive() && showTabs()}">
+
+            <header id="navbar" style="z-index: 1000; opacity: .9;">
+                {% block header %}
+                <div id="navbar-container" class="boxed">
+                    <div class="navbar-header">
+                        <a href="{% url 'home' %}" class="navbar-brand">
+                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                            <div class="brand-title">
+                                <span class="brand-text">Arches</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="navbar-content clearfix">
+                        <ul class="nav navbar-top-links pull-left">
+                            <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
+                                <a class="mainnav-toggle" href="#">
+                                    <i class="fa fa-navicon fa-lg"></i>
+                                </a>
+                            </li>
+                            <li class="hidden-xs" data-bind="if: showTabs()">
+                                <a id="toggle-aside" href="#">
+                                    <i id="toggle-aside-icon" class="fa fa-lg" data-bind="css: { 'fa-toggle-on': tabsActive(), 'fa-toggle-off': !tabsActive() }, click: function () { tabsActive(!tabsActive()) }"></i>
+                                </a>
+                            </li>
+
+
+                        </ul>
+                        <ul class="nav navbar-top-links pull-right">
+                            <li class="dropdown">
+                                <a id="demo-lang-switch" class="lang-selector dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <span class="lang-selected">
+                                        <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                                        <span class="lang-id">EN</span>
+                                        <span class="lang-name">English</span>
+                                    </span>
+                                </a>
+
+                                <ul class="head-list dropdown-menu with-arrow">
+                                    <li>
+                                        <a href="#" class="active">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/united-kingdom.png" alt="English">
+                                            <span class="lang-id">EN</span>
+                                            <span class="lang-name">English</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/france.png" alt="France">
+                                            <span class="lang-id">FR</span>
+                                            <span class="lang-name">Fran&ccedil;ais</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/germany.png" alt="Germany">
+                                            <span class="lang-id">DE</span>
+                                            <span class="lang-name">Deutsch</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/italy.png" alt="Italy">
+                                            <span class="lang-id">IT</span>
+                                            <span class="lang-name">Italiano</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <img class="lang-flag" src="{{ STATIC_URL }}img/icons/flags/spain.png" alt="Spain">
+                                            <span class="lang-id">ES</span>
+                                            <span class="lang-name">Espa&ntilde;ol</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                </span>
+                                <div class="username hidden-xs">
+                                {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
+                            </a>
+                            <li id="dropdown-user" class="dropdown">
+
+                                <div class="dropdown-menu dropdown-menu-md dropdown-menu-right with-arrow panel-default">
+
+                                    <div class="pad-all bord-btm">
+                                        <p class="text-lg text-muted text-thin mar-btm">750Gb of 1,000Gb Used</p>
+                                        <div class="progress progress-sm">
+                                            <div class="progress-bar" style="width: 70%;">
+                                                <span class="sr-only">70%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <ul class="head-list">
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user fa-fw fa-lg"></i> Profile
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="badge badge-danger pull-right">9</span>
+                                                <i class="fa fa-envelope fa-fw fa-lg"></i> Messages
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <span class="label label-success pull-right">New</span>
+                                                <i class="fa fa-gear fa-fw fa-lg"></i> Settings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-question-circle fa-fw fa-lg"></i> Help
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-lock fa-fw fa-lg"></i> Lock screen
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="pad-all text-right">
+                                        <a href="pages-login.html" class="btn btn-primary">
+                                            <i class="fa fa-sign-out fa-fw"></i> Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {% endblock header %}
+            </header>
+            <div class="boxed">
+
+                <div class="loading-mask" data-bind="visible:loading()"></div>
+
+                <div id="content-container" style="padding-bottom: 20px;">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+
+                <nav id="mainnav-container">
+                    <div id="mainnav">
+                        {% block navbar %}
+                        <div id="mainnav-menu-wrap">
+                            <div class="nano">
+                                <div class="nano-content" tabindex="0">
+                                    <ul id="mainnav-menu" class="list-group">
+
+                                        <!-- Tools -->
+                                        <li class="list-header">Tools</li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-tachometer"></i>
+                                                <span class="menu-title">
+                                                    <strong>Dashboard</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-building-o"></i>
+                                                <span class="menu-title">
+                                                    <strong>Add New Resource</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                                <!-- ko foreach: resources -->
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#">
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                </li>
+                                                <!-- /ko -->
+                                            </ul>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="{% url 'config' %}">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>System Settings</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'graph' '' %}">
+                                                <i class="fa fa-bookmark"></i>
+                                                <span class="menu-title">
+                                                    <strong>Resource Designer</strong>
+                                                </span>
+                                            </a>
+
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-server"></i>
+                                                <span class="menu-title">
+                                                    <strong>Map Server Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-globe"></i>
+                                                <span class="menu-title">
+                                                    <strong>Field Project Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-cloud-upload"></i>
+                                                <span class="menu-title">
+                                                    <strong>Import/Export Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-user-md"></i>
+                                                <span class="menu-title">
+                                                    <strong>Profile Manager</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                        <li class="list-divider-dark"></li>
+
+                                        <!-- Tools -->
+                                        <li class="list-header">Modules</li>
+
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
+                                            <a href="{% url 'rdm' '' %}">
+                                                <i class="fa fa-align-left"></i>
+                                                <span class="menu-title">
+                                                    RDM
+
+                                                </span>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endblock navbar %}
+                    </div>
+                </nav>
+
+                <aside id="aside-container" style="position: fixed;">
+                    <div id="aside">
+                        {% block tabs %}
+                        {% endblock tabs %}
+                    </div>
+                </aside>
+            </div>
+            <footer id="footer">
+                {% block footer %}
+                    <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
+                    <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
+                {% endblock footer %}
+            </footer>
+            <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+        </div>
+
+    </div>
+
+    {% endblock body %}
+</body>
+
+{% block javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
+
+{% block pre_require_js %}
+{% endblock pre_require_js %}
+
+<script>
+    {% autoescape off %}
+    define('view-data', [], function () {
+        return {
+            graphs: {{graphs}}
+        };
+    });
+    {% endautoescape %}
+</script>
+
+{% include 'javascript.htm' %}
+
+<script>
+require(["nifty"{% if main_script %},"{{ main_script }}"{% endif %}]);
+</script>
+
+{% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
+ga('send', 'pageview');
+
+</script>
+{% endif %}
+
+{% endblock javascript %}
+
+</html>
