@@ -37,8 +37,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </li>
                 <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate(graphid + '/card_manager') : $parent.navigate('../card/' + graphid); }">{% trans "Manage Cards" %}</a>
                 </li>
+                <!-- ko if: $parent.showResources() -->
                 <li><a href="#">{% trans "Manage Forms" %}</a>
                 </li>
+                <!-- /ko -->
                 <li><a href="#">{% trans "Manage Reports" %}</a>
                 </li>
                 <li class="divider"></li>
