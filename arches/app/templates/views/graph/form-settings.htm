@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load staticfiles %}
 {% load i18n %}
+{% block content %}
 <div data-bind="visible: formModel" style="display:none;">
     <div class="panel card-panel">
         <div class="panel-heading">
@@ -31,18 +32,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!--Nav Tabs-->
                 <ul class="nav nav-tabs card-nav-container">
-                    <li id="xx-id-group" class="active">
-                        <a id="xx-id-tab" data-toggle="tab" href="#form-id-card" class="card-tab-title" aria-expanded="true">
+                    <li id="form-id-group" class="active">
+                        <a id="form-id-tab" data-toggle="tab" href="#form-id-card" class="card-tab-title" aria-expanded="true">
                             Form Identifiers
                         </a>
                     </li>
-                    <li id="xx-icon-group" class="">
-                        <a id="xx-icon-tab" data-toggle="tab" href="#form-icon-card" class="card-tab-title" aria-expanded="false">
+                    <li id="form-icon-group" class="">
+                        <a id="form-icon-tab" data-toggle="tab" href="#form-icon-card" class="card-tab-title" aria-expanded="false">
                             Icon
                         </a>
                     </li>
-                    <li id="xx-status-group" class="">
-                        <a id="xx-status-tab" data-toggle="tab" href="#form-status-card" class="card-tab-title" aria-expanded="false">
+                    <li id="form-status-group" class="">
+                        <a id="form-status-tab" data-toggle="tab" href="#form-status-card" class="card-tab-title" aria-expanded="false">
                             Status
                         </a>
                     </li>
@@ -52,9 +53,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
                     <!-- Card -->
-                    <div id="form-id-card" class="tab-pane fade active in" style="display: block;">
+                    <div id="form-id-card" class="tab-pane fade active in" style="">
                         <div class="panel-body card-panel-body">
-                            <div id="" class="card-content">
+                            <div class="card-content">
 
                                 <!-- Card Level Alert -->
                                 <div id="summary-card-alert" class="panel install-card-alert"></div>
@@ -225,3 +226,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 </div>
+{% endblock content %}
+{% block pre_require_js %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
+
+<script>{% autoescape off %}
+define('form-settings-data', [], function () {
+    return {
+        icons: {{icons}},
+        form: {{form}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
