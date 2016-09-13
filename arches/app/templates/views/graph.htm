@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-nifty.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -116,7 +116,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div id="report-image-grid" class="report-image-grid">
 
             <!-- ko foreach: currentList -->
-            {% include 'views/graph/graph-list-item.htm' %}
+            <div class="resource-grid-item relative">
+                <!-- Resource Type -->
+                <div class="resource-grid-main-container" data-bind="click:function(){ $parent.navigate(graphid + '/settings') }, hover: hover, css: {active: hover}">
+                    <div class="resource-grid-main">
+                        <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
+                        <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
+                    </div>
+                </div>
+
+                <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }">{% trans "Settings" %}</a>
+                            </li>
+                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid) }">{% trans "Manage Graph" %}</a>
+                            </li>
+                            <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate(graphid + '/card_manager') : $parent.navigate('../card/' + graphid); }">{% trans "Manage Cards" %}</a>
+                            </li>
+                            <!-- ko if: $parent.showResources() -->
+                            <li><a href="#">{% trans "Manage Forms" %}</a>
+                            </li>
+                            <!-- /ko -->
+                            <li><a href="#">{% trans "Manage Reports" %}</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li><a href="#" data-bind="click:exportGraph">{% trans "Export" %}</a>
+                            </li>
+                            <li><a href="#" data-bind="click:clone">{% trans "Clone" %}</a>
+                            </li>
+                            <li><a href="#" data-bind="click:deleteGraph">{% trans "Delete" %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="resource-status">Status: <span data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                    </div>
+                </div>
+            </div>
             <!-- /ko -->
 
         </div>
@@ -124,16 +162,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 
-<input id="graphs" name="graphs" type="hidden" value="{{graphs}}"/>
 {% endblock content %}
-
-{% block pre_require_js %}
-{{ block.super }}
-<script>{% autoescape off %}
-define('view-data', [], function () {
-    return {
-        graphs: {{graphs}}
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}
