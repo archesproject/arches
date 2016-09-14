@@ -3,9 +3,10 @@ require([
     'knockout',
     'models/graph',
     'views/graph/graph-page-view',
+    'viewmodels/alert',
     'arches',
     'graph-forms-data',
-], function(_, ko, GraphModel, PageView, arches, data) {
+], function(_, ko, GraphModel, PageView, AlertViewModel, arches, data) {
 
     /**
     * a PageView representing the graph forms page
@@ -35,7 +36,7 @@ require([
         graphModel: new GraphModel({
             data: data.graph
         }),
-        forms: data.forms,
+        forms: ko.observableArray(data.forms),
         formOptions: options.concat(data.forms),
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form + formId);
@@ -50,6 +51,21 @@ require([
                 },
                 error: function(response) {
                     pageView.viewModel.loading(false);
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                }
+            });
+        },
+        deleteForm: function (form) {
+            $.ajax({
+                type: "DELETE",
+                url: arches.urls.form + form.formid + '/delete',
+                success: function(response) {
+                    pageView.viewModel.loading(false);
+                    viewModel.forms.remove(form);
+                },
+                error: function(response) {
+                    pageView.viewModel.loading(false);
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
                 }
             });
         },

@@ -77,6 +77,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, FormManagerView.as_view(), name='add_form'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
+    url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
 
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),

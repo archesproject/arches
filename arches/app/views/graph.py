@@ -335,6 +335,11 @@ class FormView(GraphBaseView):
             form.save()
         return JSONResponse(data)
 
+    def delete(self, request, formid):
+        form = models.Form.objects.get(formid=formid)
+        form.delete()
+        return JSONResponse({'succces':True})
+
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
