@@ -44,11 +44,59 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block content %}
-<div class="card-library relative fade in">
+<div class="card-library relative fade in" style="display: none;" data-bind="visible: cardList">
     <!-- Card (Tile) Listing -->
-    <div class="crud-menu hide-card-library show-card-library" style="display: none;" data-bind="visible: cardList">
-        <div class="panel crud-menu-panel data-widget-library" id="node-listing" data-bind="with: cardList">
-            {% include 'views/graph/form-manager/card-list.htm' %}
+    <div class="crud-menu hide-card-library show-card-library panel crud-menu-panel form-data-card-library" data-bind="with: cardList">
+        <!-- Menu Title -->
+        <div class="panel-heading">
+            <div class="ep-menu-list-title">
+                <h3 id="" class="panel-title card-main-title">{% trans "Data Card Library" %}</h3>
+            </div>
+        </div>
+
+        <!-- Menu List -->
+        <div class="list-group menu-title-shim">
+            <!-- Menu Item -->
+            <div class="resource-selector">
+                <div class="list-filter">
+                    <input type="text" class="form-control" style="" placeholder="{% trans "Find a Card" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+                    <!-- Remove Search -->
+                    <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Data Widget Library -->
+        <div id="report-image-grid" class="report-image-grid data-widget-container" data-bind="sortable: { data: items }">
+
+            <!-- card -->
+            <div class="data-widget-grid-item relative" data-bind="drag: {value: $data}, visible: $data.filtered() == false">
+                <div class="panel mar-no">
+
+                    <!-- card Name -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title library-card-panel-title" data-bind="text: name"></h3>
+                    </div>
+
+                    <!-- Abstract -->
+                    <div class="panel-body library-card-body">
+                        <p class="library-item-subtitle" data-bind="text: description"></p>
+                    </div>
+
+                    <!-- Selectable -->
+                    <div class="selectable" style="display: none;">
+                        <i class="ion-ios-checkmark"></i>
+                    </div>
+
+                    <!-- card Tools -->
+                    <div class="panel-footer" style="height: 40px;">
+                        <a href="#" class="pull-right" data-bind="click: $root.addCard.bind($root)"><i class="ion-plus-circled"></i> Add Card</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -79,30 +127,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <!-- Added Cards Panel -->
-        <div class="dragged-card-panel report-image-grid" data-bind="sortable: { data: addedCards }">
+        <div class="dragged-card-panel">
+            <div class="report-image-grid" data-bind="sortable: { data: addedCards }">
 
-            <!-- card -->
-            <div class="data-widget-grid-item relative">
-                <div class="panel mar-no">
+                <!-- card -->
+                <div class="data-widget-grid-item relative">
+                    <div class="panel mar-no">
 
-                    <!-- card Name -->
-                    <div class="panel-heading">
-                        <h3 class="panel-title library-card-panel-title" data-bind="text: name"></h3>
-                    </div>
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" data-bind="text: name"></h3>
+                        </div>
 
-                    <!-- Abstract -->
-                    <div class="panel-body library-card-body">
-                        <p class="library-item-subtitle" data-bind="text: description"></p>
-                    </div>
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle" data-bind="text: description"></p>
+                        </div>
 
-                    <!-- Selectable -->
-                    <div class="selectable" style="display: none;">
-                        <i class="ion-ios-checkmark"></i>
-                    </div>
+                        <!-- Selectable -->
+                        <div class="selectable" style="display: none;">
+                            <i class="ion-ios-checkmark"></i>
+                        </div>
 
-                    <!-- card Tools -->
-                    <div class="panel-footer" style="height: 40px;">
-                        <a href="#" class="pull-right" data-bind="click: $root.removeCard.bind($root)"><i class="ion-minus-circled"></i> Remove Card</a>
+                        <!-- card Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="#" class="pull-right" data-bind="click: $root.removeCard.bind($root)"><i class="ion-minus-circled"></i> Remove Card</a>
+                        </div>
                     </div>
                 </div>
             </div>
