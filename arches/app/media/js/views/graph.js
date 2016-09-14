@@ -58,7 +58,6 @@ require([
             cache: false,
             contentType: false,
             success: function(response) {
-                console.log(response)
                 window.location.reload(true);
             },
             error: function(response) {
@@ -74,10 +73,10 @@ require([
     graphs().forEach(function(graph) {
         graph.hover = ko.observable(false);
         graph.clone = function() {
-            newGraph('clone/' + graph.graphid);
+            newGraph(graph.graphid + '/clone');
         };
         graph.exportGraph = function(model) {
-            window.open('export/' + graph.graphid, '_blank');
+            window.open(graph.graphid + '/export', '_blank');
         };
         graph.deleteGraph = function () {
             pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {

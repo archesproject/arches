@@ -48,7 +48,6 @@ require([
     });
 
     viewModel.cardList = new ListView({
-        el: $('#card-listing'),
         items: viewModel.availableGraphs
     });
 

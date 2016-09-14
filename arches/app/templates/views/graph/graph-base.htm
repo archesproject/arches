@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-nifty.htm" %}
+{% extends "base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="panel-body">
                <ul class="list-group ep-menu-list">
                     <!-- Menu Item -->
-                    <li id="" class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
+                    <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
                         <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: graphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
                     </li>
 
@@ -100,9 +100,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </li>
 
+                    {% if graph.isresource %}
                     <!-- Menu Item -->
                     <li id="form-manager" class="edit-menu-item">
-                        <a href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
@@ -112,13 +113,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a id="" href="#">
+                        <a href="#">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
                             </div>
                         </a>
                     </li>
+                    {% endif %}
 
                     <!-- Menu Item -->
                     <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
@@ -132,7 +134,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a id="" href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Resource Designer" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resources" %} </span>
@@ -149,7 +151,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 
     <!-- Help Panel -->
-    <div id="" class="ep-help" style="display: none;">
+    <div class="ep-help" style="display: none;">
         <div class="panel ep-help-panel relative" style="">
 
             <!-- Help Item List -->
@@ -192,7 +194,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Edit Content -->
-    <div id="" class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
+    <div class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
         <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
             <!-- ko if: alert() -->
             <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
@@ -204,10 +206,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="ep-form-alert-buttons">
                 <!-- ko if: alert().cancel -->
-                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
                 <!-- /ko -->
                 <!-- ko if: alert().ok -->
-                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
                 <!-- /ko -->
             </div>
             <!-- /ko -->

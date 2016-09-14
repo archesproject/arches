@@ -1,0 +1,131 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Data Entry Forms" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_tools %}
+<!-- Card Filter Widget -->
+<div id="card-grid-tools" style="display: none;" data-bind="visible: formOptions">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a form..." %}" class="design" data-bind="value: selectedFormId, options: formOptions, optionsText: 'title', optionsValue: 'formid', chosen: {width: '100%'}">
+
+        </select>
+    </div>
+</div>
+{% endblock graph_header_tools %}
+
+{% block graph_header_buttons %}
+<span data-bind="visible: dirty()" style="display: none;">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
+
+{% block content %}
+<div class="card-library relative fade in">
+    <!-- Card (Tile) Listing -->
+    <div class="crud-menu hide-card-library show-card-library" style="display: none;" data-bind="visible: cardList">
+        <div class="panel crud-menu-panel data-widget-library" id="node-listing" data-bind="with: cardList">
+            {% include 'views/graph/form-manager/card-list.htm' %}
+        </div>
+    </div>
+
+    <div class="selected-cards-container" style="display: none" data-bind="visible: addedCards">
+
+        <!-- Drag Panel -->
+        <div class="relative">
+
+            <!-- Target -->
+            <div class="relative card-drag-panel-target">
+
+                <div class="add-card-icon-placement">
+                    <span class="icon-wrap icon-wrap-lg icon-circle bg-gray">
+                        <i class="add-card-icon fa fa-plus fa-4x"></i>
+                    </span>
+                </div>
+
+                <!-- Message -->
+                <div class="add-card-message-placement">
+                    <h3 class="text-thin text-center">
+                        Drag and drop cards here.
+                    </h3>
+                    <p class="text-center add-card-message-subtitle">
+                        Order your cards as you want them to appear to your users.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Added Cards Panel -->
+        <div class="dragged-card-panel report-image-grid" data-bind="sortable: { data: addedCards }">
+
+            <!-- card -->
+            <div class="data-widget-grid-item relative">
+                <div class="panel mar-no">
+
+                    <!-- card Name -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title library-card-panel-title" data-bind="text: name"></h3>
+                    </div>
+
+                    <!-- Abstract -->
+                    <div class="panel-body library-card-body">
+                        <p class="library-item-subtitle" data-bind="text: description"></p>
+                    </div>
+
+                    <!-- Selectable -->
+                    <div class="selectable" style="display: none;">
+                        <i class="ion-ios-checkmark"></i>
+                    </div>
+
+                    <!-- card Tools -->
+                    <div class="panel-footer" style="height: 40px;">
+                        <a href="#" class="pull-right" data-bind="click: $root.removeCard.bind($root)"><i class="ion-minus-circled"></i> Remove Card</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel form-settings-container" data-bind="with: formSettings">
+        {% include 'views/graph/form-settings.htm' %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('form-configuration-data', [], function () {
+    return {
+        graph: {{graph_json}},
+        form: {{form}},
+        icons: {{icons}},
+        forms: {{forms}},
+        cards: {{cards}},
+        forms_x_cards: {{forms_x_cards}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

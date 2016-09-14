@@ -951,17 +951,14 @@ class Graph(models.GraphModel):
 
         # validates that the top node of a resource graph is semantic and a collector
 
-        if self.root.datatype != 'semantic':
-            raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."))
-
         if self.isresource == True:
             if self.root.is_collector == True:
                 raise ValidationError(_("The top node of your resource graph: {0} needs to be a collector. Hint: check that nodegroup_id of your resource node(s) are not null.".format(self.root.name)))
+            if self.root.datatype != 'semantic':
+                raise ValidationError(_("The top node of your resource graph must have a datatype of 'semantic'."))
         else:
             if self.root.is_collector == False:
                 if len(self.nodes) > 1:
-                    print '*'*40
-                    print self.root.name
                     raise ValidationError(_("If your graph contains more than one node and is not a resource the root must be a collector."))
 
 

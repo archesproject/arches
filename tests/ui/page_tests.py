@@ -84,7 +84,6 @@ class UITest(StaticLiveServerTestCase):
         self.driver.implicitly_wait(3)
 
     def tearDownLocal(self):
-        #pass
         self.driver.quit()
 
     def tearDownSauce(self):
