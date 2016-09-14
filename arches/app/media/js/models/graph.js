@@ -220,7 +220,7 @@ define(['arches',
                             return response_node.nodeid === node.nodeid;
                         });
                         if (found_node){
-                            node.nodeGroupId(found_node.nodegroup_id);
+                            node.parse(found_node);
                         }
                     });
                 }

@@ -16,7 +16,11 @@ require([
         }),
         permissions: data.permissions,
         functions: data.functions,
-        helpPreviewActive: ko.observable(false)
+        helpPreviewActive: ko.observable(false),
+        reset: function () {
+            viewModel.card.reset();
+            viewModel.selection(viewModel.card);
+        }
     };
     viewModel.dirty = viewModel.card.dirty;
     viewModel.selection = ko.observable(viewModel.card);
