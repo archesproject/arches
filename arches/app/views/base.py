@@ -21,11 +21,11 @@ from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 
-class BaseNiftyView(TemplateView):
+class BaseManagerView(TemplateView):
 
     template_name = ''
 
     def get_context_data(self, **kwargs):
-        context = super(BaseNiftyView, self).get_context_data(**kwargs)
+        context = super(BaseManagerView, self).get_context_data(**kwargs)
         context['graphs'] = JSONSerializer().serialize(models.GraphModel.objects.all())
         return context

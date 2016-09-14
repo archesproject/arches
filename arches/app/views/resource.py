@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from arches.app.views.base import BaseNiftyView
+from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceManagerView(BaseNiftyView):
+class ResourceManagerView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
