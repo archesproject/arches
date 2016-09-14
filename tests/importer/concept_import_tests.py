@@ -35,12 +35,14 @@ class conceptImportTests(ArchesTestCase):
 	@classmethod
 	def setUpClass(cls):
 		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
+		se = SearchEngineFactory().create()
 		se.delete_index(index='concept_labels')
 		se.create_index(index='concept_labels')
 
 	@classmethod
 	def tearDownClass(cls):
-		pass
+		se = SearchEngineFactory().create()
+		se.delete_index(index='concept_labels')
 
 
 	def test_hierarchical_relationships(self):
@@ -57,7 +59,6 @@ class conceptImportTests(ArchesTestCase):
 
 	def test_authority_file_import(self):
 		og_concept_count = len(django_concept_model.objects.all())
-		se = SearchEngineFactory().create()
 		path_to_files = os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'authority_files')
 		authority_files.load_authority_files(path_to_files, break_on_error=True)
 		new_concept_count = len(django_concept_model.objects.all())
