@@ -3858,6 +3858,17 @@ div.row.widget-wrapper:hover {
     top: 0px;
     padding: 45px;
 }
+.form-data-card-library {
+    display: flex;
+    flex-direction: column;
+}
+.form-data-card-library .panel-heading, .form-data-card-library .menu-title-shim {
+    flex: 0 0 auto;
+}
+.form-data-card-library .report-image-grid {
+    margin:0;
+    flex: 1 100%;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
