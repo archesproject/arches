@@ -27,8 +27,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_buttons %}
 <span data-bind="if: card.dirty()">
-    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: ">{% trans "Discard Edits" %}</button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){card.save();}">{% trans "Save Edits" %}</button>
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function() { window.location.reload(true); }">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){ card.save(); }">{% trans "Save Edits" %}</button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}
