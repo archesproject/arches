@@ -209,7 +209,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
         except Exception as e:
             errors.append('ERROR in row %s (%s):\n%s\n' % (lookups.lookup[key]['rownum'], str(e), traceback.format_exc()))
 
-        # lookups.lookup[key]['concept'].index(scheme=top_concept)
+        lookups.lookup[key]['concept'].index(scheme=top_concept)
 
     # insert the concept relations
     for relation in lookups.concept_relationships:
