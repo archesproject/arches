@@ -30,8 +30,10 @@ class ResourceManagerView(BaseNiftyView):
             # self.graph = Graph.objects.get(graphid=graphid)
             return redirect('resource_editor', resourceid=graphid)
         if resourceid is not None:
-            # object = MyModel.objects.get(...)
-            return render(request, 'views/resource/editor.htm')
+            context = self.get_context_data(
+                main_script='views/resource/editor'
+            )
+            return render(request, 'views/resource/editor.htm', context)
         
         context = self.get_context_data(
             main_script='views/resource'
