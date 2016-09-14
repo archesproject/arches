@@ -126,7 +126,7 @@ class SearchEngine(object):
                 _id = uuid.uuid3(uuid.NAMESPACE_DNS, '%s%s' % (hash(term), hash(context)))
                 result = self.es.get(index='term', doc_type='value', id=_id, ignore=404)
 
-                #print 'result: %s' % result
+                print 'result: %s' % result
                 if result['found'] == True:
                     ids = result['_source']['ids']
                     if id not in ids:
