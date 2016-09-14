@@ -111,9 +111,9 @@ class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
             context = self.get_context_data(
-                main_script='views/graph/graph-list',
+                main_script='views/graph',
             )
-            return render(request, 'views/graph/graph-list.htm', context)
+            return render(request, 'views/graph.htm', context)
 
         self.graph = Graph.objects.get(graphid=graphid)
         datatypes = models.DDataType.objects.all()
@@ -314,6 +314,26 @@ class FormView(GraphBaseView):
 
         return render(request, 'views/graph/form-configuration.htm', context)
 
+    def post(self, request, formid):
+        data = JSONDeserializer().deserialize(request.body)
+        form = models.Form.objects.get(formid=formid)
+        form.title = data['title']
+        form.subtitle = data['subtitle']
+        form.iconclass = data['iconclass']
+        form.status = data['status']
+        form.visible = data['visible']
+        forms_x_cards = models.FormXCard.objects.filter(form=form)
+        with transaction.atomic():
+            forms_x_cards.delete()
+            for sortorder, card in enumerate(data['cards']):
+                form_x_card = models.FormXCard(
+                    form=form,
+                    card_id=card['cardid'],
+                    sortorder=sortorder
+                )
+                form_x_card.save()
+            form.save()
+        return JSONResponse(data)
 
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):

@@ -6,9 +6,10 @@ require([
     'views/graph/form-settings',
     'views/graph/graph-page-view',
     'views/list',
+    'viewmodels/alert',
     'form-configuration-data',
     'bindings/sortable'
-], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, data) {
+], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, AlertViewModel, data) {
     /**
     * a PageView representing the form configuration page
     */
@@ -19,20 +20,10 @@ require([
         disabled: true
     }];
 
-    var formModel = new FormModel({data:data.form});
-    var addedCards = ko.observableArray(_.map(data.forms_x_cards, function (formXCard) {
-        return _.find(data.cards, function(card) {
-            return card.cardid === formXCard.card_id;
-        });
-    }));
-    var availableCards = ko.observableArray();
-    var addedCardIds = _.map(data.forms_x_cards, function (formXCard) {
-        return formXCard.card_id;
-    });
-    _.each(data.cards, function (card) {
-        if (!_.contains(addedCardIds, card.cardid)) {
-            availableCards.push(card);
-        }
+    var formModel = new FormModel({
+        data: data.form,
+        forms_x_cards: data.forms_x_cards,
+        cards: data.cards
     });
 
     var viewModel = {
@@ -45,22 +36,35 @@ require([
         graphModel: new GraphModel({
             data: data.graph
         }),
-
         cardList: new ListView({
-            items: availableCards
+            items: formModel.availableCards
         }),
-        addedCards: addedCards,
+        addedCards: formModel.cards,
         selectedFormId: ko.observable(data.form.formid),
         openForm: function (formId) {
             pageView.viewModel.navigate(arches.urls.form_configuration + formId);
         },
         addCard: function(card) {
-            availableCards.remove(card);
-            addedCards.push(card);
+            formModel.availableCards.remove(card);
+            formModel.cards.push(card);
         },
         removeCard: function(card) {
-            addedCards.remove(card);
-            availableCards.push(card);
+            formModel.cards.remove(card);
+            formModel.availableCards.push(card);
+        },
+        save: function () {
+            pageView.viewModel.loading(true);
+            formModel.save(function(request, status, self){
+                pageView.viewModel.loading(false);
+                if(status !== 'success'){
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                } else {
+                    formModel.parse(JSON.parse(request.responseText));
+                }
+            });
+        },
+        cancel: function () {
+            formModel.reset();
         }
     };
 

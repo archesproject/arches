@@ -3725,7 +3725,6 @@ div.row.widget-wrapper:hover {
 }
 .ep-form-alert {
 	position: absolute;
-	top: 10px;
 	width: 100%;
 	height: 90px;
 	padding: 10px 25px;
