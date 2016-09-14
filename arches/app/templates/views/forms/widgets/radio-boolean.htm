@@ -1,5 +1,6 @@
 {% load i18n %}
 <div class="row widget-wrapper"  data-bind="if: !configForm">
+  <div class="form-group">
       <p class="control-label widget-input-label" data-bind="text:label"></p>
         <label data-bind="css: { 'active': value() }, click: function () { value(true) }" class="form-radio form-normal form-text">
             <input type="radio" name="stat-w-label" data-bind="checked: value" value="true"><span data-bind="text:trueLabel"></span>
@@ -7,6 +8,7 @@
         <label data-bind="css: { 'active': !value() }, click: function () { value(false) }" class="form-radio form-normal form-text">
             <input type="radio" name="stat-w-label" data-bind="checked: value" value="false"><span data-bind="text:config().falseLabel"></span>
         </label>
+  </div>
 </div>
 
 <div data-bind="if: configForm">
