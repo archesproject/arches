@@ -163,7 +163,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{}');
+    VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)

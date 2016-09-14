@@ -18,20 +18,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('radio-boolean-widget', {
         viewModel: function(params) {
+            params.configKeys = ['trueLabel', 'falseLabel'];
             WidgetViewModel.apply(this, [params]);
-            this.subtitle = this.config().subtitle;
-            this.on = this.config().on || true;
-            this.off = this.config().off || false;
-            this.setvalue = this.config().setvalue || function(self, evt){
-                if(self.value() === self.on){
-                    self.value(self.off);
-                }else{
-                    self.value(self.on);
-                }
-            }
-            this.getvalue = this.config().getvalue || ko.computed(function(){
-                return this.value() === this.on;
-            }, this);
         },
         template: { require: 'text!widget-templates/radio-boolean' }
     });
