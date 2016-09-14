@@ -24,6 +24,7 @@ from django.core import management
 from arches.app.models.concept import Concept
 from arches.app.models.models import Concept as django_concept_model
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.management.commands.package_utils import authority_files
 
 # these tests can be run from the command line via
@@ -54,7 +55,9 @@ class conceptImportTests(ArchesTestCase):
 
 	def test_authority_file_import(self):
 		og_concept_count = len(django_concept_model.objects.all())
-		# path_to_files = '/Users/ryan/projects/archesv4/tests/fixtures/authority_files'
+		se = SearchEngineFactory().create()
+		se.delete_index(index='concept_labels')
+		se.create_index(index='concept_labels')
 		path_to_files = os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'authority_files')
 		authority_files.load_authority_files(path_to_files, break_on_error=True)
 		new_concept_count = len(django_concept_model.objects.all())
