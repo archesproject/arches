@@ -3856,7 +3856,12 @@ div.row.widget-wrapper:hover {
     height: 100%;
     width: 350px;
     top: 0px;
+    padding: 0;
+}
+.dragged-card-panel .report-image-grid {
     padding: 45px;
+    height: 100%;
+    overflow-y: auto;
 }
 .form-data-card-library {
     display: flex;
