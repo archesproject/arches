@@ -2,16 +2,13 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'views/page-view',
-], function($, _, ko, PageView) {
+    'views/base-manager',
+], function($, _, ko, BaseManagerView) {
 
     /**
-    * a PageView representing the resource listing and recent edits page
+    * a BaseManagerView representing the resource listing and recent edits pages
     */
-    var pageView = new PageView({
-        viewModel:{
-
-        }
-    });
+    var ResourceView = BaseManagerView.extend({});
+    new ResourceView();
 
 });
