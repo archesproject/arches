@@ -1,0 +1,100 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resource Manager" %}
+{% endblock title %}
+
+{% block content %}
+<div class="scroll-y">
+    <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
+        <div class="page-title-block">
+            <div class="center-div" style="padding-top: 0px; padding-left: 28px;">
+                <h1 class="page-header text-overflow arches-panel-header"><i class="text-center fa fa-bookmark icon-wrap bg-gray arches-panel-icon"></i> {% trans "Resource Manager" %}</h1>
+                <p class="arches-panel-subtitle">{% trans "Manage the content of your inventory" %}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="relative" style="height: 60px; background: #f4f4f4; border-bottom: 1px solid #e4e4e4;">
+
+            <!-- Search -->
+            <div class="edit-panel-search-bar">
+
+                <!-- Find Button -->
+                <div class="">
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                </div>
+
+                <!-- Find resource -->
+                <div class="find-resource" style="display: none;" data-bind="visible: showFind()">
+                    <div>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}'"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource/Graph Toggle -->
+            <div class="resource-tools relative" data-bind="visible: !showFind()">
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resources" %}</a>
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Recently Added" %}</a>
+            </div>
+
+        </div>
+
+        <!-- ko if: alert() -->
+        <div class="ep-form-alert-wrapper">
+            <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
+                <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                <p class="ep-form-alert-text" data-bind="text: alert().text"></p>
+
+                <div class="ep-form-alert-default-dismiss">
+                    <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                </div>
+
+                <div class="ep-form-alert-buttons">
+                    <!-- ko if: alert().cancel -->
+                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                    <!-- /ko -->
+                    <!-- ko if: alert().ok -->
+                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+
+    <!-- Default Page content-->
+    <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
+
+        <div id="report-image-grid" class="report-image-grid">
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}
+
+

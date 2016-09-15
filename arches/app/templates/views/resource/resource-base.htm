@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block title %}
 {{ block.super }}
-{% trans "Graph Manager" %}
+{% trans "Resource Manager" %}
 {% endblock title %}
 
 {% block body %}
@@ -70,79 +70,60 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu List -->
             <div class="panel-body">
-               <ul class="list-group ep-menu-list">
+                <ul class="list-group ep-menu-list">
+                    
                     <!-- Menu Item -->
-                    <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
-                        <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: graphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
-                    </li>
-
-                    <!-- Menu Item -->
-                    <li id="settings-manager" class="edit-menu-item {% if main_script == "views/graph/graph-settings" %} selected{% endif %}">
-
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph_settings' graphid %}') }">
+                    <li id="settings-manager" class="edit-menu-item">
+                        <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-wrench"></i> {% trans "Settings" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Asset Name, Settings, Relations" %}</span>
+                                <div class="menu-item-title"><i class="fa fa-copy"></i> Copy Resource</div>
+                                <span class="text-muted menu-item-subtitle">Make a copy and start editing</span>
                             </div>
                         </a>
                     </li>
 
                     <!-- Menu Item -->
-                    <li id="card-manager" class="edit-menu-item {% if main_script == "views/graph/card-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }">
-
+                    <li id="card-manager" class="edit-menu-item">
+                        <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
-                            </div>
-                        </a>
-                    </li>
-
-                    {% if graph.isresource %}
-                    <!-- Menu Item -->
-                    <li id="form-manager" class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'form_manager' graphid %}'); }">
-                            <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-files-o"></i> {% trans "Data Entry Forms" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Group data entry cards" %}</span>
+                                <div class="menu-item-title"><i class="fa fa-trash"></i> Delete Resource </div>
+                                <span class="text-muted menu-item-subtitle">Permanently delete this resource</span>
                             </div>
                         </a>
                     </li>
 
                     <!-- Menu Item -->
-                    <li class="edit-menu-item">
-                        <a href="#">
+                    <li id="history-manager" class="edit-menu-item">
+                        <a id="edit-history-btn" href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>
+                                <div class="menu-item-title"><i class="fa fa-step-backward"></i> Review Edit History</div>
+                                <span class="text-muted menu-item-subtitle">View changes to this resource record</span>
                             </div>
                         </a>
                     </li>
-                    {% endif %}
 
                     <!-- Menu Item -->
-                    <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
+                    <li id="report-manager" class="edit-menu-item">
+                        <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Define graph, permissions" %}</span>
+                                <div class="menu-item-title"><i class="fa fa-book"></i> Jump to Report</div>
+                                <span class="text-muted menu-item-subtitle">View the full resource report</span>
                             </div>
                         </a>
                     </li>
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a href="#" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                        <a id="" href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Resource Designer" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resources" %} </span>
+                                <div class="menu-item-title"><i class="fa fa-mail-reply"></i> Return to Resource Manager</div>
+                                <span class="text-muted menu-item-subtitle">Create a new Arches resource </span>
                             </div>
                         </a>
                     </li>
                 </ul>
             </div>
             <div class="panel-footer ep-menu-footer hidden">
-
                 footer
             </div>
         </div>
@@ -185,7 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
             {% block graph_header_buttons %}
-            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Done" %}</button>
+            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'resource' %}') }">{% trans "Exit" %}</button>
             {% endblock graph_header_buttons %}
         </div>
     </div>
@@ -214,28 +195,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
 
-        <!-- Settings -->
-        <!-- <div id="settings-form" class="relative fade in" style="display: block;"> -->
-
-            <!-- Page Content -->
-            {% block content %}
-            {% endblock content %}
-        <!-- </div> -->
+        <!-- Page Content -->
+        {% block content %}
+        {% endblock content %}
 
 
     </div>
 </div>
 {% endblock body %}
-
-{% block tabs %}{% endblock tabs %}
-
-{% block pre_require_js %}
-<script>{% autoescape off %}
-define('graph-base-data', [], function () {
-    return {
-        graphs: {{graphs}},
-        graphid: '{{graphid}}'
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}

@@ -45,6 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </head>
 
 <body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
+    <div class="loading-mask" style="display: none;" data-bind="visible:loading()"></div>
     {% block body %}
 
     {% endblock body %}
