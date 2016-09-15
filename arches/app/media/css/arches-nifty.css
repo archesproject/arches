@@ -3856,7 +3856,23 @@ div.row.widget-wrapper:hover {
     height: 100%;
     width: 350px;
     top: 0px;
+    padding: 0;
+}
+.dragged-card-panel .report-image-grid {
     padding: 45px;
+    height: 100%;
+    overflow-y: auto;
+}
+.form-data-card-library {
+    display: flex;
+    flex-direction: column;
+}
+.form-data-card-library .panel-heading, .form-data-card-library .menu-title-shim {
+    flex: 0 0 auto;
+}
+.form-data-card-library .report-image-grid {
+    margin:0;
+    flex: 1 100%;
 }
 @keyframes loader {
 	0% { background: #ddd; }
