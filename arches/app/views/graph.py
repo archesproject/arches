@@ -254,6 +254,7 @@ class CardView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
+            graph_id=self.graph.pk,
             card=JSONSerializer().serialize(card),
             permissions=JSONSerializer().serialize([{'codename': permission.codename, 'name': permission.name} for permission in get_perms_for_model(card.nodegroup)]),
             datatypes_json=JSONSerializer().serialize(datatypes),
@@ -305,6 +306,7 @@ class FormView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/form-configuration',
+            graph_id=self.graph.pk,
             icons=JSONSerializer().serialize(icons),
             form=JSONSerializer().serialize(form),
             forms=JSONSerializer().serialize(self.graph.form_set.all()),
