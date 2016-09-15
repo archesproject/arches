@@ -42,13 +42,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Find Button -->
                 <div class="">
-                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> Find </a>
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
                 </div>
 
                 <!-- Find resource -->
                 <div class="find-resource" style="display: none;" data-bind="visible: showFind()">
                     <div>
-                        <select data-bind="chosen: {width: '100%'}, value: graphId"></select>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}'"></select>
                     </div>
                 </div>
             </div>
@@ -73,10 +73,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="ep-form-alert-buttons">
                     <!-- ko if: alert().cancel -->
-                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
                     <!-- /ko -->
                     <!-- ko if: alert().ok -->
-                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
+                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
                     <!-- /ko -->
                 </div>
             </div>
