@@ -19,12 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-{% block graph_title %}
-<div class="ep-tools-title">
-  <h1 class="page-header text-overflow ep-graph-title"><i class="text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (graph.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:graph.name"></span></h1>
-</div>
-{% endblock graph_title %}
-
 {% block graph_header_title %}
 {% trans "Resource Settings" %}
 {% endblock graph_header_title %}
