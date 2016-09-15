@@ -73,16 +73,6 @@ require([
                 };
             });
 
-            this.viewModel.graphs = ko.computed(function() {
-                return ko.utils.arrayFilter(self.viewModel.allGraphs(), function(graph) {
-                    return !graph.isresource;
-                });
-            });
-            this.viewModel.resources = ko.computed(function() {
-                return ko.utils.arrayFilter(self.viewModel.allGraphs(), function(graph) {
-                    return graph.isresource;
-                });
-            });
             this.viewModel.showResources = ko.observable(true);
 
             _.defaults(this.viewModel, {

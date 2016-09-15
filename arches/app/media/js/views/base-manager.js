@@ -22,10 +22,19 @@ define([
         constructor: function (options) {
             options = options ? options : {};
             options.viewModel = (options && options.viewModel) ? options.viewModel : {};
-            _.defaults(options.viewModel, {
-                allGraphs: ko.observableArray(data.graphs)
+
+            options.viewModel.allGraphs = ko.observableArray(data.graphs);
+            options.viewModel.graphs = ko.computed(function() {
+                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+                    return !graph.isresource;
+                });
             });
-            
+            options.viewModel.resources = ko.computed(function() {
+                return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
+                    return graph.isresource;
+                });
+            });
+
             PageView.prototype.constructor.call(this, options);
             return this;
         }
