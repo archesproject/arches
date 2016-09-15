@@ -88,8 +88,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Default Page content-->
     <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
 
-        <div id="report-image-grid" class="report-image-grid">
+        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
+            
+            <!-- ko foreach: allGraphs -->
+            <!-- ko if: isresource -->
+            <div class="card-grid-item">
+                <div class="panel mar-no">
+                    <!-- card Name -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title library-card-panel-title"><i class="text-center" data-bind="css: iconclass"></i> <span data-bind="text:name"></span> </h3>
+                    </div>
 
+                    <!-- Abstract -->
+                    <div class="panel-body library-card-body">
+                        <p data-bind="text: description"></p>
+                    </div>
+
+                    <!-- card Tools -->
+                    <div class="panel-footer" style="height: 53px;">
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-primary btn-labeled fa fa-plus " role="button" data-bind="attr: { href: '/graph/' + graphid + '/add_resource'}">{% trans "Create Resource" %}</a>
+                    <!--         <button id="select-blank" class="btn btn-primary btn-labeled fa fa-plus ">{% trans "Create Resource" %}</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+
+            
         </div>
 
     </div>
