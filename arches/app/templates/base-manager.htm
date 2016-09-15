@@ -193,7 +193,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li>
-                                            <a href="{% url 'resource' %}">
+                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
@@ -219,6 +219,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>System Settings</strong>
                                                 </span>
                                             </a>
+                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                                <li>
+                                                    TEST
+                                                </li>
+                                            </ul>
                                         </li>
 
                                         <!--Menu list item-->
