@@ -1,0 +1,246 @@
+{% load i18n %}
+
+<div class="row widget-wrapper" data-bind="if: !configForm">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <div id='map' class="map-crud-container relative">
+          <!-- Geocode Panel -->
+          <div id="geocode-container" class="geocode-container">
+              Geocode Search
+          </div>
+          <!-- Map Tools Panel -->
+          <div id="map-widget-container relative" class="">
+              <div class="text-center map-widget-container-closed">
+                  <a id="map-tools" href="" class="" style="display: inline;"><i class="ion-ios-gear add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Map Tools"></i></a>
+              </div>
+
+              <div id="map-widget-toolbar" class="map-widget-toolbar relative" style="display: none;">
+                  <div class="map-widget-tool active text-center">
+                      <a id="" href="" class=""><i class="ion-map add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Basemaps"></i></a>
+                  </div>
+                  <div id="btn-overlays" class="map-widget-tool text-center">
+                      <a id="overlays" href="" class=""><i class="ion-navicon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Overlays"></i></a>
+                  </div>
+                  <div class="map-widget-tool text-center">
+                      <a id="" href="" class=""><i class="ion-crop add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Map Tools"></i></a>
+                  </div>
+                  <div class="map-widget-tool text-center">
+                      <a id="" href="" class=""><i class="ion-ios-list add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Legend"></i></a>
+                  </div>
+                  <div class="map-widget-tool text-center">
+                      <a id="close-map-tools" href="#" class=""><i class="ion-ios-close add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Close"></i></a>
+                  </div>
+              </div>
+
+              <!-- Basemaps -->
+              <div id="map-widget-basemaps" class="panel map-widget-panel" style="display: none;">
+                  <!-- Panel Title -->
+                  <div class="map-widget-panel-title">
+                      <h4 class=""> Basemaps </h4>
+                  </div>
+
+                  <!-- Overlay Item -->
+                  <div class="map-widget-overlay-item relative">
+                      <div class="map-overlay-vis-toogle text-center">
+                          <i class="ion-checkmark-circled fade"></i>
+                      </div>
+                      <div class="map-overlay-name">
+                          <a id="" class="" href="">Bing Streets</a>
+                      </div>
+                  </div>
+
+                  <!-- Overlay Item -->
+                  <div class="map-widget-overlay-item relative">
+                      <div class="map-overlay-vis-toogle text-center">
+                          <i class="ion-checkmark-circled"></i>
+                      </div>
+                      <div class="map-overlay-name">
+                          <a id="" class="" href="">Google Streets (Gray)</a>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Overlays -->
+              <div id="overlays-panel" class="panel map-widget-panel" style="display: none;">
+                  <!-- Panel Title -->
+                  <div class="map-widget-panel-title">
+                      <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
+                  </div>
+
+                  <!-- Overlay Item -->
+                   <div id="op-1" class="map-widget-overlay-item relative">
+                      <div class="map-overlay-vis-toogle text-center">
+                          <i class="ion-ios-baseball"></i>
+                      </div>
+                      <div class="map-overlay-name">
+                          <a id="" class="" href="">An Overlay with a long name </a>
+                      </div>
+                      <div id="" class="map-overlay-item-tools">
+                          <a id="op-1-button" href="#" class="overlay-toggle"><i id="op-1-icon" class="ion-arrow-left-b"></i></a>
+                      </div>
+                      <div id="op-1-tools" class="map-overlay-item-tools-panel" style="display: none;">
+                          <div class="overlay-slider">
+                              <div id="op-1-slider" class="demo-pips pips noUi-target noUi-ltr noUi-horizontal noUi-connect"><div class="noUi-base"><div class="noUi-origin noUi-background noUi-stacking" style="left: 100%;"><div class="noUi-handle noUi-handle-lower"></div></div></div></div>
+                          </div>
+                          <div class="overlay-tool-group">
+                              <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
+                              <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                              <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Overlay Item -->
+                  <div id="op-2" class="map-widget-overlay-item relative">
+                      <div class="map-overlay-vis-toogle text-center">
+                          <i class="ion-ios-pint"></i>
+                      </div>
+                      <div class="map-overlay-name">
+                          <a id="" class="" href="">Another Overlay </a>
+                      </div>
+                      <div id="" class="map-overlay-item-tools">
+                          <a id="op-2-button" href="#" class="overlay-toggle"><i id="op-2-icon" class="ion-arrow-left-b"></i></a>
+                      </div>
+                      <div id="op-2-tools" class="map-overlay-item-tools-panel" style="display: none;">
+                          <div class="overlay-slider">
+                              <div id="op-2-slider" class="demo-pips pips noUi-target noUi-ltr noUi-horizontal noUi-connect"><div class="noUi-base"><div class="noUi-origin noUi-background noUi-stacking" style="left: 100%;"><div class="noUi-handle noUi-handle-lower"></div></div></div></div>
+                          </div>
+                          <div class="overlay-tool-group">
+                              <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
+                              <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                              <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Overlay Item -->
+                  <div id="op-3" class="map-widget-overlay-item relative off">
+                      <div class="map-overlay-vis-toogle text-center">
+                          <i class="ion-ios-flask"></i>
+                      </div>
+                      <div class="map-overlay-name">
+                          <a id="" class="" href="">Third Overlay </a>
+                      </div>
+                      <div id="" class="map-overlay-item-tools">
+                          <a id="op-3-button" href="#" class="overlay-toggle"><i id="op-3-icon" class="ion-arrow-left-b"></i></a>
+                      </div>
+                      <div id="op-3-tools" class="map-overlay-item-tools-panel" style="display: none;">
+                          <div class="overlay-slider">
+                              <div id="op-3-slider" class="demo-pips pips noUi-target noUi-ltr noUi-horizontal noUi-connect"><div class="noUi-base"><div class="noUi-origin noUi-background noUi-stacking" style="left: 100%;"><div class="noUi-handle noUi-handle-lower"></div></div></div></div>
+                          </div>
+                          <div class="overlay-tool-group">
+                              <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
+                              <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                              <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Map Tools -->
+              <div id="maptools-panel" class="panel map-widget-panel" style="display: none;">
+
+
+              </div>
+
+              <!-- Legend -->
+              <div id="legend-panel" class="panel map-widget-panel" style="display: none;">
+                  <!-- Panel Title -->
+                  <div class="map-widget-panel-title">
+                      <h4 class=""> Legend </h4>
+                  </div>
+              </div>
+          </div>
+
+
+          <!-- Overlay Selector -->
+          <div class="overlay-container" style="display: none;">
+              <h3 class="panel-title card-main-title"> Overlays <i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
+
+              <!-- Ocerlay Listing -->
+              <div id="report-image-grid" class="report-image-grid">
+
+                  <!-- Resource -->
+                  <div class="resource-grid-item relative">
+                      <!-- Resource Type -->
+                      <div class="resource-grid-main-container">
+                          <div class="resource-grid-main">
+                              <h1 class="page-header text-overflow resource-grid-title"><i class="text-center fa fa-th icon-wrap resource-grid-icon"></i> Heritage District</h1>
+                              <p class="resource-grid-subtitle">A resource that can be used to inventory buildings, structures, and archaeological sites</p>
+                          </div>
+                      </div>
+
+                      <!-- Resource Tools -->
+                      <div class="resource-grid-tools-container">
+                          <div class="btn-group">
+                              <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> Manage <i class="ion-ios-more"></i></button>
+                              <ul class="dropdown-menu dropdown-menu-right">
+                                  <li><a href="#">Settings</a>
+                                  </li>
+                                  <li><a href="#">Add Card</a>
+                                  </li>
+                                  <li><a href="#">Manage Cards</a>
+                                  </li>
+                                  <li><a href="#">Manage Forms</a>
+                                  </li>
+                                  <li><a href="#">Manage Reports</a>
+                                  </li>
+                                  <li class="divider"></li>
+                                  <li><a href="#">Delete Resource</a>
+                                  </li>
+                              </ul>
+                          </div>
+
+                          <!-- Resource Status Message -->
+                          <div class="">
+                              <p class="resource-status">Status: Active</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Resource -->
+                  <div class="resource-grid-item relative">
+                      <!-- Resource Type -->
+                      <div class="resource-grid-main-container">
+                          <div class="resource-grid-main">
+                              <h1 class="page-header text-overflow resource-grid-title"><i class="text-center fa fa-building-o icon-wrap resource-grid-icon"></i> Heritage Resource</h1>
+                              <p class="resource-grid-subtitle">A resource that can be used to inventory buildings, structures, and archaeological sites</p>
+                          </div>
+                      </div>
+
+                      <!-- Resource Tools -->
+                      <div class="resource-grid-tools-container">
+                          <div class="btn-group">
+                              <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> Manage <i class="ion-ios-more"></i></button>
+                              <ul class="dropdown-menu dropdown-menu-right">
+                                  <li><a href="#">Settings</a>
+                                  </li>
+                                  <li><a href="#">Add Card</a>
+                                  </li>
+                                  <li><a href="#">Manage Cards</a>
+                                  </li>
+                                  <li><a href="#">Manage Forms</a>
+                                  </li>
+                                  <li><a href="#">Manage Reports</a>
+                                  </li>
+                                  <li class="divider"></li>
+                                  <li><a href="#">Delete Resource</a>
+                                  </li>
+                              </ul>
+                          </div>
+
+                          <!-- Resource Status Message -->
+                          <div class="">
+                              <p class="resource-status">Status: Active</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+        </div>
+</div>
+
+
+<div data-bind="if: configForm">
+
+</div>
