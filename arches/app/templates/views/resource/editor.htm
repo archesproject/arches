@@ -18,3 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "views/resource/resource-base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Resource Editor" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="">Related Resources</button>
+    {{ block.super }}
+{% endblock graph_header_buttons %}
