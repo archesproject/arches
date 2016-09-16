@@ -23,6 +23,15 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             params.configKeys = ['trueLabel', 'falseLabel'];
+            var self = this;
+            this.mapToolsExpanded = ko.observable(false);
+            this.geocodeShimAdded = ko.observable(false);
+            this.mapToolsExpanded.subscribe(function (expanded) {
+               self.geocodeShimAdded(expanded);
+            });
+            this.toggleMapTools = function(data, event){
+                data.mapToolsExpanded(!data.mapToolsExpanded());
+            }
             WidgetViewModel.apply(this, [params]);
             var baselayer = new ol.layer.Tile({
               source: new ol.source.OSM()

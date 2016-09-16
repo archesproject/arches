@@ -1,33 +1,158 @@
 {% load i18n %}
 
+<script>
+//Map Tools
+	$('.map-widget-container-closed').on('click', function (ev) {
+		ev.preventDefault();
+
+		//Open Tools Panel
+		//$(".map-widget-container-closed").addClass('map-widget-container-expanded');
+		//$(".map-widget-container-closed").removeClass('map-widget-container-closed');
+
+		//Slide Geocode widget to make room
+		//$("#geocode-container").addClass('geocode-container-shim');
+
+		//hide map tools icon
+		$("#map-tools").toggle();
+
+		//Show Default Tool Panel
+		$("#map-widget-toolbar").delay(400).fadeIn(300);
+		$("#map-widget-basemaps").delay(400).fadeIn(300);
+	});
+
+
+	$('#close-map-tools').on('click', function (ev) {
+		ev.preventDefault();
+
+		//Open Tools Panel
+		// $(".map-widget-container-expanded").addClass('map-widget-container-closed');
+		// $(".map-widget-container-expanded").removeClass('map-widget-container-expanded');
+
+		//Slide Geocode widget to make room
+		// $("#geocode-container").removeClass('geocode-container-shim');
+
+		//show map tools icon
+		$("#map-tools").toggle();
+
+		//Hide Default Tool Panel
+		// $("#map-widget-toolbar").toggle();
+
+		//close all map widget panels
+		$( ".map-widget-panel" ).each(function() {
+	    	$( this ).css("display", "none");
+	  	});
+	});
+
+
+	//Basemap Item Highlight
+	$('.map-widget-overlay-item').on('mouseover', function (ev) {
+		ev.preventDefault();
+
+		var kids = $( event.target ).children();
+		var relatedIcon = kids.find("i");
+		relatedIcon.addClass("in");
+		relatedIcon.addClass("basemap-mask");
+
+	});
+
+	//Basemap Item Highlight
+	$('.map-widget-overlay-item').on('mouseout', function (ev) {
+		ev.preventDefault();
+
+		var kids = $( event.target ).children();
+		var relatedIcon = kids.find("i");
+		relatedIcon.removeClass("in");
+		relatedIcon.removeClass("basemap-mask");
+
+	});
+
+
+	//Overlays Panel
+	$('#overlays').on('click', function (ev) {
+		ev.preventDefault();
+
+		//close all map widget panels
+		$( ".map-widget-panel" ).each(function() {
+	    	$( this ).css("display", "none");
+	  	});
+
+	  	//update toolbar buttons
+	  	$(".map-widget-tool").each(function() {
+	    	$( this ).removeClass("active");
+	  	});
+
+	  	$("#btn-overlays").addClass("active");
+
+	  	//show overlays panel
+	  	$( "#overlays-panel" ).fadeIn();
+	});
+
+
+
+	//Show Overlay Item tools
+	$('.overlay-toggle').on('click', function (ev) {
+		ev.preventDefault();
+
+		//get id of selected overlay item
+		var linkID = this.id;
+		var linkNumber = linkID.split("-")[1];
+
+		var container = "#op-" + linkNumber;
+		var toolsPanel = "#op-" + linkNumber + "-tools";
+		var icon = "#op-" + linkNumber + "-icon";
+
+		//manage display of overlay tools
+		if ($( icon ).hasClass("ion-arrow-left-b")) {
+			$( container ).addClass("show-tools");
+			$( toolsPanel ).delay(200).fadeIn();
+
+			//update arrow
+			$( icon ).removeClass("ion-arrow-left-b");
+			$( icon ).addClass("ion-arrow-down-b");
+
+		} else {
+			$( container ).removeClass("show-tools");
+			$( toolsPanel ).toggle();
+
+			//update arrow
+			$( icon ).addClass("ion-arrow-left-b");
+			$( icon ).removeClass("ion-arrow-down-b");
+		}
+
+	});
+
+
+</script>
+
+
 <div class="row widget-wrapper" data-bind="if: !configForm">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div id='map' class="map-crud-container relative">
           <!-- Geocode Panel -->
-          <div id="geocode-container" class="geocode-container">
+          <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
               Geocode Search
           </div>
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
-              <div class="text-center map-widget-container-closed">
-                  <a id="map-tools" href="" class="" style="display: inline;"><i class="ion-ios-gear add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Map Tools"></i></a>
+              <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
+                  <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
               </div>
 
-              <div id="map-widget-toolbar" class="map-widget-toolbar relative" style="display: none;">
-                  <div class="map-widget-tool active text-center">
-                      <a id="" href="" class=""><i class="ion-map add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Basemaps"></i></a>
+              <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="css : {'map-widget-toolbar-expanded' : mapToolsExpanded}">
+                  <div class="map-widget-tool active text-center" data-bind="css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                      <a id="" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div id="btn-overlays" class="map-widget-tool text-center">
-                      <a id="overlays" href="" class=""><i class="ion-navicon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Overlays"></i></a>
+                  <div id="btn-overlays" class="map-widget-tool text-center" data-bind="css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                      <a id="overlays" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div class="map-widget-tool text-center">
-                      <a id="" href="" class=""><i class="ion-crop add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Map Tools"></i></a>
+                  <div class="map-widget-tool text-center" data-bind="css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                      <a id="" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div class="map-widget-tool text-center">
-                      <a id="" href="" class=""><i class="ion-ios-list add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Legend"></i></a>
+                  <div class="map-widget-tool text-center" data-bind="css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                      <a id="" href="" class="map-widget-icon"  data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div class="map-widget-tool text-center">
-                      <a id="close-map-tools" href="#" class=""><i class="ion-ios-close add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="Close"></i></a>
+                  <div class="map-widget-tool text-center" data-bind="css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                      <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools, css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                   </div>
               </div>
 

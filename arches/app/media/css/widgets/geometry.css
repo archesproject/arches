@@ -1,4 +1,4 @@
-.map-widget-container-closed {
+.map-widget-container {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -11,9 +11,28 @@
     height: 35px;
     border-radius: 2px;
     border: 1px solid #123;
-    opacity: .9;
-    transition: all .40s ease;
+    transition: all .4s ease;
     z-index: 1;
+}
+
+.map-widget-container a {
+  color: #fff;
+}
+
+.map-widget-container-expanded {
+    top: 0px;
+    right: 0px;
+    bottom: 10px;
+    background: rgba(17,17,17,0.21);
+    opacity: .9;
+    width: 250px;
+    height: 500px;
+    border: 1px solid #999;
+}
+
+.geocode-container-shim {
+    margin-right: 230px;
+    transition: all .40s ease;
 }
 
 .relative {
@@ -93,16 +112,64 @@
     height: 500px;
 }
 
-.map-widget-container-expanded {
+.map-widget-toolbar {
     position: absolute;
-    top: 0px;
+    transition: all .40s .10s ease;
+    width: 0px;
+    height: 0px;
     right: 0px;
-    bottom: 10px;
-    background: rgba(17,17,17,0.21);
-    opacity: .9;
+    top: 0px;
+}
+
+.map-widget-toolbar-expanded {
     width: 250px;
-    height: 500px;
-    border: 1px solid #999;
-    transition: all .40s ease;
-    z-index: 1;
+    height: 50px;
+    background: #123;
+    opacity: .9;
+    color: #fff;
+    z-index: 5;
+    display: block;
+}
+
+.map-widget-tool {
+  height: 0px;
+  width: 0px;
+  transition: all .1s .15s ease;
+  display: table-cell;
+  border-right: 1px solid rgba(0, 0, 0, 0);
+}
+
+.map-widget-tool-expanded {
+    padding-top: 5px;
+    font-size: 17px;
+    height: 50px;
+    width: 50px;
+    color: #fff;
+    vertical-align: middle;
+    border-right: 1px solid rgba(0, 0, 0, 1);
+}
+
+.map-widget-icon {
+    color: rgba(255, 255, 255, 0);
+    opacity: 0.0;
+    display: none;
+}
+
+.map-widget-icon-expanded {
+    color: rgba(255, 255, 255, 1);
+    opacity:1.0;
+    display: block;
+}
+
+.map-widget-icon-expanded:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+.map-widget-tool:nth-child(1) {
+    padding-left: 0px;
+    width: 50px;
+}
+
+.map-widget-tool-expanded.active {
+    background: steelblue;
 }
