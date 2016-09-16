@@ -275,8 +275,8 @@ INSERT INTO cards(cardid, name, description, instructions,
 
 -- end for forms.py
 
-INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
-    VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
+INSERT INTO resource_instances(resourceinstanceid, graphid)
+    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002');
 
 INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
