@@ -22,7 +22,7 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from arches.app.models import models
-from arches.app.views.base import AppManagerView
+from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 
 
