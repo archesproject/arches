@@ -11,7 +11,7 @@
     height: 35px;
     border-radius: 2px;
     border: 1px solid #123;
-    transition: all .4s ease;
+    transition: all .3s ease;
     z-index: 1;
 }
 
@@ -55,6 +55,27 @@
     border-bottom: 1px solid #ddd;
     transition: all .40s ease;
     z-index: 1;
+    opacity: 0.0;
+    visibility: hidden;
+}
+
+.map-widget-panel-expanded {
+  visibility: visible;
+  opacity: 0.9;
+}
+
+.map-widget-panel-title {
+    height: 50px;
+    width: 248px;
+    padding: 8px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    opacity: 0.0;
+    transition: all .40s ease;
+}
+
+.visible {
+  opacity: 1.0;
 }
 
 .tile-basemap-title-sm {
@@ -152,13 +173,14 @@
 .map-widget-icon {
     color: rgba(255, 255, 255, 0);
     opacity: 0.0;
-    display: none;
+    transition: all .40s ease;
+    visibility: hidden;
 }
 
 .map-widget-icon-expanded {
     color: rgba(255, 255, 255, 1);
     opacity:1.0;
-    display: block;
+    visibility: visible;
 }
 
 .map-widget-icon-expanded:hover {

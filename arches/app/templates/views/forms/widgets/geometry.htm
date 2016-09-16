@@ -1,48 +1,6 @@
 {% load i18n %}
 
 <script>
-//Map Tools
-	$('.map-widget-container-closed').on('click', function (ev) {
-		ev.preventDefault();
-
-		//Open Tools Panel
-		//$(".map-widget-container-closed").addClass('map-widget-container-expanded');
-		//$(".map-widget-container-closed").removeClass('map-widget-container-closed');
-
-		//Slide Geocode widget to make room
-		//$("#geocode-container").addClass('geocode-container-shim');
-
-		//hide map tools icon
-		$("#map-tools").toggle();
-
-		//Show Default Tool Panel
-		$("#map-widget-toolbar").delay(400).fadeIn(300);
-		$("#map-widget-basemaps").delay(400).fadeIn(300);
-	});
-
-
-	$('#close-map-tools').on('click', function (ev) {
-		ev.preventDefault();
-
-		//Open Tools Panel
-		// $(".map-widget-container-expanded").addClass('map-widget-container-closed');
-		// $(".map-widget-container-expanded").removeClass('map-widget-container-expanded');
-
-		//Slide Geocode widget to make room
-		// $("#geocode-container").removeClass('geocode-container-shim');
-
-		//show map tools icon
-		$("#map-tools").toggle();
-
-		//Hide Default Tool Panel
-		// $("#map-widget-toolbar").toggle();
-
-		//close all map widget panels
-		$( ".map-widget-panel" ).each(function() {
-	    	$( this ).css("display", "none");
-	  	});
-	});
-
 
 	//Basemap Item Highlight
 	$('.map-widget-overlay-item').on('mouseover', function (ev) {
@@ -135,7 +93,7 @@
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
               <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
-                  <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
+                  <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip"></i></a>
               </div>
 
               <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="css : {'map-widget-toolbar-expanded' : mapToolsExpanded}">
@@ -157,9 +115,9 @@
               </div>
 
               <!-- Basemaps -->
-              <div id="map-widget-basemaps" class="panel map-widget-panel" style="display: none;">
+              <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="css : {'map-widget-panel-expanded' : mapToolsExpanded}">
                   <!-- Panel Title -->
-                  <div class="map-widget-panel-title">
+                  <div class="map-widget-panel-title" data-bind="css : {'visible' : mapToolsExpanded}">
                       <h4 class=""> Basemaps </h4>
                   </div>
 
