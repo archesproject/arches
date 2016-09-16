@@ -17,26 +17,38 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from arches.app.views.base import BaseManagerView
+from django.views.generic import TemplateView
+from arches.app.models import models
+from arches.app.views.base import AppManagerView
 from arches.app.utils.decorators import group_required
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceManagerView(BaseManagerView):
+class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
-        if graphid is not None:
-            # self.graph = Graph.objects.get(graphid=graphid)
-            return redirect('resource_editor', resourceid=graphid)
-        if resourceid is not None:
-            context = self.get_context_data(
-                main_script='views/resource/editor'
-            )
-            return render(request, 'views/resource/editor.htm', context)
-        
         context = self.get_context_data(
             main_script='views/resource'
         )
         return render(request, 'views/resource.htm', context)
 
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceEditorView(TemplateView):
+    def get(self, request, graphid=None, resourceid=None):
+        if graphid is not None:
+            # self.graph = Graph.objects.get(graphid=graphid)
+            resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
+            return redirect('resource_editor', resourceid=resource_instance.pk)
+        if resourceid is not None:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            context = self.get_context_data(
+                main_script='views/resource/editor',
+                resource_type=resource_instance.graph.name, 
+                iconclass=resource_instance.graph.iconclass
+            )
+            return render(request, 'views/resource/editor.htm', context)
+        
+        return HttpResponseNotFound()

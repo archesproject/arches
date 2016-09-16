@@ -22,7 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView
-from arches.app.views.resource import ResourceManagerView
+from arches.app.views.resource import ResourceEditorView, ResourceListView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -75,9 +75,9 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
     url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, FormManagerView.as_view(), name='form_manager'),
     url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, FormManagerView.as_view(), name='add_form'),
-    url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceManagerView.as_view(), name='add_resource'),
-    url(r'^resource$', ResourceManagerView.as_view(), name='resource'),
-    url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceManagerView.as_view(), name='resource_editor'),
+    url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceEditorView.as_view(), name='add_resource'),
+    url(r'^resource$', ResourceListView.as_view(), name='resource'),
+    url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
     url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
