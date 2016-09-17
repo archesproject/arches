@@ -6,5 +6,10 @@
 </div>
 
 <div data-bind="if: configForm">
-    form here
+  <div class="control-label">
+      {% trans "Subtitle" %}
+  </div>
+  <div class="col-xs-12 pad-no crud-widget-container">
+      <input type="" id="" class="form-control input-md widget-input" data-bind="value: subtitle, valueUpdate: 'keyup'">
+  </div>
 </div>
