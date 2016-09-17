@@ -2,153 +2,138 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'views/page-view',
+    'views/base-manager',
     'viewmodels/alert',
     'arches',
     'view-data',
     'bootstrap-nifty',
     'bindings/hover',
     'bindings/chosen'
-], function($, _, ko, PageView, AlertViewModel, arches, data) {
-    var graphs = ko.observableArray(data.graphs);
+], function($, _, ko, BaseManager, AlertViewModel, arches, data) {
 
-    /**
-    * creates a request to add a new graph; redirects to the graph settings
-    * page for the new graph on success
-    *
-    * @param  {string} url - the url to be used in the request
-    * @param  {object} data (optional) - data to be included in request
-    */
-    var newGraph = function(url, data) {
-        data = data || {};
-        pageView.viewModel.loading(true);
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify(data),
-            success: function(response) {
-                window.location = response.graphid + '/settings';
-            },
-            error: function(response) {
-                pageView.viewModel.loading(false);
-            }
-        });
-    }
+    var GraphView = BaseManager.extend({
+        /**
+        * Initializes an instance of BaseManager, optionally using a passed in view
+        * model
+        *
+        * @memberof BaseManager.prototype
+        * @param {object} options - additional options to pass to the view
+        * @return {object} an instance of GraphView
+        */
+        initialize: function (options) {
+            var self = this;
 
-    /**
-    * creates a request to get and export a graph instance to the file
-    * system
-    */
-    var exportGraph = function(url) {
-        pageView.viewModel.loading(true);
-    }
-
-    /**
-    * creates a request to import an arches json file;
-    */
-    var importGraph = function(url, data, e) {
-        var formData = new FormData();
-        formData.append("importedGraph", e.target.files[0]);
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            processData: false,
-            data: formData,
-            cache: false,
-            contentType: false,
-            success: function(response) {
-                window.location.reload(true);
-            },
-            error: function(response) {
-                alert('Something went wrong. Make sure your file is properly formatted arches json. \n\n For more details please contact your system administrator.');
-                pageView.viewModel.loading(false);
-            },
-        });
-    }
-
-    /**
-    * sets up the graphs for the page's view model
-    */
-    graphs().forEach(function(graph) {
-        graph.hover = ko.observable(false);
-        graph.clone = function() {
-            newGraph(graph.graphid + '/clone');
-        };
-        graph.exportGraph = function(model) {
-            window.open(graph.graphid + '/export', '_blank');
-        };
-        graph.deleteGraph = function () {
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
-                return;
-            }, function(){
-                pageView.viewModel.loading(true);
+            /**
+            * creates a request to add a new graph; redirects to the graph settings
+            * page for the new graph on success
+            *
+            * @param  {string} url - the url to be used in the request
+            * @param  {object} data (optional) - data to be included in request
+            */
+            var newGraph = function(url, data) {
+                data = data || {};
+                self.viewModel.loading(true);
                 $.ajax({
-                    complete: function (request, status) {
-                        pageView.viewModel.loading(false);
-                        if (status === 'success') {
-                            graphs.remove(graph);
-                        }
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        window.location = response.graphid + '/settings';
                     },
-                    type: "DELETE",
-                    url: graph.graphid
+                    error: function(response) {
+                        self.viewModel.loading(false);
+                    }
                 });
-            }));
-        };
-    });
+            };
 
-    var showResources = ko.observable(true);
-    var filteredGraphs = ko.computed(function() {
-        return ko.utils.arrayFilter(graphs(), function(graph) {
-            return !graph.isresource;
-        });
-    });
-    var resources = ko.computed(function() {
-        return ko.utils.arrayFilter(graphs(), function(graph) {
-            return graph.isresource;
-        });
-    });
-    /**
-    * a PageView representing the graph list page
-    */
-    var pageView = new PageView({
-        viewModel: {
-            groupedGraphs: ko.observable({
-                groups: [
-                    { name: 'Resources', items: resources() },
-                    { name: 'Graphs', items: filteredGraphs() }
-                ]
-            }),
-            graphId: ko.observable(null),
-            showResources: showResources,
-            showFind: ko.observable(false),
-            graphs: filteredGraphs,
-            resources: resources,
-            currentList: ko.computed(function() {
-                if (showResources()) {
-                    return resources();
-                } else {
-                    return filteredGraphs();
+            this.viewModel.allGraphs().forEach(function(graph) {
+                graph.hover = ko.observable(false);
+                graph.clone = function() {
+                    newGraph(graph.graphid + '/clone');
+                };
+                graph.exportGraph = function(model) {
+                    window.open(graph.graphid + '/export', '_blank');
+                };
+                graph.deleteGraph = function () {
+                    self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
+                        return;
+                    }, function(){
+                        self.viewModel.loading(true);
+                        $.ajax({
+                            complete: function (request, status) {
+                                self.viewModel.loading(false);
+                                if (status === 'success') {
+                                    self.viewModel.allGraphs.remove(graph);
+                                }
+                            },
+                            type: "DELETE",
+                            url: graph.graphid
+                        });
+                    }));
+                };
+            });
+
+            this.viewModel.showResources = ko.observable(true);
+
+            _.defaults(this.viewModel, {
+                groupedGraphs: ko.observable({
+                    groups: [
+                        { name: 'Resources', items: self.viewModel.resources() },
+                        { name: 'Graphs', items: self.viewModel.graphs() }
+                    ]
+                }),
+                graphId: ko.observable(null),
+                showFind: ko.observable(false),
+                currentList: ko.computed(function() {
+                    if (self.viewModel.showResources()) {
+                        return self.viewModel.resources();
+                    } else {
+                        return self.viewModel.graphs() ;
+                    }
+                }),
+                newResource: function () {
+                    newGraph('new', {isresource: true});
+                },
+                newGraph: function () {
+                    newGraph('new', {isresource: false});
+                },
+                importGraph: function (data, e) {
+                    var formData = new FormData();
+                    formData.append("importedGraph", e.target.files[0]);
+
+                    $.ajax({
+                        type: "POST",
+                        url: 'import/',
+                        processData: false,
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        success: function(response) {
+                            window.location.reload(true);
+                        },
+                        error: function(response) {
+                            alert('Something went wrong. Make sure your file is properly formatted arches json. \n\n For more details please contact your system administrator.');
+                            self.viewModel.loading(false);
+                        },
+                    });
+                },
+                importButtonClick: function () {
+                    $("#fileupload").trigger('click');
                 }
-            }),
-            newResource: function () {
-                newGraph('new', {isresource: true});
-            },
-            newGraph: function () {
-                newGraph('new', {isresource: false});
-            },
-            importGraph: function (data, e) {
-                importGraph('import/', data, e)
-            },
-            importButtonClick: function () {
-                $("#fileupload").trigger('click');
-            }
-        }
-    });
+            });
 
-    pageView.viewModel.graphId.subscribe(function (graphid) {
-        pageView.viewModel.navigate(arches.urls.graph + graphid + '/settings');
+
+            this.viewModel.graphId.subscribe(function (graphid) {
+                if(graphid && graphid !== ""){
+                    self.viewModel.navigate(arches.urls.graph + graphid + '/settings');
+                }
+            });
+
+            BaseManager.prototype.initialize.call(this, options);
+        }
+        
     });
+    return new GraphView();
 
     $('.dropdown').dropdown();
 });

@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Find Button -->
                 <div class="">
-                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> Find </a>
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
                 </div>
 
                 <!-- Find widget -->
@@ -65,13 +65,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Resource/Graph Toggle -->
             <div class="resource-tools relative" data-bind="visible: !showFind()">
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">Resources</a>
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">Graph Library</a>
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resources" %}</a>
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Graph Library" %}</a>
             </div>
 
             <div class="btn-group" style="position: absolute; right: 70px; top: 12px;">
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
-                    Add <i class="ion-more"></i>
+                    {% trans "Add" %} <i class="ion-more"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource" %}</a></li>
@@ -98,10 +98,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="ep-form-alert-buttons">
                     <!-- ko if: alert().cancel -->
-                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                    <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
                     <!-- /ko -->
                     <!-- ko if: alert().ok -->
-                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
+                    <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
                     <!-- /ko -->
                 </div>
             </div>
@@ -151,7 +151,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                     </div>
                     <div>
-                        <p class="resource-status">Status: <span data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                        <p class="resource-status">{% trans "Status" %}: <span data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
                     </div>
                 </div>
             </div>
