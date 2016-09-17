@@ -22,26 +22,40 @@ define([
     */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
-            params.configKeys = ['trueLabel', 'falseLabel'];
+            params.configKeys = ['zoom'];
             var self = this;
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function (expanded) {
                self.geocodeShimAdded(expanded);
             });
+            this.mapControlPanels = {
+              basemaps: ko.observable(false),
+              overlays: ko.observable(true),
+              maptools: ko.observable(true),
+              legend: ko.observable(true)
+            };
             this.toggleMapTools = function(data, event){
                 data.mapToolsExpanded(!data.mapToolsExpanded());
+            }
+            this.toggleMapControlPanels = function(data, event){
+                var panel = data;
+                _.each(self.mapControlPanels, function(panelValue, panelName) {
+                    panelName === panel ? panelValue(false) : panelValue(true);
+                  }
+                  );
             }
             WidgetViewModel.apply(this, [params]);
             var baselayer = new ol.layer.Tile({
               source: new ol.source.OSM()
             });
-            var map = new ol.Map({
+            var coords = ol.proj.transform([params.config().centerX, params.config().centerY], 'EPSG:4326','EPSG:3857');
+            this.map = new ol.Map({
               layers: [baselayer],
               target: 'map',
               view: new ol.View({
-                center: [-11000000, 4600000],
-                zoom: 4
+                center: coords,
+                zoom: params.config().zoom
               })
             });
         },
