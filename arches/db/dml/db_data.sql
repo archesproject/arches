@@ -168,17 +168,17 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000007', 'geometry-widget', 'widgets/geometry', 'geometry',
     '{
-        "geometrytypes": "{point:true, line:true, poly:true}",
-        "defaultbounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
-        "defaultbasemap": "stamen-terrain",
-        "basemaps": "stamen-terrain, mapbox-streets, mapbox-vintage",
+        "geometrytypes": {"point": true, "line": true, "poly": true},
+        "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
+        "basemaps": [{"name":"stamen-terrain","selected":false},{"name":"osm","selected":true}],
         "defaultgeocoder": "mapzen-search",
-        "geolocate": "true",
-        "measurements": "true",
-        "zoom": "10",
-        "maxZoom": "19",
-        "minZoom": "0",
-        "center": "-122.3979693, 37.79"
+        "geolocate": true,
+        "measurements": true,
+        "zoom": 10,
+        "maxZoom": 19,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79
     }'
 );
 
