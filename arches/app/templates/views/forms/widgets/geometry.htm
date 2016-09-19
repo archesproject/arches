@@ -10,29 +10,29 @@
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
               <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
-                  <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip"></i></a>
+                  <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
               </div>
 
-              <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="css : {'map-widget-toolbar-expanded' : mapToolsExpanded}">
-                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded, 'active': !mapControlPanels.basemaps()}">
-                      <a id="" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
+              <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapToolsExpanded">
+                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
+                      <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : {'map-widget-tool-expanded' : mapToolsExpanded, 'active': !mapControlPanels.overlays()}">
-                      <a id="overlays" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
+                  <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
+                      <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'map-widget-tool-expanded' : mapToolsExpanded, 'active': !mapControlPanels.maptools()}">
-                      <a id="" href="" class="map-widget-icon" data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
+                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools()}">
+                      <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
                   </div>
-                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'map-widget-tool-expanded' : mapToolsExpanded, 'active': !mapControlPanels.legend()}">
-                      <a id="" href="" class="map-widget-icon"  data-bind="css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
+                  <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
+                      <a id="" href="" class="map-widget-icon" ><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
                   </div>
                   <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
-                      <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools, css : {'map-widget-icon-expanded' : mapToolsExpanded}"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
+                      <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
                   </div>
               </div>
 
               <!-- Basemaps -->
-              <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="css : {'map-widget-panel-expanded' : mapToolsExpanded, 'map-panel-inactive': mapControlPanels.basemaps}">
+              <div id="map-widget-basemaps" class="panel map-widget-panel" data-bind="fadeVisible: mapToolsExpanded, css : {'map-panel-inactive': mapControlPanels.basemaps}">
                   <!-- Panel Title -->
                   <div class="map-widget-panel-title">
                       <h4 class=""> Basemaps </h4>
@@ -60,7 +60,7 @@
               </div>
 
               <!-- Overlays -->
-              <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-widget-panel-expanded' : mapToolsExpanded, 'map-panel-inactive': mapControlPanels.overlays}">
+              <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.overlays}">
                   <!-- Panel Title -->
                   <div class="map-widget-panel-title">
                       <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
@@ -91,7 +91,7 @@
 						 </div>
 
               <!-- Map Tools -->
-              <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-widget-panel-expanded' : mapToolsExpanded, 'map-panel-inactive': mapControlPanels.maptools}">
+              <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.maptools}">
 								<!-- Panel Title -->
 								<div class="map-widget-panel-title">
 										<h4 class=""> Map Tools </h4>
@@ -99,7 +99,7 @@
               </div>
 
               <!-- Legend -->
-              <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-widget-panel-expanded' : mapToolsExpanded, 'map-panel-inactive': mapControlPanels.legend}">
+              <div id="legend-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.legend}">
                   <!-- Panel Title -->
                   <div class="map-widget-panel-title">
                       <h4 class=""> Legend </h4>

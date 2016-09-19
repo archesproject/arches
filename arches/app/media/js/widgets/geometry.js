@@ -1,9 +1,10 @@
 define([
   'knockout',
   'underscore',
+  'bindings/map-controls',
   'openlayers',
   'viewmodels/widget'
-], function (ko, _, ol, WidgetViewModel) {
+], function (ko, _, animations, ol, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
