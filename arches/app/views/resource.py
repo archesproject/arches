@@ -24,13 +24,25 @@ from django.views.generic import TemplateView
 from arches.app.models import models
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
 @method_decorator(group_required('edit'), name='dispatch')
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
+        instance_summaries = []
+        for resource_instance in models.ResourceInstance.objects.all():
+            instance_summaries.append({
+                'name': '',
+                'type': resource_instance.graph.name,
+                'last_edited': '',
+                'qc': '',
+                'public': '',
+                'editor': ''
+            })
         context = self.get_context_data(
-            main_script='views/resource'
+            main_script='views/resource',
+            instance_summaries=instance_summaries
         )
         return render(request, 'views/resource.htm', context)
 
@@ -46,7 +58,7 @@ class ResourceEditorView(TemplateView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             context = self.get_context_data(
                 main_script='views/resource/editor',
-                resource_type=resource_instance.graph.name, 
+                resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass
             )
             return render(request, 'views/resource/editor.htm', context)

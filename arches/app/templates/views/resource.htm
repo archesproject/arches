@@ -19,6 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css">
+{% endblock css %}
+
 {% block title %}
 {{ block.super }}
 {% trans "Resource Manager" %}
@@ -88,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Default Page content-->
     <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
 
-        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
+        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;" data-bind="visible: showResources()">
             
             <!-- ko foreach: allGraphs -->
             <!-- ko if: isresource -->
@@ -116,12 +121,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- /ko -->
             <!-- /ko -->
 
-            
         </div>
+
+
+        <!-- Resource Instances -->
+        <div id="resource-records" class="report-image-grid" style="display: none;" data-bind="visible: !showResources()">
+                            
+            <!-- Resource Records Table -->
+            <div class="panel">
+                <div class="panel-body" style="background: #ebeef0;">
+                    <table id="demo-dt-selection" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Resource Name</th>
+                                <th>Resource Type</th>
+                                <th class="min-desktop">Last Edit</th>
+                                <th class="min-desktop">QC Status</th>
+                                <th class="min-desktop">Public</th>
+                                <th class="min-tablet">Editor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for summary in instance_summaries %}
+                            <tr>
+                                <td>{{summary.name}}</td>
+                                <td>{{summary.type}}</td>
+                                <td>{{summary.last_edited}}</td>
+                                <td>{{summary.qc}}</td>
+                                <td>{{summary.public}}</td>
+                                <td>{{summary.editor}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>      
 
     </div>
 </div>
 
 {% endblock content %}
-
-

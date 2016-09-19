@@ -4,8 +4,19 @@ require([
     'knockout',
     'arches',
     'views/base-manager',
-    'bindings/chosen'
+    'bindings/chosen',
+    'datatables',
 ], function($, _, ko, arches, BaseManagerView) {
+
+    var rowSelection = $('#demo-dt-selection').DataTable({
+        "responsive": true,
+        "language": {
+            "paginate": {
+              "previous": '<i class="fa fa-angle-left"></i>',
+              "next": '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
