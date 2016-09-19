@@ -18,9 +18,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
     return ko.components.register('switch-widget', {
         viewModel: function(params) {
+            params.configKeys = ['subtitle'];
             WidgetViewModel.apply(this, [params]);
-
-            this.subtitle = this.config().subtitle;
             this.on = this.config().on || true;
             this.off = this.config().off || false;
             this.setvalue = this.config().setvalue || function(self, evt){
