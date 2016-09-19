@@ -11,7 +11,7 @@
     height: 35px;
     border-radius: 2px;
     border: 1px solid #123;
-    transition: all .2s ease;
+    transition: all .4s ease;
     z-index: 1;
 }
 
@@ -53,7 +53,7 @@
     padding: 0px;
     background: transparent;
     border-bottom: 1px solid #ddd;
-    /*transition: all .40s ease;*/
+    /*transition: all .40s .15s ease;*/
     z-index: 1;
     visibility: hidden;
 }

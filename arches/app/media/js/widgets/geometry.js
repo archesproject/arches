@@ -22,8 +22,9 @@ define([
     */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
-            params.configKeys = ['zoom'];
             var self = this;
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder'];
+            WidgetViewModel.apply(this, [params]);
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function (expanded) {
@@ -45,7 +46,7 @@ define([
                   }
                   );
             }
-            WidgetViewModel.apply(this, [params]);
+
             var baselayer = new ol.layer.Tile({
               source: new ol.source.OSM()
             });
@@ -53,11 +54,17 @@ define([
             this.map = new ol.Map({
               layers: [baselayer],
               target: 'map',
+              // interactions: ol.interaction.defaults({
+              //   dragPan: false
+              // }),
               view: new ol.View({
                 center: coords,
                 zoom: params.config().zoom
               })
             });
+            this.zoom.subscribe(function (zoom) {
+                 console.log(zoom);
+              })
         },
         template: { require: 'text!widget-templates/geometry' }
     });

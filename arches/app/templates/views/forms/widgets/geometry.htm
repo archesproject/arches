@@ -5,7 +5,7 @@
         <div id='map' class="map-crud-container relative">
           <!-- Geocode Panel -->
           <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-              Geocode Search
+            <input type="text" data-bind="value: defaultgeocoder, attr: {placeholder: 'default geocoder'}" class="form-control input-lg widget-input">
           </div>
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
@@ -127,7 +127,25 @@
 	<div class="control-label">
 			{% trans "Zoom Level" %}
 	</div>
-	<div class="col-xs-12 pad-no crud-widget-container">
-			<input type="" id="" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+  <div class="col-xs-12 pad-no crud-widget-container">
+      <input type="" id="" placeholder="{% trans "Zoom Level" %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+  </div>
+  <div class="control-label">
+      {% trans "Default Geocoder" %}
+  </div>
+  <div class="col-xs-12 pad-no crud-widget-container">
+			<input type="" id="" placeholder="{% trans "Geocoder" %}" class="form-control input-md widget-input" data-bind="value: defaultgeocoder, valueUpdate: 'keyup'">
 	</div>
+  <div class="control-label">
+      {% trans "Map Center Longitude X coordinate" %}
+  </div>
+	<div class="col-xs-12 pad-no crud-widget-container">
+			<input type="" id="" placeholder="{% trans "Longitude (x coordinate)" %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+	</div>
+  <div class="control-label">
+      {% trans "Map Center Latitude or Y coordinate" %}
+  </div>
+  <div class="col-xs-12 pad-no crud-widget-container">
+      <input type="" id="" placeholder="{% trans "Longitude (x coordinate)" %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+  </div>
 </div>
