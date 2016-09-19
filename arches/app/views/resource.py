@@ -59,7 +59,8 @@ class ResourceEditorView(TemplateView):
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
-                iconclass=resource_instance.graph.iconclass
+                iconclass=resource_instance.graph.iconclass,
+                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all())
             )
             return render(request, 'views/resource/editor.htm', context)
         

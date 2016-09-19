@@ -199,14 +199,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 {% endblock body %}
-
-{% block pre_require_js %}
-<script>{% autoescape off %}
-define('resource-base-data', [], function () {
-    return {
-        graphs: {{graphs}},
-        graphid: '{{graphid}}'
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}

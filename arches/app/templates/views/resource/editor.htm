@@ -27,3 +27,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="">Related Resources</button>
     {{ block.super }}
 {% endblock graph_header_buttons %}
+
+{% block content %}
+<div class="flex">
+
+    <!--Node Listing -->
+    <div class="left-column-container" id="node-listing" data-bind="with: formList">
+        {% include 'views/resource/editor/form-list.htm' %}
+    </div>
+
+
+    <!-- Card Container -->
+    <div class="flex" style="">
+        
+        form/cards here
+
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+<script>{% autoescape off %}
+define('resource-editor-data', [], function () {
+    return {
+        forms: {{forms}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
