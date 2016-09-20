@@ -33,12 +33,12 @@ from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
-from arches.app.views.base import BaseNiftyView
+from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
 
 
-class GraphBaseView(BaseNiftyView):
+class GraphBaseView(BaseManagerView):
     def get_context_data(self, **kwargs):
         context = super(GraphBaseView, self).get_context_data(**kwargs)
         try:

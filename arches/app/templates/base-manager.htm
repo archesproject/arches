@@ -165,8 +165,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </header>
             <div class="boxed">
 
-                <div class="loading-mask" data-bind="visible:loading()"></div>
-
                 <div id="content-container" style="padding-bottom: 20px;">
                     {% block content %}
                     {% endblock content %}
@@ -195,18 +193,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li>
-                                            <a href="#">
+                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in" aria-expanded="false">
-                                                <!-- ko foreach: resources -->
+                                                <!-- ko foreach: allGraphs -->
+                                                <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#">
+                                                    <a class="link-submenu" data-bind="attr: { href: '/graph/' + graphid + '/add_resource'}">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
+                                                <!-- /ko -->
                                                 <!-- /ko -->
                                             </ul>
                                         </li>
