@@ -13,6 +13,7 @@
     border: 1px solid #123;
     transition: all .4s ease;
     z-index: 1;
+    line-height: 1.5;
 }
 
 .map-widget-container a {
@@ -31,9 +32,24 @@
 }
 
 .geocode-container-shim {
-    margin-right: 230px;
-    transition: all .40s ease;
+    margin-right: 210px;
 }
+
+.geocode-container {
+    position: absolute;
+    top: 10px;
+    right: 55px;
+    padding: 0px;
+    background: #fff;
+    opacity: .9;
+    width: 250px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    transition: all .20s ease;
+    z-index: 1;
+}
+
 
 .relative {
     position: relative;
@@ -74,21 +90,6 @@
   visibility: visible;
 }
 
-.geocode-container {
-    position: absolute;
-    top: 10px;
-    right: 55px;
-    padding: 7px;
-    background: #fff;
-    opacity: .9;
-    width: 250px;
-    height: 36px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    transition: all .20s ease;
-    z-index: 1;
-}
-
 .map-crud-container {
     /*position: absolute;*/
     top: 0px;
@@ -108,17 +109,6 @@
     z-index: 5;
     color: #fff;
 }
-
-.map-widget-toolbar-expanded {
-
-}
-
-/*.map-widget-tool {
-  height: 0px;
-  width: 0px;
-  display: table-cell;
-  border-right: 1px solid rgba(0, 0, 0, 0);
-}*/
 
 .map-widget-tool {
     padding-top: 5px;
@@ -211,4 +201,9 @@
     height: 40px;
     opacity: .8;
     color: #123;
+}
+
+
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+  display: none;
 }

@@ -2,7 +2,8 @@
 
 <div class="row widget-wrapper" data-bind="if: !configForm">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-        <div id='map' class="map-crud-container relative">
+
+        <div id='map' class="map-crud-container relative" data-bind="mapboxgl:mapOptions">
           <!-- Geocode Panel -->
           <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
             <input type="text" data-bind="value: defaultgeocoder, attr: {placeholder: 'default geocoder'}" class="form-control input-lg widget-input">

@@ -1,10 +1,13 @@
 define([
   'knockout',
   'underscore',
+  'viewmodels/widget',
+  'arches',
+  'map/mapbox-style',
+  'geoms',
   'bindings/map-controls',
-  'openlayers',
-  'viewmodels/widget'
-], function (ko, _, animations, ol, WidgetViewModel) {
+  'bindings/mapbox-gl'
+], function (ko, _, WidgetViewModel, arches, mapStyle, geoms) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -26,6 +29,13 @@ define([
             var self = this;
             params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder'];
             WidgetViewModel.apply(this, [params]);
+            this.selectedBasemap = ko.observable('streets');
+            var layers = [];
+            arches.basemapLayers.forEach(function (layer) {
+              if (layer.name === self.selectedBasemap()) {
+                  layers.push(layer.layer);
+                  }
+            });
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function (expanded) {
@@ -47,22 +57,17 @@ define([
                   }
                   );
             }
+            mapStyle.layers = layers;
+            this.mapOptions = {
+                style: mapStyle
+            };
 
-            var baselayer = new ol.layer.Tile({
-              source: new ol.source.OSM()
+            this.basemaps = ko.observableArray(_.uniq(_.map(arches.basemapLayers, function(layer) { return layer.name })));
+
+            this.selectedBasemap.subscribe(function(val) {
+                self.setBasemap(val);
             });
-            var coords = ol.proj.transform([params.config().centerX, params.config().centerY], 'EPSG:4326','EPSG:3857');
-            this.map = new ol.Map({
-              layers: [baselayer],
-              target: 'map',
-              // interactions: ol.interaction.defaults({
-              //   dragPan: false
-              // }),
-              view: new ol.View({
-                center: coords,
-                zoom: params.config().zoom
-              })
-            });
+
             this.zoom.subscribe(function (zoom) {
                  console.log(zoom);
               })
