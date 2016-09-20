@@ -3081,6 +3081,10 @@ li.card-tree-list:last-of-type {
     overflow-y: scroll;
     overflow-x: hidden;
 }
+.form-list .grid{
+    border-top: none;
+    padding-top: 0px;
+}
 .middle-column-container{
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
