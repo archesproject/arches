@@ -278,12 +278,14 @@ class CardView(GraphBaseView):
 
 @method_decorator(group_required('edit'), name='dispatch')
 class FormManagerView(GraphBaseView):
+    action = 'add_form'
+
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
         context = self.get_context_data(
             main_script='views/graph/form-manager',
-            forms=JSONSerializer().serialize(self.graph.form_set.all()),
+            forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
 			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
         )
@@ -292,9 +294,20 @@ class FormManagerView(GraphBaseView):
 
     def post(self, request, graphid):
         graph = models.GraphModel.objects.get(graphid=graphid)
-        form = models.Form(title=_('New Form'), graph=graph)
-        form.save()
-        return JSONResponse(form)
+        ret = None
+        with transaction.atomic():
+            if self.action == 'reorder_forms':
+                data = JSONDeserializer().deserialize(request.body)
+                for i, form in enumerate(data['forms']):
+                    formModel = models.Form.objects.get(formid=form['formid'])
+                    formModel.sortorder = i
+                    formModel.save()
+                ret = data['forms']
+            if self.action == 'add_form':
+                form = models.Form(title=_('New Form'), graph=graph)
+                form.save()
+                ret = form
+        return JSONResponse(ret)
 
 @method_decorator(group_required('edit'), name='dispatch')
 class FormView(GraphBaseView):

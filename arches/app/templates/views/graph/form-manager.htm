@@ -55,38 +55,38 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </a>
                 </div>
 
-                <!-- ko foreach: forms -->
-                <div class="card-grid-item form-grid-item" data-bind="click: function () { $parent.openForm(formid) }">
-                    <div class="panel mar-no">
+                <div data-bind="sortable: { data: forms, afterMove: reorderForms }">
+                    <div class="card-grid-item form-grid-item" data-bind="click: function () { $parent.openForm(formid) }">
+                        <div class="panel mar-no">
 
-                        <!-- Form Name -->
-                        <div class="panel-heading">
-                            <h3 class="panel-title library-card-panel-title">
-                                <i data-bind="css: iconclass || 'fa fa-question'"></i>
-                                <span data-bind="text:title"></span>
-                            </h3>
-                        </div>
+                            <!-- Form Name -->
+                            <div class="panel-heading">
+                                <h3 class="panel-title library-card-panel-title">
+                                    <i data-bind="css: iconclass || 'fa fa-question'"></i>
+                                    <span data-bind="text:title"></span>
+                                </h3>
+                            </div>
 
-                        <!-- Abstract -->
-                        <div class="panel-body library-card-body">
-                            <!-- ko foreach: cards -->
-                            <p class="library-item-subtitle" data-bind="text:name"></p>
-                            <!-- /ko -->
-                        </div>
+                            <!-- Abstract -->
+                            <div class="panel-body library-card-body">
+                                <!-- ko foreach: cards -->
+                                <p class="library-item-subtitle" data-bind="text:name"></p>
+                                <!-- /ko -->
+                            </div>
 
-                        <!-- Form Tools -->
-                        <div class="panel-footer" style="height: 40px;">
-                            <span data-bind="if:status">
-                                <i class="fa fa-check-circle"></i> Active
-                            </span>
-                            <span data-bind="if:!status">
-                                <i class="fa fa-minus-circle"></i> Inactive
-                            </span>
-                            <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Form</a>
+                            <!-- Form Tools -->
+                            <div class="panel-footer" style="height: 40px;">
+                                <span data-bind="if:status">
+                                    <i class="fa fa-check-circle"></i> Active
+                                </span>
+                                <span data-bind="if:!status">
+                                    <i class="fa fa-minus-circle"></i> Inactive
+                                </span>
+                                <a href="#" class="pull-right" data-bind="click: $root.deleteForm, clickBubble: false"><i class="ion-minus-circled"></i> Delete Form</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- /ko -->
 
             </div>
         </div>
