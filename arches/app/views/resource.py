@@ -33,6 +33,7 @@ class ResourceListView(BaseManagerView):
         instance_summaries = []
         for resource_instance in models.ResourceInstance.objects.all():
             instance_summaries.append({
+                'id': resource_instance.pk,
                 'name': '',
                 'type': resource_instance.graph.name,
                 'last_edited': '',
@@ -54,7 +55,7 @@ class ResourceEditorView(TemplateView):
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
             return redirect('resource_editor', resourceid=resource_instance.pk)
-        if resourceid is not None:
+        if resourceid is not None and resourceid != '':
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             context = self.get_context_data(
                 main_script='views/resource/editor',

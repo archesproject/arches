@@ -8,15 +8,19 @@ require([
     'datatables',
 ], function($, _, ko, arches, BaseManagerView) {
 
-    var rowSelection = $('#demo-dt-selection').DataTable({
+    var recentlyAddedResourceTable = $('#demo-dt-selection').DataTable({
         "responsive": true,
         "language": {
             "paginate": {
               "previous": '<i class="fa fa-angle-left"></i>',
               "next": '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        // "columnDefs": [
+        //     { targets: [0], visible: false}
+        // ]
     });
+
 
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
@@ -36,6 +40,12 @@ require([
                     self.viewModel.navigate(arches.urls.graph + graphid + '/add_resource');
                 }
             });
+
+            $('#demo-dt-selection tbody').on('dblclick', 'tr', function () {
+                var data = recentlyAddedResourceTable.row( this ).data();
+                self.viewModel.navigate(arches.urls.resource_editor + data[0]);
+            });
+
 
             BaseManagerView.prototype.initialize.call(this, options)
         }

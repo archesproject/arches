@@ -133,6 +133,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <table id="demo-dt-selection" class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
+                                <th>Resource Id</th>
                                 <th>Resource Name</th>
                                 <th>Resource Type</th>
                                 <th class="min-desktop">Last Edit</th>
@@ -144,6 +145,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <tbody>
                             {% for summary in instance_summaries %}
                             <tr>
+                                <td>{{summary.id}}</td>
                                 <td>{{summary.name}}</td>
                                 <td>{{summary.type}}</td>
                                 <td>{{summary.last_edited}}</td>
