@@ -614,6 +614,45 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='BasemapLayers',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.TextField()),
+                ('layer', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layer', null=True)),
+            ],
+            options={
+                'db_table': 'basemap_layers',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='MapSources',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.TextField()),
+                ('source', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='source', null=True)),
+            ],
+            options={
+                'db_table': 'map_sources',
+                'managed': True,
+            },
+        ),
+        # migrations.AlterField(
+        #     model_name='edge',
+        #     name='graph',
+        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
+        # migrations.AlterField(
+        #     model_name='form',
+        #     name='graph',
+        #     field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
+        # migrations.AlterField(
+        #     model_name='node',
+        #     name='graph',
+        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
         migrations.AddField(
             model_name='ddatatype',
             name='defaultwidget',
@@ -732,6 +771,12 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField('values', ['valueid']),
         CreateAutoPopulateUUIDField('widgets', ['widgetid']),
 
+        migrations.RunSQL(
+                """
+                ALTER TABLE nodes ADD CONSTRAINT nodes_ddatatypes_fk FOREIGN KEY (datatype)
+                REFERENCES public.d_data_types (datatype) MATCH SIMPLE
+                """
+                ),
         migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, 'db', 'dml', 'db_data.sql')), ''),
         migrations.RunPython(forwards_func, reverse_func),
         migrations.RunPython(make_permissions,reverse_code=lambda *args,**kwargs: True),

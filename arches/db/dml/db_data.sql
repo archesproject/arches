@@ -100,11 +100,11 @@ INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 
 --Data types
 INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, null, '10000000-0000-0000-0000-000000000001');
-INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag');
+INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', null, null, null, '10000000-0000-0000-0000-000000000008');
 INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, '10000000-0000-0000-0000-000000000004');
-INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe');
+INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
 INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
-INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000003');
+INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
@@ -164,6 +164,26 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000007', 'geometry-widget', 'widgets/geometry', 'geometry',
+    '{
+        "geometrytypes": {"point": true, "line": true, "poly": true},
+        "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
+        "basemaps": [{"name":"stamen-terrain","selected":false},{"name":"osm","selected":true}],
+        "defaultgeocoder": "mapzen-search",
+        "geolocate": true,
+        "measurements": true,
+        "zoom": 10,
+        "maxZoom": 19,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79
+    }'
+);
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
@@ -2107,3 +2127,903 @@ INSERT INTO functions_x_datatypes VALUES (10, 'string', '60000000-0000-0000-0000
 INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-0000-000000000007');
 INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
 INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
+
+INSERT INTO map_sources(name, source)
+    VALUES ('mapbox-streets', '{
+        "url": "mapbox://mapbox.mapbox-streets-v7",
+        "type": "vector"
+    }');
+
+INSERT INTO map_sources(name, source)
+    VALUES ('mapbox-satellite', '{
+        "type": "raster",
+        "url": "mapbox://mapbox.satellite",
+        "tileSize": 256
+    }');
+
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('satellite', '{
+        "id": "satellite",
+        "type": "raster",
+        "source": "mapbox-satellite",
+        "source-layer": "mapbox_satellite_full"
+    }');
+
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "id": "landuse_overlay_national_park",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "landuse_overlay",
+        "filter": [
+            "==",
+            "class",
+            "national_park"
+        ],
+        "paint": {
+            "fill-color": "#d2edae",
+            "fill-opacity": 0.75
+        },
+        "interactive": true
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "id": "landuse_park",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "landuse",
+        "filter": [
+            "==",
+            "class",
+            "park"
+        ],
+        "paint": {
+            "fill-color": "#d2edae"
+        },
+        "interactive": true
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "id": "waterway",
+        "type": "line",
+        "source": "mapbox-streets",
+        "source-layer": "waterway",
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "in",
+                "class",
+                "river",
+                "canal"
+            ]
+        ],
+        "paint": {
+            "line-color": "#a0cfdf",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        8,
+                        0.5
+                    ],
+                    [
+                        20,
+                        15
+                    ]
+                ]
+            }
+        },
+        "interactive": true
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "water",
+        "paint": {
+            "fill-color": "#a0cfdf"
+        },
+        "interactive": true
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "id": "building",
+        "type": "fill",
+        "source": "mapbox-streets",
+        "source-layer": "building",
+        "paint": {
+            "fill-color": "#d6d6d6"
+        },
+        "interactive": true
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "tunnel"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "tunnel_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            },
+            "line-dasharray": [
+                0.36,
+                0.18
+            ]
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "tunnel"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "tunnel_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            },
+            "line-dasharray": [
+                0.28,
+                0.14
+            ]
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "in",
+                    "structure",
+                    "none",
+                    "ford"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "road_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "in",
+                    "structure",
+                    "none",
+                    "ford"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "road_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_minor case",
+        "paint": {
+            "line-color": "#dedede",
+            "line-width": {
+                "base": 1.6,
+                "stops": [
+                    [
+                        12,
+                        0.5
+                    ],
+                    [
+                        20,
+                        10
+                    ]
+                ]
+            },
+            "line-gap-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "butt",
+            "line-join": "miter"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_major case",
+        "paint": {
+            "line-color": "#dedede",
+            "line-width": {
+                "base": 1.6,
+                "stops": [
+                    [
+                        12,
+                        0.5
+                    ],
+                    [
+                        20,
+                        10
+                    ]
+                ]
+            },
+            "line-gap-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway_link",
+                    "street",
+                    "street_limited",
+                    "service",
+                    "track",
+                    "pedestrian",
+                    "path",
+                    "link"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_minor",
+        "paint": {
+            "line-color": "#efefef",
+            "line-width": {
+                "base": 1.55,
+                "stops": [
+                    [
+                        4,
+                        0.25
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "in",
+                    "class",
+                    "motorway",
+                    "primary",
+                    "secondary",
+                    "tertiary",
+                    "trunk"
+                ],
+                [
+                    "==",
+                    "structure",
+                    "bridge"
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "bridge_major",
+        "paint": {
+            "line-color": "#fff",
+            "line-width": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        6,
+                        0.5
+                    ],
+                    [
+                        20,
+                        30
+                    ]
+                ]
+            }
+        },
+        "source-layer": "road"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "all",
+                [
+                    "<=",
+                    "admin_level",
+                    2
+                ],
+                [
+                    "==",
+                    "maritime",
+                    0
+                ]
+            ]
+        ],
+        "type": "line",
+        "source": "mapbox-streets",
+        "id": "admin_country",
+        "paint": {
+            "line-color": "#8b8a8a",
+            "line-width": {
+                "base": 1.3,
+                "stops": [
+                    [
+                        3,
+                        0.5
+                    ],
+                    [
+                        22,
+                        15
+                    ]
+                ]
+            }
+        },
+        "source-layer": "admin"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "minzoom": 5,
+        "layout": {
+            "icon-image": "{maki}-11",
+            "text-offset": [
+                0,
+                0.5
+            ],
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 8,
+            "text-anchor": "top",
+            "text-size": 11,
+            "icon-size": 1
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "all",
+                [
+                    "==",
+                    "scalerank",
+                    1
+                ],
+                [
+                    "==",
+                    "localrank",
+                    1
+                ]
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "poi_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-width": 1,
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-blur": 1
+        },
+        "source-layer": "poi_label"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "symbol-placement": "line",
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-transform": "uppercase",
+            "text-letter-spacing": 0.1,
+            "text-size": {
+                "base": 1.4,
+                "stops": [
+                    [
+                        10,
+                        8
+                    ],
+                    [
+                        20,
+                        14
+                    ]
+                ]
+            }
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            [
+                "in",
+                "class",
+                "motorway",
+                "primary",
+                "secondary",
+                "tertiary",
+                "trunk"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "road_major_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 2
+        },
+        "source-layer": "road_label"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "minzoom": 8,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Semibold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 6,
+            "text-size": {
+                "stops": [
+                    [
+                        6,
+                        12
+                    ],
+                    [
+                        12,
+                        16
+                    ]
+                ]
+            }
+        },
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "in",
+                "type",
+                "town",
+                "village",
+                "hamlet",
+                "suburb",
+                "neighbourhood",
+                "island"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "place_label_other",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "place_label"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Bold",
+                "Arial Unicode MS Bold"
+            ],
+            "text-max-width": 10,
+            "text-size": {
+                "stops": [
+                    [
+                        3,
+                        12
+                    ],
+                    [
+                        8,
+                        16
+                    ]
+                ]
+            }
+        },
+        "maxzoom": 16,
+        "filter": [
+            "all",
+            [
+                "==",
+                "$type",
+                "Point"
+            ],
+            [
+                "==",
+                "type",
+                "city"
+            ]
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "place_label_city",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "place_label"
+    }');
+INSERT INTO basemap_layers(name, layer)
+    VALUES ('streets', '{
+        "interactive": true,
+        "layout": {
+            "text-field": "{name_en}",
+            "text-font": [
+                "Open Sans Regular",
+                "Arial Unicode MS Regular"
+            ],
+            "text-max-width": 10,
+            "text-size": {
+                "stops": [
+                    [
+                        3,
+                        14
+                    ],
+                    [
+                        8,
+                        22
+                    ]
+                ]
+            }
+        },
+        "maxzoom": 12,
+        "filter": [
+            "==",
+            "$type",
+            "Point"
+        ],
+        "type": "symbol",
+        "source": "mapbox-streets",
+        "id": "country_label",
+        "paint": {
+            "text-color": "#666",
+            "text-halo-color": "rgba(255,255,255,0.75)",
+            "text-halo-width": 1,
+            "text-halo-blur": 1
+        },
+        "source-layer": "country_label"
+    }');
+
+INSERT INTO map_sources(name, source)
+   VALUES ('mapzen', '{
+               "type": "vector",
+               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+       }');
+
+INSERT INTO basemap_layers(name, layer)
+   VALUES ('mapzen', '{
+       "id": "mapzen-water",
+       "type": "fill",
+       "source": "mapzen",
+       "source-layer": "water",
+       "filter": ["==", "$type", "Polygon"],
+       "paint": {
+           "fill-color": "#3887be"
+       }
+   }');

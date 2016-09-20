@@ -507,3 +507,31 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class MapSources(models.Model):
+    name = models.TextField()
+    source = JSONField(blank=True, null=True, db_column='source')
+
+    @property
+    def source_json(self):
+        json_string = json.dumps(self.source)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_sources'
+
+
+class BasemapLayers(models.Model):
+    name = models.TextField()
+    layer = JSONField(blank=True, null=True, db_column='layer')
+
+    @property
+    def layer_json(self):
+        json_string = json.dumps(self.layer)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'basemap_layers'

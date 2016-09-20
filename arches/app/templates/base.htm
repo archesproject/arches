@@ -40,11 +40,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     {% block css %}
         <link href="{% static 'css/arches-nifty.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'plugins/openlayers/ol.css' %}">
+        <link rel="stylesheet" href="{% static 'css/widgets/geometry.css' %}">
     {% endblock css%}
 
 </head>
 
 <body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
+    <div class="loading-mask" style="display: none;" data-bind="visible:loading()"></div>
     {% block body %}
 
     {% endblock body %}

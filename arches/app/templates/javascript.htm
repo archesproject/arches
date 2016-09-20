@@ -35,7 +35,8 @@
             'blueimp-jquery': '//blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
             'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
-            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min'
+            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
+            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl'
         },
         shim: {
             'openlayers': {
@@ -61,6 +62,10 @@
             },
             'select2': {
                 deps: ['jquery']
+            },
+            'plugins/mapbox-gl-draw': {
+                deps: ['mapbox-gl'],
+                exports: 'mapboxgl.Draw'
             }
         }
     });
@@ -137,7 +142,15 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
-            }
+            },
+            mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            mapSources: {{% autoescape off %}{% for map_source in map_sources %}
+                '{{ map_source.name }}': {{ map_source.source_json }},
+            {% endfor %}{% endautoescape %}},
+            basemapLayers: [{% autoescape off %}{% for basemap_layer in basemap_layers %}{
+                'name': '{{ basemap_layer.name }}',
+                'layer': {{ basemap_layer.layer_json }}
+            },{% endfor %}{% endautoescape %}],
         };
     });
 
@@ -180,4 +193,8 @@
     define('datatype-config-components',
         [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
         function () { return });
+
+    define('geoms', function () {
+        {% autoescape off %}return {{geoms}};{% endautoescape %}
+    });
 </script>

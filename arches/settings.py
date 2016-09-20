@@ -347,6 +347,8 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+MAPBOX_API_KEY = '' # Put your Mapbox key here!
+
 try:
     from settings_local import *
 except ImportError:

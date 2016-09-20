@@ -6,15 +6,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     */
 
     /**
-    * registers a switch-widget component for use in forms
-    * @function external:"ko.components".switch-widget
+    * registers a radio-boolean-widget component for use in forms
+    * @function external:"ko.components".radio-boolean-widget
     * @param {object} params
     * @param {boolean} params.value - the value being managed
     * @param {object} params.config -
     * @param {string} params.config.label - label to use alongside the select input
-    * @param {string} params.config.subtitle - subtitle to use alongside the select input
-    * @param {string|true} [params.config.on=true] - the value to use for the "on" state of the switch
-    * @param {string|false} [params.config.off=false] - the value to use for the "off" state of the switch
+    * @param {string} params.config.trueValue - label alongside the true boolean button
+    * @param {string} params.config.falseValue - label alongside the false boolean button
     */
     return ko.components.register('radio-boolean-widget', {
         viewModel: function(params) {
