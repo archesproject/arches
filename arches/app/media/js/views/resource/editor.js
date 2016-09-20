@@ -3,7 +3,7 @@ require([
     'underscore',
     'knockout',
     'views/page-view',
-    'views/resource/form-list',
+    'views/resource/editor/form-list',
     'resource-editor-data',
 ], function($, _, ko, PageView, FormList, data) {
 
