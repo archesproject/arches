@@ -24,7 +24,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_tools %}
+<div id="card-grid-tools" style="display: none;" data-bind="visible: reports">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a report..." %}" class="design" data-bind="value: selectedReportId, options: reportOptions, optionsText: 'name', optionsValue: 'reportid', chosen: {width: '100%'}">
 
+        </select>
+    </div>
+</div>
 {% endblock graph_header_tools %}
 
 {% block content %}
