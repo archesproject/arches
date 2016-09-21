@@ -29,7 +29,7 @@ define([
             viewModel.setBasemap = function(basemapType) {
                 arches.basemapLayers.forEach(function(layer) {
                     if (layer.name === basemapType.name && !map.getLayer(layer.layer.id)) {
-                        map.addLayer(layer.layer)
+                        map.addLayer(layer.layer, 'gl-draw-active-line.hot')
                     } else if (map.getLayer(layer.layer.id) && layer.name !== basemapType.name) {
                         map.removeLayer(layer.layer.id)
                     }
