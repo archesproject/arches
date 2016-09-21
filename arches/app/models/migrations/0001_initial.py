@@ -558,6 +558,7 @@ class Migration(migrations.Migration):
                 ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate')),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
                 ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('active', models.BooleanField(default=False)),               
             ],
             options={
                 'db_table': 'reports',
