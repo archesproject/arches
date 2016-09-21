@@ -98,6 +98,21 @@
 								<div class="map-widget-panel-title">
 										<h4 class=""> Map Tools </h4>
 								</div>
+
+                <!-- ko foreach: { data: [$data], as: 'self' } -->
+
+                <!-- ko foreach: geometryTypes -->
+                <div class="map-widget-overlay-item relative editing-tool" data-bind="click: self.selectEditingTool">
+                    <div class="map-overlay-vis-toogle text-center">
+                        <i data-bind="css: self.editingToolIcons[$data]"></i>
+                    </div>
+                    <div class="map-overlay-name">
+                        <a id="" class="" href=""><span data-bind='text: $data'><span></a>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+
               </div>
 
               <!-- Legend -->

@@ -26,8 +26,48 @@ define([
     */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
+              var drawConstants = {
+                            classes: {
+                              CONTROL_BASE: 'mapboxgl-ctrl',
+                              CONTROL_PREFIX: 'mapboxgl-ctrl-',
+                              CONTROL_BUTTON: 'mapbox-gl-draw_ctrl-draw-btn',
+                              CONTROL_BUTTON_LINE: 'mapbox-gl-draw_line',
+                              CONTROL_BUTTON_POLYGON: 'mapbox-gl-draw_polygon',
+                              CONTROL_BUTTON_POINT: 'mapbox-gl-draw_point',
+                              CONTROL_BUTTON_TRASH: 'mapbox-gl-draw_trash',
+                              CONTROL_GROUP: 'mapboxgl-ctrl-group',
+                              ATTRIBUTION: 'mapboxgl-ctrl-attrib',
+                              ACTIVE_BUTTON: 'active',
+                              BOX_SELECT: 'mapbox-gl-draw_boxselect'
+                            },
+                            sources: {
+                              HOT: 'mapbox-gl-draw-hot',
+                              COLD: 'mapbox-gl-draw-cold'
+                            },
+                            cursors: {
+                              ADD: 'add',
+                              MOVE: 'move',
+                              DRAG: 'drag',
+                              POINTER: 'pointer',
+                              NONE: 'none'
+                            },
+                            types: {
+                              POLYGON: 'polygon',
+                              LINE: 'line_string',
+                              POINT: 'point'
+                            },
+                            modes: {
+                              DRAW_LINE_STRING: 'draw_line_string',
+                              DRAW_POLYGON: 'draw_polygon',
+                              DRAW_POINT: 'draw_point',
+                              SIMPLE_SELECT: 'simple_select',
+                              DIRECT_SELECT: 'direct_select',
+                              STATIC: 'static'
+                            }
+                          };
+
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder', 'basemap', 'baseMaps'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder', 'basemap', 'baseMaps', 'geometryTypes'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
             var layers = [];

@@ -159,6 +159,10 @@
     text-overflow: ellipsis;
 }
 
+.map-widget-overlay-item:hover {
+  background-color: #f3f3f3;
+}
+
 .map-widget-icon:hover {
     color: rgba(255, 255, 255, 1);
 }
@@ -203,7 +207,11 @@
     color: #123;
 }
 
-
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
-  z-index:700;
+  visibility: hidden;
+}
+
+.editing-tool:hover {
+    background-color: #f3f3f3;
+    transition: all .20s ease;
 }

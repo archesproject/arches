@@ -170,9 +170,10 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     '{
         "geometrytypes": {"point": true, "line": true, "poly": true},
         "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
-        "baseMaps": [{"name":"satellite","selected":false},{"name":"streets","selected":true},{"name":"mapzen","selected":false}],
+        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
         "basemap": "streets",
-        "defaultgeocoder": "mapzen-search",
+        "geometryTypes": ["Point","Line","Polygon"],
+        "geocoder": "mapzen-search",
         "geolocate": true,
         "measurements": true,
         "zoom": 10,

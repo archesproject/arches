@@ -21,6 +21,9 @@ define([
             var map = new mapboxgl.Map(
                 _.defaults(options, defaults)
             );
+            var draw = Draw();
+            map.addControl(draw);
+
             viewModel.basemaps = arches.basemaps;
             viewModel.map = map;
             viewModel.setBasemap = function(basemapType) {
@@ -33,7 +36,14 @@ define([
                 }, this)
             };
 
+            viewModel.selectEditingTool = function(val, e) {
 
+              switch (val) {
+                case 'Point': draw.changeMode('draw_point'); break;
+                case 'Line': draw.changeMode('draw_line_string'); break;
+                case 'Polygon': draw.changeMode('draw_polygon'); break;
+              }
+            }
             //TODO I wanted to make the map events update the configurations, but it made the map animations too rough
             // viewModel.map.on('zoomend', function(e){
             //   viewModel.zoom(viewModel.map.getZoom());
@@ -47,6 +57,12 @@ define([
             //   viewModel.centerY(eventCenter.lat)
             //   }
             // })
+
+            viewModel.editingToolIcons = {
+              Point: 'ion-location',
+              Line: 'ion-steam',
+              Polygon: 'ion-star'
+            }
 
             viewModel.updateMapProperties = function(property) {
               this.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
@@ -65,8 +81,6 @@ define([
               viewModel.updateMapProperties()
               })
 
-            var draw = Draw();
-            map.addControl(draw);
         }
     }
 
