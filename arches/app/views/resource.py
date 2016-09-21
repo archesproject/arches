@@ -22,9 +22,11 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from arches.app.models import models
+from arches.app.models.forms import Form
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.JSONResponse import JSONResponse
 
 
 @method_decorator(group_required('edit'), name='dispatch')
@@ -55,14 +57,31 @@ class ResourceEditorView(TemplateView):
             # self.graph = Graph.objects.get(graphid=graphid)
             resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
             return redirect('resource_editor', resourceid=resource_instance.pk)
-        if resourceid is not None and resourceid != '':
+        if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            form = Form(resource_instance.pk)
+            datatypes = models.DDataType.objects.all()
+            widgets = models.Widget.objects.all()
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
                 iconclass=resource_instance.graph.iconclass,
-                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all())
+                form=JSONSerializer().serialize(form),
+                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
+                datatypes_json=JSONSerializer().serialize(datatypes),
+                widgets=widgets,
+                widgets_json=JSONSerializer().serialize(widgets),
             )
             return render(request, 'views/resource/editor.htm', context)
+        
+        return HttpResponseNotFound()
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceData(TemplateView):
+    def get(self, request, formid=None):
+        if formid is not None:
+            form = Form(formid)
+            return JSONResponse(form)
         
         return HttpResponseNotFound()

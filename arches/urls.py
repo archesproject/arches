@@ -22,7 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView
-from arches.app.views.resource import ResourceEditorView, ResourceListView
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -78,6 +78,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceEditorView.as_view(), name='add_resource'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/data/(?P<formid>%s)$' % uuid_regex, ResourceData.as_view(), name='resource_data'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
     url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),

@@ -19,20 +19,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import copy
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.models.card import Card
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 class Form(object):
-    def __init__(self, resourceid=None):
+    def __init__(self, resourceid=None, formid=None):
         self.forms = []
         self.widgets = []
         self.tiles = {}
         self.blanks = {}
 
         if resourceid:
-            self.load(resourceid)
+            self.load(resourceid, formid=formid)
 
-    def load(self, resourceid):
+
+    def load(self, resourceid, formid=None):
         self.widgets = models.Widget.objects.all()
 
         self.forms = [{
@@ -55,12 +57,12 @@ class Form(object):
                         'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
-                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                        'node_id': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
-                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                        'node_id': '20000000-0000-0000-0000-000000000004'
                     }]
                 },{
                     'id': '30000000-0000-0000-0000-000000000000',
@@ -72,18 +74,18 @@ class Form(object):
                         'name': 'select-widget',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
-                        'nodeid': '20000000-0000-0000-0000-000000000003',
+                        'node_id': '20000000-0000-0000-0000-000000000003',
                         'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
-                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                        'node_id': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
-                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                        'node_id': '20000000-0000-0000-0000-000000000004'
                     }]
                 }]
             },
@@ -102,18 +104,18 @@ class Form(object):
                         'name': 'select-widget',
                         'label': 'Service Provider',
                         'placeholder': 'e.g.: MapBox',
-                        'nodeid': '20000000-0000-0000-0000-000000000003',
+                        'node_id': '20000000-0000-0000-0000-000000000003',
                         'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
                     },{
                         'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
-                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                        'node_id': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
-                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                        'node_id': '20000000-0000-0000-0000-000000000004'
                     }]
                 }
                 ,{
@@ -126,17 +128,36 @@ class Form(object):
                         'name': 'text-widget',
                         'label': 'Service Name',
                         'placeholder': 'e.g. MapBox Base Maps',
-                        'nodeid': '20000000-0000-0000-0000-000000000002'
+                        'node_id': '20000000-0000-0000-0000-000000000002'
                     },{
                         'name': 'text-widget',
                         'label': 'Key',
                         'placeholder': 'Enter key value',
-                        'nodeid': '20000000-0000-0000-0000-000000000004'
+                        'node_id': '20000000-0000-0000-0000-000000000004'
                     }]
                 }
                 ]
             }]
         }]
+
+        formid = '3d98910a-7f84-11e6-892b-14109fd34195'
+
+        if formid is not None:
+            form = models.Form.objects.get(pk=formid)
+            formxcards = form.formxcard_set.all()
+            form_obj = {
+                'id': form.pk,
+                'title': form.title,
+                'subtitle': form.subtitle
+            }
+            form_obj['cardgroups'] = []
+            for formxcard in formxcards:
+                form_obj['cardgroups'].append(JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id)))
+            self.forms = [form_obj]
+        else:
+            pass
+
+
 
         tiles = models.Tile.objects.filter(resourceinstance_id=resourceid)
 
@@ -176,7 +197,7 @@ class Form(object):
                         tile['nodegroup_id'] = card['nodegroup_id']
                         tile['data'] = {}
                         for widget in card['widgets']:
-                            tile['data'][widget['nodeid']] = ''
+                            tile['data'][widget['node_id']] = ''
 
                         parentTile['tiles'][card['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card['nodegroup_id']))
 
@@ -207,7 +228,7 @@ class Form(object):
                     tile['tiles'] = []
                     tile['data'] = {}
                     for widget in card['widgets']:
-                        tile['data'][widget['nodeid']] = ''
+                        tile['data'][widget['node_id']] = ''
 
                     parentTile['tiles'][card['nodegroup_id']] = []
                     

@@ -38,9 +38,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Card Container -->
-    <div class="flex" style="">
+    <div class="card-form-preview-container">
         
-        form/cards here
+        {% include 'views/resource/editor/form.htm' %}
 
     </div>
 
@@ -51,7 +51,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('resource-editor-data', [], function () {
     return {
-        forms: {{forms}}
+        forms: {{forms}},
+        form: {{form}},
+        datatypes: {{ datatypes_json }},
+        widgets: {{ widgets_json }},
+
     };
 });
 {% endautoescape %}</script>
