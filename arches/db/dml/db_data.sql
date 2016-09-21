@@ -2111,11 +2111,11 @@ INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-000
 INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
 INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
 
-INSERT INTO report_templates(templateid, name, title, description, component, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'default-report', 'No Header Template', 'Default Template', 'reports/default', '{}');
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
 
-INSERT INTO report_templates(templateid, name, title, description, component, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'map-report', 'Map Header Template', 'Map Widget', 'reports/map', '{}');
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
 
-INSERT INTO report_templates(templateid, name, title, description, component, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'image-report', 'Image Header Template', 'Image Header', 'reports/default', '{}');
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/default', 'image-report', '{}');

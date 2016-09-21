@@ -415,10 +415,10 @@ class Relation(models.Model):
 
 class ReportTemplate(models.Model):
     templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField()
-    title = models.TextField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     component = models.TextField()
+    componentname = models.TextField()
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
 
     class Meta:

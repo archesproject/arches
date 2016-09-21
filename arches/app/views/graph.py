@@ -358,3 +358,16 @@ class FormView(GraphBaseView):
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ReportManagerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/report-manager',
+            reports=JSONSerializer().serialize(self.graph.report_set.all()),
+            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+         )
+
+        return render(request, 'views/graph/report-manager.htm', context)
