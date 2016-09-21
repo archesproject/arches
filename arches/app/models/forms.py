@@ -30,7 +30,7 @@ class Form(object):
         self.tiles = {}
         self.blanks = {}
 
-        if resourceid:
+        if resourceid or formid:
             self.load(resourceid, formid=formid)
 
 
@@ -140,7 +140,7 @@ class Form(object):
             }]
         }]
 
-        formid = '3d98910a-7f84-11e6-892b-14109fd34195'
+        #formid = '3d98910a-7f84-11e6-892b-14109fd34195'
 
         if formid is not None:
             form = models.Form.objects.get(pk=formid)

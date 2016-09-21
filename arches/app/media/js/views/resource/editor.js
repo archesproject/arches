@@ -4,39 +4,29 @@ require([
     'knockout',
     'views/page-view',
     'views/resource/editor/form-list',
+    'views/resource/editor/form',
     'models/card',
     'resource-editor-data',
-    'widgets',
+
     'bindings/sortable'
-], function($, _, ko, PageView, FormList, CardModel, data, widgets) {
+], function($, _, ko, PageView, FormList, FormView, CardModel, data) {
     var self = this;
+    var formView = new FormView({
+        formid: data.forms[0].formid,
+        currentTabIndex: this.currentTabIndex,
+
+    })
     var formList = new FormList({
         forms: ko.observableArray(data.forms)
     })
 
-    this.card = new CardModel({
-        data: data.form.forms[0].cardgroups[0],
-        datatypes: data.datatypes
+    formList.on('select', function(form){
+        pageView.viewModel.loading(true);
+        formView.loadForm(form.formid, function(){
+            pageView.viewModel.loading(false);
+        });
     });
 
-    if(this.card.isContainer()){
-        this.selection = ko.observable(self.card.get('cards')()[0]);
-    }else{
-        this.selection = ko.observable(this.card);
-    }
-    this.currentTabIndex = ko.computed(function () {
-        if (!self.card.isContainer()) {
-            return 0;
-        }
-        var card = self.selection();
-        if (card.node) {
-            card = card.card;
-        }
-        var index = self.card.get('cards')().indexOf(card);
-        return index;
-    });
-
-   
 
     /**
     * a PageView representing the resource listing and recent edits page
@@ -44,18 +34,7 @@ require([
     var pageView = new PageView({
         viewModel:{
             formList: formList,
-            card: this.card,
-            selection: this.selection,
-            widgetLookup: widgets,
-            currentTabIndex: this.currentTabIndex,
-            currentTabCard: ko.computed(function () {
-                if(self.card.get('cards')().length === 0){
-                    return self.card;
-                }else{
-                    return self.card.get('cards')()[self.currentTabIndex()];
-                }
-            }, this)
-
+            formView: formView,
         }
     });
 

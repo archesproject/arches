@@ -29,7 +29,7 @@ define([
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
-            console.log(item);
+            this.trigger('select', item);
         },
 
     });

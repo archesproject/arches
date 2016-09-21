@@ -81,7 +81,7 @@ class ResourceEditorView(TemplateView):
 class ResourceData(TemplateView):
     def get(self, request, formid=None):
         if formid is not None:
-            form = Form(formid)
+            form = Form(formid=formid)
             return JSONResponse(form)
         
         return HttpResponseNotFound()
