@@ -27,29 +27,34 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'defaultgeocoder', 'basemap', 'baseMaps'];
             WidgetViewModel.apply(this, [params]);
-            this.selectedBasemap = ko.observable('streets');
+            this.selectedBasemap = this.basemap;
             var layers = [];
+
             arches.basemapLayers.forEach(function (layer) {
               if (layer.name === self.selectedBasemap()) {
                   layers.push(layer.layer);
                   }
             });
+
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function (expanded) {
                self.geocodeShimAdded(expanded);
             });
+
             this.mapControlPanels = {
               basemaps: ko.observable(false),
               overlays: ko.observable(true),
               maptools: ko.observable(true),
               legend: ko.observable(true)
             };
+
             this.toggleMapTools = function(data, event){
                 data.mapToolsExpanded(!data.mapToolsExpanded());
             }
+
             this.toggleMapControlPanels = function(data, event){
                 var panel = data;
                 _.each(self.mapControlPanels, function(panelValue, panelName) {
@@ -57,20 +62,18 @@ define([
                   }
                   );
             }
+
             mapStyle.layers = layers;
+
             this.mapOptions = {
                 style: mapStyle
             };
 
-            this.basemaps = ko.observableArray(_.uniq(_.map(arches.basemapLayers, function(layer) { return layer.name })));
+            this.selectBasemap = function(val){
+              self.basemap(val.name)
+              self.setBasemap(val);
+            }
 
-            this.selectedBasemap.subscribe(function(val) {
-                self.setBasemap(val);
-            });
-
-            this.zoom.subscribe(function (zoom) {
-                 console.log(zoom);
-              })
         },
         template: { require: 'text!widget-templates/geometry' }
     });

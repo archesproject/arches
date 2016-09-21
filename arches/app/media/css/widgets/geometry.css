@@ -85,10 +85,10 @@
     border-bottom: 1px solid #ddd;
 }
 
-.visible {
+/*.visible {
   opacity: 1.0;
   visibility: visible;
-}
+}*/
 
 .map-crud-container {
     /*position: absolute;*/
@@ -205,5 +205,5 @@
 
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
-  display: none;
+  z-index:700;
 }

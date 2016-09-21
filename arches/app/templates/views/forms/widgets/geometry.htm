@@ -8,6 +8,7 @@
           <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
             <input type="text" data-bind="value: defaultgeocoder, attr: {placeholder: 'default geocoder'}" class="form-control input-lg widget-input">
           </div>
+
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
               <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
@@ -39,24 +40,24 @@
                       <h4 class=""> Basemaps </h4>
                   </div>
 
-                  <!-- Overlay Item -->
-                  <div class="map-widget-overlay-item relative">
-                      <div class="map-overlay-vis-toogle text-center">
-                          <i class="ion-checkmark-circled fade"></i>
-                      </div>
-                      <div class="map-overlay-name">
-                          <a id="" class="" href="">Bing Streets</a>
-                      </div>
-                  </div>
+                    <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-                  <!-- Overlay Item -->
-                  <div class="map-widget-overlay-item relative">
-                      <div class="map-overlay-vis-toogle text-center">
-                          <i class="ion-checkmark-circled"></i>
-                      </div>
-                      <div class="map-overlay-name">
-                          <a id="" class="" href="">Google Streets (Gray)</a>
-                      </div>
+                    <!-- ko foreach: baseMaps -->
+                    <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap">
+                        <div class="map-overlay-vis-toogle text-center">
+                          <!-- ko if: name === self.basemap()-->
+                            <i class="ion-checkmark-circled"></i>
+                          <!-- /ko -->
+                          <!-- ko if: name !== self.basemap() -->
+                            <i class="ion-checkmark-circled fade"></i>
+                          <!-- /ko -->
+                        </div>
+                        <div class="map-overlay-name">
+                            <a id="" class="" href=""><span data-bind='text: name'><span></a>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
                   </div>
               </div>
 
@@ -129,7 +130,7 @@
 			{% trans "Zoom Level" %}
 	</div>
   <div class="col-xs-12 pad-no crud-widget-container">
-      <input type="" id="" placeholder="{% trans "Zoom Level" %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+      <input type="number" min=1 max=20 id="" placeholder="{% trans "Zoom Level" %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
   </div>
   <div class="control-label">
       {% trans "Default Geocoder" %}
@@ -138,13 +139,13 @@
 			<input type="" id="" placeholder="{% trans "Geocoder" %}" class="form-control input-md widget-input" data-bind="value: defaultgeocoder, valueUpdate: 'keyup'">
 	</div>
   <div class="control-label">
-      {% trans "Map Center Longitude X coordinate" %}
+      {% trans "Map Center Longitude" %}
   </div>
 	<div class="col-xs-12 pad-no crud-widget-container">
 			<input type="" id="" placeholder="{% trans "Longitude (x coordinate)" %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
 	</div>
   <div class="control-label">
-      {% trans "Map Center Latitude or Y coordinate" %}
+      {% trans "Map Center Latitude" %}
   </div>
   <div class="col-xs-12 pad-no crud-widget-container">
       <input type="" id="" placeholder="{% trans "Longitude (x coordinate)" %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
