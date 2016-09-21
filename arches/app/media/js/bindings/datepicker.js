@@ -12,7 +12,7 @@ define([
     ko.bindingHandlers.datepicker = {
         init: function(element, valueAccessor, allBindingsAccessor) {
           //initialize datepicker with some optional options
-          var options = allBindingsAccessor().datepickerOptions || {};
+          var options = allBindingsAccessor().datepickerOptions || { autoclose: true, format: "yyyy-mm-dd"};
           var value = valueAccessor();
           var widget = $(element).datepicker(options).data("datepicker");
           if (typeof value() === 'string') {
