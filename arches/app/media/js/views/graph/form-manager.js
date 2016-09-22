@@ -1,4 +1,5 @@
 require([
+    'jquery',
     'underscore',
     'knockout',
     'models/graph',
@@ -7,7 +8,7 @@ require([
     'arches',
     'graph-forms-data',
     'bindings/sortable'
-], function(_, ko, GraphModel, PageView, AlertViewModel, arches, data) {
+], function($, _, ko, GraphModel, PageView, AlertViewModel, arches, data) {
 
     /**
     * a PageView representing the graph forms page
