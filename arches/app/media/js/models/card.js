@@ -186,7 +186,8 @@ define(['arches',
             var ret = {};
             for(var key in this.attributes){
                 if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'
-                 && key !== 'widgets' && key !== 'selectedCard' && key !== 'selectedCardIndex'){
+                 && key !== 'widgets' && key !== 'selectedCard' && key !== 'selectedCardIndex'
+                 && key !== 'datatypes' && key !== 'data'){
                     if(ko.isObservable(this.attributes[key])){
                         if(key === 'users' || key === 'groups'){
                             ret[key] = koMapping.toJS(this.attributes[key]);
