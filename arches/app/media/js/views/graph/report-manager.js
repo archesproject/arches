@@ -2,10 +2,11 @@ require([
     'knockout',
     'views/graph/graph-page-view',
     'views/list',
+    'viewmodels/alert',
     'report-manager-data',
     'arches',
     'bindings/dragDrop'
-], function(ko, PageView, ListView, data, arches) {
+], function(ko, PageView, ListView, AlertViewModel, data, arches) {
     var showTemplateLibrary = ko.observable(false);
 
     var viewModel = {
@@ -32,16 +33,41 @@ require([
 
     viewModel.addReport = function(data){
         this.loading(true);
-        // TODO add report....
+        $.ajax({
+            type: "POST",
+            url: 'add_report',
+            data: JSON.stringify({
+                template_id: data.templateid
+            }),
+            success: function(response) {
+                viewModel.reports.push(response);
+                pageView.viewModel.loading(false);
+            },
+            error: function(response) {
+                pageView.viewModel.loading(false);
+                alertFailure();
+            }
+        });
     };
 
     viewModel.deleteReport = function (report) {
         this.loading(true);
-        // TODO delete report....
+        $.ajax({
+            type: "DELETE",
+            url: arches.urls.report_editor + report.reportid + '/delete',
+            success: function(response) {
+                pageView.viewModel.loading(false);
+                viewModel.reports.remove(report);
+            },
+            error: function(response) {
+                pageView.viewModel.loading(false);
+                alertFailure();
+            }
+        });
     };
 
     viewModel.openReport = function (reportId) {
-        pageView.viewModel.navigate(arches.urls.report + reportId);
+        pageView.viewModel.navigate(arches.urls.report_editor + reportId);
     };
 
     viewModel.selectedReportId.subscribe(function(reportId) {

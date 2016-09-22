@@ -371,3 +371,29 @@ class ReportManagerView(GraphBaseView):
          )
 
         return render(request, 'views/graph/report-manager.htm', context)
+
+    def post(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+        graph = models.GraphModel.objects.get(graphid=graphid)
+        template = models.ReportTemplate.objects.get(templateid=data['template_id'])
+        report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
+        report.save()
+        return JSONResponse(report)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ReportEditorView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/report-editor',
+            reports=JSONSerializer().serialize(self.graph.report_set.all()),
+            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+         )
+
+        return render(request, 'views/graph/report-editor.htm', context)
+
+    def delete(self, request, reportid):
+        report = models.Report.objects.get(reportid=reportid)
+        report.delete()
+        return JSONResponse({'succces':True})
