@@ -146,6 +146,7 @@ define(['arches',
                         break;
                     case 'cardid':
                         this.set('id', value);
+                        this.get(key)(value);
                         break;
                     case 'name':
                     case 'instructions':
