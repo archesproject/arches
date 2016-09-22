@@ -1,5 +1,5 @@
 {% load i18n %}
-<!-- ko foreach: { data: [$data], as: 'self' } -->
+<!-- ko foreach: { data: cards, as: 'card' } -->
 <!-- Card Manager Panels and Forms -->
 <div class="ep-card-crud-container">
     <!-- Card Preview -->
@@ -8,7 +8,7 @@
         <div id="" class="panel">
             <div class="panel-heading">
                 <div class="">
-                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: card().get('name')"></h3>
+                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: card.get('name')"></h3>
                 </div>
             </div>
 
@@ -17,11 +17,11 @@
                 <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container"  data-bind="foreach: {
-                        data: card().isContainer() ? card().get('cards') : [card]
+                        data: card.isContainer() ? card.get('cards') : [card]
                     }">
                         <li id="summary-group" data-bind="css: {
-                            'active': self.currentTabIndex()===$index()
-                        }, click: self.selection">
+                            'active': card.get('selectedCardIndex')()===$index()
+                        }, click: card.get('selectedCard')">
                             <a id="summary-tab" href="#" class="card-tab-title">
                                 <span data-bind="text: get('name')"></span>
                             </a>
@@ -35,12 +35,12 @@
                     <div class="tab-content card-content-tab" style="margin-left: 0px;">
 
                         <!-- ko foreach: {
-                            data: card().isContainer() ? card().get('cards') : [card()],
+                            data: card.isContainer() ? card.get('cards') : [card],
                             as: 'card'
                         } -->
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
-                            'active in': self.currentTabIndex()===$index()
+                            'active in': $parent.get('selectedCardIndex')()===$index()
                         }">
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
@@ -50,7 +50,7 @@
 
                                         <!-- Help link -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: $parent.currentTabCard && $parent.currentTabCard.get('helpenabled'), click: function () { $parent.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
                                     </div>
 
@@ -61,11 +61,11 @@
                                                 data:card.get('widgets')
                                             }">
                                             <div class='widget-preview' data-bind='component: {
-                                                name: self.widgetLookup[get("widget_id")()].name,
+                                                name: $parents[2].widgetLookup[get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON,
                                                     label: get("label")(),
-                                                    value: ko.observable(null),
+                                                    value: ko.observable(),
                                                     disabled: false
                                                 }
                                             }'></div>
@@ -94,19 +94,19 @@
 
                     </div>
 
-                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: self.helpPreviewActive">
+                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: $parent.helpPreviewActive">
                         <div class="relative">
-                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { self.helpPreviewActive(false) }"></a>
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { $parent.helpPreviewActive(false) }"></a>
                         </div>
                         <div id="add-basemap-wizard-help-content">
                             <div>
                                 <div class="panel-heading">
                                     <h3 class="panel-title" style="padding: 0 10px 0 10px;">
                                         <span class="help-text-small">Help</span>
-                                        <span data-bind="text: self.currentTabCard() ? self.currentTabCard().get('helptitle') : ''"></span>
+                                        <span data-bind="text: $parent.currentTabCard ? $parent.currentTabCard.get('helptitle') : ''"></span>
                                     </h3>
                                 </div>
-                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard() ? self.currentTabCard().get('helptext') : ''">
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: $parent.currentTabCard ? $parent.currentTabCard.get('helptext') : ''">
                                 </div>
                             </div>
                         </div>
@@ -123,26 +123,26 @@
                     </div>
                 </div>
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card().get('cardinality')() === 'n' && card().isContainer()" style="display: none;">
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
-                        Saved <span data-bind="text: card().get('name')"/>
+                        Saved <span data-bind="text: card.get('name')"/>
                     </div>
 
                     <!-- Wizard Tile -->
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card().get('cards')" style="margin-bottom: 0px;">
-                            <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
-                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === card.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: $parent.selection">
                                     <!-- Editable Span -->
                                     <span class="card-tab-title">
                                         <span data-bind="text: get('name')"></span>
                                     </span>
                                 </a>
                             </li>
-                            <li class="wizard-card-tools" data-bind="if: $index() === ($parent.card().isContainer() ? ($parent.card().get('cards')().length - 1) : 0) ">
+                            <li class="wizard-card-tools" data-bind="if: $index() === (card.isContainer() ? (card.get('cards')().length - 1) : 0) ">
                                 <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                 <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                             </li>

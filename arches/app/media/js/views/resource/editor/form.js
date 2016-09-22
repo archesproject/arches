@@ -6,6 +6,7 @@ define([
     'widgets',
     'models/card',
     'resource-editor-data',
+    'select2',
 ], function($, Backbone, ko, arches, widgets, CardModel, data) {
     var FormView = Backbone.View.extend({
         /**
@@ -23,24 +24,7 @@ define([
             var self = this;
             this.formid = options.formid;
             this.widgetLookup = widgets;
-            this.selection = ko.observable();
-            this.card = ko.observable(new CardModel({}));
-           
-            this.currentTabIndex = ko.computed(function () {
-                if (!self.card().isContainer()) {
-                    return 0;
-                }
-                var index = self.card().get('cards')().indexOf(self.selection());
-                return index;
-            });
-            this.currentTabCard = ko.computed(function () {
-                if(self.card().get('cards')().length === 0){
-                    return self.card();
-                }else{
-                    return self.card().get('cards')()[self.currentTabIndex()];
-                }
-            }, this)
-
+            this.cards = ko.observableArray([new CardModel({})]);
             this.loadForm(this.formid);
         },
 
@@ -51,15 +35,13 @@ define([
                 url: arches.urls.resource_data + formid,
                 success: function(response) {
                     window.location.hash = formid;
-                    self.card(new CardModel({
-                        data: response.forms[0].cardgroups[0],
-                        datatypes: data.datatypes
-                    }));
-                    if(self.card().isContainer()){
-                        self.selection(self.card().get('cards')()[0]);
-                    }else{
-                        self.selection(self.card());
-                    }
+                    self.cards.removeAll();
+                    response.forms[0].cardgroups.forEach(function(cardgroup){
+                        self.cards.push(new CardModel({
+                            data: cardgroup,
+                            datatypes: data.datatypes
+                        }));
+                    },this);
                 },
                 error: function(response) {
 

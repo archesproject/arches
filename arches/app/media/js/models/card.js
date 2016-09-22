@@ -18,6 +18,7 @@ define(['arches',
 
         initialize: function(attributes){
             var self = this;
+            this.parent = undefined;
             this.set('cards', ko.observableArray());
             this.set('nodes', ko.observableArray());
             this.set('functions', ko.observableArray());
@@ -35,6 +36,28 @@ define(['arches',
             this.set('itemtext', ko.observable());
             this.set('ontologyproperty', ko.observable());
             this.set('sortorder', ko.observable());
+            this.set('selectedCard', ko.observable());
+
+
+
+
+            // this.set('selectedCard', ko.computed({
+            //     read: function () {
+            //        return this.get('_selectedCard');
+            //     },
+            //     write: function (card) {
+            //         this.set('_selectedCard', card);
+            //     },
+            //     owner: this
+            // });
+
+            // this.set('selectedCard', ko.computed(function () {
+            //     if(this.get('cards')().length === 0){
+            //         return this;
+            //     }else{
+            //         return this.get('cards')()[this.get('selectedCardIndex')()];
+            //     }
+            // }, this);
 
             this._card = ko.observable('{}');
 
@@ -59,6 +82,42 @@ define(['arches',
             });
 
             this.parse(attributes);
+
+            if(this.isContainer()){
+                this.get('selectedCard')(this.get('cards')()[0]);
+            }else{
+                this.get('selectedCard')(this);
+            }
+
+            // var outterCard;
+            // if(this.get('parent')){
+            //     outterCard = this.get('parent');
+            // }else{
+            //     outterCard = this;
+            // }
+            // if(outterCard.isContainer()){
+            //     this.get('selectedCard')(outterCard.get('cards')()[0]);
+            // }else{
+            //     this.get('selectedCard')(this);
+            // }
+
+
+            this.set('selectedCardIndex', ko.computed(function () {
+                var selectedCard = this.get('selectedCard')();
+                // var outterCard;
+                // if(this.get('parent')){
+                //     outterCard = this.get('parent');
+                // }else{
+                //     outterCard = this;
+                // }
+                if (!this.isContainer()) {
+                    return 0;
+                }
+                var index = this.get('cards')().indexOf(selectedCard);
+                console.log(index)
+                return index;
+            }, this));
+
         },
 
         /**
@@ -87,7 +146,8 @@ define(['arches',
                         cardData.forEach(function (card) {
                             var cardModel = new CardModel({
                                 data: card,
-                                datatypes: attributes.datatypes
+                                datatypes: attributes.datatypes,
+                                parent: this
                             });
                             cards.push(cardModel);
                         }, this);
@@ -118,11 +178,16 @@ define(['arches',
                             nodes.push(nodeModel);
                         }, this);
                         this.get('nodes')(nodes);
+                        this.get('widgets')(widgets);
+                        this.get('widgets').sort(function (w, ww) {
+                            return w.get('sortorder')() > ww.get('sortorder')();
+                        });
                         break;
                     case 'widgets':
                         break;
                     case 'cardid':
                         this.set('id', value);
+                        break;
                     case 'name':
                     case 'instructions':
                     case 'helptext':
@@ -148,10 +213,6 @@ define(['arches',
                         this.set(key, value);
                 }
             }, this);
-            this.get('widgets')(widgets);
-            this.get('widgets').sort(function (w, ww) {
-                return w.get('sortorder')() > ww.get('sortorder')();
-            });
 
             this._card(JSON.stringify(this.toJSON()));
         },
@@ -164,7 +225,8 @@ define(['arches',
         toJSON: function(){
             var ret = {};
             for(var key in this.attributes){
-                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' && key !== 'widgets'){
+                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'
+                 && key !== 'widgets' && key !== 'selectedCard' && key !== 'selectedCardIndex' && key !== 'parent'){
                     if(ko.isObservable(this.attributes[key])){
                         if(key === 'users' || key === 'groups'){
                             ret[key] = koMapping.toJS(this.attributes[key]);
