@@ -31,7 +31,7 @@ from arches.app.views.concept import get_preflabel_from_conceptid
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-
+from django.utils.module_loading import import_string
 
 import csv
 
@@ -50,10 +50,10 @@ def home_page(request):
         'max_date': min_max_dates['val__max'].year if min_max_dates['val__min'] != None else 1,
         'timefilterdata': JSONSerializer().serialize(Concept.get_time_filter_data()),
     })
-    
+
 def search_terms(request):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
-    
+
     query = build_search_terms_dsl(request)
     results = query.search(index='term', doc_type='value')
 
@@ -77,7 +77,7 @@ def build_search_terms_dsl(request):
 
 def search_results(request):
     dsl = build_search_results_dsl(request)
-    results = dsl.search(index='entity', doc_type='') 
+    results = dsl.search(index='entity', doc_type='')
     total = results['hits']['total']
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     all_entity_ids = ['_all']
@@ -91,7 +91,7 @@ def search_results(request):
 
 def build_search_results_dsl(request):
     term_filter = request.GET.get('termFilter', '')
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None)) 
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('spatialFilter', None))
     export = request.GET.get('export', None)
     page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
     temporal_filter = JSONDeserializer().deserialize(request.GET.get('temporalFilter', None))
@@ -99,14 +99,14 @@ def build_search_results_dsl(request):
     se = SearchEngineFactory().create()
 
     if export != None:
-        limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE  
+        limit = settings.SEARCH_EXPORT_ITEMS_PER_PAGE
     else:
         limit = settings.SEARCH_ITEMS_PER_PAGE
-    
+
     query = Query(se, start=limit*int(page-1), limit=limit)
     boolquery = Bool()
     boolfilter = Bool()
-    
+
     if term_filter != '':
         for term in JSONDeserializer().deserialize(term_filter):
             if term['type'] == 'term':
@@ -117,7 +117,7 @@ def build_search_results_dsl(request):
                 nested = Nested(path='child_entities', query=boolfilter_nested)
                 if term['inverted']:
                     boolfilter.must_not(nested)
-                else:    
+                else:
                     boolfilter.must(nested)
             elif term['type'] == 'concept':
                 concept_ids = _get_child_concepts(term['value'])
@@ -134,7 +134,7 @@ def build_search_results_dsl(request):
                 nested = Nested(path='child_entities', query=boolfilter_folded)
                 if term['inverted']:
                     boolquery.must_not(nested)
-                else:    
+                else:
                     boolquery.must(nested)
 
     if 'geometry' in spatial_filter and 'type' in spatial_filter['geometry'] and spatial_filter['geometry']['type'] != '':
@@ -166,7 +166,7 @@ def build_search_results_dsl(request):
             end_date = end_date.isoformat()
         range = Range(field='dates.value', gte=start_date, lte=end_date)
         nested = Nested(path='dates', query=range)
-        
+
         if 'inverted' not in temporal_filter:
             temporal_filter['inverted'] = False
 
@@ -174,7 +174,7 @@ def build_search_results_dsl(request):
             boolfilter.must_not(nested)
         else:
             boolfilter.must(nested)
-        
+
     if not boolquery.empty:
         query.add_query(boolquery)
 
@@ -184,7 +184,7 @@ def build_search_results_dsl(request):
     return query
 
 def buffer(request):
-    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}})) 
+    spatial_filter = JSONDeserializer().deserialize(request.GET.get('filter', {'geometry':{'type':'','coordinates':[]},'buffer':{'width':'0','unit':'ft'}}))
 
     if spatial_filter['geometry']['coordinates'] != '' and spatial_filter['geometry']['type'] != '':
         return JSONResponse(_buffer(spatial_filter['geometry'],spatial_filter['buffer']['width'],spatial_filter['buffer']['unit']), geom_format='json')
@@ -193,7 +193,7 @@ def buffer(request):
 
 def _buffer(geojson, width=0, unit='ft'):
     geojson = JSONSerializer().serialize(geojson)
-    
+
     try:
         width = float(width)
     except:
@@ -233,28 +233,29 @@ def get_paginator(results, total_count, page, count_per_page, all_ids):
         if len(after) > ct_after:
             after = after[0:ct_after-1]+[None,paginator.num_pages]
         pages = before+pages+after
-        
+
     return render(request, 'pagination.htm', {
-        'pages': pages, 
-        'page_obj': paginator.page(page), 
-        'results': JSONSerializer().serialize(results), 
+        'pages': pages,
+        'page_obj': paginator.page(page),
+        'results': JSONSerializer().serialize(results),
         'all_ids': JSONSerializer().serialize(all_ids)
     })
 
 def geocode(request):
-    geocoder = apps.import_string(settings.GEOCODING_PROVIDER)  
-    search_string = request.GET.get('q', '')  
-    return JSONResponse({ 'results': geocoder.find_candidates(search_string) })
+    geocoding_provider = request.GET.get('geocoder', '')
+    Geocoder = import_string('arches.app.utils.geocoders.' + geocoding_provider)
+    search_string = request.GET.get('q', '')
+    return JSONResponse({ 'results': Geocoder().find_candidates(search_string) })
 
 def export_results(request):
     dsl = build_search_results_dsl(request)
-    search_results = dsl.search(index='entity', doc_type='') 
+    search_results = dsl.search(index='entity', doc_type='')
     response = None
     format = request.GET.get('export', 'csv')
     exporter = ResourceExporter(format)
     results = exporter.export(search_results['hits']['hits'])
 
-    related_resources = [{'id1':rr.entityid1, 'id2':rr.entityid2, 'type':rr.relationshiptype} for rr in models.RelatedResource.objects.all()] 
+    related_resources = [{'id1':rr.entityid1, 'id2':rr.entityid2, 'type':rr.relationshiptype} for rr in models.RelatedResource.objects.all()]
     csv_name = 'resource_relationships.csv'
     dest = StringIO()
     csvwriter = csv.DictWriter(dest, delimiter=',', fieldnames=['id1','id2','type'])

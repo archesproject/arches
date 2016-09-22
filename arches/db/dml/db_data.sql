@@ -173,7 +173,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
         "basemap": "streets",
         "geometryTypes": ["Point","Line","Polygon"],
-        "geocoder": "mapzen-search",
+        "geocoder": "BingGeocoder",
         "geolocate": true,
         "measurements": true,
         "zoom": 10,

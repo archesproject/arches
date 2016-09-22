@@ -5,9 +5,12 @@
 
         <div id='map' class="map-crud-container relative" data-bind="mapboxgl:mapOptions">
           <!-- Geocode Panel -->
+
           <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-            <input type="text" data-bind="value: defaultgeocoder, attr: {placeholder: 'default geocoder'}" class="form-control input-lg widget-input">
-          </div>
+            <!-- <input type="text" data-bind="value: geocoder, attr: {placeholder: 'geocoder'}" class="form-control input-lg widget-input"> -->
+            <input class="geocodewidget arches-select2 margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;"  placeholder="{% trans 'Find an Address' %}">
+            <input class="geocodewidget arches-select2 margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;"  placeholder="{% trans 'Find an Address' %}">
+        </div>
 
           <!-- Map Tools Panel -->
           <div id="map-widget-container relative" class="">
@@ -151,7 +154,7 @@
       {% trans "Default Geocoder" %}
   </div>
   <div class="col-xs-12 pad-no crud-widget-container">
-			<input type="" id="" placeholder="{% trans "Geocoder" %}" class="form-control input-md widget-input" data-bind="value: defaultgeocoder, valueUpdate: 'keyup'">
+			<input type="" id="" placeholder="{% trans "Geocoder" %}" class="form-control input-md widget-input" data-bind="value: geocoder, valueUpdate: 'keyup'">
 	</div>
   <div class="control-label">
       {% trans "Map Center Longitude" %}
