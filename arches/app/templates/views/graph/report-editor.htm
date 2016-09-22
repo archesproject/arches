@@ -1,0 +1,51 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Resource Reports" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_tools %}
+<div id="card-grid-tools" style="display: none;" data-bind="visible: reports">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a report..." %}" class="design" data-bind="value: selectedReportId, options: reportOptions, optionsText: 'name', optionsValue: 'reportid', chosen: {width: '100%'}">
+
+        </select>
+    </div>
+</div>
+{% endblock graph_header_tools %}
+
+{% block content %}
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('report-editor-data', [], function () {
+    return {
+        templates: {{templates}},
+        reports: {{reports}},
+        report: {{report}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

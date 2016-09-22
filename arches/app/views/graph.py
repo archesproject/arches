@@ -382,11 +382,13 @@ class ReportManagerView(GraphBaseView):
 
 @method_decorator(group_required('edit'), name='dispatch')
 class ReportEditorView(GraphBaseView):
-    def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
+    def get(self, request, reportid):
+        report = models.Report.objects.get(reportid=reportid)
+        self.graph = Graph.objects.get(graphid=report.graph.pk)
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',
+            report=JSONSerializer().serialize(report),
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
             templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
          )
