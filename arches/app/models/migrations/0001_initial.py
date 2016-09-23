@@ -744,6 +744,11 @@ class Migration(migrations.Migration):
             name='ontology',
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
         ),
+        migrations.AddField(
+            model_name='mapsources',
+            name='isoverlay',
+            field=models.BooleanField(default=False),
+        ),
         migrations.AlterUniqueTogether(
             name='edge',
             unique_together=set([('rangenode', 'domainnode')]),

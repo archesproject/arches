@@ -5,9 +5,12 @@
 
         <div id='map' class="map-crud-container relative" data-bind="mapboxgl:mapOptions">
           <!-- Geocode Panel -->
+        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
+          <select data-bind="chosen: {width: '100%'}, value: geocodeSearchVal, options: geocodeSearchResults, optionsText: 'text', optionsValue: 'text'"></select>
+        </div> -->
 
-          <div id="geocode-container" class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-            <!-- <input type="text" data-bind="value: geocoder, attr: {placeholder: 'geocoder'}" class="form-control input-lg widget-input"> -->
+
+        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
             <input class="geocodewidget arches-select2 margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;"  placeholder="{% trans 'Find an Address' %}">
             <input class="geocodewidget arches-select2 margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;"  placeholder="{% trans 'Find an Address' %}">
         </div>

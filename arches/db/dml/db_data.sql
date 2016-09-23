@@ -2130,18 +2130,25 @@ INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-000
 INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
 INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
 
-INSERT INTO map_sources(name, source)
+INSERT INTO map_sources(name, source, isoverlay)
     VALUES ('mapbox-streets', '{
         "url": "mapbox://mapbox.mapbox-streets-v7",
         "type": "vector"
-    }');
+    }', FALSE);
 
-INSERT INTO map_sources(name, source)
+INSERT INTO map_sources(name, source, isoverlay)
     VALUES ('mapbox-satellite', '{
         "type": "raster",
         "url": "mapbox://mapbox.satellite",
         "tileSize": 256
-    }');
+    }', FALSE);
+
+INSERT INTO map_sources(name, source, isoverlay)
+   VALUES ('mapzen', '{
+               "type": "vector",
+               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+       }', FALSE);
+
 
 INSERT INTO basemap_layers(name, layer)
     VALUES ('satellite', '{
@@ -3011,12 +3018,6 @@ INSERT INTO basemap_layers(name, layer)
         },
         "source-layer": "country_label"
     }');
-
-INSERT INTO map_sources(name, source)
-   VALUES ('mapzen', '{
-               "type": "vector",
-               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
-       }');
 
 INSERT INTO basemap_layers(name, layer)
    VALUES ('mapzen', '{
