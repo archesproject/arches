@@ -49,9 +49,11 @@
                                         <span data-bind="text: card.get('instructions')"></span>
 
                                         <!-- Help link -->
+                                        <!-- ko if: card.get('helpenabled') -->
                                         <span>
-                                            <a class="pull-right card-help help editable-help" data-bind="visible: $parent.currentTabCard && $parent.currentTabCard.get('helpenabled'), click: function () { $parent.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                            <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
                                         </span>
+                                        <!-- /ko -->
                                     </div>
 
                                     <!-- Form -->
@@ -89,28 +91,31 @@
                                 <div class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250); height: 40px;" data-bind="text: card.get('itemtext')">
                                 </div>
                             </div>
+
+                            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
+                                <div class="relative">
+                                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.get('helpactive')(false) }"></a>
+                                </div>
+                                <div id="add-basemap-wizard-help-content">
+                                    <div>
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title" style="padding: 0 10px 0 10px;">
+                                                <span data-bind="text: card.get('helptitle')"></span>
+                                            </h3>
+                                        </div>
+                                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.get('helptext')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                            
                         </div>
+
+
                         <!-- /ko -->
 
                     </div>
 
-                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: $parent.helpPreviewActive">
-                        <div class="relative">
-                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { $parent.helpPreviewActive(false) }"></a>
-                        </div>
-                        <div id="add-basemap-wizard-help-content">
-                            <div>
-                                <div class="panel-heading">
-                                    <h3 class="panel-title" style="padding: 0 10px 0 10px;">
-                                        <span class="help-text-small">Help</span>
-                                        <span data-bind="text: $parent.currentTabCard ? $parent.currentTabCard.get('helptitle') : ''"></span>
-                                    </h3>
-                                </div>
-                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: $parent.currentTabCard ? $parent.currentTabCard.get('helptext') : ''">
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
                 </div>
 
                 <!-- Wizard Level Buttons -->

@@ -29,6 +29,7 @@ define(['arches',
             this.set('helptext', ko.observable());
             this.set('helpenabled', ko.observable());
             this.set('helptitle', ko.observable());
+            this.set('helpactive', ko.observable(false));
             this.set('cardinality', ko.observable());
             this.set('visible', ko.observable());
             this.set('active', ko.observable());
