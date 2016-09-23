@@ -38,7 +38,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-
+<div class="flex">
+    <div class="left-column-container panel ep-card-tools-panel" data-bind="with: reportEditorTree">
+        {% include 'views/graph/report-editor/report-editor-tree.htm' %}
+    </div>
+    <div class="middle-column-container" data-bind="with: reportEditorForm">
+        {% include 'views/graph/report-editor/report-editor-form.htm' %}
+    </div>
+    <div class="card-form-preview-container" data-bind="with: reportEditorPreview">
+        {% include 'views/graph/report-editor/report-editor-preview.htm' %}
+    </div>
+</div>
 {% endblock content %}
 
 {% block pre_require_js %}
