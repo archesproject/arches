@@ -71,6 +71,7 @@ class ResourceEditorView(TemplateView):
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
                 widgets_json=JSONSerializer().serialize(widgets),
+                resourceid=resourceid
             )
             return render(request, 'views/resource/editor.htm', context)
         
@@ -79,9 +80,9 @@ class ResourceEditorView(TemplateView):
 
 @method_decorator(group_required('edit'), name='dispatch')
 class ResourceData(TemplateView):
-    def get(self, request, formid=None):
+    def get(self, request, resourceid=None, formid=None):
         if formid is not None:
-            form = Form(formid=formid)
+            form = Form(resourceid=resourceid, formid=formid)
             return JSONResponse(form)
         
         return HttpResponseNotFound()
