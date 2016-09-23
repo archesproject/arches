@@ -33,6 +33,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock graph_header_tools %}
 
+{% block graph_header_buttons %}
+<button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'report_manager' graph_id %}') }">{% trans "Back to Reports" %}</button>
+{% endblock graph_header_buttons %}
+
 {% block content %}
 
 {% endblock content %}

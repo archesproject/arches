@@ -391,6 +391,7 @@ class ReportEditorView(GraphBaseView):
             report=JSONSerializer().serialize(report),
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
             templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            graph_id=self.graph.pk,
          )
 
         return render(request, 'views/graph/report-editor.htm', context)
