@@ -13,8 +13,9 @@ require([
     var self = this;
     var formView = new FormView({
         formid: data.forms[0].formid,
-        currentTabIndex: this.currentTabIndex,
-
+        resourceid: data.resourceid,
+        tiles: data.tiles,
+        blanks: data.blanks
     })
     var formList = new FormList({
         forms: ko.observableArray(data.forms)

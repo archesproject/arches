@@ -38,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Card Container -->
-    <div class="card-form-preview-container" data-bind="with: formView">
+    <div class="card-form-preview-container" data-bind="foreach: {data: [formView], as: 'formView'}">
         
         {% include 'views/resource/editor/form.htm' %}
 
@@ -55,7 +55,7 @@ define('resource-editor-data', [], function () {
         form: {{form}},
         datatypes: {{ datatypes_json }},
         widgets: {{ widgets_json }},
-
+        resourceid: '{{resourceid}}'
     };
 });
 {% endautoescape %}</script>

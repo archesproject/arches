@@ -23,6 +23,7 @@ from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData
+from arches.app.views.tile import TileData
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -83,8 +84,8 @@ urlpatterns = [
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
     url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
-
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
+    url(r'^tile', TileData.as_view(), name="tile"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

@@ -37,110 +37,112 @@ class Form(object):
     def load(self, resourceid, formid=None):
         self.widgets = models.Widget.objects.all()
 
-        self.forms = [{
-            'id': '1',
-            'title': _('Server Settings'),
-            'subtitle': _('Check/Update settings for Arches'),
-            'cardgroups': [
-            {
-                'id': '1-1',
-                'title': _('Arches Server Settings'),
-                'cardinality': '1',
-                'nodegroup_id': '21111111-0000-0000-0000-000000000000',  # <-- virtual nodegroup because this cardgroup has a cardinality of 1
-                'cards': [{
-                    'id': '30000000-0000-0000-0000-000000000000',
-                    'title': _('TEst'),
-                    'cardinality': '1',
-                    'nodegroup_id': '99999999-0000-0000-0000-000000000001',
-                    'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
-                    'widgets':[{
-                        'name': 'text-widget',
-                        'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps',
-                        'node_id': '20000000-0000-0000-0000-000000000002'
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Key',
-                        'placeholder': 'Enter key value',
-                        'node_id': '20000000-0000-0000-0000-000000000004'
-                    }]
-                },{
-                    'id': '30000000-0000-0000-0000-000000000000',
-                    'title': _('Keys'),
-                    'cardinality': 'n',
-                    'nodegroup_id': '99999999-0000-0000-0000-000000000000',
-                    'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
-                    'widgets':[{
-                        'name': 'select-widget',
-                        'label': 'Service Provider',
-                        'placeholder': 'e.g.: MapBox',
-                        'node_id': '20000000-0000-0000-0000-000000000003',
-                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps',
-                        'node_id': '20000000-0000-0000-0000-000000000002'
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Key',
-                        'placeholder': 'Enter key value',
-                        'node_id': '20000000-0000-0000-0000-000000000004'
-                    }]
-                }]
-            },
-            {
-                'id': '50000000-0000-0000-0000-000000000000',
-                'title': _('Base Maps'),
-                'cardinality': 'n',
-                'nodegroup_id': '11111111-0000-0000-0000-000000000000',
-                'cards': [{
-                    'id': '30000000-0000-0000-0000-000000000000',
-                    'title': _('Other Data'),
-                    'cardinality': 'n',
-                    'nodegroup_id': '32999999-0000-0000-0000-000000000000',
-                    'description': _('Do something awesome here'),
-                    'widgets':[{
-                        'name': 'select-widget',
-                        'label': 'Service Provider',
-                        'placeholder': 'e.g.: MapBox',
-                        'node_id': '20000000-0000-0000-0000-000000000003',
-                        'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps',
-                        'node_id': '20000000-0000-0000-0000-000000000002'
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Key',
-                        'placeholder': 'Enter key value',
-                        'node_id': '20000000-0000-0000-0000-000000000004'
-                    }]
-                }
-                ,{
-                    'id': '30000000-0000-0000-0000-000000000001',
-                    'title': _('TEST'),
-                    'cardinality': 'n',
-                    'nodegroup_id': '19999999-0000-0000-0000-000000000000',
-                    'description': _('TEAFASDF'),
-                    'widgets':[{
-                        'name': 'text-widget',
-                        'label': 'Service Name',
-                        'placeholder': 'e.g. MapBox Base Maps',
-                        'node_id': '20000000-0000-0000-0000-000000000002'
-                    },{
-                        'name': 'text-widget',
-                        'label': 'Key',
-                        'placeholder': 'Enter key value',
-                        'node_id': '20000000-0000-0000-0000-000000000004'
-                    }]
-                }
-                ]
-            }]
-        }]
+        # self.forms = [{
+        #     'id': '1',
+        #     'title': _('Server Settings'),
+        #     'subtitle': _('Check/Update settings for Arches'),
+        #     'cardgroups': [
+        #     {
+        #         'id': '1-1',
+        #         'title': _('Arches Server Settings'),
+        #         'cardinality': '1',
+        #         'nodegroup_id': '21111111-0000-0000-0000-000000000000',  # <-- virtual nodegroup because this cardgroup has a cardinality of 1
+        #         'cards': [{
+        #             'id': '30000000-0000-0000-0000-000000000000',
+        #             'title': _('TEst'),
+        #             'cardinality': '1',
+        #             'nodegroup_id': '99999999-0000-0000-0000-000000000001',
+        #             'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
+        #             'widgets':[{
+        #                 'name': 'text-widget',
+        #                 'label': 'Service Name',
+        #                 'placeholder': 'e.g. MapBox Base Maps',
+        #                 'node_id': '20000000-0000-0000-0000-000000000002'
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Key',
+        #                 'placeholder': 'Enter key value',
+        #                 'node_id': '20000000-0000-0000-0000-000000000004'
+        #             }]
+        #         },{
+        #             'id': '30000000-0000-0000-0000-000000000000',
+        #             'title': _('Keys'),
+        #             'cardinality': 'n',
+        #             'nodegroup_id': '99999999-0000-0000-0000-000000000000',
+        #             'description': _('Keys allow you to access external services (like Mapbox maps) from Arches. Add your user keys (optional):'),
+        #             'widgets':[{
+        #                 'name': 'select-widget',
+        #                 'label': 'Service Provider',
+        #                 'placeholder': 'e.g.: MapBox',
+        #                 'node_id': '20000000-0000-0000-0000-000000000003',
+        #                 'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Service Name',
+        #                 'placeholder': 'e.g. MapBox Base Maps',
+        #                 'node_id': '20000000-0000-0000-0000-000000000002'
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Key',
+        #                 'placeholder': 'Enter key value',
+        #                 'node_id': '20000000-0000-0000-0000-000000000004'
+        #             }]
+        #         }]
+        #     },
+        #     {
+        #         'id': '50000000-0000-0000-0000-000000000000',
+        #         'title': _('Base Maps'),
+        #         'cardinality': 'n',
+        #         'nodegroup_id': '11111111-0000-0000-0000-000000000000',
+        #         'cards': [{
+        #             'id': '30000000-0000-0000-0000-000000000000',
+        #             'title': _('Other Data'),
+        #             'cardinality': 'n',
+        #             'nodegroup_id': '32999999-0000-0000-0000-000000000000',
+        #             'description': _('Do something awesome here'),
+        #             'widgets':[{
+        #                 'name': 'select-widget',
+        #                 'label': 'Service Provider',
+        #                 'placeholder': 'e.g.: MapBox',
+        #                 'node_id': '20000000-0000-0000-0000-000000000003',
+        #                 'options': [{'id':'1', 'text': 'Bing'},{'id': '2', 'text': 'Map Box'}]
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Service Name',
+        #                 'placeholder': 'e.g. MapBox Base Maps',
+        #                 'node_id': '20000000-0000-0000-0000-000000000002'
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Key',
+        #                 'placeholder': 'Enter key value',
+        #                 'node_id': '20000000-0000-0000-0000-000000000004'
+        #             }]
+        #         }
+        #         ,{
+        #             'id': '30000000-0000-0000-0000-000000000001',
+        #             'title': _('TEST'),
+        #             'cardinality': 'n',
+        #             'nodegroup_id': '19999999-0000-0000-0000-000000000000',
+        #             'description': _('TEAFASDF'),
+        #             'widgets':[{
+        #                 'name': 'text-widget',
+        #                 'label': 'Service Name',
+        #                 'placeholder': 'e.g. MapBox Base Maps',
+        #                 'node_id': '20000000-0000-0000-0000-000000000002'
+        #             },{
+        #                 'name': 'text-widget',
+        #                 'label': 'Key',
+        #                 'placeholder': 'Enter key value',
+        #                 'node_id': '20000000-0000-0000-0000-000000000004'
+        #             }]
+        #         }
+        #         ]
+        #     }]
+        # }]
 
         #formid = '3d98910a-7f84-11e6-892b-14109fd34195'
+
+        tiles = models.Tile.objects.filter(resourceinstance_id=resourceid)
 
         if formid is not None:
             form = models.Form.objects.get(pk=formid)
@@ -152,57 +154,58 @@ class Form(object):
             }
             form_obj['cardgroups'] = []
             for formxcard in formxcards:
-                form_obj['cardgroups'].append(JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id)))
+                card_obj = JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id))
+                card_obj['tiles'] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card_obj['nodegroup_id']))
+                for child_card in card_obj['cards']:
+                    child_card['tiles'] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=child_card['nodegroup_id']))
+                form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
         else:
             pass
 
 
-
-        tiles = models.Tile.objects.filter(resourceinstance_id=resourceid)
-
         # def addTiles(parentObj, nodegroup_id, tiles):
         #     parentObj.tiles[nodegroup_id] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=nodegroup_id))
         #     return parentObj.tiles[nodegroup_id]
 
-        for form in self.forms:
-            for cardgroup in form['cardgroups']:
-                #addedTiles = addTiles(self, cardgroup['nodegroup_id'], tiles)
-                self.tiles[cardgroup['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=cardgroup['nodegroup_id']))
+        # for form in self.forms:
+        #     for cardgroup in form['cardgroups']:
+        #         #addedTiles = addTiles(self, cardgroup['nodegroup_id'], tiles)
+        #         self.tiles[cardgroup['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=cardgroup['nodegroup_id']))
 
-                if len(self.tiles[cardgroup['nodegroup_id']]) > 0:
-                    for parentTile in self.tiles[cardgroup['nodegroup_id']]:
-                        parentTile['tiles'] = {}
-                        for card in cardgroup['cards']:
-                            parentTile['tiles'][card['nodegroup_id']] = []
-                        for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
-                            parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
+        #         if len(self.tiles[cardgroup['nodegroup_id']]) > 0:
+        #             for parentTile in self.tiles[cardgroup['nodegroup_id']]:
+        #                 parentTile['tiles'] = {}
+        #                 for card in cardgroup['cards']:
+        #                     parentTile['tiles'][card['nodegroup_id']] = []
+        #                 for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
+        #                     parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
 
-                if len(self.tiles[cardgroup['nodegroup_id']]) == 0 and cardgroup['cardinality'] == '1':
-                    # add blank parent tile
-                    parentTile = JSONSerializer().serializeToPython(models.Tile())
-                    parentTile['tileid'] = ''
-                    parentTile['tiles'] = {}
-                    parentTile['nodegroup_id'] = cardgroup['nodegroup_id']
-                    parentTile['resourceinstance_id'] = resourceid
-                    self.tiles[cardgroup['nodegroup_id']] = [parentTile]
+        #         if len(self.tiles[cardgroup['nodegroup_id']]) == 0 and cardgroup['cardinality'] == '1':
+        #             # add blank parent tile
+        #             parentTile = JSONSerializer().serializeToPython(models.Tile())
+        #             parentTile['tileid'] = ''
+        #             parentTile['tiles'] = {}
+        #             parentTile['nodegroup_id'] = cardgroup['nodegroup_id']
+        #             parentTile['resourceinstance_id'] = resourceid
+        #             self.tiles[cardgroup['nodegroup_id']] = [parentTile]
 
-                    for card in cardgroup['cards']:
-                        #print card
-                        # make a blank tile
-                        tile = JSONSerializer().serializeToPython(models.Tile())
-                        tile['tileid'] = ''
-                        tile['parenttile_id'] = None # parentTile
-                        tile['resourceinstance_id'] = resourceid
-                        tile['nodegroup_id'] = card['nodegroup_id']
-                        tile['data'] = {}
-                        for widget in card['widgets']:
-                            tile['data'][widget['node_id']] = ''
+        #             for card in cardgroup['cards']:
+        #                 #print card
+        #                 # make a blank tile
+        #                 tile = JSONSerializer().serializeToPython(models.Tile())
+        #                 tile['tileid'] = ''
+        #                 tile['parenttile_id'] = None # parentTile
+        #                 tile['resourceinstance_id'] = resourceid
+        #                 tile['nodegroup_id'] = card['nodegroup_id']
+        #                 tile['data'] = {}
+        #                 for widget in card['widgets']:
+        #                     tile['data'][widget['node_id']] = ''
 
-                        parentTile['tiles'][card['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card['nodegroup_id']))
+        #                 parentTile['tiles'][card['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card['nodegroup_id']))
 
-                        if len(parentTile['tiles'][card['nodegroup_id']]) == 0 and card['cardinality'] == '1':
-                            parentTile['tiles'][card['nodegroup_id']] = [copy.deepcopy(tile)]
+        #                 if len(parentTile['tiles'][card['nodegroup_id']]) == 0 and card['cardinality'] == '1':
+        #                     parentTile['tiles'][card['nodegroup_id']] = [copy.deepcopy(tile)]
 
 
 
@@ -214,6 +217,9 @@ class Form(object):
                 parentTile['tiles'] = {}
                 parentTile['nodegroup_id'] = cardgroup['nodegroup_id']
                 parentTile['resourceinstance_id'] = resourceid
+                parentTile['data'] = {}
+                for widget in cardgroup['widgets']:
+                    parentTile['data'][widget['node_id']] = ''
 
                 # add a blank tile for the cardgroup
                 self.blanks[parentTile['nodegroup_id']] = parentTile

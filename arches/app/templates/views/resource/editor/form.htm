@@ -57,17 +57,18 @@
                                     </div>
 
                                     <!-- Form -->
-                                    <div class="col-xs-12 card-form-container" style="">
-
+                                    
+                                    <div class="col-xs-12 card-form-container" data-bind="foreach: {data: formView.getTileData(card, true), as: 'tile'}">
+                    
                                         <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
-                                                data:card.get('widgets')
+                                                data:card.get('widgets'), as: 'widget'
                                             }">
                                             <div class='widget-preview' data-bind='component: {
-                                                name: $parents[2].widgetLookup[get("widget_id")()].name,
+                                                name: formView.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON,
                                                     label: get("label")(),
-                                                    value: ko.observable(),
+                                                    value: tile.data[widget.get("node_id")()],
                                                     disabled: false
                                                 }
                                             }'></div>
@@ -75,21 +76,72 @@
 
                                         <!-- Save/Add Button -->
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus">{% trans "Add" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: formView.saveTile.bind(formView, card.get('tiles'), false)">{% trans "Add" %}</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n'">
+
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('tiles')().length > 0">
 
                                 <!-- Title -->
                                 <div class="card-tab-title mar-btm">
                                     Saved <span data-bind="text: card.get('name')"/>
                                 </div>
 
-                                <!-- Tiles -->
-                                <div class="tile-record list-group-item" style="cursor: pointer; background: rgb(250, 250, 250); height: 40px;" data-bind="text: card.get('itemtext')">
+                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: card.get('tiles'), as: 'tile'}">
+
+                                    <div class="list-group-item" style="background: rgb(250, 250, 250);">
+                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: formView.toggleTile"><span data-bind="text: formView.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: formView.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
+                                        
+                                        <div class="effect" style="display:none;">
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: formView.deleteTile.bind(formView, card.get('tiles'))">
+                                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                                </span>
+                                            </a>
+
+                                            <!-- Card Instruction -->
+                                            <div class="card-instructions">
+                                                <span data-bind="text: card.get('instructions')"></span>
+
+                                                <!-- Help link -->
+                                                <!-- ko if: card.get('helpenabled') -->
+                                                <span>
+                                                    <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                                </span>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <!-- Form -->
+                                            <div class="col-xs-12 card-form-container">
+                            
+                                                <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                        data:card.get('widgets'), as: 'widget'
+                                                    }">
+                                                    <div class='widget-preview' data-bind='component: {
+                                                        name: formView.widgetLookup[widget.get("widget_id")()].name,
+                                                        params: {
+                                                            config: configJSON,
+                                                            label: get("label")(),
+                                                            value: tile.data[widget.get("node_id")()],
+                                                            disabled: false
+                                                        }
+                                                    }'></div>
+                                                </form>
+
+                                            </div>
+
+                                            <!-- Save/Add Button -->
+                                            <div class="install-buttons">
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: formView.updateTile.bind(formView)">{% trans "Save" %}</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
                                 </div>
+
                             </div>
 
                             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
