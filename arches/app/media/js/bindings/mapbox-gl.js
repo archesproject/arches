@@ -75,6 +75,7 @@ define([
                 case 'Point': draw.changeMode('draw_point'); break;
                 case 'Line': draw.changeMode('draw_line_string'); break;
                 case 'Polygon': draw.changeMode('draw_polygon'); break;
+                default: draw.trash();
               }
             }
 
@@ -101,7 +102,8 @@ define([
             viewModel.editingToolIcons = {
               Point: 'ion-location',
               Line: 'ion-steam',
-              Polygon: 'ion-star'
+              Polygon: 'ion-star',
+              Delete: 'ion-trash-a'
             }
 
             // viewModel.geocodeQueryVal = ko.observable();
