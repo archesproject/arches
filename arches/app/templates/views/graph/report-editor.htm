@@ -58,7 +58,11 @@ define('report-editor-data', [], function () {
     return {
         templates: {{templates}},
         reports: {{reports}},
-        report: {{report}}
+        report: {{report}},
+        datatypes: {{ datatypes_json }},
+        forms: {{forms}},
+        forms_x_cards: {{forms_x_cards}},
+        cards: {{cards}}
     };
 });
 {% endautoescape %}</script>

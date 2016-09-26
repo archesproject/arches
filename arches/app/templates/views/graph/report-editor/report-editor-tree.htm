@@ -1,5 +1,6 @@
 {% load i18n %}
-<div>
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<div style="display: none;" data-bind="visible: self">
 
     <!-- Toggle form/report TOC -->
     <div class="toc-title-block">
@@ -9,6 +10,74 @@
 
     <!-- TOC Cards/Widgets -->
     <div class="card-tree-container">
+        <li class="card-tree-list"data-bind="css: {
+            'active': self.selection() === 'header'
+        }">
+            <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+                'active': self.selection() === 'header'
+            },
+            click: function() { self.selection('header') }">
+                <i class="card-tree-list-icon ion-ios-folder-outline"></i>
+                {% trans "Header" %}
+            </a>
+        </li>
+        <!-- ko foreach: { data: self.report.forms, as: 'form' } -->
+        <li class="card-tree-list"data-bind="css: {
+            'active': self.selection() === form
+        }">
+            <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+                'active': self.selection() === form
+            },
+            click: self.selection">
+                <i class="card-tree-list-icon ion-ios-folder-outline"></i>
+                <span data-bind="text: form.title"></span>
+            </a>
 
+            <ul class="card-tree-list-item" aria-expanded="true">
+                <div data-bind="template: {
+                    name: 'card-tree',
+                    foreach: cards,
+                    as: 'card'
+                }"></div>
+            </ul>
+        </li>
+        <!-- /ko -->
+        <li class="card-tree-list"data-bind="css: {
+            'active': self.selection() === 'footer'
+        }">
+            <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+                'active': self.selection() === 'footer'
+            },
+            click: function() { self.selection('footer') }">
+                <i class="card-tree-list-icon ion-ios-folder-outline"></i>
+                {% trans "Footer" %}
+            </a>
+        </li>
     </div>
 </div>
+<!-- /ko -->
+
+<template id="card-tree">
+    <li class="card-tree-list"data-bind="css: {
+        'active': self.selection() === card
+    }">
+        <a href="#" class="cc-link" aria-expanded="true" data-bind="css: {
+            'active': self.selection() === card
+        },
+        click: self.selection">
+            <i class="card-tree-list-icon" data-bind="css: {
+                'ion-ios-folder-outline': card.isContainer(),
+                'ion-ios-list-outline': !card.isContainer()
+            }"></i>
+            <span data-bind="text: card.get('name')"></span>
+        </a>
+
+        <ul class="card-tree-list-item" aria-expanded="true" data-bind="if: card.isContainer()">
+            <div data-bind="template: {
+                name: 'card-tree',
+                foreach: get('cards'),
+                as: 'card'
+            }"></div>
+        </ul>
+    </li>
+</template>

@@ -14,7 +14,8 @@ define([
         * @memberof ReportEditorTree.prototype
         */
         initialize: function(options) {
-
+            this.report = options.report;
+            this.selection = options.selection;
         }
     });
     return ReportEditorTree;

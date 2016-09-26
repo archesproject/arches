@@ -5,17 +5,16 @@ require([
     'views/graph/report-editor/report-editor-form',
     'views/graph/report-editor/report-editor-preview',
     'models/report',
+    'models/card',
     'report-editor-data',
     'arches'
-], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, data, arches) {
+], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
         reports: ko.observableArray(data.reports)
     };
 
-    viewModel.report = new ReportModel({
-        data: data.report
-    });
+    viewModel.report = new ReportModel(data);
 
     viewModel.reset = function () {
         viewModel.report.reset();

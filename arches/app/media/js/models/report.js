@@ -1,9 +1,10 @@
 define(['arches',
     'models/abstract',
+    'models/card',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function (arches, AbstractModel, ko, koMapping, _) {
+], function (arches, AbstractModel, CardModel, ko, koMapping, _) {
     var ReportModel = AbstractModel.extend({
         /**
         * A backbone model to manage report data
@@ -14,8 +15,30 @@ define(['arches',
 
         url: arches.urls.report_editor,
 
-        initialize: function(attributes){
+        initialize: function(options){
             var self = this;
+
+            this.cards = [];
+            options.cards.forEach(function (card) {
+                self.cards.push(new CardModel({
+                    data: card,
+                    datatypes: options.datatypes
+                }));
+            });
+
+            this.forms = options.forms;
+            this.forms.forEach(function (form) {
+                form.cards = [];
+                options.forms_x_cards.forEach(function (form_x_card) {
+                    if (form_x_card.form_id === form.formid) {
+                        var card = _.find(self.cards, function (card) {
+                            return card.get('id') === form_x_card.card_id;
+                        });
+                        form.cards.push(card);
+                    }
+                })
+            });
+            console.log(this.forms);
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());
@@ -31,7 +54,7 @@ define(['arches',
                 return JSON.stringify(_.extend(JSON.parse(self._data()),self.toJSON())) !== self._data();
             });
 
-            this.parse(attributes);
+            this.parse(options.report);
         },
 
         /**
@@ -43,7 +66,7 @@ define(['arches',
             var self = this;
             this._attributes = attributes;
 
-            _.each(attributes.data, function(value, key){
+            _.each(attributes, function(value, key){
                 switch(key) {
                     case 'reportid':
                         this.set('id', value);
@@ -71,7 +94,7 @@ define(['arches',
         },
 
         reset: function () {
-            this._attributes.data  = JSON.parse(this._data());
+            this._attributes  = JSON.parse(this._data());
             this.parse(this._attributes);
         },
 
