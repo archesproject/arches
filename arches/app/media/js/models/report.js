@@ -26,8 +26,7 @@ define(['arches',
                 }));
             });
 
-            this.forms = options.forms;
-            this.forms.forEach(function (form) {
+            options.forms.forEach(function (form) {
                 form.cards = [];
                 options.forms_x_cards.forEach(function (form_x_card) {
                     if (form_x_card.form_id === form.formid) {
@@ -38,7 +37,7 @@ define(['arches',
                     }
                 })
             });
-            console.log(this.forms);
+            this.forms = ko.observableArray(options.forms);
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());

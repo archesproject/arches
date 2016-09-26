@@ -7,7 +7,8 @@ require([
     'models/report',
     'models/card',
     'report-editor-data',
-    'arches'
+    'arches',
+    'bindings/sortable'
 ], function(ko, PageView, ReportEditorTree, ReportEditorForm, ReportEditorPreview, ReportModel, CardModel, data, arches) {
     var viewModel = {
         selectedReportId: ko.observable(data.report.reportid),
@@ -18,12 +19,12 @@ require([
 
     viewModel.reset = function () {
         viewModel.report.reset();
-        viewModel.selection(viewModel.report);
+        viewModel.selection('header');
     };
 
     viewModel.dirty = viewModel.report.dirty;
 
-    viewModel.selection = ko.observable(null);
+    viewModel.selection = ko.observable('header');
 
     viewModel.openReport = function (reportId) {
         pageView.viewModel.navigate(arches.urls.report_editor + reportId);
