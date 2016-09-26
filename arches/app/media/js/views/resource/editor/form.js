@@ -9,6 +9,7 @@ define([
     'models/tile',
     'resource-editor-data',
     'select2',
+    'bindings/let'
 ], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, data) {
     var FormView = Backbone.View.extend({
         /**

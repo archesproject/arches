@@ -1,5 +1,5 @@
 {% load i18n %}
-<!-- ko foreach: { data: cards, as: 'card' } -->
+<!-- ko foreach: { data: formView.cards, as: 'card' } -->
 <!-- Card Manager Panels and Forms -->
 <div class="ep-card-crud-container">
     <!-- Card Preview -->
@@ -58,7 +58,7 @@
 
                                     <!-- Form -->
                                     
-                                    <div class="col-xs-12 card-form-container" data-bind="foreach: {data: formView.getTileData(card, true), as: 'tile'}">
+                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': formView.getTileData(card, true)}">
                     
                                         <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
@@ -67,7 +67,7 @@
                                                 name: formView.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON,
-                                                    label: get("label")(),
+                                                    label: widget.get("label")(),
                                                     value: tile.data[widget.get("node_id")()],
                                                     disabled: false
                                                 }
@@ -126,7 +126,7 @@
                                                         name: formView.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
                                                             config: configJSON,
-                                                            label: get("label")(),
+                                                            label: widget.get("label")(),
                                                             value: tile.data[widget.get("node_id")()],
                                                             disabled: false
                                                         }

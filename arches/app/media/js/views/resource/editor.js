@@ -7,8 +7,8 @@ require([
     'views/resource/editor/form',
     'models/card',
     'resource-editor-data',
-
-    'bindings/sortable'
+    'bindings/sortable',
+    'bindings/let'
 ], function($, _, ko, PageView, FormList, FormView, CardModel, data) {
     var self = this;
     var formView = new FormView({
