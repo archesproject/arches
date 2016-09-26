@@ -58,11 +58,13 @@ define([
             viewModel.basemaps = arches.basemaps;
             viewModel.map = map;
 
+
             viewModel.setBasemap = function(basemapType) {
+                var lowestOverlay = _.filter(arches.basemapLayers, function(layer){ return layer.sortorder === 2})[0]
                 arches.basemapLayers.forEach(function(layer) {
                     if (layer.name === basemapType.name && !map.getLayer(layer.layer.id)) {
-                        map.addLayer(layer.layer, 'gl-draw-active-line.hot')
-                    } else if (map.getLayer(layer.layer.id) && layer.name !== basemapType.name) {
+                      map.addLayer(layer.layer, lowestOverlay.layer.id)
+                    } else if (map.getLayer(layer.layer.id) && layer.name !== basemapType.name && layer.isoverlay === false) {
                         map.removeLayer(layer.layer.id)
                     }
                 }, this)
