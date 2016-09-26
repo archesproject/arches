@@ -51,55 +51,6 @@ define([
                         "circle-color": "red"
                     }
                 });
-
-                // map.addSource("sf_culture", {
-                //     "type": "geojson",
-                //     "data":
-                //     {
-                //       "type": "FeatureCollection",
-                //       "features": [
-                //         {
-                //           "type": "Feature",
-                //           "properties": {},
-                //           "geometry": {
-                //             "type": "Polygon",
-                //             "coordinates": [
-                //               [
-                //                 [
-                //                   -122.43842124938963,
-                //                   37.79825525720401
-                //                 ],
-                //                 [
-                //                   -122.43859291076659,
-                //                   37.79669535426995
-                //                 ],
-                //                 [
-                //                   -122.43696212768555,
-                //                   37.79689882173807
-                //                 ],
-                //                 [
-                //                   -122.43842124938963,
-                //                   37.79825525720401
-                //                 ]
-                //               ]
-                //             ]
-                //           }
-                //         }
-                //       ]
-                //     }
-                //   });
-                //
-                // map.addLayer({
-                //     "id":"sf_culture_overlay",
-                //     "source":"sf_culture",
-                //     "type":"fill",
-                //     "layout": {},
-                //     "paint": {
-                //         "fill-color": "#088",
-                //         "fill-opacity": 0.8
-                //     }
-                //   });
-
             });
 
             map.addControl(draw);
@@ -127,7 +78,8 @@ define([
 
 
            viewModel.updateOpacity = function(val){
-            this.map.setPaintProperty(this.layer.id, 'fill-opacity', Number(val)/100.0);
+
+            this.map.setPaintProperty(this.layer.id, this.layer.type + '-opacity', Number(val)/100.0);
            }
 
            viewModel.overlays =

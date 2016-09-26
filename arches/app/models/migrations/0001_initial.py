@@ -749,6 +749,11 @@ class Migration(migrations.Migration):
             name='isoverlay',
             field=models.BooleanField(default=False),
         ),
+        migrations.AddField(
+            model_name='basemaplayers',
+            name='sortorder',
+            field=models.IntegerField(default=1),
+        ),
         migrations.AlterUniqueTogether(
             name='edge',
             unique_together=set([('rangenode', 'domainnode')]),

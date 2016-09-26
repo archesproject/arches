@@ -156,7 +156,8 @@
             basemapLayers: [{% autoescape off %}{% for basemap_layer in basemap_layers %}{
                 'name': '{{ basemap_layer.name }}',
                 'layer': {{ basemap_layer.layer_json }},
-                'isoverlay': {{ basemap_layer.isoverlay|lower }}
+                'isoverlay': {{ basemap_layer.isoverlay|lower }},
+                'sortorder': {{ basemap_layer.sortorder }}
             },{% endfor %}{% endautoescape %}],
         };
     });

@@ -33,7 +33,7 @@ define([
             this.selectedBasemap = this.basemap;
             var layers = [];
 
-            arches.basemapLayers.forEach(function (layer) {
+            _.each(_.sortBy(arches.basemapLayers, function(sortedLayer) {return sortedLayer.sortorder}), function (layer) {
               if (layer.name === self.selectedBasemap()) {
                   layers.push(layer.layer);
                   }

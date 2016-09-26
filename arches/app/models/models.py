@@ -528,6 +528,7 @@ class BasemapLayers(models.Model):
     name = models.TextField()
     layer = JSONField(blank=True, null=True, db_column='layer')
     isoverlay = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=1)
 
     @property
     def layer_json(self):
