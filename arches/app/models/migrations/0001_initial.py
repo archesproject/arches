@@ -745,7 +745,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
         ),
         migrations.AddField(
-            model_name='mapsources',
+            model_name='basemaplayers',
             name='isoverlay',
             field=models.BooleanField(default=False),
         ),

@@ -513,7 +513,6 @@ class Widget(models.Model):
 class MapSources(models.Model):
     name = models.TextField()
     source = JSONField(blank=True, null=True, db_column='source')
-    isoverlay = models.BooleanField(default=False)
 
     @property
     def source_json(self):
@@ -528,6 +527,7 @@ class MapSources(models.Model):
 class BasemapLayers(models.Model):
     name = models.TextField()
     layer = JSONField(blank=True, null=True, db_column='layer')
+    isoverlay = models.BooleanField(default=False)
 
     @property
     def layer_json(self):

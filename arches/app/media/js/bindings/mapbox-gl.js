@@ -5,7 +5,8 @@ define([
     'mapbox-gl',
     'arches',
     'plugins/mapbox-gl-draw',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/nouislider'
 ], function ($, _, ko, mapboxgl, arches, Draw, chosen) {
     ko.bindingHandlers.mapboxgl = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
@@ -23,6 +24,14 @@ define([
             var map = new mapboxgl.Map(
                 _.defaults(options, defaults)
             );
+
+            var uniqueOverlays =
+              _.uniq(
+                _.filter(arches.basemapLayers, {isoverlay:true}),
+                function(layer){
+                    return layer.name;
+                  }
+              );
 
             map.on('load', function() {
                 map.addSource('single-point', {
@@ -42,11 +51,62 @@ define([
                         "circle-color": "red"
                     }
                 });
+
+                // map.addSource("sf_culture", {
+                //     "type": "geojson",
+                //     "data":
+                //     {
+                //       "type": "FeatureCollection",
+                //       "features": [
+                //         {
+                //           "type": "Feature",
+                //           "properties": {},
+                //           "geometry": {
+                //             "type": "Polygon",
+                //             "coordinates": [
+                //               [
+                //                 [
+                //                   -122.43842124938963,
+                //                   37.79825525720401
+                //                 ],
+                //                 [
+                //                   -122.43859291076659,
+                //                   37.79669535426995
+                //                 ],
+                //                 [
+                //                   -122.43696212768555,
+                //                   37.79689882173807
+                //                 ],
+                //                 [
+                //                   -122.43842124938963,
+                //                   37.79825525720401
+                //                 ]
+                //               ]
+                //             ]
+                //           }
+                //         }
+                //       ]
+                //     }
+                //   });
+                //
+                // map.addLayer({
+                //     "id":"sf_culture_overlay",
+                //     "source":"sf_culture",
+                //     "type":"fill",
+                //     "layout": {},
+                //     "paint": {
+                //         "fill-color": "#088",
+                //         "fill-opacity": 0.8
+                //     }
+                //   });
+
             });
 
             map.addControl(draw);
+
             viewModel.basemaps = arches.basemaps;
             viewModel.map = map;
+
             viewModel.setBasemap = function(basemapType) {
                 arches.basemapLayers.forEach(function(layer) {
                     if (layer.name === basemapType.name && !map.getLayer(layer.layer.id)) {
@@ -64,6 +124,25 @@ define([
                 case 'Polygon': draw.changeMode('draw_polygon'); break;
               }
             }
+
+
+           viewModel.updateOpacity = function(val){
+            this.map.setPaintProperty(this.layer.id, 'fill-opacity', Number(val)/100.0);
+           }
+
+           viewModel.overlays =
+            _.each(uniqueOverlays, function(overlay) {
+              _.extend (overlay, {
+                opacity: ko.observable(100),
+                showingTools: ko.observable(false),
+                toggleOverlayTools: function(){
+                  this.showingTools(!this.showingTools())
+                },
+                handleSlider: function(val){
+                  this.updateOpacity(val, this.layer.id)
+                }
+              }, viewModel);
+            }, viewModel);
 
             viewModel.editingToolIcons = {
               Point: 'ion-location',
@@ -152,10 +231,6 @@ define([
                       var opts = _.pluck(data.results, 'text');
                       console.log(opts)
                       viewModel.geocodeSearchResults(opts);
-                      // var result = '';
-                      // _.each( data.results, function(item) {
-                      //     result += '<option value="' + item.geometry.coordinates + '">' + item.text + '</option>';
-                      // });
                     }
                   )
                   .fail(function(e){console.log(e, 'failed')})

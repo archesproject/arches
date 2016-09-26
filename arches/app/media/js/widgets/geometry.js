@@ -37,6 +37,9 @@ define([
               if (layer.name === self.selectedBasemap()) {
                   layers.push(layer.layer);
                   }
+              else if (layer.isoverlay === true) {
+                  layers.push(layer.layer);
+                }
             });
 
             this.mapToolsExpanded = ko.observable(false);

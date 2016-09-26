@@ -74,29 +74,94 @@
                       <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
                   </div>
 
-                  <!-- Overlay Item -->
-                   <div id="op-1" class="map-widget-overlay-item relative">
+                  <!-- ko foreach: { data: [$data], as: 'self' } -->
+                  <!-- ko foreach: overlays -->
+                   <div class="map-widget-overlay-item relative show-tools">
                       <div class="map-overlay-vis-toogle text-center">
                           <i class="ion-ios-baseball"></i>
                       </div>
                       <div class="map-overlay-name">
-                          <a id="" class="" href="">An Overlay with a long name </a>
+                          <a class="" href=""><span data-bind="text:name"><span></a>
                       </div>
-                      <div id="" class="map-overlay-item-tools">
-                          <a id="op-1-button" href="#" class="overlay-toggle"><i id="op-1-icon" class="ion-arrow-left-b"></i></a>
+                      <div class="map-overlay-item-tools">
+                          <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools">
+                            <!-- ko if: showingTools() === false  -->
+                              <i class="ion-arrow-left-b"></i>
+                            <!-- /ko -->
+                            <!-- ko if: showingTools() !== false  -->
+                              <i class="ion-arrow-down-b"></i>
+                            <!-- /ko -->
+                         </a>
                       </div>
-                      <div id="op-1-tools" class="map-overlay-item-tools-panel" style="display: none;">
+                      <div class="map-overlay-item-tools-panel" data-bind="css:{'show-tools': showingTools}">
+
+                        <!-- <div class="row"> -->
+
+                          <!-- <div class="col-xs-8"> -->
                           <div class="overlay-slider">
-                              <div id="op-1-slider" class="demo-pips pips noUi-target noUi-ltr noUi-horizontal noUi-connect"><div class="noUi-base"><div class="noUi-origin noUi-background noUi-stacking" style="left: 100%;"><div class="noUi-handle noUi-handle-lower"></div></div></div></div>
+                            <div data-bind="noUiSlider: {minValue: min, maxValue: max}"></div>
                           </div>
+                          <!-- </div> -->
+
+                          <!-- <div class="col-xs-4"> -->
                           <div class="overlay-tool-group">
                               <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
                               <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
                               <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
                           </div>
+                         <!-- </div> -->
+
+                      <!-- </div> -->
+
                       </div>
                   </div>
-						 </div>
+                  <!-- /ko -->
+                  <!-- /ko -->
+					</div>
+
+<script>
+
+//Show Overlay Item tools
+$('.overlay-toggle').on('click', function (ev) {
+  ev.preventDefault();
+
+  //get id of selected overlay item
+  var linkID = this.id;
+  var linkNumber = linkID.split("-")[1];
+
+  var container = "#op-" + linkNumber;
+  var toolsPanel = "#op-" + linkNumber + "-tools";
+  var icon = "#op-" + linkNumber + "-icon";
+
+  //manage display of overlay tools
+  if ($( icon ).hasClass("ion-arrow-left-b")) {
+    $( container ).addClass("show-tools");
+    $( toolsPanel ).delay(200).fadeIn();
+
+    //update arrow
+    $( icon ).removeClass("ion-arrow-left-b");
+    $( icon ).addClass("ion-arrow-down-b");
+
+  } else {
+    $( container ).removeClass("show-tools");
+    $( toolsPanel ).toggle();
+
+    //update arrow
+    $( icon ).addClass("ion-arrow-left-b");
+    $( icon ).removeClass("ion-arrow-down-b");
+  }
+
+});
+
+var range_all_sliders = {
+  'min': [ 0 ],
+  '25%': [ 25 ],
+  '50%': [ 50 ],
+  '75%': [ 75 ],
+  'max': [ 100 ]
+};
+</script>
+
 
               <!-- Map Tools -->
               <div id="maptools-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.maptools}">

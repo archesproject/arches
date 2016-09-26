@@ -36,7 +36,8 @@
             'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
             'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
-            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl'
+            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl',
+            'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min',
         },
         shim: {
             'openlayers': {
@@ -62,6 +63,10 @@
             },
             'select2': {
                 deps: ['jquery']
+            },
+            'noUiSlider': {
+                deps: ['jquery'],
+                exports : '$'
             },
             'plugins/mapbox-gl-draw': {
                 deps: ['mapbox-gl'],
@@ -150,7 +155,8 @@
             {% endfor %}{% endautoescape %}},
             basemapLayers: [{% autoescape off %}{% for basemap_layer in basemap_layers %}{
                 'name': '{{ basemap_layer.name }}',
-                'layer': {{ basemap_layer.layer_json }}
+                'layer': {{ basemap_layer.layer_json }},
+                'isoverlay': {{ basemap_layer.isoverlay|lower }}
             },{% endfor %}{% endautoescape %}],
         };
     });
