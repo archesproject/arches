@@ -66,10 +66,10 @@ define([
             var cardinaltiy = card.get('cardinality')();
             if(cardinaltiy === '1'){
                 if(nodegroup_id){
-                    if(card.tiles[nodegroup_id]().length === 0){
+                    if(card.get('tiles')().length === 0){
                         return this.blanks[nodegroup_id];
                     }else{
-                        return card.tiles[nodegroup_id]()[0];
+                        return card.get('tiles')()[0];
                     } 
                 }else{
                     return new TileModel();
@@ -80,7 +80,7 @@ define([
                     if(forceblank){
                         return this.blanks[nodegroup_id];
                     }else{
-                        return card.tiles[nodegroup_id]();
+                        return card.get('tiles')[nodegroup_id]();
                     }
                 }else{
                     return new TileModel();
@@ -126,6 +126,24 @@ define([
                     }
                 }, this);
             }
+        },
+
+        saveTileGroup: function(tilegroup, justadd, cardcontainer, e){
+            console.log(koMapping.toJS(cardcontainer));
+            var parentTile = this.getTileData(cardcontainer, true);
+            cardcontainer.get('cards')().forEach(function(card){
+                parentTile.tiles[card.get('nodegroup_id')] = card.get('tiles')();
+            }, this);
+
+            var model = new TileModel(koMapping.toJS(parentTile));
+            model.save(function(request, status, model){
+                if(request.status === 200){
+                    tilegroup.unshift(koMapping.fromJS(request.responseJSON));
+                    this.clearTile(tile);
+                }else{
+                    // inform the user
+                }
+            }, this);
         },
 
         /**

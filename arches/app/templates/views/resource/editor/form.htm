@@ -75,6 +75,9 @@
                                         </form>
 
                                         <!-- Save/Add Button -->
+                                        <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === '1' && $parent.isContainer() === false" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: formView.updateTile.bind(formView)">{% trans "Save" %}</button>
+                                        </div>
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: formView.saveTile.bind(formView, card.get('tiles'), false)">{% trans "Add" %}</button>
                                         </div>
@@ -82,7 +85,8 @@
                                 </div>
                             </div>
 
-                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('tiles')().length > 0">
+                            <!-- List of saved tiles for cardinality === 'n' -->
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n' && card.get('tiles')().length > 0">
 
                                 <!-- Title -->
                                 <div class="card-tab-title mar-btm">
@@ -171,16 +175,18 @@
                 </div>
 
                 <!-- Wizard Level Buttons -->
+                <!-- ko if: card.get('cardinality')() === 'n' && card.isContainer() -->
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
                             <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: formView.saveTileGroup.bind(formView, card.get('tiles'), false)">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
+
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;">
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
@@ -188,7 +194,7 @@
                     </div>
 
                     <!-- Wizard Tile -->
-                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
+                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: card.get('tiles'), as: 'tile'}">
 
                         <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
                             <li id="summary-group" data-bind="css: {'active': $index() === card.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
@@ -207,6 +213,7 @@
                     </div>
 
                 </div>
+                <!-- /ko -->
             </div>
 
 
