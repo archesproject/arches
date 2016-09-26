@@ -1,5 +1,5 @@
 {% load i18n %}
-<!-- ko foreach: { data: formView.cards, as: 'card' } -->
+<!-- ko foreach: { data: form.cards, as: 'card' } -->
 <!-- Card Manager Panels and Forms -->
 <div class="ep-card-crud-container">
     <!-- Card Preview -->
@@ -58,13 +58,13 @@
 
                                     <!-- Form -->
                                     
-                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': formView.getTileData(card, true)}">
+                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': form.getTileData(card, true)}">
                     
                                         <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
                                             }">
                                             <div class='widget-preview' data-bind='component: {
-                                                name: formView.widgetLookup[widget.get("widget_id")()].name,
+                                                name: form.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON,
                                                     label: widget.get("label")(),
@@ -76,10 +76,10 @@
 
                                         <!-- Save/Add Button -->
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === '1' && $parent.isContainer() === false" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: formView.updateTile.bind(formView)">{% trans "Save" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form)">{% trans "Save" %}</button>
                                         </div>
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: formView.saveTile.bind(formView, card.get('tiles'), false)">{% trans "Add" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, card.get('tiles'), false)">{% trans "Add" %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -96,10 +96,10 @@
                                 <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: card.get('tiles'), as: 'tile'}">
 
                                     <div class="list-group-item" style="background: rgb(250, 250, 250);">
-                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: formView.toggleTile"><span data-bind="text: formView.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: formView.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
+                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
                                         
                                         <div class="effect" style="display:none;">
-                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: formView.deleteTile.bind(formView, card.get('tiles'))">
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, card.get('tiles'))">
                                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                                 </span>
                                             </a>
@@ -123,7 +123,7 @@
                                                         data:card.get('widgets'), as: 'widget'
                                                     }">
                                                     <div class='widget-preview' data-bind='component: {
-                                                        name: formView.widgetLookup[widget.get("widget_id")()].name,
+                                                        name: form.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
                                                             config: configJSON,
                                                             label: widget.get("label")(),
@@ -138,7 +138,7 @@
                                             <!-- Save/Add Button -->
                                             <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: formView.updateTile.bind(formView)">{% trans "Save" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form)">{% trans "Save" %}</button>
                                             </div>
 
                                         </div>
@@ -180,7 +180,7 @@
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
                             <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: formView.saveTileGroup.bind(formView, card.get('tiles'), false)">{% trans "Save" %}</button>
+                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, card.get('tiles'), false)">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
