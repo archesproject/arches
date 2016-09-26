@@ -385,6 +385,7 @@ class Migration(migrations.Migration):
                 ('iconclass', models.TextField(blank=True, null=True)),
                 ('status', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'forms',
@@ -531,6 +532,36 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'relations',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='ReportTemplate',
+            fields=[
+                ('templateid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField(null=True, blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('component', models.TextField()),
+                ('componentname', models.TextField()),
+                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+            ],
+            options={
+                'db_table': 'report_templates',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Report',
+            fields=[
+                ('reportid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField(null=True, blank=True)),
+                ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate')),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('active', models.BooleanField(default=False)),
+            ],
+            options={
+                'db_table': 'reports',
                 'managed': True,
             },
         ),

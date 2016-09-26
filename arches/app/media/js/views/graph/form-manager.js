@@ -1,4 +1,5 @@
 require([
+    'jquery',
     'underscore',
     'knockout',
     'models/graph',
@@ -6,7 +7,8 @@ require([
     'viewmodels/alert',
     'arches',
     'graph-forms-data',
-], function(_, ko, GraphModel, PageView, AlertViewModel, arches, data) {
+    'bindings/sortable'
+], function($, _, ko, GraphModel, PageView, AlertViewModel, arches, data) {
 
     /**
     * a PageView representing the graph forms page
@@ -48,6 +50,23 @@ require([
                 url: 'add_form',
                 success: function(response) {
                     pageView.viewModel.openForm(response.formid);
+                },
+                error: function(response) {
+                    pageView.viewModel.loading(false);
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                }
+            });
+        },
+        reorderForms: function () {
+            pageView.viewModel.loading(true);
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({
+                    forms: viewModel.forms()
+                }),
+                url: 'reorder_forms',
+                success: function(response) {
+                    pageView.viewModel.loading(false);
                 },
                 error: function(response) {
                     pageView.viewModel.loading(false);
