@@ -1,5 +1,5 @@
 {% load i18n %}
-<!-- ko foreach: { data: form.cards, as: 'card' } -->
+<!-- ko foreach: { data: form.cards, as: 'outterCard' } -->
 <!-- Card Manager Panels and Forms -->
 <div class="ep-card-crud-container">
     <!-- Card Preview -->
@@ -8,36 +8,36 @@
         <div id="" class="panel">
             <div class="panel-heading">
                 <div class="">
-                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: card.get('name')"></h3>
+                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: outterCard.get('name')"></h3>
                 </div>
             </div>
 
             <!-- Data Entry -->
             <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
                 <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
+                    
                     <!--Nav Tabs-->
-                    <ul class="nav nav-tabs card-nav-container"  data-bind="foreach: {
-                        data: card.isContainer() ? card.get('cards') : [card]
+                    <ul class="nav nav-tabs card-nav-container" data-bind="foreach: {
+                        data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
+                        as: 'card'
                     }">
                         <li id="summary-group" data-bind="css: {
-                            'active': card.get('selectedCardIndex')()===$index()
-                        }, click: card.get('selectedCard')">
+                            'active': outterCard.get('selectedCardIndex')()===$index()
+                        }, click: outterCard.get('selectedCard')">
                             <a id="summary-tab" href="#" class="card-tab-title">
-                                <span data-bind="text: get('name')"></span>
+                                <span data-bind="text: card.get('name')"></span>
                             </a>
                         </li>
                     </ul>
 
                     <div id="db-arches-app-alert" class="panel data-card-alert"></div>
 
-
                     <!--Tabs Content-->
-                    <div class="tab-content card-content-tab" style="margin-left: 0px;">
-
-                        <!-- ko foreach: {
-                            data: card.isContainer() ? card.get('cards') : [card],
-                            as: 'card'
-                        } -->
+                    <div class="tab-content card-content-tab" style="margin-left: 0px;" data-bind="foreach: {
+                        data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
+                        as: 'card'
+                    }">
+          
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
                             'active in': $parent.get('selectedCardIndex')()===$index()
@@ -167,37 +167,34 @@
                             
                         </div>
 
-
-                        <!-- /ko -->
-
                     </div>
 
                 </div>
 
                 <!-- Wizard Level Buttons -->
-                <!-- ko if: card.get('cardinality')() === 'n' && card.isContainer() -->
+                <!-- ko if: outterCard.get('cardinality')() === 'n' && outterCard.isContainer() -->
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
                             <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, card.get('tiles'), false)">{% trans "Save" %}</button>
+                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, outterCard.get('tiles'), false)">{% trans "Save" %}</button>
                         </span>
                     </div>
                 </div>
 
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px; display: none;" data-bind="visible: card.get('cardinality')() === 'n' && card.get('tiles')().length > 0">
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && outterCard.get('tiles')().length > 0">
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
-                        Saved <span data-bind="text: card.get('name')"/>
+                        Saved <span data-bind="text: outterCard.get('name')"/>
                     </div>
 
                     <!-- Wizard Tile -->
-                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: card.get('tiles'), as: 'tile'}">
+                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: outterCard.get('tiles'), as: 'tile'}">
 
-                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
-                            <li id="summary-group" data-bind="css: {'active': $index() === card.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: outterCard.get('cards')" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === outterCard.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
                                 <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: $parent.selection">
                                     <!-- Editable Span -->
                                     <span class="card-tab-title">
@@ -205,7 +202,7 @@
                                     </span>
                                 </a>
                             </li>
-                            <li class="wizard-card-tools" data-bind="if: $index() === (card.isContainer() ? (card.get('cards')().length - 1) : 0) ">
+                            <li class="wizard-card-tools" data-bind="if: $index() === (outterCard.isContainer() ? (outterCard.get('cards')().length - 1) : 0) ">
                                 <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                 <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                             </li>
