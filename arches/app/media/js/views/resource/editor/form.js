@@ -106,10 +106,10 @@ define([
          * @param  {object} e event object
          * @return {null} 
          */
-        saveTile: function(tilegroup, justadd, tile, e){
+        saveTile: function(tilegroup, justadd, tile, currentContext, e){
             console.log(koMapping.toJS(tile));
             var nodegroup_id = tile.nodegroup_id();
-            if(justadd === "true"){
+            if(justadd){
                 tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
                 this.clearTile(tile);
             }else{
