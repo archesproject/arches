@@ -34,6 +34,8 @@ define(['arches',
                     }
                 })
                 form.sortorder = Infinity;
+                form.active = ko.observable(false);
+                form.label = ko.observable(form.title);
             });
             this.forms = ko.observableArray(options.forms);
 
@@ -63,6 +65,22 @@ define(['arches',
             var self = this;
             this._attributes = attributes;
 
+            var parseCardConfig = function (cardId, cardConfig, cards) {
+                var card = _.find(cards, function(card) {
+                    return card.get('id') === cardId;
+                });
+                card.get('name')(cardConfig.label);
+                _.each(cardConfig.nodes, function (nodeConfig, nodeId) {
+                    var widget = _.find(card.get('widgets')(), function(widget) {
+                        return widget.node.nodeid === nodeId;
+                    });
+                    widget.get('label')(nodeConfig.label);
+                });
+                _.each(cardConfig.cards, function (cardConfig, cardId) {
+                    parseCardConfig(cardId, cardConfig, card.get('cards')());
+                });
+            }
+
             _.each(attributes, function(value, key){
                 switch(key) {
                     case 'reportid':
@@ -88,7 +106,12 @@ define(['arches',
                             var form = _.find(forms, function(form) {
                                 return form.formid === formid;
                             });
-                            form.sortorder = formconfig.sortorder;
+                            _.extend(form, _.pick(formconfig, 'sortorder'));
+                            form.active(formconfig.active);
+                            form.label(formconfig.label);
+                            _.each(formconfig.cards, function (cardConfig, cardId) {
+                                parseCardConfig(cardId, cardConfig, form.cards);
+                            })
                         });
                     default:
                         this.set(key, value);
@@ -127,9 +150,35 @@ define(['arches',
                 }
             }
             ret.formsconfig = {};
+            var getCardConfig = function (card) {
+                var cards = card.get('cards')();
+                var widgets = card.get('widgets')();
+                var cardsConfig = {};
+                var nodesConfig = {};
+                cards.forEach(function (childCard) {
+                    cardsConfig[childCard.get('id')] = getCardConfig(childCard);
+                });
+                widgets.forEach(function (widget) {
+                    nodesConfig[widget.node.nodeid] = {
+                        label: widget.get('label')()
+                    };
+                });
+                return {
+                    label: card.get('name')(),
+                    cards: cardsConfig,
+                    nodes: nodesConfig
+                };
+            }
             this.forms().forEach(function(form, i) {
+                var cardsConfig = {};
+                form.cards.forEach(function (card) {
+                    cardsConfig[card.get('id')] = getCardConfig(card);
+                })
                 ret.formsconfig[form.formid] = {
-                    sortorder: i
+                    sortorder: i,
+                    active: form.active(),
+                    label: form.label(),
+                    cards: cardsConfig
                 };
             });
             return ret;

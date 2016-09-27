@@ -1,5 +1,65 @@
 {% load i18n %}
 <!-- Card Container CRUD -->
-<div id="ep-card-container-crud">
+<div id="ep-card-container-crud" style="display: none;" data-bind="visible: selection()">
+    <!-- ko if: selection() === 'header' -->
+    <div class="library-title-block">
+        <h4 class="title-block-title"> {% trans "Header" %}</h4>
+    </div>
+    <!-- /ko -->
 
+    <!-- ko if: selection().formid -->
+    <div class="library-title-block">
+        <h4 class="title-block-title"> {% trans "Report Section" %}</h4>
+    </div>
+    <div style="padding-bottom: 5px;">
+        <div data-bind="component: { name: 'switch-widget', params: {value: selection().active, config:{label: '{% trans "Publish Section" %}', subtitle: ''}}}"></div>
+
+        <div class="node-widget-label" style="">
+            <div class="control-label">
+                {% trans "Section Title" %}
+            </div>
+            <div class="col-sm-12 pad-no crud-widget-container">
+                <input type="text" placeholder="{% trans "Section Title" %}" class="form-control input-md widget-input" data-bind="value: selection().label, valueUpdate: 'keyup'">
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: selection().isContainer && selection().isContainer() -->
+    <div class="library-title-block">
+        <h4 class="title-block-title"> {% trans "Sub-Section" %}</h4>
+    </div>
+    <div style="padding-bottom: 5px;">
+        <div class="node-widget-label" style="">
+            <div class="control-label">
+                Sub-Section Title
+            </div>
+            <div class="col-sm-12 pad-no crud-widget-container">
+                <input type="text" placeholder="{% trans "Sub-Section Title" %}" class="form-control input-md widget-input" data-bind="value: selection().get('name'), valueUpdate: 'keyup'">
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: selection().isContainer && !selection().isContainer() -->
+    <div class="library-title-block">
+        <h4 class="title-block-title"> {% trans "Label Manager" %}</h4>
+    </div>
+    <div style="padding-bottom: 5px;">
+        <!-- ko foreach: selection().get('widgets') -->
+        <div class="node-widget-label" style="">
+            <div class="control-label" data-bind="text: node.name() + ' {% trans "Label" %}'"></div>
+            <div class="col-sm-12 pad-no crud-widget-container">
+                <input type="text" placeholder="{% trans "Label text" %}" class="form-control input-md widget-input" data-bind="value: get('label'), valueUpdate: 'keyup'">
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: selection() === 'footer' -->
+    <div class="library-title-block">
+        <h4 class="title-block-title"> {% trans "Footer" %}</h4>
+    </div>
+    <!-- /ko -->
 </div>

@@ -1,5 +1,6 @@
 define([
     'backbone',
+    'widgets'
 ], function(Backbone) {
     var ReportEditorForm = Backbone.View.extend({
         /**
@@ -14,7 +15,8 @@ define([
         * @memberof ReportEditorForm.prototype
         */
         initialize: function(options) {
-
+            this.report = options.report;
+            this.selection = options.selection;
         }
     });
     return ReportEditorForm;
