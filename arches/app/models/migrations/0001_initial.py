@@ -754,6 +754,11 @@ class Migration(migrations.Migration):
             name='sortorder',
             field=models.IntegerField(default=1),
         ),
+        migrations.AddField(
+            model_name='basemaplayers',
+            name='icon',
+            field=models.TextField(default=None),
+        ),
         migrations.AlterUniqueTogether(
             name='edge',
             unique_together=set([('rangenode', 'domainnode')]),

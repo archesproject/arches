@@ -36,7 +36,7 @@ define([
 
               map.addControl(draw);
 
-              viewModel.basemaps = arches.basemaps;
+              viewModel.basemaps = _.uniq(_.filter(arches.basemapLayers, function(baselayer){return baselayer.isoverlay===false}), function(baselayer){return baselayer.name})
               viewModel.map = map;
 
 
@@ -53,7 +53,8 @@ define([
                             this.showingTools(!this.showingTools())
                          },
                          handleSlider: function(val){
-                            this.updateOpacity(val, this.layer.id)
+                            this.updateOpacity(val, this.layer.id);
+                            this.opacity(val);
                          }
                    }, viewModel);
                }, viewModel);
@@ -87,6 +88,7 @@ define([
                   }
                   for (var i = overlays.length; i-- > 0; ) {
                     map.addLayer(overlays[i].layer, anchorLayer)
+                    map.setPaintProperty(overlays[i].layer.id, overlays[i].layer.type + '-opacity', overlays[i].opacity()/100.0);
                   }
                   viewModel.redrawGeocodeLayer();
                 })
@@ -94,7 +96,7 @@ define([
                 viewModel.editingToolIcons = {
                   Point: 'ion-location',
                   Line: 'ion-steam',
-                  Polygon: 'ion-star',
+                  Polygon: 'fa fa-pencil-square-o',
                   Delete: 'ion-trash-a'
                 }
 

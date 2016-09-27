@@ -157,7 +157,8 @@
                 'name': '{{ basemap_layer.name }}',
                 'layer': {{ basemap_layer.layer_json }},
                 'isoverlay': {{ basemap_layer.isoverlay|lower }},
-                'sortorder': {{ basemap_layer.sortorder }}
+                'sortorder': {{ basemap_layer.sortorder }},
+                'icon': '{{ basemap_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
         };
     });

@@ -8,7 +8,7 @@ define([
         var model = viewModel;
 
         noUiSlider.create(element, {
-          start: 100,
+          start: model.opacity(),
           range: {
             'min': 0,
             'max': 100

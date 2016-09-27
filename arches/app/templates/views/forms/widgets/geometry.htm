@@ -48,7 +48,7 @@
 
                     <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-                    <!-- ko foreach: baseMaps -->
+                    <!-- ko foreach: basemaps -->
                     <div class="map-widget-overlay-item relative" data-bind="click: self.selectBasemap">
                         <div class="map-overlay-vis-toogle text-center">
                           <!-- ko if: name === self.basemap()-->
@@ -78,7 +78,7 @@
                   <div data-bind="sortable: overlays">
                    <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools}">
                       <div class="map-overlay-vis-toogle text-center">
-                          <i class="ion-ios-baseball"></i>
+                          <i data-bind="css: icon"></i>
                       </div>
                       <div class="map-overlay-name">
                           <a class="" href=""><span data-bind="text:name"><span></a>
