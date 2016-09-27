@@ -7,6 +7,7 @@
         paths: {
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
+            'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '//cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
@@ -173,6 +174,16 @@
                 'component': '{{ widget.component }}',
                 'datatype': '{{ widget.datatype }}',
                 'defaultconfig': '{{ widget.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
+
+    define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for template in report_templates %}
+            '{{ template.pk }}': {
+                'componentname': '{{ template.componentname }}',
+                'component': '{{ template.component }}',
+                'defaultconfig': '{{ template.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });

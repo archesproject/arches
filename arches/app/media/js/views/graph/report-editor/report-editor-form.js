@@ -1,7 +1,8 @@
 define([
     'backbone',
+    'report-templates',
     'widgets'
-], function(Backbone) {
+], function(Backbone, reportLookup) {
     var ReportEditorForm = Backbone.View.extend({
         /**
         * A backbone view representing a form for editing report components
@@ -15,6 +16,7 @@ define([
         * @memberof ReportEditorForm.prototype
         */
         initialize: function(options) {
+            this.reportLookup = reportLookup;
             this.report = options.report;
             this.selection = options.selection;
         }

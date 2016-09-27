@@ -367,7 +367,7 @@ class ReportManagerView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
          )
 
         return render(request, 'views/graph/report-manager.htm', context)
@@ -390,12 +390,14 @@ class ReportEditorView(GraphBaseView):
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',
             report=JSONSerializer().serialize(report),
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates),
             forms=JSONSerializer().serialize(forms),
             forms_x_cards=JSONSerializer().serialize(forms_x_cards),
             cards=JSONSerializer().serialize(cards),

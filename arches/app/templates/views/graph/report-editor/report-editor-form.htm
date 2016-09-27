@@ -5,6 +5,15 @@
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Header" %}</h4>
     </div>
+
+    <div class='report-preview' data-bind='component: {
+        name: reportLookup[report.get("template_id")()].componentname,
+        params: {
+            report: report,
+            configForm: true,
+            configType: "header"
+        }
+    }'></div>
     <!-- /ko -->
 
     <!-- ko if: selection().formid -->
@@ -61,5 +70,14 @@
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Footer" %}</h4>
     </div>
+
+    <div class='report-preview' data-bind='component: {
+        name: reportLookup[report.get("template_id")()].componentname,
+        params: {
+            report: report,
+            configForm: true,
+            configType: "footer"
+        }
+    }'></div>
     <!-- /ko -->
 </div>
