@@ -6,7 +6,8 @@ define([
     'arches',
     'plugins/mapbox-gl-draw',
     'bindings/chosen',
-    'bindings/nouislider'
+    'bindings/nouislider',
+    'bindings/sortable'
 ], function ($, _, ko, mapboxgl, arches, Draw, chosen) {
     ko.bindingHandlers.mapboxgl = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
@@ -85,7 +86,7 @@ define([
             this.map.setPaintProperty(this.layer.id, this.layer.type + '-opacity', Number(val)/100.0);
            }
 
-           viewModel.overlays =
+           var overlays =
             _.each(uniqueOverlays, function(overlay) {
               _.extend (overlay, {
                 opacity: ko.observable(100),
@@ -99,12 +100,14 @@ define([
               }, viewModel);
             }, viewModel);
 
-            viewModel.editingToolIcons = {
-              Point: 'ion-location',
-              Line: 'ion-steam',
-              Polygon: 'ion-star',
-              Delete: 'ion-trash-a'
-            }
+          viewModel.overlays = ko.observableArray(overlays)
+
+          viewModel.editingToolIcons = {
+            Point: 'ion-location',
+            Line: 'ion-steam',
+            Polygon: 'ion-star',
+            Delete: 'ion-trash-a'
+          }
 
             // viewModel.geocodeQueryVal = ko.observable();
             // viewModel.geocodeSearchVal = ko.observable('')

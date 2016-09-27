@@ -168,7 +168,8 @@
     color: #888;
     border-top: 1px solid #f4f4f4;
     border-bottom: 1px solid #ddd;
-    transition: all .40s ease;
+    /*transition: all .40s ease;*/
+    display: none;
 }
 
 .overlay-tool-icon {
@@ -245,8 +246,8 @@
 
 .map-overlay-item-tools-panel .noUi-base {
     background: #489EED;
-    -webkit-transition: background 450ms;
-    transition: background 450ms;
+    /*-webkit-transition: background 450ms;*/
+    /*transition: background 450ms;*/
 }
 .map-overlay-item-tools-panel .noUi-horizontal {
     height: 10px;

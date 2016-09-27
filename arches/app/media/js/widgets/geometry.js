@@ -5,7 +5,7 @@ define([
   'arches',
   'map/mapbox-style',
   'geoms',
-  'bindings/map-controls',
+  'bindings/fadeVisible',
   'bindings/mapbox-gl'
 ], function (ko, _, WidgetViewModel, arches, mapStyle, geoms) {
     /**
