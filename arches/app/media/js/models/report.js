@@ -18,22 +18,19 @@ define(['arches',
         initialize: function(options){
             var self = this;
 
-            this.cards = [];
-            options.cards.forEach(function (card) {
-                self.cards.push(new CardModel({
-                    data: card,
-                    datatypes: options.datatypes
-                }));
-            });
-
             options.forms.forEach(function (form) {
                 form.cards = [];
                 options.forms_x_cards.forEach(function (form_x_card) {
                     if (form_x_card.form_id === form.formid) {
-                        var card = _.find(self.cards, function (card) {
-                            return card.get('id') === form_x_card.card_id;
+                        var card = _.find(options.cards, function (card) {
+                            return card.cardid === form_x_card.card_id;
                         });
-                        form.cards.push(card);
+                        var cardModel = new CardModel({
+                            data: card,
+                            datatypes: options.datatypes
+                        });
+                        cardModel.formId = form.formid;
+                        form.cards.push(cardModel);
                     }
                 })
                 form.sortorder = Infinity;
