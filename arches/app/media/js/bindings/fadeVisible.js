@@ -19,9 +19,7 @@ define([
               $(element).fadeOut(fade);
             } else {
               $(element).delay(delay).fadeIn(fade)
-              // $(element).fadeIn(fade)
             }
-            // ko.unwrap(value) ? $(element).fadeOut() : $(element).fadeIn();
         }
     };
     return ko.bindingHandlers.fadeVisible;
