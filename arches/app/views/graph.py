@@ -406,6 +406,16 @@ class ReportEditorView(GraphBaseView):
 
         return render(request, 'views/graph/report-editor.htm', context)
 
+    def post(self, request, reportid):
+        data = JSONDeserializer().deserialize(request.body)
+        report = models.Report.objects.get(reportid=reportid)
+        report.name = data['name']
+        report.config = data['config']
+        report.formsconfig = data['formsconfig']
+        report.active = data['active']
+        report.save()
+        return JSONResponse(report)
+
     def delete(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
         report.delete()

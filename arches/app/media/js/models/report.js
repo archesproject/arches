@@ -36,6 +36,7 @@ define(['arches',
                         form.cards.push(card);
                     }
                 })
+                form.sortorder = Infinity;
             });
             this.forms = ko.observableArray(options.forms);
 
@@ -84,10 +85,22 @@ define(['arches',
                         });
                         this.set(key, config);
                         break;
+                    case 'formsconfig':
+                        var forms = self.forms();
+                        _.each(value, function(formconfig, formid) {
+                            var form = _.find(forms, function(form) {
+                                return form.formid === formid;
+                            });
+                            form.sortorder = formconfig.sortorder;
+                        });
                     default:
                         this.set(key, value);
                 }
             }, this);
+
+            this.forms.sort(function (f1, f2) {
+                return f1.sortorder > f2.sortorder;
+            });
 
             this._data(JSON.stringify(this.toJSON()));
         },
@@ -116,7 +129,21 @@ define(['arches',
                     ret[key] = this.attributes[key];
                 }
             }
+            ret.formsconfig = {};
+            this.forms().forEach(function(form, i) {
+                ret.formsconfig[form.formid] = {
+                    sortorder: i
+                };
+            });
             return ret;
+        },
+
+        save: function(){
+            AbstractModel.prototype.save.call(this, function(request, status, self){
+                if(status === 'success'){
+                    this._data(JSON.stringify(this.toJSON()));
+                }
+            }, this);
         }
     });
     return ReportModel;

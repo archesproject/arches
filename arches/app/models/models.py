@@ -432,6 +432,7 @@ class Report(models.Model):
     template = models.ForeignKey(ReportTemplate, db_column='templateid')
     graph = models.ForeignKey(GraphModel, db_column='graphid')
     config = JSONField(blank=True, null=True, db_column='config')
+    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
     active = models.BooleanField(default=False)
 
     class Meta:
