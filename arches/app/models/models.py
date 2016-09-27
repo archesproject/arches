@@ -421,6 +421,11 @@ class ReportTemplate(models.Model):
     componentname = models.TextField()
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
 
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+        
     class Meta:
         managed = True
         db_table = 'report_templates'
@@ -432,6 +437,7 @@ class Report(models.Model):
     template = models.ForeignKey(ReportTemplate, db_column='templateid')
     graph = models.ForeignKey(GraphModel, db_column='graphid')
     config = JSONField(blank=True, null=True, db_column='config')
+    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
     active = models.BooleanField(default=False)
 
     class Meta:

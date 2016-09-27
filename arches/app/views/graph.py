@@ -367,7 +367,7 @@ class ReportManagerView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
          )
 
         return render(request, 'views/graph/report-manager.htm', context)
@@ -385,15 +385,38 @@ class ReportEditorView(GraphBaseView):
     def get(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
         self.graph = Graph.objects.get(graphid=report.graph.pk)
+        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',
             report=JSONSerializer().serialize(report),
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
-            templates=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates),
+            forms=JSONSerializer().serialize(forms),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
+            graph_id=self.graph.pk,
          )
 
         return render(request, 'views/graph/report-editor.htm', context)
+
+    def post(self, request, reportid):
+        data = JSONDeserializer().deserialize(request.body)
+        report = models.Report.objects.get(reportid=reportid)
+        report.name = data['name']
+        report.config = data['config']
+        report.formsconfig = data['formsconfig']
+        report.active = data['active']
+        report.save()
+        return JSONResponse(report)
 
     def delete(self, request, reportid):
         report = models.Report.objects.get(reportid=reportid)
