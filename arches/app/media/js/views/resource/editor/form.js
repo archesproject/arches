@@ -100,27 +100,27 @@ define([
         /**
          * saves a new tile object back to the database and adds it to the tilegroup
          * @memberof Form.prototype
-         * @param  {object} tilegroup a reference to the group of tiles being managed by this form
-         * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
+         * @param  {object} card the card the new tile should belong to
          * @param  {object} tile the tile to add/save
-         * @param  {object} e event object
+         * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
          * @return {null} 
          */
-        saveTile: function(tilegroup, justadd, tile, currentContext, e){
+        saveTile: function(card, tile, justadd){
             console.log(koMapping.toJS(tile));
             var nodegroup_id = tile.nodegroup_id();
+            var tiles = card.get('tiles');
             if(justadd){
-                tilegroup.unshift(koMapping.fromJS(ko.toJS(tile)));
+                tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
                 this.clearTile(tile);
             }else{
                 var model = new TileModel(koMapping.toJS(tile));
                 model.save(function(request, status, model){
                     if(request.status === 200){
-                        // if(!(nodegroup_id in tilegroup)){
-                        //     tilegroup[nodegroup_id] = koMapping.fromJS([]);
+                        // if(!(nodegroup_id in tiles)){
+                        //     tiles[nodegroup_id] = koMapping.fromJS([]);
                         // }
-                        // tilegroup[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
-                        tilegroup.unshift(koMapping.fromJS(request.responseJSON));
+                        // tiles[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
+                        tiles.unshift(koMapping.fromJS(request.responseJSON));
                         this.clearTile(tile);
                     }else{
                         // inform the user
@@ -140,7 +140,17 @@ define([
             model.save(function(request, status, model){
                 if(request.status === 200){
                     tilegroup.unshift(koMapping.fromJS(request.responseJSON));
-                    this.clearTile(tile);
+                    
+                    _.each(cardcontainer.get('tiles'), function(tile){
+                        this.clearTile(tile);
+                    }, this);
+                    cardcontainer.get('tiles').removeAll();
+
+                    _.each(cardcontainer.get('cards'), function(card){
+                        _.each(card.get('tiles'), function(tile){
+                            this.clearTile(tile);
+                        }, this);
+                    }, this);
                 }else{
                     // inform the user
                 }
@@ -169,18 +179,17 @@ define([
         /**
          * deletes a tile object from the database and removes it from the tilegroup
          * @memberof Form.prototype
-         * @param  {object} tilegroup a reference to the group of tiles being managed by this form
-         * @param  {object} tile the tile to add/save
-         * @param  {object} e event object
+         * @param  {object} card a reference to the card that the tile being deleted belongs to
+         * @param  {object} tile the tile to delete
          * @return {null} 
          */
-        deleteTile: function(tilegroup, tile, e){
+        deleteTile: function(card, tile){
             console.log(ko.toJS(tile));
-            var nodegroup_id = tile.nodegroup_id();
             var model = new TileModel(ko.toJS(tile));
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    tilegroup.remove(tile)
+                    var tiles = card.get('tiles');
+                    tiles.remove(tile)
                 }else{
                     // inform the user
                 }
@@ -223,6 +232,17 @@ define([
             _.each(tile.tiles, function(value, key, list){
                 value.removeAll();
             }, this);
+
+            // _.each(card.get('tiles'), function(tile){
+            //     _.each(tile.data, function(value, key, list){
+            //         value("");
+            //     }, this);
+            // }, this);
+            // card.get('tiles').removeAll();
+
+            // _.each(card.get('cards'), function(card){
+            //     this.clearTile(card);
+            // }, this);
         }
 
     });

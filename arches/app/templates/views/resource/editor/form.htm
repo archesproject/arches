@@ -5,7 +5,7 @@
     <!-- Card Preview -->
     <div id="card-preview">
 
-        <div id="" class="panel">
+        <div class="panel" style="padding-bottom: 10px; margin-bottom: 0px;">
             <div class="panel-heading">
                 <div class="">
                     <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: outterCard.get('name')"></h3>
@@ -75,11 +75,11 @@
                                         </form>
 
                                         <!-- Save/Add Button -->
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1' && !outterCard.isContainer()" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form)">{% trans "Save" %}</button>
+                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
                                         </div>
                                         <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, card.get('tiles'), outterCard.isContainer(), tile)">{% trans "Add" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, card, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add" %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +99,7 @@
                                         <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
                                         
                                         <div class="effect" style="display:none;">
-                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, card.get('tiles'))">
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, card, tile)">
                                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                                 </span>
                                             </a>
@@ -138,7 +138,7 @@
                                             <!-- Save/Add Button -->
                                             <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form)">{% trans "Save" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
                                             </div>
 
                                         </div>
@@ -171,9 +171,12 @@
 
                 </div>
 
+            </div>
+
+            <div class="card-body">
                 <!-- Wizard Level Buttons -->
                 <!-- ko if: outterCard.get('cardinality')() === 'n' && outterCard.isContainer() -->
-                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
+                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
                             <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
@@ -183,7 +186,7 @@
                 </div>
 
 
-                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && outterCard.get('tiles')().length > 0">
+                <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && outterCard.get('tiles')().length > 0">
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
@@ -203,7 +206,7 @@
                                 </a>
                             </li>
                             <li class="wizard-card-tools" data-bind="if: $index() === (outterCard.isContainer() ? (outterCard.get('cards')().length - 1) : 0) ">
-                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, outterCard, tile)"></i>
                                 <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                             </li>
                         </ul>
@@ -212,7 +215,6 @@
                 </div>
                 <!-- /ko -->
             </div>
-
 
         </div>
     </div>
