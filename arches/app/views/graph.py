@@ -415,7 +415,10 @@ class ReportEditorView(GraphBaseView):
         report.config = data['config']
         report.formsconfig = data['formsconfig']
         report.active = data['active']
-        report.save()
+        with transaction.atomic():
+            if report.active:
+                models.Report.objects.exclude(reportid=reportid).update(active=False)
+            report.save()
         return JSONResponse(report)
 
     def delete(self, request, reportid):
