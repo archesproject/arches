@@ -62,9 +62,15 @@ define([
             });
         },
 
-        getTileData: function(card, forceblank){
+        getTileData: function(outterCard, card, forceblank){
             var nodegroup_id = card.get('nodegroup_id');
             var cardinaltiy = card.get('cardinality')();
+            var forceblank = outterCard.get('cardinality')() === 'n' || 
+                (outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
+
+            if(outterCard.get('cardinality')() === 'n'){
+                return this.blanks[outterCard.get('nodegroup_id')];
+            }
             if(cardinaltiy === '1'){
                 if(nodegroup_id){
                     if(card.get('tiles')().length === 0){
@@ -87,6 +93,40 @@ define([
                     return new TileModel();
                 }
             }
+        },
+
+        getTileList: function(outterCard, card){
+            var nodegroup_id = card.get('nodegroup_id');
+            var cardinaltiy = card.get('cardinality')();
+            var forceblank = outterCard.get('cardinality')() === 'n'; //|| 
+                //(outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
+            if(outterCard.get('cardinality')() === 'n' && card && forceblank){
+                return this.blanks[nodegroup_id];
+            }
+            return card.get('tiles')();
+
+            // if(cardinaltiy === '1'){
+            //     if(nodegroup_id){
+            //         if(card.get('tiles')().length === 0){
+            //             return this.blanks[nodegroup_id];
+            //         }else{
+            //             return card.get('tiles')()[0];
+            //         } 
+            //     }else{
+            //         return new TileModel();
+            //     }
+            // }
+            // if(cardinaltiy === 'n'){
+            //     if(nodegroup_id){
+            //         if(forceblank){
+            //             return this.blanks[nodegroup_id];
+            //         }else{
+            //             return card.get('tiles')[nodegroup_id]();
+            //         }
+            //     }else{
+            //         return new TileModel();
+            //     }
+            // }
         },
 
         getNodeValueAndLabel: function(index, tile, card){

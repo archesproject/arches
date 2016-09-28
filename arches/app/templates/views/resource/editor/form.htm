@@ -12,9 +12,14 @@
                 </div>
             </div>
 
+
             <!-- Data Entry -->
-            <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
-                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
+            <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template', data: {'forceBlank': outterCard.get('cardinality') === 'n'}}"></div>
+
+
+            <script type="text/html" id="card-template">
+                <!-- Card Template -->
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'forceBlank': $data.forceBlank}">
                     
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container" data-bind="foreach: {
@@ -58,7 +63,7 @@
 
                                     <!-- Form -->
                                     
-                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': form.getTileData(card, true)}">
+                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': form.getTileData(outterCard, card, forceBlank)}">
                     
                                         <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
@@ -86,14 +91,14 @@
                             </div>
 
                             <!-- List of saved tiles for cardinality === 'n' -->
-                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n' && card.get('tiles')().length > 0">
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n' && form.getTileList(outterCard, card).length > 0">
 
                                 <!-- Title -->
                                 <div class="card-tab-title mar-btm">
                                     Saved <span data-bind="text: card.get('name')"/>
                                 </div>
 
-                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: card.get('tiles'), as: 'tile'}">
+                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: form.getTileList(outterCard, card), as: 'tile'}">
 
                                     <div class="list-group-item" style="background: rgb(250, 250, 250);">
                                         <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
@@ -168,10 +173,9 @@
                         </div>
 
                     </div>
-
                 </div>
+            </script>
 
-            </div>
 
             <div class="card-body">
                 <!-- Wizard Level Buttons -->
@@ -210,6 +214,9 @@
                                 <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                             </li>
                         </ul>
+
+                        <!-- Data Entry -->
+                        <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template' }"></div>
                     </div>
 
                 </div>
