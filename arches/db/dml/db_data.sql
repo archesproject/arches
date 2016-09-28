@@ -2130,6 +2130,7 @@ INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-000
 INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
 INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
 
+
 INSERT INTO map_sources(name, source)
     VALUES ('mapbox-streets', '{
         "url": "mapbox://mapbox.mapbox-streets-v7",
@@ -3164,3 +3165,12 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
            "fill-color": "#3887be"
        }
    }', FALSE, 1, '');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/default', 'image-report', '{}');

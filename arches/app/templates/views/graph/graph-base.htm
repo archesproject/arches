@@ -111,7 +111,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li class="edit-menu-item">
-                        <a href="#">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'report_manager' graphid %}'); }">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Reports" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure resource reports" %} </span>

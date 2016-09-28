@@ -413,6 +413,32 @@ class Relation(models.Model):
         db_table = 'relations'
 
 
+class ReportTemplate(models.Model):
+    templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    class Meta:
+        managed = True
+        db_table = 'report_templates'
+
+
+class Report(models.Model):
+    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(ReportTemplate, db_column='templateid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
+    config = JSONField(blank=True, null=True, db_column='config')
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'reports'
+
+
 class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
