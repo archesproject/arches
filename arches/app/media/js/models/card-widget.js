@@ -17,6 +17,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'sortorder': null,
                 'functions': []
             };
+            this.widgetLookup = widgets;
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;

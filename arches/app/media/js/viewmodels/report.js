@@ -1,8 +1,8 @@
-define(['knockout', 'underscore'], function (ko, _) {
+define(['knockout', 'underscore', 'moment'], function (ko, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
         this.report = params.report || ko.observable(null);
-        this.resource = params.resource || ko.observable(null);
+        this.reportDate = moment().format('MMMM D, YYYY');
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
 

@@ -38,6 +38,11 @@ define(['arches',
                 form.label = ko.observable(form.title);
             });
             this.forms = ko.observableArray(options.forms);
+            this.activeForms = ko.computed(function() {
+                return _.filter(self.forms(), function (form) {
+                    return form.active();
+                });
+            });
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());
@@ -69,16 +74,18 @@ define(['arches',
                 var card = _.find(cards, function(card) {
                     return card.get('id') === cardId;
                 });
-                card.get('name')(cardConfig.label);
-                _.each(cardConfig.nodes, function (nodeConfig, nodeId) {
-                    var widget = _.find(card.get('widgets')(), function(widget) {
-                        return widget.node.nodeid === nodeId;
+                if (card) {
+                    card.get('name')(cardConfig.label);
+                    _.each(cardConfig.nodes, function (nodeConfig, nodeId) {
+                        var widget = _.find(card.get('widgets')(), function(widget) {
+                            return widget.node.nodeid === nodeId;
+                        });
+                        widget.get('label')(nodeConfig.label);
                     });
-                    widget.get('label')(nodeConfig.label);
-                });
-                _.each(cardConfig.cards, function (cardConfig, cardId) {
-                    parseCardConfig(cardId, cardConfig, card.get('cards')());
-                });
+                    _.each(cardConfig.cards, function (cardConfig, cardId) {
+                        parseCardConfig(cardId, cardConfig, card.get('cards')());
+                    });
+                }
             }
 
             _.each(attributes, function(value, key){
@@ -106,12 +113,14 @@ define(['arches',
                             var form = _.find(forms, function(form) {
                                 return form.formid === formid;
                             });
-                            _.extend(form, _.pick(formconfig, 'sortorder'));
-                            form.active(formconfig.active);
-                            form.label(formconfig.label);
-                            _.each(formconfig.cards, function (cardConfig, cardId) {
-                                parseCardConfig(cardId, cardConfig, form.cards);
-                            })
+                            if (form) {
+                                _.extend(form, _.pick(formconfig, 'sortorder'));
+                                form.active(formconfig.active);
+                                form.label(formconfig.label);
+                                _.each(formconfig.cards, function (cardConfig, cardId) {
+                                    parseCardConfig(cardId, cardConfig, form.cards);
+                                })
+                            }
                         });
                     default:
                         this.set(key, value);
