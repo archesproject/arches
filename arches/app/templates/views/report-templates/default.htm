@@ -1,12 +1,67 @@
 {% load i18n %}
-<div data-bind="if: !configForm">
-    report here...
-</div>
+<!-- ko if: !configForm -->
+{% block report %}
+<div class="report-template-preview-container">
 
-<div data-bind="if: configForm && (configType === 'header')">
-    header form here...
-</div>
+    <!-- Report Title Bar -->
+    <div id="" class="relative" style="display: block;">
 
-<div data-bind="if: configForm && (configType === 'footer')">
-    footer form here...
+        <!-- Title Block -->
+        <div class="report-toolbar-preview ep-form-toolbar">
+            <h4 class="report-toolbar-title" data-bind="text: report.get('name')"></h4>
+
+            <!-- Tools -->
+            <div class="ep-form-toolbar-tools mar-no flex">
+                <p class="report-print-date">Report Date: <span data-bind="text: reportDate"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Content -->
+    <div class="rp-report-container-preview">
+
+        {% block header %}
+        {% endblock header %}
+
+        {% block body %}
+        <!-- ko foreach: { data: report.activeForms, as: 'form' } -->
+        <div class="rp-report-section relative">
+            <div class="rp-report-section-title">
+                <h4 class="rp-section-title" data-bind="text: form.label"></h4>
+            </div>
+
+            <!-- ko foreach: { data: form.cards, as: 'card' } -->
+            <div class="rp-card-section">
+                <!-- ko if: card.isContainer() -->
+                <h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
+                    <!-- ko foreach: { data: card.get('cards'), as: 'card' } -->
+                    {% include 'views/report-templates/partials/card-report.htm' %}
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: !card.isContainer() -->
+                {% include 'views/report-templates/partials/card-report.htm' %}
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+    </div>
+    {% endblock body %}
+
+    {% block footer %}
+    {% endblock footer %}
 </div>
+{% endblock report %}
+<!-- /ko -->
+
+<!-- ko if: configForm && (configType === 'header') -->
+{% block header_form %}
+{% endblock header_form %}
+<!-- /ko -->
+
+<!-- ko if: configForm && (configType === 'footer') -->
+{% block footer_form %}
+{% endblock footer_form %}
+<!-- /ko -->

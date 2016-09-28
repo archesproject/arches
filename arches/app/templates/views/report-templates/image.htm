@@ -1,12 +1,2 @@
+{% extends "views/report-templates/default.htm" %}
 {% load i18n %}
-<div data-bind="if: !configForm">
-    report here...
-</div>
-
-<div data-bind="if: configForm && (configType === 'header')">
-    header form here...
-</div>
-
-<div data-bind="if: configForm && (configType === 'footer')">
-    footer form here...
-</div>

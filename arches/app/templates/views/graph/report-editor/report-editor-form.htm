@@ -6,6 +6,15 @@
         <h4 class="title-block-title"> {% trans "Header" %}</h4>
     </div>
 
+    <div class="node-widget-label" style="">
+        <div class="control-label">
+            {% trans "Report Title" %}
+        </div>
+        <div class="col-sm-12 pad-no crud-widget-container">
+            <input type="text" placeholder="{% trans "Report Title" %}" class="form-control input-md widget-input" data-bind="value: report.get('name'), valueUpdate: 'keyup'">
+        </div>
+    </div>
+
     <div class='report-preview' data-bind='component: {
         name: reportLookup[report.get("template_id")()].componentname,
         params: {
