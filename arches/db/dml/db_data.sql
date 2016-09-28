@@ -2194,14 +2194,25 @@ INSERT INTO map_sources(name, source)
                                    ]
                                  ]
                                }
+                             },
+                             {
+                               "type": "Feature",
+                               "properties": {},
+                               "geometry": {
+                                 "type": "Point",
+                                 "coordinates": [
+                                   -122.24709014892577,
+                                   37.791879793952084
+                                 ]
+                               }
                              }
                          ]
                        }
               }');
 
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('presidio', '{
-        "id":"presidio",
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('presidio', '[{
+        "id":"presidio-poly",
         "source":"presidio",
         "type":"fill",
         "layout": {},
@@ -2209,92 +2220,113 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "fill-color": "#088",
             "fill-opacity": 0.8
         }
-      }', TRUE, 2, 'fa fa-flag');
+      },{
+          "id":"presidio-point",
+          "source":"presidio",
+          "type":"circle",
+          "layout": {},
+          "type": "circle",
+          "filter": ["!in", "$type", "Polygon"],
+          "paint": {
+              "circle-radius": 5,
+              "circle-color": "#078"
+          }
+        }]', TRUE, 2, 'fa fa-flag');
 
-  INSERT INTO map_sources(name, source)
-    VALUES ('golden-gate-park', '{
-                "type": "geojson",
-                "data":
-                {
-                  "type": "FeatureCollection",
-                  "features": [
-                    {
-                      "type": "Feature",
-                      "properties": {},
-                      "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
+INSERT INTO map_sources(name, source)
+  VALUES ('golden-gate-park', '{
+              "type": "geojson",
+              "data":
+              {
+                "type": "FeatureCollection",
+                "features": [
+                  {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [
+                        [
                           [
-                            [
-                              -122.51060485839844,
-                              37.77125750792944
-                            ],
-                            [
-                              -122.47163772583008,
-                              37.77288579232439
-                            ],
-                            [
-                              -122.45412826538086,
-                              37.77505678240509
-                            ],
-                            [
-                              -122.45292663574217,
-                              37.766643840752764
-                            ],
-                            [
-                              -122.51043319702148,
-                              37.76365837331252
-                            ],
-                            [
-                              -122.51060485839844,
-                              37.77125750792944
-                            ]
+                            -122.51060485839844,
+                            37.77125750792944
+                          ],
+                          [
+                            -122.47163772583008,
+                            37.77288579232439
+                          ],
+                          [
+                            -122.45412826538086,
+                            37.77505678240509
+                          ],
+                          [
+                            -122.45292663574217,
+                            37.766643840752764
+                          ],
+                          [
+                            -122.51043319702148,
+                            37.76365837331252
+                          ],
+                          [
+                            -122.51060485839844,
+                            37.77125750792944
                           ]
                         ]
-                      }
+                      ]
                     }
-                  ]
-                }
-                }');
-
-      INSERT INTO map_sources(name, source)
-        VALUES ('stamen-terrain', '{
-            "type": "raster",
-            "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
-            "tileSize": 256
-        }');
-
-      INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-          VALUES ('golden-gate-park', '{
-              "id":"golden-gate-park",
-              "source":"golden-gate-park",
-              "type":"fill",
-              "layout": {},
-              "paint": {
-                  "fill-color": "#088",
-                  "fill-opacity": 0.8
+                  }
+                ]
               }
-            }', TRUE, 3, 'ion-leaf');
+              }');
 
-      INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-          VALUES ('stamen-terrain', '{
-              "id": "stamen-terrain",
-              "type": "raster",
-              "source": "stamen-terrain",
-              "minzoom": 0,
-              "maxzoom": 22
-          }', TRUE, 4, 'fa fa-road');
+INSERT INTO map_sources(name, source)
+  VALUES ('stamen-terrain', '{
+      "type": "raster",
+      "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
+      "tileSize": 256
+  }');
 
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('satellite', '{
+INSERT INTO map_sources(name, source)
+  VALUES ('geocode-point', '{
+      "type": "geojson",
+      "data": {
+          "type": "FeatureCollection",
+          "features": []
+      }
+  }');
+
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('golden-gate-park', '[{
+        "id":"golden-gate-park",
+        "source":"golden-gate-park",
+        "type":"fill",
+        "layout": {},
+        "paint": {
+            "fill-color": "#088",
+            "fill-opacity": 0.8
+        }
+      }]', TRUE, 3, 'ion-leaf');
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('stamen-terrain', '[{
+        "id": "stamen-terrain",
+        "type": "raster",
+        "source": "stamen-terrain",
+        "minzoom": 0,
+        "maxzoom": 22
+    }]', TRUE, 4, 'fa fa-road');
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
-    }', FALSE, 1, '');
+    }]', FALSE, 1, '');
 
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2309,9 +2341,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "fill-opacity": 0.75
         },
         "interactive": true
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "id": "landuse_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2325,9 +2355,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "fill-color": "#d2edae"
         },
         "interactive": true
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "id": "waterway",
         "type": "line",
         "source": "mapbox-streets",
@@ -2363,9 +2391,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "interactive": true
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "id": "water",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2374,9 +2400,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "fill-color": "#a0cfdf"
         },
         "interactive": true
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "id": "building",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2385,9 +2409,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "fill-color": "#d6d6d6"
         },
         "interactive": true
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2445,9 +2467,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             ]
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2502,9 +2522,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             ]
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2559,9 +2577,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2613,9 +2629,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2682,9 +2696,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2748,9 +2760,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2804,9 +2814,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2857,9 +2865,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "road"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2906,9 +2912,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             }
         },
         "source-layer": "admin"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "minzoom": 5,
         "layout": {
@@ -2958,9 +2962,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "text-halo-blur": 1
         },
         "source-layer": "poi_label"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "symbol-placement": "line",
@@ -3011,9 +3013,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "text-halo-width": 2
         },
         "source-layer": "road_label"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "minzoom": 8,
         "layout": {
@@ -3064,9 +3064,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "text-halo-blur": 1
         },
         "source-layer": "place_label"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "text-field": "{name_en}",
@@ -3112,9 +3110,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "text-halo-blur": 1
         },
         "source-layer": "place_label"
-    }', FALSE, 1, '');
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "text-field": "{name_en}",
@@ -3152,10 +3148,10 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
             "text-halo-blur": 1
         },
         "source-layer": "country_label"
-    }', FALSE, 1, '');
+    }]', FALSE, 1, '');
 
-INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
-   VALUES ('mapzen', '{
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+   VALUES ('mapzen', '[{
        "id": "mapzen-water",
        "type": "fill",
        "source": "mapzen",
@@ -3164,7 +3160,7 @@ INSERT INTO basemap_layers(name, layer, isoverlay, sortorder, icon)
        "paint": {
            "fill-color": "#3887be"
        }
-   }', FALSE, 1, '');
+   }]', FALSE, 1, '');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');

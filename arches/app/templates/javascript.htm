@@ -154,12 +154,12 @@
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% endautoescape %}},
-            basemapLayers: [{% autoescape off %}{% for basemap_layer in basemap_layers %}{
-                'name': '{{ basemap_layer.name }}',
-                'layer': {{ basemap_layer.layer_json }},
-                'isoverlay': {{ basemap_layer.isoverlay|lower }},
-                'sortorder': {{ basemap_layer.sortorder }},
-                'icon': '{{ basemap_layer.icon }}'
+            mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
+                'name': '{{ map_layer.name }}',
+                'layer_definitions': {{ map_layer.layer_json }},
+                'isoverlay': {{ map_layer.isoverlay|lower }},
+                'sortorder': {{ map_layer.sortorder }},
+                'icon': '{{ map_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
         };
     });

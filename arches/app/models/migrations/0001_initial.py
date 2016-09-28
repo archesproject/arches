@@ -646,14 +646,17 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='BasemapLayers',
+            name='MapLayers',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
-                ('layer', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layer', null=True)),
+                ('layerdefinitions', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layerdefinitions', null=True)),
+                ('isoverlay', models.BooleanField(default=False)),
+                ('sortorder', models.IntegerField(default=1)),
+                ('icon', models.TextField(default=None)),
             ],
             options={
-                'db_table': 'basemap_layers',
+                'db_table': 'map_layers',
                 'managed': True,
             },
         ),
@@ -773,21 +776,6 @@ class Migration(migrations.Migration):
             model_name='graphmodel',
             name='ontology',
             field=models.ForeignKey(to='models.Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True),
-        ),
-        migrations.AddField(
-            model_name='basemaplayers',
-            name='isoverlay',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='basemaplayers',
-            name='sortorder',
-            field=models.IntegerField(default=1),
-        ),
-        migrations.AddField(
-            model_name='basemaplayers',
-            name='icon',
-            field=models.TextField(default=None),
         ),
         migrations.AlterUniqueTogether(
             name='edge',

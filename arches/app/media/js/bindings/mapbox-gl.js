@@ -5,10 +5,10 @@ define([
     'mapbox-gl',
     'arches',
     'plugins/mapbox-gl-draw',
-    'bindings/chosen',
+    'map/mapbox-style',
     'bindings/nouislider',
     'bindings/sortable'
-], function ($, _, ko, mapboxgl, arches, Draw, chosen) {
+], function ($, _, ko, mapboxgl, arches, Draw, mapStyle) {
     ko.bindingHandlers.mapboxgl = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
                var defaults = {
@@ -22,30 +22,56 @@ define([
               options.zoom = viewModel.zoom();
               options.center = mapCenter;
 
+              viewModel.addInitialLayers = function() {
+                var initialLayers = [];
+                var overlayLayers = _.sortBy(_.where(arches.mapLayers, {isoverlay: true}), 'sortorder').reverse();
+
+                arches.mapLayers.forEach(function(mapLayer) {
+                    if (mapLayer.name === viewModel.selectedBasemap()) {
+                        _.each(mapLayer.layer_definitions, function(layer)
+                          {
+                            initialLayers.push(layer);
+                          });
+                      }
+                    });
+
+                overlayLayers.forEach(function(overlayLayer){
+                  _.each(overlayLayer.layer_definitions, function(layer)
+                    {
+                      initialLayers.push(layer);
+                    });
+                })
+
+                initialLayers.push(
+                  {
+                      "id": "geocode-point",
+                      "source": "geocode-point",
+                      "type": "circle",
+                      "paint": {
+                          "circle-radius": 5,
+                          "circle-color": "red"
+                      }
+                  }
+                );
+
+                return initialLayers;
+              }
+
+              options.style.layers = viewModel.addInitialLayers();
+
               var map = new mapboxgl.Map(
                   _.defaults(options, defaults)
               );
 
-              var uniqueOverlays =
-                _.uniq(
-                  _.filter(arches.basemapLayers, {isoverlay:true}),
-                  function(layer){
-                      return layer.name;
-                    }
-                );
-
-              map.addControl(draw);
-
-              viewModel.basemaps = _.uniq(_.filter(arches.basemapLayers, function(baselayer){return baselayer.isoverlay===false}), function(baselayer){return baselayer.name})
               viewModel.map = map;
-
-
               viewModel.updateOpacity = function(val) {
-                  this.map.setPaintProperty(this.layer.id, this.layer.type + '-opacity', Number(val)/100.0);
+                  this.layer_definitions.forEach(function(layer){
+                    this.map.setPaintProperty(layer.id, layer.type + '-opacity', Number(val)/100.0);
+                  }, this)
               };
 
               var overlays =
-                 _.each(uniqueOverlays, function(overlay) {
+                 _.each(_.where(arches.mapLayers, {isoverlay:true}), function(overlay) {
                        _.extend (overlay, {
                          opacity: ko.observable(100),
                          showingTools: ko.observable(false),
@@ -53,21 +79,29 @@ define([
                             this.showingTools(!this.showingTools())
                          },
                          handleSlider: function(val){
-                            this.updateOpacity(val, this.layer.id);
+                            this.updateOpacity(val);
                             this.opacity(val);
                          }
                    }, viewModel);
                }, viewModel);
 
-              viewModel.overlays = ko.observableArray(overlays)
+              map.addControl(draw);
 
+              viewModel.overlays = ko.observableArray(overlays)
+              viewModel.basemaps = _.filter(arches.mapLayers, function(baselayer){return baselayer.isoverlay===false});
               viewModel.setBasemap = function(basemapType) {
-                  var lowestOverlay = overlays[overlays.length - 1]
-                  arches.basemapLayers.forEach(function(layer) {
-                      if (layer.name === basemapType.name && !map.getLayer(layer.layer.id)) {
-                        map.addLayer(layer.layer, lowestOverlay.layer.id)
-                      } else if (map.getLayer(layer.layer.id) && layer.name !== basemapType.name && layer.isoverlay === false) {
-                          map.removeLayer(layer.layer.id)
+                  var lowestOverlay = _.last(_.last(overlays).layer_definitions);
+                  this.basemaps.forEach(function(basemap) {
+                      if (basemap.name === basemapType.name) {
+                        basemap.layer_definitions.forEach(function(layer) {
+                          viewModel.map.addLayer(layer, lowestOverlay.id)
+                        })
+                      } else {
+                        basemap.layer_definitions.forEach(function(layer) {
+                          if (viewModel.map.getLayer(layer.id) !== undefined) {
+                            viewModel.map.removeLayer(layer.id);
+                          }
+                        })
                       }
                   }, this)
               };
@@ -83,12 +117,16 @@ define([
 
                 viewModel.overlays.subscribe(function(overlays){
                   var anchorLayer = 'gl-draw-active-line.hot';
-                  for (var i = overlays.length; i-- > 0; ) {
-                    map.removeLayer(overlays[i].layer.id)
+                  for (var i = overlays.length; i-- > 0; ) {  //Using a conventional loop because we want to go backwards over the array without creating a copy
+                    overlays[i].layer_definitions.forEach(function(layer){
+                      map.removeLayer(layer.id)
+                    })
                   }
                   for (var i = overlays.length; i-- > 0; ) {
-                    map.addLayer(overlays[i].layer, anchorLayer)
-                    map.setPaintProperty(overlays[i].layer.id, overlays[i].layer.type + '-opacity', overlays[i].opacity()/100.0);
+                    overlays[i].layer_definitions.forEach(function(layer){
+                      map.addLayer(layer, anchorLayer);
+                      map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity()/100.0);
+                    })
                   }
                   viewModel.redrawGeocodeLayer();
                 })

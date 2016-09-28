@@ -550,18 +550,18 @@ class MapSources(models.Model):
         db_table = 'map_sources'
 
 
-class BasemapLayers(models.Model):
+class MapLayers(models.Model):
     name = models.TextField()
-    layer = JSONField(blank=True, null=True, db_column='layer')
+    layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=1)
     icon = models.TextField(default=None)
 
     @property
     def layer_json(self):
-        json_string = json.dumps(self.layer)
+        json_string = json.dumps(self.layerdefinitions)
         return json_string
 
     class Meta:
         managed = True
-        db_table = 'basemap_layers'
+        db_table = 'map_layers'

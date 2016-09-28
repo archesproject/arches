@@ -28,37 +28,9 @@ define([
         viewModel: function(params) {
 
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'baseMaps', 'geometryTypes'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
-
-            this.defineInitialMapLayers = function() {
-
-              var layers = [];
-
-              layers.push({
-                  "id": "geocode-point",
-                  "source": "geocode-point",
-                  "type": "circle",
-                  "paint": {
-                      "circle-radius": 5,
-                      "circle-color": "red"
-                  }
-              });
-
-              _.each(arches.basemapLayers, function (layer) {
-                if (layer.name === self.selectedBasemap()) {
-                    layers.push(layer.layer);
-                    }
-              });
-
-              _.each(_.sortBy(arches.basemapLayers, function(sortedLayer) {return sortedLayer.sortorder}).reverse(), function (layer) {
-                if (layer.isoverlay === true) {
-                    layers.push(layer.layer);
-                    }
-              });
-              return layers
-            }
 
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
@@ -84,17 +56,6 @@ define([
                   }
                   );
             }
-
-            mapStyle.sources['geocode-point'] = {
-                "type": "geojson",
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": []
-                }
-            };
-
-            mapStyle.layers = this.defineInitialMapLayers();
-
 
             this.mapOptions = {
                 style: mapStyle

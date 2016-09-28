@@ -251,7 +251,7 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        basemap_layers = models.BasemapLayers.objects.all()
+        map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
 
         context = self.get_context_data(
@@ -264,7 +264,7 @@ class CardView(GraphBaseView):
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             functions=JSONSerializer().serialize(models.Function.objects.all()),
-            basemap_layers=basemap_layers,
+            map_layers=map_layers,
             map_sources=map_sources,
         )
 
