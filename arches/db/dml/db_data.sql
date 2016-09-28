@@ -2118,4 +2118,4 @@ INSERT INTO report_templates(templateid, name, description, component, component
     VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/default', 'image-report', '{}');
+    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');
