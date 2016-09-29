@@ -411,13 +411,14 @@ class ReportEditorView(GraphBaseView):
     def post(self, request, reportid):
         data = JSONDeserializer().deserialize(request.body)
         report = models.Report.objects.get(reportid=reportid)
+        graph = Graph.objects.get(graphid=report.graph.pk)
         report.name = data['name']
         report.config = data['config']
         report.formsconfig = data['formsconfig']
         report.active = data['active']
         with transaction.atomic():
             if report.active:
-                models.Report.objects.exclude(reportid=reportid).update(active=False)
+                graph.report_set.exclude(reportid=reportid).update(active=False)
             report.save()
         return JSONResponse(report)
 
