@@ -3,7 +3,7 @@
 <div class="row widget-wrapper" data-bind="if: !configForm">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-        <div id='map' class="map-crud-container relative" data-bind="mapboxgl:mapOptions">
+        <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: setupMap }">
           <!-- Geocode Panel -->
         <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
           <select data-bind="chosen: {width: '100%'}, value: geocodeSearchVal, options: geocodeSearchResults, optionsText: 'text', optionsValue: 'text'"></select>
@@ -99,7 +99,14 @@
 
                           <!-- <div class="col-xs-8"> -->
                           <div class="overlay-slider">
-                            <div data-bind="noUiSlider: {minValue: min, maxValue: max}"></div>
+                            <div data-bind="noUiSlider: {
+                                start: opacity,
+                                range: {
+                                  'min': 0,
+                                  'max': 100
+                                },
+                                connect: 'lower'
+                            }"></div>
                           </div>
                           <!-- </div> -->
 

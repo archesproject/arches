@@ -78,6 +78,9 @@ define([
               self.setBasemap(val);
             }
 
+            this.setupMap = function(map) {
+                console.log(map)
+            }
         },
         template: { require: 'text!widget-templates/geometry' }
     });
