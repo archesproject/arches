@@ -190,7 +190,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000009', 'file-widget', 'widgets/file', 'file', '{"accept": "*","maxfilesize": "*"}');
+    VALUES ('10000000-0000-0000-0000-000000000009', 'file-upload-widget', 'widgets/file-upload', 'file-upload', '{"accept": "*","maxfilesize": "*"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
