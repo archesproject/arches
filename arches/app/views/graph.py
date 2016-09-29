@@ -415,11 +415,15 @@ class ReportEditorView(GraphBaseView):
     def post(self, request, reportid):
         data = JSONDeserializer().deserialize(request.body)
         report = models.Report.objects.get(reportid=reportid)
+        graph = Graph.objects.get(graphid=report.graph.pk)
         report.name = data['name']
         report.config = data['config']
         report.formsconfig = data['formsconfig']
         report.active = data['active']
-        report.save()
+        with transaction.atomic():
+            if report.active:
+                graph.report_set.exclude(reportid=reportid).update(active=False)
+            report.save()
         return JSONResponse(report)
 
     def delete(self, request, reportid):
