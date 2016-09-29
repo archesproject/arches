@@ -10,7 +10,7 @@ define([
     'bindings/sortable'
 ], function ($, _, ko, mapboxgl, arches, Draw, mapStyle) {
     ko.bindingHandlers.mapboxgl = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
                var defaults = {
                    container: element
               };
@@ -64,6 +64,7 @@ define([
               );
 
               viewModel.map = map;
+
               viewModel.updateOpacity = function(val) {
                   this.layer_definitions.forEach(function(layer){
                     this.map.setPaintProperty(layer.id, layer.type + '-opacity', Number(val)/100.0);
@@ -115,7 +116,7 @@ define([
                   }
                 }
 
-                viewModel.overlays.subscribe(function(overlays){
+             viewModel.overlays.subscribe(function(overlays){
                   var anchorLayer = 'gl-draw-active-line.hot';
                   for (var i = overlays.length; i-- > 0; ) {  //Using a conventional loop because we want to go backwards over the array without creating a copy
                     overlays[i].layer_definitions.forEach(function(layer){
@@ -173,21 +174,26 @@ define([
                 });
             });
 
-            viewModel.updateMapProperties = function(property) {
-              this.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
-              this.map.zoomTo(viewModel.zoom())
-            }
+            // viewModel.map.on('moveend', function(e){
+            //       var mapCenter = viewModel.map.getCenter()
+            //       var zoom = viewModel.map.getZoom()
+            //       if (viewModel.zoom() !== zoom) {
+            //           viewModel.zoom(zoom);
+            //       };
+            //       viewModel.centerX(mapCenter.lng)
+            //       viewModel.centerY(mapCenter.lat)
+            // })
 
             viewModel.zoom.subscribe(function (val) {
-                viewModel.updateMapProperties()
+                viewModel.map.zoomTo(viewModel.zoom())
               })
 
             viewModel.centerX.subscribe(function (val) {
-              viewModel.updateMapProperties()
+              viewModel.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
               })
 
             viewModel.centerY.subscribe(function (val) {
-              viewModel.updateMapProperties()
+              viewModel.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
               })
 
         }

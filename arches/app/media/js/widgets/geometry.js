@@ -61,6 +61,7 @@ define([
                 style: mapStyle
             };
 
+
             this.selectBasemap = function(val){
               self.basemap(val.name)
               self.setBasemap(val);
