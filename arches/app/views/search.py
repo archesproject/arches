@@ -245,6 +245,7 @@ def geocode(request):
     geocoding_provider = request.GET.get('geocoder', '')
     Geocoder = import_string('arches.app.utils.geocoders.' + geocoding_provider)
     search_string = request.GET.get('q', '')
+    print "###" * 100, search_string
     return JSONResponse({ 'results': Geocoder().find_candidates(search_string) })
 
 def export_results(request):

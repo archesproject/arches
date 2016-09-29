@@ -30,9 +30,7 @@ class BingGeocoder:
         query_args = { 'q': search_string, 'key': settings.BING_KEY }
         encoded_args = urllib.urlencode(query_args)
         url = 'http://dev.virtualearth.net/REST/v1/Locations?' + encoded_args
-        print url
         response = json.loads(urllib2.urlopen(url).read())
-        print response
         results = []
         for resource_set in response['resourceSets']:
             for feature in resource_set['resources']:
@@ -51,11 +49,29 @@ class BingGeocoder:
 
         return results
 
-class MapboxGeocoder:
-    
+class MapzenGeocoder:
+
     def __init__(self):
         pass
 
     def find_candidates(self, search_string):
-        query_args = { 'q': search_string, 'key': settings.BING_KEY }
+        query_args = { 'text': search_string, 'api_key': settings.MAPZEN_KEY }
         encoded_args = urllib.urlencode(query_args)
+        url = 'https://search.mapzen.com/v1/autocomplete?' + encoded_args
+        response = json.loads(urllib2.urlopen(url).read())
+        results = []
+        for feature in response['features']:
+            results.append({
+                'id': feature['properties']['name'],
+                'text': feature['properties']['name'],
+                'geometry': {
+                    "type": "Point",
+                    "coordinates": [
+                      feature['geometry']['coordinates'][0],
+                      feature['geometry']['coordinates'][1]
+                    ]
+                },
+                'score': feature['properties']['confidence']
+            })
+
+        return results

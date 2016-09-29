@@ -92,6 +92,7 @@ RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
 BING_KEY = 'Ann8Gs3w7E4HtEe0MV4DH_caJk0eyZBiOj8p4VcePWcQMr51RgnnBdoAGrhmeZxq'
+MAPZEN_KEY = ''
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
