@@ -109,9 +109,9 @@ define([
                 } 
                 if(outterCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
-                        return form.blanks[card.get('nodegroup_id')];
+                        return this.blanks[card.get('nodegroup_id')];
                     }else{
-
+                        return this.blanks[card.get('nodegroup_id')];
                     }
                 } 
             }else{

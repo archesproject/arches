@@ -105,12 +105,12 @@
                             </div>
 
                             <!-- ko if: card.get('cardinality')() === 'n' -->
-                            <div class="card-tab-title mar-btm">
-                                Saved <span data-bind="text: card.get('name')"/>
-                            </div>
 
                             <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: (tile.tiles[card.get('nodegroup_id')]().length > 0)">
 
+                                <div class="card-tab-title mar-btm">
+                                    Saved <span data-bind="text: card.get('name')"/>
+                                </div>
 
                                 <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: tile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
 
@@ -146,7 +146,7 @@
                                                         params: {
                                                             config: configJSON,
                                                             label: widget.get("label")(),
-                                                            value: tile.data[widget.get("node_id")()],
+                                                            value: innerTile.data[widget.get("node_id")()],
                                                             disabled: false
                                                         }
                                                     }'></div>
@@ -192,22 +192,29 @@
                 </div>
             </script>
 
-            <!-- ko if: outterCard.get('cardinality') == 'n' -->
+            <!-- ko if: outterCard.get('cardinality')() == 'n' -->
 
             <div class="card-body">
-                <!-- Wizard Level Buttons -->
 
-                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
-                    <div class="ep-form-toolbar-tools mar-no flex">
-                        <span>
-                            <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, outterCard.get('tiles'), false)">{% trans "Save" %}</button>
-                        </span>
+                <!-- ko with: form.blanks[outterCard.get('nodegroup_id')] -->
+
+                    <!-- Data Entry -->
+                    <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
+
+
+                    <!-- Wizard Level Buttons -->
+                    <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
+                        <div class="ep-form-toolbar-tools mar-no flex">
+                            <span>
+                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                                <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, outterCard.get('tiles'), false)">{% trans "Save" %}</button>
+                            </span>
+                        </div>
                     </div>
-                </div>
 
+                <!-- /ko -->
 
-                <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && outterCard.get('tiles')().length > 0">
+                <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && form.tiles[outterCard.get('nodegroup_id')]().length > 0">
 
                     <!-- Title -->
                     <div class="card-tab-title mar-btm">
@@ -215,7 +222,7 @@
                     </div>
 
                     <!-- Wizard Tile -->
-                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: outterCard.get('tiles'), as: 'tile'}">
+                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: form.tiles[outterCard.get('nodegroup_id')](), as: 'tile'}">
 
                         <ul class="nav nav-tabs card-nav-container" data-bind="foreach: outterCard.get('cards')" style="margin-bottom: 0px;">
                             <li id="summary-group" data-bind="css: {'active': $index() === outterCard.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
