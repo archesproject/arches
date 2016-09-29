@@ -198,6 +198,14 @@ define([
               viewModel.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
               })
 
+            viewModel.pitch.subscribe(function (val) {
+              viewModel.map.setPitch(viewModel.pitch())
+              })
+
+            viewModel.bearing.subscribe(function (val) {
+              viewModel.map.setBearing(viewModel.bearing())
+              })
+
         }
     }
 
