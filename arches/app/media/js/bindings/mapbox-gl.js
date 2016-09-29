@@ -184,7 +184,7 @@ define([
                   };
                   viewModel.centerX(mapCenter.lng)
                   viewModel.centerY(mapCenter.lat)
-            })
+              })
 
             viewModel.zoom.subscribe(function (val) {
                 viewModel.map.setZoom(viewModel.zoom())
@@ -198,6 +198,10 @@ define([
               viewModel.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
               })
 
+          // prevents drag events from bubbling
+          $(element).mousedown(function (event) {
+              event.stopPropagation();
+          });
         }
     }
 
