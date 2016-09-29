@@ -13,6 +13,8 @@
         <div class="col-sm-12 pad-no crud-widget-container">
             <input type="text" placeholder="{% trans "Report Title" %}" class="form-control input-md widget-input" data-bind="value: report.get('name'), valueUpdate: 'keyup'">
         </div>
+
+        <div data-bind="component: { name: 'switch-widget', params: {value: report.get('active'), config:{label: '{% trans "Active" %}', subtitle: ''}}}"></div>
     </div>
 
     <div class='report-preview' data-bind='component: {
