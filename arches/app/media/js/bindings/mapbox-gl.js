@@ -21,6 +21,8 @@ define([
               mapboxgl.accessToken = arches.mapboxApiKey;
               options.zoom = viewModel.zoom();
               options.center = mapCenter;
+              options.pitch = viewModel.pitch();
+              options.bearing = viewModel.bearing();
 
               viewModel.addInitialLayers = function() {
                 var initialLayers = [];

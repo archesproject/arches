@@ -28,7 +28,7 @@ define([
         viewModel: function(params) {
 
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
 
