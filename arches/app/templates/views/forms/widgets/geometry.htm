@@ -186,7 +186,7 @@
       {% trans "Default Geocoder" %}
   </div>
   <div class="col-xs-12 pad-no crud-widget-container">
-			<input type="" id="" placeholder="{% trans "Geocoder" %}" class="form-control input-md widget-input" data-bind="value: geocoder, valueUpdate: 'keyup'">
+			<select type="" id="" placeholder="{% trans "Geocoder" %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, chosen: {width: '100%'}"></select>
 	</div>
   <div class="control-label">
       {% trans "Map Center Longitude" %}

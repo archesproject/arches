@@ -242,11 +242,11 @@ def get_paginator(results, total_count, page, count_per_page, all_ids):
     })
 
 def geocode(request):
-    geocoding_provider = request.GET.get('geocoder', '')
-    Geocoder = import_string('arches.app.utils.geocoders.' + geocoding_provider)
+    geocoding_provider_id = request.GET.get('geocoder', '')
+    provider = next((provider for provider in settings.GEOCODING_PROVIDERS if provider['id'] == geocoding_provider_id), None)
+    Geocoder = import_string('arches.app.utils.geocoders.' + provider['id'])
     search_string = request.GET.get('q', '')
-    print "###" * 100, search_string
-    return JSONResponse({ 'results': Geocoder().find_candidates(search_string) })
+    return JSONResponse({ 'results': Geocoder().find_candidates(search_string, provider['api_key']) })
 
 def export_results(request):
     dsl = build_search_results_dsl(request)

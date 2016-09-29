@@ -26,8 +26,8 @@ class BingGeocoder:
     def __init__(self):
         pass
 
-    def find_candidates(self, search_string):
-        query_args = { 'q': search_string, 'key': settings.BING_KEY }
+    def find_candidates(self, search_string, api_key):
+        query_args = { 'q': search_string, 'key': api_key }
         encoded_args = urllib.urlencode(query_args)
         url = 'http://dev.virtualearth.net/REST/v1/Locations?' + encoded_args
         response = json.loads(urllib2.urlopen(url).read())
@@ -54,8 +54,8 @@ class MapzenGeocoder:
     def __init__(self):
         pass
 
-    def find_candidates(self, search_string):
-        query_args = { 'text': search_string, 'api_key': settings.MAPZEN_KEY }
+    def find_candidates(self, search_string, api_key):
+        query_args = { 'text': search_string, 'api_key': api_key }
         encoded_args = urllib.urlencode(query_args)
         url = 'https://search.mapzen.com/v1/autocomplete?' + encoded_args
         response = json.loads(urllib2.urlopen(url).read())

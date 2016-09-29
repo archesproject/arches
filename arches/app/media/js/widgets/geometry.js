@@ -4,10 +4,10 @@ define([
   'viewmodels/widget',
   'arches',
   'map/mapbox-style',
-  'geoms',
   'bindings/fadeVisible',
-  'bindings/mapbox-gl'
-], function (ko, _, WidgetViewModel, arches, mapStyle, geoms) {
+  'bindings/mapbox-gl',
+  'bindings/chosen'
+], function (ko, _, WidgetViewModel, arches, mapStyle) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -44,6 +44,13 @@ define([
               maptools: ko.observable(true),
               legend: ko.observable(true)
             };
+
+            this.geocoderOptions = ko.observableArray([{'id':'MapzenGeocoder','name':'Mapzen'},{'id':'BingGeocoder','name':'Bing'}]);
+
+            this.onGeocodeSelection = function(val, e) {
+              this.geocoder(e.currentTarget.value)
+              console.log(val, e);
+            }
 
             this.toggleMapTools = function(data, event){
                 data.mapToolsExpanded(!data.mapToolsExpanded());
