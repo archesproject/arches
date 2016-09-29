@@ -12,14 +12,23 @@
                 </div>
             </div>
 
+            <!-- ko if: outterCard.get('cardinality')() == '1' -->
 
-            <!-- Data Entry -->
-            <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template', data: {'forceBlank': outterCard.get('cardinality') === 'n'}}"></div>
+                <!-- ko with: (form.tiles[outterCard.get('nodegroup_id')]().length > 0 ? form.tiles[outterCard.get('nodegroup_id')]()[0] : form.blanks[outterCard.get('nodegroup_id')]) -->
+
+                    <!-- Data Entry -->
+                    <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
+
+            
+                <!-- /ko -->
+
+            <!-- /ko -->
+
 
 
             <script type="text/html" id="card-template">
                 <!-- Card Template -->
-                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'forceBlank': $data.forceBlank}">
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'tile': $data}">
                     
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container" data-bind="foreach: {
@@ -62,49 +71,54 @@
                                     </div>
 
                                     <!-- Form -->
-                                    
-                                    <div class="col-xs-12 card-form-container" data-bind="let: {'tile': form.getTileData(outterCard, card, forceBlank)}">
-                    
-                                        <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
-                                                data:card.get('widgets'), as: 'widget'
-                                            }">
-                                            <div class='widget-preview' data-bind='component: {
-                                                name: form.widgetLookup[widget.get("widget_id")()].name,
-                                                params: {
-                                                    config: configJSON,
-                                                    label: widget.get("label")(),
-                                                    value: tile.data[widget.get("node_id")()],
-                                                    disabled: false
-                                                }
-                                            }'></div>
-                                        </form>
+                                  <!--   <div data-bind="with: card.get('cardinality')() === '1' ? (tile.tiles[card.get('nodegroup_id')]().length > 0 ? tile.tiles[card.get('nodegroup_id')]()[0] : form.blanks[card.get('nodegroup_id')]) : tile" > -->
+                                    <div data-bind="with: form.getFormEditingContext(outterCard, card, tile)" >
+                                        <div class="col-xs-12 card-form-container" data-bind="let: {'tile': $data}">
+                        
+                                            <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                    data:card.get('widgets'), as: 'widget'
+                                                }">
+                                                <div class='widget-preview' data-bind='component: {
+                                                    name: form.widgetLookup[widget.get("widget_id")()].name,
+                                                    params: {
+                                                        config: configJSON,
+                                                        label: widget.get("label")(),
+                                                        value: tile.data[widget.get("node_id")()],
+                                                        disabled: false
+                                                    }
+                                                }'></div>
+                                            </form>
+                                        </div>
 
                                         <!-- Save/Add Button -->
                                         <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
                                         </div>
                                         <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, card, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add" %}</button>
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, outterCard, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add" %}</button>
+                                        </div>
+                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add2" %}</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- List of saved tiles for cardinality === 'n' -->
-                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n' && form.getTileList(outterCard, card).length > 0">
+                            <!-- ko if: card.get('cardinality')() === 'n' -->
+                            <div class="card-tab-title mar-btm">
+                                Saved <span data-bind="text: card.get('name')"/>
+                            </div>
 
-                                <!-- Title -->
-                                <div class="card-tab-title mar-btm">
-                                    Saved <span data-bind="text: card.get('name')"/>
-                                </div>
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: (tile.tiles[card.get('nodegroup_id')]().length > 0)">
 
-                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: form.getTileList(outterCard, card), as: 'tile'}">
+
+                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: tile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
 
                                     <div class="list-group-item" style="background: rgb(250, 250, 250);">
-                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, tile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, tile, card).value"> Value of first node in card</span></h5>
+                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span></h5>
                                         
                                         <div class="effect" style="display:none;">
-                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, card, tile)">
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, tile, innerTile)">
                                                 <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
                                                 </span>
                                             </a>
@@ -152,6 +166,8 @@
                                 </div>
 
                             </div>
+                            <!-- /ko -->
+
 
                             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
                                 <div class="relative">
@@ -176,10 +192,11 @@
                 </div>
             </script>
 
+            <!-- ko if: outterCard.get('cardinality') == 'n' -->
 
             <div class="card-body">
                 <!-- Wizard Level Buttons -->
-                <!-- ko if: outterCard.get('cardinality')() === 'n' && outterCard.isContainer() -->
+
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
@@ -220,8 +237,10 @@
                     </div>
 
                 </div>
-                <!-- /ko -->
+
             </div>
+
+            <!-- /ko -->
 
         </div>
     </div>

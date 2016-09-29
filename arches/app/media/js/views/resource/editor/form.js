@@ -62,37 +62,70 @@ define([
             });
         },
 
-        getTileData: function(outterCard, card, forceblank){
-            var nodegroup_id = card.get('nodegroup_id');
-            var cardinaltiy = card.get('cardinality')();
-            var forceblank = outterCard.get('cardinality')() === 'n' || 
-                (outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
+        // getTileData: function(outterCard, card, forceblank){
+        //     var nodegroup_id = card.get('nodegroup_id');
+        //     var cardinaltiy = card.get('cardinality')();
+        //     var forceblank = outterCard.get('cardinality')() === 'n' || 
+        //         (outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
 
-            if(outterCard.get('cardinality')() === 'n'){
-                return this.blanks[outterCard.get('nodegroup_id')];
-            }
-            if(cardinaltiy === '1'){
-                if(nodegroup_id){
-                    if(card.get('tiles')().length === 0){
-                        return this.blanks[nodegroup_id];
+        //     if(outterCard.get('cardinality')() === 'n'){
+        //         return this.blanks[outterCard.get('nodegroup_id')];
+        //     }
+        //     if(cardinaltiy === '1'){
+        //         if(nodegroup_id){
+        //             if(card.get('tiles')().length === 0){
+        //                 return this.blanks[nodegroup_id];
+        //             }else{
+        //                 return card.get('tiles')()[0];
+        //             } 
+        //         }else{
+        //             return new TileModel();
+        //         }
+        //     }
+        //     if(cardinaltiy === 'n'){
+        //         if(nodegroup_id){
+        //             if(forceblank){
+        //                 return this.blanks[nodegroup_id];
+        //             }else{
+        //                 return card.get('tiles')[nodegroup_id]();
+        //             }
+        //         }else{
+        //             return new TileModel();
+        //         }
+        //     }
+        // },
+
+        getFormEditingContext: function(outterCard, card, tile){
+            if(outterCard.isContainer()){
+                if(outterCard.get('cardinality')() === '1'){
+                    if(card.get('cardinality')() === '1'){
+                        if(Object.getOwnPropertyNames(tile.data).length === 0){
+                            tile.data = this.blanks[card.get('nodegroup_id')].data;
+                        }
+                        return tile;
                     }else{
-                        return card.get('tiles')()[0];
-                    } 
-                }else{
-                    return new TileModel();
-                }
-            }
-            if(cardinaltiy === 'n'){
-                if(nodegroup_id){
-                    if(forceblank){
-                        return this.blanks[nodegroup_id];
-                    }else{
-                        return card.get('tiles')[nodegroup_id]();
+                        return this.blanks[card.get('nodegroup_id')];
                     }
+                } 
+                if(outterCard.get('cardinality')() === 'n'){
+                    if(card.get('cardinality')() === '1'){
+                        return form.blanks[card.get('nodegroup_id')];
+                    }else{
+
+                    }
+                } 
+            }else{
+                if(outterCard.get('cardinality')() === '1'){
+                    if(Object.getOwnPropertyNames(tile.data).length === 0){
+                        tile.data = this.blanks[card.get('nodegroup_id')].data;
+                    }
+                    return tile;
                 }else{
-                    return new TileModel();
+                    return this.blanks[card.get('nodegroup_id')];
                 }
             }
+
+            //return outterCard.get('cardinality')() === 'n' ? (tile.tiles[card.get('nodegroup_id')]().length > 0 ? tile.tiles[card.get('nodegroup_id')]()[0] : form.blanks[card.get('nodegroup_id')]) : tile;
         },
 
         getTileList: function(outterCard, card){
@@ -169,6 +202,43 @@ define([
             }
         },
 
+        saveTile2: function(outterTile, justadd, tile){
+            console.log(koMapping.toJS(tile));
+            var savingOutterTile = !outterTile.tileid();
+            var tiles = outterTile.tiles[tile.nodegroup_id()];
+            tile.parenttile_id(outterTile.tileid());
+            if(justadd){
+                tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
+                this.clearTile(tile);
+            }else{
+                var model;
+                // if the outterTile has never been saved then we need to save it instead, else just save the inner tile
+                if(savingOutterTile){
+                    model = new TileModel(koMapping.toJS(outterTile));
+                    model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
+                }else{
+                    model = new TileModel(koMapping.toJS(tile))
+                }
+                model.save(function(request, status, model){
+                    if(request.status === 200){
+                        // if we had to save an outterTile
+                        if(savingOutterTile){
+                            // koMapping.fromJS(request.responseJSON, outterTile);
+                            outterTile.tileid(request.responseJSON.tileid);
+                            request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
+                                outterTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
+                            }, this)
+                        }else{
+                            tiles.unshift(koMapping.fromJS(request.responseJSON));
+                        }
+                        this.clearTile(tile);
+                    }else{
+                        // inform the user
+                    }
+                }, this);
+            }
+        },
+
         saveTileGroup: function(tilegroup, justadd, cardcontainer, e){
             console.log(koMapping.toJS(cardcontainer));
             var parentTile = this.getTileData(cardcontainer, true);
@@ -223,13 +293,23 @@ define([
          * @param  {object} tile the tile to delete
          * @return {null} 
          */
-        deleteTile: function(card, tile){
+        deleteTile: function(outterTile, tile){
             console.log(ko.toJS(tile));
-            var model = new TileModel(ko.toJS(tile));
+            var model;
+            var deletingOutterTile = outterTile.tiles[tile.nodegroup_id()]().length === 1;
+            if(deletingOutterTile){
+                model = new TileModel(ko.toJS(outterTile));
+            }else{
+                model = new TileModel(ko.toJS(tile));
+            }
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    var tiles = card.get('tiles');
-                    tiles.remove(tile)
+                    if(deletingOutterTile){
+                        outterTile.tileid(null);
+                        outterTile.tiles[tile.nodegroup_id()].remove(tile);
+                    }else{
+                        outterTile.tiles[tile.nodegroup_id()].remove(tile);
+                    }
                 }else{
                     // inform the user
                 }
