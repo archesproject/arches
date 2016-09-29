@@ -198,10 +198,18 @@ define([
               viewModel.map.setCenter(new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY()))
               })
 
-          // prevents drag events from bubbling
-          $(element).mousedown(function (event) {
-              event.stopPropagation();
-          });
+            viewModel.pitch.subscribe(function (val) {
+              viewModel.map.setPitch(viewModel.pitch())
+              })
+
+            viewModel.bearing.subscribe(function (val) {
+              viewModel.map.setBearing(viewModel.bearing())
+              })
+
+            // prevents drag events from bubbling
+            $(element).mousedown(function (event) {
+                event.stopPropagation();
+            });
         }
     }
 
