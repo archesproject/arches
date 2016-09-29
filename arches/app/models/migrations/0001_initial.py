@@ -646,6 +646,48 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
+        migrations.CreateModel(
+            name='MapLayers',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.TextField()),
+                ('layerdefinitions', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layerdefinitions', null=True)),
+                ('isoverlay', models.BooleanField(default=False)),
+                ('sortorder', models.IntegerField(default=1)),
+                ('icon', models.TextField(default=None)),
+            ],
+            options={
+                'db_table': 'map_layers',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='MapSources',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.TextField()),
+                ('source', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='source', null=True)),
+            ],
+            options={
+                'db_table': 'map_sources',
+                'managed': True,
+            },
+        ),
+        # migrations.AlterField(
+        #     model_name='edge',
+        #     name='graph',
+        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
+        # migrations.AlterField(
+        #     model_name='form',
+        #     name='graph',
+        #     field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
+        # migrations.AlterField(
+        #     model_name='node',
+        #     name='graph',
+        #     field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+        # ),
         migrations.AddField(
             model_name='ddatatype',
             name='defaultwidget',

@@ -36,7 +36,9 @@
             'blueimp-jquery': '//blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
             'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
-            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min'
+            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
+            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl',
+            'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min',
         },
         shim: {
             'openlayers': {
@@ -62,6 +64,14 @@
             },
             'select2': {
                 deps: ['jquery']
+            },
+            'noUiSlider': {
+                deps: ['jquery'],
+                exports : '$'
+            },
+            'plugins/mapbox-gl-draw': {
+                deps: ['mapbox-gl'],
+                exports: 'mapboxgl.Draw'
             }
         }
     });
@@ -97,6 +107,7 @@
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
                 form: "{% url 'form' '' %}",
+                geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}"
             },
             mapDefaults: {
@@ -112,7 +123,7 @@
                 icon: '{{ map_info.resource_marker_icon }}',
                 defaultColor: '{{ map_info.resource_marker_color }}'
             },
-            bingKey: "{{ map_info.bing_key }}",
+            // bingKey: "{{ map_info.bing_key }}",
             bingLayers: [{
                 id: 'Road',
                 name: "{% trans 'Streets' %}",
@@ -139,7 +150,18 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
-            }
+            },
+            mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            mapSources: {{% autoescape off %}{% for map_source in map_sources %}
+                '{{ map_source.name }}': {{ map_source.source_json }},
+            {% endfor %}{% endautoescape %}},
+            mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
+                'name': '{{ map_layer.name }}',
+                'layer_definitions': {{ map_layer.layer_json }},
+                'isoverlay': {{ map_layer.isoverlay|lower }},
+                'sortorder': {{ map_layer.sortorder }},
+                'icon': '{{ map_layer.icon }}'
+            },{% endfor %}{% endautoescape %}],
         };
     });
 
@@ -192,4 +214,8 @@
     define('datatype-config-components',
         [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
         function () { return });
+
+    define('geoms', function () {
+        {% autoescape off %}return {{geoms}};{% endautoescape %}
+    });
 </script>

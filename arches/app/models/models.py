@@ -540,3 +540,34 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class MapSources(models.Model):
+    name = models.TextField()
+    source = JSONField(blank=True, null=True, db_column='source')
+
+    @property
+    def source_json(self):
+        json_string = json.dumps(self.source)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_sources'
+
+
+class MapLayers(models.Model):
+    name = models.TextField()
+    layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
+    isoverlay = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=1)
+    icon = models.TextField(default=None)
+
+    @property
+    def layer_json(self):
+        json_string = json.dumps(self.layerdefinitions)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_layers'
