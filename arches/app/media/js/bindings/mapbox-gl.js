@@ -174,18 +174,18 @@ define([
                 });
             });
 
-            // viewModel.map.on('moveend', function(e){
-            //       var mapCenter = viewModel.map.getCenter()
-            //       var zoom = viewModel.map.getZoom()
-            //       if (viewModel.zoom() !== zoom) {
-            //           viewModel.zoom(zoom);
-            //       };
-            //       viewModel.centerX(mapCenter.lng)
-            //       viewModel.centerY(mapCenter.lat)
-            // })
+            viewModel.map.on('moveend', function(e){
+                  var mapCenter = viewModel.map.getCenter()
+                  var zoom = viewModel.map.getZoom()
+                  if (viewModel.zoom() !== zoom) {
+                      viewModel.zoom(zoom);
+                  };
+                  viewModel.centerX(mapCenter.lng)
+                  viewModel.centerY(mapCenter.lat)
+            })
 
             viewModel.zoom.subscribe(function (val) {
-                viewModel.map.zoomTo(viewModel.zoom())
+                viewModel.map.setZoom(viewModel.zoom())
               })
 
             viewModel.centerX.subscribe(function (val) {

@@ -49,7 +49,6 @@ define([
 
             this.onGeocodeSelection = function(val, e) {
               this.geocoder(e.currentTarget.value)
-              console.log(val, e);
             }
 
             this.toggleMapTools = function(data, event){
