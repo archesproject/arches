@@ -1,0 +1,98 @@
+{% load i18n %}
+<!-- ko if: !configForm  && state === 'form' -->
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <p>Midgets</p>
+              <div id="" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+
+                      <!--Nav Tabs-->
+                      <ul class="nav nav-tabs card-nav-container" style="">
+                          <li class="active">
+                              <a data-toggle="tab" href="#A1" class="card-tab-title" aria-expanded="true"> Data Entry</a>
+                          </li>
+                          <li class="">
+                              <a data-toggle="tab" href="#A2" class="card-tab-title" aria-expanded="false"> Report</a>
+                          </li>
+                      </ul>
+
+                      <!--Tabs Content-->
+                      <div class="tab-content card-content-tab" style="margin-left: 0px;">
+
+                          <!-- Data Entry Widget -->
+                        <div id="A1" class="tab-pane fade active in">
+                            <div class="panel-body card-panel-body" style="">
+                                <div id="" class="card-content" style="">
+
+                                    <!-- Card Instruction -->
+                                    <p class="content-instructions">
+                                        Card level instructions
+
+                                        <!-- Help link -->
+                                        <span>
+                                            <a id="card-help-link" href="" class="pull-right card-help help editable-help" style=""> Help <i class="fa fa-question-circle"></i></a>
+                                        </span>
+                                    </p>
+
+                                    <!-- Form -->
+                                    <div class="col-lg-12" style="padding-bottom: 10px;">
+                                        <form class="widgets" style="margin-bottom: 20px;">
+                                            <div class="row widget-container">
+                                                <div class="col-xs-12">
+                                                    <div class="form-group">
+                                                        <div class="relative">
+                                                            <label class="col-xs-12 control-label widget-input-label" for=""> File Upload
+                                                        </label></div>
+
+                                                        <div class="col-xs-12">
+                                                             <div class="bord-top pad-ver">
+                                                                <!-- The fileinput-button span is used to style the file input field as button -->
+                                                                <span class="btn btn-success fileinput-button dz-clickable">
+                                                                    <i class="fa fa-plus"></i>
+                                                                    <span>Add files...</span>
+                                                                </span>
+
+                                                                <div class="btn-group pull-right">
+                                                                    <button id="dz-upload-btn" class="btn btn-primary" type="submit" disabled="">
+                                                                        <i class="fa fa-upload-cloud"></i> Upload
+                                                                    </button>
+                                                                    <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" disabled="">
+                                                                        <i class="ion ion-close"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div id="dz-previews">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
+<!-- /ko -->
+
+<!-- ko if: configForm -->
+<div class="control-label">
+    {% trans "Placeholder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+</div>
+<!-- /ko -->
