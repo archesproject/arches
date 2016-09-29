@@ -20,9 +20,14 @@ define([
     * @param {object} params
     * @param {boolean} params.value - the value being managed
     * @param {object} params.config -
-    * @param {string} params.config.label - label to use alongside the select input
-    * @param {string} params.config.trueValue - label alongside the true boolean button
-    * @param {string} params.config.falseValue - label alongside the false boolean button
+    * @param {string} params.config.zoom - map zoom level
+    * @param {string} params.config.centerX - map center longitude
+    * @param {string} params.config.centerY - map center latitude
+    * @param {string} params.config.geocoder - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
+    * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
+    * @param {string} params.config.geometryTypes - the geometry types available for a user to edit
+    * @param {string} params.config.pitch - the pitch of the map in degrees
+    * @param {string} params.config.pitch - the bearing of the map in degrees with north at 0
     */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
