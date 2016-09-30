@@ -6,40 +6,29 @@ define([
     ko.bindingHandlers.noUiSlider = {
         init: function(element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
             var options = ko.unwrap(valueAccessor());
+            var values = [];
             var updateValues = function() {
-                var values = [];
-                if (start) {
-                    values.push(start());
-                }
-                if (end) {
-                    values.push(end());
-                }
-                slider.set(values)
-            }
-            var start;
-            var end;
-            if (ko.isObservable(options.start)) {
-                start = options.start;
-                options.start = start();
-                start.subscribe(updateValues);
+                slider.set(values.map(function(value) {
+                    return value();
+                }))
             }
 
-            if (ko.isObservable(options.end)) {
-                end = options.end;
-                options.end = end();
-                end.subscribe(updateValues);
-            }
+            var keys = ['start', 'end'];
+            keys.forEach(function (key) {
+                var value = options[key];
+                if (ko.isObservable(value)) {
+                    value.subscribe(updateValues);
+                    values.push(value);
+                    options[key] = value();
+                }
+            });
 
             var slider = noUiSlider.create(element, options);
 
-            element.noUiSlider.on('slide', function(values, handle) {
-                var value = values[handle];
-                if (start) {
-                    start(values[0]);
-                }
-                if (end) {
-                    start(values[1]);
-                }
+            element.noUiSlider.on('slide', function(newValues) {
+                values.forEach(function (value, i) {
+                    value(newValues[i]);
+                });
             });
         }
     };
