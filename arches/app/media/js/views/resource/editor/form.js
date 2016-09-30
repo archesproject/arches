@@ -117,7 +117,6 @@ define([
          * @return {'name': label associated with the widget, 'value': value of the data associated with that widget}
          */
         getNodeValueAndLabel: function(index, tile, card){
-            console.log(tile);
             var node = card.get('widgets')()[index].node;
             var name = node.name;
             var value = tile.data[node.nodeid];
@@ -134,7 +133,6 @@ define([
          * @return {null} 
          */
         saveTile: function(outterTile, justadd, tile){
-            console.log(koMapping.toJS(tile));
             var savingOutterTile = !outterTile.tileid();
             var tiles = outterTile.tiles[tile.nodegroup_id()];
             tile.parenttile_id(outterTile.tileid());
@@ -177,7 +175,6 @@ define([
          * @return {null} 
          */
         saveTileGroup: function(outterTile, e){
-            console.log(koMapping.toJS(outterTile));
             var model = new TileModel(koMapping.toJS(outterTile));
             model.save(function(request, status, model){
                 if(request.status === 200){
@@ -197,7 +194,6 @@ define([
          * @return {null} 
          */
         updateTile: function(tile, e){
-            console.log(ko.toJS(tile));
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
@@ -216,7 +212,6 @@ define([
          * @return {null} 
          */
         deleteTile: function(outterTile, tile){
-            console.log(ko.toJS(tile));
             var model;
             var isTileGroup = !!outterTile.formid;
             var deletingOutterTile = outterTile.tiles[tile.nodegroup_id()]().length === 1;
@@ -280,7 +275,6 @@ define([
          * @return {null} 
          */
         selectTab: function(data, e){
-            console.log(data)
             var selectedTab = e.currentTarget;
             var tabElems = selectedTab.parentElement.children;
             var contentElems = selectedTab.parentElement.nextElementSibling.children;
