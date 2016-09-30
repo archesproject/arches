@@ -24,71 +24,13 @@ define([
             options.pitch = viewModel.pitch();
             options.bearing = viewModel.bearing();
 
-            viewModel.addInitialLayers = function() {
-                var initialLayers = [];
-                var overlayLayers = _.sortBy(_.where(arches.mapLayers, {
-                    isoverlay: true
-                }), 'sortorder').reverse();
-
-                arches.mapLayers.forEach(function(mapLayer) {
-                    if (mapLayer.name === viewModel.selectedBasemap()) {
-                        _.each(mapLayer.layer_definitions, function(layer) {
-                            initialLayers.push(layer);
-                        });
-                    }
-                });
-
-                overlayLayers.forEach(function(overlayLayer) {
-                    _.each(overlayLayer.layer_definitions, function(layer) {
-                        initialLayers.push(layer);
-                    });
-                })
-
-                initialLayers.push({
-                    "id": "geocode-point",
-                    "source": "geocode-point",
-                    "type": "circle",
-                    "paint": {
-                        "circle-radius": 5,
-                        "circle-color": "red"
-                    }
-                });
-
-                return initialLayers;
-            }
-
-            options.style.layers = viewModel.addInitialLayers();
-
             var map = new mapboxgl.Map(
                 _.defaults(options, defaults)
             );
 
             viewModel.map = map;
-
-            var overlays =
-                _.each(_.where(arches.mapLayers, {
-                    isoverlay: true
-                }), function(overlay) {
-                    _.extend(overlay, {
-                        opacity: ko.observable(100),
-                        showingTools: ko.observable(false),
-                        toggleOverlayTools: function() {
-                            this.showingTools(!this.showingTools())
-                        },
-                        updateOpacity: function(val) {
-                            this.layer_definitions.forEach(function(layer) {
-                                viewModel.map.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                            }, this)
-                        }
-                    });
-                    overlay.opacity.subscribe(function(value) {
-                        overlay.updateOpacity(value);
-                    });
-                }, viewModel);
-
             map.addControl(draw);
 
-            viewModel.overlays = ko.observableArray(overlays)
             viewModel.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                 return baselayer.isoverlay === false
             });

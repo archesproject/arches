@@ -84,7 +84,7 @@
                           <a class="" href=""><span data-bind="text:name"><span></a>
                       </div>
                       <div class="map-overlay-item-tools">
-                          <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools">
+                          <a href="#" class="overlay-toggle" data-bind="click: function(e){toggleOverlayTools(e)}">
                             <!-- ko if: showingTools() === false  -->
                               <i class="ion-arrow-left-b" data-bind="showingTools()"></i>
                             <!-- /ko -->
