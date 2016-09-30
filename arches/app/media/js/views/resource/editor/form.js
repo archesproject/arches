@@ -34,6 +34,13 @@ define([
             this.loadForm(this.formid);
         },
 
+        /**
+         * asynchronously loads a form into the UI
+         * @memberof Form.prototype
+         * @param  {object} formid the id of the form to load
+         * @param  {object} callback called after the form loads
+         * @return {null} 
+         */
         loadForm: function(formid, callback){
             var self = this;
             $.ajax({
@@ -62,39 +69,14 @@ define([
             });
         },
 
-        // getTileData: function(outterCard, card, forceblank){
-        //     var nodegroup_id = card.get('nodegroup_id');
-        //     var cardinaltiy = card.get('cardinality')();
-        //     var forceblank = outterCard.get('cardinality')() === 'n' || 
-        //         (outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
-
-        //     if(outterCard.get('cardinality')() === 'n'){
-        //         return this.blanks[outterCard.get('nodegroup_id')];
-        //     }
-        //     if(cardinaltiy === '1'){
-        //         if(nodegroup_id){
-        //             if(card.get('tiles')().length === 0){
-        //                 return this.blanks[nodegroup_id];
-        //             }else{
-        //                 return card.get('tiles')()[0];
-        //             } 
-        //         }else{
-        //             return new TileModel();
-        //         }
-        //     }
-        //     if(cardinaltiy === 'n'){
-        //         if(nodegroup_id){
-        //             if(forceblank){
-        //                 return this.blanks[nodegroup_id];
-        //             }else{
-        //                 return card.get('tiles')[nodegroup_id]();
-        //             }
-        //         }else{
-        //             return new TileModel();
-        //         }
-        //     }
-        // },
-
+        /**
+         * a function to return the knockout context used to render the actual widgets in the form
+         * @memberof Form.prototype
+         * @param  {object} outterCard a reference to the outter most card in the form
+         * @param  {object} card a reference to the card associated with the form being rendered
+         * @param  {object} tile a reference to the currently bound tile
+         * @return {null} 
+         */
         getFormEditingContext: function(outterCard, card, tile){
             if(outterCard.isContainer()){
                 if(outterCard.get('cardinality')() === '1'){
@@ -124,44 +106,16 @@ define([
                     return this.blanks[card.get('nodegroup_id')];
                 }
             }
-
-            //return outterCard.get('cardinality')() === 'n' ? (tile.tiles[card.get('nodegroup_id')]().length > 0 ? tile.tiles[card.get('nodegroup_id')]()[0] : form.blanks[card.get('nodegroup_id')]) : tile;
         },
 
-        getTileList: function(outterCard, card){
-            var nodegroup_id = card.get('nodegroup_id');
-            var cardinaltiy = card.get('cardinality')();
-            var forceblank = outterCard.get('cardinality')() === 'n'; //|| 
-                //(outterCard.get('cardinality')() === '1' && cardinaltiy === 'n');
-            if(outterCard.get('cardinality')() === 'n' && card && forceblank){
-                return this.blanks[nodegroup_id];
-            }
-            return card.get('tiles')();
-
-            // if(cardinaltiy === '1'){
-            //     if(nodegroup_id){
-            //         if(card.get('tiles')().length === 0){
-            //             return this.blanks[nodegroup_id];
-            //         }else{
-            //             return card.get('tiles')()[0];
-            //         } 
-            //     }else{
-            //         return new TileModel();
-            //     }
-            // }
-            // if(cardinaltiy === 'n'){
-            //     if(nodegroup_id){
-            //         if(forceblank){
-            //             return this.blanks[nodegroup_id];
-            //         }else{
-            //             return card.get('tiles')[nodegroup_id]();
-            //         }
-            //     }else{
-            //         return new TileModel();
-            //     }
-            // }
-        },
-
+        /**
+         * a function to get the label and value of a widget at the given array index in the widget array
+         * @memberof Form.prototype
+         * @param  {integer} index the array index to use when locating the widget in question
+         * @param  {object} tile a reference to the currently bound tile
+         * @param  {object} card a reference to the card associated with the form being rendered
+         * @return {'name': label associated with the widget, 'value': value of the data associated with that widget}
+         */
         getNodeValueAndLabel: function(index, tile, card){
             console.log(tile);
             var node = card.get('widgets')()[index].node;
@@ -171,38 +125,15 @@ define([
         },
 
         /**
-         * saves a new tile object back to the database and adds it to the tilegroup
+         * saves a new tile object back to the database and adds it to the UI, in some instances it will 
+         * save the outter most tile if that doesn't already exist
          * @memberof Form.prototype
-         * @param  {object} card the card the new tile should belong to
-         * @param  {object} tile the tile to add/save
+         * @param  {object} outterTile a reference to the outter most tile, used to determine if that tile needs to be saved instead
          * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
+         * @param  {object} tile the tile to add/save
          * @return {null} 
          */
-        saveTile: function(card, tile, justadd){
-            console.log(koMapping.toJS(tile));
-            var nodegroup_id = tile.nodegroup_id();
-            var tiles = card.get('tiles');
-            if(justadd){
-                tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
-                this.clearTile(tile);
-            }else{
-                var model = new TileModel(koMapping.toJS(tile));
-                model.save(function(request, status, model){
-                    if(request.status === 200){
-                        // if(!(nodegroup_id in tiles)){
-                        //     tiles[nodegroup_id] = koMapping.fromJS([]);
-                        // }
-                        // tiles[nodegroup_id].unshift(koMapping.fromJS(request.responseJSON));
-                        tiles.unshift(koMapping.fromJS(request.responseJSON));
-                        this.clearTile(tile);
-                    }else{
-                        // inform the user
-                    }
-                }, this);
-            }
-        },
-
-        saveTile2: function(outterTile, justadd, tile){
+        saveTile: function(outterTile, justadd, tile){
             console.log(koMapping.toJS(tile));
             var savingOutterTile = !outterTile.tileid();
             var tiles = outterTile.tiles[tile.nodegroup_id()];
@@ -240,6 +171,12 @@ define([
             }
         },
 
+        /**
+         * saves a tile and it's child tiles back to the database
+         * @memberof Form.prototype
+         * @param  {object} outterTile a the outter most tile to save
+         * @return {null} 
+         */
         saveTileGroup: function(outterTile, e){
             console.log(koMapping.toJS(outterTile));
             var model = new TileModel(koMapping.toJS(outterTile));
@@ -247,16 +184,6 @@ define([
                 if(request.status === 200){
                     this.tiles[outterTile.nodegroup_id()].unshift(koMapping.fromJS(request.responseJSON));
                     this.clearTile(outterTile);
-                    // _.each(cardcontainer.get('tiles'), function(tile){
-                    //     this.clearTile(tile);
-                    // }, this);
-                    // cardcontainer.get('tiles').removeAll();
-
-                    // _.each(cardcontainer.get('cards'), function(card){
-                    //     _.each(card.get('tiles'), function(tile){
-                    //         this.clearTile(tile);
-                    //     }, this);
-                    // }, this);
                 }else{
                     // inform the user
                 }
@@ -283,9 +210,9 @@ define([
         },
 
         /**
-         * deletes a tile object from the database and removes it from the tilegroup
+         * deletes a tile object or tile collection from the database and removes it from the UI
          * @memberof Form.prototype
-         * @param  {object} card a reference to the card that the tile being deleted belongs to
+         * @param  {object} outterTile a reference to the outter most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
          * @return {null} 
          */
@@ -337,7 +264,7 @@ define([
         },
 
         /**
-         * removes any existing values set on the tile
+         * removes any existing values set on the tile as well as removing any child tile instances
          * @memberof Form.prototype
          * @param  {object} tile the tile to remove values from
          * @return {null} 
@@ -367,26 +294,14 @@ define([
                     }
                 }, this);
             }
-
-            // _.each(tile.data, function(value, key, list){
-            //     value("");
-            // }, this);
-            // _.each(tile.tiles, function(value, key, list){
-            //     value.removeAll();
-            // }, this);
-
-            // _.each(card.get('tiles'), function(tile){
-            //     _.each(tile.data, function(value, key, list){
-            //         value("");
-            //     }, this);
-            // }, this);
-            // card.get('tiles').removeAll();
-
-            // _.each(card.get('cards'), function(card){
-            //     this.clearTile(card);
-            // }, this);
         },
 
+        /**
+         * removes any existing values set on the tile.data attribute
+         * @memberof Form.prototype
+         * @param  {object} tile the tile to remove values from
+         * @return {null} 
+         */
         clearTileValues: function(tile){
             _.each(tile.data, function(value, key, list){
                 value("");

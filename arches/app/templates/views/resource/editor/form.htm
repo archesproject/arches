@@ -97,14 +97,14 @@
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
                                             </div>
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, false)">{% trans 'Save' %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, false)">{% trans 'Save' %}</button>
                                             </div>
                                         <!-- /ko -->
 
                                         <!-- ko if: isWizard -->
                                             <!-- ko if: forceBlank -->
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, true)">{% trans 'Add' %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, true)">{% trans 'Add' %}</button>
                                             </div>
                                             <!-- /ko -->
                                             <!-- ko if: !forceBlank -->
@@ -112,7 +112,7 @@
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
                                             </div>
                                             <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, false)">{% trans 'Save' %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, false)">{% trans 'Save' %}</button>
                                             </div>
                                             <!-- /ko -->
                                         <!-- /ko -->
