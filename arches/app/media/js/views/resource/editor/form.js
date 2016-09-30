@@ -258,8 +258,26 @@ define([
          * @return {null} 
          */
         toggleTile: function(data, e){
-            //$('#abc'+data.tileid()).toggle('fast');
             $(e.currentTarget.nextElementSibling).toggle('fast');
+        },
+
+        /**
+         * Selects the appropriate tab in the form
+         * @memberof Form.prototype
+         * @param  {object} data a knockout reference to the current context object
+         * @param  {object} e event object
+         * @return {null} 
+         */
+        selectTab: function(data, e){
+            console.log(data)
+            var selectedTab = e.currentTarget;
+            var tabElems = selectedTab.parentElement.children;
+            var contentElems = selectedTab.parentElement.nextElementSibling.nextElementSibling.children;
+            var tabIndex = Array.prototype.indexOf.call(tabElems, selectedTab);
+            $(tabElems).removeClass('active');
+            $(selectedTab).addClass('active');
+            $(contentElems).removeClass('active in');
+            $(contentElems[tabIndex]).addClass('active in');
         },
 
         /**

@@ -37,8 +37,8 @@
                         as: 'card'
                     }">
                         <li id="summary-group" data-bind="css: {
-                            'active': outterCard.get('selectedCardIndex')()===$index()
-                        }, click: outterCard.get('selectedCard')">
+                            'active': 0 === $index()
+                        }, click: form.selectTab.bind($parent)">
                             <a id="summary-tab" href="#" class="card-tab-title">
                                 <span data-bind="text: card.get('name')"></span>
                             </a>
@@ -55,7 +55,7 @@
           
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
-                            'active in': outterCard.get('selectedCardIndex')()===$index()
+                            'active in': 0 === $index()
                         }">
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
@@ -245,8 +245,8 @@
                     <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: form.tiles[outterCard.get('nodegroup_id')](), as: 'tile'}">
 
                         <ul class="nav nav-tabs card-nav-container" data-bind="foreach: outterCard.get('cards')" style="margin-bottom: 0px;">
-                            <li id="summary-group" data-bind="css: {'active': $index() === outterCard.get('selectedCardIndex')()}" style="margin-bottom: 0px;">
-                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: $parent.selection">
+                            <li id="summary-group" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title">
                                     <!-- Editable Span -->
                                     <span class="card-tab-title">
                                         <span data-bind="text: get('name')"></span>
