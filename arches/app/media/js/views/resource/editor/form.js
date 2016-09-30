@@ -154,7 +154,6 @@ define([
                     if(request.status === 200){
                         // if we had to save an outterTile
                         if(savingOutterTile){
-                            // koMapping.fromJS(request.responseJSON, outterTile);
                             outterTile.tileid(request.responseJSON.tileid);
                             request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
                                 outterTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
@@ -202,7 +201,7 @@ define([
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    // inform the user???
+                    tile.tileid(request.responseJSON.tileid);
                 }else{
                     // inform the user
                 }
