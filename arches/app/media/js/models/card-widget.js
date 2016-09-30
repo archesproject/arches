@@ -60,7 +60,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                         if (key === 'label') {
                             this.get('label')(value[key]);
                         }
-                        if (config[key]() !== value[key]) {
+                        if (config[key] && config[key]() !== value[key]) {
                             config[key](value[key]);
                         }
                     }
