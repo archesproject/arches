@@ -209,7 +209,7 @@ define([
             tile.parenttile_id(outterTile.tileid());
             if(justadd){
                 tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
-                this.clearTile(tile);
+                this.clearTileValues(tile);
             }else{
                 var model;
                 // if the outterTile has never been saved then we need to save it instead, else just save the inner tile
@@ -228,10 +228,11 @@ define([
                             request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
                                 outterTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
                             }, this)
+                            this.clearTile(tile);
                         }else{
                             tiles.unshift(koMapping.fromJS(request.responseJSON));
+                            this.clearTileValues(tile);
                         }
-                        this.clearTile(tile);
                     }else{
                         // inform the user
                     }
@@ -342,12 +343,37 @@ define([
          * @return {null} 
          */
         clearTile: function(tile){
-            _.each(tile.data, function(value, key, list){
-                value("");
+            var card;
+            this.cards().forEach(function(c){
+                if(c.get('nodegroup_id') === tile.nodegroup_id()){
+                    card = c;
+                }
             }, this);
-            _.each(tile.tiles, function(value, key, list){
-                value.removeAll();
-            }, this);
+
+            if(!!card){
+                card.get('cards')().forEach(function(innerCard){
+                    if(innerCard.get('cardinality')() === 'n'){
+                        _.each(tile.tiles, function(innerTile, nodegroup_id, list){
+                            if(nodegroup_id === innerCard.get('nodegroup_id')){
+                                innerTile.removeAll();
+                            }
+                        }, this);
+                    }else{
+                        _.each(tile.tiles, function(innerTile, nodegroup_id, list){
+                            if(nodegroup_id === innerCard.get('nodegroup_id')){
+                                this.clearTileValues(innerTile()[0]);
+                            }
+                        }, this);
+                    }
+                }, this);
+            }
+
+            // _.each(tile.data, function(value, key, list){
+            //     value("");
+            // }, this);
+            // _.each(tile.tiles, function(value, key, list){
+            //     value.removeAll();
+            // }, this);
 
             // _.each(card.get('tiles'), function(tile){
             //     _.each(tile.data, function(value, key, list){
@@ -359,6 +385,12 @@ define([
             // _.each(card.get('cards'), function(card){
             //     this.clearTile(card);
             // }, this);
+        },
+
+        clearTileValues: function(tile){
+            _.each(tile.data, function(value, key, list){
+                value("");
+            }, this);
         }
 
     });
