@@ -18,7 +18,7 @@
                 <div class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'tile': $data}">
                     
                     <!--Nav Tabs-->
-                    <ul class="nav nav-tabs card-nav-container" data-bind="foreach: {
+                    <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px" data-bind="foreach: {
                         data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
                         as: 'card'
                     }">
@@ -37,13 +37,11 @@
                         <!-- /ko -->
                     </ul>
 
-                    <div id="db-arches-app-alert" class="panel data-card-alert"></div>
-
                     <!--Tabs Content-->
                     <div class="tab-content card-content-tab" style="margin-left: 0px;" data-bind="foreach: {
                         data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
                         as: 'card'
-                    }">
+                    }, visible: !(isWizard && !forceBlank)">
           
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {

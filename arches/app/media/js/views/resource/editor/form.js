@@ -272,7 +272,7 @@ define([
             console.log(data)
             var selectedTab = e.currentTarget;
             var tabElems = selectedTab.parentElement.children;
-            var contentElems = selectedTab.parentElement.nextElementSibling.nextElementSibling.children;
+            var contentElems = selectedTab.parentElement.nextElementSibling.children;
             var tabIndex = Array.prototype.indexOf.call(tabElems, selectedTab);
             $(tabElems).removeClass('active');
             $(selectedTab).addClass('active');
