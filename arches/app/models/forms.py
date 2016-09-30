@@ -157,9 +157,6 @@ class Form(object):
             form_obj['cardgroups'] = []
             for formxcard in formxcards:
                 card_obj = JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id))
-                card_obj['tiles'] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card_obj['nodegroup_id']))
-                for child_card in card_obj['cards']:
-                    child_card['tiles'] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=child_card['nodegroup_id']))
                 form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
         else:
