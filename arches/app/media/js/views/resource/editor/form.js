@@ -253,12 +253,23 @@ define([
         /**
          * toggle the visiblity of the tile in the view
          * @memberof Form.prototype
-         * @param  {object} data a knockout reference to the tile object
+         * @param  {object} data a knockout reference to current context object
          * @param  {object} e event object
          * @return {null} 
          */
         toggleTile: function(data, e){
             $(e.currentTarget.nextElementSibling).toggle('fast');
+        },
+
+        /**
+         * toggle the visiblity of the tile group in the view
+         * @memberof Form.prototype
+         * @param  {object} data a knockout reference to current context object
+         * @param  {object} e event object
+         * @return {null} 
+         */
+        toggleGroup: function(data, e){
+            $(e.currentTarget.parentElement.parentElement.nextElementSibling).toggle('fast');
         },
 
         /**

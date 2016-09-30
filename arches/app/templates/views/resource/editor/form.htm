@@ -32,7 +32,7 @@
                         <!-- ko if: isWizard && !forceBlank && $index() === outterCard.get('cards')().length - 1-->
                         <li class="wizard-card-tools">
                             <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, form, tile)"></i>
-                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide" data-bind="click: form.toggleGroup"></i>
                         </li>
                         <!-- /ko -->
                     </ul>
