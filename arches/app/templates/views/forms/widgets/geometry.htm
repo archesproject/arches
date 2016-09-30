@@ -3,7 +3,7 @@
 <div class="row widget-wrapper" data-bind="if: !configForm">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-        <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: setupMap }">
+        <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: function(){setupMap(map)} }">
           <!-- Geocode Panel -->
         <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
           <select data-bind="chosen: {width: '100%'}, value: geocodeSearchVal, options: geocodeSearchResults, optionsText: 'text', optionsValue: 'text'"></select>

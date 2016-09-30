@@ -3,11 +3,13 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
+    'mapbox-gl',
+    'plugins/mapbox-gl-draw',
     'map/mapbox-style',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function(ko, _, WidgetViewModel, arches, mapStyle) {
+], function(ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -31,7 +33,6 @@ define([
      */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
-            console.log('loading')
             var self = this;
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing'];
             WidgetViewModel.apply(this, [params]);
@@ -57,12 +58,12 @@ define([
                 }), 'sortorder').reverse();
 
                 arches.mapLayers.forEach(function(mapLayer) {
-                    if (mapLayer.name === this.basemap) {
+                    if (mapLayer.name === this.basemap()) {
                         _.each(mapLayer.layer_definitions, function(layer) {
                             initialLayers.push(layer);
                         });
                     }
-                });
+                }, this);
 
                 overlayLayers.forEach(function(overlayLayer) {
                     _.each(overlayLayer.layer_definitions, function(layer) {
@@ -83,29 +84,6 @@ define([
                 return initialLayers;
             }
 
-            var overlays =
-                _.each(_.where(arches.mapLayers, {
-                    isoverlay: true
-                }), function(overlay) {
-                    _.extend(overlay, {
-                        opacity: ko.observable(100),
-                        showingTools: ko.observable(false),
-                        toggleOverlayTools: function(e) {
-                            this.showingTools(!this.showingTools())
-                        },
-                        updateOpacity: function(val) {
-                            this.layer_definitions.forEach(function(layer) {
-                                this.map.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                            }, this)
-                        }
-                    });
-                    overlay.opacity.subscribe(function(value) {
-                        overlay.updateOpacity(value);
-                    });
-                });
-
-            this.overlays = ko.observableArray(overlays)
-
             this.geocoderOptions = ko.observableArray([{
                 'id': 'MapzenGeocoder',
                 'name': 'Mapzen'
@@ -113,6 +91,170 @@ define([
                 'id': 'BingGeocoder',
                 'name': 'Bing'
             }]);
+
+
+            $('.geocodewidget').select2({
+                ajax: {
+                    url: arches.urls.geocoder,
+                    dataType: 'json',
+                    quietMillis: 250,
+                    data: function(term, page) {
+                        return {
+                            q: term,
+                            geocoder: this.geocoder
+                        };
+                    },
+                    results: function(data, page) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 4,
+                multiple: false,
+                maximumSelectionSize: 1
+            }, this);
+
+            this.editingToolIcons = {
+                Point: 'ion-location',
+                Line: 'ion-steam',
+                Polygon: 'fa fa-pencil-square-o',
+                Delete: 'ion-trash-a'
+            }
+
+            this.setupMap = function(map) {
+                var self = this;
+                var draw = Draw();
+                this.map = map;
+                this.map.addControl(draw);
+                this.redrawGeocodeLayer = function() {
+                    var cacheLayer = map.getLayer('geocode-point');
+                    map.removeLayer('geocode-point');
+                    map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
+                }
+
+                this.selectEditingTool = function(val, e) {
+                    switch (val) {
+                        case 'Point':
+                            draw.changeMode('draw_point');
+                            break;
+                        case 'Line':
+                            draw.changeMode('draw_line_string');
+                            break;
+                        case 'Polygon':
+                            draw.changeMode('draw_polygon');
+                            break;
+                        default:
+                            draw.trash();
+                    }
+                }
+
+                var overlays =
+                    _.each(_.where(arches.mapLayers, {
+                        isoverlay: true
+                    }), function(overlay) {
+                        _.extend(overlay, {
+                            opacity: ko.observable(100),
+                            showingTools: ko.observable(false),
+                            toggleOverlayTools: function(e) {
+                                this.showingTools(!this.showingTools())
+                            },
+                            updateOpacity: function(val) {
+                                this.layer_definitions.forEach(function(layer) {
+                                    this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
+                                }, map)
+                            }
+                        });
+                        overlay.opacity.subscribe(function(value) {
+                            overlay.updateOpacity(value);
+                        });
+                    });
+
+                this.overlays = ko.observableArray(overlays)
+
+                this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
+                    return baselayer.isoverlay === false
+                });
+                this.setBasemap = function(basemapType) {
+                    var lowestOverlay = _.last(_.last(overlays).layer_definitions);
+                    this.basemaps.forEach(function(basemap) {
+                        var self = this;
+                        if (basemap.name === basemapType.name) {
+                            basemap.layer_definitions.forEach(function(layer) {
+                                self.map.addLayer(layer, lowestOverlay.id)
+                            })
+                        } else {
+                            basemap.layer_definitions.forEach(function(layer) {
+                                if (self.map.getLayer(layer.id) !== undefined) {
+                                    self.map.removeLayer(layer.id);
+                                }
+                            })
+                        }
+                    }, this)
+                };
+
+                $('.geocodewidget').on("select2-selecting", function(e) {
+                    this.map.getSource('geocode-point').setData(e.object.geometry);
+                    this.redrawGeocodeLayer();
+                    this.map.flyTo({
+                        center: e.object.geometry.coordinates
+                    });
+                });
+
+
+                this.updateConfigs = function(theViewModel) {
+                    //using a closure because the viewModel was not avaliable within the event
+                    return function() {
+                        var self = theViewModel;
+                        var mapCenter = this.getCenter()
+                        var zoom = self.map.getZoom()
+                        if (self.zoom() !== zoom) {
+                            self.zoom(zoom);
+                        };
+                        self.centerX(mapCenter.lng)
+                        self.centerY(mapCenter.lat)
+                    }
+                }
+
+                this.map.on('moveend', this.updateConfigs(this));
+
+                this.overlays.subscribe(function(overlays) {
+                    var anchorLayer = 'gl-draw-active-line.hot';
+                    for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array without creating a copy
+                        overlays[i].layer_definitions.forEach(function(layer) {
+                            map.removeLayer(layer.id)
+                        })
+                    }
+                    for (var i = overlays.length; i-- > 0;) {
+                        overlays[i].layer_definitions.forEach(function(layer) {
+                            map.addLayer(layer, anchorLayer);
+                            map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity() / 100.0);
+                        })
+                    }
+                    this.redrawGeocodeLayer();
+                }, this)
+
+                this.zoom.subscribe(function(val) {
+                    this.map.setZoom(this.zoom())
+                }, this);
+
+                this.centerX.subscribe(function(val) {
+                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
+                }, this);
+
+                this.centerY.subscribe(function(val) {
+                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
+                }, this);
+
+                this.pitch.subscribe(function(val) {
+                    this.map.setPitch(this.pitch())
+                }, this);
+
+                this.bearing.subscribe(function(val) {
+                    this.map.setBearing(this.bearing())
+                }, this);
+            }
 
             this.onGeocodeSelection = function(val, e) {
                 this.geocoder(e.currentTarget.value)
@@ -129,6 +271,8 @@ define([
                 });
             }
 
+
+
             mapStyle.layers = this.addInitialLayers();
 
             this.mapOptions = {
@@ -139,10 +283,6 @@ define([
             this.selectBasemap = function(val) {
                 self.basemap(val.name)
                 self.setBasemap(val);
-            }
-
-            this.setupMap = function(map) {
-                console.log(map)
             }
         },
         template: {
