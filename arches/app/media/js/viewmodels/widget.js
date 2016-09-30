@@ -20,7 +20,6 @@ define(['knockout', 'underscore'], function (ko, _) {
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
         }
-        // this.label = this.config().label || ko.observable('');
 
         var subscribeConfigObservable = function (obs, key) {
             self[key] = obs;
