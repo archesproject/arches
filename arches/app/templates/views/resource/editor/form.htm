@@ -17,8 +17,9 @@
                 <!-- ko with: (form.tiles[outterCard.get('nodegroup_id')]().length > 0 ? form.tiles[outterCard.get('nodegroup_id')]()[0] : form.blanks[outterCard.get('nodegroup_id')]) -->
 
                     <!-- Data Entry -->
+                    <!-- ko let: {'forceBlank': false} -->
                     <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
-
+                    <!-- /ko -->
             
                 <!-- /ko -->
 
@@ -71,7 +72,6 @@
                                     </div>
 
                                     <!-- Form -->
-                                  <!--   <div data-bind="with: card.get('cardinality')() === '1' ? (tile.tiles[card.get('nodegroup_id')]().length > 0 ? tile.tiles[card.get('nodegroup_id')]()[0] : form.blanks[card.get('nodegroup_id')]) : tile" > -->
                                     <div data-bind="with: form.getFormEditingContext(outterCard, card, tile)" >
                                         <div class="col-xs-12 card-form-container" data-bind="let: {'tile': $data}">
                         
@@ -91,15 +91,33 @@
                                         </div>
 
                                         <!-- Save/Add Button -->
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
-                                        </div>
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, outterCard, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add" %}</button>
-                                        </div>
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, outterCard.isContainer() && outterCard.get('cardinality')() === 'n')">{% trans "Add2" %}</button>
-                                        </div>
+                                        <!-- ko let: {'isWizard': outterCard.isContainer() && outterCard.get('cardinality')() === 'n'} -->
+                                        <!-- ko if: !isWizard -->
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
+                                            </div>
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, false)">{% trans 'Save' %}</button>
+                                            </div>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: isWizard -->
+                                            <!-- ko if: forceBlank -->
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, true)">{% trans 'Add' %}</button>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko if: !forceBlank -->
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
+                                            </div>
+                                            <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile2.bind(form, tile, false)">{% trans 'Save' %}</button>
+                                            </div>
+                                            <!-- /ko -->
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+
                                     </div>
                                 </div>
                             </div>
@@ -196,6 +214,7 @@
 
             <div class="card-body">
 
+                <!-- ko let: {'forceBlank': true} -->
                 <!-- ko with: form.blanks[outterCard.get('nodegroup_id')] -->
 
                     <!-- Data Entry -->
@@ -207,11 +226,12 @@
                         <div class="ep-form-toolbar-tools mar-no flex">
                             <span>
                                 <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                                <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form, outterCard.get('tiles'), false)">{% trans "Save" %}</button>
+                                <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form)">{% trans "Save" %}</button>
                             </span>
                         </div>
                     </div>
 
+                <!-- /ko -->
                 <!-- /ko -->
 
                 <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && form.tiles[outterCard.get('nodegroup_id')]().length > 0">
@@ -234,13 +254,15 @@
                                 </a>
                             </li>
                             <li class="wizard-card-tools" data-bind="if: $index() === (outterCard.isContainer() ? (outterCard.get('cards')().length - 1) : 0) ">
-                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, outterCard, tile)"></i>
+                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, form, tile)"></i>
                                 <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                             </li>
                         </ul>
 
                         <!-- Data Entry -->
+                        <!-- ko let: {'forceBlank': false} -->
                         <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template' }"></div>
+                        <!-- /ko -->
                     </div>
 
                 </div>

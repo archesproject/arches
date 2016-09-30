@@ -242,7 +242,10 @@ class Form(object):
                     for widget in card['widgets']:
                         tile['data'][widget['node_id']] = ''
 
-                    parentTile['tiles'][card['nodegroup_id']] = []
+                    if(card['cardinality'] == '1'):
+                        parentTile['tiles'][card['nodegroup_id']] = [tile]
+                    else:
+                        parentTile['tiles'][card['nodegroup_id']] = []
                     
                     # add a blank tile for each card 
                     self.blanks[tile['nodegroup_id']] = tile
