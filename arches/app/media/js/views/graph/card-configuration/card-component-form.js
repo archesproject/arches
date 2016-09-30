@@ -63,8 +63,8 @@ define([
                 })
             }).extend({ rateLimit: 500 });
 
-            this.cardfunctions = options.functions.filter(function(fn) { 
-                return fn.functiontype === 'nodegroup'; 
+            this.cardfunctions = options.functions.filter(function(fn) {
+                return fn.functiontype === 'nodegroup';
             });
 
             this.updateSelection = function(selection) {
