@@ -4,7 +4,7 @@ define([
     'noUiSlider'
 ], function($, ko, noUiSlider) {
     ko.bindingHandlers.noUiSlider = {
-        init: function(element, valueAccessor, allBindingsAccesor, viewModel, bindingContext) {
+        init: function(element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
             var values = [];
             var updateValues = function() {
