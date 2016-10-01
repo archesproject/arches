@@ -22,6 +22,7 @@ define(['arches',
             this.set('nodes', ko.observableArray());
             this.set('functions', ko.observableArray());
             this.set('widgets', ko.observableArray());
+            this.set('tiles', ko.observableArray());
 
             this.set('cardid', ko.observable());
             this.set('name', ko.observable());
@@ -148,6 +149,7 @@ define(['arches',
                     case 'ontology_properties':
                     case 'users':
                     case 'groups':
+                    case 'tiles':
                         this.set(key, koMapping.fromJS(value));
                         break;
                     case 'functions':

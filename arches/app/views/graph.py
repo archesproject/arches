@@ -251,6 +251,8 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -262,6 +264,8 @@ class CardView(GraphBaseView):
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             functions=JSONSerializer().serialize(models.Function.objects.all()),
+            map_layers=map_layers,
+            map_sources=map_sources,
         )
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
@@ -411,11 +415,15 @@ class ReportEditorView(GraphBaseView):
     def post(self, request, reportid):
         data = JSONDeserializer().deserialize(request.body)
         report = models.Report.objects.get(reportid=reportid)
+        graph = Graph.objects.get(graphid=report.graph.pk)
         report.name = data['name']
         report.config = data['config']
         report.formsconfig = data['formsconfig']
         report.active = data['active']
-        report.save()
+        with transaction.atomic():
+            if report.active:
+                graph.report_set.exclude(reportid=reportid).update(active=False)
+            report.save()
         return JSONResponse(report)
 
     def delete(self, request, reportid):

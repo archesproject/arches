@@ -15,6 +15,19 @@ require([
         reports: ko.observableArray(data.reports)
     };
 
+    var setupTiles = function(card) {
+        var tileData = {};
+        card.nodes.forEach(function (node) {
+            tileData[node.nodeid] = ko.observable(null);
+        });
+        card.tiles = [{
+            tileid: null,
+            data: tileData
+        }];
+        card.cards.forEach(setupTiles);
+    };
+    data.cards.forEach(setupTiles);
+
     viewModel.report = new ReportModel(data);
 
     viewModel.reset = function () {
@@ -48,7 +61,7 @@ require([
     var subViewModel = {
         report: viewModel.report,
         selection: viewModel.selection
-    }
+    };
     viewModel.reportEditorTree = new ReportEditorTree(subViewModel);
     viewModel.reportEditorForm = new ReportEditorForm(subViewModel);
     viewModel.reportEditorPreview = new ReportEditorPreview(subViewModel);

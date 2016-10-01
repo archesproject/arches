@@ -9,16 +9,17 @@ define(['knockout', 'underscore'], function (ko, _) {
     */
     var WidgetViewModel = function(params) {
         var self = this;
+        this.state = params.state || 'form';
         this.value = params.value || ko.observable(null);
         this.disabled = params.disabled || ko.observable(false);
         this.configForm = params.configForm || false;
         this.config = params.config || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
+        this.configKeys.push('label');
         if (typeof this.config !== 'function') {
             this.config = ko.observable(this.config);
         }
-        this.label = this.config().label || ko.observable('');
 
         var subscribeConfigObservable = function (obs, key) {
             self[key] = obs;
