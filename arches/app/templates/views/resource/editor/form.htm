@@ -1,0 +1,255 @@
+{% load i18n %}
+<!-- ko if: form.ready -->
+<!-- ko foreach: { data: form.cards, as: 'outterCard' } -->
+<!-- ko let: {'isWizard': outterCard.isContainer() && outterCard.get('cardinality')() === 'n'} -->
+<!-- Card Manager Panels and Forms -->
+<div class="ep-card-crud-container">
+    <!-- Card Preview -->
+    <div id="card-preview">
+
+        <div class="panel" style="padding-bottom: 10px; margin-bottom: 0px;">
+            <div class="panel-heading">
+                <div class="">
+                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: outterCard.get('name')"></h3>
+                </div>
+            </div>
+
+            <script type="text/html" id="card-template">
+                <!-- Card Template -->
+                <div class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'tile': $data}">
+                    
+                    <!--Nav Tabs-->
+                    <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px" data-bind="foreach: {
+                        data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
+                        as: 'card'
+                    }">
+                        <li id="summary-group" data-bind="css: {
+                            'active': 0 === $index()
+                        }, click: form.selectTab.bind($parent)">
+                            <a id="summary-tab" href="#" class="card-tab-title">
+                                <span data-bind="text: card.get('name')"></span>
+                            </a>
+                        </li>
+                        <!-- ko if: isWizard && !forceBlank && $index() === outterCard.get('cards')().length - 1-->
+                        <li class="wizard-card-tools">
+                            <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, form, tile)"></i>
+                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide" data-bind="click: form.toggleGroup"></i>
+                        </li>
+                        <!-- /ko -->
+                    </ul>
+
+                    <!--Tabs Content-->
+                    <div class="tab-content card-content-tab" style="margin-left: 0px;" data-bind="foreach: {
+                        data: outterCard.isContainer() ? outterCard.get('cards') : [outterCard],
+                        as: 'card'
+                    }, visible: !(isWizard && !forceBlank)">
+          
+                        <!-- Card -->
+                        <div class="tab-pane fade" data-bind="css: {
+                            'active in': 0 === $index()
+                        }">
+                            <div class="panel-body card-panel-body">
+                                <div id="" class="card-content">
+
+                                    <div class="card-instructions">
+                                        <span data-bind="text: card.get('instructions')"></span>
+
+                                        <!-- Help link -->
+                                        <!-- ko if: card.get('helpenabled') -->
+                                        <span>
+                                            <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                        </span>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <!-- Form -->
+                                    <div data-bind="with: form.getFormEditingContext(outterCard, card, tile)" >
+                                        <div class="col-xs-12 card-form-container" data-bind="let: {'tile': $data}">
+                        
+                                            <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                    data:card.get('widgets'), as: 'widget'
+                                                }">
+                                                <div class='widget-preview' data-bind='component: {
+                                                    name: form.widgetLookup[widget.get("widget_id")()].name,
+                                                    params: {
+                                                        config: configJSON,
+                                                        label: widget.get("label")(),
+                                                        value: tile.data[widget.get("node_id")()],
+                                                        disabled: false
+                                                    }
+                                                }'></div>
+                                            </form>
+                                        </div>
+
+                                        <!-- Save/Add Buttons -->
+                                        <!-- ko if: forceBlank -->
+                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, true)">{% trans 'Add' %}</button>
+                                        </div>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: !forceBlank -->
+                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
+                                        </div>
+                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, false)">{% trans 'Save' %}</button>
+                                        </div>
+                                        <!-- /ko -->
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ko if: card.get('cardinality')() === 'n' -->
+
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: (tile.tiles[card.get('nodegroup_id')]().length > 0)">
+
+                                <div class="card-tab-title mar-btm">
+                                    Saved <span data-bind="text: card.get('name')"/>
+                                </div>
+
+                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: tile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
+
+                                    <div class="list-group-item" style="background: rgb(250, 250, 250);">
+                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span></h5>
+                                        
+                                        <div class="effect" style="display:none;">
+                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, tile, innerTile)">
+                                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
+                                                </span>
+                                            </a>
+
+                                            <!-- Card Instruction -->
+                                            <div class="card-instructions">
+                                                <span data-bind="text: card.get('instructions')"></span>
+
+                                                <!-- Help link -->
+                                                <!-- ko if: card.get('helpenabled') -->
+                                                <span>
+                                                    <a class="pull-right card-help help editable-help" data-bind="click: function () { card.get('helpactive')(true) }" style="cursor:pointer;"> Help <i class="fa fa-question-circle"></i></a>
+                                                </span>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <!-- Form -->
+                                            <div class="col-xs-12 card-form-container">
+                            
+                                                <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                        data:card.get('widgets'), as: 'widget'
+                                                    }">
+                                                    <div class='widget-preview' data-bind='component: {
+                                                        name: form.widgetLookup[widget.get("widget_id")()].name,
+                                                        params: {
+                                                            config: configJSON,
+                                                            label: widget.get("label")(),
+                                                            value: innerTile.data[widget.get("node_id")()],
+                                                            disabled: false
+                                                        }
+                                                    }'></div>
+                                                </form>
+
+                                            </div>
+
+                                            <!-- Save/Add Button -->
+                                            <div class="install-buttons">
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, innerTile)">{% trans "Save" %}</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <!-- /ko -->
+
+
+                            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.get('helpactive')">
+                                <div class="relative">
+                                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { card.get('helpactive')(false) }"></a>
+                                </div>
+                                <div id="add-basemap-wizard-help-content">
+                                    <div>
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title" style="padding: 0 10px 0 10px;">
+                                                <span data-bind="text: card.get('helptitle')"></span>
+                                            </h3>
+                                        </div>
+                                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.get('helptext')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </script>
+
+
+            <!-- ko if: !isWizard -->
+
+                <!-- ko let: {'forceBlank': false} -->
+                <!-- ko with: outterCard.get('cardinality')() === '1' ? (form.tiles[outterCard.get('nodegroup_id')]().length > 0 ? form.tiles[outterCard.get('nodegroup_id')]()[0] : form.blanks[outterCard.get('nodegroup_id')]) : form -->
+                <!-- Data Entry -->
+                <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
+                <!-- /ko -->
+                <!-- /ko -->
+        
+            <!-- /ko -->
+
+
+            <!-- ko if: isWizard -->
+            <div class="card-body panel-body ">
+
+                <!-- ko let: {'forceBlank': true} -->
+                <!-- ko with: form.blanks[outterCard.get('nodegroup_id')] -->
+
+                    <!-- Data Entry -->
+                    <div class="fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
+
+
+                    <!-- Wizard Level Buttons -->
+                    <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
+                        <div class="ep-form-toolbar-tools mar-no flex">
+                            <span>
+                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                                <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form)">{% trans "Save" %}</button>
+                            </span>
+                        </div>
+                    </div>
+
+                <!-- /ko -->
+                <!-- /ko -->
+
+                <div class="relative" style="padding-bottom: 10px; display: none;" data-bind="visible: outterCard.get('cardinality')() === 'n' && form.tiles[outterCard.get('nodegroup_id')]().length > 0">
+
+                    <!-- Title -->
+                    <div class="card-tab-title mar-btm">
+                        Saved <span data-bind="text: outterCard.get('name')"/>
+                    </div>
+
+                    <!-- Wizard Tile -->
+                    <div id="wizard-tile-card" class="tab-base" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: form.tiles[outterCard.get('nodegroup_id')](), as: 'tile'}">
+
+                        <!-- ko let: {'forceBlank': false} -->
+                        <!-- Data Entry -->
+                        <div class="fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template' }"></div>
+                        <!-- /ko -->
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- /ko -->
+
+        </div>
+    </div>
+</div>
+<!-- /ko -->
+<!-- /ko -->
+<!-- /ko -->

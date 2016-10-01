@@ -583,7 +583,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('resourceinstancesecurity', models.TextField(blank=True, null=True)),
-                ('resourceclass', models.ForeignKey(db_column='resourceclassid', to='models.Node')),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
             ],
             options={
                 'db_table': 'resource_instances',

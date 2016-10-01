@@ -18,3 +18,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "views/resource/resource-base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Resource Editor" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="">Related Resources</button>
+    {{ block.super }}
+{% endblock graph_header_buttons %}
+
+{% block content %}
+<div class="flex">
+
+    <!--Form Listing -->
+    <div class="left-column-container form-list" data-bind="with: formList">
+        {% include 'views/resource/editor/form-list.htm' %}
+    </div>
+
+
+    <!-- Card Container -->
+    <div class="card-form-preview-container" data-bind="let: {'form': formView}">
+        
+        {% include 'views/resource/editor/form.htm' %}
+
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+<script>{% autoescape off %}
+define('resource-editor-data', [], function () {
+    return {
+        forms: {{forms}},
+        form: {{form}},
+        datatypes: {{ datatypes_json }},
+        widgets: {{ widgets_json }},
+        resourceid: '{{resourceid}}'
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

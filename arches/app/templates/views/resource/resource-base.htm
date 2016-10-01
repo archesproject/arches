@@ -38,16 +38,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </a>
 
         <!-- Title Bar -->
-        {% block graph_title %}
         <div class="ep-tools-title">
             <h1 class="page-header text-overflow ep-graph-title">
-                <i class="{{graph.iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
                 <span>
-                    {{graph.name}}
+                    {{resource_type}}
                 </span>
             </h1>
         </div>
-        {% endblock graph_title %}
 
         <!-- Search Bar -->
         <a href="" class="ep-tools ep-tools-right">
@@ -76,8 +74,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="settings-manager" class="edit-menu-item">
                         <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-copy"></i> Copy Resource</div>
-                                <span class="text-muted menu-item-subtitle">Make a copy and start editing</span>
+                                <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Make a copy and start editing" %}</span>
                             </div>
                         </a>
                     </li>
@@ -86,8 +84,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="card-manager" class="edit-menu-item">
                         <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-trash"></i> Delete Resource </div>
-                                <span class="text-muted menu-item-subtitle">Permanently delete this resource</span>
+                                <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>
                             </div>
                         </a>
                     </li>
@@ -96,8 +94,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="history-manager" class="edit-menu-item">
                         <a id="edit-history-btn" href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-step-backward"></i> Review Edit History</div>
-                                <span class="text-muted menu-item-subtitle">View changes to this resource record</span>
+                                <div class="menu-item-title"><i class="fa fa-step-backward"></i> {% trans "Review Edit History" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "View changes to this resource record" %}</span>
                             </div>
                         </a>
                     </li>
@@ -106,8 +104,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li id="report-manager" class="edit-menu-item">
                         <a href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-book"></i> Jump to Report</div>
-                                <span class="text-muted menu-item-subtitle">View the full resource report</span>
+                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
                             </div>
                         </a>
                     </li>
@@ -116,16 +114,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="edit-menu-item">
                         <a id="" href="" target="" class="">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-mail-reply"></i> Return to Resource Manager</div>
-                                <span class="text-muted menu-item-subtitle">Create a new Arches resource </span>
+                                <div class="menu-item-title"><i class="fa fa-mail-reply"></i> {% trans "Return to Resource Manager" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Create a new Arches resource" %} </span>
                             </div>
                         </a>
                     </li>
                 </ul>
             </div>
-            <div class="panel-footer ep-menu-footer hidden">
-                footer
-            </div>
+            
         </div>
     </div>
 
@@ -185,10 +181,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="ep-form-alert-buttons">
                 <!-- ko if: alert().cancel -->
-                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">Cancel</button>
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
                 <!-- /ko -->
                 <!-- ko if: alert().ok -->
-                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">OK</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
                 <!-- /ko -->
             </div>
             <!-- /ko -->

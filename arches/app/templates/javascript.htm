@@ -36,6 +36,10 @@
             'blueimp-jquery': '//blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
             'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
+            'datatables.net': '//cdn.datatables.net/1.10.12/js/jquery.dataTables.min',
+            'datatables.net-bs': '//cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min',
+            'datatables.net-responsive': '//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min',
+            'datatables': '//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min',
             'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
             'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl',
             'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min',
@@ -63,6 +67,12 @@
                 deps: ['jquery']
             },
             'select2': {
+                deps: ['jquery']
+            },
+            'datatables': {
+                deps: ['jquery']
+            },
+            'datatables.net': {
                 deps: ['jquery']
             },
             'noUiSlider': {
@@ -107,6 +117,10 @@
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
                 form: "{% url 'form' '' %}",
+                report_editor: "{% url 'report_editor' '' %}",
+                resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
+                tile: "{% url 'tile' %}",
                 geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}"
             },
