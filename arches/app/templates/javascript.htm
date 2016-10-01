@@ -35,7 +35,7 @@
             'blueimp-jquery': '//blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
             'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
             'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
-            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min'
+            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
         },
         shim: {
             'openlayers': {
@@ -78,6 +78,7 @@
                 concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_search: "{% url 'concept_search' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                dropdown: "{% url 'dropdown' %}",
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
@@ -138,7 +139,11 @@
             requestFailed: {
                 title: "{% trans 'Request Failed...' %}",
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
-            }
+            },
+            conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
+                'label': '{{ concept_collection.label }}',
+                'id': '{{ concept_collection.id }}',
+            },{% endfor %}{% endautoescape %}],
         };
     });
 

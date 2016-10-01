@@ -31,6 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
+from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from arches.app.views.base import BaseManagerView
@@ -251,6 +252,11 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
+        for concept in top_concepts:
+            if concept.label == 'Dropdown Lists':
+                concept_collections = concept.children
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -262,6 +268,7 @@ class CardView(GraphBaseView):
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             functions=JSONSerializer().serialize(models.Function.objects.all()),
+            concept_collections=concept_collections,
         )
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)

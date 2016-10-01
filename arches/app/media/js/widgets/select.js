@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'plugins/knockout-select2'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chosen'], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a select-widget component for use in forms
     * @function external:"ko.components".select-widget
@@ -11,10 +11,35 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'plugins/knockout-select2
     */
     return ko.components.register('select-widget', {
         viewModel: function(params) {
+            params.configKeys = ['placeholder', 'options'];
+            this.selection = params.config.selection;
+
             WidgetViewModel.apply(this, [params]);
 
-            this.placeholder = this.config().placeholder;
-            this.options = this.config().options;
+            this.node.config.topConcept.subscribe(function(newId) {
+              var self = this;
+              $.ajax({
+                url: arches.urls.dropdown,
+                data: {
+                  conceptid: newId
+                },
+                dataType:'json'
+              }).done(function(data){
+                data.unshift({
+                  id: null,
+                  text: null
+                })
+                self.options(data);
+              }).fail(function(err) {
+                  console.log( "error", err );
+                })
+                .always(function() {
+                  console.log( "complete" );
+                });
+
+
+
+            }, this);
         },
         template: { require: 'text!widget-templates/select' }
     });

@@ -20,6 +20,19 @@ define([
                 search_contains: true
             };
 
+            if (allBindings.has('placeholder')){
+                var prop = allBindings.get('placeholder');
+                var value = prop;
+                if (ko.isObservable(prop)){
+                    prop.subscribe(function(){
+                        $element.attr('data-placeholder', prop());
+                        $element.trigger('chosen:updated');
+                    });
+                    value = prop();
+                }
+                $element.attr('data-placeholder', value);
+            }
+
             if (typeof options === 'object')
                 $element.chosen(_.defaults(options, defaults));
             else
