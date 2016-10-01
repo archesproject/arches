@@ -1,4 +1,5 @@
 {% load i18n %}
+<!-- ko if: form.ready -->
 <!-- ko foreach: { data: form.cards, as: 'outterCard' } -->
 <!-- ko let: {'isWizard': outterCard.isContainer() && outterCard.get('cardinality')() === 'n'} -->
 <!-- Card Manager Panels and Forms -->
@@ -95,7 +96,7 @@
                                             <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, tile, false)">{% trans 'Save' %}</button>
                                         </div>
                                         <!-- /ko -->
-
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -153,7 +154,7 @@
                                             <!-- Save/Add Button -->
                                             <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
-                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, tile)">{% trans "Save" %}</button>
+                                                <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, innerTile)">{% trans "Save" %}</button>
                                             </div>
 
                                         </div>
@@ -189,10 +190,10 @@
             </script>
 
 
-            <!-- ko if: outterCard.get('cardinality')() == '1' -->
+            <!-- ko if: !isWizard -->
 
                 <!-- ko let: {'forceBlank': false} -->
-                <!-- ko with: (form.tiles[outterCard.get('nodegroup_id')]().length > 0 ? form.tiles[outterCard.get('nodegroup_id')]()[0] : form.blanks[outterCard.get('nodegroup_id')]) -->
+                <!-- ko with: outterCard.get('cardinality')() === '1' ? (form.tiles[outterCard.get('nodegroup_id')]().length > 0 ? form.tiles[outterCard.get('nodegroup_id')]()[0] : form.blanks[outterCard.get('nodegroup_id')]) : form -->
                 <!-- Data Entry -->
                 <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
                 <!-- /ko -->
@@ -201,7 +202,7 @@
             <!-- /ko -->
 
 
-            <!-- ko if: outterCard.get('cardinality')() == 'n' -->
+            <!-- ko if: isWizard -->
             <div class="card-body panel-body ">
 
                 <!-- ko let: {'forceBlank': true} -->
@@ -249,5 +250,6 @@
         </div>
     </div>
 </div>
+<!-- /ko -->
 <!-- /ko -->
 <!-- /ko -->

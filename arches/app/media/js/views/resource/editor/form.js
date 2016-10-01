@@ -32,6 +32,7 @@ define([
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
             this.loadForm(this.formid);
+            this.ready = ko.observable(false);
         },
 
         /**
@@ -62,8 +63,9 @@ define([
 
                 },
                 complete: function(response){
+                    self.ready(true);
                     if(callback){
-                        callback(response)
+                        callback(response);
                     }
                 }
             });
@@ -81,28 +83,36 @@ define([
             if(outterCard.isContainer()){
                 if(outterCard.get('cardinality')() === '1'){
                     if(card.get('cardinality')() === '1'){
+                        //console.log(1)
                         if(Object.getOwnPropertyNames(tile.data).length === 0){
                             tile.data = this.blanks[card.get('nodegroup_id')].data;
+                            //console.log(1.1)
                         }
                         return tile;
                     }else{
+                        //console.log(2)
                         return this.blanks[card.get('nodegroup_id')];
                     }
                 } 
                 if(outterCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
+                        //console.log(3)
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
+                        //console.log(4)
                         return this.blanks[card.get('nodegroup_id')];
                     }
                 } 
             }else{
                 if(outterCard.get('cardinality')() === '1'){
+                    //console.log(5)
                     if(Object.getOwnPropertyNames(tile.data).length === 0){
                         tile.data = this.blanks[card.get('nodegroup_id')].data;
+                        //console.log(5.1)
                     }
                     return tile;
                 }else{
+                    //console.log(6)
                     return this.blanks[card.get('nodegroup_id')];
                 }
             }
@@ -133,9 +143,11 @@ define([
          * @return {null} 
          */
         saveTile: function(outterTile, justadd, tile){
-            var savingOutterTile = !outterTile.tileid();
+            var savingOutterTile = !!outterTile.tileid ? !outterTile.tileid() : false;
             var tiles = outterTile.tiles[tile.nodegroup_id()];
-            tile.parenttile_id(outterTile.tileid());
+            if(!!outterTile.tileid){
+                tile.parenttile_id(outterTile.tileid());
+            }
             if(justadd){
                 tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
                 this.clearTileValues(tile);
