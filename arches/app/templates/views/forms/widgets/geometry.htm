@@ -6,7 +6,7 @@
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-             <select data-bind="ajaxchosen: {ajaxChosenOptions:{loadingImg: '{{ STATIC_URL }}img/select2-spinner.gif', minLength: 3, processItems: function(data){ return _.map(data.results, function(res) { return {text: res.id, id:res.geometry.coordinates}})}}, chosenOptions: {width: '100%'}, ajaxOptions: {url: geocodeUrl, type: 'GET', success: function(data, textStatus, jqXHR){ console.log(geocoder(), data);}, data: [{name:'geocoder', value:geocoder}]}, selectedItem: geocodePoint}, optionsText: 'text', optionsValue: 'text'"></select>
+            <select data-bind="ajaxchosen: {ajaxChosenOptions:{loadingImg: '{{ STATIC_URL }}img/select2-spinner.gif', minLength: 3, processItems: function(data){ return _.map(data.results, function(res) { return {text: res.id, id:res.geometry.coordinates}})}}, chosenOptions: {width: '100%'}, ajaxOptions: {url: geocodeUrl, type: 'GET', success: function(data, textStatus, jqXHR){ console.log(geocoder(), data);}, data: [{name:'geocoder', value:geocoder}]}, geocodeTarget: geocodePoint}, optionsText: 'text', optionsValue: 'text'"></select>
         </div>
 
         <!-- Map Tools Panel -->

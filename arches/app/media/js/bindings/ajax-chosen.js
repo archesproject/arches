@@ -26,12 +26,24 @@ define([
                 options.chosenOptions
             );
 
+
+            var keys = ['geocodeTarget'];
+            keys.forEach(function(key) {
+                var value = options[key];
+                if (ko.isObservable(value)) {
+                    values.push(value);
+                    options[key] = value();
+                }
+            });
+
             $element.on('change', function(a) {
                 var coords = a.target.value.split(",");
                 var numericCoords = _.map(coords, function(coord) {
                     return Number(coord)
                 })
-                viewModel.geocodePoint(numericCoords);
+                values.forEach(function(value, i) {
+                    value(numericCoords);
+                })
             });
 
         }
