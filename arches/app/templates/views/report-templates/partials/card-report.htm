@@ -16,3 +16,9 @@
     </dl>
 </div>
 <!-- /ko -->
+
+<!-- ko if: card.get('tiles')().length === 0 -->
+<div class="row rp-report-tile" style="color: #808080">
+    {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+</div>
+<!-- /ko -->
