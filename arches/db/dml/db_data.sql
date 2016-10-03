@@ -2317,7 +2317,7 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         "source": "stamen-terrain",
         "minzoom": 0,
         "maxzoom": 22
-    }]', TRUE, 4, 'fa fa-road');
+    }]', FALSE, 4, 'fa fa-road');
 
 INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
     VALUES ('satellite', '[{
