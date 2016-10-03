@@ -45,13 +45,13 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-          this.geocoderOptions = ko.observableArray([{
-            'id': 'BingGeocoder',
-            'name': 'Bing'
-          }, {
-            'id': 'MapzenGeocoder',
-            'name': 'Mapzen'
-          }]);
+            this.geocoderOptions = ko.observableArray([{
+                'id': 'BingGeocoder',
+                'name': 'Bing'
+            }, {
+                'id': 'MapzenGeocoder',
+                'name': 'Mapzen'
+            }]);
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodePoint = ko.observable();
@@ -176,21 +176,21 @@ define([
                     }, this)
                 };
 
-                this.geocodePoint.subscribe(function(coords){
-                  var point =     {
-                          "type": "Feature",
-                          "properties": {},
-                          "geometry": {
+                this.geocodePoint.subscribe(function(coords) {
+                    var point = {
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
                             "type": "Point",
                             "coordinates": coords
-                          }
                         }
-                  this.map.getSource('geocode-point').setData(point);
-                  this.redrawGeocodeLayer();
-                  var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                  this.map.flyTo({
-                      center: centerPoint
-                  });
+                    }
+                    this.map.getSource('geocode-point').setData(point);
+                    this.redrawGeocodeLayer();
+                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                    this.map.flyTo({
+                        center: centerPoint
+                    });
                 }, this);
 
                 this.updateConfigs = function(theViewModel) {
@@ -262,14 +262,11 @@ define([
                 });
             }
 
-
-
             mapStyle.layers = this.addInitialLayers();
 
             this.mapOptions = {
                 style: mapStyle
             };
-
 
             this.selectBasemap = function(val) {
                 self.basemap(val.name)
