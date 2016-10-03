@@ -94,7 +94,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div id="page-content" style="padding: 0 50px 160px; margin-top: -1px;">
 
         <div id="resource-list" class="report-image-grid" style="margin-top: 5px;" data-bind="visible: showResources()">
-            
+
             <!-- ko foreach: allGraphs -->
             <!-- ko if: isresource -->
             <div class="card-grid-item">
@@ -126,7 +126,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Resource Instances -->
         <div id="resource-records" class="report-image-grid" style="display: none;" data-bind="visible: !showResources()">
-                            
+
             <!-- Resource Records Table -->
             <div class="panel">
                 <div class="panel-body" style="background: #ebeef0;">
@@ -140,6 +140,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <th class="min-desktop">QC Status</th>
                                 <th class="min-desktop">Public</th>
                                 <th class="min-tablet">Editor</th>
+                                <th class="min-tablet"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -152,13 +153,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <td>{{summary.qc}}</td>
                                 <td>{{summary.public}}</td>
                                 <td>{{summary.editor}}</td>
+                                <td>
+                                    <!-- var data = recentlyAddedResourceTable.row( this ).data();
+                                    self.viewModel.navigate(arches.urls.resource_editor + data[0]); -->
+                                    <a href="#" class="btn btn-primary" data-bind="click: function () {
+                                        navigate('{% url 'resource' %}/{{summary.id}}')
+                                    }">{% trans "Edit" %}</a>
+                                    <a href="#" class="btn btn-primary" data-bind="click: function () {
+                                        navigate('{% url 'resource_report' summary.id %}')
+                                    }">{% trans "View Report" %}</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>      
+        </div>
 
     </div>
 </div>
