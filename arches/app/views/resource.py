@@ -94,7 +94,10 @@ class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         tiles = models.Tile.objects.filter(pk=resourceid)
-        report = models.Report.objects.get(graph=resource_instance.graph, active=True)
+        try:
+           report = models.Report.objects.get(graph=resource_instance.graph, active=True)
+        except models.Report.DoesNotExist:
+           report = None
         forms = resource_instance.graph.form_set.filter(status=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
@@ -105,7 +108,6 @@ class ResourceReportView(BaseManagerView):
         context = self.get_context_data(
             main_script='resource-report',
             report=JSONSerializer().serialize(report),
-            reports=JSONSerializer().serialize(resource_instance.graph.report_set.all()),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
             forms=JSONSerializer().serialize(forms),
@@ -115,6 +117,7 @@ class ResourceReportView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             graph_id=resource_instance.graph.pk,
+            graph_name=resource_instance.graph.name
          )
 
         return render(request, 'resource-report.htm', context)

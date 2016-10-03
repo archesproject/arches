@@ -25,12 +25,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock title %}
 
 {% block content %}
+<!-- ko if: report -->
 <div class='resource-report' data-bind='component: {
     name: reportLookup[report.get("template_id")()].componentname,
     params: {
         report: report
     }
 }'></div>
+<!-- /ko -->
+
+<div style="display: none;" class="report-undefined" data-bind="visible: !report">No report defined for "{{graph_name}}"...</div>
 {% endblock content %}
 
 {% block pre_require_js %}
@@ -39,7 +43,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('resource-report-data', [], function () {
     return {
         templates: {{templates_json}},
-        reports: {{reports}},
         report: {{report}},
         datatypes: {{ datatypes_json }},
         forms: {{forms}},

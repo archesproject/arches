@@ -12,17 +12,21 @@ require([
     var ResourceReportView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
-
+            var report = null;
             var setupTiles = function(card) {
                 card.tiles = _.filter(data.tiles, function(tile) {
                     tile.nodegroup_id === card.nodegroup_id;
                 });
                 card.cards.forEach(setupTiles);
             };
-            data.cards.forEach(setupTiles);
+
+            if (data.report) {
+                data.cards.forEach(setupTiles);
+                report =  new ReportModel(data);
+            }
 
             this.viewModel.reportLookup = reportLookup;
-            this.viewModel.report = new ReportModel(data);
+            this.viewModel.report = report;
             BaseManagerView.prototype.initialize.call(this, options)
         }
     });
