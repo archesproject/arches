@@ -18,7 +18,6 @@ define([
         init: function(element, valueAccessor, allBindings, viewModel) {
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
-            var values = [];
 
             $element.ajaxChosen(
                 options.ajaxOptions,
@@ -26,24 +25,21 @@ define([
                 options.chosenOptions
             );
 
+            var value = options.value;
 
-            var keys = ['geocodeTarget'];
-            keys.forEach(function(key) {
-                var value = options[key];
-                if (ko.isObservable(value)) {
-                    values.push(value);
-                    options[key] = value();
-                }
+            $element.on('change', function(val) {
+                value(val.currentTarget.value);
             });
 
-            $element.on('change', function(a) {
-                var coords = a.target.value.split(",");
-                var numericCoords = _.map(coords, function(coord) {
-                    return Number(coord)
-                })
-                values.forEach(function(value, i) {
-                    value(numericCoords);
-                })
+            ['value'].forEach(function(propName){
+                if (allBindings.has(propName)){
+                    var prop = allBindings.get(propName);
+                    if (ko.isObservable(prop)){
+                        prop.subscribe(function(){
+                            $element.trigger('chosen:updated');
+                        });
+                    }
+                }
             });
 
         }

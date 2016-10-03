@@ -55,7 +55,7 @@ define([
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodePoint = ko.observable();
-
+            this.geocodeResponseOptions = ko.observable();
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -176,23 +176,6 @@ define([
                     }, this)
                 };
 
-                this.geocodePoint.subscribe(function(coords) {
-                    var point = {
-                        "type": "Feature",
-                        "properties": {},
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": coords
-                        }
-                    }
-                    this.map.getSource('geocode-point').setData(point);
-                    this.redrawGeocodeLayer();
-                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                    this.map.flyTo({
-                        center: centerPoint
-                    });
-                }, this);
-
                 this.updateConfigs = function(theViewModel) {
                     //using a closure because the viewModel was not avaliable within the event
                     return function() {
@@ -244,6 +227,24 @@ define([
                 this.bearing.subscribe(function(val) {
                     this.map.setBearing(this.bearing())
                 }, this);
+
+                this.geocodePoint.subscribe(function(val){
+                   var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
+                   var point = {
+                       "type": "Feature",
+                       "properties": {},
+                       "geometry": {
+                           "type": "Point",
+                           "coordinates": coords
+                       }
+                   }
+                   this.map.getSource('geocode-point').setData(point);
+                   this.redrawGeocodeLayer();
+                   var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                   this.map.flyTo({
+                       center: centerPoint
+                   });
+                }, this)
 
             }
 
