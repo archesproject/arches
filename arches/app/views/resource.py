@@ -93,7 +93,7 @@ class ResourceData(TemplateView):
 class ResourceReportView(BaseManagerView):
     def get(self, request, resourceid=None):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        tiles = models.Tile.objects.filter(pk=resourceid)
+        tiles = models.Tile.objects.filter(resourceinstance=resource_instance)
         try:
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
         except models.Report.DoesNotExist:

@@ -15,7 +15,7 @@ require([
             var report = null;
             var setupTiles = function(card) {
                 card.tiles = _.filter(data.tiles, function(tile) {
-                    tile.nodegroup_id === card.nodegroup_id;
+                    return tile.nodegroup_id === card.nodegroup_id;
                 });
                 card.cards.forEach(setupTiles);
             };
