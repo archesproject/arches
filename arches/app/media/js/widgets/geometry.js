@@ -8,7 +8,8 @@ define([
     'map/mapbox-style',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/ajax-chosen'
 ], function(ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
@@ -43,6 +44,17 @@ define([
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
+
+          this.geocoderOptions = ko.observableArray([{
+            'id': 'BingGeocoder',
+            'name': 'Bing'
+          }, {
+            'id': 'MapzenGeocoder',
+            'name': 'Mapzen'
+          }]);
+
+            this.geocodeUrl = arches.urls.geocoder;
+            this.geocodePoint = ko.observable();
 
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
@@ -84,38 +96,6 @@ define([
                 return initialLayers;
             }
 
-            this.geocoderOptions = ko.observableArray([{
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }, {
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }]);
-
-
-            $('.geocodewidget').select2({
-                ajax: {
-                    url: arches.urls.geocoder,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: function(term, page) {
-                        return {
-                            q: term,
-                            geocoder: this.geocoder
-                        };
-                    },
-                    results: function(data, page) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 4,
-                multiple: false,
-                maximumSelectionSize: 1
-            }, this);
-
             this.editingToolIcons = {
                 Point: 'ion-location',
                 Line: 'ion-steam',
@@ -124,6 +104,7 @@ define([
             }
 
             this.setupMap = function(map) {
+
                 var self = this;
                 var draw = Draw();
                 this.map = map;
@@ -176,6 +157,7 @@ define([
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                     return baselayer.isoverlay === false
                 });
+
                 this.setBasemap = function(basemapType) {
                     var lowestOverlay = _.last(_.last(overlays).layer_definitions);
                     this.basemaps.forEach(function(basemap) {
@@ -194,14 +176,22 @@ define([
                     }, this)
                 };
 
-                $('.geocodewidget').on("select2-selecting", function(e) {
-                    this.map.getSource('geocode-point').setData(e.object.geometry);
-                    this.redrawGeocodeLayer();
-                    this.map.flyTo({
-                        center: e.object.geometry.coordinates
-                    });
-                });
-
+                this.geocodePoint.subscribe(function(coords){
+                  var point =     {
+                          "type": "Feature",
+                          "properties": {},
+                          "geometry": {
+                            "type": "Point",
+                            "coordinates": coords
+                          }
+                        }
+                  this.map.getSource('geocode-point').setData(point);
+                  this.redrawGeocodeLayer();
+                  var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                  this.map.flyTo({
+                      center: centerPoint
+                  });
+                }, this);
 
                 this.updateConfigs = function(theViewModel) {
                     //using a closure because the viewModel was not avaliable within the event
@@ -254,6 +244,7 @@ define([
                 this.bearing.subscribe(function(val) {
                     this.map.setBearing(this.bearing())
                 }, this);
+
             }
 
             this.onGeocodeSelection = function(val, e) {
