@@ -23,6 +23,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from arches.app.models import models
 from arches.app.models.forms import Form
+from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -74,7 +75,7 @@ class ResourceEditorView(TemplateView):
                 resourceid=resourceid
             )
             return render(request, 'views/resource/editor.htm', context)
-        
+
         return HttpResponseNotFound()
 
 
@@ -84,5 +85,39 @@ class ResourceData(TemplateView):
         if formid is not None:
             form = Form(resourceid=resourceid, formid=formid)
             return JSONResponse(form)
-        
+
         return HttpResponseNotFound()
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceReportView(BaseManagerView):
+    def get(self, request, resourceid=None):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        tiles = models.Tile.objects.filter(pk=resourceid)
+        try:
+           report = models.Report.objects.get(graph=resource_instance.graph, active=True)
+        except models.Report.DoesNotExist:
+           report = None
+        forms = resource_instance.graph.form_set.filter(status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+
+        context = self.get_context_data(
+            main_script='resource-report',
+            report=JSONSerializer().serialize(report),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates),
+            forms=JSONSerializer().serialize(forms),
+            tiles=JSONSerializer().serialize(tiles),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
+            graph_id=resource_instance.graph.pk,
+            graph_name=resource_instance.graph.name
+         )
+
+        return render(request, 'resource-report.htm', context)

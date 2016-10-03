@@ -4020,6 +4020,11 @@ div.row.widget-wrapper:hover {
 h4.report-toolbar-title {
 	width: 500px;
 }
+.report-undefined {
+    margin: 25px;
+    font-size: 16px;
+    color: #808080;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
