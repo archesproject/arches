@@ -277,6 +277,24 @@ class Card(models.CardModel):
         ret['groups'] = self.groups
         ret['users'] = self.users
 
+        # provide a models.CardXNodeXWidget model for every node 
+        # even if a widget hasn't been configured
+        for node in ret['nodes']: 
+            found = False
+            for widget in ret['widgets']:
+                if node.nodeid == widget.node_id:
+                    found = True
+            if not found:
+                widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
+                if widget:
+                    widget_model = models.CardXNodeXWidget()
+                    widget_model.node_id = node.nodeid
+                    widget_model.card_id = self.cardid
+                    widget_model.widget_id = widget.pk
+                    widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
+                    widget_model.label = node.name
+                    ret['widgets'].append(widget_model)
+
         if self.ontologyproperty:
             ret['ontology_properties'] = [item['ontology_property'] for item in self.graph.get_valid_domain_ontology_classes(nodeid=self.nodegroup_id)]
 
