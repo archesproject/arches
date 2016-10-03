@@ -1,6 +1,23 @@
 /*jshint forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, strict:true, undef:true, curly:true, browser:true, indent:4, maxerr:50, onevar:false, nomen:false, regexp:false, plusplus:false, newcap:true */
 (function ($) {
 	"use strict";
+
+		(function($, undefined) {
+	    $.fn.getCursorPosition = function() {
+	        var el = $(this).get(0);
+	        var pos = 0;
+	        if ('selectionStart' in el) {
+	            pos = el.selectionStart;
+	        } else if ('selection' in document) {
+	            el.focus();
+	            var Sel = document.selection.createRange();
+	            var SelLength = document.selection.createRange().text.length;
+	            Sel.moveStart('character', -el.value.length);
+	            pos = Sel.text.length - SelLength;
+	        }
+	        return pos;
+	    }
+	})(jQuery);
 	//Thanks John - http://ejohn.org/blog/javascript-array-remove/
 	var arrayRemove = function (from, to) {
 		var rest = this.slice((to || from) + 1 || this.length);
@@ -204,6 +221,14 @@
 				(e.which === 224) ||//command key
 				(e.which >= 112 && e.which <= 123)//F1 to F12
 			))) { return false; }
+
+			if (e.which === 8) {
+				var cursorPosition = $(input).getCursorPosition()
+				var inputVal  = $(input).val()
+				q = inputVal.substring(0, cursorPosition - 1) + inputVal.substring(cursorPosition, inputVal.length);
+				$(input).val(q)
+			}
+
 			//backout of ajax dynamically
 			if ('useAjax' in options && $.isFunction(options.useAjax)) {
 				if (!options.useAjax(e)) { return false; }
