@@ -15,47 +15,40 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "views/resource/resource-base.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
-{% block graph_header_title %}
-{% trans "Resource Editor" %}
-{% endblock graph_header_title %}
-
-{% block graph_header_buttons %}
-    <button id="related-resources-open-btn" class="btn btn-sm btn-mint btn-labeled fa fa-code-fork" data-bind="">Related Resources</button>
-    {{ block.super }}
-{% endblock graph_header_buttons %}
+{% block title %}
+{{ block.super }}
+{% trans "Resource Report" %}
+{% endblock title %}
 
 {% block content %}
-<div class="flex">
+<!-- ko if: report -->
+<div class='resource-report' data-bind='component: {
+    name: reportLookup[report.get("template_id")()].componentname,
+    params: {
+        report: report
+    }
+}'></div>
+<!-- /ko -->
 
-    <!--Form Listing -->
-    <div class="left-column-container form-list" data-bind="with: formList">
-        {% include 'views/resource/editor/form-list.htm' %}
-    </div>
-
-
-    <!-- Card Container -->
-    <div class="card-form-preview-container" data-bind="let: {'form': formView}">
-        
-        {% include 'views/resource/editor/form.htm' %}
-
-    </div>
-
-</div>
+<div style="display: none;" class="report-undefined" data-bind="visible: !report">No report defined for "{{graph_name}}"...</div>
 {% endblock content %}
 
 {% block pre_require_js %}
+{{ block.super }}
 <script>{% autoescape off %}
-define('resource-editor-data', [], function () {
+define('resource-report-data', [], function () {
     return {
-        forms: {{forms}},
-        form: {{form}},
+        templates: {{templates_json}},
+        report: {{report}},
         datatypes: {{ datatypes_json }},
-        widgets: {{ widgets_json }},
-        resourceid: '{{resourceid}}'
+        forms: {{forms}},
+        forms_x_cards: {{forms_x_cards}},
+        cards: {{cards}},
+        tiles: {{tiles}}
     };
 });
 {% endautoescape %}</script>

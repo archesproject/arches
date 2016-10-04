@@ -15,3 +15,7 @@ arches/settings_local.py
 arches.log
 .atom-build.json
 .atom-build.yml
+arches/app/media/js/docs
+Net.html
+arches/Net_files
+.idea

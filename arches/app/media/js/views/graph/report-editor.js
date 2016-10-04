@@ -20,11 +20,17 @@ require([
         card.nodes.forEach(function (node) {
             tileData[node.nodeid] = ko.observable(null);
         });
+        var children = []
+        card.cards.forEach(function (childCard) {
+            children = children.concat(setupTiles(childCard));
+        });
         card.tiles = [{
             tileid: null,
-            data: tileData
+            data: tileData,
+            nodegroup_id: card.nodegroup_id,
+            tiles: children
         }];
-        card.cards.forEach(setupTiles);
+        return card.tiles;
     };
     data.cards.forEach(setupTiles);
 
