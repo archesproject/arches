@@ -181,7 +181,6 @@
                 'sortorder': {{ map_layer.sortorder }},
                 'icon': '{{ map_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
-            },
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
                 'label': '{{ concept_collection.label }}',
                 'id': '{{ concept_collection.id }}',
