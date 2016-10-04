@@ -279,6 +279,16 @@
     margin-bottom: 70px;
 }
 
+.map-thumbnail {
+  padding-top: 5px;
+}
+
+.map-widget-panel-title.legend-subtitle {
+  height: 35px;
+  padding-left: 8px;
+  padding-top: 1px;
+}
+
 .noUi-target {
     position: relative;
     margin-top: 10px;

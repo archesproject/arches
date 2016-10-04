@@ -22,7 +22,7 @@
             'openlayers': '{{ STATIC_URL }}plugins/openlayers/ol',
             'easing': '//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
             'backbone': '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
-            'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min',
+            'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.0/underscore-min',
             'jquery-validate': '//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
             'd3': '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min',
             'dropzone': '//cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
@@ -43,6 +43,7 @@
             'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
             'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl',
             'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min',
+            'chosen-ajax-addition': '{{ STATIC_URL }}plugins/chosen.ajaxaddition.jquery'
         },
         shim: {
             'openlayers': {
@@ -83,7 +84,7 @@
                 deps: ['mapbox-gl'],
                 exports: 'mapboxgl.Draw'
             },
-            'plugins/chosen.ajaxaddition.jquery': {
+            'chosen-ajax-addition': {
                 deps: ['jquery', 'chosen']
             }
         }
