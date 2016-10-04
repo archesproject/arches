@@ -22,7 +22,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView
-from arches.app.views.resource import ResourceManagerView
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
+from arches.app.views.tile import TileData
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -79,17 +80,20 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/reorder_forms$' % uuid_regex, FormManagerView.as_view(action='reorder_forms'), name='reorder_forms'),
     url(r'^graph/(?P<graphid>%s)/report_manager$' % uuid_regex, ReportManagerView.as_view(), name='report_manager'),
     url(r'^graph/(?P<graphid>%s)/add_report$' % uuid_regex, ReportManagerView.as_view(), name='add_report'),
-    url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceManagerView.as_view(), name='add_resource'),
-    url(r'^resource$', ResourceManagerView.as_view(), name='resource'),
-    url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceManagerView.as_view(), name='resource_editor'),
+    url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceEditorView.as_view(), name='add_resource'),
+    url(r'^resource$', ResourceListView.as_view(), name='resource'),
+    url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
+    url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
     url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
     url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
     url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
     url(r'^report_editor/(?P<reportid>%s|())$' % uuid_regex, ReportEditorView.as_view(), name='report_editor'),
     url(r'^report_editor/(?P<reportid>%s)/delete$' % uuid_regex, ReportEditorView.as_view(), name='delete_report'),
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
-
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
+    url(r'^report-templates/(?P<template>[a-zA-Z_-]*)', main.report_templates, name="report-templates"),
+    url(r'^tile', TileData.as_view(), name="tile"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

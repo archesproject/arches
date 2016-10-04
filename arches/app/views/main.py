@@ -64,3 +64,7 @@ def search(request):
 
 def widget(request, template="text"):
     return render(request, 'views/forms/widgets/%s.htm' % template)
+
+
+def report_templates(request, template="text"):
+    return render(request, 'views/report-templates/%s.htm' % template)

@@ -17,6 +17,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 'sortorder': null,
                 'functions': []
             };
+            this.widgetLookup = widgets;
             options || (options = {});
             attributes || (attributes = {});
             options.parse = true;
@@ -58,7 +59,8 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                     for (key in value) {
                         if (key === 'label') {
                             this.get('label')(value[key]);
-                        } else if (config[key]() !== value[key]) {
+                        }
+                        if (config[key] && config[key]() !== value[key]) {
                             config[key](value[key]);
                         }
                     }

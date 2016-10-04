@@ -1,5 +1,6 @@
 {% load i18n %}
-<div class="row widget-wrapper"  data-bind="if: !configForm">
+<!-- ko if: !configForm  && state=== 'form' -->
+<div class="row widget-wrapper">
   <div class="form-group">
       <p class="control-label widget-input-label" data-bind="text:label"></p>
       <div class="col-xs-12">
@@ -14,18 +15,24 @@
    </div>
   </div>
 </div>
+<!-- /ko -->
 
-<div data-bind="if: configForm">
-    <div class="control-label">
-        {% trans "Label 'True'" %}
-    </div>
-    <div class="col-xs-12 pad-no crud-widget-container">
-        <input type="" id="" class="form-control input-md widget-input" data-bind="value:trueLabel, valueUpdate: 'keyup'">
-    </div>
-    <div class="control-label">
-        {% trans "Label 'False'" %}
-    </div>
-    <div class="col-xs-12 pad-no crud-widget-container">
-        <input type="" id="" class="form-control input-md widget-input" data-bind="value: falseLabel, valueUpdate: 'keyup'">
-    </div>
+<!-- ko if: !configForm  && state=== 'report' -->
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
+<!-- /ko -->
+
+<!-- ko if: configForm -->
+<div class="control-label">
+    {% trans "Label 'True'" %}
 </div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input" data-bind="value:trueLabel, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Label 'False'" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input" data-bind="value: falseLabel, valueUpdate: 'keyup'">
+</div>
+<!-- /ko -->

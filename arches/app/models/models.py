@@ -421,6 +421,11 @@ class ReportTemplate(models.Model):
     componentname = models.TextField()
     defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
 
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+        
     class Meta:
         managed = True
         db_table = 'report_templates'
@@ -432,6 +437,7 @@ class Report(models.Model):
     template = models.ForeignKey(ReportTemplate, db_column='templateid')
     graph = models.ForeignKey(GraphModel, db_column='graphid')
     config = JSONField(blank=True, null=True, db_column='config')
+    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
     active = models.BooleanField(default=False)
 
     class Meta:
@@ -465,7 +471,7 @@ class ResourceXResource(models.Model):
 
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclass = models.ForeignKey(Node, db_column='resourceclassid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
     resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
 
     class Meta:
@@ -534,3 +540,34 @@ class Widget(models.Model):
     class Meta:
         managed = True
         db_table = 'widgets'
+
+
+class MapSources(models.Model):
+    name = models.TextField()
+    source = JSONField(blank=True, null=True, db_column='source')
+
+    @property
+    def source_json(self):
+        json_string = json.dumps(self.source)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_sources'
+
+
+class MapLayers(models.Model):
+    name = models.TextField()
+    layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
+    isoverlay = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=1)
+    icon = models.TextField(default=None)
+
+    @property
+    def layer_json(self):
+        json_string = json.dumps(self.layerdefinitions)
+        return json_string
+
+    class Meta:
+        managed = True
+        db_table = 'map_layers'

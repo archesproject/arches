@@ -1,5 +1,6 @@
 {% load i18n %}
-<div class="row widget-wrapper" data-bind="if: !configForm">
+<!-- ko if: !configForm  && state=== 'form' -->
+<div class="row widget-wrapper" data-bind="if: !configForm && state=== 'form'">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
@@ -9,6 +10,7 @@
         </div>
     </div>
 </div>
+<!-- /ko -->
 
 <div data-bind="if: configForm">
   <div class="control-label">

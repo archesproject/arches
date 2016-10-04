@@ -33,8 +33,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock graph_header_tools %}
 
-{% block content %}
+{% block graph_header_buttons %}
+<span data-bind="if: dirty()">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: reset">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){ report.save(); }">{% trans "Save Edits" %}</button>
+</span>
+<button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'report_manager' graph_id %}') }">{% trans "Back to Reports" %}</button>
+{% endblock graph_header_buttons %}
 
+{% block content %}
+<div class="flex">
+    <div class="left-column-container panel ep-card-tools-panel" data-bind="with: reportEditorTree">
+        {% include 'views/graph/report-editor/report-editor-tree.htm' %}
+    </div>
+    <div class="middle-column-container" data-bind="with: reportEditorForm">
+        {% include 'views/graph/report-editor/report-editor-form.htm' %}
+    </div>
+    <div class="card-form-preview-container" data-bind="with: reportEditorPreview">
+        {% include 'views/graph/report-editor/report-editor-preview.htm' %}
+    </div>
+</div>
 {% endblock content %}
 
 {% block pre_require_js %}
@@ -42,9 +60,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
 define('report-editor-data', [], function () {
     return {
-        templates: {{templates}},
+        templates: {{templates_json}},
         reports: {{reports}},
-        report: {{report}}
+        report: {{report}},
+        datatypes: {{ datatypes_json }},
+        forms: {{forms}},
+        forms_x_cards: {{forms_x_cards}},
+        cards: {{cards}}
     };
 });
 {% endautoescape %}</script>

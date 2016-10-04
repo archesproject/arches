@@ -60,10 +60,14 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {string} method - the type of request being made either "GET", "POST", "DELETE"
         */
         _getURL: function(method){
+            var id = this.get('id');
+            if(!(id)){
+                id = '';
+            }
             if(this.url.indexOf('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') > -1){
-                return this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id'));
+                return this.url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', id);
             }else{
-                return this.url + this.get('id');
+                return this.url + id;
             }
         },
 
