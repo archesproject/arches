@@ -269,6 +269,11 @@ def confirm_delete(request, conceptid):
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
+def dropdown(request):
+    conceptid = request.GET.get('conceptid')
+    results = Concept().get_e55_domain(conceptid)
+    return JSONResponse(results)
+
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']

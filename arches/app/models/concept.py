@@ -690,15 +690,13 @@ class Concept(object):
                     return in_use
         return in_use
 
-    def get_e55_domain(self, entitytypeid):
+    def get_e55_domain(self, conceptid):
         """
         For a given entitytypeid creates a dictionary representing that entitytypeid's concept graph (member pathway) formatted to support
         select2 dropdowns
 
         """
         cursor = connection.cursor()
-
-        entitytype = models.EntityTypes.objects.get(pk=entitytypeid)
 
         sql = """
         WITH RECURSIVE children AS (
@@ -720,7 +718,7 @@ class Concept(object):
                 and v.valuetype in ('prefLabel','sortorder', 'collector')
                 and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
             ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
-        """.format(entitytype.conceptid_id)
+        """.format(conceptid)
 
 
         column_names = ['conceptidfrom', 'conceptidto', 'value', 'valueid', 'valueto', 'valueidto', 'depth', 'idpath', 'conceptpath', 'vtype']
@@ -735,9 +733,8 @@ class Concept(object):
                 self.sortorder = ''
                 self.collector = ''
                 self.children = []
-                self.entitytypeid = entitytypeid
 
-        result = Val(entitytype.conceptid_id)
+        result = Val(conceptid)
 
         def _findNarrower(val, path, rec):
             for conceptid in path:
