@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'moment'], function (ko, _, moment) {
+define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
         this.report = params.report || ko.observable(null);

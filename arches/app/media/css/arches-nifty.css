@@ -529,7 +529,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 .list-filter {
     position: relative;
-    background-color: #314151;
     margin-bottom: 5px;
     margin-right: 0px;
 }
@@ -3082,6 +3081,12 @@ li.card-tree-list:last-of-type {
     overflow-y: scroll;
     overflow-x: hidden;
 }
+.form-list{
+    padding-top: 0px;
+}
+.form-list .grid{
+    border-top: none;
+}
 .middle-column-container{
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
@@ -3939,6 +3944,12 @@ div.row.widget-wrapper:hover {
 	padding-left: 270px;
 	margin-top: 0px;
 }
+.rp-report-container-tile .rp-report-tile {
+	padding-bottom: 0;
+}
+.rp-report-container-tile {
+	padding-bottom: 15px;
+}
 .rp-report-tile-left-panel {
 	padding: 0px 15px 0px 0px;
 }
@@ -4014,6 +4025,11 @@ div.row.widget-wrapper:hover {
 }
 h4.report-toolbar-title {
 	width: 500px;
+}
+.report-undefined {
+    margin: 25px;
+    font-size: 16px;
+    color: #808080;
 }
 @keyframes loader {
 	0% { background: #ddd; }
