@@ -245,6 +245,13 @@ define([
                 });
             }
 
+            this.moveOverlayUp = function(overlay){
+              var layerPosition = _.findIndex(self.overlays(), function(item) { return item.name == overlay.name })
+              if (layerPosition !== 0) {
+                console.log(layerPosition)
+              }
+            }
+
             this.mapStyle = mapStyle;
             this.mapStyle.layers = this.addInitialLayers();
 
