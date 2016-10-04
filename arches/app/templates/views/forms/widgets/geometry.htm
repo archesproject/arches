@@ -3,7 +3,14 @@
 <div class="row widget-wrapper">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: function(){setupMap(map)} }">
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
+          style: mapStyle,
+          zoom: zoom,
+          centerX: centerX,
+          centerY: centerY,
+          pitch: pitch,
+          bearing: bearing
+      }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
             <select data-bind="ajaxchosen: {
@@ -20,9 +27,7 @@
                 type: 'GET',
                 success: function(data, textStatus, jqXHR){ geocodeResponseOptions(data.results);},
                 data: [{name:'geocoder', value:geocoder}]},
-              value: geocodePoint},
-              optionsText: 'text',
-              optionsValue: 'text'">
+              value: geocodePoint}">
             </select>
         </div>
 

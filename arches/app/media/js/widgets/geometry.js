@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'knockout',
     'underscore',
     'viewmodels/widget',
@@ -10,7 +11,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/ajax-chosen'
-], function(ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -208,26 +209,6 @@ define([
                     this.redrawGeocodeLayer();
                 }, this)
 
-                this.zoom.subscribe(function(val) {
-                    this.map.setZoom(this.zoom())
-                }, this);
-
-                this.centerX.subscribe(function(val) {
-                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
-                }, this);
-
-                this.centerY.subscribe(function(val) {
-                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
-                }, this);
-
-                this.pitch.subscribe(function(val) {
-                    this.map.setPitch(this.pitch())
-                }, this);
-
-                this.bearing.subscribe(function(val) {
-                    this.map.setBearing(this.bearing())
-                }, this);
-
                 this.geocodePoint.subscribe(function(val){
                    var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
                    var point = {
@@ -263,11 +244,8 @@ define([
                 });
             }
 
-            mapStyle.layers = this.addInitialLayers();
-
-            this.mapOptions = {
-                style: mapStyle
-            };
+            this.mapStyle = mapStyle;
+            this.mapStyle.layers = this.addInitialLayers();
 
             this.selectBasemap = function(val) {
                 self.basemap(val.name)
