@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chosen'], function (ko, _, WidgetViewModel, arches) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chosen', 'plugins/knockout-select2'], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a select-widget component for use in forms
     * @function external:"ko.components".select-widget
@@ -25,20 +25,10 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 },
                 dataType:'json'
               }).done(function(data){
-                data.unshift({
-                  id: null,
-                  text: null
-                })
                 self.options(data);
               }).fail(function(err) {
                   console.log( "error", err );
-                })
-                .always(function() {
-                  console.log( "complete" );
                 });
-
-
-
             }, this);
         },
         template: { require: 'text!widget-templates/select' }

@@ -3,7 +3,9 @@
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <select class="form-control input-lg widget-input design" data-bind="value: selection, options: options , optionsText: 'text', optionsValue: 'id', placeholder: placeholder, chosen: {width: '100%'}"></select>
+            <!-- Select element with chosen binding does not support nesting at the moment. -->
+            <!-- <select class="form-control input-lg widget-input design" data-bind="value: selection, options: options , optionsText: 'text', optionsValue: 'id', placeholder: placeholder, chosen: {width: '100%'}"></select> -->
+            <input style="width:30%; display:inline-block;" data-bind="select2: {select2Config: {data: options, placeholder: '{% trans "Unit" %}'}}"></input>
         </div>
     </div>
 </div>
