@@ -4124,3 +4124,25 @@ h4.report-toolbar-title {
         width: 300px;
     }
 }
+@media print {
+    header, nav, footer, button, aside {
+        display: none;
+    }
+    #content-container {
+        padding: 0 !important;
+    }
+    .rp-report-tile {
+        padding-left: 340px;
+    }
+    .scroll-y {
+        height: auto;
+    }
+    dt {
+        text-decoration: underline;
+        font-weight: bold;
+        color: #808080 !important;
+    }
+    dd {
+        margin-left:2px;
+    }
+}
