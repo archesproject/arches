@@ -8,14 +8,14 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-    return ko.components.register('file-upload-widget', {
+    return ko.components.register('file-widget', {
         viewModel: function(params) {
-          console.log('registring')
+          console.log('registering')
 
             params.configKeys = [];
 
             WidgetViewModel.apply(this, [params]);
         },
-        template: { require: 'text!widget-templates/file-upload' }
+        template: { require: 'text!widget-templates/file' }
     });
 });
