@@ -1,24 +1,33 @@
 {% load i18n %}
-<!-- ko foreach: { data: card.get('tiles'), as: 'tile' } -->
-<div class="row rp-report-tile">
-    <dl class="dl-horizontal">
-        <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
-        <!-- ko component: {
-            name: widget.widgetLookup[widget.get("widget_id")()].name,
-            params: {
-                config: configJSON,
-                label: widget.get("label")(),
-                value: tile.data[widget.node.nodeid],
-                state: "report"
-            }
-        } --><!-- /ko -->
-        <!-- /ko -->
-    </dl>
-</div>
+<!-- ko if: card.isContainer() -->
+<h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
+    <!-- ko foreach: { data: card.get('cards'), as: 'card' } -->
+    {% include 'views/report-templates/partials/card-report.htm' %}
+    <!-- /ko -->
 <!-- /ko -->
 
-<!-- ko if: card.get('tiles')().length === 0 -->
-<div class="row rp-report-tile" style="color: #808080">
-    {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
-</div>
+<!-- ko if: !card.isContainer() -->
+    <!-- ko foreach: { data: card.get('tiles'), as: 'tile' } -->
+    <div class="row rp-report-tile">
+        <dl class="dl-horizontal">
+        <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
+            <!-- ko component: {
+                name: widget.widgetLookup[widget.get("widget_id")()].name,
+                params: {
+                    config: configJSON,
+                    label: widget.get("label")(),
+                    value: tile.data[widget.node.nodeid],
+                    state: "report"
+                }
+            } --><!-- /ko -->
+        <!-- /ko -->
+        </dl>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: card.get('tiles')().length === 0 -->
+    <div class="row rp-report-tile" style="color: #808080">
+        {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
+    </div>
+    <!-- /ko -->
 <!-- /ko -->
