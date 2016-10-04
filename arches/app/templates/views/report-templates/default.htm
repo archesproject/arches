@@ -44,7 +44,7 @@
             <!-- ko if: card.isContainer() -->
             <h4 class="rp-tile-title"><span class="rp-tile-title-float" data-bind="text: card.get('name')"></span></h4>
                 <!-- ko foreach: { data: tiles, as: 'tile' } -->
-                <div class="row rp-report-container-tile">
+                <div class="rp-report-container-tile">
                     <!-- ko foreach: {
                         data: card.get('cards'),
                         as: 'card'
@@ -62,7 +62,7 @@
             <!-- ko if: !card.isContainer() -->
                 <!-- ko foreach: { data: tiles, as: 'tile' } -->
                     <!-- ko if: tile.nodegroup_id() === card.get('nodegroup_id') -->
-                    <div class="row rp-report-tile">
+                    <div class="rp-report-tile">
                         <dl class="dl-horizontal">
                         <!-- ko foreach: { data: card.get('widgets'), as: 'widget' } -->
                             <!-- ko component: {
@@ -81,7 +81,7 @@
                 <!-- /ko -->
 
             <!-- /ko -->
-            
+
             <!-- ko if: tiles.length === 0 -->
             <div class="row rp-report-tile" style="color: #808080">
                 {% trans "No data added yet for" %} "<span data-bind="text: card.get('name')"></span>"
