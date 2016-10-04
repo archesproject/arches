@@ -4,7 +4,7 @@ define([
     'knockout',
     'arches',
     'chosen',
-    'plugins/chosen.ajaxaddition.jquery'
+    'chosen-ajax-addition'
 ], function($, _, ko, arc, chosen, chosenajax) {
     /**
      * A knockout.js binding for the "chosen.js" select box - https://harvesthq.github.io/chosen/

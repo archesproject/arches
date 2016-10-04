@@ -9,21 +9,24 @@ define([
     'bindings/sortable'
 ], function($, _, ko, mapboxgl, arches, mapStyle) {
     ko.bindingHandlers.mapboxgl = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        init: function(element, valueAccessor, allBindings, viewModel) {
             var defaults = {
                 container: element
             };
             var options = ko.unwrap(valueAccessor()).mapOptions;
-            var mapCenter = new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY());
-
+            var mapInitOptions = {style: options.style};
             mapboxgl.accessToken = arches.mapboxApiKey;
-            options.zoom = viewModel.zoom();
-            options.center = mapCenter;
-            options.pitch = viewModel.pitch();
-            options.bearing = viewModel.bearing();
+
+            _.each(options, function(option, key){
+              if (ko.isObservable(option)){
+                mapInitOptions[key] = option();
+              }
+            })
+
+            mapInitOptions['center'] = new mapboxgl.LngLat(mapInitOptions.centerX, mapInitOptions.centerY);
 
             var map = new mapboxgl.Map(
-                _.defaults(options, defaults)
+                _.defaults(mapInitOptions, defaults)
             );
             viewModel.map = map;
 
@@ -35,6 +38,26 @@ define([
             if (typeof ko.unwrap(valueAccessor()).afterRender === 'function') {
                 ko.unwrap(valueAccessor()).afterRender(map)
             }
+
+            options.zoom.subscribe(function(val) {
+                map.setZoom(options.zoom())
+            }, this);
+
+            options.centerX.subscribe(function(val) {
+                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
+            }, this);
+
+            options.centerY.subscribe(function(val) {
+                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
+            }, this);
+
+            options.pitch.subscribe(function(val) {
+                map.setPitch(options.pitch())
+            }, this);
+
+            options.bearing.subscribe(function(val) {
+                map.setBearing(options.bearing())
+            }, this);
         }
     }
 

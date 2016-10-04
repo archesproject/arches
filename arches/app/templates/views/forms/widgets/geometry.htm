@@ -3,7 +3,14 @@
 <div class="row widget-wrapper">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: function(){setupMap(map)} }">
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
+          style: mapStyle,
+          zoom: zoom,
+          centerX: centerX,
+          centerY: centerY,
+          pitch: pitch,
+          bearing: bearing
+      }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
             <select data-bind="ajaxchosen: {
@@ -20,9 +27,7 @@
                 type: 'GET',
                 success: function(data, textStatus, jqXHR){ geocodeResponseOptions(data.results);},
                 data: [{name:'geocoder', value:geocoder}]},
-              value: geocodePoint},
-              optionsText: 'text',
-              optionsValue: 'text'">
+              value: geocodePoint}">
             </select>
         </div>
 
@@ -174,6 +179,36 @@
             <div class="map-widget-panel-title">
                 <h4 class=""> Legend </h4>
             </div>
+            <div class="map-widget-panel-title legend-subtitle">
+                <h5 class=""> Overlays </h5>
+            </div>
+            <div data-bind="sortable: overlays">
+              <div class="map-widget-overlay-item relative">
+                  <div class="map-overlay-vis-toogle text-center">
+                      <i data-bind="css: icon, style: {color:color}"></i>
+                  </div>
+                  <div class="map-overlay-name">
+                      <a class="" href=""><span data-bind="text:name"><span></a>
+                  </div>
+              </div>
+            </div>
+
+            <div class="map-widget-panel-title legend-subtitle">
+                <h5 class=""> Basemaps </h5>
+            </div>
+            <!-- ko foreach: { data: [$data], as: 'self' } -->
+            <!-- ko foreach: basemaps -->
+            <div class="map-widget-overlay-item relative">
+                <div class="map-overlay-vis-toogle text-center map-thumbnail">
+                    <img height="40px" data-bind="attr: { src: '{{ STATIC_URL }}img/map-thumbnails/' + name + '.png'}" ></img>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span data-bind='text: name'><span></a>
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+
         </div>
     </div>
 
@@ -182,7 +217,7 @@
     <div class="overlay-container" style="display: none;">
         <h3 class="panel-title card-main-title"> Overlays <i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
 
-        <!-- Ocerlay Listing -->
+        <!-- Overlay Listing -->
         <div id="report-image-grid" class="report-image-grid">
 
 
