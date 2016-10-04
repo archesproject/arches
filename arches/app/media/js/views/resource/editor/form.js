@@ -74,27 +74,25 @@ define([
         /**
          * a function to return the knockout context used to render the actual widgets in the form
          * @memberof Form.prototype
-         * @param  {object} outterCard a reference to the outter most card in the form
+         * @param  {object} outerCard a reference to the outer most card in the form
          * @param  {object} card a reference to the card associated with the form being rendered
          * @param  {object} tile a reference to the currently bound tile
          * @return {null} 
          */
-        getFormEditingContext: function(outterCard, card, tile){
-            if(outterCard.isContainer()){
-                if(outterCard.get('cardinality')() === '1'){
+        getFormEditingContext: function(outerCard, card, tile){
+            if(outerCard.isContainer()){
+                // this is not a "wizard"
+                if(outerCard.get('cardinality')() === '1'){
                     if(card.get('cardinality')() === '1'){
                         //console.log(1)
-                        if(Object.getOwnPropertyNames(tile.data).length === 0){
-                            tile.data = this.blanks[card.get('nodegroup_id')].data;
-                            //console.log(1.1)
-                        }
-                        return tile;
+                        return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
                         return this.blanks[card.get('nodegroup_id')];
                     }
                 } 
-                if(outterCard.get('cardinality')() === 'n'){
+                // this is a "wizard"
+                if(outerCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
                         //console.log(3)
                         return tile.tiles[card.get('nodegroup_id')]()[0];
@@ -104,12 +102,9 @@ define([
                     }
                 } 
             }else{
-                if(outterCard.get('cardinality')() === '1'){
+                // this is not a "wizard"
+                if(outerCard.get('cardinality')() === '1'){
                     //console.log(5)
-                    if(Object.getOwnPropertyNames(tile.data).length === 0){
-                        tile.data = this.blanks[card.get('nodegroup_id')].data;
-                        //console.log(5.1)
-                    }
                     return tile;
                 }else{
                     //console.log(6)
@@ -135,38 +130,38 @@ define([
 
         /**
          * saves a new tile object back to the database and adds it to the UI, in some instances it will 
-         * save the outter most tile if that doesn't already exist
+         * save the outer most tile if that doesn't already exist
          * @memberof Form.prototype
-         * @param  {object} outterTile a reference to the outter most tile, used to determine if that tile needs to be saved instead
+         * @param  {object} parentTile a reference to the outer most tile, used to determine if that tile needs to be saved instead
          * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
          * @param  {object} tile the tile to add/save
          * @return {null} 
          */
-        saveTile: function(outterTile, justadd, tile){
-            var savingOutterTile = !!outterTile.tileid ? !outterTile.tileid() : false;
-            var tiles = outterTile.tiles[tile.nodegroup_id()];
-            if(!!outterTile.tileid){
-                tile.parenttile_id(outterTile.tileid());
+        saveTile: function(parentTile, justadd, tile){
+            var savingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 0 && !parentTile.formid;
+            var tiles = parentTile.tiles[tile.nodegroup_id()];
+            if(!!parentTile.tileid){
+                tile.parenttile_id(parentTile.tileid());
             }
             if(justadd){
                 tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
                 this.clearTileValues(tile);
             }else{
                 var model;
-                // if the outterTile has never been saved then we need to save it instead, else just save the inner tile
-                if(savingOutterTile){
-                    model = new TileModel(koMapping.toJS(outterTile));
+                // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
+                if(savingParentTile){
+                    model = new TileModel(koMapping.toJS(parentTile));
                     model.get('tiles')[tile.nodegroup_id()].push(koMapping.toJS(tile));
                 }else{
                     model = new TileModel(koMapping.toJS(tile))
                 }
                 model.save(function(request, status, model){
                     if(request.status === 200){
-                        // if we had to save an outterTile
-                        if(savingOutterTile){
-                            outterTile.tileid(request.responseJSON.tileid);
+                        // if we had to save an parentTile
+                        if(savingParentTile){
+                            parentTile.tileid(request.responseJSON.tileid);
                             request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                outterTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
+                                parentTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
                             }, this)
                             this.clearTile(tile);
                         }else{
@@ -183,15 +178,15 @@ define([
         /**
          * saves a tile and it's child tiles back to the database
          * @memberof Form.prototype
-         * @param  {object} outterTile a the outter most tile to save
+         * @param  {object} parentTile a the outer most tile to save
          * @return {null} 
          */
-        saveTileGroup: function(outterTile, e){
-            var model = new TileModel(koMapping.toJS(outterTile));
+        saveTileGroup: function(parentTile, e){
+            var model = new TileModel(koMapping.toJS(parentTile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    this.tiles[outterTile.nodegroup_id()].unshift(koMapping.fromJS(request.responseJSON));
-                    this.clearTile(outterTile);
+                    this.tiles[parentTile.nodegroup_id()].unshift(koMapping.fromJS(request.responseJSON));
+                    this.clearTile(parentTile);
                 }else{
                     // inform the user
                 }
@@ -219,26 +214,25 @@ define([
         /**
          * deletes a tile object or tile collection from the database and removes it from the UI
          * @memberof Form.prototype
-         * @param  {object} outterTile a reference to the outter most tile that the tile to delete belongs to
+         * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
          * @return {null} 
          */
-        deleteTile: function(outterTile, tile){
+        deleteTile: function(parentTile, tile){
             var model;
-            var isTileGroup = !!outterTile.formid;
-            var deletingOutterTile = outterTile.tiles[tile.nodegroup_id()]().length === 1;
-            if(deletingOutterTile && !isTileGroup){
-                model = new TileModel(ko.toJS(outterTile));
+            var deletingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 1 && !parentTile.formid;
+            if(deletingParentTile){
+                model = new TileModel(ko.toJS(parentTile));
             }else{
                 model = new TileModel(ko.toJS(tile));
             }
             model.delete(function(request, status, model){
                 if(request.status === 200){
-                    if(deletingOutterTile && !isTileGroup){
-                        outterTile.tileid(null);
-                        outterTile.tiles[tile.nodegroup_id()].remove(tile);
+                    if(deletingParentTile){
+                        parentTile.tileid(null);
+                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
                     }else{
-                        outterTile.tiles[tile.nodegroup_id()].remove(tile);
+                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
                     }
                 }else{
                     // inform the user
