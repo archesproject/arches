@@ -2219,7 +2219,7 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         "type":"fill",
         "layout": {},
         "paint": {
-            "fill-color": "#088",
+            "fill-color": "#fb6017",
             "fill-opacity": 0.8
         }
       },{
@@ -2231,7 +2231,7 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
           "filter": ["!in", "$type", "Polygon"],
           "paint": {
               "circle-radius": 5,
-              "circle-color": "#078"
+              "circle-color": "#fb6017"
           }
         }]', TRUE, 2, 'fa fa-flag');
 

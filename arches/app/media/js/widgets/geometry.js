@@ -138,6 +138,7 @@ define([
                     }), function(overlay) {
                         _.extend(overlay, {
                             opacity: ko.observable(100),
+                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
                             showingTools: ko.observable(false),
                             toggleOverlayTools: function(e) {
                                 this.showingTools(!this.showingTools())
