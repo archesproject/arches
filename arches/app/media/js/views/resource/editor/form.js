@@ -88,7 +88,7 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
-                        return this.blanks[card.get('nodegroup_id')];
+                        return this.blanks[card.get('nodegroup_id')]()[0];
                     }
                 } 
                 // this is a "wizard"
@@ -98,7 +98,7 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(4)
-                        return this.blanks[card.get('nodegroup_id')];
+                        return this.blanks[card.get('nodegroup_id')]()[0];
                     }
                 } 
             }else{
@@ -108,7 +108,7 @@ define([
                     return tile;
                 }else{
                     //console.log(6)
-                    return this.blanks[card.get('nodegroup_id')];
+                    return this.blanks[card.get('nodegroup_id')]()[0];
                 }
             }
         },

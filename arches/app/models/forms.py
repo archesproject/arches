@@ -49,7 +49,7 @@ class Form(object):
                 card_obj = JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id))
                 form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
-            
+
 
         # get the actual tile data
         for form in self.forms:
@@ -80,7 +80,7 @@ class Form(object):
                     parentTile['data'][widget['node_id']] = ''
 
                 # add a blank tile for the cardgroup
-                self.blanks[parentTile['nodegroup_id']] = parentTile
+                self.blanks[parentTile['nodegroup_id']] = [parentTile]
 
                 for card in cardgroup['cards']:
                     # make a blank tile
@@ -100,4 +100,4 @@ class Form(object):
                         parentTile['tiles'][card['nodegroup_id']] = []
                     
                     # add a blank tile for each card 
-                    self.blanks[tile['nodegroup_id']] = tile
+                    self.blanks[tile['nodegroup_id']] = [tile]
