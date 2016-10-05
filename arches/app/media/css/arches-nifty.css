@@ -3899,7 +3899,7 @@ div.row.widget-wrapper:hover {
 	background: #f4f4f4;
 	border-bottom: 1px solid #e9e9e9;
 }
-.rp-report-section:nth-child(2) {
+.rp-report-section:nth-child(even) {
 	background: #fafafa;
 }
 .rp-report-section-title {
@@ -4125,7 +4125,7 @@ h4.report-toolbar-title {
     }
 }
 @media print {
-    header, nav, footer, button, aside, .print-btn {
+    header, nav, footer, button, aside, .print-btn{
         display: none;
     }
     #content-container {
