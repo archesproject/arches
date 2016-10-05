@@ -7,11 +7,14 @@ define([
         init: function(element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
             var values = [];
+            var sliding = false;
             var updateValues = function() {
-                slider.set(values.map(function(value) {
-                    return value();
-                }))
-            }
+                if (!sliding) {
+                    slider.set(values.map(function(value) {
+                        return value();
+                    }));
+                }
+            };
 
             var keys = ['start', 'end'];
             keys.forEach(function (key) {
@@ -26,9 +29,11 @@ define([
             var slider = noUiSlider.create(element, options);
 
             element.noUiSlider.on('slide', function(newValues) {
+                sliding = true;
                 values.forEach(function (value, i) {
                     value(newValues[i]);
                 });
+                sliding = false;
             });
         }
     };

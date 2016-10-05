@@ -4,7 +4,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var self = this;
             var allBindings = allBindingsAccessor().select2;
-            var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);            
+            var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).select2('destroy');
@@ -14,14 +14,34 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 return item.text;
             };
 
-            _.each(select2Config.data, function (item) {
+            function formatData(data) {
+              _.each(data, function (item) {
                 if (item.collector === 'collector') {
-                    delete item.id;
+                  delete item.id;
                 }
+              });
+            }
+
+            var placeholder = select2Config.placeholder
+            placeholder.subscribe(function(newItems){
+              select2Config.placeholder = newItems;
+              $(el).select2("destroy").select2(select2Config);
+            });
+            select2Config.placeholder = select2Config.placeholder();
+
+            var data = select2Config.data.extend({ rateLimit: 500 });
+            data.subscribe(function(newItems){
+              formatData(newItems);
+              select2Config.data = newItems;
+              $(el).select2("destroy").select2(select2Config);
             });
 
-            select2Config.createSearchChoice = function(term, data) { 
-                if ($(data).filter(function() 
+            select2Config.data = select2Config.data();
+
+            formatData(select2Config.data);
+
+            select2Config.createSearchChoice = function(term, data) {
+                if ($(data).filter(function()
                     { return this.text.localeCompare(term)===0; }).length===0) {
                         return {id:term, text:term};
                     }
@@ -31,14 +51,14 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
                 var root = {'children': select2Config.data}
                 var result = [];
                 var isParent = false;
-  
+
                 function lookForChild(obj, conceptid) {
                     isParent = false;
                     _.each(obj.children, function (item) {
                         if (item.conceptid === conceptid) {
                             isParent = true;
                             result.push(obj)
-                        } 
+                        }
                     });
 
                     if (isParent === false) {
@@ -70,14 +90,13 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
             $(el).select2(select2Config);
 
-
             $(el).on("change", function(val) {
                 return allBindings.value(val.val);
             });
         },
 
         update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            // we don't want the setting of the select2 dropdown value (eg: $(el).select2("val", val.value, true) ) 
+            // we don't want the setting of the select2 dropdown value (eg: $(el).select2("val", val.value, true) )
             // to re-trigger the element binding (in this case it's usually a getEditedNode call on the dropdown
             // because that can have the side affect of adding a new blank node) so we use ko.ignoreDependencies
             var val = '';

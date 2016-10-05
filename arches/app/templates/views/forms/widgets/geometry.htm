@@ -90,10 +90,9 @@
                 <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
             </div>
 
-
             <div data-bind="sortable: overlays">
                 <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools}">
-                    <div class="map-overlay-vis-toogle text-center">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css: {'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
                     </div>
                     <div class="map-overlay-name">
@@ -129,8 +128,12 @@
                         <!-- <div class="col-xs-4"> -->
                         <div class="overlay-tool-group">
                             <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
-                            <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
-                            <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'up') }">
+                                <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                            </a>
+                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'down') }">
+                                <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            </a>
                         </div>
                         <!-- </div> -->
 

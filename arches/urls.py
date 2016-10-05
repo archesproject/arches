@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^concepts/search$', concept.search, name="concept_search"),
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
+    url(r'^concepts/dropdown', concept.dropdown, name="dropdown"),
     url(r'^search$', search.home_page, name="search_home"),
     url(r'^search/terms$', search.search_terms, name="search_terms"),
     url(r'^search/resources$', search.search_results, name="search_results"),

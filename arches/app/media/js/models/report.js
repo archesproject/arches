@@ -34,7 +34,7 @@ define(['arches',
                     }
                 })
                 form.sortorder = Infinity;
-                form.active = ko.observable(false);
+                form.active = ko.observable(true);
                 form.label = ko.observable(form.title);
             });
             this.forms = ko.observableArray(options.forms);

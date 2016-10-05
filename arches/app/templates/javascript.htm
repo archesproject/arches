@@ -103,6 +103,7 @@
                 concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_search: "{% url 'concept_search' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                dropdown: "{% url 'dropdown' %}",
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
@@ -179,6 +180,10 @@
                 'isoverlay': {{ map_layer.isoverlay|lower }},
                 'sortorder': {{ map_layer.sortorder }},
                 'icon': '{{ map_layer.icon }}'
+            },{% endfor %}{% endautoescape %}],
+            conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
+                'label': '{{ concept_collection.label }}',
+                'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
         };
     });
