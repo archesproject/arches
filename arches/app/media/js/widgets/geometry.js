@@ -250,16 +250,12 @@ define([
                 var source = ko.utils.arrayIndexOf(overlays, overlay);
                 var target = (direction==='up') ? source - 1 : source + 1;
 
-                if (self.overlays.valueWillMutate) {
-                    self.overlays.valueWillMutate();
-                }
+                self.overlays.valueWillMutate();
                 if (target >= 0 && target < overlays.length) {
                     overlays.splice(source, 1);
                     overlays.splice(target, 0, overlay);
 
-                    if (self.overlays.valueHasMutated) {
-                        self.overlays.valueHasMutated();
-                    }
+                    self.overlays.valueHasMutated();
                 }
             };
 
