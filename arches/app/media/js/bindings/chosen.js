@@ -41,7 +41,7 @@ define([
             ['options', 'selectedOptions', 'value'].forEach(function(propName){
                 if (allBindings.has(propName)){
                     var prop = allBindings.get(propName);
-                    if (ko.isObservable(prop)){
+                    if (ko.isObservable(prop) || ko.isComputed(prop)){
                         prop.subscribe(function(){
                             $element.trigger('chosen:updated');
                         });

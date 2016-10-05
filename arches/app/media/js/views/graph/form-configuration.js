@@ -1,4 +1,5 @@
 require([
+    'underscore',
     'knockout',
     'arches',
     'models/graph',
@@ -9,13 +10,13 @@ require([
     'viewmodels/alert',
     'form-configuration-data',
     'bindings/sortable'
-], function(ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, AlertViewModel, data) {
+], function(_, ko, arches, GraphModel, FormModel, FormSettingsView, PageView, ListView, AlertViewModel, data) {
     /**
     * a PageView representing the form configuration page
     */
     var self = this;
     var options = [{
-        title: null,
+        title: ko.observable(null),
         formid: null,
         disabled: true
     }];
@@ -25,10 +26,20 @@ require([
         forms_x_cards: data.forms_x_cards,
         cards: data.cards
     });
+    _.each(data.forms, function (form) {
+        if (form.formid === formModel.formid) {
+            form.title = formModel.title;
+        } else {
+            form.title = ko.observable(form.title);
+        }
+    });
 
     var viewModel = {
         dirty: formModel.dirty,
-        formOptions: options.concat(data.forms),
+        formOptions: ko.computed(function() {
+            formModel.title();
+            return options.concat(data.forms);
+        }),
         formSettings: new FormSettingsView({
             formModel: formModel,
             icons: data.icons
@@ -41,8 +52,31 @@ require([
         }),
         addedCards: formModel.cards,
         selectedFormId: ko.observable(data.form.formid),
-        openForm: function (formId) {
-            pageView.viewModel.navigate(arches.urls.form_configuration + formId);
+        openForm: function (formId, bypass) {
+            pageView.viewModel.navigate(arches.urls.form + formId, bypass);
+        },
+        addForm: function (bypass) {
+            if (!bypass && pageView.viewModel.dirty()) {
+                pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                    pageView.viewModel.showConfirmNav(false);
+                }, function() {
+                    pageView.viewModel.addForm(true);
+                }));
+                return;
+            }
+            pageView.viewModel.alert(null)
+            pageView.viewModel.loading(true);
+            $.ajax({
+                type: "POST",
+                url: '../graph/' + data.graph.graphid + '/add_form',
+                success: function(response) {
+                    pageView.viewModel.openForm(response.formid, true);
+                },
+                error: function(response) {
+                    pageView.viewModel.loading(false);
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                }
+            });
         },
         addCard: function(card) {
             formModel.availableCards.remove(card);
