@@ -140,12 +140,18 @@ define([
                             opacity: ko.observable(100),
                             color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
                             showingTools: ko.observable(false),
+                            invisible: ko.observable(false),
                             toggleOverlayTools: function(e) {
-                                this.showingTools(!this.showingTools())
+                                this.showingTools(!this.showingTools());
+                            },
+                            toggleOverlayVisibility: function(e) {
+                                this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
                             },
                             updateOpacity: function(val) {
+                                val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
+                                    console.log(this.getPaintProperty(layer.id, layer.type + '-opacity'));
                                 }, map)
                             }
                         });

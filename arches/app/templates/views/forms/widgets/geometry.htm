@@ -90,10 +90,9 @@
                 <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
             </div>
 
-
             <div data-bind="sortable: overlays">
                 <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools}">
-                    <div class="map-overlay-vis-toogle text-center">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css: {'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
                     </div>
                     <div class="map-overlay-name">
