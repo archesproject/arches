@@ -245,12 +245,20 @@ define([
                 });
             }
 
-            this.moveOverlayUp = function(overlay){
-              var layerPosition = _.findIndex(self.overlays(), function(item) { return item.name == overlay.name })
-              if (layerPosition !== 0) {
-                console.log(layerPosition)
-              }
-            }
+            this.moveOverlay = function(overlay, direction) {
+                var overlays = ko.utils.unwrapObservable(self.overlays);
+                var source = ko.utils.arrayIndexOf(overlays, overlay);
+                var target = (direction==='up') ? source - 1 : source + 1;
+
+                if (target >= 0 && target < overlays.length) {
+                    self.overlays.valueWillMutate();
+
+                    overlays.splice(source, 1);
+                    overlays.splice(target, 0, overlay);
+
+                    self.overlays.valueHasMutated();
+                }
+            };
 
             this.mapStyle = mapStyle;
             this.mapStyle.layers = this.addInitialLayers();
