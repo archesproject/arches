@@ -4125,7 +4125,7 @@ h4.report-toolbar-title {
     }
 }
 @media print {
-    header, nav, footer, button, aside {
+    header, nav, footer, button, aside, .print-btn {
         display: none;
     }
     #content-container {
