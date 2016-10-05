@@ -41,8 +41,31 @@ require([
         }),
         addedCards: formModel.cards,
         selectedFormId: ko.observable(data.form.formid),
-        openForm: function (formId) {
-            pageView.viewModel.navigate(arches.urls.form_configuration + formId);
+        openForm: function (formId, bypass) {
+            pageView.viewModel.navigate(arches.urls.form + formId, bypass);
+        },
+        addForm: function (bypass) {
+            if (!bypass && pageView.viewModel.dirty()) {
+                pageView.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function(){
+                    pageView.viewModel.showConfirmNav(false);
+                }, function() {
+                    pageView.viewModel.addForm(true);
+                }));
+                return;
+            }
+            pageView.viewModel.alert(null)
+            pageView.viewModel.loading(true);
+            $.ajax({
+                type: "POST",
+                url: '../graph/' + data.graph.graphid + '/add_form',
+                success: function(response) {
+                    pageView.viewModel.openForm(response.formid, true);
+                },
+                error: function(response) {
+                    pageView.viewModel.loading(false);
+                    pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
+                }
+            });
         },
         addCard: function(card) {
             formModel.availableCards.remove(card);
