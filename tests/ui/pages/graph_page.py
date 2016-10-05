@@ -1,4 +1,4 @@
-import re 
+import re
 from base_page import BasePage, script_returns_true
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,7 +18,7 @@ class GraphPage(BasePage):
         self.driver.find_element_by_xpath("//button[@type='button']").click()
         wait = WebDriverWait(self.driver, 20)
         element = wait.until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "New Graph"))
+            EC.element_to_be_clickable((By.LINK_TEXT, "New Branch"))
         )
         element.click()
 
@@ -39,4 +39,3 @@ class GraphPage(BasePage):
 
         return graph_id
         #re.compile(uuid_regex).findall(self.driver.current_url)
-

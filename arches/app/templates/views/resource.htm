@@ -159,9 +159,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <a href="#" class="btn btn-primary" data-bind="click: function () {
                                         navigate('{% url 'resource' %}/{{summary.id}}')
                                     }">{% trans "Edit" %}</a>
-                                    <a href="#" class="btn btn-primary" data-bind="click: function () {
-                                        navigate('{% url 'resource_report' summary.id %}')
-                                    }">{% trans "View Report" %}</a>
+                                    <a href="{% url 'resource_report' summary.id %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
                                 </td>
                             </tr>
                             {% endfor %}
