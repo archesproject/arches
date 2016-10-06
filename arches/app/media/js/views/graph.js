@@ -51,8 +51,7 @@ require([
                 graph.root = graphManagerData.root_nodes.find(function(node) {
                     return node.graph_id === graph.graphid
                 });
-                graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
-                console.log(graph.name, graph.isCard);
+                graph.isCard = (graph.root && graph.root.nodegroup_id === graph.root.nodeid);
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
                     newGraph(graph.graphid + '/clone');
