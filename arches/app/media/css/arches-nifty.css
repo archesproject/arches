@@ -1792,6 +1792,7 @@ ul .collapse li:last-of-type {
     border-bottom: 1px solid #ddd;
     background: #fff;
     opacity: .99;
+    position: relative;
 }
 .edit-menu-item:hover {
     background: #f8f8f8;
@@ -1821,6 +1822,22 @@ ul .collapse li:last-of-type {
     background: #f4f4f4;
     border-left: 3px solid #579ddb;
     opacity: 1.0;
+}
+.edit-menu-item.disabled:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    background: rgba(255, 255, 255, 0.66);
+    bottom: 0;
+    left: -4px;
+    right: 0;
+    z-index: 1;
+    cursor: not-allowed;
+}
+.edit-menu-item.disable:hover {
+    border-left: 3px solid #ebeef0;
+    background: #fff;
+    opacity: .99;
 }
 .edit-menu-control {
     position: absolute;

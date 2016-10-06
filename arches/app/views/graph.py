@@ -46,6 +46,7 @@ class GraphBaseView(BaseManagerView):
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
             context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
         except:
             pass
         return context
