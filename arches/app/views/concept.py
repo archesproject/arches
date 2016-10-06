@@ -274,6 +274,12 @@ def dropdown(request):
     results = Concept().get_e55_domain(conceptid)
     return JSONResponse(results)
 
+def get_pref_label(request):
+    valueid = request.GET.get('valueid')
+    label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
+    print label
+    return JSONResponse(label)
+
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
