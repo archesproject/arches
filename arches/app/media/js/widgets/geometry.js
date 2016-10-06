@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'knockout',
     'underscore',
     'viewmodels/widget',
@@ -8,8 +9,9 @@ define([
     'map/mapbox-style',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen'
-], function(ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
+    'bindings/chosen',
+    'bindings/ajax-chosen'
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -44,6 +46,17 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
+            this.geocoderOptions = ko.observableArray([{
+                'id': 'BingGeocoder',
+                'name': 'Bing'
+            }, {
+                'id': 'MapzenGeocoder',
+                'name': 'Mapzen'
+            }]);
+
+            this.geocodeUrl = arches.urls.geocoder;
+            this.geocodePoint = ko.observable();
+            this.geocodeResponseOptions = ko.observable();
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -84,38 +97,6 @@ define([
                 return initialLayers;
             }
 
-            this.geocoderOptions = ko.observableArray([{
-                'id': 'MapzenGeocoder',
-                'name': 'Mapzen'
-            }, {
-                'id': 'BingGeocoder',
-                'name': 'Bing'
-            }]);
-
-
-            $('.geocodewidget').select2({
-                ajax: {
-                    url: arches.urls.geocoder,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: function(term, page) {
-                        return {
-                            q: term,
-                            geocoder: this.geocoder
-                        };
-                    },
-                    results: function(data, page) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 4,
-                multiple: false,
-                maximumSelectionSize: 1
-            }, this);
-
             this.editingToolIcons = {
                 Point: 'ion-location',
                 Line: 'ion-steam',
@@ -124,6 +105,7 @@ define([
             }
 
             this.setupMap = function(map) {
+
                 var self = this;
                 var draw = Draw();
                 this.map = map;
@@ -156,11 +138,20 @@ define([
                     }), function(overlay) {
                         _.extend(overlay, {
                             opacity: ko.observable(100),
+                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
                             showingTools: ko.observable(false),
+                            invisible: ko.observable(false),
                             toggleOverlayTools: function(e) {
-                                this.showingTools(!this.showingTools())
+                                this.showingTools(!this.showingTools());
+                            },
+                            toggleOverlayVisibility: function(e) {
+                                this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
                             },
                             updateOpacity: function(val) {
+                                var shift = val > 0.0 ? 0.0001 : -0.0001;
+                                var unsetMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift)}, 200); //Layers do not always redraw when toggled
+                                var refreshMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift * -1)}, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
+                                val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
                                 }, map)
@@ -176,6 +167,7 @@ define([
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                     return baselayer.isoverlay === false
                 });
+
                 this.setBasemap = function(basemapType) {
                     var lowestOverlay = _.last(_.last(overlays).layer_definitions);
                     this.basemaps.forEach(function(basemap) {
@@ -194,15 +186,6 @@ define([
                     }, this)
                 };
 
-                $('.geocodewidget').on("select2-selecting", function(e) {
-                    this.map.getSource('geocode-point').setData(e.object.geometry);
-                    this.redrawGeocodeLayer();
-                    this.map.flyTo({
-                        center: e.object.geometry.coordinates
-                    });
-                });
-
-
                 this.updateConfigs = function(theViewModel) {
                     //using a closure because the viewModel was not avaliable within the event
                     return function() {
@@ -212,8 +195,11 @@ define([
                         if (self.zoom() !== zoom) {
                             self.zoom(zoom);
                         };
-                        self.centerX(mapCenter.lng)
-                        self.centerY(mapCenter.lat)
+                        self.centerX(mapCenter.lng);
+                        self.centerY(mapCenter.lat);
+                        if (Math.abs(this.getBearing()) > 0.01) {
+                          self.bearing(this.getBearing());
+                        }
                     }
                 }
 
@@ -235,25 +221,24 @@ define([
                     this.redrawGeocodeLayer();
                 }, this)
 
-                this.zoom.subscribe(function(val) {
-                    this.map.setZoom(this.zoom())
-                }, this);
+                this.geocodePoint.subscribe(function(val){
+                   var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
+                   var point = {
+                       "type": "Feature",
+                       "properties": {},
+                       "geometry": {
+                           "type": "Point",
+                           "coordinates": coords
+                       }
+                   }
+                   this.map.getSource('geocode-point').setData(point);
+                   this.redrawGeocodeLayer();
+                   var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                   this.map.flyTo({
+                       center: centerPoint
+                   });
+                }, this)
 
-                this.centerX.subscribe(function(val) {
-                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
-                }, this);
-
-                this.centerY.subscribe(function(val) {
-                    this.map.setCenter(new mapboxgl.LngLat(this.centerX(), this.centerY()))
-                }, this);
-
-                this.pitch.subscribe(function(val) {
-                    this.map.setPitch(this.pitch())
-                }, this);
-
-                this.bearing.subscribe(function(val) {
-                    this.map.setBearing(this.bearing())
-                }, this);
             }
 
             this.onGeocodeSelection = function(val, e) {
@@ -271,14 +256,23 @@ define([
                 });
             }
 
+            this.moveOverlay = function(overlay, direction) {
+                var overlays = ko.utils.unwrapObservable(self.overlays);
+                var source = ko.utils.arrayIndexOf(overlays, overlay);
+                var target = (direction==='up') ? source - 1 : source + 1;
 
+                if (target >= 0 && target < overlays.length) {
+                    self.overlays.valueWillMutate();
 
-            mapStyle.layers = this.addInitialLayers();
+                    overlays.splice(source, 1);
+                    overlays.splice(target, 0, overlay);
 
-            this.mapOptions = {
-                style: mapStyle
+                    self.overlays.valueHasMutated();
+                }
             };
 
+            this.mapStyle = mapStyle;
+            this.mapStyle.layers = this.addInitialLayers();
 
             this.selectBasemap = function(val) {
                 self.basemap(val.name)

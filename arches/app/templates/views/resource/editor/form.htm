@@ -43,7 +43,7 @@
                         data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
                         as: 'card'
                     }, visible: !(isWizard && !forceBlank)">
-          
+
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
                             'active in': 0 === $index()
@@ -75,6 +75,7 @@
                                                         config: configJSON,
                                                         label: widget.get("label")(),
                                                         value: tile.data[widget.get("node_id")()],
+                                                        node: widget.node,
                                                         disabled: false
                                                     }
                                                 }'></div>
@@ -146,6 +147,7 @@
                                                             config: configJSON,
                                                             label: widget.get("label")(),
                                                             value: innerTile.data[widget.get("node_id")()],
+                                                            node: widget.node,
                                                             disabled: false
                                                         }
                                                     }'></div>
@@ -186,7 +188,7 @@
                                     </div>
                                 </div>
                             </aside>
-                            
+
                         </div>
 
                     </div>
@@ -202,7 +204,7 @@
                 <div class="panel-body card-body fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template'}"></div>
                 <!-- /ko -->
                 <!-- /ko -->
-        
+
             <!-- /ko -->
 
 

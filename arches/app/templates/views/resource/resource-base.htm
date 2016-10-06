@@ -69,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Menu List -->
             <div class="panel-body">
                 <ul class="list-group ep-menu-list">
-                    
+
                     <!-- Menu Item -->
                     <li id="settings-manager" class="edit-menu-item">
                         <a href="" target="" class="">
@@ -102,7 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li id="report-manager" class="edit-menu-item">
-                        <a href="" target="" class="">
+                        <a href="#" data-bind="click: function () {window.open('{% url 'resource_report' resourceid %}')}">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
@@ -121,7 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </li>
                 </ul>
             </div>
-            
+
         </div>
     </div>
 

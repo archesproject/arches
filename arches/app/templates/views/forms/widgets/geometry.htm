@@ -3,16 +3,32 @@
 <div class="row widget-wrapper">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: mapOptions, afterRender: function(){setupMap(map)} }">
+    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
+          style: mapStyle,
+          zoom: zoom,
+          centerX: centerX,
+          centerY: centerY,
+          pitch: pitch,
+          bearing: bearing
+      }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
-        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-          <select data-bind="chosen: {width: '100%'}, value: geocodeSearchVal, options: geocodeSearchResults, optionsText: 'text', optionsValue: 'text'"></select>
-        </div> -->
-
-
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-            <input class="geocodewidget arches-select2 margin-top-10 hidden-xs" id="geocodewidget" name="" style="width:100%;" placeholder="{% trans 'Find an Address' %}">
-            <input class="geocodewidget arches-select2 margin-top-10 hidden-sm hidden-md hidden-lg" id="geocodewidget" name="" style="width:80%;" placeholder="{% trans 'Find an Address' %}">
+            <select data-bind="ajaxchosen: {
+              ajaxChosenOptions:{
+                loadingImg: '{{ STATIC_URL }}img/select2-spinner.gif',
+                minLength: 3,
+                processItems: function(data){return _.map(data.results, function(res, i) {return {text: res.id, id:i}})}
+              },
+              chosenOptions: {
+                width: '100%'
+              },
+              ajaxOptions: {
+                url: geocodeUrl,
+                type: 'GET',
+                success: function(data, textStatus, jqXHR){ geocodeResponseOptions(data.results);},
+                data: [{name:'geocoder', value:geocoder}]},
+              value: geocodePoint}">
+            </select>
         </div>
 
         <!-- Map Tools Panel -->
@@ -74,10 +90,9 @@
                 <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
             </div>
 
-
             <div data-bind="sortable: overlays">
                 <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools}">
-                    <div class="map-overlay-vis-toogle text-center">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css: {'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
                     </div>
                     <div class="map-overlay-name">
@@ -113,8 +128,12 @@
                         <!-- <div class="col-xs-4"> -->
                         <div class="overlay-tool-group">
                             <i class="ion-information-circled pull-right overlay-tool-icon add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="visible: 7-20"></i>
-                            <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
-                            <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'up') }">
+                                <i class="ion-ios-arrow-up pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay up"></i>
+                            </a>
+                            <a href="#" data-bind="click: function () { $parent.moveOverlay($data, 'down') }">
+                                <i class="ion-ios-arrow-down pull-right overlay-tool-icon add-tooltip" data-placement="bottom" data-toggle="tooltip" data-original-title="move overlay down"></i>
+                            </a>
                         </div>
                         <!-- </div> -->
 
@@ -163,6 +182,36 @@
             <div class="map-widget-panel-title">
                 <h4 class=""> Legend </h4>
             </div>
+            <div class="map-widget-panel-title legend-subtitle">
+                <h5 class=""> Overlays </h5>
+            </div>
+            <div data-bind="sortable: overlays">
+              <div class="map-widget-overlay-item relative">
+                  <div class="map-overlay-vis-toogle text-center">
+                      <i data-bind="css: icon, style: {color:color}"></i>
+                  </div>
+                  <div class="map-overlay-name">
+                      <a class="" href=""><span data-bind="text:name"><span></a>
+                  </div>
+              </div>
+            </div>
+
+            <div class="map-widget-panel-title legend-subtitle">
+                <h5 class=""> Basemaps </h5>
+            </div>
+            <!-- ko foreach: { data: [$data], as: 'self' } -->
+            <!-- ko foreach: basemaps -->
+            <div class="map-widget-overlay-item relative">
+                <div class="map-overlay-vis-toogle text-center map-thumbnail">
+                    <img height="40px" data-bind="attr: { src: '{{ STATIC_URL }}img/map-thumbnails/' + name + '.png'}" ></img>
+                </div>
+                <div class="map-overlay-name">
+                    <a id="" class="" href=""><span data-bind='text: name'><span></a>
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+
         </div>
     </div>
 
@@ -171,7 +220,7 @@
     <div class="overlay-container" style="display: none;">
         <h3 class="panel-title card-main-title"> Overlays <i class="pull-right icon-xl ion ion-ios-close-empty"></i></h3>
 
-        <!-- Ocerlay Listing -->
+        <!-- Overlay Listing -->
         <div id="report-image-grid" class="report-image-grid">
 
 
@@ -197,7 +246,7 @@
     {% trans "Default Geocoder" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, chosen: {width: '100%'}"></select>
+    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
 </div>
 <div class="control-label">
     {% trans "Map Center Longitude" %}

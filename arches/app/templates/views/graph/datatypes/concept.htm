@@ -1,9 +1,9 @@
 {% load i18n %}
 <div class="node-widget-label">
     <div class="control-label">
-        {% trans "Top Concept" %}
+        {% trans "Concept Collection" %}
     </div>
     <div>
-        <input type="" placeholder="{% trans "Top Concept" %}" id="" class="form-control input-md widget-input" data-bind="value: topConcept, valueUpdate: 'keyup'">
+        <select data-bind="placeholder: 'Select a concept collection', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%'}"></select>
     </div>
 </div>

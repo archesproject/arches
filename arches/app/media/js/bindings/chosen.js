@@ -20,6 +20,19 @@ define([
                 search_contains: true
             };
 
+            if (allBindings.has('placeholder')){
+                var prop = allBindings.get('placeholder');
+                var value = prop;
+                if (ko.isObservable(prop)){
+                    prop.subscribe(function(){
+                        $element.attr('data-placeholder', prop());
+                        $element.trigger('chosen:updated');
+                    });
+                    value = prop();
+                }
+                $element.attr('data-placeholder', value);
+            }
+
             if (typeof options === 'object')
                 $element.chosen(_.defaults(options, defaults));
             else
@@ -28,7 +41,7 @@ define([
             ['options', 'selectedOptions', 'value'].forEach(function(propName){
                 if (allBindings.has(propName)){
                     var prop = allBindings.get(propName);
-                    if (ko.isObservable(prop)){
+                    if (ko.isObservable(prop) || ko.isComputed(prop)){
                         prop.subscribe(function(){
                             $element.trigger('chosen:updated');
                         });
