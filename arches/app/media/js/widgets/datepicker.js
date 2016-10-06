@@ -21,7 +21,7 @@ define([
             var self = this;
             params.configKeys = ['minDate','maxDate','viewMode']
             WidgetViewModel.apply(this, [params]);
-
+            // this.disabledTimeIntervals = ko.observable([]);
             this.placeholder = params.config().placeholder;
         },
         template: { require: 'text!widget-templates/datepicker' }
