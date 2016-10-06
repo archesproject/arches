@@ -64,9 +64,9 @@
 
                                     <!-- Form -->
                                     <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
-                                        <div class="col-xs-12 card-form-container" data-bind="let: {'tile': $data}">
+                                        <div class="card-form-container" data-bind="let: {'tile': $data}">
                         
-                                            <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                            <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                     data:card.get('widgets'), as: 'widget'
                                                 }">
                                                 <div class='widget-preview' data-bind='component: {
@@ -79,24 +79,26 @@
                                                     }
                                                 }'></div>
                                             </form>
-                                        </div>
 
-                                        <!-- Save/Add Buttons -->
-                                        <!-- ko if: forceBlank -->
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, true)">{% trans 'Add' %}</button>
-                                        </div>
-                                        <!-- /ko -->
+                                            <!-- Save/Add Buttons -->
+                                            <!-- ko if: tile.dirty() -->
+                                                <!-- ko if: forceBlank -->
+                                                <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, true)">{% trans 'Add' %}</button>
+                                                </div>
+                                                <!-- /ko -->
 
-                                        <!-- ko if: !forceBlank -->
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, parentTile)">{% trans "Save" %}</button>
-                                        </div>
-                                        <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, false)">{% trans 'Save' %}</button>
-                                        </div>
-                                        <!-- /ko -->
+                                                <!-- ko if: !forceBlank -->
+                                                <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, parentTile)">{% trans "Save" %}</button>
+                                                </div>
+                                                <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                                    <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, false)">{% trans 'Save' %}</button>
+                                                </div>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
                                         
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +114,7 @@
                                 <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: parentTile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
 
                                     <div class="list-group-item" style="background: rgb(250, 250, 250);">
-                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span></h5>
+                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px; max-height: 20px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span></h5>
                                         
                                         <div class="effect" style="display:none;">
                                             <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile)">
@@ -133,9 +135,9 @@
                                             </div>
 
                                             <!-- Form -->
-                                            <div class="col-xs-12 card-form-container">
+                                            <div class="card-form-container">
                             
-                                                <form class="widgets row" style="margin-bottom: 20px;" data-bind="foreach: {
+                                                <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                         data:card.get('widgets'), as: 'widget'
                                                     }">
                                                     <div class='widget-preview' data-bind='component: {
@@ -152,10 +154,12 @@
                                             </div>
 
                                             <!-- Save/Add Button -->
+                                            <!-- ko if: innerTile.dirty -->
                                             <div class="install-buttons">
                                                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, innerTile)">{% trans "Save" %}</button>
                                             </div>
+                                            <!-- /ko -->
 
                                         </div>
                                     </div>
@@ -221,6 +225,7 @@
                             </span>
                         </div>
                     </div>
+
 
                 <!-- /ko -->
                 <!-- /ko -->

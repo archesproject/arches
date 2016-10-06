@@ -35,6 +35,56 @@ define([
             this.ready = ko.observable(false);
         },
 
+        initTile: function(data){
+            _.keys(data).forEach(function(nodegroup_id){
+                if(nodegroup_id !== '__ko_mapping__'){
+                    data[nodegroup_id]().forEach(function(tile){
+                        //tile.childTiles = ko.observableArray();
+                        tile._data = ko.observable(koMapping.toJSON(tile.data));
+                        tile.childIsDirty = ko.observable(false);
+                        tile.dirty = ko.computed(function(){
+                            // tile.childTiles().forEach(function(childTile){
+                            //     childIsDirty || childTile.dirty();
+                            // })
+                            // var checkChildIsDirty = function(obj){
+                            //     var ret = false;
+                            //     _.keys(obj).forEach(function(ng){
+                            //         if(ng !== '__ko_mapping__'){
+                            //             obj[ng]().forEach(function(t){
+                            //                 ret = t.dirty();
+                            //                 t.dirty.subscribe(function(isDirty){
+                            //                     tile.childIsDirty(isDirty || tile.childIsDirty());
+                            //                 })
+                            //             }, this);
+                            //         }
+                            //     }, this);
+                            //     return ret;
+                            //     // for (key in obj) {
+                            //     //     if(obj.hasOwnProperty(key)){
+                            //     //         if(ko.isObservable(obj[key]) && typeof obj[key].dirty === 'function' && obj[key].dirty()) {
+                            //     //             return true;
+                            //     //         }else{
+                            //     //             return checkChildIsDirty(ko.unwrap(obj[key]));
+                            //     //         }
+                            //     //     }
+                            //     // }
+
+                            // }
+
+                            // var x = !!tile.tiles ? checkChildIsDirty(tile.tiles) : false;
+                            return koMapping.toJSON(tile.data) !== tile._data() || tile.childIsDirty();
+                        });
+                        if(!!tile.tiles){
+                            this.initTile(tile.tiles);
+                        }
+                        // if(!!parentTile){
+                        //     parentTile.childTiles.push(tile);
+                        // }
+                    }, this);
+                }
+            }, this);
+        },
+
         /**
          * asynchronously loads a form into the UI
          * @memberof Form.prototype
@@ -51,6 +101,8 @@ define([
                     window.location.hash = formid;
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
+                    self.initTile(self.tiles);
+                    self.initTile(self.blanks);
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -204,6 +256,7 @@ define([
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
+                    tile._data(JSON.stringify(request.responseJSON.data));
                     tile.tileid(request.responseJSON.tileid);
                 }else{
                     // inform the user
