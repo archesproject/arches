@@ -16,6 +16,29 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
 
             WidgetViewModel.apply(this, [params]);
 
+            this.conceptLabel = ko.observable()
+
+            this.getConceptLabel = function() {
+                var self = this;
+                $.ajax({
+                  url: arches.urls.get_pref_label,
+                  data: {
+                    valueid: this.value
+                  },
+                  datatype: 'json'
+                }).done(function(label){
+                  self.conceptLabel(label.value);
+                }).fail(function(err) {
+                  console.log("error", err);
+                });
+            }
+
+              if (this.state === 'report' && this.value() != null) {
+                  this.getConceptLabel()
+              } else {
+                this.conceptLabel = 'None'
+              }
+
             this.node.config.topConcept.subscribe(function(newId) {
               var self = this;
               $.ajax({
