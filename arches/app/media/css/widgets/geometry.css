@@ -283,6 +283,10 @@
   padding-top: 5px;
 }
 
+.overlay-invisible {
+  color: #c3c3c3;
+}
+
 .map-widget-panel-title.legend-subtitle {
   height: 35px;
   padding-left: 8px;
