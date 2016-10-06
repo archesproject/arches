@@ -6,10 +6,11 @@ require([
     'viewmodels/alert',
     'arches',
     'view-data',
+    'graph-manager-data',
     'bootstrap-nifty',
     'bindings/hover',
     'bindings/chosen'
-], function($, _, ko, BaseManager, AlertViewModel, arches, data) {
+], function($, _, ko, BaseManager, AlertViewModel, arches, data, graphManagerData) {
 
     var GraphView = BaseManager.extend({
         /**
@@ -47,6 +48,11 @@ require([
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {
+                graph.root = graphManagerData.root_nodes.find(function(node) {
+                    return node.graph_id === graph.graphid
+                });
+                graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
+                console.log(graph.name, graph.isCard);
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
                     newGraph(graph.graphid + '/clone');
