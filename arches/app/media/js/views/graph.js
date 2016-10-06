@@ -48,9 +48,11 @@ require([
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {
-                graph.root = graphManagerData.root_nodes.find(function(node) {
-                    return node.graph_id === graph.graphid
-                });
+                if (graphManagerData && graphManagerData.root_nodes) {
+                    graph.root = graphManagerData.root_nodes.find(function(node) {
+                        return node.graph_id === graph.graphid
+                    });
+                }
                 graph.isCard = (graph.root && graph.root.nodegroup_id === graph.root.nodeid);
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
