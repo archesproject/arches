@@ -192,7 +192,7 @@ class GraphDataView(View):
 
             if self.action == 'new_graph':
                 isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource') if isresource else _('New Graph')
+                name = _('New Resource Model') if isresource else _('New Branch')
                 author = request.user.first_name + ' ' + request.user.last_name
                 ret = Graph.new(name=name,is_resource=isresource,author=author)
 

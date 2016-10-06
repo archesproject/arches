@@ -140,10 +140,18 @@ define([
                             opacity: ko.observable(100),
                             color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
                             showingTools: ko.observable(false),
+                            invisible: ko.observable(false),
                             toggleOverlayTools: function(e) {
-                                this.showingTools(!this.showingTools())
+                                this.showingTools(!this.showingTools());
+                            },
+                            toggleOverlayVisibility: function(e) {
+                                this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
                             },
                             updateOpacity: function(val) {
+                                var shift = val > 0.0 ? 0.0001 : -0.0001;
+                                var unsetMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift)}, 200); //Layers do not always redraw when toggled
+                                var refreshMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift * -1)}, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
+                                val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
                                 }, map)
@@ -187,8 +195,11 @@ define([
                         if (self.zoom() !== zoom) {
                             self.zoom(zoom);
                         };
-                        self.centerX(mapCenter.lng)
-                        self.centerY(mapCenter.lat)
+                        self.centerX(mapCenter.lng);
+                        self.centerY(mapCenter.lat);
+                        if (Math.abs(this.getBearing()) > 0.01) {
+                          self.bearing(this.getBearing());
+                        }
                     }
                 }
 
@@ -245,12 +256,20 @@ define([
                 });
             }
 
-            this.moveOverlayUp = function(overlay){
-              var layerPosition = _.findIndex(self.overlays(), function(item) { return item.name == overlay.name })
-              if (layerPosition !== 0) {
-                console.log(layerPosition)
-              }
-            }
+            this.moveOverlay = function(overlay, direction) {
+                var overlays = ko.utils.unwrapObservable(self.overlays);
+                var source = ko.utils.arrayIndexOf(overlays, overlay);
+                var target = (direction==='up') ? source - 1 : source + 1;
+
+                if (target >= 0 && target < overlays.length) {
+                    self.overlays.valueWillMutate();
+
+                    overlays.splice(source, 1);
+                    overlays.splice(target, 0, overlay);
+
+                    self.overlays.valueHasMutated();
+                }
+            };
 
             this.mapStyle = mapStyle;
             this.mapStyle.layers = this.addInitialLayers();

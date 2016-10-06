@@ -3899,7 +3899,7 @@ div.row.widget-wrapper:hover {
 	background: #f4f4f4;
 	border-bottom: 1px solid #e9e9e9;
 }
-.rp-report-section:nth-child(2) {
+.rp-report-section:nth-child(even) {
 	background: #fafafa;
 }
 .rp-report-section-title {
@@ -4122,5 +4122,27 @@ h4.report-toolbar-title {
 @media screen and max-width 500px {
     .resource-grid-subtitle {
         width: 300px;
+    }
+}
+@media print {
+    header, nav, footer, button, aside, .print-btn{
+        display: none;
+    }
+    #content-container {
+        padding: 0 !important;
+    }
+    .rp-report-tile {
+        padding-left: 340px;
+    }
+    .scroll-y {
+        height: auto;
+    }
+    dt {
+        text-decoration: underline;
+        font-weight: bold;
+        color: #808080 !important;
+    }
+    dd {
+        margin-left:2px;
     }
 }
