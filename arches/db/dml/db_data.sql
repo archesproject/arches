@@ -105,14 +105,14 @@ INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, '10
 INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
 INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
-INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o', null, null, null, '10000000-0000-0000-0000-000000000009');
+INSERT INTO d_data_types VALUES ('filearray', 'fa fa-file-image-o', null, null, null, '10000000-0000-0000-0000-000000000009');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
 -- data type functions
 INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
-INSERT INTO functions_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'filearray', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
@@ -190,7 +190,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000009', 'file-widget', 'widgets/file', 'file', '{"accept": "*","maxfilesize": "*"}');
+    VALUES ('10000000-0000-0000-0000-000000000009', 'file-widget', 'widgets/file', 'filearray', '{"accept": "*","maxfilesize": "*"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
