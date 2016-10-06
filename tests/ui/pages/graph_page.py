@@ -15,8 +15,11 @@ class GraphPage(BasePage):
 
     def add_new_graph(self):
         self.driver.get(self.live_server_url + self.base_url)
-        self.driver.find_element_by_xpath("//button[@type='button']").click()
         wait = WebDriverWait(self.driver, 20)
+        wait.until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loading-mask"))
+        )
+        self.driver.find_element_by_xpath("//button[@type='button']").click()
         element = wait.until(
             EC.element_to_be_clickable((By.LINK_TEXT, "New Branch"))
         )
