@@ -63,6 +63,8 @@ class ResourceEditorView(TemplateView):
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
+            map_layers = models.MapLayers.objects.all()
+            map_sources = models.MapSources.objects.all()
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -71,6 +73,8 @@ class ResourceEditorView(TemplateView):
                 forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
+                map_layers=map_layers,
+                map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid
             )
@@ -104,7 +108,6 @@ class ResourceReportView(BaseManagerView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
-
         context = self.get_context_data(
             main_script='resource-report',
             report=JSONSerializer().serialize(report),
