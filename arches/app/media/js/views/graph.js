@@ -52,10 +52,7 @@ require([
                     return node.graph_id === graph.graphid
                 });
 
-                graph.isCard = false;
-                if (graph.root) {
-                    graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
-                }
+                graph.isCard = true;
 
                 graph.hover = ko.observable(false);
                 graph.clone = function() {
