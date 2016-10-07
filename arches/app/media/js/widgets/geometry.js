@@ -5,7 +5,7 @@ define([
     'viewmodels/widget',
     'arches',
     'mapbox-gl',
-    'plugins/mapbox-gl-draw',
+    'mapbox-gl-draw',
     'map/mapbox-style',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
@@ -109,6 +109,7 @@ define([
                 var self = this;
                 var draw = Draw();
                 this.map = map;
+                this.draw = draw;
                 this.map.addControl(draw);
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
@@ -138,7 +139,11 @@ define([
                     }), function(overlay) {
                         _.extend(overlay, {
                             opacity: ko.observable(100),
-                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
+                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
+                                if (key.includes('-color')) {
+                                    return prop
+                                };
+                            })[0],
                             showingTools: ko.observable(false),
                             invisible: ko.observable(false),
                             toggleOverlayTools: function(e) {
@@ -149,8 +154,12 @@ define([
                             },
                             updateOpacity: function(val) {
                                 var shift = val > 0.0 ? 0.0001 : -0.0001;
-                                var unsetMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift)}, 200); //Layers do not always redraw when toggled
-                                var refreshMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift * -1)}, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
+                                var unsetMap = setTimeout(function(val) {
+                                    map.setBearing(map.getBearing() + shift)
+                                }, 200); //Layers do not always redraw when toggled
+                                var refreshMap = setTimeout(function(val) {
+                                    map.setBearing(map.getBearing() + shift * -1)
+                                }, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
                                 val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
@@ -186,10 +195,9 @@ define([
                     }, this)
                 };
 
-                this.updateConfigs = function(theViewModel) {
-                    //using a closure because the viewModel was not avaliable within the event
+                this.updateConfigs = function() {
+                    var self = this;
                     return function() {
-                        var self = theViewModel;
                         var mapCenter = this.getCenter()
                         var zoom = self.map.getZoom()
                         if (self.zoom() !== zoom) {
@@ -198,12 +206,21 @@ define([
                         self.centerX(mapCenter.lng);
                         self.centerY(mapCenter.lat);
                         if (Math.abs(this.getBearing()) > 0.01) {
-                          self.bearing(this.getBearing());
+                            self.bearing(this.getBearing());
                         }
                     }
                 }
 
-                this.map.on('moveend', this.updateConfigs(this));
+                this.saveGeometries = function(e) {
+                    var self = this;
+                    return function() {
+                        self.value(self.draw.getAll(e));
+                    }
+                }
+
+                this.map.on('moveend', this.updateConfigs());
+                this.map.on('draw.create', this.saveGeometries())
+                this.map.on('draw.delete', this.saveGeometries())
 
                 this.overlays.subscribe(function(overlays) {
                     var anchorLayer = 'gl-draw-active-line.hot';
@@ -221,22 +238,22 @@ define([
                     this.redrawGeocodeLayer();
                 }, this)
 
-                this.geocodePoint.subscribe(function(val){
-                   var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
-                   var point = {
-                       "type": "Feature",
-                       "properties": {},
-                       "geometry": {
-                           "type": "Point",
-                           "coordinates": coords
-                       }
-                   }
-                   this.map.getSource('geocode-point').setData(point);
-                   this.redrawGeocodeLayer();
-                   var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                   this.map.flyTo({
-                       center: centerPoint
-                   });
+                this.geocodePoint.subscribe(function(val) {
+                    var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
+                    var point = {
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": coords
+                        }
+                    }
+                    this.map.getSource('geocode-point').setData(point);
+                    this.redrawGeocodeLayer();
+                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                    this.map.flyTo({
+                        center: centerPoint
+                    });
                 }, this)
 
             }
@@ -259,7 +276,7 @@ define([
             this.moveOverlay = function(overlay, direction) {
                 var overlays = ko.utils.unwrapObservable(self.overlays);
                 var source = ko.utils.arrayIndexOf(overlays, overlay);
-                var target = (direction==='up') ? source - 1 : source + 1;
+                var target = (direction === 'up') ? source - 1 : source + 1;
 
                 if (target >= 0 && target < overlays.length) {
                     self.overlays.valueWillMutate();
