@@ -52,7 +52,7 @@ class ResourceListView(BaseManagerView):
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceEditorView(TemplateView):
+class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
