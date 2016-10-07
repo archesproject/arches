@@ -50,8 +50,8 @@ require([
             this.viewModel.allGraphs().forEach(function(graph) {
                 graph.root = null;
                 graph.isCard = false;
-                if (graphManagerData.root_nodes) {
-                    graphManagerData.root_nodes.find(function(node) {
+                if (graphManagerData && typeof graphManagerData.root_nodes === 'object') {
+                    _.find(graphManagerData.root_nodes, function(node) {
                         return node.graph_id === graph.graphid
                     });
                     // graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
