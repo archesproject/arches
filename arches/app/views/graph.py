@@ -46,6 +46,7 @@ class GraphBaseView(BaseManagerView):
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
             context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
         except:
             pass
         return context
@@ -111,8 +112,10 @@ class GraphSettingsView(GraphBaseView):
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
+            root_nodes = models.Node.objects.filter(istopnode=True)
             context = self.get_context_data(
                 main_script='views/graph',
+                root_nodes=JSONSerializer().serialize(root_nodes),
             )
             return render(request, 'views/graph.htm', context)
 
@@ -121,6 +124,11 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
+        for concept in top_concepts:
+            if concept.label == 'Dropdown Lists':
+                concept_collections = concept.children
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -128,6 +136,7 @@ class GraphManagerView(GraphBaseView):
             branches=JSONSerializer().serialize(branch_graphs),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
+            concept_collections=concept_collections,
             node_list={
                 'title': _('Node List'),
                 'search_placeholder': _('Find a node...')

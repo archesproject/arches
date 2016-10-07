@@ -9,7 +9,7 @@
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css);
-@import url(//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.css);
+@import url(//api.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl.css);
 
 .navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
@@ -1814,6 +1814,7 @@ ul .collapse li:last-of-type {
     border-bottom: 1px solid #ddd;
     background: #fff;
     opacity: .99;
+    position: relative;
 }
 .edit-menu-item:hover {
     background: #f8f8f8;
@@ -1843,6 +1844,22 @@ ul .collapse li:last-of-type {
     background: #f4f4f4;
     border-left: 3px solid #579ddb;
     opacity: 1.0;
+}
+.edit-menu-item.disabled:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    background: rgba(255, 255, 255, 0.66);
+    bottom: 0;
+    left: -4px;
+    right: 0;
+    z-index: 1;
+    cursor: not-allowed;
+}
+.edit-menu-item.disable:hover {
+    border-left: 3px solid #ebeef0;
+    background: #fff;
+    opacity: .99;
 }
 .edit-menu-control {
     position: absolute;
