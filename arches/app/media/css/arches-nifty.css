@@ -15,6 +15,10 @@
     border-right: 1px solid rgba(0,0,0,0.07);
 }
 
+#navbar{
+    width: 50px;
+}
+
 .navbar-header{
     height: 50px;
 }
@@ -4148,6 +4152,9 @@ h4.report-toolbar-title {
 @media screen and (max-width: 768px) {
     #content-container {
         padding-top: 50px !important;
+    }
+    #navbar{
+        width: 100%;
     }
     .resource-grid-main-container {
         height: 130px;
