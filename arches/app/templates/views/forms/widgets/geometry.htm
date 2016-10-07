@@ -13,22 +13,8 @@
       }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-            <select data-bind="ajaxchosen: {
-              ajaxChosenOptions:{
-                loadingImg: '{{ STATIC_URL }}img/select2-spinner.gif',
-                minLength: 3,
-                processItems: function(data){return _.map(data.results, function(res, i) {return {text: res.id, id:i}})}
-              },
-              chosenOptions: {
-                width: '100%'
-              },
-              ajaxOptions: {
-                url: geocodeUrl,
-                type: 'GET',
-                success: function(data, textStatus, jqXHR){ geocodeResponseOptions(data.results);},
-                data: [{name:'geocoder', value:geocoder}]},
-              value: geocodePoint}">
-            </select>
+          <input id="select2Input" data-bind="
+              select2v4Data: selectedItems, select2v4: selectSetup" style="width: 100%"></input>
         </div>
 
         <!-- Map Tools Panel -->

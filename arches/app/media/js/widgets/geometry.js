@@ -7,10 +7,11 @@ define([
     'mapbox-gl',
     'mapbox-gl-draw',
     'map/mapbox-style',
+    'select2v4',
+    'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen',
-    'bindings/ajax-chosen'
+    'bindings/chosen'
 ], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
@@ -55,8 +56,8 @@ define([
             }]);
 
             this.geocodeUrl = arches.urls.geocoder;
-            this.geocodePoint = ko.observable();
-            this.geocodeResponseOptions = ko.observable();
+            this.geocodeResponseOption = ko.observable();
+            this.selectedItems = ko.observableArray(['Germany'])
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -117,6 +118,16 @@ define([
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
 
+                this.selectedItems.subscribe(function(e){
+                    var coords = e.geometry.coordinates;
+                    this.map.getSource('geocode-point').setData(e.geometry);
+                    this.redrawGeocodeLayer();
+                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                    this.map.flyTo({
+                        center: centerPoint
+                    });
+                  }, this);
+
                 this.selectEditingTool = function(val, e) {
                     switch (val) {
                         case 'Point':
@@ -132,6 +143,33 @@ define([
                             draw.trash();
                     }
                 }
+
+                this.dataReturn =
+                    function(term, page) {
+                          return {
+                              q: term,
+                              geocoder: self.geocoder()
+                          };
+                      }
+
+
+                this.selectSetup = {
+                        ajax: {
+                            url: arches.urls.geocoder,
+                            dataType: 'json',
+                            quietMillis: 250,
+                            data: this.dataReturn,
+                            results: function(data, page) {
+                                return {
+                                    results: data.results
+                                };
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 4,
+                        multiple: false,
+                        maximumSelectionSize: 1
+                    };
 
                 var overlays =
                     _.each(_.where(arches.mapLayers, {
@@ -230,25 +268,6 @@ define([
                     }
                     this.redrawGeocodeLayer();
                 }, this)
-
-                this.geocodePoint.subscribe(function(val) {
-                    var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
-                    var point = {
-                        "type": "Feature",
-                        "properties": {},
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": coords
-                        }
-                    }
-                    this.map.getSource('geocode-point').setData(point);
-                    this.redrawGeocodeLayer();
-                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                    this.map.flyTo({
-                        center: centerPoint
-                    });
-                }, this)
-
             }
 
             this.onGeocodeSelection = function(val, e) {
