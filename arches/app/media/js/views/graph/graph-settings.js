@@ -49,7 +49,7 @@ require([
             });
         }),
         graph: graph,
-        resources: data.resources,
+        relatable_resources: data.resources,
         ontologies: data.ontologies,
         ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {
