@@ -211,10 +211,10 @@ define([
                     }
                 }
 
-                this.saveGeometries = function(e) {
+                this.saveGeometries = function() {
                     var self = this;
                     return function() {
-                        self.value(self.draw.getAll(e));
+                        self.value(self.draw.getAll());
                     }
                 }
 
