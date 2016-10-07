@@ -153,13 +153,6 @@ define([
                                 this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
                             },
                             updateOpacity: function(val) {
-                                var shift = val > 0.0 ? 0.0001 : -0.0001;
-                                var unsetMap = setTimeout(function(val) {
-                                    map.setBearing(map.getBearing() + shift)
-                                }, 200); //Layers do not always redraw when toggled
-                                var refreshMap = setTimeout(function(val) {
-                                    map.setBearing(map.getBearing() + shift * -1)
-                                }, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
                                 val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
