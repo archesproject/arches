@@ -46,6 +46,7 @@ class GraphBaseView(BaseManagerView):
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
             context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
         except:
             pass
         return context
@@ -111,8 +112,10 @@ class GraphSettingsView(GraphBaseView):
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
+            root_nodes = models.Node.objects.filter(istopnode=True)
             context = self.get_context_data(
                 main_script='views/graph',
+                root_nodes=JSONSerializer().serialize(root_nodes),
             )
             return render(request, 'views/graph.htm', context)
 
