@@ -51,10 +51,12 @@ require([
                 graph.root = null;
                 graph.isCard = false;
                 if (graphManagerData && typeof graphManagerData.root_nodes === 'object') {
-                    _.find(graphManagerData.root_nodes, function(node) {
+                    graph.root = _.find(graphManagerData.root_nodes, function(node) {
                         return node.graph_id === graph.graphid
                     });
-                    // graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
+                    if (graph.root) {
+                        graph.isCard = (graph.root.nodegroup_id === graph.root.nodeid);
+                    }
                 }
 
                 graph.hover = ko.observable(false);
