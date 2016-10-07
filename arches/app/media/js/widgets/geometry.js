@@ -37,7 +37,8 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing'];
+
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
 
@@ -152,7 +153,6 @@ define([
                           };
                       }
 
-
                 this.selectSetup = {
                         ajax: {
                             url: arches.urls.geocoder,
@@ -168,7 +168,8 @@ define([
                         },
                         minimumInputLength: 4,
                         multiple: false,
-                        maximumSelectionSize: 1
+                        maximumSelectionSize: 1,
+                        placeholder: this.geocodePlaceholder()
                     };
 
                 var overlays =

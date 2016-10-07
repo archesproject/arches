@@ -14,7 +14,7 @@
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
           <input id="select2Input" data-bind="
-              select2v4Data: selectedItems, select2v4: selectSetup" style="width: 100%"></input>
+              select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
 
         <!-- Map Tools Panel -->
@@ -233,6 +233,12 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
+</div>
+<div class="control-label">
+    {% trans "Geocoder Placehoder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Map Center Longitude" %}

@@ -54,6 +54,19 @@
             });
         }
 
+        if (allBindingsAccessor.has('placeholder')){
+            var prop = allBindingsAccessor.get('placeholder');
+            var value = prop;
+            if (ko.isObservable(prop)){
+                prop.subscribe(function(){
+                    $(element).attr('data-placeholder', prop());
+                    $(element).data("select2").setPlaceholder();
+                });
+                value = prop();
+            }
+            $(element).attr('data-placeholder', value);
+        }
+
         // Provide a hook for binding to the select2 "data" property; this property is read-only in select2 so not subscribing.
         if (ko.isWriteableObservable(allBindings[dataBindingName])) {
             dataChangeHandler = function() {
