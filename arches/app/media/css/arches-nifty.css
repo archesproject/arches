@@ -15,6 +15,27 @@
     border-right: 1px solid rgba(0,0,0,0.07);
 }
 
+.navbar-header{
+    height: 50px;
+}
+
+.brand-icon {
+    height: 20px !important; 
+    width: 20px !important;
+    margin-top: 14px !important;
+    margin-left: 15px !important;
+    margin-right: 15px !important;
+}
+
+.brand-title{
+    display: block;
+    line-height: 48px;
+}
+
+#mainnav-container{
+    padding-top: 50px;
+    background-color: #2d3c4b;
+}
 
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
     border-bottom: 1px solid #eee;
@@ -1702,6 +1723,7 @@ ul .collapse li:last-of-type {
     flex-direction: column;
     width: 100%;
     height: 100vh;
+    position: relative;
 }
 .edit-panel {
     position: absolute;
@@ -2853,7 +2875,7 @@ ul.jqtree_common li.jqtree-folder {
 .ep-menu {
     position: absolute;
     top: 49px;
-    left: 0;
+    left: 0px;
     bottom: 0;
     border: 1px solid #ddd;
     z-index: 4000;
@@ -2952,7 +2974,7 @@ ul.jqtree_common li.jqtree-folder {
     height: 50px;
     background: #f8f8f8;
     border-bottom: 1px solid #e9e9e9;
-    z-index: 300;
+    z-index: 1;
 }
 .ep-form-toolbar div:nth-last-child(2){
     margin-right: auto;
@@ -2970,7 +2992,7 @@ ul.jqtree_common li.jqtree-folder {
     justify-content: flex-end;
 }
 .ep-form-content {
-    z-index: 10;
+    z-index: 1;
     padding: 12px;
     transition: all .30s ease;
     -ms-flex: 1;
@@ -4036,18 +4058,18 @@ h4.report-toolbar-title {
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
 	66% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ddd, -15px 30px 1px #ccc; }
 }
-@media min-width 992px {
+@media (min-width: 992px) {
     #page-content {
         padding: 15px 15px 25px;
     }
 }
-@media min-width 400px {
+@media (min-width: 400px) {
     .card-wz-grid {
         padding-top: 0;
         margin-top: -10px;
     }
 }
-@media screen and max-width 767px {
+@media screen and (max-width: 767px) {
     .morphsearch {
         width: 30%;
         top: 50px;
@@ -4072,21 +4094,21 @@ h4.report-toolbar-title {
         transform: translate3d(0, -50%, 0) scale3d(0.5, 0.5, 1);
     }
 }
-@media screen and max-width 969px {
+@media screen and (max-width: 969px) {
     .morphsearch {
         width: 30%;
         top: 10px;
         right: 25px;
     }
 }
-@media screen and min-width 970px {
+@media screen and (min-width: 970px) {
     .morphsearch {
         width: 30%;
         top: 15px;
         right: 25px;
     }
 }
-@media screen and max-width 830px {
+@media screen and (max-width: 830px) {
     .og-expander h3 {
         font-size: 32px;
     }
@@ -4097,7 +4119,7 @@ h4.report-toolbar-title {
         font-size: 12px;
     }
 }
-@media screen and max-width 650px {
+@media screen and (max-width: 650px) {
     .og-fullimg {
         display: none;
     }
@@ -4106,7 +4128,10 @@ h4.report-toolbar-title {
         width: 100%;
     }
 }
-@media screen and max-width 768px {
+@media screen and (max-width: 768px) {
+    #content-container {
+        padding-top: 50px !important;
+    }
     .resource-grid-main-container {
         height: 130px;
     }
@@ -4119,7 +4144,7 @@ h4.report-toolbar-title {
         left: 70px;
     }
 }
-@media screen and max-width 500px {
+@media screen and (max-width: 500px) {
     .resource-grid-subtitle {
         width: 300px;
     }

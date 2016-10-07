@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -24,7 +24,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graph Manager" %}
 {% endblock title %}
 
-{% block body %}
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
@@ -225,17 +227,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-{% endblock body %}
+{% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
-<script>{% autoescape off %}
-define('graph-base-data', [], function () {
-    return {
-        graphs: {{graphs}},
-        graphid: '{{graphid}}'
-    };
-});
-{% endautoescape %}</script>
+    {{block.super}}
+    <script>
+        {% autoescape off %}
+        define('graph-base-data', [], function () {
+            return {
+                graphid: '{{graphid}}'
+            };
+        });
+        {% endautoescape %}
+    </script>
 {% endblock pre_require_js %}

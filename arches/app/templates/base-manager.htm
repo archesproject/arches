@@ -23,21 +23,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
 
     <div class="wrapper">
-        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'aside-in': tabsActive() && showTabs()}">
+        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
 
             <header id="navbar" style="z-index: 1000; opacity: .9;">
-                {% block header %}
-                <div id="navbar-container" class="boxed">
+                
+                <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
                         <a href="{% url 'home' %}" class="navbar-brand">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
                             <div class="brand-title">
                                 <span class="brand-text">Arches</span>
                             </div>
                         </a>
                     </div>
+                </div>
+                
+            </header>
 
-                    <div class="navbar-content clearfix">
+
+            <div class="boxed">
+                <div id="content-container" style="padding-bottom: 20px; padding-top: 0px;">
+                    {% block login_header %}
+                    <div class="navbar-content clearfix" style="background-color: inherit; padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
                             <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
                                 <a class="mainnav-toggle" href="#">
@@ -49,8 +56,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <i id="toggle-aside-icon" class="fa fa-lg" data-bind="css: { 'fa-toggle-on': tabsActive(), 'fa-toggle-off': !tabsActive() }, click: function () { tabsActive(!tabsActive()) }"></i>
                                 </a>
                             </li>
-
-
                         </ul>
                         <ul class="nav navbar-top-links pull-right">
                             <li class="dropdown">
@@ -160,14 +165,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         </ul>
                     </div>
-                </div>
-                {% endblock header %}
-            </header>
-            <div class="boxed">
+                    {% endblock login_header %}
 
-                <div id="content-container" style="padding-bottom: 20px;">
-                    {% block content %}
-                    {% endblock content %}
+                    {% block header %}
+                    {% endblock header %}
+
+                    {% block main_content %}
+                    {% endblock main_content %}
                 </div>
 
                 <nav id="mainnav-container">
