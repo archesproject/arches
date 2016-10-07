@@ -237,9 +237,8 @@ define([
                         };
                         self.centerX(mapCenter.lng);
                         self.centerY(mapCenter.lat);
-                        if (Math.abs(this.getBearing()) > 0.01) {
-                            self.bearing(this.getBearing());
-                        }
+                        self.bearing(this.getBearing());
+                        self.pitch(this.getPitch());
                     }
                 }
 
