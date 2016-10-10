@@ -186,12 +186,11 @@ input[type="checkbox"] {
 }
 .record-delete {
     position: absolute;
-    font-size: 10px;
-    top: 5px;
-    right: 45px;
+    top: 8px;
+    right: 8px;
     height: 20px;
     width: 20px;
-    margin-right: 10px;
+    color: lightcoral;
 }
 .record-close {
     position: absolute;
