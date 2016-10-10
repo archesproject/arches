@@ -182,7 +182,8 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
         "centerX": -122.3979693,
         "centerY": 37.79,
         "pitch": 0.0,
-        "bearing": 0.0
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search"
     }'
 );
 

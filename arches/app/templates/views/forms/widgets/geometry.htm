@@ -13,22 +13,8 @@
       }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
-            <select data-bind="ajaxchosen: {
-              ajaxChosenOptions:{
-                loadingImg: '{{ STATIC_URL }}img/select2-spinner.gif',
-                minLength: 3,
-                processItems: function(data){return _.map(data.results, function(res, i) {return {text: res.id, id:i}})}
-              },
-              chosenOptions: {
-                width: '100%'
-              },
-              ajaxOptions: {
-                url: geocodeUrl,
-                type: 'GET',
-                success: function(data, textStatus, jqXHR){ geocodeResponseOptions(data.results);},
-                data: [{name:'geocoder', value:geocoder}]},
-              value: geocodePoint}">
-            </select>
+          <input id="select2Input" data-bind="
+              select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
 
         <!-- Map Tools Panel -->
@@ -247,6 +233,12 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
+</div>
+<div class="control-label">
+    {% trans "Geocoder Placehoder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Map Center Longitude" %}

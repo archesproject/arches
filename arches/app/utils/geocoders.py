@@ -21,16 +21,30 @@ import urllib
 import urllib2
 import json
 
-class BingGeocoder:
+class Geocoder(object):
 
     def __init__(self):
         pass
 
     def find_candidates(self, search_string, api_key):
-        query_args = { 'q': search_string, 'key': api_key }
+        pass
+
+    def get_response(self, query_args, url):
         encoded_args = urllib.urlencode(query_args)
-        url = 'http://dev.virtualearth.net/REST/v1/Locations?' + encoded_args
-        response = json.loads(urllib2.urlopen(url).read())
+        complete_url = url + encoded_args
+        response = json.loads(urllib2.urlopen(complete_url).read())
+        return response
+
+
+class BingGeocoder(Geocoder):
+
+    def __init__(self):
+        super(Geocoder, self).__init__()
+
+    def find_candidates(self, search_string, api_key):
+        query_args = { 'q': search_string, 'key': api_key }
+        url = 'http://dev.virtualearth.net/REST/v1/Locations?'
+        response = self.get_response(query_args, url)
         results = []
         for resource_set in response['resourceSets']:
             for feature in resource_set['resources']:
@@ -49,16 +63,14 @@ class BingGeocoder:
 
         return results
 
-class MapzenGeocoder:
-
+class MapzenGeocoder(Geocoder):
     def __init__(self):
-        pass
+        super(Geocoder, self).__init__()
 
     def find_candidates(self, search_string, api_key):
         query_args = { 'text': search_string, 'api_key': api_key }
-        encoded_args = urllib.urlencode(query_args)
-        url = 'https://search.mapzen.com/v1/autocomplete?' + encoded_args
-        response = json.loads(urllib2.urlopen(url).read())
+        url = 'https://search.mapzen.com/v1/autocomplete?'
+        response = self.get_response(query_args, url)
         results = []
         for feature in response['features']:
             results.append({

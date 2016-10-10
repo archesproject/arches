@@ -7,6 +7,7 @@
 @import url(../plugins/themify-icons/themify-icons.min.css);
 @import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
+@import url(//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css);
 @import url(//api.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl.css);
@@ -24,7 +25,7 @@
 }
 
 .brand-icon {
-    height: 20px !important; 
+    height: 20px !important;
     width: 20px !important;
     margin-top: 14px !important;
     margin-left: 15px !important;
@@ -4072,6 +4073,9 @@ h4.report-toolbar-title {
     margin: 25px;
     font-size: 16px;
     color: #808080;
+}
+.dataTable tr:hover {
+    background-color: #e4e4e4 !important;
 }
 @keyframes loader {
 	0% { background: #ddd; }

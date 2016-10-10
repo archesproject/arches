@@ -130,7 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Resource Records Table -->
             <div class="panel">
                 <div class="panel-body" style="background: #ebeef0;">
-                    <table id="demo-dt-selection" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <table data-bind="datatable: tableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                             <tr>
                                 <th>Resource Id</th>
@@ -145,7 +145,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </thead>
                         <tbody>
                             {% for summary in instance_summaries %}
-                            <tr>
+                            <tr data-bind="click: function () { $root.navigate('{% url 'resource_editor' summary.id %}'); }">
                                 <td>{{summary.id}}</td>
                                 <td>{{summary.name}}</td>
                                 <td>{{summary.type}}</td>
@@ -154,12 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <td>{{summary.public}}</td>
                                 <td>{{summary.editor}}</td>
                                 <td>
-                                    <!-- var data = recentlyAddedResourceTable.row( this ).data();
-                                    self.viewModel.navigate(arches.urls.resource_editor + data[0]); -->
-                                    <a href="#" class="btn btn-primary" data-bind="click: function () {
-                                        navigate('{% url 'resource' %}/{{summary.id}}')
-                                    }">{% trans "Edit" %}</a>
-                                    <a href="{% url 'resource_report' summary.id %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
+                                    <a href="#" data-bind="click: function () { window.open('{% url 'resource_report' summary.id %}'); }, clickBubble: false" class="btn btn-primary">{% trans "View Report" %}</a>
                                 </td>
                             </tr>
                             {% endfor %}
