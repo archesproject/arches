@@ -109,7 +109,7 @@ class ResourceReportView(BaseManagerView):
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
         context = self.get_context_data(
-            main_script='resource-report',
+            main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
@@ -123,4 +123,4 @@ class ResourceReportView(BaseManagerView):
             graph_name=resource_instance.graph.name
          )
 
-        return render(request, 'resource-report.htm', context)
+        return render(request, 'views/resource/report.htm', context)
