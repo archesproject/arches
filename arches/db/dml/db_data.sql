@@ -157,12 +157,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date',
-    '{
-        "dateMin": null,
-        "dateMax": null,
-        "viewMode": "default"
-    }');
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date', '{ "placeholder": "Enter date"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
@@ -175,15 +170,19 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     '{
         "geometrytypes": {"point": true, "line": true, "poly": true},
         "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
-        "basemaps": [{"name":"stamen-terrain","selected":false},{"name":"osm","selected":true}],
-        "defaultgeocoder": "mapzen-search",
+        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
+        "basemap": "streets",
+        "geometryTypes": ["Point","Line","Polygon"],
+        "geocoder": "MapzenGeocoder",
         "geolocate": true,
         "measurements": true,
         "zoom": 10,
         "maxZoom": 19,
         "minZoom": 0,
         "centerX": -122.3979693,
-        "centerY": 37.79
+        "centerY": 37.79,
+        "pitch": 0.0,
+        "bearing": 0.0
     }'
 );
 
@@ -297,8 +296,8 @@ INSERT INTO cards(cardid, name, description, instructions,
 
 -- end for forms.py
 
-INSERT INTO resource_instances(resourceinstanceid, resourceclassid)
-    VALUES ('40000000-0000-0000-0000-000000000000','20000000-0000-0000-0000-000000000004');
+INSERT INTO resource_instances(resourceinstanceid, graphid)
+    VALUES ('40000000-0000-0000-0000-000000000000','22000000-0000-0000-0000-000000000002');
 
 INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000000', 'required', 'node', 'required', 'A value must be entered for this node.');
@@ -2133,6 +2132,7 @@ INSERT INTO functions_x_datatypes VALUES (11, 'concept', '60000000-0000-0000-000
 INSERT INTO functions_x_datatypes VALUES (12, 'concept', '60000000-0000-0000-0000-000000000008');
 INSERT INTO functions_x_datatypes VALUES (13, 'concept', '60000000-0000-0000-0000-000000000009');
 
+
 INSERT INTO map_sources(name, source)
     VALUES ('mapbox-streets', '{
         "url": "mapbox://mapbox.mapbox-streets-v7",
@@ -2146,16 +2146,189 @@ INSERT INTO map_sources(name, source)
         "tileSize": 256
     }');
 
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('satellite', '{
+INSERT INTO map_sources(name, source)
+   VALUES ('mapzen', '{
+               "type": "vector",
+               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
+       }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('presidio', '{
+              "type": "geojson",
+              "data": {
+                         "type": "FeatureCollection",
+                         "features": [
+                             {
+                               "type": "Feature",
+                               "properties": {},
+                               "geometry": {
+                                 "type": "Polygon",
+                                 "coordinates": [
+                                   [
+                                     [
+                                       -122.44794845581055,
+                                       37.80666460115532
+                                     ],
+                                     [
+                                       -122.44709014892577,
+                                       37.791879793952084
+                                     ],
+                                     [
+                                       -122.46751785278319,
+                                       37.78808138412046
+                                     ],
+                                     [
+                                       -122.48828887939453,
+                                       37.78848836594184
+                                     ],
+                                     [
+                                       -122.47730255126952,
+                                       37.810326435534755
+                                     ],
+                                     [
+                                       -122.46356964111327,
+                                       37.80476580072879
+                                     ],
+                                     [
+                                       -122.44794845581055,
+                                       37.80666460115532
+                                     ]
+                                   ]
+                                 ]
+                               }
+                             },
+                             {
+                               "type": "Feature",
+                               "properties": {},
+                               "geometry": {
+                                 "type": "Point",
+                                 "coordinates": [
+                                   -122.24709014892577,
+                                   37.791879793952084
+                                 ]
+                               }
+                             }
+                         ]
+                       }
+              }');
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('presidio', '[{
+        "id":"presidio-poly",
+        "source":"presidio",
+        "type":"fill",
+        "layout": {},
+        "paint": {
+            "fill-color": "#fb6017",
+            "fill-opacity": 0.8
+        }
+      },{
+          "id":"presidio-point",
+          "source":"presidio",
+          "type":"circle",
+          "layout": {},
+          "type": "circle",
+          "filter": ["!in", "$type", "Polygon"],
+          "paint": {
+              "circle-radius": 5,
+              "circle-color": "#fb6017"
+          }
+        }]', TRUE, 2, 'fa fa-flag');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('golden-gate-park', '{
+              "type": "geojson",
+              "data":
+              {
+                "type": "FeatureCollection",
+                "features": [
+                  {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [
+                        [
+                          [
+                            -122.51060485839844,
+                            37.77125750792944
+                          ],
+                          [
+                            -122.47163772583008,
+                            37.77288579232439
+                          ],
+                          [
+                            -122.45412826538086,
+                            37.77505678240509
+                          ],
+                          [
+                            -122.45292663574217,
+                            37.766643840752764
+                          ],
+                          [
+                            -122.51043319702148,
+                            37.76365837331252
+                          ],
+                          [
+                            -122.51060485839844,
+                            37.77125750792944
+                          ]
+                        ]
+                      ]
+                    }
+                  }
+                ]
+              }
+              }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('stamen-terrain', '{
+      "type": "raster",
+      "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
+      "tileSize": 256
+  }');
+
+INSERT INTO map_sources(name, source)
+  VALUES ('geocode-point', '{
+      "type": "geojson",
+      "data": {
+          "type": "FeatureCollection",
+          "features": []
+      }
+  }');
+
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('golden-gate-park', '[{
+        "id":"golden-gate-park",
+        "source":"golden-gate-park",
+        "type":"fill",
+        "layout": {},
+        "paint": {
+            "fill-color": "#088",
+            "fill-opacity": 0.8
+        }
+      }]', TRUE, 3, 'ion-leaf');
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('stamen-terrain', '[{
+        "id": "stamen-terrain",
+        "type": "raster",
+        "source": "stamen-terrain",
+        "minzoom": 0,
+        "maxzoom": 22
+    }]', FALSE, 4, 'fa fa-road');
+
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
-    }');
+    }]', FALSE, 1, '');
 
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES ('streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2170,9 +2343,7 @@ INSERT INTO basemap_layers(name, layer)
             "fill-opacity": 0.75
         },
         "interactive": true
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "id": "landuse_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2186,9 +2357,7 @@ INSERT INTO basemap_layers(name, layer)
             "fill-color": "#d2edae"
         },
         "interactive": true
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "id": "waterway",
         "type": "line",
         "source": "mapbox-streets",
@@ -2224,9 +2393,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "interactive": true
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "id": "water",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2235,9 +2402,7 @@ INSERT INTO basemap_layers(name, layer)
             "fill-color": "#a0cfdf"
         },
         "interactive": true
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "id": "building",
         "type": "fill",
         "source": "mapbox-streets",
@@ -2246,9 +2411,7 @@ INSERT INTO basemap_layers(name, layer)
             "fill-color": "#d6d6d6"
         },
         "interactive": true
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2306,9 +2469,7 @@ INSERT INTO basemap_layers(name, layer)
             ]
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2363,9 +2524,7 @@ INSERT INTO basemap_layers(name, layer)
             ]
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2420,9 +2579,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2474,9 +2631,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2543,9 +2698,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "butt",
@@ -2609,9 +2762,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2665,9 +2816,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2718,9 +2867,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "road"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "line-cap": "round",
@@ -2767,9 +2914,7 @@ INSERT INTO basemap_layers(name, layer)
             }
         },
         "source-layer": "admin"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "minzoom": 5,
         "layout": {
@@ -2819,9 +2964,7 @@ INSERT INTO basemap_layers(name, layer)
             "text-halo-blur": 1
         },
         "source-layer": "poi_label"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "symbol-placement": "line",
@@ -2872,9 +3015,7 @@ INSERT INTO basemap_layers(name, layer)
             "text-halo-width": 2
         },
         "source-layer": "road_label"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "minzoom": 8,
         "layout": {
@@ -2925,9 +3066,7 @@ INSERT INTO basemap_layers(name, layer)
             "text-halo-blur": 1
         },
         "source-layer": "place_label"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "text-field": "{name_en}",
@@ -2973,9 +3112,7 @@ INSERT INTO basemap_layers(name, layer)
             "text-halo-blur": 1
         },
         "source-layer": "place_label"
-    }');
-INSERT INTO basemap_layers(name, layer)
-    VALUES ('streets', '{
+    },{
         "interactive": true,
         "layout": {
             "text-field": "{name_en}",
@@ -3013,22 +3150,316 @@ INSERT INTO basemap_layers(name, layer)
             "text-halo-blur": 1
         },
         "source-layer": "country_label"
-    }');
+    }]', FALSE, 1, '');
 
-INSERT INTO map_sources(name, source)
-   VALUES ('mapzen', '{
-               "type": "vector",
-               "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
-       }');
+INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
+   VALUES ('mapzen', '
+     [
+     {
+         "id": "background",
+         "type": "background",
+         "paint": {
+           "background-color": "#ededed"
+         }
+       }, {
+         "id": "water-line",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "filter": ["==", "$type", "LineString"],
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.2,
+             "stops": [[8, 0.5], [20, 15]]
+           }
+         }
+       }, {
+         "id": "water-polygon",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "fill",
+         "filter": ["==", "$type", "Polygon"],
+         "paint": {
+           "fill-color": "#7acad0"
+         }
+       }, {
+         "id": "park",
+         "type": "fill",
+         "source": "mapzen",
+         "source-layer": "landuse",
+         "minzoom": 6,
+         "filter": ["in", "kind", "park", "forest", "garden", "grass", "farm", "meadow", "playground", "golf_course", "nature_reserve", "wetland", "wood", "cemetery"],
+         "paint": {
+           "fill-color": "#c2cd44"
+         }
+       }, {
+         "id": "river",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "minzoom": 6,
+         "filter": ["all", ["==", "$type", "LineString"], ["==", "kind", "river"]],
+         "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.2,
+             "stops": [[8, 0.75], [20, 15]]
+           }
+         }
+       }, {
+         "id": "stream-etc",
+         "source": "mapzen",
+         "source-layer": "water",
+         "type": "line",
+         "minzoom": 11,
+         "filter": ["all", ["==", "$type", "LineString"], ["==", "kind", "stream"]],
+         "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+         "paint": {
+           "line-color": "#7acad0",
+           "line-width": {
+             "base": 1.4,
+             "stops": [[10, 0.5], [20, 15]]
+           }
+         }
+       }, {
+           "id": "country-boundary",
+           "source": "mapzen",
+           "source-layer": "places",
+           "type": "line",
+           "filter": ["==", "admin_level", "2"],
+           "maxzoom": 4,
+           "layout": {
+             "line-cap": "round",
+             "line-join": "round"
+           },
+           "paint": {
+             "line-color": "#afd3d3",
+           "line-width": {
+             "base": 2,
+             "stops": [[1, 0.5], [7, 3]]
+             }
+           }
+         }, {
+           "id": "state-boundary",
+           "source": "mapzen",
+           "source-layer": "places",
+           "type": "fill",
+           "filter": ["==", "admin_level", "4"],
+           "maxzoom": 10,
+           "paint": {
+             "fill-color": "#ededed",
+             "fill-outline-color": "#cacecc"
+           }
+         }, {
+         "id": "subways",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "paint": {
+           "line-color": "#ef7369",
+           "line-dasharray": [2, 1]
+         },
+         "filter": ["==", "railway", "subway"]
+       }, {
+         "id": "link-tunnel",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "is_tunnel", "yes"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#afd3d3",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.25], [20, 30]]
+           },
+           "line-dasharray": [1, 2]
+         }
+       }, {
+         "id": "buildings",
+         "type": "fill",
+         "source": "mapzen",
+         "source-layer": "buildings",
+         "paint": {
+         "fill-outline-color": "#afd3d3",
+         "fill-color": "#ededed"
+         }
+       }, {
+         "id": "road",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "kind", "minor_road"],["==", "kind", "major_road"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#c0c4c2",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.25], [20, 30]]
+           }
+         }
+       }, {
+         "id": "link-bridge",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["any",["==", "is_link", "yes"], ["==", "is_bridge", "yes"]],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#c0c4c2",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.5], [8, 1.5], [20, 40]]
+           }
+         }
+       }, {
+         "id": "highway",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["==", "kind", "highway"],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "paint": {
+           "line-color": "#5d6765",
+           "line-width": {
+             "base": 1.55,
+             "stops": [[4, 0.5], [8, 1.5], [20, 40]]
+           }
+         }
+       }, {
+         "id": "path",
+         "source": "mapzen",
+         "source-layer": "roads",
+         "type": "line",
+         "filter": ["==", "kind", "path"],
+         "layout": {
+           "line-join": "round",
+           "line-cap": "round"
+         },
+         "minzoom": 12,
+         "paint": {
+           "line-color": "#5d6765",
+           "line-width": {
+             "base": 1.8,
+             "stops": [[10, 0.15], [20, 15]]
+           },
+           "line-dasharray": [2, 2]
+         }
+       }, {
+         "id": "ocean-label",
+         "source": "mapzen",
+         "source-layer": "places",
+         "type": "symbol",
+         "minzoom": 2,
+         "maxzoom": 6,
+         "filter": ["==", "kind", "ocean"],
+         "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Italic", "Arial Unicode MS Regular"],
+             "text-max-width": 14,
+             "text-letter-spacing": 0.1
+           },
+         "paint": {
+           "text-color": "#ededed",
+           "text-halo-color": "rgba(0,0,0,0.2)"
+         }
+       }, {
+           "id": "other-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "neighbourhood"]],
+           "minzoom": 12,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 10
+           },
+           "paint": {
+             "text-color": "#cb4b49",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "city-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "city"]],
+           "minzoom": 10,
+           "maxzoom": 14,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 10,
+             "text-letter-spacing": 0.1
+           },
+           "paint": {
+             "text-color": "#384646",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "state-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "state"]],
+           "minzoom": 6,
+           "maxzoom": 12,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+             "text-max-width": 8
+           },
+           "paint": {
+             "text-color": "#f27a87",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }, {
+           "id": "country-label",
+           "source": "mapzen",
+           "source-layer": "places",
+           "filter": ["all", ["==", "$type", "Point"], ["==", "kind", "country"]],
+           "maxzoom": 7,
+           "type": "symbol",
+           "layout": {
+             "text-field": "{name}",
+             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+             "text-max-width": 4
+           },
+           "paint": {
+             "text-color": "#cb4b49",
+             "text-halo-color": "rgba(255,255,255,0.5)"
+           }
+         }
+       ]
 
-INSERT INTO basemap_layers(name, layer)
-   VALUES ('mapzen', '{
-       "id": "mapzen-water",
-       "type": "fill",
-       "source": "mapzen",
-       "source-layer": "water",
-       "filter": ["==", "$type", "Polygon"],
-       "paint": {
-           "fill-color": "#3887be"
-       }
-   }');
+     ', FALSE, 1, '');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
+
+INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
+    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');

@@ -93,7 +93,7 @@ def load_authority_file(cursor, path_to_authority_files, filename, auth_file_to_
     if auth_doc_file_name.upper() != 'ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.CSV':
         top_concept = Concept()
         top_concept.id = str(uuid.uuid4())
-        top_concept.nodetype = 'Concept'
+        top_concept.nodetype = 'Collection'
         top_concept.legacyoid = auth_doc_file_name
         top_concept.addvalue({'value':display_file_name, 'language': settings.LANGUAGE_CODE, 'type': 'prefLabel', 'category': 'label'})
         lookups.add_relationship(source='00000000-0000-0000-0000-000000000001', type='hasTopConcept', target=top_concept.id)

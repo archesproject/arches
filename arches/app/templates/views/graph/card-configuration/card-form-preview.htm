@@ -69,8 +69,8 @@
                                                 name: self.widgetLookup[get("widget_id")()].name,
                                                 params: {
                                                     config: configJSON,
-                                                    label: get("label")(),
                                                     value: ko.observable(null),
+                                                    node: node,
                                                     disabled: true
                                                 }
                                             }, css:{

@@ -78,8 +78,8 @@ require([
             _.defaults(this.viewModel, {
                 groupedGraphs: ko.observable({
                     groups: [
-                        { name: 'Resources', items: self.viewModel.resources() },
-                        { name: 'Graphs', items: self.viewModel.graphs() }
+                        { name: 'Resource Models', items: self.viewModel.resources() },
+                        { name: 'Branches', items: self.viewModel.graphs() }
                     ]
                 }),
                 graphId: ko.observable(null),
@@ -131,7 +131,7 @@ require([
 
             BaseManager.prototype.initialize.call(this, options);
         }
-        
+
     });
     return new GraphView();
 

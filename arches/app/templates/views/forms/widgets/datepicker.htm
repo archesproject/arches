@@ -1,5 +1,6 @@
 {% load i18n %}
-<div class="row widget-wrapper" data-bind="if: !configForm">
+<!-- ko if: !configForm  && state=== 'form' -->
+<div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
@@ -12,6 +13,7 @@
         </div>
     </div>
 </div>
+<!-- /ko -->
 
 <div data-bind="if: configForm">
     <!-- <div class="control-label">
@@ -33,3 +35,11 @@
         <input type="" id="" placeholder="{% trans "View Mode" %}" class="form-control input-md widget-input" data-bind="value:viewMode, valueUpdate: 'keyup'">
     </div>
 </div>
+<!-- ko if: !configForm  && state=== 'report' -->
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
+<!-- /ko -->
+
+<!-- ko if: configForm -->
+
+<!-- /ko -->

@@ -91,7 +91,6 @@ RESOURCE_MARKER_ICON_UNICODE = '\uf060'
 RESOURCE_MARKER_ICON_FONT = 'octicons'
 RESOURCE_MARKER_DEFAULT_COLOR = '#C4171D'
 
-BING_KEY = 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
@@ -121,7 +120,11 @@ def RESOURCE_TYPE_CONFIGS():
         # },
     }
 
-GEOCODING_PROVIDER = 'arches.app.utils.bing_geocoder'
+GEOCODING_PROVIDERS = [
+    {'name': 'MapZen', 'api_key':'', 'id':'MapzenGeocoder'},
+    {'name': 'Bing', 'api_key':'', 'id':'BingGeocoder'},
+    ]
+
 
 EXPORT_CONFIG = ''
 
@@ -291,6 +294,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'arches.app.utils.set_anonymous_user.SetAnonymousUser',
+    # 'arches.app.utils.bing_geocoder'
 )
 
 ROOT_URLCONF = 'arches.urls'

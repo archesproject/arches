@@ -31,6 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
+from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from arches.app.views.base import BaseManagerView
@@ -191,7 +192,7 @@ class GraphDataView(View):
 
             if self.action == 'new_graph':
                 isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource') if isresource else _('New Graph')
+                name = _('New Resource Model') if isresource else _('New Branch')
                 author = request.user.first_name + ' ' + request.user.last_name
                 ret = Graph.new(name=name,is_resource=isresource,author=author)
 
@@ -251,8 +252,13 @@ class CardView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=card.graph_id)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        basemap_layers = models.BasemapLayers.objects.all()
+        map_layers = models.MapLayers.objects.all()
         map_sources = models.MapSources.objects.all()
+        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
+        for concept in top_concepts:
+            if concept.label == 'Dropdown Lists':
+                concept_collections = concept.children
 
         context = self.get_context_data(
             main_script='views/graph/card-configuration-manager',
@@ -264,8 +270,9 @@ class CardView(GraphBaseView):
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             functions=JSONSerializer().serialize(models.Function.objects.all()),
-            basemap_layers=basemap_layers,
+            map_layers=map_layers,
             map_sources=map_sources,
+            concept_collections=concept_collections,
         )
 
         return render(request, 'views/graph/card-configuration-manager.htm', context)
@@ -282,12 +289,14 @@ class CardView(GraphBaseView):
 
 @method_decorator(group_required('edit'), name='dispatch')
 class FormManagerView(GraphBaseView):
+    action = 'add_form'
+
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
         context = self.get_context_data(
             main_script='views/graph/form-manager',
-            forms=JSONSerializer().serialize(self.graph.form_set.all()),
+            forms=JSONSerializer().serialize(self.graph.form_set.all().order_by('sortorder')),
 			cards=JSONSerializer().serialize(models.CardModel.objects.filter(graph=self.graph)),
             forms_x_cards=JSONSerializer().serialize(models.FormXCard.objects.filter(form__in=self.graph.form_set.all()).order_by('sortorder')),
         )
@@ -296,9 +305,20 @@ class FormManagerView(GraphBaseView):
 
     def post(self, request, graphid):
         graph = models.GraphModel.objects.get(graphid=graphid)
-        form = models.Form(title=_('New Form'), graph=graph)
-        form.save()
-        return JSONResponse(form)
+        ret = None
+        with transaction.atomic():
+            if self.action == 'reorder_forms':
+                data = JSONDeserializer().deserialize(request.body)
+                for i, form in enumerate(data['forms']):
+                    formModel = models.Form.objects.get(formid=form['formid'])
+                    formModel.sortorder = i
+                    formModel.save()
+                ret = data['forms']
+            if self.action == 'add_form':
+                form = models.Form(title=_('New Form'), graph=graph)
+                form.save()
+                ret = form
+        return JSONResponse(ret)
 
 @method_decorator(group_required('edit'), name='dispatch')
 class FormView(GraphBaseView):
@@ -349,3 +369,71 @@ class FormView(GraphBaseView):
 class DatatypeTemplateView(TemplateView):
     def get(sefl, request, template='text'):
         return render(request, 'views/graph/datatypes/%s.htm' % template)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ReportManagerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/report-manager',
+            reports=JSONSerializer().serialize(self.graph.report_set.all()),
+            templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+         )
+
+        return render(request, 'views/graph/report-manager.htm', context)
+
+    def post(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+        graph = models.GraphModel.objects.get(graphid=graphid)
+        template = models.ReportTemplate.objects.get(templateid=data['template_id'])
+        report = models.Report(name=_('New Report'), graph=graph, template=template, config=template.defaultconfig)
+        report.save()
+        return JSONResponse(report)
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ReportEditorView(GraphBaseView):
+    def get(self, request, reportid):
+        report = models.Report.objects.get(reportid=reportid)
+        self.graph = Graph.objects.get(graphid=report.graph.pk)
+        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+
+        context = self.get_context_data(
+            main_script='views/graph/report-editor',
+            report=JSONSerializer().serialize(report),
+            reports=JSONSerializer().serialize(self.graph.report_set.all()),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates),
+            forms=JSONSerializer().serialize(forms),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
+            graph_id=self.graph.pk,
+         )
+
+        return render(request, 'views/graph/report-editor.htm', context)
+
+    def post(self, request, reportid):
+        data = JSONDeserializer().deserialize(request.body)
+        report = models.Report.objects.get(reportid=reportid)
+        graph = Graph.objects.get(graphid=report.graph.pk)
+        report.name = data['name']
+        report.config = data['config']
+        report.formsconfig = data['formsconfig']
+        report.active = data['active']
+        with transaction.atomic():
+            if report.active:
+                graph.report_set.exclude(reportid=reportid).update(active=False)
+            report.save()
+        return JSONResponse(report)
+
+    def delete(self, request, reportid):
+        report = models.Report.objects.get(reportid=reportid)
+        report.delete()
+        return JSONResponse({'succces':True})

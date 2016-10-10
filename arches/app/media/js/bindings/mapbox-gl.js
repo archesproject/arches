@@ -4,35 +4,60 @@ define([
     'knockout',
     'mapbox-gl',
     'arches',
-    'plugins/mapbox-gl-draw'
-], function ($, _, ko, mapboxgl, arches, Draw) {
+    'map/mapbox-style',
+    'bindings/nouislider',
+    'bindings/sortable'
+], function($, _, ko, mapboxgl, arches, mapStyle) {
     ko.bindingHandlers.mapboxgl = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
+        init: function(element, valueAccessor, allBindings, viewModel) {
             var defaults = {
                 container: element
             };
-            var options = ko.unwrap(valueAccessor());
+            var options = ko.unwrap(valueAccessor()).mapOptions;
+            var mapInitOptions = {style: options.style};
             mapboxgl.accessToken = arches.mapboxApiKey;
-            var mapCenter = new mapboxgl.LngLat(viewModel.centerX(), viewModel.centerY());
-            options.zoom = viewModel.zoom();
-            options.center = mapCenter;
+
+            _.each(options, function(option, key){
+              if (ko.isObservable(option)){
+                mapInitOptions[key] = option();
+              }
+            })
+
+            mapInitOptions['center'] = new mapboxgl.LngLat(mapInitOptions.centerX, mapInitOptions.centerY);
+
             var map = new mapboxgl.Map(
-                _.defaults(options, defaults)
+                _.defaults(mapInitOptions, defaults)
             );
-
             viewModel.map = map;
-            viewModel.setBasemap = function(basemapType) {
-                arches.basemapLayers.forEach(function(layer) {
-                    if (layer.name === basemapType && !map.getLayer(layer.layer.id)) {
-                        map.addLayer(layer.layer)
-                    } else if (map.getLayer(layer.layer.id) && layer.name !== basemapType) {
-                        map.removeLayer(layer.layer.id)
-                    }
-                })
-            };
 
-            var draw = Draw();
-            map.addControl(draw);
+            // prevents drag events from bubbling
+            $(element).mousedown(function(event) {
+                event.stopPropagation();
+            });
+
+            if (typeof ko.unwrap(valueAccessor()).afterRender === 'function') {
+                ko.unwrap(valueAccessor()).afterRender(map)
+            }
+
+            options.zoom.subscribe(function(val) {
+                map.setZoom(options.zoom())
+            }, this);
+
+            options.centerX.subscribe(function(val) {
+                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
+            }, this);
+
+            options.centerY.subscribe(function(val) {
+                map.setCenter(new mapboxgl.LngLat(options.centerX(), options.centerY()))
+            }, this);
+
+            options.pitch.subscribe(function(val) {
+                map.setPitch(options.pitch())
+            }, this);
+
+            options.bearing.subscribe(function(val) {
+                map.setBearing(options.bearing())
+            }, this);
         }
     }
 

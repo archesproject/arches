@@ -22,6 +22,7 @@ define(['arches',
             this.set('nodes', ko.observableArray());
             this.set('functions', ko.observableArray());
             this.set('widgets', ko.observableArray());
+            this.set('tiles', ko.observableArray());
 
             this.set('cardid', ko.observable());
             this.set('name', ko.observable());
@@ -29,12 +30,14 @@ define(['arches',
             this.set('helptext', ko.observable());
             this.set('helpenabled', ko.observable());
             this.set('helptitle', ko.observable());
+            this.set('helpactive', ko.observable(false));
             this.set('cardinality', ko.observable());
             this.set('visible', ko.observable());
             this.set('active', ko.observable());
             this.set('itemtext', ko.observable());
             this.set('ontologyproperty', ko.observable());
             this.set('sortorder', ko.observable());
+
 
             this._card = ko.observable('{}');
 
@@ -59,6 +62,7 @@ define(['arches',
             });
 
             this.parse(attributes);
+
         },
 
         /**
@@ -118,11 +122,17 @@ define(['arches',
                             nodes.push(nodeModel);
                         }, this);
                         this.get('nodes')(nodes);
+                        this.get('widgets')(widgets);
+                        this.get('widgets').sort(function (w, ww) {
+                            return w.get('sortorder')() > ww.get('sortorder')();
+                        });
                         break;
                     case 'widgets':
                         break;
                     case 'cardid':
                         this.set('id', value);
+                        this.get(key)(value);
+                        break;
                     case 'name':
                     case 'instructions':
                     case 'helptext':
@@ -139,6 +149,7 @@ define(['arches',
                     case 'ontology_properties':
                     case 'users':
                     case 'groups':
+                    case 'tiles':
                         this.set(key, koMapping.fromJS(value));
                         break;
                     case 'functions':
@@ -148,10 +159,6 @@ define(['arches',
                         this.set(key, value);
                 }
             }, this);
-            this.get('widgets')(widgets);
-            this.get('widgets').sort(function (w, ww) {
-                return w.get('sortorder')() > ww.get('sortorder')();
-            });
 
             this._card(JSON.stringify(this.toJSON()));
         },
@@ -164,7 +171,8 @@ define(['arches',
         toJSON: function(){
             var ret = {};
             for(var key in this.attributes){
-                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes' && key !== 'widgets'){
+                if(key !== 'datatypelookup' && key !== 'ontology_properties' && key !== 'nodes'
+                 && key !== 'widgets' && key !== 'datatypes' && key !== 'data'){
                     if(ko.isObservable(this.attributes[key])){
                         if(key === 'users' || key === 'groups'){
                             ret[key] = koMapping.toJS(this.attributes[key]);

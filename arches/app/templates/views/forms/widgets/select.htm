@@ -1,13 +1,25 @@
 {% load i18n %}
-<div class="row widget-wrapper" data-bind="if: !configForm">
+<!-- ko if: !configForm  && state=== 'form' -->
+<div class="row widget-wrapper" data-bind="if: !configForm && state=== 'form'">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <input class="select2 arches-select2-crud-form" data-bind="disable: disabled, select2: {value: value, select2Config: {data: options}, placeholder: placeholder}"></input>
+            <!-- Select element with chosen binding does not support nesting at the moment. -->
+            <!-- <select class="form-control input-lg widget-input design" data-bind="value: selection, options: options , optionsText: 'text', optionsValue: 'id', placeholder: placeholder, chosen: {width: '100%'}"></select> -->
+            <input style="width:30%; display:inline-block;" data-bind="select2: {select2Config: {data: options, placeholder: placeholder}}"></input>
         </div>
     </div>
 </div>
+<!-- /ko -->
 
 <div data-bind="if: configForm">
-    form here
+  <div class="control-label">
+      {% trans "Placeholder" %}
+  </div>
+  <div class="col-xs-12 pad-no crud-widget-container">
+      <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+  </div>
+</br/>
+</br/>
+</br/>
 </div>

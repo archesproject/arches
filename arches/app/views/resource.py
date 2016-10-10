@@ -17,26 +17,110 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
+from arches.app.models import models
+from arches.app.models.forms import Form
+from arches.app.models.card import Card
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.JSONResponse import JSONResponse
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceManagerView(BaseManagerView):
+class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
-        if graphid is not None:
-            # self.graph = Graph.objects.get(graphid=graphid)
-            return redirect('resource_editor', resourceid=graphid)
-        if resourceid is not None:
-            context = self.get_context_data(
-                main_script='views/resource/editor'
-            )
-            return render(request, 'views/resource/editor.htm', context)
-        
+        instance_summaries = []
+        for resource_instance in models.ResourceInstance.objects.all():
+            instance_summaries.append({
+                'id': resource_instance.pk,
+                'name': '',
+                'type': resource_instance.graph.name,
+                'last_edited': '',
+                'qc': '',
+                'public': '',
+                'editor': ''
+            })
         context = self.get_context_data(
-            main_script='views/resource'
+            main_script='views/resource',
+            instance_summaries=instance_summaries
         )
         return render(request, 'views/resource.htm', context)
 
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceEditorView(TemplateView):
+    def get(self, request, graphid=None, resourceid=None):
+        if graphid is not None:
+            # self.graph = Graph.objects.get(graphid=graphid)
+            resource_instance = models.ResourceInstance.objects.create(graph_id=graphid)
+            return redirect('resource_editor', resourceid=resource_instance.pk)
+        if resourceid is not None:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            form = Form(resource_instance.pk)
+            datatypes = models.DDataType.objects.all()
+            widgets = models.Widget.objects.all()
+            map_layers = models.MapLayers.objects.all()
+            map_sources = models.MapSources.objects.all()
+            context = self.get_context_data(
+                main_script='views/resource/editor',
+                resource_type=resource_instance.graph.name,
+                iconclass=resource_instance.graph.iconclass,
+                form=JSONSerializer().serialize(form),
+                forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
+                datatypes_json=JSONSerializer().serialize(datatypes),
+                widgets=widgets,
+                map_layers=map_layers,
+                map_sources=map_sources,
+                widgets_json=JSONSerializer().serialize(widgets),
+                resourceid=resourceid
+            )
+            return render(request, 'views/resource/editor.htm', context)
+
+        return HttpResponseNotFound()
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceData(TemplateView):
+    def get(self, request, resourceid=None, formid=None):
+        if formid is not None:
+            form = Form(resourceid=resourceid, formid=formid)
+            return JSONResponse(form)
+
+        return HttpResponseNotFound()
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class ResourceReportView(BaseManagerView):
+    def get(self, request, resourceid=None):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        tiles = models.Tile.objects.filter(resourceinstance=resource_instance)
+        try:
+           report = models.Report.objects.get(graph=resource_instance.graph, active=True)
+        except models.Report.DoesNotExist:
+           report = None
+        forms = resource_instance.graph.form_set.filter(status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        context = self.get_context_data(
+            main_script='resource-report',
+            report=JSONSerializer().serialize(report),
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates),
+            forms=JSONSerializer().serialize(forms),
+            tiles=JSONSerializer().serialize(tiles),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
+            graph_id=resource_instance.graph.pk,
+            graph_name=resource_instance.graph.name
+         )
+
+        return render(request, 'resource-report.htm', context)

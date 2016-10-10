@@ -180,6 +180,7 @@ class Form(models.Model):
     iconclass = models.TextField(blank=True, null=True)
     status = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
     graph = models.ForeignKey('GraphModel', db_column='graphid', blank=False, null=False)
 
     class Meta:
@@ -412,6 +413,38 @@ class Relation(models.Model):
         db_table = 'relations'
 
 
+class ReportTemplate(models.Model):
+    templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    component = models.TextField()
+    componentname = models.TextField()
+    defaultconfig = JSONField(blank=True, null=True, db_column='defaultconfig')
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+        
+    class Meta:
+        managed = True
+        db_table = 'report_templates'
+
+
+class Report(models.Model):
+    reportid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField(blank=True, null=True)
+    template = models.ForeignKey(ReportTemplate, db_column='templateid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
+    config = JSONField(blank=True, null=True, db_column='config')
+    formsconfig = JSONField(blank=True, null=True, db_column='formsconfig')
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'reports'
+
+
 class Resource2ResourceConstraint(models.Model):
     resource2resourceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     resourceclassfrom = models.ForeignKey(Node, db_column='resourceclassfrom', blank=True, null=True, related_name='resxres_contstraint_classes_from')
@@ -438,7 +471,7 @@ class ResourceXResource(models.Model):
 
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    resourceclass = models.ForeignKey(Node, db_column='resourceclassid')
+    graph = models.ForeignKey(GraphModel, db_column='graphid')
     resourceinstancesecurity = models.TextField(blank=True, null=True) #Intended to support flagging individual resources as unavailable to given user roles.
 
     class Meta:
@@ -523,15 +556,18 @@ class MapSources(models.Model):
         db_table = 'map_sources'
 
 
-class BasemapLayers(models.Model):
+class MapLayers(models.Model):
     name = models.TextField()
-    layer = JSONField(blank=True, null=True, db_column='layer')
+    layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
+    isoverlay = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=1)
+    icon = models.TextField(default=None)
 
     @property
     def layer_json(self):
-        json_string = json.dumps(self.layer)
+        json_string = json.dumps(self.layerdefinitions)
         return json_string
 
     class Meta:
         managed = True
-        db_table = 'basemap_layers'
+        db_table = 'map_layers'

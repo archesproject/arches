@@ -30,7 +30,7 @@ def map_info(request):
             'x': settings.DEFAULT_MAP_X,
             'y': settings.DEFAULT_MAP_Y,
             'zoom': settings.DEFAULT_MAP_ZOOM,
-            'bing_key': settings.BING_KEY,
+            # 'bing_key': settings.BING_KEY,
             'map_min_zoom': settings.MAP_MIN_ZOOM,
             'map_max_zoom': settings.MAP_MAX_ZOOM,
             'extent': settings.MAP_EXTENT,

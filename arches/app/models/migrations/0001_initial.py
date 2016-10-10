@@ -385,6 +385,7 @@ class Migration(migrations.Migration):
                 ('iconclass', models.TextField(blank=True, null=True)),
                 ('status', models.BooleanField(default=True)),
                 ('visible', models.BooleanField(default=True)),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'forms',
@@ -535,6 +536,37 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='ReportTemplate',
+            fields=[
+                ('templateid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField(null=True, blank=True)),
+                ('description', models.TextField(null=True, blank=True)),
+                ('component', models.TextField()),
+                ('componentname', models.TextField()),
+                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+            ],
+            options={
+                'db_table': 'report_templates',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='Report',
+            fields=[
+                ('reportid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ('name', models.TextField(null=True, blank=True)),
+                ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate')),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
+                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('formsconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='formsconfig', null=True)),
+                ('active', models.BooleanField(default=False)),
+            ],
+            options={
+                'db_table': 'reports',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Resource2ResourceConstraint',
             fields=[
                 ('resource2resourceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
@@ -551,7 +583,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('resourceinstanceid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('resourceinstancesecurity', models.TextField(blank=True, null=True)),
-                ('resourceclass', models.ForeignKey(db_column='resourceclassid', to='models.Node')),
+                ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
             ],
             options={
                 'db_table': 'resource_instances',
@@ -615,14 +647,17 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='BasemapLayers',
+            name='MapLayers',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
-                ('layer', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layer', null=True)),
+                ('layerdefinitions', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layerdefinitions', null=True)),
+                ('isoverlay', models.BooleanField(default=False)),
+                ('sortorder', models.IntegerField(default=1)),
+                ('icon', models.TextField(default=None)),
             ],
             options={
-                'db_table': 'basemap_layers',
+                'db_table': 'map_layers',
                 'managed': True,
             },
         ),

@@ -19,14 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 
-{% block graph_title %}
-<div class="ep-tools-title">
-  <h1 class="page-header text-overflow ep-graph-title"><i class="text-center icon-wrap bg-gray ep-graph-title-icon"  data-bind="css: (graph.iconclass() || 'fa fa-question') + '  text-center icon-wrap bg-gray ep-graph-title-icon'"></i> <span data-bind="text:graph.name"></span></h1>
-</div>
-{% endblock graph_title %}
-
 {% block graph_header_title %}
-{% trans "Resource Settings" %}
+<span data-bind="text: graph.isresource() ? '{% trans "Resource Model Settings" %}' : '{% trans "Branch Settings" %}'"></span>
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
@@ -38,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div class="ep-form-content">
+<div class="ep-form-content" style="display: none" data-bind="visible: graph">
     <div id="external-page-content">
         <div style="padding: 12px;">
             <div class="panel card-panel">
@@ -61,7 +55,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <ul class="nav nav-tabs card-nav-container">
                             <li id="xx-id-group" class="active">
                                 <a id="xx-id-tab" data-toggle="tab" href="#id-card" class="card-tab-title" aria-expanded="true">
-                                    {% trans "Resource Identifiers" %}
+                                    <span data-bind="text: graph.isresource() ? '{% trans "Resource Model Identifiers" %}' : '{% trans "Branch Identifiers" %}'"></span>
                                 </a>
                             </li>
                             <li id="xx-icon-group">
@@ -96,7 +90,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Set the defaults for your resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Set the defaults for your resource model" %}' : '{% trans "Set the defaults for your branch" %}'"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -176,7 +170,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Pick an icon for your resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Pick an icon for your resource model" %}' : '{% trans "Pick an icon for your branch" %}'"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -244,7 +238,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Define this resource's status" %}
+                                            <span data-bind="if: graph.isresource()">
+                                                {% trans "Define this resource model's status" %}
+                                            </span>
+                                            <span data-bind="if: !graph.isresource()">
+                                                {% trans "Define this branch's status" %}
+                                            </span>
                                         </p>
 
                                         <!-- Form -->
@@ -272,7 +271,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="row widget-container" data-bind="visible: graph.isresource()">
                                                 <div class="form-group">
                                                     <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resources that may be related:" %}</label>
+                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Resource models that may be related:" %}</label>
                                                     </div>
 
                                                     <div class="col-xs-12">
@@ -303,7 +302,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            {% trans "Describe this resource" %}
+                                            <span data-bind="text: graph.isresource() ? '{% trans "Describe this resource model" %}' : '{% trans "Describe this branch" %}'"></span>
                                         </p>
 
                                         <!-- Form -->
@@ -329,7 +328,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
 
                                                         <div class="col-xs-12">
-                                                            <textarea placeholder="{% trans "Resource abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                                            <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
