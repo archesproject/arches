@@ -321,7 +321,7 @@ class Command(BaseCommand):
             resource_graphs = [x.strip(' ') for x in resource_graphs.split(",")]
         ArchesFileExporter().export_graphs(data_dest, resource_graphs)
 
-    def export_resources(self, package_name, data_dest=None, resources=[]):
+    def export_resources(self, package_name, data_dest=None, resources=''):
         """
         Exports resources to archesjson
         """

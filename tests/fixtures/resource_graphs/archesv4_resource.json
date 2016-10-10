@@ -7143,7 +7143,7 @@
           ]
         }
       ],
-      "relationships": [
+      "relations": [
         {
           "resourceidfrom": "",
           "resourceidto": "",

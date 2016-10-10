@@ -44,6 +44,10 @@ class JsonWriter(Writer):
 
     def write_resources(self, resourceids, dest_dir):
         resources = []
+        relations = []
+        export = {}
+        export['business_data'] = {}
+
         resourceids = [x.strip() for x in resourceids.split(',')]
         if resourceids == None or resourceids == []:
             for resourceinstance in models.ResourceInstance.objects.all():
@@ -54,9 +58,15 @@ class JsonWriter(Writer):
                 resource['resourceinstanceid'] = resourceid
                 resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
                 resources.append(resource)
-        export = {}
-        export['business_data'] = {}
+
+        for relation in models.ResourceXResource.objects.all():
+            relations.append(relation)
+
         export['business_data']['resources'] = resources
+        export['business_data']['relations'] = relations
+
+
+
         with open(dest_dir, 'w') as f:
             f.write(JSONSerializer().serialize(export))
 
