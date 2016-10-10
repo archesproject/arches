@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graphs" %}
 {% endblock title %}
 
-{% block content %}
+{% block main_content %}
 <div class="scroll-y">
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
         <div class="page-title-block">
@@ -133,8 +133,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                             <li><a href="#" data-bind="click:function() { $parent.navigate(graphid) }">{% trans "Manage Graph" %}</a>
                             </li>
+                            <!-- ko if: isresource || isCard -->
                             <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate(graphid + '/card_manager') : $parent.navigate('../card/' + graphid); }">{% trans "Manage Cards" %}</a>
                             </li>
+                            <!-- /ko -->
                             <!-- ko if: $parent.showResources() -->
                             <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/form_manager') }">{% trans "Manage Forms" %}</a>
                             </li>
@@ -162,4 +164,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 
-{% endblock content %}
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-manager-data', [], function () {
+    return {
+        root_nodes: {{ root_nodes }}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

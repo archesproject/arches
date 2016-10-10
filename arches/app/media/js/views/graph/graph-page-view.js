@@ -1,20 +1,20 @@
 define([
     'knockout',
     'underscore',
-    'views/page-view',
+    'views/base-manager',
     'arches',
     'graph-base-data',
     'bindings/chosen'
-], function(ko, _, PageView, arches, data) {
+], function(ko, _, BaseManager, arches, data) {
     /**
     * A backbone view representing a page in the graph manager workflow.  It
     * adds some graph manager specfic values to the view model.
     *
-    * @augments PageView
+    * @augments BaseManager
     * @constructor
     * @name GraphPageView
     */
-    var GraphPageView = PageView.extend({
+    var GraphPageView = BaseManager.extend({
         /**
         * Creates an instance of GraphPageView, optionally using a passed in
         * view model
@@ -27,9 +27,8 @@ define([
         */
         constructor: function (options) {
             var self = this;
-            options.viewModel.graphs = data.graphs;
             options.viewModel.graphid = ko.observable(data.graphid);
-            PageView.apply(this, arguments);
+            BaseManager.apply(this, arguments);
             options.viewModel.graphid.subscribe(function (graphid) {
                 self.viewModel.navigate(arches.urls.graph + graphid + '/settings');
             });

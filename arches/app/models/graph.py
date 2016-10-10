@@ -153,6 +153,8 @@ class Graph(models.GraphModel):
             node.config = nodeobj.get('config', None)
             node.functions.set(nodeobj.get('functions', []))
 
+            node.nodeid = uuid.UUID(str(node.nodeid))
+
             if node.nodegroup_id != None and node.nodegroup_id != '':
                 node.nodegroup_id = uuid.UUID(str(node.nodegroup_id))
                 node.nodegroup = self.get_or_create_nodegroup(nodegroupid=node.nodegroup_id)
@@ -185,8 +187,8 @@ class Graph(models.GraphModel):
             egdeobj = edge.copy()
             edge = models.Edge()
             edge.edgeid = egdeobj.get('edgeid', None)
-            edge.rangenode = self.nodes[egdeobj.get('rangenode_id')]
-            edge.domainnode = self.nodes[egdeobj.get('domainnode_id')]
+            edge.rangenode = self.nodes[uuid.UUID(str(egdeobj.get('rangenode_id')))]
+            edge.domainnode = self.nodes[uuid.UUID(str(egdeobj.get('domainnode_id')))]
             edge.ontologyproperty = egdeobj.get('ontologyproperty', '')
 
         edge.graph = self

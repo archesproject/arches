@@ -48,15 +48,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock content %}
 
 {% block pre_require_js %}
-<script>{% autoescape off %}
-define('resource-editor-data', [], function () {
-    return {
-        forms: {{forms}},
-        form: {{form}},
-        datatypes: {{ datatypes_json }},
-        widgets: {{ widgets_json }},
-        resourceid: '{{resourceid}}'
-    };
-});
-{% endautoescape %}</script>
+{{block.super}}
+<script>
+    {% autoescape off %}
+    define('resource-editor-data', [], function () {
+        return {
+            forms: {{forms}},
+            form: {{form}},
+            datatypes: {{ datatypes_json }},
+            widgets: {{ widgets_json }},
+            resourceid: '{{resourceid}}'
+        };
+    });
+    {% endautoescape %}
+</script>
 {% endblock pre_require_js %}

@@ -5,12 +5,13 @@ define([
     'viewmodels/widget',
     'arches',
     'mapbox-gl',
-    'plugins/mapbox-gl-draw',
+    'mapbox-gl-draw',
     'map/mapbox-style',
+    'select2v4',
+    'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen',
-    'bindings/ajax-chosen'
+    'bindings/chosen'
 ], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
     /**
      * knockout components namespace used in arches
@@ -36,7 +37,8 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing'];
+
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
 
@@ -55,8 +57,8 @@ define([
             }]);
 
             this.geocodeUrl = arches.urls.geocoder;
-            this.geocodePoint = ko.observable();
-            this.geocodeResponseOptions = ko.observable();
+            this.geocodeResponseOption = ko.observable();
+            this.selectedItems = ko.observableArray(['Germany'])
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -109,12 +111,23 @@ define([
                 var self = this;
                 var draw = Draw();
                 this.map = map;
+                this.draw = draw;
                 this.map.addControl(draw);
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
+
+                this.selectedItems.subscribe(function(e){
+                    var coords = e.geometry.coordinates;
+                    this.map.getSource('geocode-point').setData(e.geometry);
+                    this.redrawGeocodeLayer();
+                    var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                    this.map.flyTo({
+                        center: centerPoint
+                    });
+                  }, this);
 
                 this.selectEditingTool = function(val, e) {
                     switch (val) {
@@ -132,13 +145,44 @@ define([
                     }
                 }
 
+                this.dataReturn =
+                    function(term, page) {
+                          return {
+                              q: term,
+                              geocoder: self.geocoder()
+                          };
+                      }
+
+                this.selectSetup = {
+                        ajax: {
+                            url: arches.urls.geocoder,
+                            dataType: 'json',
+                            quietMillis: 250,
+                            data: this.dataReturn,
+                            results: function(data, page) {
+                                return {
+                                    results: data.results
+                                };
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 4,
+                        multiple: false,
+                        maximumSelectionSize: 1,
+                        placeholder: this.geocodePlaceholder()
+                    };
+
                 var overlays =
                     _.each(_.where(arches.mapLayers, {
                         isoverlay: true
                     }), function(overlay) {
                         _.extend(overlay, {
                             opacity: ko.observable(100),
-                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {if (key.includes('-color')) {return prop};})[0],
+                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
+                                if (key.includes('-color')) {
+                                    return prop
+                                };
+                            })[0],
                             showingTools: ko.observable(false),
                             invisible: ko.observable(false),
                             toggleOverlayTools: function(e) {
@@ -148,9 +192,6 @@ define([
                                 this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
                             },
                             updateOpacity: function(val) {
-                                var shift = val > 0.0 ? 0.0001 : -0.0001;
-                                var unsetMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift)}, 200); //Layers do not always redraw when toggled
-                                var refreshMap = setTimeout(function(val){map.setBearing(map.getBearing() + shift * -1)}, 100); // Shifting the map back and forth forces the map to refresh and draw the toggled layers
                                 val > 0.0 ? this.invisible(false) : this.invisible(true);
                                 this.layer_definitions.forEach(function(layer) {
                                     this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
@@ -186,10 +227,9 @@ define([
                     }, this)
                 };
 
-                this.updateConfigs = function(theViewModel) {
-                    //using a closure because the viewModel was not avaliable within the event
+                this.updateConfigs = function() {
+                    var self = this;
                     return function() {
-                        var self = theViewModel;
                         var mapCenter = this.getCenter()
                         var zoom = self.map.getZoom()
                         if (self.zoom() !== zoom) {
@@ -197,13 +237,21 @@ define([
                         };
                         self.centerX(mapCenter.lng);
                         self.centerY(mapCenter.lat);
-                        if (Math.abs(this.getBearing()) > 0.01) {
-                          self.bearing(this.getBearing());
-                        }
+                        self.bearing(this.getBearing());
+                        self.pitch(this.getPitch());
                     }
                 }
 
-                this.map.on('moveend', this.updateConfigs(this));
+                this.saveGeometries = function() {
+                    var self = this;
+                    return function() {
+                        self.value(self.draw.getAll());
+                    }
+                }
+
+                this.map.on('moveend', this.updateConfigs());
+                this.map.on('draw.create', this.saveGeometries())
+                this.map.on('draw.delete', this.saveGeometries())
 
                 this.overlays.subscribe(function(overlays) {
                     var anchorLayer = 'gl-draw-active-line.hot';
@@ -220,25 +268,6 @@ define([
                     }
                     this.redrawGeocodeLayer();
                 }, this)
-
-                this.geocodePoint.subscribe(function(val){
-                   var coords = this.geocodeResponseOptions()[val].geometry.coordinates;
-                   var point = {
-                       "type": "Feature",
-                       "properties": {},
-                       "geometry": {
-                           "type": "Point",
-                           "coordinates": coords
-                       }
-                   }
-                   this.map.getSource('geocode-point').setData(point);
-                   this.redrawGeocodeLayer();
-                   var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
-                   this.map.flyTo({
-                       center: centerPoint
-                   });
-                }, this)
-
             }
 
             this.onGeocodeSelection = function(val, e) {
@@ -259,7 +288,7 @@ define([
             this.moveOverlay = function(overlay, direction) {
                 var overlays = ko.utils.unwrapObservable(self.overlays);
                 var source = ko.utils.arrayIndexOf(overlays, overlay);
-                var target = (direction==='up') ? source - 1 : source + 1;
+                var target = (direction === 'up') ? source - 1 : source + 1;
 
                 if (target >= 0 && target < overlays.length) {
                     self.overlays.valueWillMutate();

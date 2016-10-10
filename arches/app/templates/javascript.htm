@@ -15,6 +15,7 @@
             'jquery': '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min',
             'js-cookie': '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.1/js.cookie.min',
             'select2': '//cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min',
+            'select2v4': '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min',
             'bootstrap': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
             'bootstrap-nifty': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min',
             'jquery-ui': '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
@@ -41,9 +42,9 @@
             'datatables.net-responsive': '//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min',
             'datatables': '//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min',
             'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
-            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl',
-            'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min',
-            'chosen-ajax-addition': '{{ STATIC_URL }}plugins/chosen.ajaxaddition.jquery'
+            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl',
+            'mapbox-gl-draw': '//api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v0.11.15/mapbox-gl-draw',
+            'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min'
         },
         shim: {
             'openlayers': {
@@ -80,12 +81,12 @@
                 deps: ['jquery'],
                 exports : '$'
             },
-            'plugins/mapbox-gl-draw': {
+            'mapbox-gl-draw': {
                 deps: ['mapbox-gl'],
                 exports: 'mapboxgl.Draw'
             },
-            'chosen-ajax-addition': {
-                deps: ['jquery', 'chosen']
+            'select2v4': {
+                deps: ['jquery']
             }
         }
     });
@@ -104,6 +105,7 @@
                 concept_search: "{% url 'concept_search' %}",
                 concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 dropdown: "{% url 'dropdown' %}",
+                get_pref_label: "{% url 'get_pref_label' %}",
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
