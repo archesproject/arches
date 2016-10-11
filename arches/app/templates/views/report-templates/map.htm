@@ -2,8 +2,16 @@
 {% load i18n %}
 
 {% block header %}
-<div class="rp-report-header relative">
-    <!-- Map here... -->
+<div>
+  <!-- ko component: {
+      name: 'geometry-widget',
+      params: {
+          config: report.get('config'),
+          state: "report",
+          node: null,
+          value: null,
+      }
+  } --><!-- /ko -->
 </div>
 {% endblock header %}
 

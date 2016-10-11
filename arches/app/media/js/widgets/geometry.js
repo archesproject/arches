@@ -6,13 +6,12 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'map/mapbox-style',
     'select2v4',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -37,7 +36,9 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-
+            if (ko.isObservable(params.config) === false) {
+              params.config = _.mapObject(params.config, function(config){ return config()})
+            }
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
@@ -300,7 +301,19 @@ define([
                 }
             };
 
-            this.mapStyle = mapStyle;
+          this.mapStyle = {
+                    "version": 8,
+                    "name": "Basic",
+                    "metadata": {
+                        "mapbox:autocomposite": true,
+                        "mapbox:type": "template"
+                    },
+                    "sources": arches.mapSources,
+                    "sprite": "mapbox://sprites/mapbox/basic-v9",
+                    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                    "layers": []
+                };
+
             this.mapStyle.layers = this.addInitialLayers();
 
             this.selectBasemap = function(val) {

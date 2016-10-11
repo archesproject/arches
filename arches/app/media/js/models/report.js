@@ -103,7 +103,7 @@ define(['arches',
                         self.configKeys.removeAll();
                         _.each(value, function(configVal, configKey) {
                             config[configKey] = ko.observable(configVal);
-                            self.configKeys.push(configKey);
+                            // self.configKeys.push(configKey);
                         });
                         this.set(key, config);
                         break;
