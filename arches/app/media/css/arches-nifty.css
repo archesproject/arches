@@ -187,12 +187,11 @@ input[type="checkbox"] {
 }
 .record-delete {
     position: absolute;
-    font-size: 10px;
-    top: 5px;
-    right: 45px;
+    top: 8px;
+    right: 8px;
     height: 20px;
     width: 20px;
-    margin-right: 10px;
+    color: lightcoral;
 }
 .record-close {
     position: absolute;
@@ -4079,6 +4078,9 @@ h4.report-toolbar-title {
     margin: 25px;
     font-size: 16px;
     color: #808080;
+}
+.dataTable tr:hover {
+    background-color: #e4e4e4 !important;
 }
 @keyframes loader {
 	0% { background: #ddd; }
