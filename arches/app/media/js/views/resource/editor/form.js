@@ -35,38 +35,6 @@ define([
             this.loadForm(this.formid);
         },
 
-        initTiles: function(data){
-            _.keys(data).forEach(function(nodegroup_id){
-                if(nodegroup_id !== '__ko_mapping__'){
-                    data[nodegroup_id]().forEach(function(tile){
-                        this.initTile(tile);
-                    }, this);
-                }
-            }, this);
-        },
-
-        initTile: function(tile){
-            tile._data = ko.observable(koMapping.toJSON(tile.data));
-            tile.dirty = ko.computed(function(){
-                return koMapping.toJSON(tile.data) !== tile._data();
-            });
-            if(!!tile.tiles){
-                this.initTiles(tile.tiles);
-            }
-        },
-
-        getBlankTile: function(nodegroup_id){
-            var tile = koMapping.fromJS(koMapping.toJS(this.blanks[nodegroup_id]()[0]));
-            this.initTile(tile);
-            return tile;
-            // var tile = koMapping.fromJS(this._blanks[nodegroup_id][0]);
-            // tile._data = ko.observable(koMapping.toJSON(tile.data));
-            // tile.dirty = ko.computed(function(){
-            //     return koMapping.toJSON(tile.data) !== tile._data();
-            // });
-            // return tile;
-        },
-
         /**
          * asynchronously loads a form into the UI
          * @memberof Form.prototype
@@ -82,7 +50,6 @@ define([
                 success: function(response) {
                     window.location.hash = formid;
                     self.ready(false);
-                    self._blanks = response.blanks;
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTiles(self.tiles);
@@ -108,12 +75,56 @@ define([
         },
 
         /**
+         * initializes a list of tile objects
+         * @memberof Form.prototype
+         * @param  {object} data the list of tile objects to initialize
+         * @return {null} 
+         */
+        initTiles: function(data){
+            _.keys(data).forEach(function(nodegroup_id){
+                if(nodegroup_id !== '__ko_mapping__'){
+                    data[nodegroup_id]().forEach(function(tile){
+                        this.initTile(tile);
+                    }, this);
+                }
+            }, this);
+        },
+
+        /**
+         * initializes a single tile object
+         * @memberof Form.prototype
+         * @param  {object} tile the tile object to initialize
+         * @return {null} 
+         */
+        initTile: function(tile){
+            tile._data = ko.observable(koMapping.toJSON(tile.data));
+            tile.dirty = ko.computed(function(){
+                return koMapping.toJSON(tile.data) !== tile._data();
+            });
+            if(!!tile.tiles){
+                this.initTiles(tile.tiles);
+            }
+        },
+
+        /**
+         * gets a copy of a new blank tile
+         * @memberof Form.prototype
+         * @param  {string} nodegroup_id the nodegroup id of the blank tile to retrieve
+         * @return {object} a tile object
+         */
+        getBlankTile: function(nodegroup_id){
+            var tile = koMapping.fromJS(koMapping.toJS(this.blanks[nodegroup_id]()[0]));
+            this.initTile(tile);
+            return tile;
+        },
+
+        /**
          * a function to return the knockout context used to render the actual widgets in the form
          * @memberof Form.prototype
          * @param  {object} outerCard a reference to the outer most card in the form
          * @param  {object} card a reference to the card associated with the form being rendered
          * @param  {object} tile a reference to the currently bound tile
-         * @return {null} 
+         * @return {object} a tile object
          */
         getFormEditingContext: function(outerCard, card, tile){
             if(outerCard.isContainer()){
