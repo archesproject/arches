@@ -20,6 +20,60 @@ from optparse import make_option
 from formats.archesfile import ArchesReader
 from formats.archesjson import JsonReader
 from formats.shpfile import ShapeReader
+from arches.app.models.models import Tile
+from arches.app.models.models import ResourceInstance
+from arches.app.models.models import ResourceXResource
+from arches.app.models.models import NodeGroup
+
+
+def import_business_data(business_data):
+    for resource in business_data['resources']:
+        if resource['resourceinstance'] != None:
+            resource['resourceinstance']['resourceinstanceid'] = uuid.UUID(str(resource['resourceinstance']['resourceinstanceid']))
+            resource['resourceinstance']['graphid'] = uuid.UUID(str(resource['resourceinstance']['graph_id']))
+
+            resourceinstance = ResourceInstance(
+                resourceinstanceid = resource['resourceinstance']['resourceinstanceid'],
+                graph_id = resource['resourceinstance']['graphid'],
+                resourceinstancesecurity = resource['resourceinstance']['resourceinstancesecurity']
+            )
+            resourceinstance.save()
+
+        if resource['tiles'] != []:
+            for tile in resource['tiles']:
+                tile['parenttile_id'] = uuid.UUID(str(tile['parenttile_id'])) if tile['parenttile_id'] else None
+                tile['nodegroup_id'] = NodeGroup(uuid.UUID(str(tile['nodegroup_id']))) if tile['nodegroup_id'] else None
+                tile['resourceinstance_id'] = ResourceInstance(uuid.UUID(str(tile['resourceinstance_id'])))
+                tile['tileid'] = uuid.UUID(str(tile['tileid']))
+
+                tile = Tile(
+                    resourceinstance = tile['resourceinstance_id'],
+                    parenttile = tile['parenttile_id'],
+                    nodegroup = tile['nodegroup_id'],
+                    tileid = tile['tileid'],
+                    data = tile['data']
+                )
+                tile.save()
+
+    for relation in business_data['relations']:
+        relation['resourcexid'] = uuid.UUID(str(relation['resourcexid']))
+        relation['resourceinstanceidfrom'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidfrom'])))
+        relation['resourceinstanceidto'] = ResourceInstance(uuid.UUID(str(relation['resourceinstanceidto'])))
+        relation['relationshiptype'] = uuid.UUID(str(relation['relationshiptype']))
+
+        relation = ResourceXResource(
+            resourcexid = relation['resourcexid'],
+            resourceinstanceidfrom = relation['resourceinstanceidfrom'],
+            resourceinstanceidto = relation['resourceinstanceidto'],
+            notes = relation['notes'],
+            relationshiptype = relation['relationshiptype'],
+            datestarted = relation['datestarted'],
+            dateended = relation['dateended']
+        )
+        print vars(relation)
+        relation.save()
+
+
 
 
 class ResourceLoader(object):
@@ -107,12 +161,12 @@ class ResourceLoader(object):
                     entityid = resource.resource_id
                 except(ValueError):
                     entityid = ''
-                    
+
                 master_graph.save(user=self.user, note=load_id, resource_uuid=entityid)
                 master_graph.index()
                 resource.entityid = master_graph.entityid
                 legacyid_to_entityid[resource.resource_id] = master_graph.entityid
-            
+
             else:
                 new_resource = Resource(resource)
                 new_resource.save(user=self.user, note=load_id, resource_uuid=new_resource.entityid)
@@ -150,7 +204,7 @@ class ResourceLoader(object):
             for row in group.rows:
                 entity = Resource()
                 entity.create_from_mapping(row.resourcetype, schema[row.attributename]['steps'], row.attributename, row.attributevalue)
-                entity_data2.append(entity)  
+                entity_data2.append(entity)
 
             mapping_graph = entity_data2[0]
             for mapping in entity_data2[1:]:
