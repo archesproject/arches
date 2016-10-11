@@ -89,28 +89,10 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
 
 
             $(el).select2(select2Config);
-
+            $(el).select2("val", select2Config.value());
             $(el).on("change", function(val) {
                 return allBindings.select2Config.value(val.val);
             });
-        },
-
-        update: function (el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
-            // we don't want the setting of the select2 dropdown value (eg: $(el).select2("val", val.value, true) )
-            // to re-trigger the element binding (in this case it's usually a getEditedNode call on the dropdown
-            // because that can have the side affect of adding a new blank node) so we use ko.ignoreDependencies
-            var val = '';
-            if(valueAccessor().value){
-                val = ko.utils.unwrapObservable(valueAccessor().value());
-                if (typeof val === 'string' || val === null){
-                    return ko.ignoreDependencies($(el).select2, $(el) , ["val", val, true]);
-                }
-                if (typeof val === 'object'){
-                    return ko.ignoreDependencies($(el).select2, $(el) , ["val", val.value, true]);
-                }
-            }else{
-                return ko.ignoreDependencies($(el).select2, $(el) , ["val", val, true]);
-            }
         }
     };
 

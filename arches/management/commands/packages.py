@@ -37,6 +37,7 @@ from arches.app.models import models
 import csv
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
+from arches.app.models.resource import Resource
 
 class Command(BaseCommand):
     """
@@ -46,10 +47,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources', 'import_json', 'export_json'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources', 'import_json', 'export_json'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
+            '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'install\'=Runs the setup file defined in your package root' +
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
@@ -84,6 +86,10 @@ class Command(BaseCommand):
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
+            self.setup_indexes(package_name)
+
+        if options['operation'] == 'setup_indexes':
+            self.setup_indexes(package_name)
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
@@ -219,6 +225,9 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
         management.call_command('migrate')
+
+    def setup_indexes(self, package_name):
+        Resource().prepare_term_index(create=True)
 
     def generate_procfile(self, package_name):
         """
