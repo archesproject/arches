@@ -74,8 +74,6 @@ def import_business_data(business_data):
         relation.save()
 
 
-
-
 class ResourceLoader(object):
 
     def __init__(self):
