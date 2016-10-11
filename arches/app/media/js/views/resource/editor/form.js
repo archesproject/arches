@@ -54,6 +54,23 @@ define([
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTiles(self.tiles);
                     self.initTiles(self.blanks);
+                    // ko.watch(self.blanks, {
+                    //     depth: -1,
+                    //     keepOldValues: 1,
+                    //     tagParentsWithName: true,
+                    //     tagFields: true,
+                    //     oldValues: 3
+                    // }, function(parents, child, item) {
+                    //     var log = parents[0] ? parents[0]._fieldName + ': ' : '';
+
+                    //     if (item)
+                    //         log += item.status + ' ' + ko.toJSON(item.value);
+                    //     else
+                    //         log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
+                    //         //log += ko.toJSON(child());
+                    //     parents[0]()[0].dirty(true);
+                    //     console.log(log);
+                    // });
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -82,7 +99,7 @@ define([
          */
         initTiles: function(data){
             _.keys(data).forEach(function(nodegroup_id){
-                if(nodegroup_id !== '__ko_mapping__'){
+                if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
                     data[nodegroup_id]().forEach(function(tile){
                         this.initTile(tile);
                     }, this);
@@ -101,6 +118,7 @@ define([
             tile.dirty = ko.computed(function(){
                 return koMapping.toJSON(tile.data) !== tile._data();
             });
+            //tile.dirty = ko.observable(false).watch(false);
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
@@ -337,6 +355,7 @@ define([
             $(selectedTab).addClass('active');
             $(contentElems).removeClass('active in');
             $(contentElems[tabIndex]).addClass('active in');
+            e.stopPropagation();
         },
 
         /**
@@ -370,6 +389,7 @@ define([
                     }
                 }, this);
             }
+            //tile.dirty(false);
         },
 
         /**
@@ -382,6 +402,7 @@ define([
             _.each(tile.data, function(value, key, list){
                 value("");
             }, this);
+            //tile.dirty(false);
         }
 
     });
