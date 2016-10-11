@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/report'], function (ko, ReportViewModel) {
+define(['knockout', 'viewmodels/report', 'widgets/geometry'], function (ko, ReportViewModel) {
     return ko.components.register('map-report', {
         viewModel: function(params) {
             params.configKeys = [];

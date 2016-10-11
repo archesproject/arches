@@ -7,14 +7,23 @@
       name: 'geometry-widget',
       params: {
           config: report.get('config'),
-          state: "report",
           node: null,
           value: null,
+          type: 'report-header'
       }
   } --><!-- /ko -->
 </div>
 {% endblock header %}
 
 {% block header_form %}
-<!-- config form here... -->
+<!-- ko component: {
+    name: 'geometry-widget',
+    params: {
+        config: report.get('config'),
+        node: null,
+        value: null,
+        configForm: true,
+        type: 'report-header'
+    }
+} --><!-- /ko -->
 {% endblock header_form %}

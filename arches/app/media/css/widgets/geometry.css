@@ -20,6 +20,10 @@
   color: #fff;
 }
 
+div.row.widget-wrapper.report-header {
+  margin-right: 0px;
+}
+
 .map-widget-container-expanded {
     top: 0px;
     right: 0px;

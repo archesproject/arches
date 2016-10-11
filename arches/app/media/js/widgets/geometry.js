@@ -36,9 +36,11 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            if (ko.isObservable(params.config) === false) {
-              params.config = _.mapObject(params.config, function(config){ return config()})
-            }
+            this.reportHeader = params.type === 'report-header' ? true : false;
+            this.configType = params.reportHeader || 'header';
+            // if (this.reportHeader) {
+            //   params.config = _.mapObject(params.config, function(config){ return config()})
+            // }
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;

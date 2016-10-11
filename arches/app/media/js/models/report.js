@@ -100,12 +100,14 @@ define(['arches',
                         break;
                     case 'config':
                         var config = {};
+                        var configKeys = [];
                         self.configKeys.removeAll();
                         _.each(value, function(configVal, configKey) {
-                            config[configKey] = ko.observable(configVal);
-                            // self.configKeys.push(configKey);
+                          // config[configKey] = ko.observable(configVal);
+                          config[configKey] = configVal;
                         });
                         this.set(key, config);
+                        configKeys.forEach(function(key){self.configKeys.push(key)});
                         break;
                     case 'formsconfig':
                         var forms = self.forms();
@@ -141,6 +143,7 @@ define(['arches',
 
         toJSON: function(){
             var ret = {};
+            var self = this;
             for(var key in this.attributes){
                 if (ko.isObservable(this.attributes[key])){
                     ret[key] = this.attributes[key]();
@@ -150,7 +153,7 @@ define(['arches',
                     if (configKeys.length > 0) {
                         config = {};
                         _.each(configKeys, function(configKey) {
-                            config[configKey] = self.config[configKey]();
+                            config[configKey] = self.get('config')[configKey]();
                         });
                     }
                     ret[key] = config;
