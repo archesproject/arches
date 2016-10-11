@@ -85,6 +85,14 @@ define([
             }, this);
         },
 
+        applyDirty: function(tile){
+            tile._data = ko.observable(koMapping.toJSON(tile.data));
+            tile.dirty = ko.computed(function(){
+                //console.log(koMapping.toJSON(tile.data) !== tile._data() || tile.childIsDirty());
+                return koMapping.toJSON(tile.data) !== tile._data();
+            });
+        },
+
         /**
          * asynchronously loads a form into the UI
          * @memberof Form.prototype
@@ -100,6 +108,7 @@ define([
                 success: function(response) {
                     window.location.hash = formid;
                     self.ready(false);
+                    self._blanks = response.blanks;
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTile(self.tiles);
@@ -133,6 +142,7 @@ define([
          * @return {null} 
          */
         getFormEditingContext: function(outerCard, card, tile){
+            var self = this;
             if(outerCard.isContainer()){
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
@@ -141,6 +151,10 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
+
+                        var x = koMapping.fromJS(this._blanks[card.get('nodegroup_id')]()[0]);
+                        this.applyDirty(x);
+                        return x;
                         return this.blanks[card.get('nodegroup_id')]()[0];
                     }
                 } 
@@ -150,8 +164,24 @@ define([
                         //console.log(3)
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
-                        //console.log(4)
-                        return this.blanks[card.get('nodegroup_id')]()[0];
+
+                        var x;
+
+                        ko.ignoreDependencies(function(){
+                            //console.log(4)
+                            x = koMapping.fromJS(self._blanks[card.get('nodegroup_id')][0]);
+                            //var isFirstEvaluation = ko.computedContext.isInitial();
+                            x._data = ko.observable(koMapping.toJSON(x.data));
+
+                            x.dirty = ko.computed(function(){
+                                return koMapping.toJSON(x.data) !== x._data();
+                            });
+                            //return x;
+                        })
+                        return x;
+                        //this._blanks[card.get('nodegroup_id')][0].dirty = false;
+                        
+                        //return this.blanks[card.get('nodegroup_id')]()[0];
                     }
                 } 
             }else{
@@ -161,7 +191,10 @@ define([
                     return tile;
                 }else{
                     //console.log(6)
-                    return this.blanks[card.get('nodegroup_id')]()[0];
+                    var x = koMapping.fromJS(this._blanks[card.get('nodegroup_id')]()[0]);
+                        this.applyDirty(x);
+                        return x;
+                        return this.blanks[card.get('nodegroup_id')]()[0];
                 }
             }
         },
