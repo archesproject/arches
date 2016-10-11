@@ -31,8 +31,8 @@ define([
             this.cards = ko.observableArray([new CardModel({})]);
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
-            this.loadForm(this.formid);
             this.ready = ko.observable(false);
+            this.loadForm(this.formid);
         },
 
         initTile: function(data){
@@ -99,6 +99,7 @@ define([
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,
                 success: function(response) {
                     window.location.hash = formid;
+                    self.ready(false);
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTile(self.tiles);
