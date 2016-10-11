@@ -6,7 +6,7 @@
   <!-- ko component: {
       name: 'geometry-widget',
       params: {
-          config: report.get('config'),
+          config: report.configJSON,
           node: null,
           value: null,
           type: 'report-header'
@@ -19,11 +19,10 @@
 <!-- ko component: {
     name: 'geometry-widget',
     params: {
-        config: report.get('config'),
+        config: report.configJSON,
         node: null,
         value: null,
-        configForm: true,
-        type: 'report-header'
+        configForm: true
     }
 } --><!-- /ko -->
 {% endblock header_form %}
