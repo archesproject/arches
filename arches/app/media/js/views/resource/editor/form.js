@@ -35,62 +35,36 @@ define([
             this.loadForm(this.formid);
         },
 
-        initTile: function(data){
+        initTiles: function(data){
             _.keys(data).forEach(function(nodegroup_id){
                 if(nodegroup_id !== '__ko_mapping__'){
                     data[nodegroup_id]().forEach(function(tile){
-                        //tile.childTiles = ko.observableArray();
-                        tile._data = ko.observable(koMapping.toJSON(tile.data));
-                        tile.childIsDirty = ko.observable(false);
-                        tile.dirty = ko.computed(function(){
-                            // tile.childTiles().forEach(function(childTile){
-                            //     childIsDirty || childTile.dirty();
-                            // })
-                            // var checkChildIsDirty = function(obj){
-                            //     var ret = false;
-                            //     _.keys(obj).forEach(function(ng){
-                            //         if(ng !== '__ko_mapping__'){
-                            //             obj[ng]().forEach(function(t){
-                            //                 ret = t.dirty();
-                            //                 t.dirty.subscribe(function(isDirty){
-                            //                     tile.childIsDirty(isDirty || tile.childIsDirty());
-                            //                 })
-                            //             }, this);
-                            //         }
-                            //     }, this);
-                            //     return ret;
-                            //     // for (key in obj) {
-                            //     //     if(obj.hasOwnProperty(key)){
-                            //     //         if(ko.isObservable(obj[key]) && typeof obj[key].dirty === 'function' && obj[key].dirty()) {
-                            //     //             return true;
-                            //     //         }else{
-                            //     //             return checkChildIsDirty(ko.unwrap(obj[key]));
-                            //     //         }
-                            //     //     }
-                            //     // }
-
-                            // }
-
-                            // var x = !!tile.tiles ? checkChildIsDirty(tile.tiles) : false;
-                            return koMapping.toJSON(tile.data) !== tile._data() || tile.childIsDirty();
-                        });
-                        if(!!tile.tiles){
-                            this.initTile(tile.tiles);
-                        }
-                        // if(!!parentTile){
-                        //     parentTile.childTiles.push(tile);
-                        // }
+                        this.initTile(tile);
                     }, this);
                 }
             }, this);
         },
 
-        applyDirty: function(tile){
+        initTile: function(tile){
             tile._data = ko.observable(koMapping.toJSON(tile.data));
             tile.dirty = ko.computed(function(){
-                //console.log(koMapping.toJSON(tile.data) !== tile._data() || tile.childIsDirty());
                 return koMapping.toJSON(tile.data) !== tile._data();
             });
+            if(!!tile.tiles){
+                this.initTiles(tile.tiles);
+            }
+        },
+
+        getBlankTile: function(nodegroup_id){
+            var tile = koMapping.fromJS(koMapping.toJS(this.blanks[nodegroup_id]()[0]));
+            this.initTile(tile);
+            return tile;
+            // var tile = koMapping.fromJS(this._blanks[nodegroup_id][0]);
+            // tile._data = ko.observable(koMapping.toJSON(tile.data));
+            // tile.dirty = ko.computed(function(){
+            //     return koMapping.toJSON(tile.data) !== tile._data();
+            // });
+            // return tile;
         },
 
         /**
@@ -111,8 +85,8 @@ define([
                     self._blanks = response.blanks;
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
-                    self.initTile(self.tiles);
-                    self.initTile(self.blanks);
+                    self.initTiles(self.tiles);
+                    self.initTiles(self.blanks);
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -142,7 +116,6 @@ define([
          * @return {null} 
          */
         getFormEditingContext: function(outerCard, card, tile){
-            var self = this;
             if(outerCard.isContainer()){
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
@@ -151,11 +124,7 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
-
-                        var x = koMapping.fromJS(this._blanks[card.get('nodegroup_id')]()[0]);
-                        this.applyDirty(x);
-                        return x;
-                        return this.blanks[card.get('nodegroup_id')]()[0];
+                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 } 
                 // this is a "wizard"
@@ -164,24 +133,8 @@ define([
                         //console.log(3)
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
-
-                        var x;
-
-                        ko.ignoreDependencies(function(){
-                            //console.log(4)
-                            x = koMapping.fromJS(self._blanks[card.get('nodegroup_id')][0]);
-                            //var isFirstEvaluation = ko.computedContext.isInitial();
-                            x._data = ko.observable(koMapping.toJSON(x.data));
-
-                            x.dirty = ko.computed(function(){
-                                return koMapping.toJSON(x.data) !== x._data();
-                            });
-                            //return x;
-                        })
-                        return x;
-                        //this._blanks[card.get('nodegroup_id')][0].dirty = false;
-                        
-                        //return this.blanks[card.get('nodegroup_id')]()[0];
+                        //console.log(4)
+                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 } 
             }else{
@@ -191,10 +144,7 @@ define([
                     return tile;
                 }else{
                     //console.log(6)
-                    var x = koMapping.fromJS(this._blanks[card.get('nodegroup_id')]()[0]);
-                        this.applyDirty(x);
-                        return x;
-                        return this.blanks[card.get('nodegroup_id')]()[0];
+                    return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                 }
             }
         },
