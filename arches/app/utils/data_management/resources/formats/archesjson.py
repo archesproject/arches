@@ -48,15 +48,15 @@ class JsonWriter(Writer):
         export = {}
         export['business_data'] = {}
 
-        resourceids = [x.strip() for x in resourceids.split(',')]
+        resourceids = set([x.strip() for x in resourceids.split(',')])
         if resourceids == None or resourceids == []:
             for resourceinstance in models.ResourceInstance.objects.all():
                 resourceids.append(resourceinstance.resourceinstanceid)
         for resourceid in resourceids:
             if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
                 resource = {}
-                resource['resourceinstanceid'] = resourceid
                 resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
+                resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 resources.append(resource)
 
         for relation in models.ResourceXResource.objects.all():
