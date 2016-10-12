@@ -44,7 +44,7 @@
                     }, visible: !(isWizard && !forceBlank)">
 
                         <!-- ko if: isWizard && !forceBlank -->
-                        <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTile.bind(form, form, parentTile)">
+                        <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTile.bind(form, form, parentTile, false)">
                             <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                         </a>
                         <!-- /ko -->
@@ -138,7 +138,7 @@
                                         </h5>
                                         
                                         <div class="effect" style="display:none; padding: 10px;">
-                                            <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile)">
+                                            <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank)">
                                                 <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                             </a>
 

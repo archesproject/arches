@@ -261,7 +261,6 @@ define([
          * @return {null} 
          */
         saveTile: function(parentTile, justadd, tile){
-            var savingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 0 && !parentTile.formid;
             var tiles = parentTile.tiles[tile.nodegroup_id()];
             if(!!parentTile.tileid){
                 tile.parenttile_id(parentTile.tileid());
@@ -272,6 +271,7 @@ define([
                 this.clearTileValues(tile);
             }else{
                 var model;
+                var savingParentTile = tiles().length === 0 && !parentTile.formid;
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
@@ -328,21 +328,16 @@ define([
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    //parentTile.tileid(request.responseJSON.tileid);
                     _.each(tile.tiles, function(tile){
                         _.each(request.responseJSON.tiles, function(savedtile){
-                            //parentTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
                             if(tile()[0].tileid() === savedtile[0].tileid){
                                 tile()[0]._data(JSON.stringify(savedtile[0].data));
-                                
                             }
                         }, this);
                     }, this);
-                    //this.initTile(koMapping.fromJS(request.responseJSON, tile));
                     if(!!tile._data){
                         tile._data(JSON.stringify(request.responseJSON.data));
                     }
-                    //tile.tileid(request.responseJSON.tileid);
                 }else{
                     // inform the user
                 }
@@ -354,28 +349,36 @@ define([
          * @memberof Form.prototype
          * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
+         * @param  {boolean} justremove if true, remove without deleting, else delete from the database
          * @return {null} 
          */
-        deleteTile: function(parentTile, tile){
-            var model;
-            var deletingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 1 && !parentTile.formid;
-            if(deletingParentTile){
-                model = new TileModel(ko.toJS(parentTile));
-            }else{
-                model = new TileModel(ko.toJS(tile));
-            }
-            model.delete(function(request, status, model){
-                if(request.status === 200){
-                    if(deletingParentTile){
-                        parentTile.tileid(null);
-                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
-                    }else{
-                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
-                    }
-                }else{
-                    // inform the user
+        deleteTile: function(parentTile, tile, justremove){
+            var tiles = parentTile.tiles[tile.nodegroup_id()];
+            if(justremove){
+                tiles.remove(tile);
+                if(tiles().length === 0){
+                    parentTile.dirty(false);
                 }
-            }, this);
+            }else{
+                var model;
+                var deletingParentTile = tiles().length === 1 && !parentTile.formid;
+                if(deletingParentTile){
+                    model = new TileModel(ko.toJS(parentTile));
+                }else{
+                    model = new TileModel(ko.toJS(tile));
+                }
+                model.delete(function(request, status, model){
+                    if(request.status === 200){
+                        if(deletingParentTile){
+                            this.tiles[parentTile.nodegroup_id()].remove(parentTile);
+                        }else{
+                            tiles.remove(tile);
+                        }
+                    }else{
+                        // inform the user
+                    }
+                }, this);
+            }
         },
         
         /**
