@@ -45,8 +45,6 @@ def install():
             # See http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
             os.system("pip install psycopg2==2.6.1")
 
-        os.system("bower install")
-
 def site_packages_dir():
     if sys.platform == 'win32':
         return os.path.join(sys.prefix, 'Lib', 'site-packages')
