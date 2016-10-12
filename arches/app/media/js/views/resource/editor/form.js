@@ -31,6 +31,7 @@ define([
             this.cards = ko.observableArray([new CardModel({})]);
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
+            this.addedBlanks = ko.observableArray();
             this.ready = ko.observable(false);
             this.loadForm(this.formid);
         },
@@ -54,23 +55,69 @@ define([
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTiles(self.tiles);
                     self.initTiles(self.blanks);
-                    // ko.watch(self.blanks, {
+                    // ko.watch(self.tiles, {
                     //     depth: -1,
                     //     keepOldValues: 1,
                     //     tagParentsWithName: true,
                     //     tagFields: true,
                     //     oldValues: 3
                     // }, function(parents, child, item) {
-                    //     var log = parents[0] ? parents[0]._fieldName + ': ' : '';
+                    //     if(parents.length!==0){
+                    //         var log = parents[0] ? parents[0]._fieldName + ': ' : '';
 
-                    //     if (item)
-                    //         log += item.status + ' ' + ko.toJSON(item.value);
-                    //     else
-                    //         log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
-                    //         //log += ko.toJSON(child());
-                    //     parents[0]()[0].dirty(true);
-                    //     console.log(log);
-                    // });
+                    //         if (item)
+                    //             log += item.status + ' ' + ko.toJSON(item.value);
+                    //         else
+                    //             log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
+                    //             //log += ko.toJSON(child());
+                    //         //parents[parents.length-2].dirty(true)
+                    //         //parents[0]()[0].dirty(true);
+                    //         console.log(log);
+                            
+                    //     }
+                    // }, self);
+                    // ko.watch(self.blanks, {
+                    //     depth: -1,
+                    //     keepOldValues: 1,
+                    //     tagParentsWithName: true,
+                    //     tagFields: true,
+                    //     oldValues: 30
+                    // }, function(parents, child, item) {
+                    //     if(parents.length!==0){
+                    //         var log = parents[0] ? parents[0]._fieldName + ': ' : '';
+
+                    //         if (item)
+                    //             log += item.status + ' ' + ko.toJSON(item.value);
+                    //         else
+                    //             log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
+                    //             //log += ko.toJSON(child());
+                    //         //parents[parents.length-2].dirty(true)
+                    //         parents[0]()[0].dirty(true);
+                    //         console.log(log);
+                            
+                    //     }
+                    // }, self);
+                    // ko.watch(self.addedBlanks, {
+                    //     depth: -1,
+                    //     keepOldValues: 1,
+                    //     tagParentsWithName: true,
+                    //     tagFields: true,
+                    //     oldValues: 30
+                    // }, function(parents, child, item) {
+                    //     if(parents.length!==0){
+                    //         var log = parents[0] ? parents[0]._fieldName + ': ' : '';
+
+                    //         if (item)
+                    //             log += item.status + ' ' + ko.toJSON(item.value);
+                    //         else
+                    //             log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
+                    //             //log += ko.toJSON(child());
+                    //         //parents[parents.length-2].dirty(true)
+                    //         parents[0].dirty(true);
+                    //         console.log(child.oldValues);
+                            
+                    //     }
+                    // }, self);
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -114,11 +161,14 @@ define([
          * @return {null} 
          */
         initTile: function(tile){
-            tile._data = ko.observable(koMapping.toJSON(tile.data));
-            tile.dirty = ko.computed(function(){
-                return koMapping.toJSON(tile.data) !== tile._data();
-            });
-            //tile.dirty = ko.observable(false).watch(false);
+            if('tiles' in tile && _.keys(tile.tiles).length > 0){
+                tile.dirty = ko.observable(false);
+            }else{
+                tile._data = ko.observable(koMapping.toJSON(tile.data));
+                tile.dirty = ko.computed(function(){
+                    return koMapping.toJSON(tile.data) !== tile._data();
+                });
+            }
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
@@ -153,7 +203,9 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
-                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                        var x = ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                        this.addedBlanks.push(x)
+                        return x
                     }
                 } 
                 // this is a "wizard"
@@ -163,7 +215,9 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(4)
-                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                        var x = ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                        this.addedBlanks.push(x)
+                        return x
                     }
                 } 
             }else{
@@ -173,7 +227,9 @@ define([
                     return tile;
                 }else{
                     //console.log(6)
-                    return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                    var x = ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
+                    this.addedBlanks.push(x)
+                    return x
                 }
             }
         },
@@ -209,6 +265,7 @@ define([
                 tile.parenttile_id(parentTile.tileid());
             }
             if(justadd){
+                parentTile.dirty(true);
                 tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
                 this.clearTileValues(tile);
             }else{
@@ -389,7 +446,7 @@ define([
                     }
                 }, this);
             }
-            //tile.dirty(false);
+            tile.dirty(false);
         },
 
         /**

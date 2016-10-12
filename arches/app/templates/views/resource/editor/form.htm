@@ -86,11 +86,13 @@
                                             </form>
 
                                             <!-- Save/Add Buttons -->
-                                            <!-- ko if: tile.dirty() -->
+                                            <!-- ko if: tile.dirty -->
                                                 <!-- ko if: forceBlank -->
                                                 <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, true)">{% trans 'Add' %}</button>
                                                 </div>
+                                                <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
+                                                <!-- /ko -->
                                                 <!-- /ko -->
 
                                                 <!-- ko if: !forceBlank -->
@@ -101,6 +103,13 @@
                                                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, false)">{% trans 'Save' %}</button>
                                                 </div>
                                                 <!-- /ko -->
+                                            <!-- /ko -->
+
+                                            <!-- ko if: !tile.dirty() -->
+                                            <!-- ko if: forceBlank -->
+                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(false): null -->
+                                            <!-- /ko -->
+                                            <!-- /ko -->
                                             <!-- /ko -->
                                         
                                         </div>
@@ -228,7 +237,7 @@
 
 
                     <!-- Wizard Level Buttons -->
-                    
+                    <!-- ko if: $data.dirty -->
                     <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                         <div class="ep-form-toolbar-tools mar-no flex">
                             <span>
@@ -237,7 +246,7 @@
                             </span>
                         </div>
                     </div>
-           
+                    <!-- /ko -->
 
 
                 <!-- /ko -->
