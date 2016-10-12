@@ -10,48 +10,47 @@
             'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
-            'async': '//cdnjs.cloudflare.com/ajax/libs/requirejs-async/0.1.1/async',
-            'text': '//cdnjs.cloudflare.com/ajax/libs/require-text/2.0.12/text.min',
-            'jquery': '//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min',
-            'js-cookie': '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.1/js.cookie.min',
-            'select2': '//cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min',
-            'select2v4': '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min',
-            'bootstrap': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.0/js/bootstrap.min',
-            'bootstrap-nifty': '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min',
-            'jquery-ui': '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min',
-            'flexslider': '//cdnjs.cloudflare.com/ajax/libs/flexslider/2.2.2/jquery.flexslider-min',
+            'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
+            'text': '{{ STATIC_URL }}bower_components/requirejs-text/text',
+            'jquery': '{{ STATIC_URL }}bower_components/jquery/dist/jquery.min',
+            'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
+            'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
+            'select2v4': '{{ STATIC_URL }}bower_components/select2/dist/js/select2.min',
+            'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
+            'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui/jquery-ui',
+            'flexslider': '{{ STATIC_URL }}bower_components/flexslider/2.2.2/jquery.flexslider-min',
             'openlayers': '{{ STATIC_URL }}plugins/openlayers/ol',
-            'easing': '//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min',
-            'backbone': '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min',
-            'underscore': '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.0/underscore-min',
-            'jquery-validate': '//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min',
-            'd3': '//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min',
-            'dropzone': '//cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/dropzone-amd-module.min',
-            'summernote': '//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min',
-            'knockout': '//cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min',
-            'knockout-mapping': '//cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min',
-            'moment': '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min',
-            'bootstrap-datetimepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min',
-            'shp': '//raw.githubusercontent.com/wavded/js-shapefile-to-geojson/master/shapefile',
-            'blueimp-gallery': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-gallery',
-            'blueimp-jquery': '//blueimp.github.io/Gallery/js/jquery.blueimp-gallery',
-            'blueimp-helper': '//cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.15.2/js/blueimp-helper.min',
-            'bootstrap-datepicker': '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min',
-            'datatables.net': '//cdn.datatables.net/1.10.12/js/jquery.dataTables.min',
-            'datatables.net-bs': '//cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min',
-            'datatables.net-responsive': '//cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min',
-            'datatables': '//cdn.datatables.net/responsive/2.1.0/js/responsive.bootstrap.min',
-            'chosen': '//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min',
-            'mapbox-gl': '//api.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl',
-            'mapbox-gl-draw': '//api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v0.11.15/mapbox-gl-draw',
-            'noUiSlider': '//cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min'
+            'easing': '{{ STATIC_URL }}bower_components/jquery-easing/jquery.easing.min',
+            'backbone': '{{ STATIC_URL }}bower_components/backbone/backbone',
+            'underscore': '{{ STATIC_URL }}bower_components/underscore/underscore-min',
+            'jquery-validate': '{{ STATIC_URL }}bower_components/jquery-validate/jquery.validate',
+            'd3': '{{ STATIC_URL }}bower_components/d3/d3.min',
+            'dropzone': '{{ STATIC_URL }}bower_components/dropzone/downloads/dropzone-amd-module.min',
+            'summernote': '{{ STATIC_URL }}bower_components/summernote/dist/summernote.min',
+            'knockout': '{{ STATIC_URL }}bower_components/knockout/dist/knockout',
+            'knockout-mapping': '{{ STATIC_URL }}bower_components/bower-knockout-mapping/dist/knockout.mapping.min',
+            'moment': '{{ STATIC_URL }}bower_components/moment/min/moment.min',
+            'bootstrap-datetimepicker': '{{ STATIC_URL }}bower_components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min',
+            'shp': '{{ STATIC_URL }}bower_components/shp/index',
+            'blueimp-gallery': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/blueimp-gallery.min',
+            'blueimp-jquery': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/jquery.blueimp-gallery.min',
+            'blueimp-helper': '{{ STATIC_URL }}bower_components/blueimp-gallery/js/blueimp-helper.min',
+            'bootstrap-datepicker': '{{ STATIC_URL }}bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min',
+            'datatables.net': '{{ STATIC_URL }}bower_components/datatables/media/js/jquery.dataTables.min',
+            'datatables.net-bs': '{{ STATIC_URL }}bower_components/datatables/media/js/dataTables.bootstrap.min',
+            'datatables.net-responsive': '{{ STATIC_URL }}bower_components/datatables-responsive/js/dataTables.responsive.min',
+            'datatables': '{{ STATIC_URL }}bower_components/datatables-responsive/responsive.bootstrap.min',
+            'chosen': '{{ STATIC_URL }}bower_components/chosen/chosen.jquery.min',
+            'mapbox-gl': '{{ STATIC_URL }}bower_components/mapbox-gl-js/mapbox-gl',
+            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-plugins/plugins/mapbox-gl-draw/v0.11.15/mapbox-gl-draw',
+            'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min'
         },
         shim: {
             'openlayers': {
                 exports: 'ol'
             },
             'nifty': {
-                deps: ['bootstrap-nifty', 'jquery', 'jquery-ui']
+                deps: ['bootstrap', 'jquery', 'jquery-ui']
             },
             'chosen': {
                 deps: ['jquery']
@@ -59,8 +58,8 @@
             'bootstrap': {
                 deps: ['jquery', 'jquery-ui']
             },
-            'bootstrap-nifty': {
-                deps: ['jquery', 'jquery-ui']
+            'knockout-mapping': {
+                deps: ['knockout']
             },
             'jquery-validate': {
                 deps: ['jquery']

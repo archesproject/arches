@@ -45,12 +45,14 @@ def install():
             # See http://goshawknest.wordpress.com/2011/02/16/how-to-install-psycopg2-under-virtualenv/
             os.system("pip install psycopg2==2.6.1")
 
+        os.system("bower install")
+
 def site_packages_dir():
     if sys.platform == 'win32':
         return os.path.join(sys.prefix, 'Lib', 'site-packages')
     else:
         py_version = 'python%s.%s' % (sys.version_info[0], sys.version_info[1])
-        return os.path.join(sys.prefix, 'lib', py_version, 'site-packages')        
+        return os.path.join(sys.prefix, 'lib', py_version, 'site-packages')
 
 def confirm_system_requirements():
     # CHECK PYTHON VERSION
@@ -86,7 +88,7 @@ def run_virtual_environment(env='ENV'):
     else:
         # Are we a developer who has access to the included virtual env?
         # If so, then try to install and activate the virtual env
-        virtualenv_root = os.path.join(root_dir, 'virtualenv')            
+        virtualenv_root = os.path.join(root_dir, 'virtualenv')
         if os.path.exists(os.path.join(virtualenv_root, 'virtualenv.py')):
             virtualenv_working_dir = os.path.join(virtualenv_root, env)
             os.system("python %s %s" % (os.path.join(virtualenv_root, 'virtualenv.py'), virtualenv_working_dir))
@@ -155,7 +157,7 @@ def get_elasticsearch_download_url(install_dir):
     ERROR: There was an error getting the url for Elastic search from the requirements.txt file
     Make sure the requirements.txt file contains a line similar to the following line,\nincluding the pound symbol (#) but not the double quotes (") and where the x.x.x represent the version number:
         "# https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-x.x.x.zip"
-----------------------------------------------------------------------------------------------------\n""") 
+----------------------------------------------------------------------------------------------------\n""")
 
 def get_version(version=None):
     "Returns a PEP 440-compliant version number from VERSION."
@@ -210,7 +212,7 @@ def get_changeset(path_to_file=None):
     sb = StringIO()
     if not path_to_file:
         path_to_file =os.path.abspath(os.path.dirname(__file__))
-    
+
     ver = ''
     try:
         hg_archival = open(os.path.abspath(os.path.join(here, '..', '.hg_archival.txt')),'r')
@@ -226,9 +228,9 @@ def get_changeset(path_to_file=None):
                 latesttag = line.split(':')[1].strip()
             if line.startswith('date:'):
                 date = line.split(':')[1].strip()
-    
-        sb.writelines(['__VERSION__="%s"' % latesttag])   
-        sb.writelines(['\n__BUILD__="%s"' % node])  
+
+        sb.writelines(['__VERSION__="%s"' % latesttag])
+        sb.writelines(['\n__BUILD__="%s"' % node])
         ver = '%s:%s' % (latesttag, node)
         ver = date
         #write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
@@ -238,7 +240,7 @@ def get_changeset(path_to_file=None):
             ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{node|short}'])
             ver = subprocess.check_output(['hg', 'log', '-r', '.', '--template', '{date}'])
             sb.writelines(['__VERSION__="%s"' % ver.split(':')[0]])
-            sb.writelines(['\n__BUILD__="%s"' % ver.split(':')[1]]) 
+            sb.writelines(['\n__BUILD__="%s"' % ver.split(':')[1]])
             #write_to_file(os.path.join(path_to_file,'version.py'), sb.getvalue(), 'w')
         except:
             pass

@@ -1,0 +1,47 @@
+{
+  "name": "arches",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "2.2.1",
+    "requirejs": "~2.3.2",
+    "requirejs-plugins": "~1.0.3",
+    "requirejs-text": "2.0.12",
+    "js-cookie": "2.1.1",
+    "select2": "4.0.3",
+    "select2v3": "http://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min.js",
+    "shp": "http://raw.githubusercontent.com/wavded/js-shapefile-to-geojson/master/shapefile.js",
+    "bootstrap": "3.3.2",
+    "jqueryui": "1.10.4",
+    "flexslider": "~2.6.3",
+    "jquery-easing": "*",
+    "backbone": "1.1.2",
+    "underscore": "1.8.0",
+    "jquery-validate": "1.11.1",
+    "d3": "3.5.17",
+    "dropzone": "3.8.4",
+    "summernote": "0.8.2",
+    "knockout": "3.4.0",
+    "moment": "2.8.4",
+    "bootstrap-datetimepicker": "~0.0.11",
+    "chosen": "1.4.2",
+    "nouislider": "8.5.1",
+    "blueimp-gallery": "2.15.2",
+    "bootstrap-datepicker": "~1.6.4",
+    "datatables": "1.10.12",
+    "mapbox-gl-js": "~0.11.0",
+    "mapbox-gl-plugins": "mapbox/mapbox-gl-plugins",
+    "datatables-responsive": "~2.1.0",
+    "bower-knockout-mapping": "~2.6.0"
+  },
+  "resolutions": {
+    "bootstrap": "3.3.2",
+    "jquery": "2.2.1"
+  }
+}
