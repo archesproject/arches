@@ -293,9 +293,11 @@ class Command(BaseCommand):
         Runs the setup.py file found in the package root
 
         """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.setup.load_resources' % package_name)
-        load(data_source)
+        # data_source = None if data_source == '' else data_source
+        # load = import_string('%s.setup.load_resources' % package_name)
+        # load(data_source)
+        ArchesFileImporter(data_source).import_business_data()
+
 
     def remove_resources(self, load_id):
         """
@@ -346,7 +348,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        ArchesFileImporter(data_source).import_concepts()        
+        ArchesFileImporter(data_source).import_concepts()
         ArchesFileImporter(data_source).import_graphs()
 
     def export_json(self, package_name, data_dest=None, resources=None):

@@ -68,6 +68,9 @@ class ArchesFileImporter(object):
 		conceptImporter(self.reference_data)
 
 	def import_business_data(self):
+		"""
+		Wrapper around arches.app.utils.data_management.resources.importer method.
+		"""
 		businessDataImporter(self.business_data)
 
 	def import_all(self):
