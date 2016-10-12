@@ -35,13 +35,13 @@
     "blueimp-gallery": "2.15.2",
     "bootstrap-datepicker": "~1.6.4",
     "datatables": "1.10.12",
-    "mapbox-gl-js": "~0.11.0",
     "mapbox-gl-plugins": "mapbox/mapbox-gl-plugins",
     "datatables-responsive": "~2.1.0",
     "bower-knockout-mapping": "~2.6.0",
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
-    "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin"
+    "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin",
+    "mapbox-gl-bower": "*"
   },
   "resolutions": {
     "bootstrap": "3.3.2",
