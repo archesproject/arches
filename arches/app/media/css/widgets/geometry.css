@@ -24,6 +24,10 @@ div.row.widget-wrapper.report-header {
   margin-right: 0px;
 }
 
+div.row.widget-wrapper.report-header:hover {
+    background: #ebeef0;
+}
+
 .map-widget-container-expanded {
     top: 0px;
     right: 0px;

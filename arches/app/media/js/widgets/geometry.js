@@ -38,9 +38,6 @@ define([
             var self = this;
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
-            // if (this.reportHeader) {
-            //   params.config = _.mapObject(params.config, function(config){ return config()})
-            // }
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
             this.selectedBasemap = this.basemap;
@@ -50,7 +47,7 @@ define([
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
-
+            this.layers = _.clone(arches.mapLayers);
             this.geocoderOptions = ko.observableArray([{
                 'id': 'BingGeocoder',
                 'name': 'Bing'
@@ -69,13 +66,61 @@ define([
                 legend: ko.observable(true)
             };
 
+
+            this.defineResourceLayer = function(resource) {
+              var resourceLayer = {
+                name: "resource",
+                layer_definitions: [
+                  {
+                      "id":"resource-poly",
+                      "source":"resource",
+                      "type":"fill",
+                      "layout": {},
+                      "filter": ["!in", "$type", "LineString"],
+                      "paint": {
+                          "fill-color": "#fb6017",
+                          "fill-opacity": 0.8
+                      }
+                    },{
+                        "id":"resource-point",
+                        "source":"resource",
+                        "type":"circle",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString", "Polygon"],
+                        "paint": {
+                            "circle-radius": 5,
+                            "circle-color": "#fb6017",
+                            "circle-opacity":0.8
+                        }
+                      },
+                      {
+                          "id":"resource-line",
+                          "source":"resource",
+                          "type":"line",
+                          "layout": {},
+                          "paint": {
+                              "line-color": "#fb6017",
+                              "line-opacity":0.8,
+                              "line-width": 2.5
+                          }
+                        }
+                ],
+                isoverlay: true,
+                sortorder: 4,
+                icon: 'fa fa-map-marker'
+              };
+              return resourceLayer;
+            }
+
+
             this.addInitialLayers = function() {
+                this.layers.push(this.defineResourceLayer());
                 var initialLayers = [];
-                var overlayLayers = _.sortBy(_.where(arches.mapLayers, {
+                var overlayLayers = _.sortBy(_.where(this.layers, {
                     isoverlay: true
                 }), 'sortorder').reverse();
 
-                arches.mapLayers.forEach(function(mapLayer) {
+                this.layers.forEach(function(mapLayer) {
                     if (mapLayer.name === this.basemap()) {
                         _.each(mapLayer.layer_definitions, function(layer) {
                             initialLayers.push(layer);
@@ -121,6 +166,29 @@ define([
                     map.removeLayer('geocode-point');
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
+
+                this.map.on('load', function(){
+                  if (_.isArray(self.value)) {
+                    self.value.forEach(function(tile)
+                        {
+                        _.each(tile.data, function(val, key) {
+                          if (_.contains(val, 'FeatureCollection')){
+                            var source = self.map.getSource('resource')//.setData(val.features)
+                            if (!self.configForm) {
+                              self.value.forEach(function(tile){
+                                _.each(tile.data, function(val, key){
+                                  if (_.contains(val, 'FeatureCollection')){
+                                    source.setData(val)
+                                  }
+                                })
+                                // overlayLayers.push()
+                              }, self)
+                            }
+                          }
+                        }, self);
+                      }, self)
+                  };
+                })
 
                 this.selectedItems.subscribe(function(e){
                     var coords = e.geometry.coordinates;
@@ -176,7 +244,7 @@ define([
                     };
 
                 var overlays =
-                    _.each(_.where(arches.mapLayers, {
+                    _.each(_.where(this.layers, {
                         isoverlay: true
                     }), function(overlay) {
                         _.extend(overlay, {
@@ -303,6 +371,15 @@ define([
                 }
             };
 
+          this.sources = _.clone(arches.mapSources);
+          this.sources["resource"] = {
+              "type": "geojson",
+              "data": {
+                  "type": "FeatureCollection",
+                  "features": []
+              }
+          }
+
           this.mapStyle = {
                     "version": 8,
                     "name": "Basic",
@@ -310,7 +387,7 @@ define([
                         "mapbox:autocomposite": true,
                         "mapbox:type": "template"
                     },
-                    "sources": arches.mapSources,
+                    "sources": this.sources,
                     "sprite": "mapbox://sprites/mapbox/basic-v9",
                     "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
                     "layers": []

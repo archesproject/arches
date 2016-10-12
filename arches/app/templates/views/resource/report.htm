@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Resource Report" %}
 {% endblock title %}
 
-{% block content %}
+{% block main_content %}
 <div class='scroll-y'>
     <!-- ko if: report -->
     <div class='resource-report' data-bind='component: {
@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% trans "No report defined for" %} "{{graph_name}}"...
     </div>
 </div>
-{% endblock content %}
+{% endblock main_content %}
 
 {% block pre_require_js %}
 {{ block.super }}

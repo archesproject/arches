@@ -413,6 +413,7 @@ class Graph(models.GraphModel):
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         card.pk = uuid.uuid1()
                         card.nodegroup = node.nodegroup
+                        card.graph = copy_of_self
             else:
                 node.nodegroup = None
 
