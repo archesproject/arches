@@ -10,8 +10,8 @@
 @import url(../bower_components/select2/dist/css/select2.min.css);
 @import url(plugins/select2/select2-bootstrap.min.css);
 @import url(../bower_components/summernote/dist/summernote.css);
-@import url(../bower_components/mapbox-gl-js/mapbox-gl.css);
-@import url(../bower_components/noUiSlider/distribute/nouislider.min.css);
+@import url(../bower_components/mapbox-gl-bower/mapbox-gl.css);
+@import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
 
 .navbar-top-links:last-child>li {
