@@ -152,6 +152,7 @@ define([
                     }, this);
                 }
             }, this);
+            return data;
         },
 
         /**
@@ -172,6 +173,7 @@ define([
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+            return tile;
         },
 
         /**
@@ -307,7 +309,7 @@ define([
             var model = new TileModel(koMapping.toJS(parentTile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    this.tiles[parentTile.nodegroup_id()].unshift(koMapping.fromJS(request.responseJSON));
+                    this.tiles[parentTile.nodegroup_id()].unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
                     this.clearTile(parentTile);
                 }else{
                     // inform the user
@@ -326,8 +328,21 @@ define([
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    tile._data(JSON.stringify(request.responseJSON.data));
-                    tile.tileid(request.responseJSON.tileid);
+                    //parentTile.tileid(request.responseJSON.tileid);
+                    _.each(tile.tiles, function(tile){
+                        _.each(request.responseJSON.tiles, function(savedtile){
+                            //parentTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
+                            if(tile()[0].tileid() === savedtile[0].tileid){
+                                tile()[0]._data(JSON.stringify(savedtile[0].data));
+                                
+                            }
+                        }, this);
+                    }, this);
+                    //this.initTile(koMapping.fromJS(request.responseJSON, tile));
+                    if(!!tile._data){
+                        tile._data(JSON.stringify(request.responseJSON.data));
+                    }
+                    //tile.tileid(request.responseJSON.tileid);
                 }else{
                     // inform the user
                 }
