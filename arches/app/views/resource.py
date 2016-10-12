@@ -120,7 +120,8 @@ class ResourceReportView(BaseManagerView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             graph_id=resource_instance.graph.pk,
-            graph_name=resource_instance.graph.name
+            graph_name=resource_instance.graph.name,
+            graph_json = JSONSerializer().serialize(resource_instance.graph)
          )
 
         return render(request, 'resource-report.htm', context)

@@ -43,11 +43,11 @@ define(['arches',
                     return form.active();
                 });
             });
+            this.graph = options.graph;
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());
             this.set('template_id', ko.observable());
-            this.set('graph', ko.observable());
             this.set('active', ko.observable());
             this.set('config', {});
             self.configKeys = ko.observableArray();
