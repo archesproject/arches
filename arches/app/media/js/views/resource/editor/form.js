@@ -393,7 +393,8 @@ define([
          * @return {null} 
          */
         toggleGroup: function(data, e){
-            $(e.currentTarget.parentElement.parentElement.nextElementSibling).toggle('fast');
+            $(e.currentTarget.nextElementSibling).toggle('fast');
+            $(e.currentTarget.nextElementSibling).find('.library-tools-icon').toggle('fast');
         },
 
         /**
@@ -406,7 +407,7 @@ define([
         selectTab: function(data, e){
             var selectedTab = e.currentTarget;
             var tabElems = selectedTab.parentElement.children;
-            var contentElems = selectedTab.parentElement.nextElementSibling.children;
+            var contentElems = $(selectedTab.parentElement.nextElementSibling).find('.tab-pane');
             var tabIndex = Array.prototype.indexOf.call(tabElems, selectedTab);
             $(tabElems).removeClass('active');
             $(selectedTab).addClass('active');
