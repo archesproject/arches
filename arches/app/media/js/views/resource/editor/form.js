@@ -54,23 +54,6 @@ define([
                     koMapping.fromJS(response.blanks, self.blanks);
                     self.initTiles(self.tiles);
                     self.initTiles(self.blanks);
-                    // ko.watch(self.blanks, {
-                    //     depth: -1,
-                    //     keepOldValues: 1,
-                    //     tagParentsWithName: true,
-                    //     tagFields: true,
-                    //     oldValues: 3
-                    // }, function(parents, child, item) {
-                    //     var log = parents[0] ? parents[0]._fieldName + ': ' : '';
-
-                    //     if (item)
-                    //         log += item.status + ' ' + ko.toJSON(item.value);
-                    //     else
-                    //         log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
-                    //         //log += ko.toJSON(child());
-                    //     parents[0]()[0].dirty(true);
-                    //     console.log(log);
-                    // });
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -105,6 +88,7 @@ define([
                     }, this);
                 }
             }, this);
+            return data;
         },
 
         /**
@@ -114,14 +98,18 @@ define([
          * @return {null} 
          */
         initTile: function(tile){
-            tile._data = ko.observable(koMapping.toJSON(tile.data));
-            tile.dirty = ko.computed(function(){
-                return koMapping.toJSON(tile.data) !== tile._data();
-            });
-            //tile.dirty = ko.observable(false).watch(false);
+            if('tiles' in tile && _.keys(tile.tiles).length > 0){
+                tile.dirty = ko.observable(false);
+            }else{
+                tile._data = ko.observable(koMapping.toJSON(tile.data));
+                tile.dirty = ko.computed(function(){
+                    return koMapping.toJSON(tile.data) !== tile._data();
+                });
+            }
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+            return tile;
         },
 
         /**
@@ -203,16 +191,17 @@ define([
          * @return {null} 
          */
         saveTile: function(parentTile, justadd, tile){
-            var savingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 0 && !parentTile.formid;
             var tiles = parentTile.tiles[tile.nodegroup_id()];
             if(!!parentTile.tileid){
                 tile.parenttile_id(parentTile.tileid());
             }
             if(justadd){
-                tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
+                parentTile.dirty(true);
+                tiles.unshift(this.initTile(koMapping.fromJS(ko.toJS(tile))));
                 this.clearTileValues(tile);
             }else{
                 var model;
+                var savingParentTile = tiles().length === 0 && !parentTile.formid;
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
@@ -226,11 +215,11 @@ define([
                         if(savingParentTile){
                             parentTile.tileid(request.responseJSON.tileid);
                             request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                parentTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
+                                parentTile.tiles[tile.nodegroup_id].unshift(this.initTile(koMapping.fromJS(tile)));
                             }, this)
                             this.clearTile(tile);
                         }else{
-                            tiles.unshift(koMapping.fromJS(request.responseJSON));
+                            tiles.unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
                             this.clearTileValues(tile);
                         }
                     }else{
@@ -250,7 +239,7 @@ define([
             var model = new TileModel(koMapping.toJS(parentTile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    this.tiles[parentTile.nodegroup_id()].unshift(koMapping.fromJS(request.responseJSON));
+                    this.tiles[parentTile.nodegroup_id()].unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
                     this.clearTile(parentTile);
                 }else{
                     // inform the user
@@ -269,8 +258,16 @@ define([
             var model = new TileModel(ko.toJS(tile));
             model.save(function(request, status, model){
                 if(request.status === 200){
-                    tile._data(JSON.stringify(request.responseJSON.data));
-                    tile.tileid(request.responseJSON.tileid);
+                    _.each(tile.tiles, function(tile){
+                        _.each(request.responseJSON.tiles, function(savedtile){
+                            if(tile()[0].tileid() === savedtile[0].tileid){
+                                tile()[0]._data(JSON.stringify(savedtile[0].data));
+                            }
+                        }, this);
+                    }, this);
+                    if(!!tile._data){
+                        tile._data(JSON.stringify(request.responseJSON.data));
+                    }
                 }else{
                     // inform the user
                 }
@@ -282,39 +279,52 @@ define([
          * @memberof Form.prototype
          * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
+         * @param  {boolean} justremove if true, remove without deleting, else delete from the database
          * @return {null} 
          */
-        deleteTile: function(parentTile, tile){
-            var model;
-            var deletingParentTile = parentTile.tiles[tile.nodegroup_id()]().length === 1 && !parentTile.formid;
-            if(deletingParentTile){
-                model = new TileModel(ko.toJS(parentTile));
-            }else{
-                model = new TileModel(ko.toJS(tile));
-            }
-            model.delete(function(request, status, model){
-                if(request.status === 200){
-                    if(deletingParentTile){
-                        parentTile.tileid(null);
-                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
-                    }else{
-                        parentTile.tiles[tile.nodegroup_id()].remove(tile);
-                    }
-                }else{
-                    // inform the user
+        deleteTile: function(parentTile, tile, justremove){
+            var tiles = parentTile.tiles[tile.nodegroup_id()];
+            if(justremove){
+                tiles.remove(tile);
+                if(tiles().length === 0){
+                    parentTile.dirty(false);
                 }
-            }, this);
+            }else{
+                var model;
+                var deletingParentTile = tiles().length === 1 && !parentTile.formid;
+                if(deletingParentTile){
+                    model = new TileModel(ko.toJS(parentTile));
+                }else{
+                    model = new TileModel(ko.toJS(tile));
+                }
+                model.delete(function(request, status, model){
+                    if(request.status === 200){
+                        if(deletingParentTile){
+                            this.tiles[parentTile.nodegroup_id()].remove(parentTile);
+                        }else{
+                            tiles.remove(tile);
+                        }
+                    }else{
+                        // inform the user
+                    }
+                }, this);
+            }
         },
         
         /**
          * currently unused
          * @memberof Form.prototype
-         * @param  {object} data a knockout reference to the tile object
+         * @param  {object} tile a knockout reference to the tile object
          * @param  {object} e event object
          * @return {null} 
          */
-        cancelEdit: function(data, e){
-            console.log(ko.toJSON(data));
+        cancelEdit: function(tile, e){
+            var oldData = JSON.parse(tile._data());
+            _.keys(tile.data).forEach(function(nodegroup_id){
+                if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
+                    tile.data[nodegroup_id](oldData[nodegroup_id]);
+                }
+            }, this);
         },
 
         /**
@@ -336,7 +346,9 @@ define([
          * @return {null} 
          */
         toggleGroup: function(data, e){
-            $(e.currentTarget.parentElement.parentElement.nextElementSibling).toggle('fast');
+            var contentPane = $(e.currentTarget.nextElementSibling);
+            contentPane.toggle('fast');
+            $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
         },
 
         /**
@@ -349,7 +361,7 @@ define([
         selectTab: function(data, e){
             var selectedTab = e.currentTarget;
             var tabElems = selectedTab.parentElement.children;
-            var contentElems = selectedTab.parentElement.nextElementSibling.children;
+            var contentElems = $(selectedTab.parentElement.nextElementSibling).find('.tab-pane');
             var tabIndex = Array.prototype.indexOf.call(tabElems, selectedTab);
             $(tabElems).removeClass('active');
             $(selectedTab).addClass('active');
@@ -389,7 +401,7 @@ define([
                     }
                 }, this);
             }
-            //tile.dirty(false);
+            tile.dirty(false);
         },
 
         /**

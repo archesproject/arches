@@ -93,6 +93,9 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             $(el).on("change", function(val) {
                 return allBindings.select2Config.value(val.val);
             });
+            select2Config.value.subscribe(function(newVal){
+                $(el).select2("val", newVal);
+            }, this);
         }
     };
 
