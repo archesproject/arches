@@ -6,7 +6,7 @@ sudo rm -r /home/ubuntu/ENV
 sudo apt-get install -y git
 sudo apt-get install -y python-pip
 sudo -H pip install virtualenv==13.1.2
-npm install -g bower
+sudo npm install -g bower
 
 git clone -b master https://github.com/archesproject/arches.git /home/ubuntu/arches
 
