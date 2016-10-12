@@ -40,7 +40,8 @@
     "datatables-responsive": "~2.1.0",
     "bower-knockout-mapping": "~2.6.0",
     "font-awesome": "~4.6.3",
-    "ionicons": "~2.0.1"
+    "ionicons": "~2.0.1",
+    "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

@@ -1,4 +1,4 @@
-@import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=latin);
+@import url(../bower_components/fonts/openSans.css);
 @import url(../bower_components/bootstrap/dist/css/bootstrap.min.css);
 @import url(../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css);
 @import url(nifty.min.css);
