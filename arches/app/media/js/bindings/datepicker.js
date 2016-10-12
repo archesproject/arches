@@ -13,6 +13,14 @@ define([
         init: function (element, valueAccessor, allBindingsAccessor) {
             //initialize datepicker with some optional options
             var options = allBindingsAccessor().datepickerOptions || {};
+
+            if (ko.isObservable(options.dateFormat)) {
+                options.dateFormat.subscribe(function (value) {
+                    options.dateFormat = value;
+                    $(element).datetimepicker(options);
+                })
+                options.dateFormat = options.dateFormat();
+            }
             $(element).datetimepicker(options);
 
             //when a user changes the date, update the view model
