@@ -1,16 +1,19 @@
 @import url(//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=latin);
-@import url(//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.min.css);
+@import url(../bower_components/bootstrap/dist/css/bootstrap.min.css);
+@import url(../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css);
 @import url(nifty.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css);
+@import url(../bower_components/font-awesome/css/font-awesome.min.css);
+@import url(../bower_components/ionicons/css/ionicons.min.css);
 @import url(../plugins/themify-icons/themify-icons.min.css);
 @import url(../plugins/chosen.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css);
+@import url(../bower_components/select2/dist/css/select2.min.css);
 @import url(//cdnjs.cloudflare.com/ajax/libs/select2/3.5.0/select2-bootstrap.min.css);
-@import url(//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css);
-@import url(//api.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl.css);
+@import url(../bower_components/summernote/dist/summernote.css);
+@import url(../bower_components/mapbox-gl-js/mapbox-gl.css);
+@import url(../bower_components/noUiSlider/distribute/nouislider.min.css);
+@import url(../plugins/openlayers/ol.css);
+@import url(widgets/geometry.css);
 
 .navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
