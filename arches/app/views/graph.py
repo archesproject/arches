@@ -411,6 +411,8 @@ class ReportEditorView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',
@@ -424,6 +426,8 @@ class ReportEditorView(GraphBaseView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             graph_id=self.graph.pk,
+            map_layers=map_layers,
+            map_sources=map_sources,
          )
 
         return render(request, 'views/graph/report-editor.htm', context)

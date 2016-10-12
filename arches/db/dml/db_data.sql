@@ -3460,7 +3460,21 @@ INSERT INTO report_templates(templateid, name, description, component, component
     VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
+    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
+        "geometrytypes": {"point": true, "line": true, "poly": true},
+        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
+        "basemap": "streets",
+        "geometryTypes": ["Point","Line","Polygon"],
+        "geocoder": "MapzenGeocoder",
+        "zoom": 10,
+        "maxZoom": 19,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79,
+        "pitch": 0.0,
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search"
+    }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');

@@ -72,6 +72,8 @@ class MapzenGeocoder(Geocoder):
         url = 'https://search.mapzen.com/v1/autocomplete?'
         response = self.get_response(query_args, url)
         results = []
+        print response
+
         for feature in response['features']:
             results.append({
                 'id': feature['properties']['name'],
@@ -82,8 +84,7 @@ class MapzenGeocoder(Geocoder):
                       feature['geometry']['coordinates'][0],
                       feature['geometry']['coordinates'][1]
                     ]
-                },
-                'score': feature['properties']['confidence']
+                }
             })
 
         return results

@@ -130,35 +130,11 @@
                 geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}"
             },
-            mapDefaults: {
-                x: {{ map_info.x }},
-                y: {{ map_info.y }},
-                zoom: {{ map_info.zoom }},
-                minZoom: {{ map_info.map_min_zoom }},
-                maxZoom: {{ map_info.map_max_zoom }},
-                extent: '{{ map_info.extent }}'
-            },
             resourceMarker: {
                 font: '{{ map_info.resource_marker_font }}',
                 icon: '{{ map_info.resource_marker_icon }}',
                 defaultColor: '{{ map_info.resource_marker_color }}'
             },
-            // bingKey: "{{ map_info.bing_key }}",
-            bingLayers: [{
-                id: 'Road',
-                name: "{% trans 'Streets' %}",
-                icon: "{% static 'img/map/bing_streets.png' %}"
-            },
-            {
-                id: 'Aerial',
-                name: "{% trans 'Satellite' %}",
-                icon: "{% static 'img/map/bing_satellite.png' %}"
-            },
-            {
-                id: 'AerialWithLabels',
-                name: "{% trans 'Streets & Satellite' %}",
-                icon: "{% static 'img/map/bing_hybrid.png' %}"
-            }],
             confirmNav: {
                 title: "{% trans 'Edits pending...' %}",
                 text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
