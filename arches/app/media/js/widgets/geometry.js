@@ -6,12 +6,13 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
+    'knockout-mapping',
     'select2v4',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -168,27 +169,30 @@ define([
                 }
 
                 this.map.on('load', function(){
-                  if (_.isArray(self.value)) {
-                    self.value.forEach(function(tile)
-                        {
-                        _.each(tile.data, function(val, key) {
-                          if (_.contains(val, 'FeatureCollection')){
-                            var source = self.map.getSource('resource')//.setData(val.features)
-                            if (!self.configForm) {
-                              self.value.forEach(function(tile){
-                                _.each(tile.data, function(val, key){
+                  if (!self.configForm) {
+                      if (_.isObject(self.value)) { //confirm value is not "", null, or undefined
+                          var source = self.map.getSource('resource')
+                          if (self.reportHeader === true) {  //check if values are for a report header
+                            self.value.forEach(function(tile)
+                                {
+                                _.each(tile.data, function(val, key) {
                                   if (_.contains(val, 'FeatureCollection')){
-                                    source.setData(val)
+                                      self.value.forEach(function(tile){
+                                        _.each(tile.data, function(val, key){
+                                          if (_.contains(val, 'FeatureCollection')){
+                                            source.setData(val)
+                                          }
+                                        })
+                                      }, self)
                                   }
-                                })
-                                // overlayLayers.push()
+                                }, self);
                               }, self)
-                            }
-                          }
-                        }, self);
-                      }, self)
-                  };
-                })
+                          } else { //if values are for a form widget...
+                            source.setData(koMapping.toJS(self.value))
+                          };
+                      }
+                    }
+                });
 
                 this.selectedItems.subscribe(function(e){
                     var coords = e.geometry.coordinates;
