@@ -4,12 +4,15 @@ import zipfile
 import datetime
 import json
 import glob
+import uuid
 from django.conf import settings
-from formats.csvfile import CsvWriter 
-from formats.kmlfile import KmlWriter 
-from formats.shpfile import ShpWriter 
+from formats.csvfile import CsvWriter
+from formats.kmlfile import KmlWriter
+from formats.shpfile import ShpWriter
 from formats.archesjson import JsonWriter #Writes full resource instances rather than search results
 from django.http import HttpResponse
+from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 try:
     from cStringIO import StringIO
@@ -25,7 +28,9 @@ class ResourceExporter(object):
 
     def export(self, resources=None, zip=False, search_results=True, dest_dir=None):
         result=None
-        if search_results == True:
+        if search_results == True and dest_dir is not None:
+            result = self.writer.write_resources(resources, dest_dir)
+        elif search_results == True:
             configs = self.read_export_configs()
             result = self.writer.write_resources(resources, configs)
         else:
@@ -45,7 +50,7 @@ class ResourceExporter(object):
                     configs['RESOURCE_TYPES'][key]['records'] = []
             else:
                 configs = ''
-        
+
         return configs
 
     def zip_response(self, files_for_export, zip_file_name=None, file_type=None):
@@ -71,6 +76,15 @@ class ResourceExporter(object):
         response.write(zip_stream)
         return response
 
-
-
-
+    def get_resources_for_export(self, resourceids):
+        resources = []
+        if resourceids == None or resourceids == []:
+            for resourceinstance in models.ResourceInstance.objects.all():
+                resourceids.append(resourceinstance.resourceinstanceid)
+        for resourceid in resourceids:
+            if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
+                resource = {}
+                resource['resourceinstanceid'] = resourceid
+                resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
+                resources.append(resource)
+        return JSONSerializer().serialize(resources)
