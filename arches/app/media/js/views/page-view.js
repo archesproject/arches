@@ -6,7 +6,7 @@ define([
     'arches',
     'viewmodels/alert',
     'bindings/scrollTo',
-    'bootstrap-nifty'
+    'bootstrap'
 ], function($, _, Backbone, ko, arches,  AlertViewModel) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the

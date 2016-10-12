@@ -119,7 +119,7 @@ class Command(BaseCommand):
             self.export_resource_graphs(package_name, options['dest_dir'])
 
         if options['operation'] == 'export_resources':
-            self.export_resources(package_name, options['dest_dir'])
+            self.export_resources(package_name, options['dest_dir'], options['resources'])
 
         if options['operation'] == 'import_json':
             self.import_json(package_name, options['source'])
@@ -293,9 +293,11 @@ class Command(BaseCommand):
         Runs the setup.py file found in the package root
 
         """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.setup.load_resources' % package_name)
-        load(data_source)
+        # data_source = None if data_source == '' else data_source
+        # load = import_string('%s.setup.load_resources' % package_name)
+        # load(data_source)
+        ArchesFileImporter(data_source).import_business_data()
+
 
     def remove_resources(self, load_id):
         """
@@ -320,25 +322,33 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-    def export_resource_graphs(self, package_name, data_dest=None):
+    def export_resource_graphs(self, package_name, data_dest=None, resource_graphs=None):
         """
-        Exports resource graphs to csv files
+        Export resource graphs to arches.json
         """
-        graph_exporter.export(data_dest)
+        # graph_exporter.export(data_dest)
 
-    def export_resources(self, package_name, data_dest=None):
+        if resource_graphs != None:
+            resource_graphs = [x.strip(' ') for x in resource_graphs.split(",")]
+        ArchesFileExporter().export_graphs(data_dest, resource_graphs)
+
+    def export_resources(self, package_name, data_dest=None, resources=''):
         """
         Exports resources to archesjson
         """
+    #     resource_exporter = ResourceExporter('json')
+    #     resource_exporter.export(search_results=False, dest_dir=data_dest)
+    #     related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
+    #     relations_file = os.path.splitext(data_dest)[0] + '.relations'
+    #     with open(relations_file, 'w') as f:
+    #         csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
+    #         csvwriter.writeheader()
+    #         for csv_record in related_resources:
+    #             csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
+
         resource_exporter = ResourceExporter('json')
-        resource_exporter.export(search_results=False, dest_dir=data_dest)
-        related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
-        relations_file = os.path.splitext(data_dest)[0] + '.relations'
-        with open(relations_file, 'w') as f:
-            csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
-            csvwriter.writeheader()
-            for csv_record in related_resources:
-                csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
+        resource_exporter.export(resources=resources, dest_dir=data_dest)
+
 
     def import_json(self, package_name, data_source=None):
         """
@@ -346,7 +356,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        ArchesFileImporter(data_source).import_concepts()        
+        ArchesFileImporter(data_source).import_concepts()
         ArchesFileImporter(data_source).import_graphs()
 
     def export_json(self, package_name, data_dest=None, resources=None):
