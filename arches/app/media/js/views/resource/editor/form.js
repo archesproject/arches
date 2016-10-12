@@ -31,58 +31,8 @@ define([
             this.cards = ko.observableArray([new CardModel({})]);
             this.tiles = koMapping.fromJS({});
             this.blanks = koMapping.fromJS({});
-            this.loadForm(this.formid);
             this.ready = ko.observable(false);
-        },
-
-        initTile: function(data){
-            _.keys(data).forEach(function(nodegroup_id){
-                if(nodegroup_id !== '__ko_mapping__'){
-                    data[nodegroup_id]().forEach(function(tile){
-                        //tile.childTiles = ko.observableArray();
-                        tile._data = ko.observable(koMapping.toJSON(tile.data));
-                        tile.childIsDirty = ko.observable(false);
-                        tile.dirty = ko.computed(function(){
-                            // tile.childTiles().forEach(function(childTile){
-                            //     childIsDirty || childTile.dirty();
-                            // })
-                            // var checkChildIsDirty = function(obj){
-                            //     var ret = false;
-                            //     _.keys(obj).forEach(function(ng){
-                            //         if(ng !== '__ko_mapping__'){
-                            //             obj[ng]().forEach(function(t){
-                            //                 ret = t.dirty();
-                            //                 t.dirty.subscribe(function(isDirty){
-                            //                     tile.childIsDirty(isDirty || tile.childIsDirty());
-                            //                 })
-                            //             }, this);
-                            //         }
-                            //     }, this);
-                            //     return ret;
-                            //     // for (key in obj) {
-                            //     //     if(obj.hasOwnProperty(key)){
-                            //     //         if(ko.isObservable(obj[key]) && typeof obj[key].dirty === 'function' && obj[key].dirty()) {
-                            //     //             return true;
-                            //     //         }else{
-                            //     //             return checkChildIsDirty(ko.unwrap(obj[key]));
-                            //     //         }
-                            //     //     }
-                            //     // }
-
-                            // }
-
-                            // var x = !!tile.tiles ? checkChildIsDirty(tile.tiles) : false;
-                            return koMapping.toJSON(tile.data) !== tile._data() || tile.childIsDirty();
-                        });
-                        if(!!tile.tiles){
-                            this.initTile(tile.tiles);
-                        }
-                        // if(!!parentTile){
-                        //     parentTile.childTiles.push(tile);
-                        // }
-                    }, this);
-                }
-            }, this);
+            this.loadForm(this.formid);
         },
 
         /**
@@ -99,10 +49,28 @@ define([
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,
                 success: function(response) {
                     window.location.hash = formid;
+                    self.ready(false);
                     koMapping.fromJS(response.tiles, self.tiles);
                     koMapping.fromJS(response.blanks, self.blanks);
-                    self.initTile(self.tiles);
-                    self.initTile(self.blanks);
+                    self.initTiles(self.tiles);
+                    self.initTiles(self.blanks);
+                    // ko.watch(self.blanks, {
+                    //     depth: -1,
+                    //     keepOldValues: 1,
+                    //     tagParentsWithName: true,
+                    //     tagFields: true,
+                    //     oldValues: 3
+                    // }, function(parents, child, item) {
+                    //     var log = parents[0] ? parents[0]._fieldName + ': ' : '';
+
+                    //     if (item)
+                    //         log += item.status + ' ' + ko.toJSON(item.value);
+                    //     else
+                    //         log += ko.toJSON(child.oldValues[0]) + ' -> ' + ko.toJSON(child());
+                    //         //log += ko.toJSON(child());
+                    //     parents[0]()[0].dirty(true);
+                    //     console.log(log);
+                    // });
                     self.cards.removeAll();
                     response.forms[0].cardgroups.forEach(function(cardgroup){
                         self.cards.push(new CardModel({
@@ -124,12 +92,57 @@ define([
         },
 
         /**
+         * initializes a list of tile objects
+         * @memberof Form.prototype
+         * @param  {object} data the list of tile objects to initialize
+         * @return {null} 
+         */
+        initTiles: function(data){
+            _.keys(data).forEach(function(nodegroup_id){
+                if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
+                    data[nodegroup_id]().forEach(function(tile){
+                        this.initTile(tile);
+                    }, this);
+                }
+            }, this);
+        },
+
+        /**
+         * initializes a single tile object
+         * @memberof Form.prototype
+         * @param  {object} tile the tile object to initialize
+         * @return {null} 
+         */
+        initTile: function(tile){
+            tile._data = ko.observable(koMapping.toJSON(tile.data));
+            tile.dirty = ko.computed(function(){
+                return koMapping.toJSON(tile.data) !== tile._data();
+            });
+            //tile.dirty = ko.observable(false).watch(false);
+            if(!!tile.tiles){
+                this.initTiles(tile.tiles);
+            }
+        },
+
+        /**
+         * gets a copy of a new blank tile
+         * @memberof Form.prototype
+         * @param  {string} nodegroup_id the nodegroup id of the blank tile to retrieve
+         * @return {object} a tile object
+         */
+        getBlankTile: function(nodegroup_id){
+            var tile = koMapping.fromJS(koMapping.toJS(this.blanks[nodegroup_id]()[0]));
+            this.initTile(tile);
+            return tile;
+        },
+
+        /**
          * a function to return the knockout context used to render the actual widgets in the form
          * @memberof Form.prototype
          * @param  {object} outerCard a reference to the outer most card in the form
          * @param  {object} card a reference to the card associated with the form being rendered
          * @param  {object} tile a reference to the currently bound tile
-         * @return {null} 
+         * @return {object} a tile object
          */
         getFormEditingContext: function(outerCard, card, tile){
             if(outerCard.isContainer()){
@@ -140,7 +153,7 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(2)
-                        return this.blanks[card.get('nodegroup_id')]()[0];
+                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 } 
                 // this is a "wizard"
@@ -150,7 +163,7 @@ define([
                         return tile.tiles[card.get('nodegroup_id')]()[0];
                     }else{
                         //console.log(4)
-                        return this.blanks[card.get('nodegroup_id')]()[0];
+                        return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
                 } 
             }else{
@@ -160,7 +173,7 @@ define([
                     return tile;
                 }else{
                     //console.log(6)
-                    return this.blanks[card.get('nodegroup_id')]()[0];
+                    return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                 }
             }
         },
@@ -342,6 +355,7 @@ define([
             $(selectedTab).addClass('active');
             $(contentElems).removeClass('active in');
             $(contentElems[tabIndex]).addClass('active in');
+            e.stopPropagation();
         },
 
         /**
@@ -375,6 +389,7 @@ define([
                     }
                 }, this);
             }
+            //tile.dirty(false);
         },
 
         /**
@@ -387,6 +402,7 @@ define([
             _.each(tile.data, function(value, key, list){
                 value("");
             }, this);
+            //tile.dirty(false);
         }
 
     });
