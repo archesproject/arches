@@ -243,7 +243,7 @@
                     <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                         <div class="ep-form-toolbar-tools mar-no flex">
                             <span>
-                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash" data-bind="click: form.clearTile.bind(form, $data)">{% trans "Discard" %}</button>
                                 <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form)">{% trans "Save" %}</button>
                             </span>
                         </div>
