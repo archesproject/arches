@@ -316,7 +316,14 @@ define([
                 this.saveGeometries = function() {
                     var self = this;
                     return function() {
-                        self.value(self.draw.getAll());
+                        var currentDrawing = self.draw.getAll()
+                        if (self.value.features !== undefined) {
+                              currentDrawing.features.forEach(function(feature){
+                              self.value.features.push(feature)
+                           })
+                        } else {
+                          self.value(currentDrawing)
+                        }
                     }
                 }
 
