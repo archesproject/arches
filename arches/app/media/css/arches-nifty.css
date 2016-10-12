@@ -3987,6 +3987,11 @@ div.row.widget-wrapper:hover {
 	padding-left: 270px;
 	margin-top: 0px;
 }
+
+.rp-report-tile-map {
+  margin-left: -270px;
+}
+
 .rp-report-container-tile .rp-report-tile {
 	padding-bottom: 0;
 }

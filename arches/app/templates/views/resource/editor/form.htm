@@ -22,7 +22,7 @@
                     <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
                         data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
                         as: 'card'
-                    }, click: form.toggleTile">
+                    }, click: isWizard && !forceBlank ? form.toggleTile : null;">
                         <li id="summary-group" data-bind="css: {
                             'active': 0 === $index()
                         }, click: form.selectTab.bind($parent)">
@@ -51,9 +51,6 @@
                             <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, form, parentTile)">
                                 <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                             </a>
-                           <!--  <div class="wizard-card-tools">
-                                <i class="ion-ios-trash add-tooltip record-delete library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, form, parentTile)"></i>
-                            </div> -->
                             <!-- /ko -->
                             <div class="panel-body card-panel-body">
                                 <div id="" class="card-content">
@@ -231,6 +228,7 @@
 
 
                     <!-- Wizard Level Buttons -->
+                    
                     <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                         <div class="ep-form-toolbar-tools mar-no flex">
                             <span>
@@ -239,6 +237,7 @@
                             </span>
                         </div>
                     </div>
+           
 
 
                 <!-- /ko -->
