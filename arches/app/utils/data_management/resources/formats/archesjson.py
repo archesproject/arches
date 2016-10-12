@@ -48,12 +48,16 @@ class JsonWriter(Writer):
         export = {}
         export['business_data'] = {}
 
-        resourceids = set([x.strip() for x in resourceids.split(',')])
-        if resourceids == None or resourceids == []:
+        if resourceids == None or resourceids == [] or resourceids == '':
+            resourceids = []
             for resourceinstance in models.ResourceInstance.objects.all():
                 resourceids.append(resourceinstance.resourceinstanceid)
+        else:
+            resourceids = set([x.strip() for x in resourceids.split(',')])
+
         for resourceid in resourceids:
             if resourceid != uuid.UUID(str('40000000-0000-0000-0000-000000000000')):
+                resourceid = uuid.UUID(str(resourceid))
                 resource = {}
                 resource['tiles'] = models.Tile.objects.filter(resourceinstance_id=resourceid)
                 resource['resourceinstance'] = models.ResourceInstance.objects.get(resourceinstanceid=resourceid)
