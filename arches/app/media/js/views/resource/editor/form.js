@@ -314,12 +314,17 @@ define([
         /**
          * currently unused
          * @memberof Form.prototype
-         * @param  {object} data a knockout reference to the tile object
+         * @param  {object} tile a knockout reference to the tile object
          * @param  {object} e event object
          * @return {null} 
          */
-        cancelEdit: function(data, e){
-            console.log(ko.toJSON(data));
+        cancelEdit: function(tile, e){
+            var oldData = JSON.parse(tile._data());
+            _.keys(tile.data).forEach(function(nodegroup_id){
+                if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
+                    tile.data[nodegroup_id](oldData[nodegroup_id]);
+                }
+            }, this);
         },
 
         /**
