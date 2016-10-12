@@ -1,6 +1,6 @@
 {% load i18n %}
 <!-- ko if: !configForm  && state=== 'form' -->
-<div class="row widget-wrapper">
+  <div class="row widget-wrapper"  data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
@@ -182,25 +182,8 @@
               </div>
             </div>
 
-            <div class="map-widget-panel-title legend-subtitle">
-                <h5 class=""> Basemaps </h5>
-            </div>
-            <!-- ko foreach: { data: [$data], as: 'self' } -->
-            <!-- ko foreach: basemaps -->
-            <div class="map-widget-overlay-item relative">
-                <div class="map-overlay-vis-toogle text-center map-thumbnail">
-                    <img height="40px" data-bind="attr: { src: '{{ STATIC_URL }}img/map-thumbnails/' + name + '.png'}" ></img>
-                </div>
-                <div class="map-overlay-name">
-                    <a id="" class="" href=""><span data-bind='text: name'><span></a>
-                </div>
-            </div>
-            <!-- /ko -->
-            <!-- /ko -->
-
         </div>
     </div>
-
 
     <!-- Overlay Selector -->
     <div class="overlay-container" style="display: none;">
@@ -216,12 +199,13 @@
 </div>
 <!-- /ko -->
 
+
 <!-- ko if: !configForm  && state=== 'report' -->
-<dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans " None " %}'"></dd>
+<div>Map summary details possibly to go here...</div>
 <!-- /ko -->
 
-<!-- ko if: configForm -->
+
+<!-- ko if: configForm && state!== 'report'-->
 <div class="control-label">
     {% trans "Zoom Level" %}
 </div>
