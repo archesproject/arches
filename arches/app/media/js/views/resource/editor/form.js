@@ -409,7 +409,7 @@ define([
          */
         toggleGroup: function(data, e){
             $(e.currentTarget.nextElementSibling).toggle('fast');
-            $(e.currentTarget.nextElementSibling).find('.library-tools-icon').toggle('fast');
+            $(e.currentTarget.nextElementSibling).find('.library-tools-icon')[0].toggle('fast');
         },
 
         /**
