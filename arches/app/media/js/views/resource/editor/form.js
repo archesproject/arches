@@ -268,7 +268,7 @@ define([
             }
             if(justadd){
                 parentTile.dirty(true);
-                tiles.unshift(koMapping.fromJS(ko.toJS(tile)));
+                tiles.unshift(this.initTile(koMapping.fromJS(ko.toJS(tile))));
                 this.clearTileValues(tile);
             }else{
                 var model;
@@ -285,11 +285,11 @@ define([
                         if(savingParentTile){
                             parentTile.tileid(request.responseJSON.tileid);
                             request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                parentTile.tiles[tile.nodegroup_id].unshift(koMapping.fromJS(tile));
+                                parentTile.tiles[tile.nodegroup_id].unshift(this.initTile(koMapping.fromJS(tile)));
                             }, this)
                             this.clearTile(tile);
                         }else{
-                            tiles.unshift(koMapping.fromJS(request.responseJSON));
+                            tiles.unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
                             this.clearTileValues(tile);
                         }
                     }else{
@@ -408,8 +408,9 @@ define([
          * @return {null} 
          */
         toggleGroup: function(data, e){
-            $(e.currentTarget.nextElementSibling).toggle('fast');
-            $(e.currentTarget.nextElementSibling).find('.library-tools-icon')[0].toggle('fast');
+            var contentPane = $(e.currentTarget.nextElementSibling);
+            contentPane.toggle('fast');
+            $(contentPane.find('.library-tools-icon')[0]).toggle('fast');
         },
 
         /**
