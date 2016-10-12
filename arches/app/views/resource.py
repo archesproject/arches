@@ -107,6 +107,8 @@ class ResourceReportView(BaseManagerView):
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
         templates = models.ReportTemplate.objects.all()
         context = self.get_context_data(
             main_script='views/resource/report',
@@ -119,6 +121,8 @@ class ResourceReportView(BaseManagerView):
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
+            map_layers = map_layers,
+            map_sources = map_sources,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name
          )
