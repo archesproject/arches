@@ -12,7 +12,7 @@
 
 <!-- ko if: !configForm  && state=== 'report' -->
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
+<dd data-bind="html: value() || '{% trans "None" %}'"></dd>
 <!-- /ko -->
 
 <!-- ko if: configForm -->
