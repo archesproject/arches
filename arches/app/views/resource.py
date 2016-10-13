@@ -124,7 +124,8 @@ class ResourceReportView(BaseManagerView):
             map_layers = map_layers,
             map_sources = map_sources,
             graph_id=resource_instance.graph.pk,
-            graph_name=resource_instance.graph.name
+            graph_name=resource_instance.graph.name,
+            graph_json = JSONSerializer().serialize(resource_instance.graph)
          )
 
         return render(request, 'views/resource/report.htm', context)

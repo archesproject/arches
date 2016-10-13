@@ -238,7 +238,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}
         define('graph-base-data', [], function () {
             return {
-                graphid: '{{graphid}}'
+                graphid: '{{graphid}}',
+                graph: '{{graph_json}}'
             };
         });
         {% endautoescape %}

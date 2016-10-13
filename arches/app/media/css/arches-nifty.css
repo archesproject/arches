@@ -14,6 +14,14 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
 
+.regular-link{
+    color: #337ab7;
+    text-decoration: none;
+}
+.regular-link:hover{
+    text-decoration: underline;
+}
+
 .navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }
@@ -24,6 +32,30 @@
 
 .navbar-header{
     height: 50px;
+}
+
+.arches-navbar {
+    background: #fff;
+}
+
+.navbar-content.arches-navbar {
+    margin-left: 0px;
+}
+
+.arches-user-img {
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.username {
+    margin: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.username:hover {
+    background: #f2f2f2;
 }
 
 .brand-icon {
@@ -135,6 +167,16 @@
 .sub-title {
     font-weight: 600;
 }
+
+.crud-record-item {
+    background: rgb(250, 250, 250); 
+    padding: 0px;
+}
+
+.crud-record-item:nth-child(even) {
+    background: #fdfdfd; 
+}
+
 .data-card-alert {
     margin-bottom: 5px;
     margin-top: 5px;
@@ -624,6 +666,53 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     text-overflow: ellipsis;
     padding: 2px 2px 3px 0;
 }
+
+.crud-card {
+    float: left;
+    width: 274px;
+    height: 58px;
+    margin: -5px 0 0 0;
+    position: relative;
+    padding: 5px;
+    color: #666;
+    background: #fcfcfc;
+    opacity: .7;
+}
+
+.crud-card:not(.selected):hover {
+    background: #fff;
+    cursor: pointer;
+    opacity: 1.0;
+    color: #123;
+    border-bottom: 1px solid #eee;
+}
+
+
+
+.crud-card-main {
+    width: 200px;
+    position: absolute;
+    left: 60px;
+    top: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+}
+
+.crud-card-subtitle {
+    width: 200px;
+    position: absolute;
+    left: 60px;
+    top: 25px;
+    padding: 2px 2px 3px 0px;
+    color: #8ba2b9;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .permission-level-icon {
     height: 20px;
     margin-top: -5px;
@@ -3114,6 +3203,20 @@ li.card-tree-list:last-of-type {
 .ep-card-crud-container {
     margin: 10px;
 }
+
+.left-column-crud-container{
+    -ms-flex: 0 0 275px;
+    -webkit-flex: 0 0 275px;
+    flex: 0 0 275px;
+    margin-bottom: 0px;
+    background-color: #fafafa;
+    width: 275px;
+    padding: 7px;
+    border-right: solid 1px #dddddd;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .left-column-container{
     -ms-flex: 0 0 220px;
     -webkit-flex: 0 0 220px;
@@ -4082,8 +4185,14 @@ h4.report-toolbar-title {
     color: #808080;
 }
 .dataTable tr:hover {
-    background-color: #e4e4e4 !important;
+    background-color: #f0f0f0 !important;
+    cursor: pointer;
 }
+
+#container .table td {
+    vertical-align: middle;
+}
+
 .map-widget-container {
     position: absolute;
     top: 10px;
@@ -4140,7 +4249,7 @@ div.row.widget-wrapper.report-header:hover {
     height: 36px;
     border: 1px solid #ddd;
     border-radius: 2px;
-    transition: all .20s ease;
+    transition: all .450s ease;
     z-index: 1;
 }
 

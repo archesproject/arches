@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="boxed">
                 <div id="content-container" style="padding-bottom: 20px; padding-top: 0px;">
                     {% block login_header %}
-                    <div class="navbar-content clearfix" style="background-color: inherit; padding-right: 0px; z-index: 1000;">
+                    <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
                             <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
                                 <a class="mainnav-toggle" href="#">
@@ -108,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
                                 <span class="pull-right">
-                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                    <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
                                 </span>
                                 <div class="username hidden-xs">
                                 {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
