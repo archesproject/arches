@@ -41,7 +41,7 @@
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
     "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin",
-    "mapbox-gl-bower": "*"
+    "mapbox-gl": "archesproject/mapbox-gl-js-bower"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

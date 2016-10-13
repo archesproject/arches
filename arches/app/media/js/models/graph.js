@@ -433,6 +433,19 @@ define(['arches',
                 }, this);
                 return selectedNode;
             }));
+
+            this.graphCards = ko.computed(function(){
+                var parentCards = [];
+                var allCards = this.get('cards')();
+                this.get('nodegroups').filter(function(nodegroup){
+                    return !!nodegroup.parentnodegroup_id === false;
+                }, this).forEach(function(nodegroup){
+                    parentCards = parentCards.concat(allCards.filter(function(card){
+                        return card.nodegroup_id === nodegroup.nodegroupid;
+                    }, this))
+                }, this);
+                return parentCards;
+            }, this);
         },
 
         /**
