@@ -26,13 +26,13 @@
         {% trans "Minimum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, value: minDate, valueUpdate: 'keyup'">
+    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}">
 </div>
 <div class="control-label">
         {% trans "Maximum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, value: maxDate, valueUpdate: 'keyup'">
+    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}">
 </div>
 <div class="control-label">
         {% trans "View Mode" %}
