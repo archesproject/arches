@@ -160,7 +160,10 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date',
     '{
         "placeholder": "Enter date",
-        "dateFormat": "YYYY-MM-DD"
+        "viewMode": "days",
+        "dateFormat": "YYYY-MM-DD",
+        "minDate": false,
+        "maxDate": false
     }'
 );
 

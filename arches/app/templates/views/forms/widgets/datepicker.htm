@@ -6,7 +6,7 @@
         <div class="col-xs-12">
             <div style="pad-hor">
                 <div class="input-group date">
-                    <input type="text" data-bind="datepicker: value, datepickerOptions: {format: dateFormat}" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                    <input type="text" data-bind="datepicker: value, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
                 </div>
             </div>
             <!-- <input type="text" data-bind="datepicker: value, placeholder: placeholder" class="form-control input-lg widget-input"> -->
@@ -22,18 +22,18 @@
 
 <!-- ko if: configForm -->
 
-<!-- <div class="control-label">
+<div class="control-label">
         {% trans "Minimum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, datepickerOptions: {minDate: moment('9/20/2016'), autoclose: true, format: 'YYYY-MM-DD'}, value:minDate, valueUpdate: 'keyup'">
+    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, value: minDate, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
         {% trans "Maximum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, datepickerOptions: {minDate: moment('9/20/2016'), autoclose: true, format: 'YYYY-MM-DD'}, value:maxDate, valueUpdate: 'keyup'">
-</div> -->
+    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: value, value: maxDate, valueUpdate: 'keyup'">
+</div>
 <div class="control-label">
         {% trans "View Mode" %}
 </div>
