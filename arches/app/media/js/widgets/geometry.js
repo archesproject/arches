@@ -12,7 +12,7 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, rrd) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -251,38 +251,42 @@ define([
                     placeholder: this.geocodePlaceholder()
                 };
 
-                var overlays =
-                    _.each(_.where(this.layers, {
-                        isoverlay: true
-                    }), function(overlay) {
-                        _.extend(overlay, {
-                            opacity: ko.observable(100),
-                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
-                                if (key.includes('-color')) {
-                                    return prop
-                                };
-                            })[0],
-                            showingTools: ko.observable(false),
-                            invisible: ko.observable(false),
-                            toggleOverlayTools: function(e) {
-                                this.showingTools(!this.showingTools());
-                            },
-                            toggleOverlayVisibility: function(e) {
-                                this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
-                            },
-                            updateOpacity: function(val) {
-                                val > 0.0 ? this.invisible(false) : this.invisible(true);
-                                this.layer_definitions.forEach(function(layer) {
-                                    this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                                }, map)
-                            }
+                this.createOverlays = function() {
+                    var overlays =
+                        _.each(_.where(this.layers, {
+                            isoverlay: true
+                        }), function(overlay) {
+                            _.extend(overlay, {
+                                opacity: ko.observable(100),
+                                color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
+                                    if (key.includes('-color')) {
+                                        return prop
+                                    };
+                                })[0],
+                                showingTools: ko.observable(false),
+                                invisible: ko.observable(false),
+                                toggleOverlayTools: function(e) {
+                                    this.showingTools(!this.showingTools());
+                                },
+                                toggleOverlayVisibility: function(e) {
+                                    this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
+                                },
+                                updateOpacity: function(val) {
+                                    val > 0.0 ? this.invisible(false) : this.invisible(true);
+                                    this.layer_definitions.forEach(function(layer) {
+                                        this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
+                                    }, map)
+                                }
+                            });
+                            overlay.opacity.subscribe(function(value) {
+                                overlay.updateOpacity(value);
+                            });
                         });
-                        overlay.opacity.subscribe(function(value) {
-                            overlay.updateOpacity(value);
-                        });
-                    });
 
-                this.overlays = ko.observableArray(overlays)
+                    return overlays;
+                }
+
+                this.overlays = ko.observableArray(this.createOverlays())
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                     return baselayer.isoverlay === false
