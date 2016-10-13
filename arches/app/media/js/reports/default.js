@@ -4,6 +4,8 @@ define(['knockout', 'viewmodels/report'], function (ko, ReportViewModel) {
             params.configKeys = [];
 
             ReportViewModel.apply(this, [params]);
+
+            console.log(this.report);
         },
         template: { require: 'text!report-templates/default' }
     });
