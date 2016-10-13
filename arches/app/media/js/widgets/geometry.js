@@ -12,7 +12,7 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, rrd) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -37,10 +37,18 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
+            var resourceIcon = 'fa fa-map-marker';
+            var resourceName = 'resource';
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
+
+            if (!this.configForm && params.graph !== undefined) {
+                resourceIcon = params.graph.iconclass;
+                resourceName = params.graph.name;
+            }
+
             this.selectedBasemap = this.basemap;
 
             this.mapToolsExpanded = ko.observable(false);
@@ -59,7 +67,7 @@ define([
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodeResponseOption = ko.observable();
-            this.selectedItems = ko.observableArray(['Germany'])
+            this.selectedItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -69,48 +77,45 @@ define([
 
 
             this.defineResourceLayer = function(resource) {
-              var resourceLayer = {
-                name: "resource",
-                layer_definitions: [
-                  {
-                      "id":"resource-poly",
-                      "source":"resource",
-                      "type":"fill",
-                      "layout": {},
-                      "filter": ["!in", "$type", "LineString"],
-                      "paint": {
-                          "fill-color": "#fb6017",
-                          "fill-opacity": 0.8
-                      }
-                    },{
-                        "id":"resource-point",
-                        "source":"resource",
-                        "type":"circle",
+                var resourceLayer = {
+                    name: resourceName,
+                    layer_definitions: [{
+                        "id": "resource-poly",
+                        "source": "resource",
+                        "type": "fill",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString"],
+                        "paint": {
+                            "fill-color": "#fb6017",
+                            "fill-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-point",
+                        "source": "resource",
+                        "type": "circle",
                         "layout": {},
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
                             "circle-radius": 5,
                             "circle-color": "#fb6017",
-                            "circle-opacity":0.8
+                            "circle-opacity": 0.8
                         }
-                      },
-                      {
-                          "id":"resource-line",
-                          "source":"resource",
-                          "type":"line",
-                          "layout": {},
-                          "paint": {
-                              "line-color": "#fb6017",
-                              "line-opacity":0.8,
-                              "line-width": 2.5
-                          }
+                    }, {
+                        "id": "resource-line",
+                        "source": "resource",
+                        "type": "line",
+                        "layout": {},
+                        "paint": {
+                            "line-color": "#fb6017",
+                            "line-opacity": 0.8,
+                            "line-width": 2.5
                         }
-                ],
-                isoverlay: true,
-                sortorder: 4,
-                icon: 'fa fa-map-marker'
-              };
-              return resourceLayer;
+                    }],
+                    isoverlay: true,
+                    sortorder: 4,
+                    icon: resourceIcon
+                };
+                return resourceLayer;
             }
 
 
@@ -168,33 +173,32 @@ define([
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
 
-                this.map.on('load', function(){
-                  if (!self.configForm) {
-                      if (_.isObject(self.value)) { //confirm value is not "", null, or undefined
-                          var source = self.map.getSource('resource')
-                          if (self.reportHeader === true) {  //check if values are for a report header
-                            self.value.forEach(function(tile)
-                                {
+                this.map.on('load', function() {
+                    if (!self.configForm) {
+                        var source = self.map.getSource('resource')
+                        if (self.reportHeader === true && !ko.isObservable(self.value)) {
+                            self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
-                                  if (_.contains(val, 'FeatureCollection')){
-                                      self.value.forEach(function(tile){
-                                        _.each(tile.data, function(val, key){
-                                          if (_.contains(val, 'FeatureCollection')){
-                                            source.setData(val)
-                                          }
-                                        })
-                                      }, self)
-                                  }
+                                    if (_.contains(val, 'FeatureCollection')) {
+                                        self.value.forEach(function(tile) {
+                                            _.each(tile.data, function(val, key) {
+                                                if (_.contains(val, 'FeatureCollection')) {
+                                                    source.setData(val)
+                                                }
+                                            })
+                                        }, self)
+                                    }
                                 }, self);
-                              }, self)
-                          } else { //if values are for a form widget...
-                            source.setData(koMapping.toJS(self.value))
-                          };
-                      }
+                            }, self)
+                        } else { //if values are for a form widget...
+                            if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
+                                source.setData(koMapping.toJS(self.value))
+                            }
+                        };
                     }
                 });
 
-                this.selectedItems.subscribe(function(e){
+                this.selectedItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
                     this.redrawGeocodeLayer();
@@ -202,7 +206,7 @@ define([
                     this.map.flyTo({
                         center: centerPoint
                     });
-                  }, this);
+                }, this);
 
                 this.selectEditingTool = function(val, e) {
                     switch (val) {
@@ -222,30 +226,30 @@ define([
 
                 this.dataReturn =
                     function(term, page) {
-                          return {
-                              q: term,
-                              geocoder: self.geocoder()
-                          };
-                      }
+                        return {
+                            q: term,
+                            geocoder: self.geocoder()
+                        };
+                    }
 
                 this.selectSetup = {
-                        ajax: {
-                            url: arches.urls.geocoder,
-                            dataType: 'json',
-                            quietMillis: 250,
-                            data: this.dataReturn,
-                            results: function(data, page) {
-                                return {
-                                    results: data.results
-                                };
-                            },
-                            cache: true
+                    ajax: {
+                        url: arches.urls.geocoder,
+                        dataType: 'json',
+                        quietMillis: 250,
+                        data: this.dataReturn,
+                        results: function(data, page) {
+                            return {
+                                results: data.results
+                            };
                         },
-                        minimumInputLength: 4,
-                        multiple: false,
-                        maximumSelectionSize: 1,
-                        placeholder: this.geocodePlaceholder()
-                    };
+                        cache: true
+                    },
+                    minimumInputLength: 4,
+                    multiple: false,
+                    maximumSelectionSize: 1,
+                    placeholder: this.geocodePlaceholder()
+                };
 
                 var overlays =
                     _.each(_.where(this.layers, {
@@ -322,11 +326,11 @@ define([
                     return function() {
                         var currentDrawing = self.draw.getAll()
                         if (self.value.features !== undefined) {
-                              currentDrawing.features.forEach(function(feature){
-                              self.value.features.push(feature)
-                           })
+                            currentDrawing.features.forEach(function(feature) {
+                                self.value.features.push(feature)
+                            })
                         } else {
-                          self.value(currentDrawing)
+                            self.value(currentDrawing)
                         }
                     }
                 }
@@ -382,27 +386,27 @@ define([
                 }
             };
 
-          this.sources = _.clone(arches.mapSources);
-          this.sources["resource"] = {
-              "type": "geojson",
-              "data": {
-                  "type": "FeatureCollection",
-                  "features": []
-              }
-          }
+            this.sources = _.clone(arches.mapSources);
+            this.sources["resource"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            }
 
-          this.mapStyle = {
-                    "version": 8,
-                    "name": "Basic",
-                    "metadata": {
-                        "mapbox:autocomposite": true,
-                        "mapbox:type": "template"
-                    },
-                    "sources": this.sources,
-                    "sprite": "mapbox://sprites/mapbox/basic-v9",
-                    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-                    "layers": []
-                };
+            this.mapStyle = {
+                "version": 8,
+                "name": "Basic",
+                "metadata": {
+                    "mapbox:autocomposite": true,
+                    "mapbox:type": "template"
+                },
+                "sources": this.sources,
+                "sprite": "mapbox://sprites/mapbox/basic-v9",
+                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "layers": []
+            };
 
             this.mapStyle.layers = this.addInitialLayers();
 
