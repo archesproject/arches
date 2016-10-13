@@ -14,6 +14,14 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
 
+.regular-link{
+    color: #337ab7;
+    text-decoration: none;
+}
+.regular-link:hover{
+    text-decoration: underline;
+}
+
 .navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }

@@ -13,21 +13,24 @@ require([
     var ResourceView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
-            this.viewModel.showResources = ko.observable(true);
-
-            this.viewModel.tableConfig = {
-                "responsive": true,
-                "language": {
-                    "paginate": {
-                        "previous": '<i class="fa fa-angle-left"></i>',
-                        "next": '<i class="fa fa-angle-right"></i>'
-                    }
-                }
-            };
 
             _.defaults(this.viewModel, {
+                showResources: ko.observable(true),
                 showFind: ko.observable(false),
                 graphId: ko.observable(null),
+                editResource: function(url, vm, e){
+                    e.stopPropagation();
+                    this.navigate(url)
+                },
+                tableConfig: {
+                    "responsive": true,
+                    "language": {
+                        "paginate": {
+                            "previous": '<i class="fa fa-angle-left"></i>',
+                            "next": '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                }
             });
 
             this.viewModel.graphId.subscribe(function (graphid) {
