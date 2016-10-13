@@ -93,31 +93,18 @@ require([
         }
     });
 
-    viewModel.graphCards = ko.computed(function(){
-        var parentCards = [];
-        var allCards = this.graphModel.get('cards')();
-        this.graphModel.get('nodegroups').filter(function(nodegroup){
-            return !!nodegroup.parentnodegroup_id === false;
-        }, this).forEach(function(nodegroup){
-            parentCards = parentCards.concat(allCards.filter(function(card){
-                return card.nodegroup_id === nodegroup.nodegroupid;
-            }, this))
-        }, this);
-        return parentCards;
-    }, viewModel);
-
     viewModel.graphCardOptions = ko.computed(function () {
         var options = [{
             name: null,
             graphId: null,
             disabled: true
         }]
-        return options.concat(viewModel.graphCards());
+        return options.concat(viewModel.graphModel.graphCards());
     });
 
     viewModel.newCard = ko.computed({
         read: function() {
-            return viewModel.graphCards().length ? viewModel.graphCards()[0] : null;
+            return viewModel.graphModel.graphCards().length ? viewModel.graphModel.graphCards()[0] : null;
         },
         write: function(value) {
             viewModel.addCard(value);

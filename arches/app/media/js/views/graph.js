@@ -7,7 +7,7 @@ require([
     'arches',
     'view-data',
     'graph-manager-data',
-    'bootstrap-nifty',
+    'bootstrap',
     'bindings/hover',
     'bindings/chosen'
 ], function($, _, ko, BaseManager, AlertViewModel, arches, data, graphManagerData) {

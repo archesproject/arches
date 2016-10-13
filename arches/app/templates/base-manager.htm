@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
 
             <header id="navbar">
-                
+
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
                         <a href="{% url 'home' %}" class="navbar-brand">
@@ -37,14 +37,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </div>
                 </div>
-                
+
             </header>
 
 
             <div class="boxed">
                 <div id="content-container" style="padding-bottom: 20px; padding-top: 0px;">
                     {% block login_header %}
-                    <div class="navbar-content clearfix" style="background-color: inherit; padding-right: 0px; z-index: 1000;">
+                    <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
                             <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
                                 <a class="mainnav-toggle" href="#">
@@ -108,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
                                 <span class="pull-right">
-                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                    <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
                                 </span>
                                 <div class="username hidden-xs">
                                 {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
@@ -196,8 +196,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li>
-                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '/resource') ">
+                                        <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
@@ -207,7 +207,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- ko foreach: allGraphs -->
                                                 <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" data-bind="attr: { href: '/graph/' + graphid + '/add_resource'}">
+                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource') ">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
@@ -216,8 +216,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li>
-                                            <a href="{% url 'config' %}">
+                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>System Settings</strong>
@@ -226,8 +226,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'graph' '' %}">
+                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
                                                 <i class="fa fa-bookmark"></i>
                                                 <span class="menu-title">
                                                     <strong>Arches Designer</strong>
@@ -283,7 +283,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'rdm' '' %}">
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
                                                     RDM
@@ -333,4 +333,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% endautoescape %}
     </script>
 {% endblock pre_require_js %}
-

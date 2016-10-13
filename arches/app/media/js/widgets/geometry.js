@@ -6,13 +6,13 @@ define([
     'arches',
     'mapbox-gl',
     'mapbox-gl-draw',
-    'map/mapbox-style',
+    'knockout-mapping',
     'select2v4',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, mapStyle) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -37,9 +37,18 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-
+            var resourceIcon = 'fa fa-map-marker';
+            var resourceName = 'resource';
+            this.reportHeader = params.type === 'report-header' ? true : false;
+            this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
             WidgetViewModel.apply(this, [params]);
+
+            if (!this.configForm && params.graph !== undefined) {
+                resourceIcon = params.graph.iconclass;
+                resourceName = params.graph.name;
+            }
+
             this.selectedBasemap = this.basemap;
 
             this.mapToolsExpanded = ko.observable(false);
@@ -47,7 +56,7 @@ define([
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
-
+            this.layers = _.clone(arches.mapLayers);
             this.geocoderOptions = ko.observableArray([{
                 'id': 'BingGeocoder',
                 'name': 'Bing'
@@ -58,7 +67,7 @@ define([
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodeResponseOption = ko.observable();
-            this.selectedItems = ko.observableArray(['Germany'])
+            this.selectedItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -66,13 +75,58 @@ define([
                 legend: ko.observable(true)
             };
 
+
+            this.defineResourceLayer = function(resource) {
+                var resourceLayer = {
+                    name: resourceName,
+                    layer_definitions: [{
+                        "id": "resource-poly",
+                        "source": "resource",
+                        "type": "fill",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString"],
+                        "paint": {
+                            "fill-color": "#fb6017",
+                            "fill-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-point",
+                        "source": "resource",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ["!in", "$type", "LineString", "Polygon"],
+                        "paint": {
+                            "circle-radius": 5,
+                            "circle-color": "#fb6017",
+                            "circle-opacity": 0.8
+                        }
+                    }, {
+                        "id": "resource-line",
+                        "source": "resource",
+                        "type": "line",
+                        "layout": {},
+                        "paint": {
+                            "line-color": "#fb6017",
+                            "line-opacity": 0.8,
+                            "line-width": 2.5
+                        }
+                    }],
+                    isoverlay: true,
+                    sortorder: 4,
+                    icon: resourceIcon
+                };
+                return resourceLayer;
+            }
+
+
             this.addInitialLayers = function() {
+                this.layers.push(this.defineResourceLayer());
                 var initialLayers = [];
-                var overlayLayers = _.sortBy(_.where(arches.mapLayers, {
+                var overlayLayers = _.sortBy(_.where(this.layers, {
                     isoverlay: true
                 }), 'sortorder').reverse();
 
-                arches.mapLayers.forEach(function(mapLayer) {
+                this.layers.forEach(function(mapLayer) {
                     if (mapLayer.name === this.basemap()) {
                         _.each(mapLayer.layer_definitions, function(layer) {
                             initialLayers.push(layer);
@@ -119,7 +173,32 @@ define([
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
 
-                this.selectedItems.subscribe(function(e){
+                this.map.on('load', function() {
+                    if (!self.configForm) {
+                        var source = self.map.getSource('resource')
+                        if (self.reportHeader === true && !ko.isObservable(self.value)) {
+                            self.value.forEach(function(tile) {
+                                _.each(tile.data, function(val, key) {
+                                    if (_.contains(val, 'FeatureCollection')) {
+                                        self.value.forEach(function(tile) {
+                                            _.each(tile.data, function(val, key) {
+                                                if (_.contains(val, 'FeatureCollection')) {
+                                                    source.setData(val)
+                                                }
+                                            })
+                                        }, self)
+                                    }
+                                }, self);
+                            }, self)
+                        } else { //if values are for a form widget...
+                            if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
+                                source.setData(koMapping.toJS(self.value))
+                            }
+                        };
+                    }
+                });
+
+                this.selectedItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
                     this.redrawGeocodeLayer();
@@ -127,7 +206,7 @@ define([
                     this.map.flyTo({
                         center: centerPoint
                     });
-                  }, this);
+                }, this);
 
                 this.selectEditingTool = function(val, e) {
                     switch (val) {
@@ -147,63 +226,67 @@ define([
 
                 this.dataReturn =
                     function(term, page) {
-                          return {
-                              q: term,
-                              geocoder: self.geocoder()
-                          };
-                      }
+                        return {
+                            q: term,
+                            geocoder: self.geocoder()
+                        };
+                    }
 
                 this.selectSetup = {
-                        ajax: {
-                            url: arches.urls.geocoder,
-                            dataType: 'json',
-                            quietMillis: 250,
-                            data: this.dataReturn,
-                            results: function(data, page) {
-                                return {
-                                    results: data.results
-                                };
-                            },
-                            cache: true
+                    ajax: {
+                        url: arches.urls.geocoder,
+                        dataType: 'json',
+                        quietMillis: 250,
+                        data: this.dataReturn,
+                        results: function(data, page) {
+                            return {
+                                results: data.results
+                            };
                         },
-                        minimumInputLength: 4,
-                        multiple: false,
-                        maximumSelectionSize: 1,
-                        placeholder: this.geocodePlaceholder()
-                    };
+                        cache: true
+                    },
+                    minimumInputLength: 4,
+                    multiple: false,
+                    maximumSelectionSize: 1,
+                    placeholder: this.geocodePlaceholder()
+                };
 
-                var overlays =
-                    _.each(_.where(arches.mapLayers, {
-                        isoverlay: true
-                    }), function(overlay) {
-                        _.extend(overlay, {
-                            opacity: ko.observable(100),
-                            color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
-                                if (key.includes('-color')) {
-                                    return prop
-                                };
-                            })[0],
-                            showingTools: ko.observable(false),
-                            invisible: ko.observable(false),
-                            toggleOverlayTools: function(e) {
-                                this.showingTools(!this.showingTools());
-                            },
-                            toggleOverlayVisibility: function(e) {
-                                this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
-                            },
-                            updateOpacity: function(val) {
-                                val > 0.0 ? this.invisible(false) : this.invisible(true);
-                                this.layer_definitions.forEach(function(layer) {
-                                    this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                                }, map)
-                            }
+                this.createOverlays = function() {
+                    var overlays =
+                        _.each(_.where(this.layers, {
+                            isoverlay: true
+                        }), function(overlay) {
+                            _.extend(overlay, {
+                                opacity: ko.observable(100),
+                                color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
+                                    if (key.includes('-color')) {
+                                        return prop
+                                    };
+                                })[0],
+                                showingTools: ko.observable(false),
+                                invisible: ko.observable(false),
+                                toggleOverlayTools: function(e) {
+                                    this.showingTools(!this.showingTools());
+                                },
+                                toggleOverlayVisibility: function(e) {
+                                    this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
+                                },
+                                updateOpacity: function(val) {
+                                    val > 0.0 ? this.invisible(false) : this.invisible(true);
+                                    this.layer_definitions.forEach(function(layer) {
+                                        this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
+                                    }, map)
+                                }
+                            });
+                            overlay.opacity.subscribe(function(value) {
+                                overlay.updateOpacity(value);
+                            });
                         });
-                        overlay.opacity.subscribe(function(value) {
-                            overlay.updateOpacity(value);
-                        });
-                    });
 
-                this.overlays = ko.observableArray(overlays)
+                    return overlays;
+                }
+
+                this.overlays = ko.observableArray(this.createOverlays())
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                     return baselayer.isoverlay === false
@@ -245,7 +328,14 @@ define([
                 this.saveGeometries = function() {
                     var self = this;
                     return function() {
-                        self.value(self.draw.getAll());
+                        var currentDrawing = self.draw.getAll()
+                        if (self.value.features !== undefined) {
+                            currentDrawing.features.forEach(function(feature) {
+                                self.value.features.push(feature)
+                            })
+                        } else {
+                            self.value(currentDrawing)
+                        }
                     }
                 }
 
@@ -300,7 +390,28 @@ define([
                 }
             };
 
-            this.mapStyle = mapStyle;
+            this.sources = _.clone(arches.mapSources);
+            this.sources["resource"] = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            }
+
+            this.mapStyle = {
+                "version": 8,
+                "name": "Basic",
+                "metadata": {
+                    "mapbox:autocomposite": true,
+                    "mapbox:type": "template"
+                },
+                "sources": this.sources,
+                "sprite": "mapbox://sprites/mapbox/basic-v9",
+                "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+                "layers": []
+            };
+
             this.mapStyle.layers = this.addInitialLayers();
 
             this.selectBasemap = function(val) {

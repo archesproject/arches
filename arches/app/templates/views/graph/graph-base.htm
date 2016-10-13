@@ -91,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     {% block card_manager_menu_item %}
                     <li id="card-manager" class="edit-menu-item{% if main_script == "views/graph/card-manager" %} selected{% endif %}{% if not graph.isresource and not root_node.is_collector %} disabled{% endif %}">
-                        <a href="#" {% if root_node.is_collector %}data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
+                        <a href="#" {% if graph.isresource or root_node.is_collector %}data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
 
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
@@ -238,7 +238,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}
         define('graph-base-data', [], function () {
             return {
-                graphid: '{{graphid}}'
+                graphid: '{{graphid}}',
+                graph: '{{graph_json}}'
             };
         });
         {% endautoescape %}

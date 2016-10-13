@@ -19,10 +19,10 @@
                 <div class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
                     
                     <!--Nav Tabs-->
-                    <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px" data-bind="foreach: {
+                    <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
                         data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
                         as: 'card'
-                    }">
+                    }, click: isWizard && !forceBlank ? form.toggleGroup : null;">
                         <li id="summary-group" data-bind="css: {
                             'active': 0 === $index()
                         }, click: form.selectTab.bind($parent)">
@@ -32,8 +32,7 @@
                         </li>
                         <!-- ko if: isWizard && !forceBlank && $index() === outerCard.get('cards')().length - 1-->
                         <li class="wizard-card-tools">
-                            <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete" data-bind="click: form.deleteTile.bind(form, form, parentTile)"></i>
-                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide" data-bind="click: form.toggleGroup"></i>
+                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                         </li>
                         <!-- /ko -->
                     </ul>
@@ -43,6 +42,12 @@
                         data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
                         as: 'card'
                     }, visible: !(isWizard && !forceBlank)">
+
+                        <!-- ko if: isWizard && !forceBlank -->
+                        <a href="#" class="library-tools-icon" style="display: none;" data-bind="click: form.deleteTile.bind(form, form, parentTile, false)">
+                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                        </a>
+                        <!-- /ko -->
 
                         <!-- Card -->
                         <div class="tab-pane fade" data-bind="css: {
@@ -82,21 +87,31 @@
                                             </form>
 
                                             <!-- Save/Add Buttons -->
-                                            <!-- ko if: tile.dirty() -->
+                                            <!-- ko if: tile.dirty -->
                                                 <!-- ko if: forceBlank -->
                                                 <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, true)">{% trans 'Add' %}</button>
                                                 </div>
+                                                <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(true): null -->
+                                                <!-- /ko -->
                                                 <!-- /ko -->
 
                                                 <!-- ko if: !forceBlank -->
                                                 <div class="install-buttons" data-bind="visible: card.get('cardinality')() === '1'" style="display: none;">
+                                                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, parentTile)">{% trans "Cancel" %}</button>
                                                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.updateTile.bind(form, parentTile)">{% trans "Save" %}</button>
                                                 </div>
                                                 <div class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
                                                     <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" data-bind="click: form.saveTile.bind(form, parentTile, false)">{% trans 'Save' %}</button>
                                                 </div>
                                                 <!-- /ko -->
+                                            <!-- /ko -->
+
+                                            <!-- ko if: !tile.dirty() -->
+                                            <!-- ko if: forceBlank -->
+                                            <!-- ko if: card.get('cardinality')() === '1' ? parentTile.dirty(false): null -->
+                                            <!-- /ko -->
+                                            <!-- /ko -->
                                             <!-- /ko -->
                                         
                                         </div>
@@ -114,13 +129,18 @@
 
                                 <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: parentTile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
 
-                                    <div class="list-group-item" style="background: rgb(250, 250, 250);">
-                                        <h5 style="cursor: pointer; padding: 5px 0px 5px 0px; margin: 0px; max-height: 20px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile"><span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span></h5>
+                                    <div class="list-group-item crud-record-item" style="">
+
+                                        <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
+                                            <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                                            <span style="position: relative; top: -2px;">
+                                                <span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span>
+                                            </span>
+                                        </h5>
                                         
-                                        <div class="effect" style="display:none;">
-                                            <a id="record-1-delete" href="#" class="record-delete" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile)">
-                                                <span class="icon-wrap icon-circle bg-gray-dark"><i class="fa fa-trash"></i>
-                                                </span>
+                                        <div class="effect" style="display:none; padding: 10px;">
+                                            <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank)">
+                                                <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
                                             </a>
 
                                             <!-- Card Instruction -->
@@ -156,9 +176,9 @@
                                             </div>
 
                                             <!-- Save/Add Button -->
-                                            <!-- ko if: innerTile.dirty -->
+                                            <!-- ko if: innerTile.dirty() && !forceBlank -->
                                             <div class="install-buttons">
-                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times">{% trans "Cancel" %}</button>
+                                                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: form.cancelEdit.bind(form, innerTile)">{% trans "Cancel" %}</button>
                                                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-refresh" data-bind="click: form.updateTile.bind(form, innerTile)">{% trans "Save" %}</button>
                                             </div>
                                             <!-- /ko -->
@@ -219,14 +239,16 @@
 
 
                     <!-- Wizard Level Buttons -->
+                    <!-- ko if: $data.dirty -->
                     <div class="ep-form-toolbar" style="background: transparent; border-bottom: none;">
                         <div class="ep-form-toolbar-tools mar-no flex">
                             <span>
-                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                                <button class="btn btn-danger btn-lg btn-labeled fa fa-trash" data-bind="click: form.clearTile.bind(form, $data)">{% trans "Discard" %}</button>
                                 <button class="btn btn-primary btn-lg btn-labeled fa fa-check" data-bind="click: form.saveTileGroup.bind(form)">{% trans "Save" %}</button>
                             </span>
                         </div>
                     </div>
+                    <!-- /ko -->
 
 
                 <!-- /ko -->

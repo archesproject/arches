@@ -5,34 +5,32 @@ require([
     'arches',
     'views/base-manager',
     'bindings/chosen',
-    'datatables',
+    'bindings/datatable'
 ], function($, _, ko, arches, BaseManagerView) {
-
-    var recentlyAddedResourceTable = $('#demo-dt-selection').DataTable({
-        "responsive": true,
-        "language": {
-            "paginate": {
-              "previous": '<i class="fa fa-angle-left"></i>',
-              "next": '<i class="fa fa-angle-right"></i>'
-            }
-        },
-        // "columnDefs": [
-        //     { targets: [0], visible: false}
-        // ]
-    });
-
-
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
     */
     var ResourceView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;
-            this.viewModel.showResources = ko.observable(true);
 
             _.defaults(this.viewModel, {
+                showResources: ko.observable(true),
                 showFind: ko.observable(false),
                 graphId: ko.observable(null),
+                editResource: function(url, vm, e){
+                    e.stopPropagation();
+                    this.navigate(url)
+                },
+                tableConfig: {
+                    "responsive": true,
+                    "language": {
+                        "paginate": {
+                            "previous": '<i class="fa fa-angle-left"></i>',
+                            "next": '<i class="fa fa-angle-right"></i>'
+                        }
+                    }
+                }
             });
 
             this.viewModel.graphId.subscribe(function (graphid) {
@@ -41,15 +39,8 @@ require([
                 }
             });
 
-            $('#demo-dt-selection tbody').on('dblclick', 'tr', function () {
-                var data = recentlyAddedResourceTable.row( this ).data();
-                self.viewModel.navigate(arches.urls.resource_editor + data[0]);
-            });
-
-
             BaseManagerView.prototype.initialize.call(this, options)
         }
     });
     return new ResourceView();
-
 });

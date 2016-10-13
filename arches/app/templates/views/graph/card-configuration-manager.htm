@@ -25,10 +25,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Card Designer" %}
 {% endblock graph_header_title %}
 
+{% block graph_header_tools %}
+<!-- ko if: graphModel.get('isresource') -->
+<div id="card-grid-tools" style="display: none;" data-bind="visible: graphModel.graphCards">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a card..." %}" class="design" data-bind="value: selectedCardId, options: graphCardOptions, optionsText: 'name', optionsValue: 'cardid', chosen: {width: '100%'}">
+
+        </select>
+    </div>
+</div>
+<!-- /ko -->
+{% endblock graph_header_tools %}
+
 {% block graph_header_buttons %}
 <span data-bind="if: card.dirty()">
     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: reset">{% trans "Discard Edits" %}</button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){ card.save(); }">{% trans "Save Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
 </span>
 
 {% if graph.isresource %}
@@ -59,6 +71,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('card-configuration-data', [], function () {
     return {
         card: {{ card }},
+        graph: {{graph_json}},
         permissions: {{ permissions }},
         datatypes: {{ datatypes_json }},
         widgets: {{ widgets_json }},
