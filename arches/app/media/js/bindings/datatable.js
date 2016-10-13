@@ -1,7 +1,7 @@
 define([
     'jquery',
     'knockout',
-    'datatables'
+    'datatables.net-responsive-bs'
 ], function ($, ko, DataTable) {
     ko.bindingHandlers.datatable = {
         init: function(element, valueAccessor){

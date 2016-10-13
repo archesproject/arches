@@ -21,7 +21,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" >
+    <link rel="stylesheet" href="{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" >
 {% endblock css %}
 
 {% block title %}
@@ -145,8 +146,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </thead>
                         <tbody>
                             {% for summary in instance_summaries %}
-                            <tr data-bind="click: function () { $root.navigate('{% url 'resource_editor' summary.id %}'); }">
-                                <td>{{summary.id}}</td>
+                            <tr>
+                                <td><a href="" class="regular-link" data-bind="click: editResource.bind($data, '{% url 'resource_editor' summary.id %}')">{{summary.id}}</a></td>
                                 <td>{{summary.name}}</td>
                                 <td>{{summary.type}}</td>
                                 <td>{{summary.last_edited}}</td>
