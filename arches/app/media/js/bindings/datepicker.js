@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
     'bootstrap-datetimepicker'
-], function ($, ko) {
+], function ($, _, ko) {
     /**
     * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
     * data-bind property to the datepicker on init
@@ -14,13 +15,16 @@ define([
             //initialize datepicker with some optional options
             var options = allBindingsAccessor().datepickerOptions || {};
 
-            if (ko.isObservable(options.dateFormat)) {
-                options.dateFormat.subscribe(function (value) {
-                    options.dateFormat = value;
-                    $(element).datetimepicker(options);
-                })
-                options.dateFormat = options.dateFormat();
-            }
+            _.forEach(options, function (value, key){
+                if (ko.isObservable(value)) {
+                    value.subscribe(function (newValue) {
+                        options[key] = newValue;
+                        $(element).data("DateTimePicker").options(options);
+                    })
+                    options[key] = options[key]();
+                }
+            })
+
             $(element).datetimepicker(options);
 
             //when a user changes the date, update the view model

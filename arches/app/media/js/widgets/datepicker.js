@@ -26,7 +26,6 @@ define([
             // this.disabledTimeIntervals = ko.observable([]);
 
             this.placeholder = params.config().placeholder;
-            this.dateFormat = params.config().dateFormat;
         },
         template: { require: 'text!widget-templates/datepicker' }
     });
