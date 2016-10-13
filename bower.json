@@ -34,14 +34,16 @@
     "nouislider": "8.5.1",
     "blueimp-gallery": "2.15.2",
     "bootstrap-datepicker": "~1.6.4",
-    "datatables": "1.10.12",
     "mapbox-gl-plugins": "mapbox/mapbox-gl-plugins",
-    "datatables-responsive": "~2.1.0",
     "bower-knockout-mapping": "~2.6.0",
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
     "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin",
-    "mapbox-gl": "archesproject/mapbox-gl-js-bower"
+    "mapbox-gl": "archesproject/mapbox-gl-js-bower",
+    "datatables.net": "~1.10.12",
+    "datatables.net-bs": "~1.10.12",
+    "datatables.net-responsive": "~2.1.0",
+    "datatables.net-responsive-bs": "~2.1.0"
   },
   "resolutions": {
     "bootstrap": "3.3.2",
