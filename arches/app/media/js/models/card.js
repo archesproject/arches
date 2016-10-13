@@ -200,7 +200,7 @@ define(['arches',
             return ret;
         },
 
-        save: function(){
+        save: function(callback){
             AbstractModel.prototype.save.call(this, function(request, status, self){
                 if(status === 'success'){
                     // only user permissions data needs to be updated from the response because it's value can
@@ -220,6 +220,9 @@ define(['arches',
                         });
                     })
                     this._card(JSON.stringify(this.toJSON()));
+                }
+                if (typeof callback === 'function') {
+                    callback(request, status, self);
                 }
             }, this);
         }

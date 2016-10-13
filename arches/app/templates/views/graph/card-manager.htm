@@ -25,7 +25,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_tools %}
 <!-- Card Filter Widget -->
-<div id="card-grid-tools" style="display: none;" data-bind="visible: graphCards">
+<div id="card-grid-tools" style="display: none;" data-bind="visible: graphModel.graphCards">
     <div class="ep-card-search">
         <select data-placeholder="{% trans "Select a card..." %}" class="design" data-bind="value: selectedCardId, options: graphCardOptions, optionsText: 'name', optionsValue: 'cardid', chosen: {width: '100%'}">
 
@@ -47,7 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Card Grid -->
     <div class="card-grid relative ep-form-content new-card-indent" data-bind="drop: {value: newCard}">
-        <div data-bind="visible: graphCards" style="display:none;">
+        <div data-bind="visible: graphModel.graphCards" style="display:none;">
             <!-- Isotope Layout -->
             <div id="report-image-grid" class="report-image-grid">
 
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- card -->
-                <!-- ko foreach: graphCards -->
+                <!-- ko foreach: graphModel.graphCards -->
                 <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }">
                     <div class="panel mar-no">
 
