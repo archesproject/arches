@@ -3,8 +3,9 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
+    'moment',
     'bindings/datepicker'
-], function (ko, _, WidgetViewModel, arches) {
+], function (ko, _, WidgetViewModel, arches, moment) {
     /**
     * registers a datepicker-widget component for use in forms
     * @function external:"ko.components".datepicker-widget
@@ -22,8 +23,20 @@ define([
             var self = this;
             params.configKeys = ['minDate','maxDate','viewMode', 'dateFormat'];
             WidgetViewModel.apply(this, [params]);
+            this.mutable = false;
+            if (!this.configForm  && this.configForm !== undefined) {
+               this.mutable = true
+            }
+
+            this.maxDateVal = this.maxDate() !== false ? moment(this.maxDate()).format(this.dateFormat())  : null;
+            this.minDateVal = this.minDate() !== false ? moment(this.minDate()).format(this.dateFormat()) : null;
 
             // this.disabledTimeIntervals = ko.observable([]);
+
+            this.dateFormat.subscribe(function(val){
+               console.log(this.maxDate())
+               console.log(this.minDate())
+            }, this)
 
             this.placeholder = params.config().placeholder;
         },
