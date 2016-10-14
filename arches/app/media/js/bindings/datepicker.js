@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'bootstrap-datetimepicker'
-], function ($, _, ko) {
+    'moment',
+    'bootstrap-datetimepicker',
+], function ($, _, ko, moment) {
     /**
     * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
     * data-bind property to the datepicker on init
@@ -18,6 +19,9 @@ define([
             _.forEach(options, function (value, key){
                 if (ko.isObservable(value)) {
                     value.subscribe(function (newValue) {
+                        if (_.isObject(newValue)) {
+                          newValue = moment(newValue).format(options['format']);
+                        }
                         options[key] = newValue;
                         $(element).data("DateTimePicker").options(options);
                     })
@@ -48,15 +52,16 @@ define([
         },
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
 
-            var picker = $(element).data("datepicker");
+            var picker = $(element).data("DateTimePicker");
             //when the view model is updated, update the widget
             if (picker) {
                 var koDate = ko.utils.unwrapObservable(valueAccessor());
+                if (koDate) {
+                  //in case return from server datetime i am get in this form for example /Date(93989393)/ then fomat this
+                  koDate = (typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
 
-                //in case return from server datetime i am get in this form for example /Date(93989393)/ then fomat this
-                koDate = (typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
-
-                picker.date(koDate);
+                  picker.date(koDate);
+                }
             }
         }
     };
