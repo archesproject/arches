@@ -32,7 +32,7 @@ define([
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {string} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {string} params.config.pitch - the pitch of the map in degrees
-     * @param {string} params.config.pitch - the bearing of the map in degrees with north at 0
+     * @param {string} params.config.bearing - the bearing of the map in degrees with north at 0
      */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
