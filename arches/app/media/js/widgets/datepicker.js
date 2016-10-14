@@ -4,7 +4,8 @@ define([
     'viewmodels/widget',
     'arches',
     'bindings/datepicker',
-    'bindings/moment-date'
+    'bindings/moment-date',
+    'bindings/chosen'
 ], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a datepicker-widget component for use in forms
@@ -27,6 +28,24 @@ define([
             // this.disabledTimeIntervals = ko.observable([]);
 
             this.placeholder = params.config().placeholder;
+
+            this.viewModeOptions = ko.observableArray([{
+                'id': 'days',
+                'name': 'Days'
+            }, {
+                'id': 'months',
+                'name': 'Months'
+            }, {
+                'id': 'years',
+                'name': 'Years'
+            }, {
+                'id': 'decades',
+                'name': 'Decades'
+            }]);
+
+            this.onViewModeSelection = function(val, e) {
+                this.viewMode(e.currentTarget.value)
+            };
         },
         template: { require: 'text!widget-templates/datepicker' }
     });

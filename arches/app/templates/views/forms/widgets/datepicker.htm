@@ -38,7 +38,7 @@
         {% trans "View Mode" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="" placeholder="{% trans "View Mode" %}" class="form-control input-md widget-input" data-bind="value: viewMode, valueUpdate: 'keyup'">
+    <select type="" id="" placeholder="{% trans " View Mode " %}" data-bind="options:viewModeOptions, optionsText:'name', optionsValue:'id', event: {change: onViewModeSelection}, value: viewMode, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 
 <div class="control-label">
