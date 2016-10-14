@@ -6,7 +6,7 @@
         <div class="col-xs-12">
             <div style="pad-hor">
                 <div class="input-group date">
-                    <input type="text" data-bind="datepicker: value, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                    <input type="text" data-bind="datepicker: value, placeholder: placeholder, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
                 </div>
             </div>
             <!-- <input type="text" data-bind="datepicker: value, placeholder: placeholder" class="form-control input-lg widget-input"> -->
@@ -17,7 +17,7 @@
 
 <!-- ko if: !configForm  && state=== 'report' -->
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans "No Date Entered" %}'"></dd>
+<dd data-bind="date: value(), dateFormat: dateFormat || '{% trans "No Date Entered" %}'"></dd>
 <!-- /ko -->
 
 <!-- ko if: configForm -->
@@ -38,7 +38,7 @@
         {% trans "View Mode" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="" placeholder="{% trans "View Mode" %}" class="form-control input-md widget-input" data-bind="value: viewMode, valueUpdate: 'keyup'">
+    <select type="" id="" placeholder="{% trans " View Mode " %}" data-bind="options:viewModeOptions, optionsText:'name', optionsValue:'id', event: {change: onViewModeSelection}, value: viewMode, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 
 <div class="control-label">
