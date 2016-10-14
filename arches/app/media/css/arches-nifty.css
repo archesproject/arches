@@ -1,6 +1,6 @@
 @import url(../bower_components/fonts/openSans.css);
 @import url(../bower_components/bootstrap/dist/css/bootstrap.min.css);
-@import url(../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css);
+@import url(../bower_components/bootstrap3-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
 @import url(nifty.min.css);
 @import url(../bower_components/font-awesome/css/font-awesome.min.css);
 @import url(../bower_components/ionicons/css/ionicons.min.css);
@@ -10,7 +10,7 @@
 @import url(../bower_components/select2/dist/css/select2.min.css);
 @import url(plugins/select2/select2-bootstrap.min.css);
 @import url(../bower_components/summernote/dist/summernote.css);
-@import url(../bower_components/mapbox-gl-bower/mapbox-gl.css);
+@import url(../bower_components/mapbox-gl/mapbox-gl.css);
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
 
@@ -169,12 +169,12 @@
 }
 
 .crud-record-item {
-    background: rgb(250, 250, 250); 
+    background: rgb(250, 250, 250);
     padding: 0px;
 }
 
 .crud-record-item:nth-child(even) {
-    background: #fdfdfd; 
+    background: #fdfdfd;
 }
 
 .data-card-alert {
