@@ -176,20 +176,22 @@ define([
                 this.map.on('load', function() {
                     if (!self.configForm) {
                         var source = self.map.getSource('resource')
+                        var features = [];
+                        var result = {
+                            "type": "FeatureCollection",
+                            "features": []
+                        };
                         if (self.reportHeader === true && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
                                     if (_.contains(val, 'FeatureCollection')) {
-                                        self.value.forEach(function(tile) {
-                                            _.each(tile.data, function(val, key) {
-                                                if (_.contains(val, 'FeatureCollection')) {
-                                                    source.setData(val)
-                                                }
-                                            })
-                                        }, self)
+                                        result.features = _.union(result.features, val.features)
                                     }
                                 }, self);
                             }, self)
+                            source.setData(result);
+                        } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
+                            source.setData(koMapping.toJS(self.value))
                         } else { //if values are for a form widget...
                             if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
                                 source.setData(koMapping.toJS(self.value))
@@ -397,7 +399,7 @@ define([
                     "type": "FeatureCollection",
                     "features": []
                 }
-            }
+            };
 
             this.mapStyle = {
                 "version": 8,

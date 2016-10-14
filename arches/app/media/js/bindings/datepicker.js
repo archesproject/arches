@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'knockout',
-    'bootstrap-datepicker'
-], function ($, ko) {
+    'bootstrap-datetimepicker'
+], function ($, _, ko) {
     /**
     * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
     * data-bind property to the datepicker on init
@@ -10,31 +11,52 @@ define([
     * @name datepicker
     */
     ko.bindingHandlers.datepicker = {
-        init: function(element, valueAccessor, allBindingsAccessor) {
-          //initialize datepicker with some optional options
-          var options = allBindingsAccessor().datepickerOptions || {};
-          var value = valueAccessor();
-          var widget = $(element).datepicker(options).data("datepicker");
-          if (typeof value() === 'string') {
-              var dateValue = new Date(value());
-              value(dateValue);
-              widget.setDate(dateValue);
-          }
+        init: function (element, valueAccessor, allBindingsAccessor) {
+            //initialize datepicker with some optional options
+            var options = allBindingsAccessor().datepickerOptions || {};
 
-          //when a user changes the date, update the view model
-          ko.utils.registerEventHandler(element, "changeDate", function(event) {
-                 var value = valueAccessor();
-                 if (ko.isObservable(value)) {
-                     value(event.date);
-                 }
-          });
+            _.forEach(options, function (value, key){
+                if (ko.isObservable(value)) {
+                    value.subscribe(function (newValue) {
+                        options[key] = newValue;
+                        $(element).data("DateTimePicker").options(options);
+                    })
+                    options[key] = options[key]();
+                }
+            })
+
+            $(element).datetimepicker(options);
+
+            //when a user changes the date, update the view model
+            ko.utils.registerEventHandler(element, "dp.change", function (event) {
+                var value = valueAccessor();
+                if (ko.isObservable(value)) {
+                    if (event.date != null && !(event.date instanceof Date)) {
+                        value(event.date.toDate());
+                    } else {
+                        value(event.date);
+                    }
+                }
+            });
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                var picker = $(element).data("datepicker");
+                if (picker) {
+                    picker.destroy();
+                }
+            });
         },
-        update: function(element, valueAccessor)   {
-            var widget = $(element).data("datepicker");
-             //when the view model is updated, update the widget
-            if (widget) {
-                widget.date = ko.utils.unwrapObservable(valueAccessor());
-                widget.setValue();
+        update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+
+            var picker = $(element).data("datepicker");
+            //when the view model is updated, update the widget
+            if (picker) {
+                var koDate = ko.utils.unwrapObservable(valueAccessor());
+
+                //in case return from server datetime i am get in this form for example /Date(93989393)/ then fomat this
+                koDate = (typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
+
+                picker.date(koDate);
             }
         }
     };

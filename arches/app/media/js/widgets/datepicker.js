@@ -1,4 +1,10 @@
-define(['knockout', 'underscore', 'bindings/datepicker', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout',
+    'underscore',
+    'viewmodels/widget',
+    'arches',
+    'bindings/datepicker'
+], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a datepicker-widget component for use in forms
     * @function external:"ko.components".datepicker-widget
@@ -6,11 +12,18 @@ define(['knockout', 'underscore', 'bindings/datepicker', 'viewmodels/widget'], f
     * @param {boolean} params.value - the value being managed
     * @param {object} params.config -
     * @param {string} params.config.label - label to use alongside the text input
-    * @param {string} params.config.placeholder - default text to show in the text input
+    * @param {string} params.config.minDate - Minimum date allowed to be chosen
+    * @param {string} params.config.maxDate - Maximum date allowed to be chosen
+    * @param {string} params.config.viewMode - The default view to display when the picker is shown. (Accepts: 'decades','years','months','days')
+    * @param {string} params.config.dateFormat - Format of the date to display. (See moment.js' options for format: http://momentjs.com/docs/#/displaying/format/)
     */
     return ko.components.register('datepicker-widget', {
         viewModel: function(params) {
+            var self = this;
+            params.configKeys = ['minDate','maxDate','viewMode', 'dateFormat'];
             WidgetViewModel.apply(this, [params]);
+
+            // this.disabledTimeIntervals = ko.observable([]);
 
             this.placeholder = params.config().placeholder;
         },
