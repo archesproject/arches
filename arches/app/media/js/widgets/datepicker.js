@@ -3,7 +3,8 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
-    'bindings/datepicker'
+    'bindings/datepicker',
+    'bindings/moment-date'
 ], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a datepicker-widget component for use in forms
