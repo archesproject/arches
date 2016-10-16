@@ -216,16 +216,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
-                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
-                                                <i class="ti-alarm-clock"></i>
-                                                <span class="menu-title">
-                                                    <strong>System Settings</strong>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                        <!--Menu list item-->
                                         <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
                                             <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
                                                 <i class="fa fa-bookmark"></i>
@@ -234,6 +224,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
 
+                                        </li>
+
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                                <i class="ti-alarm-clock"></i>
+                                                <span class="menu-title">
+                                                    <strong>System Settings</strong>
+                                                </span>
+                                            </a>
                                         </li>
 
                                         <!--Menu list item-->
@@ -308,12 +308,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </aside>
             </div>
 
-            <footer id="footer">
-                {% block footer %}
-                    <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
-                    <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
-                {% endblock footer %}
-            </footer>
             <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
         </div>
 
