@@ -65,8 +65,24 @@ define([
                 'name': 'Decades'
             }]);
 
+            // these options should be set in the global admin page
+            this.dateFormatOptions = ko.observableArray([{
+                'id': 'YYYY-MM-DD',
+                'name': 'ISO 8601 Date (YYYY-MM-DD)'
+            }, {
+                'id': 'YYYY-MM',
+                'name': 'ISO 8601 Month (YYYY-MM)'
+            }, {
+                'id': 'YYYY',
+                'name': 'CE Year (YYYY)'
+            }]);
+
             this.onViewModeSelection = function(val, e) {
                 this.viewMode(e.currentTarget.value)
+            };
+
+            this.onDateFormatSelection = function(val, e) {
+                this.dateFormat(e.currentTarget.value)
             };
         },
         template: {
