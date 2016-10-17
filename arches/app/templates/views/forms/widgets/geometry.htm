@@ -6,6 +6,8 @@
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
           zoom: zoom,
+          minZoom: minZoom,
+          maxZoom: maxZoom,
           centerX: centerX,
           centerY: centerY,
           pitch: pitch,
@@ -273,13 +275,13 @@
                     {% trans "Min Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: minZoom, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
                       {% trans "Max Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: maxZoom, valueUpdate: 'keyup'">
                 </div>
             </div>
           </div>

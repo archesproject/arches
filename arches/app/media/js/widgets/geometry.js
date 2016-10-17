@@ -41,7 +41,7 @@ define([
             var resourceName = 'resource';
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
             WidgetViewModel.apply(this, [params]);
 
             if (!this.configForm && params.graph !== undefined) {
