@@ -203,19 +203,19 @@
 
 
 <!-- ko if: configForm && state!== 'report'-->
-
+<div class="control-label map-config-header">Map Features</div>
 <div class="panel-group accordion" id="accordion">
     <div class="panel">
 
         <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#collapseTwo" class="collapsed" aria-expanded="false">Position and Zoom</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-position" class="collapsed" aria-expanded="false">Position</a>
             </h4>
         </div>
 
         <!--Accordion content-->
-        <div class="panel-collapse collapse" id="collapseTwo" aria-expanded="false" style="height: 0px;">
+        <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
             <div class="panel-body">
               <div class="control-label">
                   {% trans "Zoom Level" %}
@@ -256,12 +256,44 @@
         <!--Accordion title-->
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-parent="#accordion" data-toggle="collapse" href="#collapseOne" aria-expanded="false" class="collapsed">Geocoder</a>
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-zoom" class="collapsed" aria-expanded="false">Zoom</a>
             </h4>
         </div>
 
         <!--Accordion content-->
-        <div class="panel-collapse collapse" id="collapseOne" aria-expanded="false" style="height: 0px;">
+        <div class="panel-collapse collapse" id="map-config-zoom" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                <div class="control-label">
+                    {% trans "Default Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                    {% trans "Min Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                </div>
+                <div class="control-label">
+                      {% trans "Max Zoom" %}
+                </div>
+                <div class="col-xs-12 pad-no crud-widget-container">
+                    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+                </div>
+            </div>
+          </div>
+    </div>
+    <div class="panel">
+        <!--Accordion title-->
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-geocoder" aria-expanded="false" class="collapsed">Geocoder</a>
+            </h4>
+        </div>
+
+        <!--Accordion content-->
+        <div class="panel-collapse collapse" id="map-config-geocoder" aria-expanded="false" style="height: 0px;">
             <div class="panel-body">
               <div class="control-label">
                   {% trans "Default Geocoder" %}
