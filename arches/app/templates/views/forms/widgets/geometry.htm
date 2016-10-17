@@ -203,46 +203,81 @@
 
 
 <!-- ko if: configForm && state!== 'report'-->
-<div class="control-label">
-    {% trans "Zoom Level" %}
+
+<div class="panel-group accordion" id="accordion">
+    <div class="panel">
+
+        <!--Accordion title-->
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#collapseTwo" class="collapsed" aria-expanded="false">Position and Zoom</a>
+            </h4>
+        </div>
+
+        <!--Accordion content-->
+        <div class="panel-collapse collapse" id="collapseTwo" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+              <div class="control-label">
+                  {% trans "Zoom Level" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+              </div>
+
+              <div class="control-label">
+                  {% trans "Map Center Longitude" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Map Center Latitude" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Pitch" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Bearing" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+
+        <!--Accordion title-->
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#collapseOne" aria-expanded="false" class="collapsed">Geocoder</a>
+            </h4>
+        </div>
+
+        <!--Accordion content-->
+        <div class="panel-collapse collapse" id="collapseOne" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+              <div class="control-label">
+                  {% trans "Default Geocoder" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
+              </div>
+              <div class="control-label">
+                  {% trans "Geocoder Placehoder" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
+              </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Default Geocoder" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
-</div>
-<div class="control-label">
-    {% trans "Geocoder Placehoder" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Map Center Longitude" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Map Center Latitude" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Pitch" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
-</div>
-<div class="control-label">
-    {% trans "Bearing" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
-</div>
+
 <!-- /ko -->
