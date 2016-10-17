@@ -14,7 +14,7 @@
           bearing: bearing
       }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
-        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded}">
+        <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
           <input id="select2Input" data-bind="
               select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
@@ -308,6 +308,16 @@
               </div>
               <div class="col-xs-12 pad-no crud-widget-container">
                   <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Geocoder Availability" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+
+                <div class="toggle-container">
+                    <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: toggleGeocoder"><small></small></span>
+                    <p class="arches-toggle-sm">Toggle on to show a geocoder on the map</p>
+                </div>
               </div>
             </div>
         </div>

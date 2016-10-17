@@ -165,6 +165,16 @@ define([
                 Delete: 'ion-trash-a'
             }
 
+
+            this.toggleGeocoder = function(self, evt){
+                if(self.geocoderVisible() === true){
+                  self.geocoderVisible(false)
+                }else{
+                  self.geocoderVisible(true)
+                }
+            }
+
+
             this.setupMap = function(map) {
 
                 var self = this;
