@@ -23,7 +23,7 @@ sudo apt-get install -y docbook-mathml
 sudo apt-get install -y libgdal1-dev
 sudo apt-get install -y libpq-dev
 sudo apt-get install -y libgeos-3.4.2
-sudo apt-get install openjdk-8-jre-headless elasticsearch=2.2.0
+sudo apt-get install openjdk-8-jre-headless -y elasticsearch=2.2.0
 
 sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password 'postgis';"
 sudo echo "*:*:*:postgres:postgis" >> ~/.pgpass
@@ -50,9 +50,8 @@ sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON geography_columns 
 sudo -u postgres psql -d template_postgis_20 -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
 sudo -u postgres createdb training -T template_postgis_20
 
-sudo apt-get install python-pip
+sudo apt-get install python-pip -y
 pip install virtualenv==13.1.2
 
 
 # sudo -u postgres createdb -E UTF8 -T template_postgis_20 --locale=en_US.utf8 arches
-

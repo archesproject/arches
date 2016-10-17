@@ -38,11 +38,12 @@
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
     "fonts": "https://google-fonts.azurewebsites.net/googleFonts/openSans?family=Open+Sans:300,400,600,700&subset=latin",
-    "mapbox-gl": "archesproject/mapbox-gl-js-bower",
+    "mapbox-gl": "archesproject/mapbox-gl-js-bower#0.25.1",
     "datatables.net": "~1.10.12",
     "datatables.net-bs": "~1.10.12",
     "datatables.net-responsive": "~2.1.0",
-    "datatables.net-responsive-bs": "~2.1.0"
+    "datatables.net-responsive-bs": "~2.1.0",
+    "geojson-extent": "mapbox/geojson-extent#0.3.2"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

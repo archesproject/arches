@@ -7,12 +7,13 @@ define([
     'mapbox-gl',
     'mapbox-gl-draw',
     'knockout-mapping',
+    'geojson-extent',
     'select2v4',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -32,7 +33,7 @@ define([
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
      * @param {string} params.config.geometryTypes - the geometry types available for a user to edit
      * @param {string} params.config.pitch - the pitch of the map in degrees
-     * @param {string} params.config.pitch - the bearing of the map in degrees with north at 0
+     * @param {string} params.config.bearing - the bearing of the map in degrees with north at 0
      */
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
@@ -196,6 +197,7 @@ define([
                             "type": "FeatureCollection",
                             "features": []
                         };
+                        var data = null;
                         if (self.reportHeader === true && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
@@ -204,14 +206,30 @@ define([
                                     }
                                 }, self);
                             }, self)
-                            source.setData(result);
+                            data = result;
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
-                            source.setData(koMapping.toJS(self.value))
+                            data = koMapping.toJS(self.value);
                         } else { //if values are for a form widget...
                             if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
-                                source.setData(koMapping.toJS(self.value))
+                                data = koMapping.toJS(self.value);
                             }
                         };
+                        if (data) {
+                            source.setData(data)
+                            var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
+                            var tr = this.transform;
+                            var nw = tr.project(bounds.getNorthWest());
+                            var se = tr.project(bounds.getSouthEast());
+                            var size = se.sub(nw);
+                            var scaleX = (tr.width - 80) / size.x;
+                            var scaleY = (tr.height - 80) / size.y;
+
+                            var options = {
+                                center: tr.unproject(nw.add(se).div(2)),
+                                zoom: Math.min(tr.scaleZoom(tr.scale * Math.min(scaleX, scaleY)), Infinity)
+                            };
+                            self.map.jumpTo(options);
+                        }
                     }
                 });
 
