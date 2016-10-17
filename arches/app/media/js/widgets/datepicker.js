@@ -6,8 +6,7 @@ define([
     'moment',
     'bindings/datepicker',
     'bindings/moment-date',
-    'bindings/chosen',
-    'bindings/datepicker'
+    'bindings/chosen'
 ], function(ko, _, WidgetViewModel, arches, moment) {
     /**
      * registers a datepicker-widget component for use in forms
