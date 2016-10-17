@@ -23,7 +23,11 @@ define([
                           newValue = moment(newValue).format(options['format']);
                         }
                         options[key] = newValue;
-                        $(element).data("DateTimePicker").options(options);
+
+                        var picker = $(element).data("DateTimePicker");
+                        if (picker) {
+                            picker.options(options);
+                        }
                     })
                     options[key] = options[key]();
                 }
