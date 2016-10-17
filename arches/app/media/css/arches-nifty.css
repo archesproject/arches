@@ -4518,11 +4518,10 @@ div.row.widget-wrapper.report-header:hover {
     margin-top: 10px;
     margin-bottom: -12px;
 }
-
-
-
-
-
+.sub-navmenu-header {
+    padding: 10px 18px;
+    font-weight: bold;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

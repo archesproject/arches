@@ -223,7 +223,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <strong>Arches Designer</strong>
                                                 </span>
                                             </a>
-
+                                            <ul class="collapse in pop-in" aria-expanded="false">
+                                                <span class="sub-navmenu-header">Resource Models</span>
+                                                <!-- ko foreach: allGraphs -->
+                                                <!-- ko if: isresource -->
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- /ko -->
+                                                <span class="sub-navmenu-header">Branches</span>
+                                                <!-- ko foreach: allGraphs -->
+                                                <!-- ko if: !isresource -->
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                </li>
+                                                <!-- /ko -->
+                                                <!-- /ko -->
+                                            </ul>
                                         </li>
 
                                         <!--Menu list item-->
