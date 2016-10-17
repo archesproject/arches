@@ -45,8 +45,13 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             if (!this.configForm && params.graph !== undefined) {
+              if (this.reportHeader) {
                 resourceIcon = params.graph.iconclass;
                 resourceName = params.graph.name;
+              } else {
+                resourceIcon = params.graph.get('iconclass');
+                resourceName = params.graph.get('name');
+              }
             }
 
             this.selectedBasemap = this.basemap;

@@ -20,6 +20,7 @@ define([
         initialize: function(options) {
             var self = this;
             this.card = options.card;
+            this.graph = options.graphModel;
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.widgetLookup = widgets;
