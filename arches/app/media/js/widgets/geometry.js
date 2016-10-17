@@ -40,6 +40,7 @@ define([
             var self = this;
             var resourceIcon = 'fa fa-map-marker';
             var resourceName = 'resource';
+            this.resourceColor = ko.observable("rgba(255,0.0,0.0,1.0)");
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
@@ -92,7 +93,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": "#fb6017",
+                            "fill-color": this.resourceColor(),
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -103,7 +104,7 @@ define([
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
                             "circle-radius": 5,
-                            "circle-color": "#fb6017",
+                            "circle-color": this.resourceColor(),
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -112,7 +113,7 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": "#fb6017",
+                            "line-color": this.resourceColor(),
                             "line-opacity": 0.8,
                             "line-width": 2.5
                         }

@@ -315,6 +315,26 @@
             </div>
         </div>
     </div>
+    <div class="panel">
+        <!--Accordion title-->
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-parent="#accordion" data-toggle="collapse" href="#map-config-resource-style" aria-expanded="false" class="collapsed">Resource Style</a>
+            </h4>
+        </div>
+
+        <!--Accordion content-->
+        <div class="panel-collapse collapse" id="map-config-resource-style" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+              <div class="control-label">
+                    {% trans "Resource Color" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="" id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: resourceColor, valueUpdate: 'keyup'">
+              </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- /ko -->
