@@ -3474,13 +3474,14 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "geometryTypes": ["Point","Line","Polygon"],
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
-        "maxZoom": 19,
+        "maxZoom": 20,
         "minZoom": 0,
         "centerX": -122.3979693,
         "centerY": 37.79,
         "pitch": 0.0,
         "bearing": 0.0,
-        "geocodePlaceholder": "Search"
+        "geocodePlaceholder": "Search",
+        "geocoderVisible": true
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)

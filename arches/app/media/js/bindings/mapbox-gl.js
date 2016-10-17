@@ -19,7 +19,6 @@ define([
             _.each(options, function(option, key){
               if (ko.isObservable(option)){
                 mapInitOptions[key] = option();
-                console.log(mapInitOptions)
               }
             })
 
