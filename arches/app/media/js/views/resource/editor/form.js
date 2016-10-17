@@ -40,7 +40,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} formid the id of the form to load
          * @param  {object} callback called after the form loads
-         * @return {null} 
+         * @return {null}
          */
         loadForm: function(formid, callback){
             var self = this;
@@ -78,7 +78,7 @@ define([
          * initializes a list of tile objects
          * @memberof Form.prototype
          * @param  {object} data the list of tile objects to initialize
-         * @return {null} 
+         * @return {null}
          */
         initTiles: function(data){
             _.keys(data).forEach(function(nodegroup_id){
@@ -95,7 +95,7 @@ define([
          * initializes a single tile object
          * @memberof Form.prototype
          * @param  {object} tile the tile object to initialize
-         * @return {null} 
+         * @return {null}
          */
         initTile: function(tile){
             if('tiles' in tile && _.keys(tile.tiles).length > 0){
@@ -143,7 +143,7 @@ define([
                         //console.log(2)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
-                } 
+                }
                 // this is a "wizard"
                 if(outerCard.get('cardinality')() === 'n'){
                     if(card.get('cardinality')() === '1'){
@@ -153,7 +153,7 @@ define([
                         //console.log(4)
                         return ko.ignoreDependencies(this.getBlankTile, this, [card.get('nodegroup_id')]);
                     }
-                } 
+                }
             }else{
                 // this is not a "wizard"
                 if(outerCard.get('cardinality')() === '1'){
@@ -174,21 +174,40 @@ define([
          * @param  {object} card a reference to the card associated with the form being rendered
          * @return {'name': label associated with the widget, 'value': value of the data associated with that widget}
          */
-        getNodeValueAndLabel: function(index, tile, card){
-            var node = card.get('widgets')()[index].node;
-            var name = node.name;
-            var value = tile.data[node.nodeid];
-            return {'name': name, 'value': value}
-        },
+       getNodeValueAndLabel: function(index, tile, card){
+           var value;
+           var node = card.get('widgets')()[index].node;
+           var name = node.name;
+           switch(node.datatype()) {
+               case 'concept':
+                   var lookupConceptLabel = function(concepts){
+                       var label = _.find(concepts, function(concept){
+                           return concept.id === tile.data[node.nodeid]();
+                       }, this);
+                       if(!label){
+                           _.each(concepts, function(concept){
+                               return lookupConceptLabel(concept.children);
+                           })
+                       }else{
+                           return label.text;
+                       }
+                   }
+                   value = lookupConceptLabel(node.widget.configJSON().options);
+                   break;
+               default:
+                   value = tile.data[node.nodeid]();
+           }
+           return {'name': name, 'value': value}
+       },
 
         /**
-         * saves a new tile object back to the database and adds it to the UI, in some instances it will 
+         * saves a new tile object back to the database and adds it to the UI, in some instances it will
          * save the outer most tile if that doesn't already exist
          * @memberof Form.prototype
          * @param  {object} parentTile a reference to the outer most tile, used to determine if that tile needs to be saved instead
          * @param  {boolean} [justadd=false] if true, then just adds a tile without saving it to the database
          * @param  {object} tile the tile to add/save
-         * @return {null} 
+         * @return {null}
          */
         saveTile: function(parentTile, justadd, tile){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
@@ -233,7 +252,7 @@ define([
          * saves a tile and it's child tiles back to the database
          * @memberof Form.prototype
          * @param  {object} parentTile a the outer most tile to save
-         * @return {null} 
+         * @return {null}
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
@@ -252,7 +271,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} tile the tile to save
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         updateTile: function(tile, e){
             var model = new TileModel(ko.toJS(tile));
@@ -280,7 +299,7 @@ define([
          * @param  {object} parentTile a reference to the outer most tile that the tile to delete belongs to
          * @param  {object} tile the tile to delete
          * @param  {boolean} justremove if true, remove without deleting, else delete from the database
-         * @return {null} 
+         * @return {null}
          */
         deleteTile: function(parentTile, tile, justremove){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
@@ -310,13 +329,13 @@ define([
                 }, this);
             }
         },
-        
+
         /**
          * currently unused
          * @memberof Form.prototype
          * @param  {object} tile a knockout reference to the tile object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         cancelEdit: function(tile, e){
             var oldData = JSON.parse(tile._data());
@@ -332,7 +351,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} data a knockout reference to current context object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         toggleTile: function(data, e){
             $(e.currentTarget.nextElementSibling).toggle('fast');
@@ -343,7 +362,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} data a knockout reference to current context object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         toggleGroup: function(data, e){
             var contentPane = $(e.currentTarget.nextElementSibling);
@@ -356,7 +375,7 @@ define([
          * @memberof Form.prototype
          * @param  {object} data a knockout reference to the current context object
          * @param  {object} e event object
-         * @return {null} 
+         * @return {null}
          */
         selectTab: function(data, e){
             var selectedTab = e.currentTarget;
@@ -374,7 +393,7 @@ define([
          * removes any existing values set on the tile as well as removing any child tile instances
          * @memberof Form.prototype
          * @param  {object} tile the tile to remove values from
-         * @return {null} 
+         * @return {null}
          */
         clearTile: function(tile){
             var card;
@@ -408,7 +427,7 @@ define([
          * removes any existing values set on the tile.data attribute
          * @memberof Form.prototype
          * @param  {object} tile the tile to remove values from
-         * @return {null} 
+         * @return {null}
          */
         clearTileValues: function(tile){
             _.each(tile.data, function(value, key, list){
