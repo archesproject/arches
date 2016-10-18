@@ -21,7 +21,7 @@ require([
         forms: ko.observableArray(data.forms)
     })
 
-    formList.on('select', function(form){
+    formList.on('item-selected', function(form){
         pageView.viewModel.loading(true);
         formView.loadForm(form.formid, function(){
             pageView.viewModel.loading(false);

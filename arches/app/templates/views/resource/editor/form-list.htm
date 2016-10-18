@@ -5,17 +5,17 @@
 {% block header %}{% endblock header %}
 
 {% block listitem %}
-    <div class="crud-card">
-        <div class="library-icon" style="">
-            <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark">
-                <i class="fa fa-hand-o-left" data-bind="css: $data.iconclass"></i>
-            </span>
-        </div>
-        <div class="crud-card-main">
-            <a class="listitem_name" data-bind="text: $data.title">
-            </a>
-        </div>
-        <div class="crud-card-subtitle" data-bind="text: $data.subtitle">
-        </div>
+
+    <div class="library-icon" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark">
+            <i class="fa fa-hand-o-left" data-bind="css: $data.iconclass"></i>
+        </span>
     </div>
+    <div class="crud-card-main">
+        <a class="listitem_name" data-bind="text: $data.title">
+        </a>
+    </div>
+    <div class="crud-card-subtitle" data-bind="text: $data.subtitle">
+    </div>
+
 {% endblock %}
