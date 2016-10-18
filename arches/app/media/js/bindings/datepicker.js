@@ -15,20 +15,41 @@ define([
         init: function (element, valueAccessor, allBindingsAccessor) {
             //initialize datepicker with some optional options
             var options = allBindingsAccessor().datepickerOptions || {};
+            var minDate;
+            var maxDate;
 
             _.forEach(options, function (value, key){
                 if (ko.isObservable(value)) {
+                    if (key === 'minDate') {
+                        minDate = value;
+                    } else if (key === 'maxDate') {
+                        maxDate = value;
+                    }
+
                     value.subscribe(function (newValue) {
                         if (_.isObject(newValue)) {
                           newValue = moment(newValue).format(options['format']);
                         }
                         options[key] = newValue;
 
+                        if ((key === 'minDate' || key === 'maxDate') &&
+                            typeof minDate === 'function' && minDate() &&
+                            typeof maxDate === 'function' && maxDate() &&
+                            (minDate() > maxDate() || maxDate() < minDate())) {
+                            if (key === 'minDate') {
+                                maxDate(minDate());
+                            } else {
+                                minDate(maxDate());
+                            }
+                            options[key === 'minDate' ? 'maxDate': 'minDate'] = newValue;
+                        }
+
                         var picker = $(element).data("DateTimePicker");
                         if (picker) {
                             picker.options(options);
                         }
-                    })
+                    });
+
                     options[key] = options[key]();
                 }
             })
@@ -63,7 +84,7 @@ define([
                 if (koDate) {
                   //in case return from server datetime i am get in this form for example /Date(93989393)/ then fomat this
                   koDate = (typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
-
+                  koDate = moment(koDate).format(picker.format());
                   picker.date(koDate);
                 }
             }

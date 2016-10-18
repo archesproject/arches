@@ -26,31 +26,6 @@ define([
             params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat'];
             WidgetViewModel.apply(this, [params]);
 
-            // this.maxDateVal = this.maxDate() !== false ? moment(this.maxDate()).format(this.dateFormat()) : null;
-            // this.minDateVal = this.minDate() !== false ? moment(this.minDate()).format(this.dateFormat()) : null;
-
-            this.minDate.subscribe(function(val) {
-                // if minDate is > max date
-                // Set max date to >= min date
-                console.log('before change:')
-                console.log(this.minDate())
-                console.log(this.maxDate())
-
-                if (this.maxDate()!==false) {
-                    if (this.maxDate()<this.minDate()){
-                        this.maxDate(this.minDate())
-                    }
-                }
-                console.log('after change:')
-                console.log(this.minDate())
-                console.log(this.maxDate())
-                // this.maxDate() !== false && this.maxDate() < this.minDate() ? this.maxDate(this.minDate()) : null;
-            }, this)
-
-            this.maxDate.subscribe(function(val) {
-                this.minDate() !== false && this.minDate() < this.maxDate() ? this.minDate(this.maxDate()) : null;
-            }, this)
-
             this.placeholder = params.config().placeholder;
 
             this.viewModeOptions = ko.observableArray([{
