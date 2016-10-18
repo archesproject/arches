@@ -67,6 +67,7 @@ define(['underscore', 'knockout', 'models/abstract', 'widgets'], function (_, ko
                 },
                 owner: this
             });
+            this.configJSON.extend({ rateLimit: { timeout: 100, method: "notifyWhenChangesStop" } })
 
             return this;
         },
