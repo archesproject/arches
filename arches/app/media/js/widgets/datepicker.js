@@ -26,27 +26,29 @@ define([
             params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat'];
             WidgetViewModel.apply(this, [params]);
 
-            this.maxDateVal = this.maxDate() !== false ? moment(this.maxDate()).format(this.dateFormat()) : null;
-            this.minDateVal = this.minDate() !== false ? moment(this.minDate()).format(this.dateFormat()) : null;
-
-            // this.disabledTimeIntervals = ko.observable([]);
-
-            this.dateFormat.subscribe(function(val) {
-                console.log(this.maxDate())
-                console.log(this.minDate())
-            }, this)
+            // this.maxDateVal = this.maxDate() !== false ? moment(this.maxDate()).format(this.dateFormat()) : null;
+            // this.minDateVal = this.minDate() !== false ? moment(this.minDate()).format(this.dateFormat()) : null;
 
             this.minDate.subscribe(function(val) {
                 // if minDate is > max date
                 // Set max date to >= min date
-
-                console.log(this.maxDate())
+                console.log('before change:')
                 console.log(this.minDate())
+                console.log(this.maxDate())
+
+                if (this.maxDate()!==false) {
+                    if (this.maxDate()<this.minDate()){
+                        this.maxDate(this.minDate())
+                    }
+                }
+                console.log('after change:')
+                console.log(this.minDate())
+                console.log(this.maxDate())
+                // this.maxDate() !== false && this.maxDate() < this.minDate() ? this.maxDate(this.minDate()) : null;
             }, this)
 
             this.maxDate.subscribe(function(val) {
-                console.log(this.maxDate())
-                console.log(this.minDate())
+                this.minDate() !== false && this.minDate() < this.maxDate() ? this.minDate(this.maxDate()) : null;
             }, this)
 
             this.placeholder = params.config().placeholder;
@@ -68,7 +70,7 @@ define([
             // these options should be set in the global admin page
             this.dateFormatOptions = ko.observableArray([{
                 'id': 'YYYY-MM-DD',
-                'name': 'ISO 8601 Date (YYYY-MM-DD)'
+                'name': 'ISO 8601 (YYYY-MM-DD)'
             }, {
                 'id': 'YYYY-MM',
                 'name': 'ISO 8601 Month (YYYY-MM)'

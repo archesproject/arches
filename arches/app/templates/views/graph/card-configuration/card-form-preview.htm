@@ -75,7 +75,7 @@
                                                 }
                                             }, css:{
                                                 "active": self.selection() === $data
-                                            }, click: self.selection'></div>
+                                            }, click: self.selection() === $data ? null : self.selection'></div>
                                         </form>
 
                                         <!-- Save/Add Button -->
