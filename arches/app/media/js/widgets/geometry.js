@@ -329,7 +329,7 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var lowestOverlay = _.last(_.last(overlays).layer_definitions);
+                    var lowestOverlay = _.last(_.last(this.overlays()).layer_definitions);
                     this.basemaps.forEach(function(basemap) {
                         var self = this;
                         if (basemap.name === basemapType.name) {
