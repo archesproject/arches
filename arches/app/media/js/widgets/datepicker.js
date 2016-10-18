@@ -12,7 +12,7 @@ define([
      * registers a datepicker-widget component for use in forms
      * @function external:"ko.components".datepicker-widget
      * @param {object} params
-     * @param {boolean} params.value - the value being managed
+     * @param {date} params.value - the value being managed
      * @param {object} params.config -
      * @param {string} params.config.label - label to use alongside the text input
      * @param {string} params.config.minDate - Minimum date allowed to be chosen
