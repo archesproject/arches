@@ -220,30 +220,43 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
                                                 <i class="fa fa-bookmark"></i>
                                                 <span class="menu-title">
-                                                    <strong>Arches Designer</strong>
+                                                    <strong>{% trans "Arches Designer" %}</strong>
                                                 </span>
                                             </a>
-                                            <ul class="collapse in pop-in" aria-expanded="false">
-                                                <span class="sub-navmenu-header">Resource Models</span>
-                                                <!-- ko foreach: allGraphs -->
-                                                <!-- ko if: isresource -->
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
-                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li>
+                                                    <a href="#">{% trans "Resource Models" %}<i class="arrow"></i></a>
+
+                                                    <!--Submenu-->
+                                                    <ul class="collapse pop-in in" aria-expanded="false">
+                                                        <!-- ko foreach: allGraphs -->
+                                                            <!-- ko if: isresource -->
+                                                            <li class="link-submenu-item">
+                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                            </li>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    </ul>
                                                 </li>
-                                                <!-- /ko -->
-                                                <!-- /ko -->
-                                                <span class="sub-navmenu-header">Branches</span>
-                                                <!-- ko foreach: allGraphs -->
-                                                <!-- ko if: !isresource -->
-                                                <li class="link-submenu-item">
-                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
-                                                        <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                <li>
+                                                    <a href="#">{% trans "Branches" %}<i class="arrow"></i></a>
+
+                                                    <!--Submenu-->
+                                                    <ul class="collapse pop-in in">
+                                                        <!-- ko foreach: allGraphs -->
+                                                            <!-- ko if: !isresource -->
+                                                            <li class="link-submenu-item">
+                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                            </li>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    </ul>
                                                 </li>
-                                                <!-- /ko -->
-                                                <!-- /ko -->
                                             </ul>
                                         </li>
+
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
