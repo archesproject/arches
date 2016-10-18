@@ -198,8 +198,8 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 -- Node graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'fa fa-circle', 'Represents a single node in a graph.', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'semantic', '22000000-0000-0000-0000-000000000000');
@@ -209,8 +209,8 @@ INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
 -- End Node graph
 
 -- Node/NodeType graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  't', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  't', 'fa fa-angle-double-down','Represents a node and node type pairing', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -236,8 +236,8 @@ INSERT INTO cards(cardid, name, description, instructions,
 
 
 -- Arches Configuration graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
-    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass)
+    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't', 'fa fa-cogs');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid, config)

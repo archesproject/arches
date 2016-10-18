@@ -180,19 +180,18 @@ define([
            var name = node.name;
            switch(node.datatype()) {
                case 'concept':
-                   var lookupConceptLabel = function(concepts){
-                       var label = _.find(concepts, function(concept){
-                           return concept.id === tile.data[node.nodeid]();
-                       }, this);
-                       if(!label){
-                           _.each(concepts, function(concept){
-                               return lookupConceptLabel(concept.children);
-                           })
-                       }else{
-                           return label.text;
-                       }
+                   var selectedConcept;
+                   var lookupConcept = function(concept){
+                        if (concept.id === tile.data[node.nodeid]()) {
+                          selectedConcept = concept;
+                        } else {
+                          _.each(concept.children, lookupConcept);
+                        }
+                   };
+                   _.each(node.widget.configJSON().options, lookupConcept);
+                   if (selectedConcept) {
+                     value = selectedConcept.text;
                    }
-                   value = lookupConceptLabel(node.widget.configJSON().options);
                    break;
                default:
                    value = tile.data[node.nodeid]();
