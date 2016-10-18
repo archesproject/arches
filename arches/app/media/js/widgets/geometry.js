@@ -40,14 +40,20 @@ define([
             var self = this;
             var resourceIcon = 'fa fa-map-marker';
             var resourceName = 'resource';
+            this.resourceColor = ko.observable("rgba(255,0.0,0.0,1.0)");
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
             WidgetViewModel.apply(this, [params]);
 
             if (!this.configForm && params.graph !== undefined) {
+              if (this.reportHeader) {
                 resourceIcon = params.graph.iconclass;
                 resourceName = params.graph.name;
+              } else {
+                resourceIcon = params.graph.get('iconclass');
+                resourceName = params.graph.get('name');
+              }
             }
 
             this.selectedBasemap = this.basemap;
@@ -87,7 +93,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": "#fb6017",
+                            "fill-color": this.resourceColor(),
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -98,7 +104,7 @@ define([
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
                             "circle-radius": 5,
-                            "circle-color": "#fb6017",
+                            "circle-color": this.resourceColor(),
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -107,7 +113,7 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": "#fb6017",
+                            "line-color": this.resourceColor(),
                             "line-opacity": 0.8,
                             "line-width": 2.5
                         }
@@ -160,6 +166,16 @@ define([
                 Polygon: 'fa fa-pencil-square-o',
                 Delete: 'ion-trash-a'
             }
+
+
+            this.toggleGeocoder = function(self, evt){
+                if(self.geocoderVisible() === true){
+                  self.geocoderVisible(false)
+                }else{
+                  self.geocoderVisible(true)
+                }
+            }
+
 
             this.setupMap = function(map) {
 
@@ -313,7 +329,7 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var lowestOverlay = _.last(_.last(overlays).layer_definitions);
+                    var lowestOverlay = _.last(_.last(this.overlays()).layer_definitions);
                     this.basemaps.forEach(function(basemap) {
                         var self = this;
                         if (basemap.name === basemapType.name) {

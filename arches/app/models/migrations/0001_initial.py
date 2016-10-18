@@ -206,6 +206,9 @@ class Migration(migrations.Migration):
                 ('isresource', models.BooleanField()),
                 ('isactive', models.BooleanField()),
                 ('iconclass', models.TextField(null=True, blank=True)),
+                ('mapfeaturecolor', models.TextField(blank=True, null=True)),
+                ('maplinewidth', models.IntegerField(blank=True, null=True)),
+                ('mappointsize', models.IntegerField(blank=True, null=True)),
                 ('subtitle', models.TextField(null=True, blank=True)),
             ],
             options={

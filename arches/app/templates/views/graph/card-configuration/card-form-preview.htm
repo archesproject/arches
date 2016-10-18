@@ -71,11 +71,12 @@
                                                     config: configJSON,
                                                     value: ko.observable(null),
                                                     node: node,
-                                                    disabled: true
+                                                    disabled: true,
+                                                    graph: self.graph
                                                 }
                                             }, css:{
                                                 "active": self.selection() === $data
-                                            }, click: self.selection'></div>
+                                            }, click: self.selection() === $data ? null : self.selection'></div>
                                         </form>
 
                                         <!-- Save/Add Button -->

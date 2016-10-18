@@ -222,6 +222,9 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
+    mapfeaturecolor = models.TextField(blank=True, null=True)
+    mappointsize = models.IntegerField(blank=True, null=True)
+    maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
 
@@ -425,7 +428,7 @@ class ReportTemplate(models.Model):
     def defaultconfig_json(self):
         json_string = json.dumps(self.defaultconfig)
         return json_string
-        
+
     class Meta:
         managed = True
         db_table = 'report_templates'
