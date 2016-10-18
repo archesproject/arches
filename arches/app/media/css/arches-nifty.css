@@ -4268,6 +4268,11 @@ div.row.widget-wrapper.report-header:hover {
     border-radius: 2px;
     transition: all .450s ease;
     z-index: 1;
+    visibility: hidden;
+}
+
+.geocode-container.hide-geocoder {
+  visibility: visible;
 }
 
 .relative {

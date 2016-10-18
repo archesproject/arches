@@ -107,6 +107,9 @@ class Graph(models.GraphModel):
             isresource=is_resource,
             isactive=False,
             iconclass="",
+            mapfeaturecolor="rgba(255,0.0,0.0,1.0)",
+            mappointsize=4,
+            maplinewidth=1,
             ontology=None
         )
         if not is_resource:
