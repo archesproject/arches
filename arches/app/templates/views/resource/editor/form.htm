@@ -136,6 +136,21 @@
                                         <h5 style="cursor: pointer; padding: 6px 6px 6px 10px;" class="list-group-item-heading text-thin" data-bind="click: form.toggleTile">
                                             <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                                             <span style="position: relative; top: -2px;">
+                                                <!-- ko if: card.get('widgets').length > 0 -->
+                                                    <!-- ko component: {
+                                                        name: form.widgetLookup[card.get('widgets')[0].get("widget_id")()].name,
+                                                        params: {
+                                                            config: configJSON,
+                                                            label: card.get('widgets')[0].get("label")(),
+                                                            value: tile.data[card.get('widgets')[0].get("node_id")()],
+                                                            node: card.get('widgets')[0].node,
+                                                            disabled: false,
+                                                            graph: form.graph,
+                                                            type: "resource-editor",
+                                                            state: "display_value"
+                                                        }
+                                                    } --><!-- /ko -->
+                                                <!-- /ko -->
                                                 <span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span>
                                             </span>
                                         </h5>

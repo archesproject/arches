@@ -7,13 +7,13 @@
 <!-- ko if: !configForm  && state === 'report' -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
+<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
 {% endblock report %}
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: displayValue"></span>
+<span data-bind="text: node.name"></span>: <span data-bind="text: displayValue"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
