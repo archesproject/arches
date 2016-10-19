@@ -35,11 +35,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_tools %}
 
 {% block graph_header_buttons %}
+<button class="btn btn-sm btn-primary btn-labeled fa fa-plus" data-bind="click: function() { addForm() }">{% trans "New Form" %}</button>
 <span data-bind="visible: dirty()" style="display: none;">
     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
 </span>
-<button class="btn btn-sm btn-primary btn-labeled fa fa-plus" data-bind="click: function() { addForm() }">{% trans "New Form" %}</button>
 <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'form_manager' graph_id %}') }">{% trans "Back to Forms" %}</button>
 {% endblock graph_header_buttons %}
 
