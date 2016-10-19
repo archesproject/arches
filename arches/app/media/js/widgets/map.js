@@ -21,8 +21,8 @@ define([
      */
 
     /**
-     * registers a geometry-widget component for use in forms
-     * @function external:"ko.components".geometry-widget
+     * registers a map-widget component for use in forms
+     * @function external:"ko.components".map-widget
      * @param {object} params
      * @param {boolean} params.value - the value being managed
      * @param {object} params.config -
@@ -35,7 +35,7 @@ define([
      * @param {string} params.config.pitch - the pitch of the map in degrees
      * @param {string} params.config.bearing - the bearing of the map in degrees with north at 0
      */
-    return ko.components.register('geometry-widget', {
+    return ko.components.register('map-widget', {
         viewModel: function(params) {
             var self = this;
             this.reportHeader = params.type === 'report-header' ? true : false;
@@ -452,7 +452,7 @@ define([
             }
         },
         template: {
-            require: 'text!widget-templates/geometry'
+            require: 'text!widget-templates/map'
         }
     });
 });
