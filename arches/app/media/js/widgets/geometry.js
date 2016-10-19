@@ -45,19 +45,11 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             if (params.graph !== undefined) {
-              if (this.reportHeader || this.resourceEditor) {
-                this.resourceIcon = params.graph.iconclass;
-                this.resourceName = params.graph.name;
-                this.resourceColor = params.graph.mapfeaturecolor;
-                this.resourcePointSize = params.graph.mappointsize;
-                this.resourceLineWidth = params.graph.maplinewidth;
-              } else {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
                 this.resourceColor = params.graph.get('mapfeaturecolor');
                 this.resourcePointSize = params.graph.get('mappointsize');
                 this.resourceLineWidth = params.graph.get('maplinewidth');
-              }
             }
 
             this.selectedBasemap = this.basemap;
@@ -172,11 +164,11 @@ define([
             }
 
 
-            this.toggleGeocoder = function(self, evt){
-                if(self.geocoderVisible() === true){
-                  self.geocoderVisible(false)
-                }else{
-                  self.geocoderVisible(true)
+            this.toggleGeocoder = function(self, evt) {
+                if (self.geocoderVisible() === true) {
+                    self.geocoderVisible(false)
+                } else {
+                    self.geocoderVisible(true)
                 }
             }
 

@@ -24,6 +24,7 @@ from django.views.generic import TemplateView
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
+from arches.app.models.graph import Graph
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -60,6 +61,7 @@ class ResourceEditorView(BaseManagerView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
@@ -77,7 +79,7 @@ class ResourceEditorView(BaseManagerView):
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
                 resourceid=resourceid,
-                graph_json=JSONSerializer().serialize(resource_instance.graph),
+                graph_json=JSONSerializer().serialize(graph),
             )
             return render(request, 'views/resource/editor.htm', context)
 
@@ -103,6 +105,7 @@ class ResourceReportView(BaseManagerView):
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
         except models.Report.DoesNotExist:
            report = None
+        graph = Graph.objects.get(graphid=resource_instance.graph.pk)
         forms = resource_instance.graph.form_set.filter(status=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
@@ -126,7 +129,7 @@ class ResourceReportView(BaseManagerView):
             map_sources = map_sources,
             graph_id=resource_instance.graph.pk,
             graph_name=resource_instance.graph.name,
-            graph_json = JSONSerializer().serialize(resource_instance.graph)
+            graph_json = JSONSerializer().serialize(graph)
          )
 
         return render(request, 'views/resource/report.htm', context)
