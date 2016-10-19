@@ -1,5 +1,7 @@
+{% extends "views/forms/widgets/base.htm" %}
 {% load i18n %}
-<!-- ko if: !configForm  && state=== 'form' -->
+
+{% block form %}
   <div class="row widget-wrapper"  data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
@@ -196,15 +198,15 @@
 
     </div>
 </div>
-<!-- /ko -->
+{% endblock form %}
 
 
-<!-- ko if: !configForm  && state=== 'report' -->
+{% block report %}
 <div>Map summary details possibly to go here...</div>
-<!-- /ko -->
+{% endblock report %}
 
 
-<!-- ko if: configForm && state!== 'report'-->
+{% block config_form %}
 <div class="control-label map-config-header">Map Properties</div>
 <div class="panel-group accordion" id="accordion">
     <div class="panel">
@@ -336,5 +338,4 @@
         </div>
     </div>
 </div>
-
-<!-- /ko -->
+{% endblock config_form %}
