@@ -1,10 +1,11 @@
 define(['arches',
     'models/abstract',
     'models/card',
+    'models/graph',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function(arches, AbstractModel, CardModel, ko, koMapping, _) {
+], function(arches, AbstractModel, CardModel, GraphModel, ko, koMapping, _) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -43,7 +44,7 @@ define(['arches',
                     return form.active();
                 });
             });
-            this.graph = options.graph;
+            this.graph = new GraphModel({data: options.graph});
 
             this.set('reportid', ko.observable());
             this.set('name', ko.observable());

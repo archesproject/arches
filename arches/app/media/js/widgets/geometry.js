@@ -38,22 +38,18 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            var resourceIcon = 'fa fa-map-marker';
-            var resourceName = 'resource';
-            this.resourceColor = ko.observable("rgba(255,0.0,0.0,1.0)");
             this.reportHeader = params.type === 'report-header' ? true : false;
+            this.resourceEditor = params.type === 'resource-editor' ? true : false;
             this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
             WidgetViewModel.apply(this, [params]);
 
-            if (!this.configForm && params.graph !== undefined) {
-              if (this.reportHeader) {
-                resourceIcon = params.graph.iconclass;
-                resourceName = params.graph.name;
-              } else {
-                resourceIcon = params.graph.get('iconclass');
-                resourceName = params.graph.get('name');
-              }
+            if (params.graph !== undefined) {
+                this.resourceIcon = params.graph.get('iconclass');
+                this.resourceName = params.graph.get('name');
+                this.resourceColor = params.graph.get('mapfeaturecolor');
+                this.resourcePointSize = params.graph.get('mappointsize');
+                this.resourceLineWidth = params.graph.get('maplinewidth');
             }
 
             this.selectedBasemap = this.basemap;
@@ -64,6 +60,7 @@ define([
                 self.geocodeShimAdded(expanded);
             });
             this.layers = _.clone(arches.mapLayers);
+
             this.geocoderOptions = ko.observableArray([{
                 'id': 'BingGeocoder',
                 'name': 'Bing'
@@ -82,10 +79,9 @@ define([
                 legend: ko.observable(true)
             };
 
-
-            this.defineResourceLayer = function(resource) {
+            this.defineResourceLayer = function() {
                 var resourceLayer = {
-                    name: resourceName,
+                    name: this.resourceName,
                     layer_definitions: [{
                         "id": "resource-poly",
                         "source": "resource",
@@ -93,7 +89,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": this.resourceColor(),
+                            "fill-color": this.resourceColor,
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -104,7 +100,7 @@ define([
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
                             "circle-radius": 5,
-                            "circle-color": this.resourceColor(),
+                            "circle-color": this.resourceColor,
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -113,14 +109,14 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": this.resourceColor(),
+                            "line-color": this.resourceColor,
                             "line-opacity": 0.8,
                             "line-width": 2.5
                         }
                     }],
                     isoverlay: true,
                     sortorder: 4,
-                    icon: resourceIcon
+                    icon: this.resourceIcon
                 };
                 return resourceLayer;
             }
@@ -168,11 +164,11 @@ define([
             }
 
 
-            this.toggleGeocoder = function(self, evt){
-                if(self.geocoderVisible() === true){
-                  self.geocoderVisible(false)
-                }else{
-                  self.geocoderVisible(true)
+            this.toggleGeocoder = function(self, evt) {
+                if (self.geocoderVisible() === true) {
+                    self.geocoderVisible(false)
+                } else {
+                    self.geocoderVisible(true)
                 }
             }
 

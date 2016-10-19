@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Card Container -->
     <div class="card-form-preview-container" data-bind="let: {'form': formView}">
-        
+
         {% include 'views/resource/editor/form.htm' %}
 
     </div>
@@ -57,7 +57,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             form: {{form}},
             datatypes: {{ datatypes_json }},
             widgets: {{ widgets_json }},
-            resourceid: '{{resourceid}}'
+            resourceid: '{{resourceid}}',
+            graph: {{graph_json}},
         };
     });
     {% endautoescape %}

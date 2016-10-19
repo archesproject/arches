@@ -40,14 +40,14 @@
                 <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="value: widget().get('label'), valueUpdate: 'keyup'">
             </div>
         </div>
-
         <div class='widget-config-form' data-bind='component: {
             name: widgetLookup[widget().get("widget_id")()].name,
             params: {
                 config: widget().configJSON,
                 configForm: true,
                 value: ko.observable(null),
-                node: widget().node
+                node: widget().node,
+                graph: graph
             }
         }'></div>
 

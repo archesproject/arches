@@ -7,10 +7,11 @@ define([
     'widgets',
     'models/card',
     'models/tile',
+    'models/graph',
     'resource-editor-data',
     'select2',
     'bindings/let'
-], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, data) {
+], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, GraphModel, data) {
     var FormView = Backbone.View.extend({
         /**
         * A backbone view representing a card form preview
@@ -44,6 +45,7 @@ define([
          */
         loadForm: function(formid, callback){
             var self = this;
+            self.graph = new GraphModel({data: data.graph});
             $.ajax({
                 type: "GET",
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,
