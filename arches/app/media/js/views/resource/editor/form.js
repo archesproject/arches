@@ -169,39 +169,6 @@ define([
         },
 
         /**
-         * a function to get the label and value of a widget at the given array index in the widget array
-         * @memberof Form.prototype
-         * @param  {integer} index the array index to use when locating the widget in question
-         * @param  {object} tile a reference to the currently bound tile
-         * @param  {object} card a reference to the card associated with the form being rendered
-         * @return {'name': label associated with the widget, 'value': value of the data associated with that widget}
-         */
-       getNodeValueAndLabel: function(index, tile, card){
-           var value;
-           var node = card.get('widgets')()[index].node;
-           var name = node.name;
-           switch(node.datatype()) {
-               case 'concept':
-                   var selectedConcept;
-                   var lookupConcept = function(concept){
-                        if (concept.id === tile.data[node.nodeid]()) {
-                          selectedConcept = concept;
-                        } else {
-                          _.each(concept.children, lookupConcept);
-                        }
-                   };
-                   _.each(node.widget.configJSON().options, lookupConcept);
-                   if (selectedConcept) {
-                     value = selectedConcept.text;
-                   }
-                   break;
-               default:
-                   value = tile.data[node.nodeid]();
-           }
-           return {'name': name, 'value': value}
-       },
-
-        /**
          * saves a new tile object back to the database and adds it to the UI, in some instances it will
          * save the outer most tile if that doesn't already exist
          * @memberof Form.prototype

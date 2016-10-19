@@ -1,5 +1,7 @@
+{% extends "views/forms/widgets/base.htm" %}
 {% load i18n %}
-<!-- ko if: !configForm  && state=== 'form' -->
+
+{% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-labx mesel widget-input-label" for="" data-bind="text:label"></label>
@@ -13,15 +15,14 @@
         </div>
     </div>
 </div>
-<!-- /ko -->
+{% endblock form %}
 
-<!-- ko if: !configForm  && state=== 'report' -->
+{% block report %}
 <dt data-bind="text: label"></dt>
 <dd data-bind="date: value(), dateFormat: dateFormat || '{% trans "No Date Entered" %}'"></dd>
-<!-- /ko -->
+{% endblock report %}
 
-<!-- ko if: configForm -->
-
+{% block config_form %}
 <div class="control-label">
         {% trans "Minimum Date" %}
 </div>
@@ -47,4 +48,4 @@
 <div class="col-xs-12 pad-no crud-widget-container">
     <select type="" id="" placeholder="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
 </div>
-<!-- /ko -->
+{% endblock config_form %}

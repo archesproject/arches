@@ -1,22 +1,19 @@
+{% extends "views/forms/widgets/base.htm" %}
 {% load i18n %}
-<!-- ko if: !configForm  && state=== 'form' -->
+
+{% block form %}
 <div class="toggle-container">
     <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
     <p class="arches-toggle-sm" data-bind="text:label"></p>
     <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
 </div>
-<!-- /ko -->
+{% endblock form %}
 
-<!-- ko if: !configForm  && state=== 'report' -->
-<dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
-<!-- /ko -->
-
-<!-- ko if: configForm -->
+{% block config_form %}
 <div class="control-label">
   {% trans "Subtitle" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
   <input type="" id="" class="form-control input-md widget-input" data-bind="value: subtitle, valueUpdate: 'keyup'">
 </div>
-<!-- /ko -->
+{% endblock config_form %}
