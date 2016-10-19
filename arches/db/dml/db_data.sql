@@ -174,7 +174,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000007', 'geometry-widget', 'widgets/geometry', 'geometry',
+    VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'widgets/map', 'geometry',
     '{
         "geometrytypes": {"point": true, "line": true, "poly": true},
         "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
