@@ -38,9 +38,6 @@ define([
     return ko.components.register('geometry-widget', {
         viewModel: function(params) {
             var self = this;
-            var resourceIcon = 'fa fa-map-marker';
-            var resourceName = 'resource';
-            this.resourceColor = ko.observable("rgba(255,0.0,0.0,1.0)");
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
@@ -48,11 +45,17 @@ define([
 
             if (!this.configForm && params.graph !== undefined) {
               if (this.reportHeader) {
-                resourceIcon = params.graph.iconclass;
-                resourceName = params.graph.name;
+                this.resourceIcon = params.graph.iconclass;
+                this.resourceName = params.graph.name;
+                this.resourceColor = params.graph.mapfeaturecolor;
+                this.resourcePointSize = params.graph.mappointsize;
+                this.resourceLineWidth = params.graph.maplinewidth;
               } else {
-                resourceIcon = params.graph.get('iconclass');
-                resourceName = params.graph.get('name');
+                this.resourceIcon = params.graph.get('iconclass');
+                this.resourceName = params.graph.get('name');
+                this.resourceColor = params.graph.get('mapfeaturecolor');
+                this.resourcePointSize = params.graph.get('mappointsize');
+                this.resourceLineWidth = params.graph.get('maplinewidth');
               }
             }
 
@@ -85,7 +88,7 @@ define([
 
             this.defineResourceLayer = function(resource) {
                 var resourceLayer = {
-                    name: resourceName,
+                    name: this.resourceName,
                     layer_definitions: [{
                         "id": "resource-poly",
                         "source": "resource",
@@ -93,7 +96,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": this.resourceColor(),
+                            "fill-color": this.resourceColor,
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -104,7 +107,7 @@ define([
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
                             "circle-radius": 5,
-                            "circle-color": this.resourceColor(),
+                            "circle-color": this.resourceColor,
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -113,14 +116,14 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": this.resourceColor(),
+                            "line-color": this.resourceColor,
                             "line-opacity": 0.8,
                             "line-width": 2.5
                         }
                     }],
                     isoverlay: true,
                     sortorder: 4,
-                    icon: resourceIcon
+                    icon: this.resourceIcon
                 };
                 return resourceLayer;
             }
@@ -292,10 +295,12 @@ define([
                         _.each(_.where(this.layers, {
                             isoverlay: true
                         }), function(overlay) {
+                            console.log(overlay)
                             _.extend(overlay, {
                                 opacity: ko.observable(100),
                                 color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
                                     if (key.includes('-color')) {
+                                        console.log(prop, key)
                                         return prop
                                     };
                                 })[0],
