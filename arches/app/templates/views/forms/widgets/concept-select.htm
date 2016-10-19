@@ -1,5 +1,7 @@
+{% extends "views/forms/widgets/base.htm" %}
 {% load i18n %}
-<!-- ko if: !configForm  && state=== 'form' -->
+
+{% block form %}
 <div class="row widget-wrapper" data-bind="if: !configForm && state=== 'form'">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
@@ -10,14 +12,9 @@
         </div>
     </div>
 </div>
-<!-- /ko -->
+{% endblock form %}
 
-<!-- ko if: !configForm  && state === 'report' -->
-<dt data-bind="text: label"></dt>
-<dd data-bind="text: conceptLabel || '{% trans "None" %}'"></dd>
-<!-- /ko -->
-
-<!-- ko if: configForm -->
+{% block config_form %}
 <div data-bind="if: configForm">
   <div class="control-label">
       {% trans "Placeholder" %}
@@ -29,4 +26,4 @@
 </br/>
 </br/>
 </div>
-<!-- /ko -->
+{% endblock config_form %}
