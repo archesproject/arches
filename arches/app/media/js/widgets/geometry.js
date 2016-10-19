@@ -39,12 +39,13 @@ define([
         viewModel: function(params) {
             var self = this;
             this.reportHeader = params.type === 'report-header' ? true : false;
+            this.resourceEditor = params.type === 'resource-editor' ? true : false;
             this.configType = params.reportHeader || 'header';
             params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
             WidgetViewModel.apply(this, [params]);
 
-            if (!this.configForm && params.graph !== undefined) {
-              if (this.reportHeader) {
+            if (params.graph !== undefined) {
+              if (this.reportHeader || this.resourceEditor) {
                 this.resourceIcon = params.graph.iconclass;
                 this.resourceName = params.graph.name;
                 this.resourceColor = params.graph.mapfeaturecolor;
@@ -67,6 +68,7 @@ define([
                 self.geocodeShimAdded(expanded);
             });
             this.layers = _.clone(arches.mapLayers);
+
             this.geocoderOptions = ko.observableArray([{
                 'id': 'BingGeocoder',
                 'name': 'Bing'
@@ -85,8 +87,7 @@ define([
                 legend: ko.observable(true)
             };
 
-
-            this.defineResourceLayer = function(resource) {
+            this.defineResourceLayer = function() {
                 var resourceLayer = {
                     name: this.resourceName,
                     layer_definitions: [{
@@ -295,12 +296,10 @@ define([
                         _.each(_.where(this.layers, {
                             isoverlay: true
                         }), function(overlay) {
-                            console.log(overlay)
                             _.extend(overlay, {
                                 opacity: ko.observable(100),
                                 color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
                                     if (key.includes('-color')) {
-                                        console.log(prop, key)
                                         return prop
                                     };
                                 })[0],

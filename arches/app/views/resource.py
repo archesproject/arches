@@ -76,7 +76,8 @@ class ResourceEditorView(BaseManagerView):
                 map_layers=map_layers,
                 map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
-                resourceid=resourceid
+                resourceid=resourceid,
+                graph_json=JSONSerializer().serialize(resource_instance.graph),
             )
             return render(request, 'views/resource/editor.htm', context)
 

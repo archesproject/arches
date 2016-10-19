@@ -4,9 +4,10 @@ define([
     'knockout',
     'views/graph/card-configuration/component-forms/permissions-list',
     'widgets',
+    'card-configuration-data',
     'bindings/summernote',
     'plugins/knockstrap'
-], function(_, Backbone,  ko, PermissionsList, widgets) {
+], function(_, Backbone,  ko, PermissionsList, widgets, data) {
     var CardComponentForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form
@@ -27,6 +28,7 @@ define([
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.card = ko.observable();
             this.widget = ko.observable();
+            this.graph = options.graphModel;
             this.widgetLookup = widgets;
             this.widgetList = function() {
                 var cardWidget = self.widget();

@@ -44,6 +44,7 @@ define([
          */
         loadForm: function(formid, callback){
             var self = this;
+            self.graph = data.graph;
             $.ajax({
                 type: "GET",
                 url: arches.urls.resource_data.replace('//', '/' + this.resourceid + '/') + formid,

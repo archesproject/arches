@@ -17,7 +17,7 @@
             <script type="text/html" id="card-template">
                 <!-- Card Template -->
                 <div class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;" data-bind="let: {'parentTile': $data}">
-                    
+
                     <!--Nav Tabs-->
                     <ul class="nav nav-tabs card-nav-container" style="margin-bottom: 1px; cursor: pointer; " data-bind="foreach: {
                         data: outerCard.isContainer() ? outerCard.get('cards') : [outerCard],
@@ -70,7 +70,7 @@
                                     <!-- Form -->
                                     <div data-bind="with: form.getFormEditingContext(outerCard, card, parentTile)" >
                                         <div class="card-form-container" data-bind="let: {'tile': $data}">
-                        
+
                                             <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                     data:card.get('widgets'), as: 'widget'
                                                 }">
@@ -81,7 +81,9 @@
                                                         label: widget.get("label")(),
                                                         value: tile.data[widget.get("node_id")()],
                                                         node: widget.node,
-                                                        disabled: false
+                                                        disabled: false,
+                                                        graph: form.graph,
+                                                        type: "resource-editor"
                                                     }
                                                 }'></div>
                                             </form>
@@ -113,7 +115,7 @@
                                             <!-- /ko -->
                                             <!-- /ko -->
                                             <!-- /ko -->
-                                        
+
                                         </div>
                                     </div>
                                 </div>
@@ -137,7 +139,7 @@
                                                 <span data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).name">Key of first node in card:</span> : <span class="text-semibold" data-bind="text: form.getNodeValueAndLabel(0, innerTile, card).value"> Value of first node in card</span>
                                             </span>
                                         </h5>
-                                        
+
                                         <div class="effect" style="display:none; padding: 10px;">
                                             <a href="#" class="library-tools-icon" style="display: block;" data-bind="click: form.deleteTile.bind(form, parentTile, innerTile, forceBlank)">
                                                 <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
@@ -157,7 +159,7 @@
 
                                             <!-- Form -->
                                             <div class="card-form-container">
-                            
+
                                                 <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                         data:card.get('widgets'), as: 'widget'
                                                     }">
@@ -168,7 +170,8 @@
                                                             label: widget.get("label")(),
                                                             value: innerTile.data[widget.get("node_id")()],
                                                             node: widget.node,
-                                                            disabled: false
+                                                            disabled: false,
+                                                            graph: form.graph
                                                         }
                                                     }'></div>
                                                 </form>
