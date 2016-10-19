@@ -637,7 +637,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background-color: #f1f1f1;
 }
 .library-card:hover {
-    background-color: #f8f8f8;
+    background-color: #fff;
     cursor: pointer;
     border-left: 5px solid steelblue;
 }
@@ -2761,7 +2761,7 @@ span.editable-card i.fa.fa-align-justify:hover{
 }
 .card-grid-item {
     float: left;
-    width: 250px;
+    width: 290px;
     border: 1px solid #ddd;
     opacity: .79;
     margin: 3px;
@@ -3097,10 +3097,10 @@ ul.jqtree_common li.jqtree-folder {
     -webkit-align-items: center;
     align-items: center;
     width: 100%;
-    height: 50px;
+    min-height: 55px;
     background: #f8f8f8;
     border-bottom: 1px solid #e9e9e9;
-    z-index: 1;
+    z-index: 2;
 }
 .ep-form-toolbar div:nth-last-child(2){
     margin-right: auto;
@@ -3140,6 +3140,13 @@ ul.jqtree_common li.jqtree-folder {
     color: #123;
     font-size: 17px;
 }
+
+.resource-toolbar {
+    min-height: 60px; 
+    background: #f4f4f4; 
+    border-bottom: 1px solid #e4e4e4;
+}
+
 .resource-selector {
     height: 60px;
     background: #fff;
@@ -3290,7 +3297,7 @@ li.card-tree-list:last-of-type {
     width: 250px;
 }
 .crud-widget-container {
-    padding-bottom: 5px;
+    padding-bottom: 15px;
 }
 .editable-widget:hover {
     background: #fcfcfc;
@@ -3435,7 +3442,7 @@ li.card-tree-list:last-of-type {
     float: left;
     width: 250px;
     border: 1px solid #ddd;
-    opacity: .7;
+    opacity: .9;
     margin: 3px;
 }
 .data-widget-grid-item:hover {
@@ -3479,6 +3486,16 @@ li.card-tree-list:last-of-type {
     width: 450px;
     padding: 10px;
 }
+
+.accordion-body {
+    padding-top: 0px;
+}
+
+.panel-group.accordion .panel-title a {
+    font-weight: 400;
+    color: #777;
+}
+
 .toggle-container {
     padding-bottom: 15px;
     padding-right: 15px;
@@ -3738,7 +3755,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .resource-tools {
 	margin-left: 120px;
 	margin-top: 0px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 .resource-grid-title {
     font-weight: normal;

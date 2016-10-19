@@ -85,7 +85,7 @@ require([
                 };
             });
 
-            this.viewModel.showResources = ko.observable(true);
+            this.viewModel.showResources = ko.observable(window.location.hash!=='#branches');
 
             _.defaults(this.viewModel, {
                 groupedGraphs: ko.observable({
