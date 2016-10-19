@@ -13,6 +13,9 @@ define(['knockout', 'underscore'], function (ko, _) {
         this.value = params.value || ko.observable(null);
         this.disabled = params.disabled || ko.observable(false);
         this.node = params.node || null;
+        this.displayValue = ko.computed(function() {
+            return self.value();
+        });
         this.configForm = params.configForm || false;
         this.config = params.config || ko.observable({});
         this.configObservables = params.configObservables || {};

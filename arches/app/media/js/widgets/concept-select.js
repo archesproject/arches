@@ -9,14 +9,14 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
     * @param {string} params.config.placeholder - default text to show in the select input
     * @param {string} params.config.options -
     */
-    return ko.components.register('select-widget', {
+    return ko.components.register('concept-select-widget', {
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'options'];
             this.selection = params.config.selection;
 
             WidgetViewModel.apply(this, [params]);
 
-            this.conceptLabel = ko.observable()
+            this.displayValue = ko.observable()
 
             this.getConceptLabel = function() {
                 var self = this;
@@ -27,7 +27,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                   },
                   datatype: 'json'
                 }).done(function(label){
-                  self.conceptLabel(label.value);
+                  self.displayValue(label.value);
                 }).fail(function(err) {
                   console.log("error", err);
                 });
@@ -36,7 +36,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
               if (this.state === 'report' && this.value() != null) {
                   this.getConceptLabel()
               } else {
-                this.conceptLabel = 'None'
+                this.displayValue = 'None'
               }
 
             this.node.config.topConcept.subscribe(function(newId) {
@@ -54,6 +54,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 });
             }, this);
         },
-        template: { require: 'text!widget-templates/select' }
+        template: { require: 'text!widget-templates/concept-select' }
     });
 });

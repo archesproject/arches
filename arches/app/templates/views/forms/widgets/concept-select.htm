@@ -14,7 +14,7 @@
 
 <!-- ko if: !configForm  && state === 'report' -->
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: conceptLabel || '{% trans "None" %}'"></dd>
+<dd data-bind="text: displayValue || '{% trans "None" %}'"></dd>
 <!-- /ko -->
 
 <!-- ko if: configForm -->
