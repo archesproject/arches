@@ -3142,8 +3142,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .resource-toolbar {
-    min-height: 60px; 
-    background: #f4f4f4; 
+    min-height: 60px;
+    background: #f4f4f4;
     border-bottom: 1px solid #e4e4e4;
 }
 
@@ -4527,7 +4527,15 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .overlay-invisible {
-  color: #c3c3c3;
+  background-color: #f8f8f8;
+}
+
+.overlay-invisible a {
+  color: #999;
+}
+
+.overlay-invisible i {
+  color: #999;
 }
 
 .map-widget-panel-title.legend-subtitle {
