@@ -81,15 +81,15 @@
             </div>
 
             <div data-bind="sortable: overlays">
-                <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}, click: toggleOverlayVisibility">
-                    <div class="map-overlay-vis-toogle text-center">
+                <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css:{'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
                     </div>
-                    <div class="map-overlay-name">
+                    <div class="map-overlay-name" data-bind="click: toggleOverlayVisibility">
                         <a class="" href=""><span data-bind="text:name"><span></a>
                     </div>
                     <div class="map-overlay-item-tools">
-                        <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools">
+                        <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools, css:{'overlay-invisible':invisible}">
                             <!-- ko if: showingTools() === false  -->
                             <i class="ion-arrow-left-b" data-bind="showingTools()"></i>
                             <!-- /ko -->

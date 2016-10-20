@@ -4528,7 +4528,7 @@ div.row.widget-wrapper.report-header:hover {
   padding-top: 5px;
 }
 
-.overlay-invisible {
+.overlay-invisible .relative {
   background-color: #f8f8f8;
 }
 
