@@ -13,8 +13,7 @@
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: label"></span>:
-<span data-bind="text: displayValue"></span>
+<span data-bind="text: displayValue() || '{% trans "None" %}'"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
