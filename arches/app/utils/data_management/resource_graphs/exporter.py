@@ -4,6 +4,7 @@ import csv
 from pprint import pprint as pp
 import os
 from arches.app.models.graph import Graph
+from arches.app.models.models import CardXNodeXWidget
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def export(export_dir):
@@ -44,18 +45,32 @@ def write_edges(export_dir):
             for node in v:
                 writer.writerow(node)
 
+def get_card_x_node_x_widget_data_for_export(resource_graph):
+    cards_x_nodes_x_widgets = []
+    for card in  resource_graph['cards']:
+        cards_x_nodes_x_widgets = CardXNodeXWidget.objects.filter(card=card['cardid'])
+    return cards_x_nodes_x_widgets
+
+
 def get_graphs_for_export(resource_list=None):
     graphs = {}
+    graphs['graph'] = []
     if resource_list == None:
         graphs['graph'] = Graph.objects.all().exclude(name='Arches configuration')
+        for resource_graph in resource_graph_query:
+            resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
+            graphs['graph'].append(resource_graph)
     else:
-        graphs['graph'] = Graph.objects.filter(graphid__in=resource_list)
+        resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=resource_list))
+        for resource_graph in resource_graph_query:
+            resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
+            graphs['graph'].append(resource_graph)
     return graphs
 
 def write_graph(export_dir, resource_list):
     resource_graphs = get_graphs_for_export(resource_list)
     graph = {}
-    graph['graph'] = resource_graphs
+    graph = resource_graphs
 
     with open(os.path.join(export_dir, 'graph_export.json'), 'w') as graph_json:
         graph_json.write(JSONSerializer().serialize(graph))

@@ -16,9 +16,27 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import sys
 from arches.app.models.graph import Graph
+from arches.app.models.models import CardXNodeXWidget
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.db import transaction
 
 def import_graph(graphs):
-	for resource in graphs:
-		graph = Graph(resource)
-		graph.save()
+	with transaction.atomic():
+		for resource in graphs:
+			graph = Graph(resource)
+			graph.save()
+
+			if not hasattr(graph, 'cards_x_nodes_x_widgets'):
+				print '*********This graph has no attribute cards_x_nodes_x_widgets*********'
+				sys.exit()
+			else:
+				for	card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
+					functions = card_x_node_x_widget['functions']
+					card_x_node_x_widget.pop('functions', None)
+					cardxnodexwidget = CardXNodeXWidget.objects.create(**card_x_node_x_widget)
+					cardxnodexwidget.save()
+					cardxnodexwidget.functions.set(functions)
+
+			return Graph
