@@ -1,4 +1,5 @@
 require([
+    'underscore',
     'knockout',
     'views/graph/graph-page-view',
     'views/list',
@@ -6,9 +7,14 @@ require([
     'report-manager-data',
     'arches',
     'bindings/dragDrop'
-], function(ko, PageView, ListView, AlertViewModel, data, arches) {
+], function(_, ko, PageView, ListView, AlertViewModel, data, arches) {
     var showTemplateLibrary = ko.observable(false);
 
+    data.reports.forEach(function(report) {
+        report.template = _.find(data.templates, function(template) {
+            return report.template_id === template.templateid;
+        });
+    });
     var viewModel = {
         showTemplateLibrary: showTemplateLibrary,
         toggleTemplateLibrary: function(){
