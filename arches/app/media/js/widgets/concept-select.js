@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chosen', 'plugins/knockout-select2'], function(ko, _, WidgetViewModel, arches) {
+define([
+    'knockout',
+    'underscore',
+    'viewmodels/widget',
+    'arches',
+    'bindings/chosen',
+    'plugins/knockout-select2'
+], function(ko, _, WidgetViewModel, arches) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -16,7 +23,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
 
             WidgetViewModel.apply(this, [params]);
 
-            this.displayValue = ko.observable()
+            this.displayValue = ko.observable();
 
             this.getConceptLabel = function() {
                 var self = this;
@@ -31,12 +38,12 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 }).fail(function(err) {
                     console.log("error", err);
                 });
-            }
+            };
 
             if ((this.state === 'report' || this.state === 'display_value') && this.value() != null) {
-                this.getConceptLabel()
+                this.getConceptLabel();
             } else {
-                this.displayValue('None')
+                this.displayValue(null);
             }
 
             this.node.config.topConcept.subscribe(function(newId) {
