@@ -34,6 +34,7 @@ from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
+from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
@@ -190,10 +191,9 @@ class GraphDataView(View):
         if self.action == 'import_graph':
             graph_file = request.FILES.get('importedGraph').read()
             graphs = JSONDeserializer().deserialize(graph_file)['graph']
+            GraphImporter.import_graph(graphs)
             for graph in graphs:
-                new_graph = Graph(graph)
-                new_graph.save()
-                ret = new_graph
+                ret = graph
         else:
             if graphid is not None:
                 graph = Graph.objects.get(graphid=graphid)
