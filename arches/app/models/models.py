@@ -205,6 +205,7 @@ class Function(models.Model):
     functiontype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    config = JSONField(blank=True, null=True, db_column='config')
 
     class Meta:
         managed = True
