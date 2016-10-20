@@ -628,11 +628,12 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     color: #666;
     border-bottom: 1px solid #ddd;
     /*border-right: 1px solid #e9e9e9;*/
-    background: #fdfdfd;
+    background: #fbfbfb;
     border-left: 5px solid #fdfdfd;
+    opacity: .825;
 }
 .selected-card {
-    opacity: .9;
+    opacity: 1.0;
     color: #fff;
     background-color: #f1f1f1;
 }
@@ -640,6 +641,7 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background-color: #fff;
     cursor: pointer;
     border-left: 5px solid steelblue;
+    opacity: 1.0;
 }
 #branch-library, #card-crud-permissions .library-card {
     width: 100%;
@@ -3142,8 +3144,8 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .resource-toolbar {
-    min-height: 60px; 
-    background: #f4f4f4; 
+    min-height: 60px;
+    background: #f4f4f4;
     border-bottom: 1px solid #e4e4e4;
 }
 
@@ -4526,8 +4528,16 @@ div.row.widget-wrapper.report-header:hover {
   padding-top: 5px;
 }
 
-.overlay-invisible {
-  color: #c3c3c3;
+.overlay-invisible .relative {
+  background-color: #f8f8f8;
+}
+
+.overlay-invisible a {
+  color: #999;
+}
+
+.overlay-invisible i {
+  color: #999;
 }
 
 .map-widget-panel-title.legend-subtitle {
