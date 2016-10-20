@@ -33,11 +33,12 @@ import arches.management.commands.package_utils.resource_graphs as resource_grap
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.mappings import prepare_term_index
 from arches.app.models import models
 import csv
 from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
 from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
-from arches.app.models.resource import Resource
+
 
 class Command(BaseCommand):
     """
@@ -227,7 +228,7 @@ class Command(BaseCommand):
         management.call_command('migrate')
 
     def setup_indexes(self, package_name):
-        Resource().prepare_term_index(create=True)
+        prepare_term_index(create=True)
 
     def generate_procfile(self, package_name):
         """
