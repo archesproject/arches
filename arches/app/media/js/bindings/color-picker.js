@@ -26,10 +26,6 @@ define([
             });
 
             var cp = $(element).colorpicker(options);
-            // prevents mouse events from bubbling
-            $('body').mousemove(function(event) {
-                event.stopPropagation();
-            });
 
             cp.on('changeColor', function(newValues) {
                 picking = true;

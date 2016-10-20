@@ -12,7 +12,8 @@ define([
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/color-picker'
 ], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent) {
     /**
      * knockout components namespace used in arches
