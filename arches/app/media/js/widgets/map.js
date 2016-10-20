@@ -12,7 +12,8 @@ define([
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen'
+    'bindings/chosen',
+    'bindings/color-picker'
 ], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent) {
     /**
      * knockout components namespace used in arches
@@ -41,15 +42,38 @@ define([
             this.reportHeader = params.type === 'report-header' ? true : false;
             this.resourceEditor = params.type === 'resource-editor' ? true : false;
             this.configType = params.reportHeader || 'header';
-            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder', 'geocoderVisible', 'minZoom', 'maxZoom'];
+            params.configKeys = [
+                'zoom',
+                'centerX',
+                'centerY',
+                'geocoder',
+                'basemap',
+                'geometryTypes',
+                'pitch',
+                'bearing',
+                'geocodePlaceholder',
+                'geocoderVisible',
+                'minZoom',
+                'maxZoom',
+                'resourceColor',
+                'resourcePointSize',
+                'resourceLineWidth'
+              ];
+
             WidgetViewModel.apply(this, [params]);
 
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
-                this.resourceColor = params.graph.get('mapfeaturecolor');
-                this.resourcePointSize = params.graph.get('mappointsize');
-                this.resourceLineWidth = params.graph.get('maplinewidth');
+                if (this.resourceColor() === null) {
+                  this.resourceColor(params.graph.get('mapfeaturecolor'));
+                }
+                if (this.resourcePointSize() === null) {
+                  this.resourcePointSize(params.graph.get('mappointsize'));
+                }
+                if (this.resourceLineWidth() === null) {
+                  this.resourceLineWidth(params.graph.get('maplinewidth'));
+                }
             }
 
             this.selectedBasemap = this.basemap;
@@ -89,7 +113,7 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString"],
                         "paint": {
-                            "fill-color": this.resourceColor,
+                            "fill-color": this.resourceColor(),
                             "fill-opacity": 0.8
                         }
                     }, {
@@ -99,8 +123,8 @@ define([
                         "layout": {},
                         "filter": ["!in", "$type", "LineString", "Polygon"],
                         "paint": {
-                            "circle-radius": 5,
-                            "circle-color": this.resourceColor,
+                            "circle-radius": this.resourcePointSize(),
+                            "circle-color": this.resourceColor(),
                             "circle-opacity": 0.8
                         }
                     }, {
@@ -109,9 +133,9 @@ define([
                         "type": "line",
                         "layout": {},
                         "paint": {
-                            "line-color": this.resourceColor,
+                            "line-color": this.resourceColor(),
                             "line-opacity": 0.8,
-                            "line-width": 2.5
+                            "line-width": this.resourceLineWidth()
                         }
                     }],
                     isoverlay: true,
@@ -174,7 +198,6 @@ define([
 
 
             this.setupMap = function(map) {
-
                 var self = this;
                 var draw = Draw();
                 this.map = map;
