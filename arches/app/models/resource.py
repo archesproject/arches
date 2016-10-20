@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import importlib
 from arches.app.models import models
 
 class Resource(models.ResourceInstance):
@@ -32,7 +33,8 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-
+    @property
     def primary_name(self):
-        
-        pass
+        module = importlib.import_module('arches.app.functions.resource_functions')
+        get_primary_name = getattr(module, 'get_primary_name_from_nodes')
+        return get_primary_name('resource', {})

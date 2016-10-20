@@ -25,6 +25,7 @@ from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -35,10 +36,10 @@ from arches.app.utils.JSONResponse import JSONResponse
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         instance_summaries = []
-        for resource_instance in models.ResourceInstance.objects.all():
+        for resource_instance in Resource.objects.all():
             instance_summaries.append({
                 'id': resource_instance.pk,
-                'name': '',
+                'name': resource_instance.primary_name,
                 'type': resource_instance.graph.name,
                 'last_edited': '',
                 'qc': '',
