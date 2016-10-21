@@ -4369,6 +4369,10 @@ div.row.widget-wrapper.report-header:hover {
     opacity: 1.0;
 }
 
+.map-widget-overlay-item.map-draw-tools-active {
+  background-color: #f3f3f3;
+}
+
 .map-widget-overlay-item {
     width: 248px;
     height: 50px;
@@ -4432,10 +4436,6 @@ div.row.widget-wrapper.report-header:hover {
     text-overflow: ellipsis;
 }
 
-.map-widget-overlay-item:hover {
-  background-color: #f3f3f3;
-}
-
 .map-widget-icon:hover {
     color: rgba(255, 255, 255, 1);
 }
@@ -4482,11 +4482,6 @@ div.row.widget-wrapper.report-header:hover {
 
 .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
   visibility: hidden;
-}
-
-.editing-tool:hover {
-    background-color: #f3f3f3;
-    transition: all .20s ease;
 }
 
 .map-overlay-item-tools-panel .noUi-base {
