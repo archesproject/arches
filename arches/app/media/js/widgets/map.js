@@ -211,33 +211,35 @@ define([
             this.setupMap = function(map) {
                 var self = this;
                 var draw = Draw({
-                    styles: [
-                      {
-                          "id": "gl-draw-point-active",
-                          "type": "circle",
-                          "filter": ["all", ["!=", "meta", "vertex"],
-                              ["==", "$type", "Point"],
-                              ["!=", "mode", "static"]
-                          ],
-                          "paint": {
-                              "circle-radius": 5,
-                              "circle-color": "#FFF"
-                          },
-                          "interactive": true
-                      },
-                      {
-                          "id": "gl-draw-point",
-                          "type": "circle",
-                          "layout": {},
-                          "filter": ["all", ["!in", "$type", "LineString", "Polygon"],["!=", "mode", "static"]],
-                          "paint": {
-                              "circle-radius": this.resourcePointSize(),
-                              "circle-color": this.resourceColor(),
-                              "circle-opacity": 0.8
-                          },
-                          "interactive": true
-                      },
-                      {
+                    controls: {
+                        trash: false //if true, the backspace key is inactivated in the geocoder input
+                    },
+                    styles: [{
+                        "id": "gl-draw-point-active",
+                        "type": "circle",
+                        "filter": ["all", ["!=", "meta", "vertex"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 5,
+                            "circle-color": "#FFF"
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-point",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ["all", ["!in", "$type", "LineString", "Polygon"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": this.resourcePointSize(),
+                            "circle-color": this.resourceColor(),
+                            "circle-opacity": 0.8
+                        },
+                        "interactive": true
+                    }, {
                         "id": "gl-draw-line",
                         "type": "line",
                         "filter": ["all", ["==", "$type", "LineString"],
@@ -401,6 +403,19 @@ define([
                     }
                 });
 
+                this.resourceColor.subscribe(function(e) {
+                    var colorProperties = ['fill-outline-color', 'fill-color', 'circle-color', 'line-color'];
+                    _.each(this.draw.options.styles, function(style) {
+                        var paint = this.map.getLayer(style.id).paint
+                        var self = this;
+                        colorProperties.forEach(function(prop) {
+                            if (paint.hasOwnProperty(prop)) {
+                                self.map.setPaintProperty(style.id, prop, e)
+                            }
+                        })
+                    }, this)
+                }, this);
+
                 this.selectedItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
@@ -413,12 +428,12 @@ define([
 
                 this.selectEditingTool = function(self, val) {
 
-                    _.each(self.geometryTypeDetails, function(geomtype){
-                      if (geomtype.name === val) {
-                        self.geometryTypeDetails[val].active(!self.geometryTypeDetails[val].active())
-                      } else {
-                        self.geometryTypeDetails[geomtype.name].active(false)
-                      }
+                    _.each(self.geometryTypeDetails, function(geomtype) {
+                        if (geomtype.name === val) {
+                            self.geometryTypeDetails[val].active(!self.geometryTypeDetails[val].active())
+                        } else {
+                            self.geometryTypeDetails[geomtype.name].active(false)
+                        }
                     });
 
                     if (self.geometryTypeDetails[val] === undefined) { //it has no geom type, so must be trash
