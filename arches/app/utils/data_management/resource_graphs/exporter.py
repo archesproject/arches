@@ -56,7 +56,7 @@ def get_graphs_for_export(resource_list=None):
     graphs = {}
     graphs['graph'] = []
     if resource_list == None:
-        graphs['graph'] = Graph.objects.all().exclude(name='Arches configuration')
+        resource_graph_query = Graph.objects.all().exclude(name='Arches configuration')
         for resource_graph in resource_graph_query:
             resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
             graphs['graph'].append(resource_graph)
