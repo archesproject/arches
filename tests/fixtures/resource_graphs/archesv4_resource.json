@@ -5422,7 +5422,7 @@
           "ontologyclass": "E47_Spatial_Coordinates",
           "nodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
           "nodegroup_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
-          "datatype": "geometry",
+          "datatype": "geojson-feature-collection",
           "cardinality": ""
         },
         {
