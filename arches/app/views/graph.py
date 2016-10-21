@@ -75,6 +75,7 @@ class GraphSettingsView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph/graph-settings',
             icons=JSONSerializer().serialize(icons),
+            function_templates=models.Function.objects.exclude(component__isnull=True),
             node_json=JSONSerializer().serialize(node),
             ontologies=JSONSerializer().serialize(ontologies),
             ontology_classes=JSONSerializer().serialize(ontology_classes),

@@ -218,7 +218,7 @@
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for template in function_templates %}
             '{{ template.pk }}': {
-                'componentname': '{{ template.componentname }}',
+                'componentname': '{{ template.name }}',
                 'component': '{{ template.component }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}'
             },

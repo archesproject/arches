@@ -205,11 +205,17 @@ class Function(models.Model):
     functiontype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    config = JSONField(blank=True, null=True, db_column='config')
+    defaultconfig = JSONField(blank=True, null=True)
+    component = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'functions'
+
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
 
 
 class GraphModel(models.Model):

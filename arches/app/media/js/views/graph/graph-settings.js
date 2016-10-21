@@ -5,7 +5,8 @@ require([
     'knockout-mapping',
     'views/graph/graph-page-view',
     'graph-settings-data',
-    'bindings/color-picker'
+    'bindings/color-picker',
+    'function-templates',
 ], function($, _, ko, koMapping, PageView, data) {
     /**
     * prep data for models

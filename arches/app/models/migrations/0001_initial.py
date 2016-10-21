@@ -416,7 +416,8 @@ class Migration(migrations.Migration):
                 ('functiontype', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('config', JSONField(blank=True, null=True, db_column='config')),
+                ('defaultconfig', JSONField(blank=True, null=True, db_column='defaultconfig')),
+                ('component', models.TextField(blank=True, null=True)),
             ],
             options={
                 'db_table': 'functions',
