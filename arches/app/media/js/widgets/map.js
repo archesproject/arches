@@ -70,9 +70,13 @@ define([
                 }
                 if (this.resourcePointSize() === null) {
                     this.resourcePointSize(params.graph.get('mappointsize'));
+                } else {
+                  this.resourcePointSize(Number(this.resourcePointSize()))
                 }
                 if (this.resourceLineWidth() === null) {
                     this.resourceLineWidth(params.graph.get('maplinewidth'));
+                } else {
+                  this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
 
@@ -251,7 +255,7 @@ define([
                         },
                         "paint": {
                             "line-color": this.resourceColor(),
-                            "line-dasharray": [0.2, 2],
+                            // "line-dasharray": [0.2, 2],
                             "line-width": this.resourceLineWidth()
                         },
                         "interactive": true
@@ -279,7 +283,7 @@ define([
                         },
                         "paint": {
                             "line-color": this.resourceColor(),
-                            "line-dasharray": [0.2, 2],
+                            // "line-dasharray": [0.2, 2],
                             "line-width": this.resourceLineWidth()
                         },
                         "interactive": true
@@ -403,17 +407,29 @@ define([
                     }
                 });
 
-                this.resourceColor.subscribe(function(e) {
-                    var colorProperties = ['fill-outline-color', 'fill-color', 'circle-color', 'line-color'];
+                this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
+                    var val = isNumber ? Number(val) : val; //point size and line width must be number types
                     _.each(this.draw.options.styles, function(style) {
                         var paint = this.map.getLayer(style.id).paint
                         var self = this;
-                        colorProperties.forEach(function(prop) {
+                        paintProperties.forEach(function(prop) {
                             if (paint.hasOwnProperty(prop)) {
-                                self.map.setPaintProperty(style.id, prop, e)
+                                self.map.setPaintProperty(style.id, prop, val)
                             }
                         })
                     }, this)
+                }
+
+                this.resourceColor.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['fill-outline-color', 'fill-color', 'circle-color', 'line-color'], e)
+                }, this);
+
+                this.resourcePointSize.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['circle-radius'], e, true)
+                }, this);
+
+                this.resourceLineWidth.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
                 this.selectedItems.subscribe(function(e) {

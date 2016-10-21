@@ -331,12 +331,12 @@
 
                 <div class="control-label">{% trans "Point Size" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourcePointSize, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourcePointSize, valueUpdate: 'keyup'">
                 </div>
 
                 <div class="control-label">{% trans "Line Width" %}</div>
                 <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourceLineWidth, valueUpdate: 'keyup'">
+                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourceLineWidth, valueUpdate: 'keyup'">
                 </div>
             </div>
         </div>
