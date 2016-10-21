@@ -11,14 +11,18 @@
           centerY: centerY,
           pitch: pitch,
           bearing: bearing
-      }, afterRender: function(){setupMap(map)} }">
+       }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
             <input id="select2Input" data-bind="
               select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
+        <!-- Map Tools Panel-->
+        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
+            <input id="geocoderInput" data-bind="
+              geocodeData: selectedItems, geocoder: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
+        </div> -->
 
-        <!-- Map Tools Panel -->
         <div id="map-widget-container relative" class="">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
