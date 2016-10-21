@@ -14,6 +14,10 @@ define([
                 }
             };
 
+            // $('body').mousemove(function(event) {
+            //       event.stopPropagation();
+            // });
+
             var keys = ['color','format'];
 
             keys.forEach(function (key) {

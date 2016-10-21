@@ -11,14 +11,18 @@
           centerY: centerY,
           pitch: pitch,
           bearing: bearing
-      }, afterRender: function(){setupMap(map)} }">
+       }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
             <input id="select2Input" data-bind="
               select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
+        <!-- Map Tools Panel-->
+        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
+            <input id="geocoderInput" data-bind="
+              geocodeData: selectedItems, geocoder: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
+        </div> -->
 
-        <!-- Map Tools Panel -->
         <div id="map-widget-container relative" class="">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
@@ -142,19 +146,19 @@
             <!-- ko foreach: { data: [$data], as: 'self' } -->
 
             <!-- ko foreach: geometryTypes -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: self.selectEditingTool">
+            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data].active}">
                 <div class="map-overlay-vis-toogle text-center">
-                    <i data-bind="css: self.editingToolIcons[$data]"></i>
+                    <i data-bind="css: self.geometryTypeDetails[$data].icon"></i>
                 </div>
                 <div class="map-overlay-name">
-                    <a id="" class="" href=""><span data-bind='text: $data'><span></a>
+                    <a id="" class="" href=""><span data-bind='text: self.geometryTypeDetails[$data].name'><span></a>
                 </div>
             </div>
             <!-- /ko -->
             <!-- /ko -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: selectEditingTool">
+            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool">
                 <div class="map-overlay-vis-toogle text-center">
-                    <i data-bind="css: editingToolIcons.Delete"></i>
+                    <i class='ion-trash-a'></i>
                 </div>
                 <div class="map-overlay-name">
                     <a id="" class="" href=""><span>Delete<span></a>
