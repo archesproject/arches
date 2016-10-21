@@ -37,4 +37,8 @@ class Resource(models.ResourceInstance):
     def primary_name(self):
         module = importlib.import_module('arches.app.functions.resource_functions')
         get_primary_name = getattr(module, 'get_primary_name_from_nodes')
-        return get_primary_name('resource', {})
+        #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
+        config = {}
+        config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
+        config['string_template'] = '{7a7dfaf5-971e-11e6-aec3-14109fd34195} Type({7a7e0211-971e-11e6-a67c-14109fd34195})'
+        return get_primary_name(self, config)
