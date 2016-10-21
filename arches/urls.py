@@ -94,6 +94,7 @@ urlpatterns = [
     url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
     url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
     url(r'^report-templates/(?P<template>[a-zA-Z_-]*)', main.report_templates, name="report-templates"),
+    url(r'^function-templates/(?P<template>[a-zA-Z_-]*)', main.function_templates, name="function-templates"),
     url(r'^tile', TileData.as_view(), name="tile"),
 
     # Uncomment the admin/doc line below to enable admin documentation:

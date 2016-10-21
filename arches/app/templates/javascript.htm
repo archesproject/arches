@@ -8,6 +8,7 @@
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
             'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
+            'function-templates': '{% url "function-templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
@@ -214,6 +215,15 @@
         {% endfor %}{% endautoescape %}};
     });
 
+    define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for template in function_templates %}
+            '{{ template.pk }}': {
+                'componentname': '{{ template.componentname }}',
+                'component': '{{ template.component }}',
+                'defaultconfig': '{{ template.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
 
     define('datatype-config-components',
         [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],
