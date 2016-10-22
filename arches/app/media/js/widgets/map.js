@@ -8,7 +8,7 @@ define([
     'mapbox-gl-draw',
     'knockout-mapping',
     'geojson-extent',
-    'select2v4',
+    'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
@@ -120,7 +120,7 @@ define([
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodeResponseOption = ko.observable();
-            this.selectedItems = ko.observableArray()
+            this.selectedGeocodeItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -211,6 +211,13 @@ define([
                     self.geocoderVisible(true)
                 }
             }
+
+            this.geomTypeSelectSetup = {
+                minimumInputLength: 0,
+                multiple: true,
+                placeholder: "Available Geometry Types",
+                data: [{text:'Point', id:'Point'}, {text:'Line', id:'Line'}, {text:'Polygon', id:'Polygon'}]
+            };
 
             this.setupMap = function(map) {
                 var self = this;
@@ -432,7 +439,7 @@ define([
                     this.updateDrawLayerPaintProperties(['line-width'], e, true)
                 }, this);
 
-                this.selectedItems.subscribe(function(e) {
+                this.selectedGeocodeItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
                     this.redrawGeocodeLayer();
@@ -470,7 +477,7 @@ define([
 
                 }
 
-                this.dataReturn =
+                this.geocodeQueryPayload =
                     function(term, page) {
                         return {
                             q: term,
@@ -478,12 +485,12 @@ define([
                         };
                     }
 
-                this.selectSetup = {
+                this.geocodeSelectSetup = {
                     ajax: {
                         url: arches.urls.geocoder,
                         dataType: 'json',
                         quietMillis: 250,
-                        data: this.dataReturn,
+                        data: this.geocodeQueryPayload,
                         results: function(data, page) {
                             return {
                                 results: data.results
