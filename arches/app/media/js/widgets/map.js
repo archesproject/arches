@@ -8,7 +8,7 @@ define([
     'mapbox-gl-draw',
     'knockout-mapping',
     'geojson-extent',
-    'select2v4',
+    'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
@@ -70,9 +70,13 @@ define([
                 }
                 if (this.resourcePointSize() === null) {
                     this.resourcePointSize(params.graph.get('mappointsize'));
+                } else {
+                  this.resourcePointSize(Number(this.resourcePointSize()))
                 }
                 if (this.resourceLineWidth() === null) {
                     this.resourceLineWidth(params.graph.get('maplinewidth'));
+                } else {
+                  this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
 
@@ -116,7 +120,7 @@ define([
 
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodeResponseOption = ko.observable();
-            this.selectedItems = ko.observableArray()
+            this.selectedGeocodeItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -208,6 +212,13 @@ define([
                 }
             }
 
+            this.geomTypeSelectSetup = {
+                minimumInputLength: 0,
+                multiple: true,
+                placeholder: "Available Geometry Types",
+                data: [{text:'Point', id:'Point'}, {text:'Line', id:'Line'}, {text:'Polygon', id:'Polygon'}]
+            };
+
             this.setupMap = function(map) {
                 var self = this;
                 var draw = Draw({
@@ -251,7 +262,7 @@ define([
                         },
                         "paint": {
                             "line-color": this.resourceColor(),
-                            "line-dasharray": [0.2, 2],
+                            // "line-dasharray": [0.2, 2],
                             "line-width": this.resourceLineWidth()
                         },
                         "interactive": true
@@ -279,7 +290,7 @@ define([
                         },
                         "paint": {
                             "line-color": this.resourceColor(),
-                            "line-dasharray": [0.2, 2],
+                            // "line-dasharray": [0.2, 2],
                             "line-width": this.resourceLineWidth()
                         },
                         "interactive": true
@@ -403,20 +414,32 @@ define([
                     }
                 });
 
-                this.resourceColor.subscribe(function(e) {
-                    var colorProperties = ['fill-outline-color', 'fill-color', 'circle-color', 'line-color'];
+                this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
+                    var val = isNumber ? Number(val) : val; //point size and line width must be number types
                     _.each(this.draw.options.styles, function(style) {
                         var paint = this.map.getLayer(style.id).paint
                         var self = this;
-                        colorProperties.forEach(function(prop) {
+                        paintProperties.forEach(function(prop) {
                             if (paint.hasOwnProperty(prop)) {
-                                self.map.setPaintProperty(style.id, prop, e)
+                                self.map.setPaintProperty(style.id, prop, val)
                             }
                         })
                     }, this)
+                }
+
+                this.resourceColor.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['fill-outline-color', 'fill-color', 'circle-color', 'line-color'], e)
                 }, this);
 
-                this.selectedItems.subscribe(function(e) {
+                this.resourcePointSize.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['circle-radius'], e, true)
+                }, this);
+
+                this.resourceLineWidth.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['line-width'], e, true)
+                }, this);
+
+                this.selectedGeocodeItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
                     this.redrawGeocodeLayer();
@@ -454,7 +477,7 @@ define([
 
                 }
 
-                this.dataReturn =
+                this.geocodeQueryPayload =
                     function(term, page) {
                         return {
                             q: term,
@@ -462,12 +485,12 @@ define([
                         };
                     }
 
-                this.selectSetup = {
+                this.geocodeSelectSetup = {
                     ajax: {
                         url: arches.urls.geocoder,
                         dataType: 'json',
                         quietMillis: 250,
-                        data: this.dataReturn,
+                        data: this.geocodeQueryPayload,
                         results: function(data, page) {
                             return {
                                 results: data.results
