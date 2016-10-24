@@ -2,12 +2,10 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper" data-bind="if: !configForm && state=== 'form'">
+<div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
-            <!-- Select element with chosen binding does not support nesting at the moment. -->
-            <!-- <select class="form-control input-lg widget-input design" data-bind="value: selection, options: options , optionsText: 'text', optionsValue: 'id', placeholder: placeholder, chosen: {width: '100%'}"></select> -->
             <input style="width:30%; display:inline-block;" data-bind="select2: {select2Config: {data: options, value: value, placeholder: placeholder}}"></input>
         </div>
     </div>
@@ -15,7 +13,7 @@
 {% endblock form %}
 
 {% block config_form %}
-<div data-bind="if: configForm">
+<div>
   <div class="control-label">
       {% trans "Placeholder" %}
   </div>
