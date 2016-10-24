@@ -6,10 +6,10 @@ define([
     'arches'
 ], function ($, ko, _, WidgetViewModel, arches) {
     /**
-    * A viewmodel used for generic widgets
+    * A viewmodel used for concept widgets
     *
     * @constructor
-    * @name WidgetViewModel
+    * @name ConceptWidgetViewModel
     *
     * @param  {string} params - a configuration object
     */
