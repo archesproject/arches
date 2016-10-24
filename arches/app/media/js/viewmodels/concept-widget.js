@@ -58,6 +58,7 @@ define([
                 console.log("error", err);
             });
         }, this);
+
     };
     return ConceptWidgetViewModel;
 });
