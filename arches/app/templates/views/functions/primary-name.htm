@@ -1,4 +1,25 @@
 {% load i18n %}
 <div>
-    function template goes here...
+    <div class="row widget-container">
+        <div class="form-group">
+            <div class="relative">
+                <label class="col-xs-12 control-label widget-input-label"> {% trans "Card Name" %}</label>
+            </div>
+
+            <div class="col-xs-12">
+                <select placeholder="{% trans "Select a nodegroup" %}" data-bind="chosen: {width: '100%'}, value: selectedNodegroup, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row widget-container">
+        <div class="form-group">
+            <div class="relative">
+                <label class="col-xs-12 control-label widget-input-label"> {% trans "Primary Name Template" %}</label>
+            </div>
+
+            <div class="col-xs-12">
+                <input placeholder="{% trans "put something here..." %}" class="form-control input-lg widget-input" data-bind="textInput: primaryNameTemplate">
+            </div>
+        </div>
+    </div>
 </div>

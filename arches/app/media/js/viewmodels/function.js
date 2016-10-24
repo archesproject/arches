@@ -1,4 +1,4 @@
-define([], function () {
+define(['graph-base-data'], function (data) {
     /**
     * A base viewmodel for functions
     *
@@ -8,9 +8,8 @@ define([], function () {
     * @param  {string} params - a configuration object
     */
     var FunctionViewModel = function(params) {
-        var self = this;
-        this.state = params.state || 'form';
-        
+        this.graphid = data.graphid;
+        this.graph = data.graph;
     };
     return FunctionViewModel;
 });
