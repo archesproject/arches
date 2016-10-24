@@ -1,19 +1,7 @@
-{% extends "views/forms/widgets/base.htm" %} {% load i18n %} {% block form %}
-<div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
+{% load i18n %}
+<!-- ko if: !configForm  && state=== 'form' -->
+  <div class="row widget-wrapper"  data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-
-    <!-- <div id="geometry-widget-floating-top-left" class="floating-container">
-        <div class="alert-wrap in animated jellyIn">
-            <div class="alert alert-warning" role="alert">
-                <button class="close" type="button">
-                    <i class="fa fa-times-circle"></i>
-                </button>
-                <div class="media">
-                    <strong>Edit Mode</strong> You are editing polygons.  Click the geometry again to add vertices.
-                </div>
-            </div>
-        </div>
-    </div> -->
 
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
@@ -24,18 +12,14 @@
           centerY: centerY,
           pitch: pitch,
           bearing: bearing
-       }, afterRender: function(){setupMap(map)} }">
+      }, afterRender: function(){setupMap(map)} }">
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
-            <input id="select2Input" data-bind="
-              select2v4Data: selectedGeocodeItems, select2v4: geocodeSelectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
+          <input id="select2Input" data-bind="
+              select2v4Data: selectedItems, select2v4: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
         </div>
-        <!-- Map Tools Panel-->
-        <!-- <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
-            <input id="geocoderInput" data-bind="
-              geocodeData: selectedItems, geocoder: selectSetup, placeholder: geocodePlaceholder" style="width: 100%"></input>
-        </div> -->
 
+        <!-- Map Tools Panel -->
         <div id="map-widget-container relative" class="">
             <div class="text-center map-widget-container" data-bind="css : {'map-widget-container-expanded' : mapToolsExpanded}">
                 <a id="map-tools" href="" class="" style="display: inline;" data-bind="click: toggleMapTools"><i class="ion-ios-gear add-tooltip" data-bind="tooltip: { title: '{% trans "Map Controls" %}', placement: 'bottom' }"></i></a>
@@ -95,15 +79,15 @@
             </div>
 
             <div data-bind="sortable: overlays">
-                <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools, 'overlay-invisible':invisible}">
-                    <div class="map-overlay-vis-toogle text-center" data-bind="css:{'overlay-invisible':invisible}, click: toggleOverlayVisibility">
+                <div class="map-widget-overlay-item relative" data-bind="css:{'show-tools': showingTools}">
+                    <div class="map-overlay-vis-toogle text-center" data-bind="css: {'overlay-invisible':invisible}, click: toggleOverlayVisibility">
                         <i data-bind="css: icon"></i>
                     </div>
-                    <div class="map-overlay-name" data-bind="click: toggleOverlayVisibility">
+                    <div class="map-overlay-name">
                         <a class="" href=""><span data-bind="text:name"><span></a>
                     </div>
                     <div class="map-overlay-item-tools">
-                        <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools, css:{'overlay-invisible':invisible}">
+                        <a href="#" class="overlay-toggle" data-bind="click: toggleOverlayTools">
                             <!-- ko if: showingTools() === false  -->
                             <i class="ion-arrow-left-b" data-bind="showingTools()"></i>
                             <!-- /ko -->
@@ -159,19 +143,19 @@
             <!-- ko foreach: { data: [$data], as: 'self' } -->
 
             <!-- ko foreach: geometryTypes -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: function(){self.selectEditingTool(self, self.geometryTypeDetails[$data.id].name)}, css: {'map-draw-tools-active': self.geometryTypeDetails[$data.id].active}">
+            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: self.selectEditingTool">
                 <div class="map-overlay-vis-toogle text-center">
-                    <i data-bind="css: self.geometryTypeDetails[$data.id].icon"></i>
+                    <i data-bind="css: self.editingToolIcons[$data]"></i>
                 </div>
                 <div class="map-overlay-name">
-                    <a id="" class="" href=""><span data-bind='text: self.geometryTypeDetails[$data.id].name'><span></a>
+                    <a id="" class="" href=""><span data-bind='text: $data'><span></a>
                 </div>
             </div>
             <!-- /ko -->
             <!-- /ko -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool">
+            <div class="map-widget-overlay-item relative editing-tool" data-bind="click: selectEditingTool">
                 <div class="map-overlay-vis-toogle text-center">
-                    <i class='ion-trash-a'></i>
+                    <i data-bind="css: editingToolIcons.Delete"></i>
                 </div>
                 <div class="map-overlay-name">
                     <a id="" class="" href=""><span>Delete<span></a>
@@ -187,14 +171,14 @@
                 <h4 class=""> Legend </h4>
             </div>
             <div data-bind="sortable: overlays">
-                <div class="map-widget-overlay-item relative">
-                    <div class="map-overlay-vis-toogle text-center">
-                        <i data-bind="css: icon, style: {color:color}"></i>
-                    </div>
-                    <div class="map-overlay-name">
-                        <a class="" href=""><span data-bind="text:name"><span></a>
-                    </div>
-                </div>
+              <div class="map-widget-overlay-item relative">
+                  <div class="map-overlay-vis-toogle text-center">
+                      <i data-bind="css: icon, style: {color:color}"></i>
+                  </div>
+                  <div class="map-overlay-name">
+                      <a class="" href=""><span data-bind="text:name"><span></a>
+                  </div>
+              </div>
             </div>
 
         </div>
@@ -212,9 +196,15 @@
 
     </div>
 </div>
-{% endblock form %} {% block report %}
+<!-- /ko -->
+
+
+<!-- ko if: !configForm  && state=== 'report' -->
 <div>Map summary details possibly to go here...</div>
-{% endblock report %} {% block config_form %}
+<!-- /ko -->
+
+
+<!-- ko if: configForm && state!== 'report'-->
 <div class="control-label map-config-header">Map Properties</div>
 <div class="panel-group accordion" id="accordion">
     <div class="panel">
@@ -229,30 +219,30 @@
         <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-position" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
-                <div class="control-label">
-                    {% trans "Map Center Longitude" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
-                </div>
-                <div class="control-label">
-                    {% trans "Map Center Latitude" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
-                </div>
-                <div class="control-label">
-                    {% trans "Pitch" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
-                </div>
-                <div class="control-label">
-                    {% trans "Bearing" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
-                </div>
+              <div class="control-label">
+                  {% trans "Map Center Longitude" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Map Center Latitude" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Pitch" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Pitch (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: pitch, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Bearing" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="number" id="" placeholder="{% trans " Bearing (Degrees) " %}" class="form-control input-md widget-input" data-bind="value: bearing, valueUpdate: 'keyup'">
+              </div>
             </div>
         </div>
     </div>
@@ -281,13 +271,13 @@
                     <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: minZoom, valueUpdate: 'keyup'">
                 </div>
                 <div class="control-label">
-                    {% trans "Max Zoom" %}
+                      {% trans "Max Zoom" %}
                 </div>
                 <div class="col-xs-12 pad-no crud-widget-container">
                     <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: maxZoom, valueUpdate: 'keyup'">
                 </div>
             </div>
-        </div>
+          </div>
     </div>
     <div class="panel">
         <!--Accordion title-->
@@ -300,28 +290,28 @@
         <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-geocoder" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
-                <div class="control-label">
-                    {% trans "Default Geocoder" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
-                </div>
-                <div class="control-label">
-                    {% trans "Geocoder Placehoder" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
-                </div>
-                <div class="control-label">
-                    {% trans "Geocoder Availability" %}
-                </div>
-                <div class="col-xs-12 pad-no crud-widget-container">
+              <div class="control-label">
+                  {% trans "Default Geocoder" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <select type="" id="" placeholder="{% trans " Geocoder " %}" data-bind="options:geocoderOptions, optionsText:'name', optionsValue:'id', event: {change: onGeocodeSelection}, value: geocoder, chosen: {width: '100%'}"></select>
+              </div>
+              <div class="control-label">
+                  {% trans "Geocoder Placehoder" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="text" placeholder="{% trans " Geocoder Placehoder " %}" class="form-control input-md widget-input" data-bind="value: geocodePlaceholder, valueUpdate: 'keyup'">
+              </div>
+              <div class="control-label">
+                  {% trans "Geocoder Availability" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
 
-                    <div class="toggle-container">
-                        <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: toggleGeocoder"><small></small></span>
-                        <p class="arches-toggle-sm">Toggle on to show a geocoder on the map</p>
-                    </div>
+                <div class="toggle-container">
+                    <span class="switch switch-small" data-bind="css: {'on': geocoderVisible}, click: toggleGeocoder"><small></small></span>
+                    <p class="arches-toggle-sm">Toggle on to show a geocoder on the map</p>
                 </div>
+              </div>
             </div>
         </div>
     </div>
@@ -336,33 +326,15 @@
         <!--Accordion content-->
         <div class="panel-collapse collapse" id="map-config-resource-style" aria-expanded="false" style="height: 0px;">
             <div class="panel-body accordion-body">
-                <div class="control-label">{% trans "Color" %}</div>
-
-                <div class="col-xs-12 pad-no crud-widget-container colorpicker-component">
-                    <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: resourceColor, format:'rgba'}">
-                </div>
-
-                <div class="control-label">{% trans "Point Size" %}</div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourcePointSize, valueUpdate: 'keyup'">
-                </div>
-
-                <div class="control-label">{% trans "Line Width" %}</div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input type="number" min="1" placeholder="{% trans " Map Feature Color " %}" class="form-control input-lg widget-input" data-bind="value: resourceLineWidth, valueUpdate: 'keyup'">
-                </div>
-
-                <div class="control-label">{% trans "Available Geometry Types" %}</div>
-                <div class="col-xs-12 pad-no crud-widget-container">
-                    <input id="select2Input2" data-bind="
-                      select2v4Data: geometryTypes,
-                      select2v4: geomTypeSelectSetup"
-                      style="width: 100%">
-                    </input>
-                </div>
+              <div class="control-label">
+                    {% trans "Resource Color" %}
+              </div>
+              <div class="col-xs-12 pad-no crud-widget-container">
+                  <input type="" id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: resourceColor, valueUpdate: 'keyup'">
+              </div>
             </div>
         </div>
-
     </div>
 </div>
-{% endblock config_form %}
+
+<!-- /ko -->

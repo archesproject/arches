@@ -200,6 +200,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'widgets/concept-radio', 'concept', '{ "options": [] }');
+
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
     VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'fa fa-circle', 'Represents a single node in a graph.', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');

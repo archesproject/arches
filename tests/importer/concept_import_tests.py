@@ -46,6 +46,8 @@ class conceptImportTests(ArchesTestCase):
 		se = SearchEngineFactory().create()
 		se.delete_index(index='concept_labels')
 		se.delete_index(index='term')
+		se.create_index(index='concept_labels')
+		se.create_index(index='term')
 
 
 	def test_hierarchical_relationships(self):

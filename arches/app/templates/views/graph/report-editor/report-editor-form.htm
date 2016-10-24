@@ -4,6 +4,7 @@
     <!-- ko if: selection() === 'header' -->
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Header" %}</h4>
+        <div class="mar-lft" data-bind="component: { name: 'switch-widget', params: {value: report.get('active'), config:{label: '{% trans "Active" %}', subtitle: ''}}}"></div>
     </div>
 
     <div class="node-widget-label" style="">
@@ -14,7 +15,7 @@
             <input type="text" placeholder="{% trans "Report Title" %}" class="form-control input-md widget-input" data-bind="value: report.get('name'), valueUpdate: 'keyup'">
         </div>
 
-        <div data-bind="component: { name: 'switch-widget', params: {value: report.get('active'), config:{label: '{% trans "Active" %}', subtitle: ''}}}"></div>
+        
     </div>
 
     <div class='report-preview' data-bind='component: {
@@ -30,10 +31,9 @@
     <!-- ko if: selection().formid -->
     <div class="library-title-block">
         <h4 class="title-block-title"> {% trans "Report Section" %}</h4>
+        <div class="mar-lft" data-bind="component: { name: 'switch-widget', params: {value: selection().active, config:{label: '{% trans "Publish Section" %}', subtitle: ''}}}"></div>
     </div>
     <div style="padding-bottom: 5px;">
-        <div data-bind="component: { name: 'switch-widget', params: {value: selection().active, config:{label: '{% trans "Publish Section" %}', subtitle: ''}}}"></div>
-
         <div class="node-widget-label" style="">
             <div class="control-label">
                 {% trans "Section Title" %}
@@ -46,7 +46,7 @@
     <!-- /ko -->
 
     <!-- ko if: selection().isContainer && selection().isContainer() -->
-    <div class="library-title-block">
+    <div class="library-title-block title-block-min">
         <h4 class="title-block-title"> {% trans "Sub-Section" %}</h4>
     </div>
     <div style="padding-bottom: 5px;">
@@ -62,7 +62,7 @@
     <!-- /ko -->
 
     <!-- ko if: selection().isContainer && !selection().isContainer() -->
-    <div class="library-title-block">
+    <div class="library-title-block title-block-min">
         <h4 class="title-block-title"> {% trans "Label Manager" %}</h4>
     </div>
     <div style="padding-bottom: 5px;">

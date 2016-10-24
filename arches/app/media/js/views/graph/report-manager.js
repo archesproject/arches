@@ -4,16 +4,20 @@ require([
     'views/graph/graph-page-view',
     'views/list',
     'viewmodels/alert',
+    'models/report',
     'report-manager-data',
     'arches',
     'bindings/dragDrop'
-], function(_, ko, PageView, ListView, AlertViewModel, data, arches) {
+], function(_, ko, PageView, ListView, AlertViewModel, ReportModel, data, arches) {
     var showTemplateLibrary = ko.observable(false);
 
+    var reportModels = []
     data.reports.forEach(function(report) {
-        report.template = _.find(data.templates, function(template) {
+        var reportModel = new ReportModel(_.extend({report: report}, data))
+        reportModel.template = _.find(data.templates, function(template) {
             return report.template_id === template.templateid;
         });
+        reportModels.push(reportModel);
     });
     var viewModel = {
         showTemplateLibrary: showTemplateLibrary,
@@ -22,7 +26,7 @@ require([
         },
         selectedReportId: ko.observable(null),
         templates: ko.observableArray(data.templates),
-        reports: ko.observableArray(data.reports)
+        reports: ko.observableArray(reportModels)
     };
 
     viewModel.templateLibraryStatus = ko.pureComputed(function() {
@@ -37,16 +41,20 @@ require([
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
 
-    viewModel.addReport = function(data){
+    viewModel.addReport = function(newReportData){
         this.loading(true);
         $.ajax({
             type: "POST",
             url: 'add_report',
             data: JSON.stringify({
-                template_id: data.templateid
+                template_id: newReportData.templateid
             }),
             success: function(response) {
-                viewModel.reports.push(response);
+                var reportModel = new ReportModel(_.extend({report: response}, data))
+                reportModel.template = _.find(data.templates, function(template) {
+                    return response.template_id === template.templateid;
+                });
+                viewModel.reports.push(reportModel);
                 pageView.viewModel.loading(false);
             },
             error: function(response) {
@@ -60,7 +68,7 @@ require([
         this.loading(true);
         $.ajax({
             type: "DELETE",
-            url: arches.urls.report_editor + report.reportid + '/delete',
+            url: arches.urls.report_editor + report.get('reportid')() + '/delete',
             success: function(response) {
                 pageView.viewModel.loading(false);
                 viewModel.reports.remove(report);
@@ -88,7 +96,13 @@ require([
             reportid: null,
             disabled: true
         }]
-        return options.concat(viewModel.reports());
+        var reports = _.map(viewModel.reports(), function (reportModel) {
+            return {
+                name: reportModel.get('name'),
+                reportid: reportModel.get('reportid')
+            };
+        });
+        return options.concat(options.concat(reports));
     });
 
     viewModel.newReport = ko.computed({
