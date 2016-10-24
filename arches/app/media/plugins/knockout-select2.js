@@ -1,4 +1,3 @@
-
 define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
