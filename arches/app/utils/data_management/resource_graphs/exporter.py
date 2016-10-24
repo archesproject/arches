@@ -56,6 +56,7 @@ def get_forms_for_export(resource_graph):
     return forms
 
 def get_form_x_card_data_for_export(resource_graph):
+    forms_x_cards = []
     for form in resource_graph['forms']:
         forms_x_cards = FormXCard.objects.filter(form_id=form.formid)
     return forms_x_cards
