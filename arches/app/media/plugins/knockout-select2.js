@@ -5,6 +5,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             var self = this;
             var allBindings = allBindingsAccessor().select2;
             var select2Config = ko.utils.unwrapObservable(allBindings.select2Config);
+            var value = select2Config.value;
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).select2('destroy');
@@ -34,6 +35,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
               formatData(newItems);
               select2Config.data = newItems;
               $(el).select2("destroy").select2(select2Config);
+              $(el).select2("val", select2Config.value)
             });
 
             select2Config.data = select2Config.data();
@@ -88,12 +90,14 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function ($, ko, _) {
             };
 
 
+            select2Config.value = value();
             $(el).select2(select2Config);
-            $(el).select2("val", select2Config.value());
+            $(el).select2("val", value());
             $(el).on("change", function(val) {
-                return allBindings.select2Config.value(val.val);
+                return value(val.val);
             });
-            select2Config.value.subscribe(function(newVal){
+            value.subscribe(function(newVal){
+                select2Config.value = newVal;
                 $(el).select2("val", newVal);
             }, this);
         }
