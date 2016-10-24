@@ -113,25 +113,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- ko foreach: reports -->
-                <div class="card-grid-item" data-bind="click: function () { $parent.openReport(reportid) }">
+                <div class="card-grid-item" data-bind="click: function () { $parent.openReport(get('reportid')()) }">
                     <div class="panel mar-no">
 
                         <!-- card Name -->
                         <div class="panel-heading">
-                            <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
+                            <h3 class="panel-title library-card-panel-title" data-bind="text:get('name')"></h3>
                         </div>
 
                         <!-- Abstract -->
                         <div class="panel-body library-card-body">
                             <p class="library-item-subtitle">
-                                Template:
-                                <span data-bind="text:template.name"></span>
+                                (Template:
+                                <span data-bind="text:template.name"></span>)
                             </p>
+                            <!-- ko foreach: forms -->
+                                <div data-bind="text: label()" class="library-item-subtitle"></div>
+                            <!-- /ko -->
                         </div>
 
                         <!-- card Tools -->
                         <div class="panel-footer" style="height: 40px;">
-                            <a href="" class="" style=""><i data-bind="css: active ? 'fa fa-check-circle' : 'fa fa-ban'"></i> <span data-bind="text: active ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></span></a>
+                            <a href="" class="" style=""><i data-bind="css: get('active') ? 'fa fa-check-circle' : 'fa fa-ban'"></i> <span data-bind="text: get('active') ? '{% trans "Active" %}' : '{% trans "Inactive" %}'"></span></a>
                             <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteReport($data) }, clickBubble: false"><i class="ion-minus-circled"></i> Delete Report</a>
                         </div>
 
@@ -153,7 +156,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 define('report-manager-data', [], function () {
     return {
         templates: {{templates_json}},
-        reports: {{reports}}
+        reports: {{reports}},
+        datatypes: {{ datatypes_json }},
+        forms: {{forms}},
+        forms_x_cards: {{forms_x_cards}},
+        cards: {{cards}},
+        graph: {{graph_json}}
     };
 });
 {% endautoescape %}</script>

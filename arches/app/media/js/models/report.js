@@ -19,7 +19,9 @@ define(['arches',
         initialize: function(options) {
             var self = this;
 
-            options.forms.forEach(function(form) {
+            var forms = [];
+            options.forms.forEach(function(formData) {
+                form = _.clone(formData);
                 form.cards = [];
                 options.forms_x_cards.forEach(function(form_x_card) {
                     if (form_x_card.form_id === form.formid) {
@@ -37,8 +39,9 @@ define(['arches',
                 form.sortorder = Infinity;
                 form.active = ko.observable(true);
                 form.label = ko.observable(form.title);
+                forms.push(form);
             });
-            this.forms = ko.observableArray(options.forms);
+            this.forms = ko.observableArray(forms);
             this.activeForms = ko.computed(function() {
                 return _.filter(self.forms(), function(form) {
                     return form.active();
