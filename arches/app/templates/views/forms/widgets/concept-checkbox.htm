@@ -7,9 +7,12 @@
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <div class="col-xs-12">
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
-                <label class="form-radio form-normal form-text" data-bind="css: { 'active': $parent.value() === id }, click: function () { $parent.value(id) }">
-                    <input type="radio" data-bind="checked: $parent.value, attr: {value: id, name: $parent.node.nodeid}"> <span data-bind="text: text"></span>
+
+                <label class="form-checkbox form-normal form-primary form-text" data-bind="css: {'active': selected()}, click: function () { selected(!selected()) }"">
+                    <input type="checkbox" data-bind="checked: selected">
+                    <span data-bind="text:text"></span>
                 </label>
+
             </div>
         </div>
     </div>

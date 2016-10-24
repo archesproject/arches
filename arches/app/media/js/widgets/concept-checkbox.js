@@ -14,7 +14,11 @@ define([
      * @param {string} params.config.options -
      */
     return ko.components.register('concept-checkbox-widget', {
-        viewModel: ConceptWidgetViewModel,
+        viewModel: function(params) {
+            ConceptWidgetViewModel.apply(this, [params]);
+
+            this.multiple = true;
+        },
         template: {
             require: 'text!widget-templates/concept-checkbox'
         }

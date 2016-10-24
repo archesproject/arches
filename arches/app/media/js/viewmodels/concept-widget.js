@@ -29,6 +29,31 @@ define([
             var options = self.options();
             var flatOptions = [];
             options.forEach(function(option) {
+                var value = self.value();
+                if (!Array.isArray(value)) {
+                    var valueArray = [];
+                    if (value) {
+                        valueArray.push(value);
+                    }
+                    value = valueArray
+                }
+                option.selected = ko.computed({
+                    read: function () {
+                        var selected = false;
+                        if (self.value()) {
+                            selected = self.value().indexOf(option.id) >= 0;
+                        }
+                        return selected;
+                    },
+                    write: function (newValue) {
+                        if (newValue) {
+                            value.push(option.id);
+                            self.value(value);
+                        } else {
+                            self.value(_.without(value, option.id));
+                        }
+                    }
+                });
                 gatherChildren(option, flatOptions);
             });
             return flatOptions;
