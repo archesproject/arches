@@ -155,7 +155,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-list-select-widget', 'widgets/concept-list-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-list-select-widget', 'widgets/concept-list-select', 'concept-list', '{ "placeholder": "Select an option", "options": [] }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
@@ -206,6 +206,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'widgets/concept-radio', 'concept', '{ "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000013', 'concept-checkbox-widget', 'widgets/concept-checkbox', 'concept-list', '{ "options": [] }');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
