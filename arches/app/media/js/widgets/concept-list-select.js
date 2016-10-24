@@ -13,10 +13,15 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('concept-radio-widget', {
-        viewModel: ConceptWidgetViewModel,
+    return ko.components.register('concept-list-select-widget', {
+        viewModel: function(params) {
+            params.configKeys = ['placeholder'];
+            ConceptWidgetViewModel.apply(this, [params]);
+
+            this.multiple = true;
+        },
         template: {
-            require: 'text!widget-templates/concept-radio'
+            require: 'text!widget-templates/concept-select'
         }
     });
 });

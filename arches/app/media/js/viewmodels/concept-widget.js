@@ -14,6 +14,8 @@ define([
     * @param  {string} params - a configuration object
     */
     var ConceptWidgetViewModel = function(params) {
+        var self = this;
+
         params.configKeys || (params.configKeys = []);
         if (!_.contains(params.configKeys, 'options')) {
             params.configKeys.push('options');
@@ -21,44 +23,71 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
-        this.displayValue = ko.observable();
+        this.multiple = false;
 
-        this.getConceptLabel = function() {
-            var self = this;
-            $.ajax({
-                url: arches.urls.get_pref_label,
-                data: {
-                    valueid: this.value
-                },
-                datatype: 'json'
-            }).done(function(label) {
-                self.displayValue(label.value);
-            }).fail(function(err) {
-                console.log("error", err);
+        this.flatOptions = ko.computed(function () {
+            var options = self.options();
+            var flatOptions = [];
+            options.forEach(function(option) {
+                gatherChildren(option, flatOptions);
             });
+            return flatOptions;
+        });
+
+        var findConceptLabel = function (conceptId) {
+            var label = null;
+            var concept = _.find(self.flatOptions(), function (concept) {
+                return concept.id === conceptId;
+            });
+            if (concept) {
+                label = concept.text;
+            }
+            return label;
         };
 
-        if ((this.state === 'report' || this.state === 'display_value') && this.value() != null) {
-            this.getConceptLabel();
-        } else {
-            this.displayValue(null);
-        }
+        this.displayValue = ko.computed(function () {
+            var value = self.value();
+            var displayValue = null;
+            if (value) {
+                if (!Array.isArray(value)) {
+                    value = [value];
+                }
+                displayValue = _.map(value, function(conceptId) {
+                    return findConceptLabel(conceptId);
+                }).join(', ');
+            }
+            return displayValue;
+        });
 
-        this.node.config.topConcept.subscribe(function(newId) {
+        this.getConcepts = function (rootId) {
             var self = this;
             $.ajax({
                 url: arches.urls.dropdown,
                 data: {
-                    conceptid: newId
+                    conceptid: rootId
                 },
                 dataType: 'json'
             }).done(function(data) {
                 self.options(data);
-            }).fail(function(err) {
-                console.log("error", err);
             });
+        }
+
+        this.node.config.topConcept.subscribe(function(rootId) {
+            this.getConcepts(rootId);
         }, this);
 
+        if (this.node.config.topConcept()) {
+            this.getConcepts(this.node.config.topConcept());
+        }
     };
+
+    var gatherChildren = function (current, list) {
+        list.push(current);
+        current.children.forEach(function (child) {
+            gatherChildren(child, list);
+        });
+        return list;
+    }
+
     return ConceptWidgetViewModel;
 });
