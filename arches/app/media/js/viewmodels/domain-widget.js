@@ -37,7 +37,7 @@ define([
                 }
                 value = valueArray
             }
-            options.forEach(function(option) {
+            var setupOption = function (option) {
                 option.selected = ko.computed({
                     read: function () {
                         var selected = false;
@@ -60,7 +60,10 @@ define([
                         }
                     }
                 });
-                gatherChildren(option, flatOptions);
+            }
+            options.forEach(function(option) {
+                setupOption(option);
+                gatherChildren(option, flatOptions, setupOption);
             });
             return flatOptions;
         });
@@ -93,13 +96,14 @@ define([
         });
     };
 
-    var gatherChildren = function (current, list) {
+    var gatherChildren = function (current, list, callback) {
         list.push(current);
         if (current.children) {
             current.children.forEach(function (child) {
-                gatherChildren(child, list);
+                gatherChildren(child, list, callback);
             });
         }
+        callback(current);
         return list;
     };
 
