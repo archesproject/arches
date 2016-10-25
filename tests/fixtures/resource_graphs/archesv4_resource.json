@@ -5422,7 +5422,7 @@
           "ontologyclass": "E47_Spatial_Coordinates",
           "nodeid": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
           "nodegroup_id": "2d18cb13-d175-47d6-b218-8f2644cf8b3c",
-          "datatype": "geometry",
+          "datatype": "geojson-feature-collection",
           "cardinality": ""
         },
         {
@@ -7051,7 +7051,10 @@
           "description": ""
         }
       ],
-      "cards": []
+      "cards": [],
+      "cards_x_nodes_x_widgets": [],
+      "forms": [],
+      "forms_x_cards": []
     }
   ],
   "business_data": {
@@ -7098,29 +7101,6 @@
     ]
   },
   "ui_components": [
-    {
-      "forms": [
-        {
-          "formid": "",
-          "name": "",
-          "title": "",
-          "subtitile": ""
-        }
-      ]
-    },
-    {
-      "cards": [
-        {
-          "cardid": "",
-          "name": "",
-          "title": "",
-          "subtitle": "",
-          "helptext": "",
-          "nodegroup_id": "",
-          "parentcardid": ""
-        }
-      ]
-    },
     {
       "widgets": [
         {

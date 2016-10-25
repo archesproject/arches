@@ -16,7 +16,6 @@
             'jquery': '{{ STATIC_URL }}bower_components/jquery/dist/jquery.min',
             'js-cookie': '{{ STATIC_URL }}bower_components/js-cookie/src/js.cookie',
             'select2': '{{ STATIC_URL }}bower_components/select2v3/index',
-            'select2v4': '{{ STATIC_URL }}bower_components/select2/dist/js/select2.min',
             'bootstrap': '{{ STATIC_URL }}bower_components/bootstrap/dist/js/bootstrap.min',
             'jquery-ui': '{{ STATIC_URL }}bower_components/jqueryui/ui/jquery-ui',
             'flexslider': '{{ STATIC_URL }}bower_components/flexslider/2.2.2/jquery.flexslider-min',
@@ -69,9 +68,6 @@
             'jquery-ui': {
                 deps: ['jquery']
             },
-            'select2': {
-                deps: ['jquery']
-            },
             'datatables': {
                 deps: ['jquery']
             },
@@ -86,8 +82,8 @@
                 deps: ['mapbox-gl'],
                 exports: 'mapboxgl.Draw'
             },
-            'select2v4': {
-                deps: ['jquery']
+            'select2': {
+                deps: ['jquery'],
             },
             'moment': {
                 deps: ['jquery']

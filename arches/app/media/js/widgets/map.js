@@ -8,7 +8,7 @@ define([
     'mapbox-gl-draw',
     'knockout-mapping',
     'geojson-extent',
-    'select2v4',
+    'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
@@ -58,7 +58,7 @@ define([
                 'resourceColor',
                 'resourcePointSize',
                 'resourceLineWidth'
-              ];
+            ];
 
             WidgetViewModel.apply(this, [params]);
 
@@ -66,13 +66,17 @@ define([
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
                 if (this.resourceColor() === null) {
-                  this.resourceColor(params.graph.get('mapfeaturecolor'));
+                    this.resourceColor(params.graph.get('mapfeaturecolor'));
                 }
                 if (this.resourcePointSize() === null) {
-                  this.resourcePointSize(params.graph.get('mappointsize'));
+                    this.resourcePointSize(params.graph.get('mappointsize'));
+                } else {
+                  this.resourcePointSize(Number(this.resourcePointSize()))
                 }
                 if (this.resourceLineWidth() === null) {
-                  this.resourceLineWidth(params.graph.get('maplinewidth'));
+                    this.resourceLineWidth(params.graph.get('maplinewidth'));
+                } else {
+                  this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
 
@@ -93,9 +97,30 @@ define([
                 'name': 'Mapzen'
             }]);
 
+            this.geometryTypeDetails = {
+                Point: {
+                    name: 'Point',
+                    icon: 'ion-location',
+                    drawMode: 'draw_point',
+                    active: ko.observable(false)
+                },
+                Line: {
+                    name: 'Line',
+                    icon: 'ion-steam',
+                    drawMode: 'draw_line_string',
+                    active: ko.observable(false)
+                },
+                Polygon: {
+                    name: 'Polygon',
+                    icon: 'fa fa-pencil-square-o',
+                    drawMode: 'draw_polygon',
+                    active: ko.observable(false)
+                }
+            }
+
             this.geocodeUrl = arches.urls.geocoder;
             this.geocodeResponseOption = ko.observable();
-            this.selectedItems = ko.observableArray()
+            this.selectedGeocodeItems = ko.observableArray()
             this.mapControlPanels = {
                 basemaps: ko.observable(false),
                 overlays: ko.observable(true),
@@ -145,7 +170,6 @@ define([
                 return resourceLayer;
             }
 
-
             this.addInitialLayers = function() {
                 this.layers.push(this.defineResourceLayer());
                 var initialLayers = [];
@@ -180,14 +204,6 @@ define([
                 return initialLayers;
             }
 
-            this.editingToolIcons = {
-                Point: 'ion-location',
-                Line: 'ion-steam',
-                Polygon: 'fa fa-pencil-square-o',
-                Delete: 'ion-trash-a'
-            }
-
-
             this.toggleGeocoder = function(self, evt) {
                 if (self.geocoderVisible() === true) {
                     self.geocoderVisible(false)
@@ -196,12 +212,157 @@ define([
                 }
             }
 
+            this.geomTypeSelectSetup = {
+                minimumInputLength: 0,
+                multiple: true,
+                placeholder: "Available Geometry Types",
+                data: [{text:'Point', id:'Point'}, {text:'Line', id:'Line'}, {text:'Polygon', id:'Polygon'}]
+            };
 
             this.setupMap = function(map) {
                 var self = this;
-                var draw = Draw();
+                var draw = Draw({
+                    controls: {
+                        trash: false //if true, the backspace key is inactivated in the geocoder input
+                    },
+                    styles: [{
+                        "id": "gl-draw-point-active",
+                        "type": "circle",
+                        "filter": ["all", ["!=", "meta", "vertex"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 5,
+                            "circle-color": "#FFF"
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-point",
+                        "type": "circle",
+                        "layout": {},
+                        "filter": ["all", ["!in", "$type", "LineString", "Polygon"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": this.resourcePointSize(),
+                            "circle-color": this.resourceColor(),
+                            "circle-opacity": 0.8
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-line",
+                        "type": "line",
+                        "filter": ["all", ["==", "$type", "LineString"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "layout": {
+                            "line-cap": "round",
+                            "line-join": "round"
+                        },
+                        "paint": {
+                            "line-color": this.resourceColor(),
+                            // "line-dasharray": [0.2, 2],
+                            "line-width": this.resourceLineWidth()
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-fill",
+                        "type": "fill",
+                        "filter": ["all", ["==", "$type", "Polygon"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "fill-color": this.resourceColor(),
+                            "fill-outline-color": this.resourceColor(),
+                            "fill-opacity": 0.1
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-stroke-active",
+                        "type": "line",
+                        "filter": ["all", ["==", "$type", "Polygon"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "layout": {
+                            "line-cap": "round",
+                            "line-join": "round"
+                        },
+                        "paint": {
+                            "line-color": this.resourceColor(),
+                            // "line-dasharray": [0.2, 2],
+                            "line-width": this.resourceLineWidth()
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-and-line-vertex-halo-active",
+                        "type": "circle",
+                        "filter": ["all", ["==", "meta", "vertex"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 5,
+                            "circle-color": "#FFF"
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-and-line-vertex-active",
+                        "type": "circle",
+                        "filter": ["all", ["==", "meta", "vertex"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 3,
+                            "circle-color": this.resourceColor(),
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-and-line-midpoint-halo-active",
+                        "type": "circle",
+                        "filter": ["all", ["==", "meta", "midpoint"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 4,
+                            "circle-color": "#FFF"
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-polygon-and-line-midpoint-active",
+                        "type": "circle",
+                        "filter": ["all", ["==", "meta", "midpoint"],
+                            ["==", "$type", "Point"],
+                            ["!=", "mode", "static"]
+                        ],
+                        "paint": {
+                            "circle-radius": 2,
+                            "circle-color": this.resourceColor(),
+                        },
+                        "interactive": true
+                    }, {
+                        "id": "gl-draw-line-static",
+                        "type": "line",
+                        "filter": ["all", ["==", "$type", "LineString"],
+                            ["==", "mode", "active"]
+                        ],
+                        "layout": {
+                            "line-cap": "round",
+                            "line-join": "round"
+                        },
+                        "paint": {
+                            "line-color": "#000",
+                            "line-width": this.resourceLineWidth()
+                        },
+                        "interactive": true
+                    }]
+                });
+
                 this.map = map;
                 this.draw = draw;
+                this.drawMode;
                 this.map.addControl(draw);
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
@@ -253,7 +414,32 @@ define([
                     }
                 });
 
-                this.selectedItems.subscribe(function(e) {
+                this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
+                    var val = isNumber ? Number(val) : val; //point size and line width must be number types
+                    _.each(this.draw.options.styles, function(style) {
+                        var paint = this.map.getLayer(style.id).paint
+                        var self = this;
+                        paintProperties.forEach(function(prop) {
+                            if (paint.hasOwnProperty(prop)) {
+                                self.map.setPaintProperty(style.id, prop, val)
+                            }
+                        })
+                    }, this)
+                }
+
+                this.resourceColor.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['fill-outline-color', 'fill-color', 'circle-color', 'line-color'], e)
+                }, this);
+
+                this.resourcePointSize.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['circle-radius'], e, true)
+                }, this);
+
+                this.resourceLineWidth.subscribe(function(e) {
+                    this.updateDrawLayerPaintProperties(['line-width'], e, true)
+                }, this);
+
+                this.selectedGeocodeItems.subscribe(function(e) {
                     var coords = e.geometry.coordinates;
                     this.map.getSource('geocode-point').setData(e.geometry);
                     this.redrawGeocodeLayer();
@@ -263,23 +449,35 @@ define([
                     });
                 }, this);
 
-                this.selectEditingTool = function(val, e) {
-                    switch (val) {
-                        case 'Point':
-                            draw.changeMode('draw_point');
-                            break;
-                        case 'Line':
-                            draw.changeMode('draw_line_string');
-                            break;
-                        case 'Polygon':
-                            draw.changeMode('draw_polygon');
-                            break;
-                        default:
-                            draw.trash();
+                this.selectEditingTool = function(self, val) {
+
+                    _.each(self.geometryTypeDetails, function(geomtype) {
+                        if (geomtype.name === val) {
+                            self.geometryTypeDetails[val].active(!self.geometryTypeDetails[val].active())
+                        } else {
+                            self.geometryTypeDetails[geomtype.name].active(false)
+                        }
+                    });
+
+                    if (self.geometryTypeDetails[val] === undefined) { //it has no geom type, so must be trash
+                        self.draw.trash();
+                        self.drawMode = null;
+                    } else {
+                        if (!self.drawMode) {
+                            self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
+                            self.drawMode = self.geometryTypeDetails[val].drawMode;
+                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode) {
+                            self.draw.changeMode('simple_select')
+                            self.drawMode = undefined;
+                        } else {
+                            self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
+                            self.drawMode = self.geometryTypeDetails[val].drawMode;
+                        }
                     }
+
                 }
 
-                this.dataReturn =
+                this.geocodeQueryPayload =
                     function(term, page) {
                         return {
                             q: term,
@@ -287,12 +485,12 @@ define([
                         };
                     }
 
-                this.selectSetup = {
+                this.geocodeSelectSetup = {
                     ajax: {
                         url: arches.urls.geocoder,
                         dataType: 'json',
                         quietMillis: 250,
-                        data: this.dataReturn,
+                        data: this.geocodeQueryPayload,
                         results: function(data, page) {
                             return {
                                 results: data.results
@@ -394,9 +592,19 @@ define([
                     }
                 }
 
+                this.updateDrawMode = function(e) {
+                    var self = this;
+                    return function() {
+                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode) && self.drawMode !== self.draw.getMode()) {
+                            self.draw.changeMode(self.drawMode)
+                        }
+                    }
+                }
+
                 this.map.on('moveend', this.updateConfigs());
                 this.map.on('draw.create', this.saveGeometries())
                 this.map.on('draw.delete', this.saveGeometries())
+                this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
                     var anchorLayer = 'gl-draw-active-line.hot';

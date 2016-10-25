@@ -13,13 +13,14 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('concept-select-widget', {
+    return ko.components.register('concept-checkbox-widget', {
         viewModel: function(params) {
-            params.configKeys = ['placeholder'];
             ConceptWidgetViewModel.apply(this, [params]);
+
+            this.multiple = true;
         },
         template: {
-            require: 'text!widget-templates/concept-select'
+            require: 'text!widget-templates/concept-checkbox'
         }
     });
 });

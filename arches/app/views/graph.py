@@ -34,6 +34,7 @@ from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
+from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
@@ -191,10 +192,9 @@ class GraphDataView(View):
         if self.action == 'import_graph':
             graph_file = request.FILES.get('importedGraph').read()
             graphs = JSONDeserializer().deserialize(graph_file)['graph']
+            GraphImporter.import_graph(graphs)
             for graph in graphs:
-                new_graph = Graph(graph)
-                new_graph.save()
-                ret = new_graph
+                ret = graph
         else:
             if graphid is not None:
                 graph = Graph.objects.get(graphid=graphid)
@@ -384,11 +384,21 @@ class DatatypeTemplateView(TemplateView):
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
+        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
             templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            forms=JSONSerializer().serialize(forms),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
          )
 
         return render(request, 'views/graph/report-manager.htm', context)
