@@ -615,6 +615,7 @@ class Migration(migrations.Migration):
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
                 ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.Tile')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'tiles',

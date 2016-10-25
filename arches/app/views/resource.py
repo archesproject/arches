@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
@@ -88,7 +88,7 @@ class ResourceEditorView(BaseManagerView):
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceData(TemplateView):
+class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
             form = Form(resourceid=resourceid, formid=formid)
