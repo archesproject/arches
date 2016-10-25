@@ -31,10 +31,14 @@ define([
 
             var cp = $(element).colorpicker(options);
 
-            cp.on('changeColor', function(newValues) {
+            cp.on('changeColor', function(newValues, options) {
                 picking = true;
                 values.forEach(function (value, i) {
-                    value(newValues.color.toString());
+                    if (newValues.color === undefined) {
+                      value(options.color);
+                    } else {
+                      value(newValues.color.toString());
+                    }
                 });
                 picking = false
             });

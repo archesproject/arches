@@ -188,11 +188,8 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'widgets/map', 'geojson-feature-collection',
     '{
-        "geometrytypes": {"point": true, "line": true, "poly": true},
-        "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
-        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
         "basemap": "streets",
-        "geometryTypes": ["Point","Line","Polygon"],
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
@@ -3495,10 +3492,8 @@ INSERT INTO report_templates(templateid, name, description, component, component
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
-        "geometrytypes": {"point": true, "line": true, "poly": true},
-        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
         "basemap": "streets",
-        "geometryTypes": ["Point","Line","Polygon"],
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
