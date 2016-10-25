@@ -14,7 +14,7 @@
   "reference_data": [
     {
       "nodetype": "Concept",
-      "legacyoid": "CULTURAL_PERIOD_AUTHORITY_DOCUMENT_TEST.csv",
+      "legacyoid": "CULTURAL_PERIOD_AUTHORITY_DOCUMENT_TEST",
       "relatedconcepts": [],
       "id": "708e87fd-35bc-3270-b322-b551cd63c589",
       "parentconcepts": [],
