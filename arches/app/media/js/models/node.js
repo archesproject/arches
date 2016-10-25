@@ -182,7 +182,7 @@ define([
             if (source.config) {
                 self.configKeys.removeAll();
                 _.each(source.config, function(configVal, configKey) {
-                    self.config[configKey] = ko.observable(configVal);
+                    self.config[configKey] = (Array.isArray(configVal) ? ko.observableArray(configVal): ko.observable(configVal));
                     self.configKeys.push(configKey);
                 });
             }
