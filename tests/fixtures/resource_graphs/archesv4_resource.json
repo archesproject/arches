@@ -7052,7 +7052,9 @@
         }
       ],
       "cards": [],
-      "cards_x_nodes_x_widgets": []
+      "cards_x_nodes_x_widgets": [],
+      "forms": [],
+      "forms_x_cards": []
     }
   ],
   "business_data": {
@@ -7099,16 +7101,6 @@
     ]
   },
   "ui_components": [
-    {
-      "forms": [
-        {
-          "formid": "",
-          "name": "",
-          "title": "",
-          "subtitile": ""
-        }
-      ]
-    },
     {
       "widgets": [
         {
