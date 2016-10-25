@@ -4,9 +4,17 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
         <div class="col-xs-12">
-            <input style="width:30%; display:inline-block;" data-bind="select2: {select2Config: {data: options, value: value, multiple: multiple, placeholder: placeholder}}"></input>
+            <input style="width:30%; display:inline-block;" data-bind="select2: {
+                select2Config: {
+                    data: options,
+                    value: value,
+                    multiple: multiple,
+                    placeholder: placeholder
+                }
+            }"></input>
         </div>
     </div>
 </div>
@@ -18,10 +26,9 @@
       {% trans "Placeholder" %}
   </div>
   <div class="col-xs-12 pad-no crud-widget-container">
-      <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+      <input placeholder="{% trans "Placeholder" %}"
+        class="form-control input-md widget-input"
+        data-bind="value: placeholder, valueUpdate: 'keyup'">
   </div>
-</br/>
-</br/>
-</br/>
 </div>
 {% endblock config_form %}

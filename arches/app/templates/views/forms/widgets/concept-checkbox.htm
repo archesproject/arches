@@ -4,11 +4,17 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
         <div class="col-xs-12">
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
-
-                <label class="form-checkbox form-normal form-primary form-text" data-bind="css: {'active': selected()}, click: function () { selected(!selected()) }">
+                <label class="form-checkbox form-normal form-primary form-text"
+                    data-bind="css: {
+                        'active': selected()
+                    },
+                    click: function () {
+                        selected(!selected())
+                    }">
                     <input type="checkbox" data-bind="checked: selected">
                     <span data-bind="text:text"></span>
                 </label>

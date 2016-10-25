@@ -46,11 +46,15 @@ define([
                         return selected;
                     },
                     write: function (newValue) {
-                        if (newValue) {
-                            value.push(option.id);
-                            self.value(value);
-                        } else {
-                            self.value(_.without(value, option.id));
+                        if (self.multiple) {
+                            if (newValue) {
+                                value.push(option.id);
+                                self.value(value);
+                            } else {
+                                self.value(_.without(value, option.id));
+                            }
+                        } else if (newValue) {
+                            self.value(option.id);
                         }
                     }
                 });
