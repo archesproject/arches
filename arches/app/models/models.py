@@ -15,7 +15,7 @@ import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 import json
 
@@ -514,6 +514,12 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
+
+    def save(self, *args, **kwargs):
+        if(self.sortorder is None):
+            sortorder_max = Tile.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
 class Value(models.Model):
