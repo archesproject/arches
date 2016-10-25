@@ -37,4 +37,4 @@ def write_reference_data(export_dir, conceptids):
     reference_data_dict['reference_data'] = reference_data
 
     with open(os.path.join(export_dir, 'reference_data_export.json'), 'w') as reference_data_json:
-        reference_data_json.write(JSONSerializer().serialize(reference_data))
+        reference_data_json.write(JSONSerializer().serialize(reference_data_dict))

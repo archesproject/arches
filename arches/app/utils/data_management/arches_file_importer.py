@@ -23,7 +23,7 @@ from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resourceGraphImporter
-from arches.app.utils.data_management.concepts.importer import import_concepts as conceptImporter
+from arches.app.utils.data_management.concepts.importer import import_reference_data as conceptImporter
 from arches.app.utils.data_management.resources.importer import import_business_data as businessDataImporter
 
 
@@ -61,7 +61,7 @@ class ArchesFileImporter(object):
 		"""
 		resourceGraphImporter(self.graphs)
 
-	def import_concepts(self):
+	def import_reference_data(self):
 		"""
 		Wrapper around arches.app.utils.data_management.concepts.importer method.
 		"""
