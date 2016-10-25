@@ -614,6 +614,7 @@ class Migration(migrations.Migration):
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
                 ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.Tile')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'tiles',
@@ -628,7 +629,6 @@ class Migration(migrations.Migration):
                 ('concept', models.ForeignKey(db_column='conceptid', to='models.Concept')),
                 ('language', models.ForeignKey(blank=True, db_column='languageid', null=True, to='models.DLanguage')),
                 ('valuetype', models.ForeignKey(db_column='valuetype', to='models.DValueType')),
-                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'values',

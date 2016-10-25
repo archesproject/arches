@@ -3322,6 +3322,9 @@ li.card-tree-list:last-of-type {
     background: #fcfcfc;
     cursor: pointer;
 }
+.sortable-placeholder{
+    border: dotted 2px #d4d4d4;
+}
 .card-pre-drop {
     position: absolute;
     top: 99px;
@@ -3697,6 +3700,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .alert-active .ep-form-alert {
     display: block;
     height: 90px;
+    top: 0px;
 }
 .graph-base-content .alert-active .ep-form-alert {
     top: 0;
