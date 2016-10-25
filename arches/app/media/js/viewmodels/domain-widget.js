@@ -18,6 +18,12 @@ define([
 
         if (this.node.config.options) {
             this.options = this.node.config.options;
+            this.options().forEach(function (option) {
+                if (!ko.isObservable(option.text)) {
+                    option.text = ko.observable(option.text);
+                }
+            })
+            this.node.configKeys.valueHasMutated();
         }
 
         this.flatOptions = ko.computed(function () {
@@ -66,7 +72,7 @@ define([
                 return option.id === id;
             });
             if (option) {
-                text = option.text;
+                text = ko.unwrap(option.text);
             }
             return text;
         };

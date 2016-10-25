@@ -11,7 +11,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             });
 
             select2Config.formatResult = function(item) {
-                return item.text;
+                return ko.unwrap(item.text);
             };
 
             function formatData(data) {
@@ -46,7 +46,7 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
 
             select2Config.createSearchChoice = function(term, data) {
                 if ($(data).filter(function() {
-                        return this.text.localeCompare(term) === 0;
+                        return ko.unwrap(this.text).localeCompare(term) === 0;
                     }).length === 0) {
                     return {
                         id: term,
@@ -87,11 +87,11 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
 
             select2Config.formatSelection = function(item) {
                 var path = [];
-                var result = item.text;
+                var result = ko.unwrap(item.text);
                 if (select2Config.showParents === true) {
                     path = this.getConceptPath(item.conceptid);
                     if (path.length > 1) {
-                        result = path[0].text + ": " + item.text;
+                        result = ko.unwrap(path[0].text) + ": " + ko.unwrap(item.text);
                     }
                 }
                 return result

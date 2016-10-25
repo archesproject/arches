@@ -135,15 +135,16 @@ define([
                         config[key] = self.config[key]();
                     });
                 }
-                return JSON.stringify(_.extend(JSON.parse(self._node()), {
-                    name: self.name(),
-                    datatype: self.datatype(),
-                    nodegroup_id: self.nodeGroupId(),
-                    functions: self.functions(),
-                    ontologyclass: self.ontologyclass(),
-                    parentproperty: self.parentproperty(),
+                var jsObj = ko.toJS({
+                    name: self.name,
+                    datatype: self.datatype,
+                    nodegroup_id: self.nodeGroupId,
+                    functions: self.functions,
+                    ontologyclass: self.ontologyclass,
+                    parentproperty: self.parentproperty,
                     config: config
-                }))
+                })
+                return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
 
             self.dirty = ko.computed(function() {

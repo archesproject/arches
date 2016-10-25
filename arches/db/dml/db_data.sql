@@ -105,8 +105,8 @@ INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, '10
 INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
 INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
 INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
-INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', '{"options": [{"id": "1", "text": "test 1"}, {"id": "2", "text": "test 2"}, {"id": "3", "text": "test 3"}]}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
-INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', '{"options": [{"id": "1", "text": "test 1"}, {"id": "2", "text": "test 2"}, {"id": "3", "text": "test 3"}]}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
+INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
