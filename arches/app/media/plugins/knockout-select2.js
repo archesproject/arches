@@ -29,18 +29,17 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             });
             select2Config.placeholder = select2Config.placeholder();
 
-            var data = select2Config.data;
-            ko.computed(function() {
-                var newItems = data();
-                formatData(ko.toJS(newItems));
+            var data = select2Config.data.extend({
+                rateLimit: 500
+            });
+            data.subscribe(function(newItems) {
+                formatData(newItems);
                 select2Config.data = newItems;
                 $(el).select2("destroy").select2(select2Config);
                 $(el).select2("val", select2Config.value)
-            }).extend({
-                rateLimit: 500
             });
 
-            select2Config.data = data();
+            select2Config.data = select2Config.data();
 
             formatData(select2Config.data);
 
@@ -98,12 +97,9 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             };
 
 
-            if (select2Config.multiple && !Array.isArray(value())) {
-                value([]);
-            }
             select2Config.value = value();
             $(el).select2(select2Config);
-            $(el).select2("val", select2Config.value);
+            $(el).select2("val", value());
             $(el).on("change", function(val) {
                 return value(val.val);
             });
