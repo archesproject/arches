@@ -98,9 +98,12 @@ define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
             };
 
 
+            if (select2Config.multiple && !Array.isArray(value())) {
+                value([]);
+            }
             select2Config.value = value();
             $(el).select2(select2Config);
-            $(el).select2("val", value());
+            $(el).select2("val", select2Config.value);
             $(el).on("change", function(val) {
                 return value(val.val);
             });

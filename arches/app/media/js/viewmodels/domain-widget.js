@@ -41,8 +41,9 @@ define([
                 option.selected = ko.computed({
                     read: function () {
                         var selected = false;
-                        if (self.value()) {
-                            selected = self.value().indexOf(option.id) >= 0;
+                        var value = self.value();
+                        if (Array.isArray(value) || typeof value === 'string') {
+                            selected = value.indexOf(option.id) >= 0;
                         }
                         return selected;
                     },
