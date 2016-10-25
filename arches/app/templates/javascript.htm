@@ -43,7 +43,8 @@
             'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-plugins/plugins/mapbox-gl-draw/v0.11.15/mapbox-gl-draw',
             'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}bower_components/geojson-extent/geojson-extent',
-            'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min'
+            'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
+            'uuid': '{{ STATIC_URL }}bower_components/uuid.js/dist/uuid.core'
         },
         shim: {
             'openlayers': {
@@ -86,6 +87,9 @@
             },
             'moment': {
                 deps: ['jquery']
+            },
+            'uuid': {
+                exports: 'UUID'
             }
         }
     });
