@@ -13,7 +13,7 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
             this.addNewOption = function () {
                 var option = {
                     id: uuid.generate(),
-                    text: self.newOptionLabel()
+                    text: ko.observable(self.newOptionLabel())
                 }
                 setupOption(option);
                 self.options.push(option);
