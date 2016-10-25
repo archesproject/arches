@@ -4,11 +4,23 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
         <div class="col-xs-12">
             <div class="pad-hor columns" data-bind="foreach: flatOptions">
-                <label class="form-radio form-normal form-text" data-bind="css: { 'active': $parent.value() === id }, click: function () { $parent.value(id) }">
-                    <input type="radio" data-bind="checked: $parent.value, attr: {value: id, name: $parent.node.nodeid}"> <span data-bind="text: text"></span>
+                <label class="form-radio form-normal form-text"
+                    data-bind="css: {
+                        'active': selected()
+                    },
+                    click: function () {
+                        selected(true);
+                    }">
+                    <input type="radio" data-bind="checked: $parent.value,
+                        attr: {
+                            value: id,
+                            name: $parent.node.nodeid
+                        }">
+                    <span data-bind="text: text"></span>
                 </label>
             </div>
         </div>
