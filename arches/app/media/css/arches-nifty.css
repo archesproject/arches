@@ -90,6 +90,11 @@
     color: #5f5f5f;
     border-width: 0;
 }
+
+.branch-item {
+    margin-bottom: 10px;
+}
+
 .summary-divider {
     margin-left: 50px;
     margin-right: 50px;
@@ -1295,8 +1300,13 @@ ul.nav.nav-tabs.nav-justified {
     padding: 0;
 }
 .node-widget-label {
-    padding: 0 0 15px;
+    padding: 20px 0 15px;
 }
+
+.concept-label {
+    padding-top: 0px;
+}
+
 .node-attribute-widget {
     width: 100%;
     background: #3c4d5e;
@@ -2924,7 +2934,15 @@ ul.jqtree_common li.jqtree-folder {
     color: #666;
     border-bottom: 1px solid #eee;
     margin-bottom: 10px;
+    background: #f5f5f5;
+    margin: -10px -10px;
+    padding: 5px 5px;
 }
+
+.title-block-min {
+    height: 35px;
+}
+
 .library-tools {
     padding-left: 15px;
     margin-top: -3px;
@@ -3194,7 +3212,7 @@ ul.jqtree_common li.jqtree-folder {
 .card-tree-list {
     list-style: none;
     font-size: 12px;
-    color: #999;
+    color: #888;
     padding-top: 2px;
 }
 ul.card-tree-list-item {
@@ -3204,7 +3222,7 @@ li.card-tree-list:last-of-type {
     margin-bottom: 8px;
 }
 .card-tree-list a {
-    color: #888;
+    color: #777;
 }
 .card-tree-list.selected a {
     color: #666;
@@ -3244,7 +3262,7 @@ li.card-tree-list:last-of-type {
     -webkit-flex: 0 0 220px;
     flex: 0 0 220px;
     margin-bottom: 0px;
-    background-color: white;
+    background-color: #f0f0f0;
     width: 200px;
     padding: 7px;
     border-right: solid 1px #dddddd;
@@ -3261,7 +3279,7 @@ li.card-tree-list:last-of-type {
     -ms-flex: 0 0 250px;
     -webkit-flex: 0 0 250px;
     flex: 0 0 250px;
-    background: #f8f8f8;
+    background: #fbfbfb;
     padding: 7px;
     color: #666;
     border-right: solid 1px #dddddd;
@@ -3283,7 +3301,7 @@ li.card-tree-list:last-of-type {
     font-weight: 400;
     margin-top: 0;
     margin-bottom: 5px;
-    color: #666;
+    color: #222;
     padding: 5px 0 5px 5px;
     width: 210px;
     white-space: nowrap;
@@ -3497,9 +3515,15 @@ li.card-tree-list:last-of-type {
     color: #777;
 }
 
+#card-crud-advanced {
+    padding-top: 20px;
+}
+
 .toggle-container {
     padding-bottom: 15px;
     padding-right: 15px;
+    padding-top: 0px;
+    padding-left: 5px;
 }
 .arches-toggle-sm {
     margin-left: 40px;
@@ -4548,6 +4572,16 @@ div.row.widget-wrapper.report-header:hover {
 .sub-navmenu-header {
     padding: 10px 18px;
     font-weight: bold;
+}
+.new-option-field input {
+    display: inline;
+    width: 90%;
+}
+.new-option-field i {
+    padding-top: 10px;
+}
+.added-domain-option {
+    padding-bottom: 4px;
 }
 @keyframes loader {
 	0% { background: #ddd; }

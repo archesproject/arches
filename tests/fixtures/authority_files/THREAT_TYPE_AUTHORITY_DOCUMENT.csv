@@ -1,0 +1,29 @@
+conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider ,Source
+THREAT_TYPE:1,meteorological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:2,storm,,THREAT_TYPE:1,Index,GCI,
+THREAT_TYPE:3,fire induced by lightning,,THREAT_TYPE:1,Index,GCI,
+THREAT_TYPE:4,hydrological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:5,flood,,THREAT_TYPE:4,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:6,tsunami,,THREAT_TYPE:4,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:7,geological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:8,volcanic,,THREAT_TYPE:7,Index,GCI,
+THREAT_TYPE:9,seismic,,THREAT_TYPE:7,Index,GCI,
+THREAT_TYPE:10,mass movement,,THREAT_TYPE:7,Index,GCI,
+THREAT_TYPE:11,erosion,,THREAT_TYPE:7,Index,GCI,
+THREAT_TYPE:12,biological,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:13,pest infestation,,THREAT_TYPE:12,Index,GCI,
+THREAT_TYPE:14,plant growth,,THREAT_TYPE:12,Index,GCI,
+THREAT_TYPE:15,human-induced,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,AAT/Events (activities)
+THREAT_TYPE:16,fire,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:17,explosion,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:18,pollution,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:19,violence and conflict,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:20,looting/theft,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:21,vandalism,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:22,infrastructure failure,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:23,agriculture,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:24,mining,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:25,construction,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:26,inappropriate use,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:27,lack of maintenance,,THREAT_TYPE:15,Index,GCI,
+THREAT_TYPE:28,climate change,,THREAT_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI,
