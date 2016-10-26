@@ -19,7 +19,7 @@ define([
         DomainWidgetViewModel.apply(this, [params]);
 
         // to be used in widgets/extended view models to prep data for select
-        this.prepData = typeof params.prepData === 'function' ?
+        var prepData = typeof params.prepData === 'function' ?
             params.prepData :
             function(data) { return data; };
 
@@ -29,8 +29,7 @@ define([
                     url: url,
                     dataType: 'json'
                 }).done(function(data) {
-                    data = self.prepData(data);
-                    self.options(data);
+                    self.options(prepData(data));
                 });
             }
         }
