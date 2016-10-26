@@ -1,8 +1,8 @@
 define([
     'knockout',
-    'viewmodels/concept-widget',
+    'viewmodels/domain-widget',
     'plugins/knockout-select2'
-], function(ko, ConceptWidgetViewModel) {
+], function(ko, DomainWidgetViewModel) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -13,13 +13,10 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('concept-select-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['placeholder'];
-            ConceptWidgetViewModel.apply(this, [params]);
-        },
+    return ko.components.register('domain-radio-widget', {
+        viewModel: DomainWidgetViewModel,
         template: {
-            require: 'text!widget-templates/select'
+            require: 'text!widget-templates/radio'
         }
     });
 });

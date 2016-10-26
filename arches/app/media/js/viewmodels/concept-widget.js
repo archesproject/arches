@@ -1,10 +1,7 @@
 define([
-    'jquery',
-    'knockout',
-    'underscore',
-    'viewmodels/widget',
+    'viewmodels/remote-domain-widget',
     'arches'
-], function ($, ko, _, WidgetViewModel, arches) {
+], function (RemoteDomainWidgetViewModel, arches) {
     /**
     * A viewmodel used for concept widgets
     *
@@ -16,78 +13,17 @@ define([
     var ConceptWidgetViewModel = function(params) {
         var self = this;
 
-        params.configKeys || (params.configKeys = []);
-        if (!_.contains(params.configKeys, 'options')) {
-            params.configKeys.push('options');
-        }
+        RemoteDomainWidgetViewModel.apply(this, [params]);
 
-        WidgetViewModel.apply(this, [params]);
-
-        this.multiple = false;
-
-        this.flatOptions = ko.computed(function () {
-            var options = self.options();
-            var flatOptions = [];
-            options.forEach(function(option) {
-                gatherChildren(option, flatOptions);
-            });
-            return flatOptions;
-        });
-
-        var findConceptLabel = function (conceptId) {
-            var label = null;
-            var concept = _.find(self.flatOptions(), function (concept) {
-                return concept.id === conceptId;
-            });
-            if (concept) {
-                label = concept.text;
+        var setUrl = function (id) {
+            if (id) {
+                self.url(arches.urls.dropdown + '?conceptid=' + id)
             }
-            return label;
         };
 
-        this.displayValue = ko.computed(function () {
-            var value = self.value();
-            var displayValue = null;
-            if (value) {
-                if (!Array.isArray(value)) {
-                    value = [value];
-                }
-                displayValue = _.map(value, function(conceptId) {
-                    return findConceptLabel(conceptId);
-                }).join(', ');
-            }
-            return displayValue;
-        });
-
-        this.getConcepts = function (rootId) {
-            var self = this;
-            $.ajax({
-                url: arches.urls.dropdown,
-                data: {
-                    conceptid: rootId
-                },
-                dataType: 'json'
-            }).done(function(data) {
-                self.options(data);
-            });
-        }
-
-        this.node.config.topConcept.subscribe(function(rootId) {
-            this.getConcepts(rootId);
-        }, this);
-
-        if (this.node.config.topConcept()) {
-            this.getConcepts(this.node.config.topConcept());
-        }
+        this.node.config.topConcept.subscribe(setUrl);
+        setUrl(this.node.config.topConcept());
     };
-
-    var gatherChildren = function (current, list) {
-        list.push(current);
-        current.children.forEach(function (child) {
-            gatherChildren(child, list);
-        });
-        return list;
-    }
 
     return ConceptWidgetViewModel;
 });
