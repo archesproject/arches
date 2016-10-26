@@ -3488,10 +3488,10 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
      ', FALSE, 1, '');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
+    VALUES ('50000000-0000-0000-0000-000000000002', 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "geocoder": "MapzenGeocoder",
@@ -3510,4 +3510,4 @@ INSERT INTO report_templates(templateid, name, description, component, component
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');

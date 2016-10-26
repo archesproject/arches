@@ -4,7 +4,7 @@ import csv
 from pprint import pprint as pp
 import os
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 def export(export_dir):
@@ -61,6 +61,11 @@ def get_form_x_card_data_for_export(resource_graph):
         forms_x_cards = FormXCard.objects.filter(form_id=form.formid)
     return forms_x_cards
 
+def get_report_data_for_export(resource_graph):
+    reports = []
+    reports = Report.objects.filter(graph_id=resource_graph['graphid'])
+    return reports
+
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
@@ -77,5 +82,6 @@ def get_graphs_for_export(graphids=None):
         resource_graph['cards_x_nodes_x_widgets'] = get_card_x_node_x_widget_data_for_export(resource_graph)
         resource_graph['forms'] = get_forms_for_export(resource_graph)
         resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
+        resource_graph['reports'] = get_report_data_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
     return graphs

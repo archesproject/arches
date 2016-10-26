@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, Form, FormXCard
+from arches.app.models.models import CardXNodeXWidget, Form, FormXCard, Report
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.db import transaction
 
@@ -54,5 +54,13 @@ def import_graph(graphs):
 				for form_x_card in graph.forms_x_cards:
 					formxcard = FormXCard.objects.create(**form_x_card)
 					formxcard.save()
+
+			if not hasattr(graph, 'reports'):
+				print '*********This graph has no attribute reports*********'
+				sys.exit()
+			else:
+				for report in graph.reports:
+					report = Report.objects.create(**report)
+					report.save()
 
 			return Graph
