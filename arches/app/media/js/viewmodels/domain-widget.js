@@ -70,27 +70,25 @@ define([
 
         this.multiple = false;
 
-        this.findText = function (id) {
-            var text = null;
-            var option = _.find(ko.unwrap(self.options), function (option) {
-                return option.id === id;
-            });
-            if (option) {
-                text = ko.unwrap(option.text);
-            }
-            return text;
-        };
-
         this.displayValue = ko.computed(function () {
             var value = self.value();
+            var options = ko.unwrap(self.flatOptions);
             var displayValue = null;
             if (value) {
                 if (!Array.isArray(value)) {
                     value = [value];
                 }
                 displayValue = _.map(value, function(id) {
-                    return self.findText(id);
-                }).join(', ');
+                    var text = null;
+                    var option = _.find(options, function (option) {
+                        return option.id === id;
+                    });
+                    if (option) {
+                        text = ko.unwrap(option.text);
+                    }
+                    return text;
+                })
+                displayValue = _.without(displayValue, null).join(', ');
             }
             return displayValue;
         });
