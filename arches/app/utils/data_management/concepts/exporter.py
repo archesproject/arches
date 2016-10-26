@@ -23,18 +23,12 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 
 def get_reference_data_for_export(conceptids=None):
+    reference_data_dict = {}
     reference_data = []
-    if conceptids is None:
+    if conceptids is None or conceptids[0] == 'all':
         reference_data.append(Concept().get('00000000-0000-0000-0000-000000000001', include_subconcepts=True, semantic=True))
     else:
         for conceptid in conceptids:
             reference_data.append(Concept().get(uuid.UUID(str(conceptid)), include_subconcepts=True, semantic=True))
-    return reference_data
-
-def write_reference_data(export_dir, conceptids):
-    reference_data = get_reference_data_for_export(conceptids)
-    reference_data_dict = {}
     reference_data_dict['reference_data'] = reference_data
-
-    with open(os.path.join(export_dir, 'reference_data_export.json'), 'w') as reference_data_json:
-        reference_data_json.write(JSONSerializer().serialize(reference_data_dict))
+    return reference_data_dict

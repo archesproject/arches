@@ -64,11 +64,11 @@ def get_form_x_card_data_for_export(resource_graph):
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs['graph'] = []
-    if graphids == None:
+    if graphids == None or graphids[0] == 'all':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.all().exclude(name='Arches configuration'))
-    elif graphids == 'resources':
+    elif graphids[0] == 'resources':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=True).exclude(name='Arches configuration'))
-    elif graphids == 'branches':
+    elif graphids[0] == 'branches':
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(isresource=False).exclude(name='Arches configuration'))
     else:
         resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids))
@@ -79,11 +79,3 @@ def get_graphs_for_export(graphids=None):
         resource_graph['forms_x_cards'] = get_form_x_card_data_for_export(resource_graph)
         graphs['graph'].append(resource_graph)
     return graphs
-
-def write_graph(export_dir, graphids):
-    resource_graphs = get_graphs_for_export(graphids)
-    graph = {}
-    graph = resource_graphs
-
-    with open(os.path.join(export_dir, 'graph_export.json'), 'w') as graph_json:
-        graph_json.write(JSONSerializer().serialize(graph))
