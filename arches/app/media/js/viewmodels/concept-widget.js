@@ -1,10 +1,7 @@
 define([
-    'jquery',
-    'knockout',
-    'underscore',
-    'viewmodels/domain-widget',
+    'viewmodels/remote-domain-widget',
     'arches'
-], function ($, ko, _, DomainWidgetViewModel, arches) {
+], function (RemoteDomainWidgetViewModel, arches) {
     /**
     * A viewmodel used for concept widgets
     *
@@ -16,32 +13,17 @@ define([
     var ConceptWidgetViewModel = function(params) {
         var self = this;
 
-        params.configKeys || (params.configKeys = []);
-        if (!_.contains(params.configKeys, 'options')) {
-            params.configKeys.push('options');
-        }
+        RemoteDomainWidgetViewModel.apply(this, [params]);
 
-        DomainWidgetViewModel.apply(this, [params]);
+        var setUrl = function (id) {
+            self.url(arches.urls.dropdown + '?conceptid=' + id)
+        };
 
-        this.getConcepts = function (rootId) {
-            var self = this;
-            $.ajax({
-                url: arches.urls.dropdown,
-                data: {
-                    conceptid: rootId
-                },
-                dataType: 'json'
-            }).done(function(data) {
-                self.options(data);
-            });
-        }
+        this.node.config.topConcept.subscribe(setUrl);
 
-        this.node.config.topConcept.subscribe(function(rootId) {
-            this.getConcepts(rootId);
-        }, this);
-
-        if (this.node.config.topConcept()) {
-            this.getConcepts(this.node.config.topConcept());
+        var conceptId = this.node.config.topConcept();
+        if (conceptId) {
+            setUrl(conceptId);
         }
     };
 
