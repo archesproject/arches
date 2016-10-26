@@ -185,7 +185,7 @@ define([
             }
             if(justadd){
                 parentTile.dirty(true);
-                tiles.unshift(this.initTile(koMapping.fromJS(ko.toJS(tile))));
+                tiles.push(this.initTile(koMapping.fromJS(ko.toJS(tile))));
                 this.clearTileValues(tile);
             }else{
                 var model;
@@ -204,11 +204,11 @@ define([
                         if(savingParentTile){
                             parentTile.tileid(response.responseJSON.tileid);
                             response.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                parentTile.tiles[tile.nodegroup_id].unshift(this.initTile(koMapping.fromJS(tile)));
+                                parentTile.tiles[tile.nodegroup_id].push(this.initTile(koMapping.fromJS(tile)));
                             }, this)
                             this.clearTile(tile);
                         }else{
-                            tiles.unshift(this.initTile(koMapping.fromJS(response.responseJSON)));
+                            tiles.push(this.initTile(koMapping.fromJS(response.responseJSON)));
                             this.clearTileValues(tile);
                         }
                     }
@@ -228,7 +228,7 @@ define([
             this.trigger('before-update');
             model.save(function(response, status, model){
                 if(response.status === 200){
-                    this.tiles[parentTile.nodegroup_id()].unshift(this.initTile(koMapping.fromJS(response.responseJSON)));
+                    this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
                     this.clearTile(parentTile);
                 }
                 this.trigger('after-update', response);
