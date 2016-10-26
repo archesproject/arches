@@ -16,7 +16,7 @@ define([
     return ko.components.register('concept-radio-widget', {
         viewModel: ConceptWidgetViewModel,
         template: {
-            require: 'text!widget-templates/concept-radio'
+            require: 'text!widget-templates/radio'
         }
     });
 });

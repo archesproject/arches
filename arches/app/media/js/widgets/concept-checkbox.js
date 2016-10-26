@@ -20,7 +20,7 @@ define([
             this.multiple = true;
         },
         template: {
-            require: 'text!widget-templates/concept-checkbox'
+            require: 'text!widget-templates/checkbox'
         }
     });
 });

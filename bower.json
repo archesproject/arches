@@ -43,7 +43,8 @@
     "datatables.net-responsive": "~2.1.0",
     "datatables.net-responsive-bs": "~2.1.0",
     "geojson-extent": "mapbox/geojson-extent#0.3.2",
-    "bootstrap-colorpicker": "^2.3.6"
+    "bootstrap-colorpicker": "^2.3.6",
+    "uuid.js": "^3.3.0"
   },
   "resolutions": {
     "bootstrap": "3.3.2",

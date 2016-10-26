@@ -4577,6 +4577,16 @@ div.row.widget-wrapper.report-header:hover {
     padding: 10px 18px;
     font-weight: bold;
 }
+.new-option-field input {
+    display: inline;
+    width: 90%;
+}
+.new-option-field i {
+    padding-top: 10px;
+}
+.added-domain-option {
+    padding-bottom: 4px;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

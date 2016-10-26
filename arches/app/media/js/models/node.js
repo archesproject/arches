@@ -135,15 +135,16 @@ define([
                         config[key] = self.config[key]();
                     });
                 }
-                return JSON.stringify(_.extend(JSON.parse(self._node()), {
-                    name: self.name(),
-                    datatype: self.datatype(),
-                    nodegroup_id: self.nodeGroupId(),
-                    functions: self.functions(),
-                    ontologyclass: self.ontologyclass(),
-                    parentproperty: self.parentproperty(),
+                var jsObj = ko.toJS({
+                    name: self.name,
+                    datatype: self.datatype,
+                    nodegroup_id: self.nodeGroupId,
+                    functions: self.functions,
+                    ontologyclass: self.ontologyclass,
+                    parentproperty: self.parentproperty,
                     config: config
-                }))
+                })
+                return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj))
             });
 
             self.dirty = ko.computed(function() {
@@ -182,7 +183,7 @@ define([
             if (source.config) {
                 self.configKeys.removeAll();
                 _.each(source.config, function(configVal, configKey) {
-                    self.config[configKey] = ko.observable(configVal);
+                    self.config[configKey] = (Array.isArray(configVal) ? ko.observableArray(configVal): ko.observable(configVal));
                     self.configKeys.push(configKey);
                 });
             }

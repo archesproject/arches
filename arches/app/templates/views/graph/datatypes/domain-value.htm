@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="node-widget-label new-option-field">
+    <div class="control-label">
+        {% trans "Add new option" %}
+    </div>
+    <div>
+        <input type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="value: newOptionLabel, valueUpdate: 'keyup'">
+        <a href="#" data-bind="click: addNewOption">
+             <i class="fa fa-plus-circle pull-right"></i>
+        </a>
+    </div>
+</div>
+<div class="node-widget-label new-option-field">
+    <div class="control-label">
+        {% trans "Added options" %}
+    </div>
+    <div data-bind="foreach: options">
+        <div class="added-domain-option">
+            <input type="text" class="form-control library-search" data-bind="value: text, valueUpdate: 'keyup'">
+            <a href="#" data-bind="click: remove">
+                 <i class="fa fa-minus-circle pull-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
