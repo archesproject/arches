@@ -74,4 +74,6 @@ class ArchesFileImporter(object):
 		businessDataImporter(self.business_data)
 
 	def import_all(self):
-		pass
+		resourceGraphImporter(self.graphs)
+		conceptImporter(self.reference_data)
+		# businessDataImporter(self.business_data)

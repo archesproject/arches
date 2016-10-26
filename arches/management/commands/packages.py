@@ -127,7 +127,7 @@ class Command(BaseCommand):
             self.export_resources(package_name, options['dest_dir'], options['resources'])
 
         if options['operation'] == 'import_json':
-            self.import_json(package_name, options['source'])
+            self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'export_json':
             self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
@@ -346,14 +346,15 @@ class Command(BaseCommand):
         resource_exporter.export(resources=resources, dest_dir=data_dest)
 
 
-    def import_json(self, package_name, data_source=None):
+    def import_json(self, data_source=None, graphs=None, resources=None, concepts=None):
         """
         Imports objects from arches.json.
 
         """
+
         data_source = None if data_source == '' else data_source
-        ArchesFileImporter(data_source).import_reference_data()
-        ArchesFileImporter(data_source).import_graphs()
+        ArchesFileImporter(data_source).import_all()
+
 
     def start_livereload(self):
         from livereload import Server
@@ -366,7 +367,7 @@ class Command(BaseCommand):
 
     def export(self, data_dest=None, graphs=None, resources=None, concepts=None):
         """
-        Manages export of arches dataself.
+        Export objects to arches.json.
         """
 
         if graphs != False:

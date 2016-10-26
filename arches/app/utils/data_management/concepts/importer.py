@@ -58,8 +58,9 @@ from django.db import transaction
 
 def import_reference_data(reference_data):
     # with transaction.atomic():
-    print '\nLOADING AUTHORITY FILES FROM JSON'
-    print '-----------------------'
+    if reference_data != '':
+        print '\nLOADING AUTHORITY FILES FROM JSON'
+        print '-----------------------'
     for data in reference_data:
         print data['legacyoid']
         concept = Concept(data)
