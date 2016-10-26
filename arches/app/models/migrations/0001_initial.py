@@ -425,6 +425,18 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='FunctionXGraph',
+            fields=[
+                ('function', models.ForeignKey(to='models.Function', db_column='functionid')),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('config', JSONField(blank=True, null=True, db_column='config')),
+            ],
+            options={
+                'db_table': 'functions_x_graphs',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
             name='Icon',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=True)),
@@ -777,6 +789,11 @@ class Migration(migrations.Migration):
             model_name='form',
             name='graph',
             field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False),
+        ),
+        migrations.AddField(
+            model_name='graphmodel',
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', through='FunctionXGraph'),
         ),
         migrations.AddField(
             model_name='graphmodel',

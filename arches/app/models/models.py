@@ -217,6 +217,15 @@ class Function(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
+class FunctionXGraph(models.Model):
+    id = models.AutoField(primary_key=True)
+    function = models.ForeignKey('Function', on_delete=models.CASCADE, db_column='functionid')
+    graph = models.ForeignKey('GraphModel', on_delete=models.CASCADE, db_column='graphid')
+    config = JSONField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'functions_x_graphs'
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -234,6 +243,7 @@ class GraphModel(models.Model):
     maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
+    functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
 
     class Meta:
         managed = True
@@ -521,6 +531,7 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
+        
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None):
