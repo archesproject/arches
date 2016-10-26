@@ -18,8 +18,7 @@ define([
 
         DomainWidgetViewModel.apply(this, [params]);
 
-        this.getOptions = function (url) {
-            var self = this;
+        var getOptions = function (url) {
             if (url) {
                 $.ajax({
                     url: url,
@@ -30,11 +29,8 @@ define([
             }
         }
 
-        this.url.subscribe(function(url) {
-            this.getOptions(url);
-        }, this);
-
-        this.getOptions(this.url());
+        this.url.subscribe(getOptions);
+        getOptions(this.url());
     };
 
     return RemoteDomainWidgetViewModel;

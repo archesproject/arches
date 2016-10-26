@@ -16,15 +16,13 @@ define([
         RemoteDomainWidgetViewModel.apply(this, [params]);
 
         var setUrl = function (id) {
-            self.url(arches.urls.dropdown + '?conceptid=' + id)
+            if (id) {
+                self.url(arches.urls.dropdown + '?conceptid=' + id)
+            }
         };
 
         this.node.config.topConcept.subscribe(setUrl);
-
-        var conceptId = this.node.config.topConcept();
-        if (conceptId) {
-            setUrl(conceptId);
-        }
+        setUrl(this.node.config.topConcept());
     };
 
     return ConceptWidgetViewModel;
