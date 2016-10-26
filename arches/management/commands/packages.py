@@ -47,7 +47,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_graphs','export_resources', 'import_json', 'export_json'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -122,9 +122,6 @@ class Command(BaseCommand):
 
         if options['operation'] == 'index_database':
             self.index_database(package_name)
-
-        if options['operation'] == 'export_graphs':
-            self.export_graphs(options['dest_dir'], options['graphs'])
 
         if options['operation'] == 'export_resources':
             self.export_resources(package_name, options['dest_dir'], options['resources'])
@@ -330,15 +327,6 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-    def export_graphs(self, data_dest=None, graphs=None):
-        """
-        Export resource graphs to arches.json
-        """
-        # graph_exporter.export(data_dest)
-
-        if graphs != None and graphs != 'resources' and graphs != 'branches':
-            graphs = [x.strip(' ') for x in graphs.split(",")]
-        ArchesFileExporter().export_graphs(data_dest, graphs)
 
     def export_resources(self, package_name, data_dest=None, resources=''):
         """
