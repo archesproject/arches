@@ -22,48 +22,50 @@ define([
                 if (!ko.isObservable(option.text)) {
                     option.text = ko.observable(option.text);
                 }
-            })
+            });
+            // force the node config to refresh (so it detects text observables)
             this.node.configKeys.valueHasMutated();
         }
 
-        this.flatOptions = ko.computed(function() {
-            var options = self.options();
-            var flatOptions = [];
-            var value = self.value();
-            if (!Array.isArray(value)) {
-                var valueArray = [];
-                if (value) {
-                    valueArray.push(value);
-                }
-                value = valueArray
+        var flattenOptions = function(opt, allOpts) {
+            allOpts.push(opt);
+            if (opt.children) {
+                opt.children.forEach(function(child) {
+                    flattenOptions(child, allOpts);
+                });
             }
-            var setupOption = function(option) {
-                option.selected = ko.computed({
+            if (typeof opt.selected !== 'function') {
+                opt.selected = ko.computed({
                     read: function() {
                         var selected = false;
-                        var value = self.value();
-                        if (value && value.indexOf) {
-                            selected = value.indexOf(option.id) >= 0;
+                        var val = self.value();
+                        if (val && val.indexOf) {
+                            selected = val.indexOf(opt.id) >= 0;
                         }
                         return selected;
                     },
                     write: function(selected) {
                         if (self.multiple) {
-                            var value = self.value();
+                            var val = self.value();
                             self.value(
                                 selected ?
-                                _.union(value, [option.id]) :
-                                _.without(value, option.id)
+                                _.union([opt.id], val) :
+                                _.without(val ? val : [], opt.id)
                             );
                         } else if (selected) {
-                            self.value(option.id);
+                            self.value(opt.id);
                         }
                     }
                 });
             }
+            return allOpts;
+        };
+
+        this.flatOptions = ko.computed(function() {
+            var options = self.options();
+            var flatOptions = [];
             options.forEach(function(option) {
-                setupOption(option);
-                gatherChildren(option, flatOptions, setupOption);
+                flattenOptions(option, flatOptions);
             });
             return flatOptions;
         });
@@ -71,39 +73,25 @@ define([
         this.multiple = false;
 
         this.displayValue = ko.computed(function() {
-            var value = self.value();
-            var options = ko.unwrap(self.flatOptions);
-            var displayValue = null;
-            if (value) {
-                if (!Array.isArray(value)) {
-                    value = [value];
-                }
-                displayValue = _.map(value, function(id) {
-                    var text = null;
-                    var option = _.find(options, function(option) {
-                        return option.id === id;
-                    });
-                    if (option) {
-                        text = ko.unwrap(option.text);
-                    }
-                    return text;
-                })
-                displayValue = _.without(displayValue, null).join(', ');
+            var val = self.value();
+            var opts = ko.unwrap(self.flatOptions);
+            var displayVal = null;
+            if (val) {
+                Array.isArray(val) || (val = [val]);
+                displayVal = _.without(
+                    _.map(val, function(id) {
+                        var opt = _.find(opts, function(opt) {
+                            return opt.id === id;
+                        });
+                        return opt ? ko.unwrap(opt.text) : null;
+                    }),
+                    null
+                ).join(', ');
             }
-            return displayValue;
+            return displayVal;
         });
     };
 
-    var gatherChildren = function(current, list, callback) {
-        list.push(current);
-        if (current.children) {
-            current.children.forEach(function(child) {
-                gatherChildren(child, list, callback);
-            });
-        }
-        callback(current);
-        return list;
-    };
 
     return DomainWidgetViewModel;
 });
