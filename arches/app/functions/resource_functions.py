@@ -9,12 +9,12 @@ def get_primary_name_from_nodes(resource, config):
     # for match in re.findall(uuid_regex, config['string_template']):
     #     x[match] = ''
 
-    for tile in models.Tile.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id'])):
+    for tile in models.Tile.objects.filter(nodegroup_id=uuid.UUID(config['nodegroup_id']), sortorder=0):
         t = Tile(tile)
-        t.get_node_display_values()
+        #t.get_node_display_values()
         for nodeid, nodevalue in t.data.iteritems():
             #x[nodeid] = nodevalue
-            print nodevalue
+            #print nodevalue
             config['string_template'] = config['string_template'].replace('{%s}' % nodeid, nodevalue)
 
     return config['string_template']

@@ -81,7 +81,8 @@ class GraphSettingsView(GraphBaseView):
             ontologies=JSONSerializer().serialize(ontologies),
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count()
+            node_count=models.Node.objects.filter(graph=self.graph).count(),
+            functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
         )
         return render(request, 'views/graph/graph-settings.htm', context)
 
@@ -92,6 +93,14 @@ class GraphSettingsView(GraphBaseView):
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                 'ontology_id', 'version',  'subtitle', 'isactive', 'mapfeaturecolor', 'mappointsize', 'maplinewidth']:
                 setattr(graph, key, value)
+        if data['primaryNameViewModel']:
+            functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                function_id = '60000000-0000-0000-0000-000000000010', 
+                defaults = {
+                    'graph_id': graphid, 
+                    'config': data['primaryNameViewModel']
+                }
+            )
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))

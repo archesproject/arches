@@ -30,6 +30,7 @@ class Tile(object):
         self.resourceinstance_id = kwargs.get('resourceinstance_id', '')
         self.nodegroup_id = kwargs.get('nodegroup_id', '')
         self.data = kwargs.get('data', {})
+        self.sortorder = kwargs.get('sortorder', {})
         self.tiles = kwargs.get('tiles', {})
 
         if len(args) != 0:
@@ -51,6 +52,7 @@ class Tile(object):
         self.resourceinstance_id = obj.get('resourceinstance_id', '')
         self.nodegroup_id = obj.get('nodegroup_id', '')
         self.data = obj.get('data', {})
+        self.sortorder = obj.get('sortorder', {})
         if not isinstance(self.data, dict):
             self.data = {}
         self.tiles = {}

@@ -38,7 +38,14 @@ class Resource(models.ResourceInstance):
         module = importlib.import_module('arches.app.functions.resource_functions')
         get_primary_name = getattr(module, 'get_primary_name_from_nodes')
         #{"7a7dfaf5-971e-11e6-aec3-14109fd34195": "Alexei", "7a7e0211-971e-11e6-a67c-14109fd34195": "a55f219a-e126-4f80-a5fd-0282efd43339"}
-        config = {}
-        config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
-        config['string_template'] = '{7a7dfaf5-971e-11e6-aec3-14109fd34195} Type({7a7e0211-971e-11e6-a67c-14109fd34195})'
-        return get_primary_name(self, config)
+        # config = {}
+        # config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
+        # config['string_template'] = '{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})'
+
+        try:
+            functionConfig = models.FunctionXGraph.objects.get(graph=self.graph, function__functiontype='primaryname')
+            return get_primary_name(self, functionConfig.config)
+        except:
+            return 'undefined'
+        #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
+        #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}

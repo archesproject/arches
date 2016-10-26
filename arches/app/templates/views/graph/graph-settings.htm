@@ -161,9 +161,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                 <div data-bind='component: {
                                                     name: "primary-name",
-                                                    params: {
-                                                        
-                                                    }
+                                                    params: $root
                                                 }'></div>
 
                                             </form>
@@ -428,7 +426,8 @@ define('graph-settings-data', [], function () {
         node: {{node_json}},
         ontologies: {{ontologies}},
         ontologyClasses: {{ontology_classes}},
-        resources: {{resource_data}}
+        resources: {{resource_data}},
+        functions: {{functions}}
     };
 });
 {% endautoescape %}</script>

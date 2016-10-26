@@ -23,6 +23,7 @@ require([
     var graph = koMapping.fromJS(data.graph);
     var iconFilter = ko.observable('');
     var ontologyClass = ko.observable(data.node.ontologyclass);
+    var primaryNameConfig = koMapping.fromJS({});
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
             return resource.isRelatable();
@@ -35,7 +36,8 @@ require([
         return JSON.stringify({
             graph: koMapping.toJS(graph),
             relatable_resource_ids: relatableResourceIds,
-            ontology_class: ontologyClass()
+            ontology_class: ontologyClass(),
+            primaryNameViewModel: koMapping.toJS(primaryNameConfig)
         });
     });
     var jsonCache = ko.observable(jsonData());
@@ -43,6 +45,7 @@ require([
         return jsonData() !== jsonCache();
     });
     var viewModel = {
+        primaryNameConfig: primaryNameConfig,
         dirty: dirty,
         iconFilter: iconFilter,
         icons: ko.computed(function () {
