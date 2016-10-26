@@ -18,13 +18,18 @@ define([
 
         DomainWidgetViewModel.apply(this, [params]);
 
+        // to be used in widgets/extended view models to prep data for select
+        var prepData = typeof params.prepData === 'function' ?
+            params.prepData :
+            function(data) { return data; };
+
         var getOptions = function (url) {
             if (url) {
                 $.ajax({
                     url: url,
                     dataType: 'json'
                 }).done(function(data) {
-                    self.options(data);
+                    self.options(prepData(data));
                 });
             }
         }
