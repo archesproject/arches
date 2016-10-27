@@ -48,9 +48,16 @@
                 <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                 </div>
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools()}">
+                <!-- ko if: featureEditingDisabled -->
+                <div class="map-widget-tool text-center" data-bind="css : {'disabled': featureEditingDisabled}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
                 </div>
+                <!-- /ko -->
+                <!-- ko ifnot: featureEditingDisabled -->
+                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
+                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
+                </div>
+                <!-- /ko -->
                 <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
                 </div>

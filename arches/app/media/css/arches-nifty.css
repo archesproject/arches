@@ -4396,6 +4396,14 @@ div.row.widget-wrapper.report-header:hover {
   background-color: #f3f3f3;
 }
 
+.map-widget-tool.disabled {
+  background-color: #999999;
+}
+
+.map-widget-tool.disabled i {
+  color: black;
+}
+
 .map-widget-overlay-item {
     width: 248px;
     height: 50px;

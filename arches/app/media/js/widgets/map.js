@@ -57,7 +57,8 @@ define([
                 'maxZoom',
                 'resourceColor',
                 'resourcePointSize',
-                'resourceLineWidth'
+                'resourceLineWidth',
+                'featureEditingDisabled'
             ];
 
             WidgetViewModel.apply(this, [params]);
