@@ -4314,6 +4314,13 @@ div.row.widget-wrapper.report-header:hover {
     visibility: hidden;
 }
 
+.geometry-editing-notifications {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+}
+
 .geocode-container.hide-geocoder {
   visibility: visible;
 }

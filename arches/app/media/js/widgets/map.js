@@ -82,7 +82,8 @@ define([
             }
 
             this.selectedBasemap = this.basemap;
-
+            this.drawMode = ko.observable();
+            this.selectedFeatureType = ko.observable();
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function(expanded) {
@@ -364,7 +365,6 @@ define([
 
                 this.map = map;
                 this.draw = draw;
-                this.drawMode;
                 this.map.addControl(draw);
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
@@ -464,17 +464,17 @@ define([
 
                     if (self.geometryTypeDetails[val] === undefined) { //it has no geom type, so must be trash
                         self.draw.trash();
-                        self.drawMode = null;
+                        self.drawMode(null);
                     } else {
-                        if (!self.drawMode) {
+                        if (!self.drawMode()) {
                             self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode = self.geometryTypeDetails[val].drawMode;
-                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode) {
+                            self.drawMode(self.geometryTypeDetails[val].drawMode);
+                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
-                            self.drawMode = undefined;
+                            self.drawMode(undefined);
                         } else {
                             self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode = self.geometryTypeDetails[val].drawMode;
+                            self.drawMode(self.geometryTypeDetails[val].drawMode);
                         }
                     }
 
@@ -597,9 +597,21 @@ define([
 
                 this.updateDrawMode = function(e) {
                     var self = this;
-                    return function() {
-                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode) && self.drawMode !== self.draw.getMode()) {
-                            self.draw.changeMode(self.drawMode)
+                    return function(e) {
+                        var selectedFeatureType;
+                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
+                            self.draw.changeMode(self.drawMode())
+                        } else {
+                          self.drawMode(self.draw.getMode());
+                          if (self.draw.getSelectedIds().length > 0) {
+                              selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                              self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                          }
+                          else {
+                            if (self.draw.getMode().endsWith("select")) {
+                                self.drawMode(undefined);
+                            };
+                          }
                         }
                     }
                 }
