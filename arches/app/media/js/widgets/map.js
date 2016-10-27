@@ -87,6 +87,7 @@ define([
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
+
             this.layers = _.clone(arches.mapLayers);
 
             this.geocoderOptions = ko.observableArray([{
@@ -171,8 +172,8 @@ define([
             }
 
             this.addInitialLayers = function() {
-                this.layers.push(this.defineResourceLayer());
                 var initialLayers = [];
+                this.layers.unshift(this.defineResourceLayer());
                 var overlayLayers = _.sortBy(_.where(this.layers, {
                     isoverlay: true
                 }), 'sortorder').reverse();
@@ -367,6 +368,7 @@ define([
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
+                    console.log(map.getLayer('gl-draw-active-line.hot'))
                     map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
                 }
 
@@ -607,8 +609,8 @@ define([
                 this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
-                    var anchorLayer = 'gl-draw-active-line.hot';
-                    for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array without creating a copy
+                    var anchorLayer = 'gl-draw-point.cold';
+                    for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
                         overlays[i].layer_definitions.forEach(function(layer) {
                             map.removeLayer(layer.id)
                         })
