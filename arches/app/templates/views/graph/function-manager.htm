@@ -33,12 +33,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Title Block -->
         <div class="title-block-title">
             <h4 class="title-block-title"> Functions</h4>
-            
-            <!-- Toolbar -->
-            <div class="href-toolbar">
-                <a id="show-functions" class="href-button" href="#">Close Function Library</a>
-            </div>
-
         </div>
 
 
@@ -50,8 +44,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
 
-        <div id="function-list" class="report-image-grid" style="margin-top: 5px; display: none;" data-bind="visible: appliedFunctionList.items().length > 0, with: appliedFunctionList">
+        <div id="function-list" class="report-image-grid" style="margin-top: 5px; display: none;" data-bind="visible: appliedFunctionList.items().length > 0">
+            <!-- Toolbar -->
+            <div class="href-toolbar">
+                <a class="href-button" href="#" data-bind="visible: !selectedFunction(), click: toggleFunctionLibrary">Close Function Library</a>
+                <a class="href-button" href="#" data-bind="visible: !!selectedFunction(), click: toggleFunctionLibrary">Show Function Library</a>
+            </div>
+
+            <!-- ko with: appliedFunctionList -->
             {% include 'views/graph/function-manager/applied-function-list.htm' %}
+            <!-- /ko -->
         </div>   
 
     </div>
@@ -59,7 +61,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Card Container -->
     <div class="card-form-preview-container">
-        <div id="function-library" class="card-form-preview-container library-container">
+        <div style="display: none;" class="card-form-preview-container library-container" data-bind="visible: !selectedFunction()">
             <div class="">
                 
                 <!-- Header -->
@@ -101,8 +103,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
 
-        <!-- Right Panel: COnfig Form -->
-        <div id="function-configuration" class="card-form-preview-container hidden">
+        <!-- Right Panel: Config Form -->
+        <div style="display: none;" class="card-form-preview-container" data-bind="visible: !!selectedFunction()">
 
             <div id="card-preview" class="pad-all" style="">
 

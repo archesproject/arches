@@ -16,7 +16,8 @@ require([
     var functionXGraphModels = [];
     var loading = ko.observable(false);
     var viewModel = {
-        loading: loading
+        loading: loading,
+        selectedFunction: ko.observable()
     };
 
 
@@ -28,7 +29,7 @@ require([
         functions: ko.observableArray(functionModels)
     })
 
-    viewModel.functionList.on('item-selected', function(form){
+    viewModel.functionList.on('item-clicked', function(func){
         // pageView.viewModel.loading(true);
         // formView.loadForm(form.formid, function(){
         //     pageView.viewModel.loading(false);
@@ -47,12 +48,28 @@ require([
         functions: ko.observableArray(functionXGraphModels)
     })
 
-    viewModel.appliedFunctionList.on('item-selected', function(form){
+    viewModel.appliedFunctionList.on('item-clicked', function(func){
+        if (func.selected()) {
+            viewModel.selectedFunction(func);
+        }else{
+            viewModel.selectedFunction(undefined);
+        }
         // pageView.viewModel.loading(true);
         // formView.loadForm(form.formid, function(){
         //     pageView.viewModel.loading(false);
         // });
     });
+
+    viewModel.toggleFunctionLibrary = function(){
+        if (!!viewModel.selectedFunction()) {
+            viewModel._selectedFunction = viewModel.selectedFunction();
+            viewModel._selectedFunction.selected(false);
+            viewModel.selectedFunction(undefined);
+        }else{
+            viewModel.selectedFunction(viewModel._selectedFunction);
+            viewModel._selectedFunction.selected(true);
+        }
+    }
 
     /**
     * a GraphPageView representing the graph manager page
