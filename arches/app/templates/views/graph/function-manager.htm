@@ -30,12 +30,143 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!--Form Listing -->
     <div class="left-column-crud-container form-list">
+        <!-- Title Block -->
+        <div class="title-block-title">
+            <h4 class="title-block-title"> Functions</h4>
+            
+            <!-- Toolbar -->
+            <div class="href-toolbar">
+                <a id="show-functions" class="href-button" href="#">Close Function Library</a>
+            </div>
 
+        </div>
+
+
+        <!-- Default Message -->                                   
+        <div class="left-column-message" style="">
+            You haven't added any functions yet.  
+            <br><br>
+            Select functions from the library to add new capabilities to your resource.
+        </div>
     </div>
 
 
     <!-- Card Container -->
     <div class="card-form-preview-container">
+        <div id="function-library" class="card-form-preview-container library-container">
+            <div class="">
+                
+                <!-- Header -->
+                <div class="library-header" style="">
+                    
+                    <!-- Search -->
+                    <div>
+
+                        <!-- Find Button -->
+                        <div class="">
+                            <a class="library-find" href="#"> Find </a>
+                        </div>
+
+                        <!-- Find widget -->
+                        <div class="find-widget" style="display: none;">
+                            <div class="">
+                                
+                                Library filter goes here
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource/Graph Toggle -->
+                    <div style="display: block;">
+                        <a id="" class="library-grid-title active" href="">Function Library</a>
+                    </div>
+                </div>
+
+                <!-- Function Grid Container -->
+                <div id="page-content">
+
+                    <!-- Function Grid -->
+                    <div id="function-list" class="report-image-grid" style="margin-top: 5px;">
+
+                        <!-- Function -->
+                        <div class="card-grid-item">
+                            <div class="panel mar-no">
+                                <!-- Function Name -->
+                                <div class="panel-heading">
+                                    <h3 id="f1-name" class="panel-title library-card-panel-title"><i class="text-center fa fa-university"></i> Resource Identifier</h3>
+                                </div>
+
+                                <!-- Abstract -->
+                                <div class="panel-body library-card-body">
+                                    <p class="">A function that configures how Arches labels your resource for search and map display</p>
+                                </div>
+
+                                <!-- Selectable -->
+                                <div class="selectable" style="display: none;">
+                                    <i class="ion-ios-checkmark"></i>
+                                </div>
+
+                                <!-- card Tools -->
+                                <div class="panel-footer" style="height: 53px;">
+                                    <div class="pull-right">
+                                        <button id="f1" class="add-function-button btn btn-primary btn-labeled fa fa-plus ">Select Function</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>   
+                </div>   
+            </div>
+        </div>
+
+
+        <!-- Right Panel: COnfig Form -->
+        <div id="function-configuration" class="card-form-preview-container hidden">
+
+            <div id="card-preview" class="pad-all" style="">
+
+                <div id="permissions-form" class="panel">
+                    <div class="panel-heading">
+                        <div class="">
+                            <h3 id="cc-title" class="panel-title card-main-title">Function Name Configuration</h3>
+                        </div>
+                    </div>
+
+                    <!-- Alert Panel -->
+                    <div id="basemap-delete-alert" class="panel wizard-data-card-alert" style=""></div>
+
+                    <!-- Data Entry -->
+                    <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
+                        <div id="cards" class="tab-base card-content-container outline" style="margin-bottom: 20px; margin-top: -2px;">
+
+                            <!--Nav Tabs-->
+                            <ul class="nav nav-tabs card-nav-container" style="">
+                                <li id="summary-group" class="active">
+                                    <a id="summary-tab" data-toggle="tab" href="#summary-card" class="card-tab-title" aria-expanded="true">Settings</a>
+                                </li>
+                            </ul>
+
+                            <!--Tabs Content-->
+                            <div class="tab-content card-content-tab" style="margin-left: 0px;">
+
+                                <!-- Card -->
+                                <div id="summary-card" class="tab-pane fade active in" style=""> 
+                                    <div class="panel-body card-panel-body" style="">
+
+                                        Function Configuration Bits Go Here
+
+                                    </div>  
+                                </div>    
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
 
     </div>
