@@ -4314,6 +4314,13 @@ div.row.widget-wrapper.report-header:hover {
     visibility: hidden;
 }
 
+.geometry-editing-notifications {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+}
+
 .geocode-container.hide-geocoder {
   visibility: visible;
 }
@@ -4394,6 +4401,14 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-overlay-item.map-draw-tools-active {
   background-color: #f3f3f3;
+}
+
+.map-widget-tool.disabled {
+  background-color: #999999;
+}
+
+.map-widget-tool.disabled i {
+  color: black;
 }
 
 .map-widget-overlay-item {

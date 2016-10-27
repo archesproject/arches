@@ -2,18 +2,8 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-    <!-- <div id="geometry-widget-floating-top-left" class="floating-container">
-        <div class="alert-wrap in animated jellyIn">
-            <div class="alert alert-warning" role="alert">
-                <button class="close" type="button">
-                    <i class="fa fa-times-circle"></i>
-                </button>
-                <div class="media">
-                    <strong>Edit Mode</strong> You are editing polygons.  Click the geometry again to add vertices.
-                </div>
-            </div>
-        </div>
-    </div> -->
+
+
 
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
@@ -25,6 +15,43 @@
           pitch: pitch,
           bearing: bearing
        }, afterRender: function(){setupMap(map)} }">
+
+       <!--ko if: drawMode -->
+       <div class="geometry-editing-notifications">
+           <div class="alert-wrap in animated jellyIn">
+               <div class="alert alert-warning" role="alert">
+                   <button class="close" type="button">
+                   </button>
+                     <!-- ko if: drawMode() === 'draw_point'  -->
+                   <div class="media">
+                     <strong>Edit Mode</strong> You are creating points.  Click the Point tool to exit.
+                   </div>
+                   <!-- /ko -->
+                   <!-- ko if: drawMode() === 'draw_polygon'-->
+                   <div class="media">
+                     <strong>Edit Mode</strong> You are creating polygons.  Click the Polygon tool to exit.
+                   </div>
+                   <!-- /ko -->
+                   <!-- ko if: drawMode() === 'draw_line_string'-->
+                   <div class="media">
+                     <strong>Edit Mode</strong> You are creating lines.  Click the Line tool to exit.
+                   </div>
+                   <!-- /ko -->
+                   <!-- ko if: drawMode() === 'simple_select'-->
+                   <div class="media">
+                     <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>. Drag to move <!-- ko if: selectedFeatureType() !== 'Point'--> or click it again to edit verticies <!-- /ko -->
+                   </div>
+                   <!-- /ko -->
+                   <!-- ko if: drawMode() === 'direct_select'-->
+                   <div class="media">
+                     <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
+                   </div>
+                   <!-- /ko -->
+               </div>
+           </div>
+       </div>
+       <!-- /ko -->
+
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
             <input id="select2Input" data-bind="
@@ -48,9 +75,16 @@
                 <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
                 </div>
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools()}">
+                <!-- ko if: featureEditingDisabled -->
+                <div class="map-widget-tool text-center" data-bind="css : {'disabled': featureEditingDisabled}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
                 </div>
+                <!-- /ko -->
+                <!-- ko ifnot: featureEditingDisabled -->
+                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
+                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
+                </div>
+                <!-- /ko -->
                 <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
                 </div>
@@ -169,7 +203,7 @@
             </div>
             <!-- /ko -->
             <!-- /ko -->
-            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool">
+            <div class="map-widget-overlay-item relative editing-tool" data-bind="click:selectEditingTool, css: {'map-draw-tools-active': drawMode() === 'simple_select' || drawMode() === 'direct_select'}">
                 <div class="map-overlay-vis-toogle text-center">
                     <i class='ion-trash-a'></i>
                 </div>

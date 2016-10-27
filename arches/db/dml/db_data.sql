@@ -3506,7 +3506,8 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "geocoderVisible": true,
         "resourceColor": null,
         "resourceLineWidth": null,
-        "resourcePointSize": null
+        "resourcePointSize": null,
+        "featureEditingDisabled": true
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
