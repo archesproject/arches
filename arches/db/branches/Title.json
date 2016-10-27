@@ -4,6 +4,8 @@
       "subtitle": "",
       "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
       "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-font",
       "domain_connections": [
         {
@@ -1447,6 +1449,7 @@
       ],
       "author": "GCI ",
       "deploymentfile": null,
+      "forms": [],
       "version": "",
       "nodes": [
         {
@@ -1496,8 +1499,6 @@
       "graphid": "fe350939-97d3-11e6-84a5-026d961c88e6",
       "name": "Title",
       "cards_x_nodes_x_widgets": [],
-      "forms": [],
-      "forms_x_cards": [],
       "cards": [
         {
           "itemtext": null,

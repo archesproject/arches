@@ -47,7 +47,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_graphs','export_resources', 'import_json', 'export_json'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
@@ -66,14 +66,18 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
 
-        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
             help='Directory where you want to save exported files.')
 
-        parser.add_argument('-r', '--resources', action='store', dest='resources',
-            help='A comma separated list of the names of the resources you would like to export.')
+        parser.add_argument('-r', '--resources', action='store', dest='resources', default=False,
+            help='A comma separated list of the resourceids of the resources you would like to import/export.')
 
-        parser.add_argument('-g', '--graphs', action='store', dest='graphs',
-            help='A comma separated list of the graphids of the resources you would like to export.')
+        parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
+            help='A comma separated list of the graphids of the resources you would like to import/export.')
+
+        parser.add_argument('-c', '--concepts', action='store', dest='concepts', default=False,
+            help='A comma separated list of the conceptids of the concepts you would like to import/export.')
+
 
 
 
@@ -119,17 +123,14 @@ class Command(BaseCommand):
         if options['operation'] == 'index_database':
             self.index_database(package_name)
 
-        if options['operation'] == 'export_graphs':
-            self.export_graphs(options['dest_dir'], options['graphs'])
-
         if options['operation'] == 'export_resources':
             self.export_resources(package_name, options['dest_dir'], options['resources'])
 
         if options['operation'] == 'import_json':
-            self.import_json(package_name, options['source'])
+            self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
 
         if options['operation'] == 'export_json':
-            self.export_json(package_name, options['dest_dir'], options['resources'])
+            self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
 
     def setup(self, package_name):
         """
@@ -326,15 +327,6 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-    def export_graphs(self, data_dest=None, graphs=None):
-        """
-        Export resource graphs to arches.json
-        """
-        # graph_exporter.export(data_dest)
-
-        if graphs != None and graphs != 'resources' and graphs != 'branches':
-            graphs = [x.strip(' ') for x in graphs.split(",")]
-        ArchesFileExporter().export_graphs(data_dest, graphs)
 
     def export_resources(self, package_name, data_dest=None, resources=''):
         """
@@ -354,22 +346,15 @@ class Command(BaseCommand):
         resource_exporter.export(resources=resources, dest_dir=data_dest)
 
 
-    def import_json(self, package_name, data_source=None):
+    def import_json(self, data_source=None, graphs=None, resources=None, concepts=None):
         """
         Imports objects from arches.json.
 
         """
-        data_source = None if data_source == '' else data_source
-        ArchesFileImporter(data_source).import_concepts()
-        ArchesFileImporter(data_source).import_graphs()
 
-    def export_json(self, package_name, data_dest=None, resources=None):
-        """
-        Export objects to arches.json
-        """
-        if resources != None:
-            resources = [x.strip(' ') for x in resources.split(",")]
-        ArchesFileExporter().export_graphs(data_dest, resources)
+        data_source = None if data_source == '' else data_source
+        ArchesFileImporter(data_source).import_all()
+
 
     def start_livereload(self):
         from livereload import Server
@@ -379,3 +364,17 @@ class Command(BaseCommand):
         for path in settings.TEMPLATES[0]['DIRS']:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
+
+    def export(self, data_dest=None, graphs=None, resources=None, concepts=None):
+        """
+        Export objects to arches.json.
+        """
+
+        if graphs != False:
+            graphs = [x.strip(' ') for x in graphs.split(",")]
+        if concepts != False:
+            concepts = [x.strip(' ') for x in concepts.split(",")]
+        if resources != False:
+            resources = [x.strip(' ') for x in resources.split(",")]
+
+        ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)
