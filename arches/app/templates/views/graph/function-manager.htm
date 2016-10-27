@@ -42,12 +42,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
 
-        <!-- Default Message -->                                   
-        <div class="left-column-message" style="">
+        <!-- Default Message -->                              
+        <div class="left-column-message" style="display: none;" data-bind="visible: appliedFunctionList.items().length === 0">
             You haven't added any functions yet.  
             <br><br>
             Select functions from the library to add new capabilities to your resource.
         </div>
+
+
+        <div id="function-list" class="report-image-grid" style="margin-top: 5px; display: none;" data-bind="visible: appliedFunctionList.items().length > 0, with: appliedFunctionList">
+            {% include 'views/graph/function-manager/applied-function-list.htm' %}
+        </div>   
+
     </div>
 
 
@@ -154,7 +160,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     define('graph-functions-data', [], function () {
         return {
             functions: {{functions}},
-            // form: {{form}},
+            applied_functions: {{applied_functions}},
             // datatypes: {{ datatypes_json }},
             // widgets: {{ widgets_json }},
             // resourceid: '{{resourceid}}',
