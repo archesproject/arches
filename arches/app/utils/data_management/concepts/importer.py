@@ -59,7 +59,7 @@ from django.db import transaction
 def import_reference_data(reference_data):
     # with transaction.atomic():
     if reference_data != '':
-        print '\nLOADING AUTHORITY FILES FROM JSON'
+        print '\nLOADING REFERENCE DATA FROM ARCHES JSON'
         print '-----------------------'
     for data in reference_data:
         print data['legacyoid']

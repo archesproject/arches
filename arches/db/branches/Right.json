@@ -1,6 +1,11 @@
 {
   "graph": [
     {
+      "subtitle": "",
+      "mapfeaturecolor": null,
+      "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-copyright",
       "domain_connections": [
         {
@@ -1538,95 +1543,37 @@
           ]
         }
       ],
-      "graphid": "94ebff3f-9587-11e6-b664-024f9e178154",
-      "name": "Right",
       "nodegroups": [
+        {
+          "cardinality": "n",
+          "legacygroupid": null,
+          "nodegroupid": "94ebff3e-9587-11e6-b664-024f9e178154",
+          "parentnodegroup_id": null
+        },
         {
           "cardinality": "1",
           "legacygroupid": null,
           "nodegroupid": "d28b7dd9-9587-11e6-b664-024f9e178154",
           "parentnodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154"
-        },
-        {
-          "cardinality": "1",
-          "legacygroupid": null,
-          "nodegroupid": "94ebff3e-9587-11e6-b664-024f9e178154",
-          "parentnodegroup_id": null
         }
       ],
       "author": " GCI",
-      "description": "Captures information about special status, protection, or privileges afforded under law.",
       "deploymentfile": null,
-      "isresource": false,
-      "edges": [
-        {
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "name": null,
-          "edgeid": "d28b7dde-9587-11e6-b664-024f9e178154",
-          "domainnode_id": "94ebff3e-9587-11e6-b664-024f9e178154",
-          "rangenode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "ontologyproperty": "P94i_was_created_by",
-          "description": null
-        },
-        {
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "name": null,
-          "edgeid": "46f04200-9588-11e6-b664-024f9e178154",
-          "domainnode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
-          "rangenode_id": "46f041ff-9588-11e6-b664-024f9e178154",
-          "ontologyproperty": "P78_is_identified_by",
-          "description": null
-        },
-        {
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "name": null,
-          "edgeid": "d28b7ddd-9587-11e6-b664-024f9e178154",
-          "domainnode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "rangenode_id": "d28b7ddc-9587-11e6-b664-024f9e178154",
-          "ontologyproperty": "P2_has_type",
-          "description": null
-        },
-        {
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "name": null,
-          "edgeid": "69f856f2-9588-11e6-b664-024f9e178154",
-          "domainnode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
-          "rangenode_id": "69f856f1-9588-11e6-b664-024f9e178154",
-          "ontologyproperty": "P78_is_identified_by",
-          "description": null
-        },
-        {
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "name": null,
-          "edgeid": "23f7e500-9588-11e6-b664-024f9e178154",
-          "domainnode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "rangenode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
-          "ontologyproperty": "P4_has_time-span",
-          "description": null
-        }
-      ],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "version": "",
-      "cards": [],
-      "cards_x_nodes_x_widgets": [],
       "forms": [],
-      "forms_x_cards": [],
-      "subtitle": "",
+      "version": "",
       "nodes": [
         {
           "functions": [],
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "",
           "istopnode": false,
-          "ontologyclass": "E55_Type",
-          "nodeid": "d28b7ddc-9587-11e6-b664-024f9e178154",
-          "datatype": "concept",
+          "ontologyclass": "E65_Creation",
+          "nodeid": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "datatype": "semantic",
           "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "config": {
-            "topConcept": null
-          },
-          "parentproperty": "P2_has_type",
-          "name": "Type of Designation or Protection"
+          "config": null,
+          "parentproperty": "P94i_was_created_by",
+          "name": "Protection Event"
         },
         {
           "functions": [],
@@ -1659,32 +1606,6 @@
           "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
           "description": "Represents a single node in a graph",
           "istopnode": false,
-          "ontologyclass": "E49_Time_Appellation",
-          "nodeid": "46f041ff-9588-11e6-b664-024f9e178154",
-          "datatype": "date",
-          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P78_is_identified_by",
-          "name": "Designation or Protection From Date"
-        },
-        {
-          "functions": [],
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": false,
-          "ontologyclass": "E65_Creation",
-          "nodeid": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P94i_was_created_by",
-          "name": "Protection Event"
-        },
-        {
-          "functions": [],
-          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
           "ontologyclass": "E52_Time-Span",
           "nodeid": "23f7e4ff-9588-11e6-b664-024f9e178154",
           "datatype": "semantic",
@@ -1692,6 +1613,122 @@
           "config": null,
           "parentproperty": "P4_has_time-span",
           "name": "Timespan of Designation or Protection"
+        },
+        {
+          "functions": [],
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "d28b7ddc-9587-11e6-b664-024f9e178154",
+          "datatype": "concept",
+          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "Type of Designation or Protection"
+        },
+        {
+          "functions": [],
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "46f041ff-9588-11e6-b664-024f9e178154",
+          "datatype": "date",
+          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "Designation or Protection From Date"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "Captures information about special status, protection, or privileges afforded under law.",
+      "edges": [
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "d28b7ddd-9587-11e6-b664-024f9e178154",
+          "domainnode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "rangenode_id": "d28b7ddc-9587-11e6-b664-024f9e178154",
+          "ontologyproperty": "P2_has_type",
+          "description": null
+        },
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "69f856f2-9588-11e6-b664-024f9e178154",
+          "domainnode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
+          "rangenode_id": "69f856f1-9588-11e6-b664-024f9e178154",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "46f04200-9588-11e6-b664-024f9e178154",
+          "domainnode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
+          "rangenode_id": "46f041ff-9588-11e6-b664-024f9e178154",
+          "ontologyproperty": "P78_is_identified_by",
+          "description": null
+        },
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "d28b7dde-9587-11e6-b664-024f9e178154",
+          "domainnode_id": "94ebff3e-9587-11e6-b664-024f9e178154",
+          "rangenode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "ontologyproperty": "P94i_was_created_by",
+          "description": null
+        },
+        {
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "name": null,
+          "edgeid": "23f7e500-9588-11e6-b664-024f9e178154",
+          "domainnode_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "rangenode_id": "23f7e4ff-9588-11e6-b664-024f9e178154",
+          "ontologyproperty": "P4_has_time-span",
+          "description": null
+        }
+      ],
+      "maplinewidth": null,
+      "mappointsize": null,
+      "graphid": "94ebff3f-9587-11e6-b664-024f9e178154",
+      "name": "Right",
+      "cards_x_nodes_x_widgets": [],
+      "cards": [
+        {
+          "itemtext": null,
+          "functions": [],
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "",
+          "name": "Protection Event",
+          "nodegroup_id": "d28b7dd9-9587-11e6-b664-024f9e178154",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": 0,
+          "cardid": "d28b7ddb-9587-11e6-b664-024f9e178154",
+          "helptitle": null,
+          "active": true,
+          "instructions": ""
+        },
+        {
+          "itemtext": null,
+          "functions": [],
+          "graph_id": "94ebff3f-9587-11e6-b664-024f9e178154",
+          "description": "Captures information about special status, protection, or privileges afforded under law.",
+          "name": "Right",
+          "nodegroup_id": "94ebff3e-9587-11e6-b664-024f9e178154",
+          "visible": false,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "94ebff41-9587-11e6-b664-024f9e178154",
+          "helptitle": null,
+          "active": false,
+          "instructions": null
         }
       ],
       "root": {
