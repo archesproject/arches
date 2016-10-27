@@ -63,5 +63,19 @@ def import_reference_data(reference_data):
         print '-----------------------'
     for data in reference_data:
         print data['legacyoid']
+        def create_collections(concept):
+            relations = {'':'hasCollection', 'hasTopConcept':'member', 'narrower':'member'}
+            for subconcept in concept.subconcepts:
+                if concept.relationshiptype in relations.keys():
+                    if concept.id == '00000000-0000-0000-0000-000000000001':
+                        concept.id = '00000000-0000-0000-0000-000000000003'
+                    relation = models.Relation()
+                    relation.conceptfrom_id = concept.id
+                    relation.conceptto_id = subconcept.id
+                    relation.relationtype_id = relations[concept.relationshiptype]
+                    relation.save()
+
         concept = Concept(data)
         concept.save()
+        concept.traverse(create_collections, 'down')
+        # concept.index(scheme=concept)
