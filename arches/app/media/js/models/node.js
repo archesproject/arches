@@ -42,7 +42,7 @@ define([
                         var defaultConfig = datatypeRecord.defaultconfig;
                         self.configKeys.removeAll();
                         _.each(defaultConfig, function(configVal, configKey) {
-                            self.config[configKey] = ko.observable(configVal);
+                            self.config[configKey] = (Array.isArray(configVal) ? ko.observableArray(configVal): ko.observable(configVal));
                             self.configKeys.push(configKey);
                         });
                     }
