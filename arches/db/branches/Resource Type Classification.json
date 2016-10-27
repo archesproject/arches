@@ -1,6 +1,11 @@
 {
   "graph": [
     {
+      "subtitle": "",
+      "mapfeaturecolor": null,
+      "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-tags",
       "domain_connections": [
         {
@@ -1741,8 +1746,6 @@
           ]
         }
       ],
-      "graphid": "95931699-957d-11e6-b664-024f9e178154",
-      "name": "Resource Type Classification",
       "nodegroups": [
         {
           "cardinality": "1",
@@ -1752,17 +1755,9 @@
         }
       ],
       "author": " GCI",
-      "description": "Describes the type of resource.",
       "deploymentfile": null,
-      "isresource": false,
-      "edges": [],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "version": "",
-      "cards": [],
-      "cards_x_nodes_x_widgets": [],
       "forms": [],
-      "forms_x_cards": [],
-      "subtitle": "",
+      "version": "",
       "nodes": [
         {
           "functions": [],
@@ -1778,6 +1773,32 @@
           },
           "parentproperty": "",
           "name": "Resource Type Classification"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "Describes the type of resource.",
+      "edges": [],
+      "maplinewidth": null,
+      "mappointsize": null,
+      "graphid": "95931699-957d-11e6-b664-024f9e178154",
+      "name": "Resource Type Classification",
+      "cards_x_nodes_x_widgets": [],
+      "cards": [
+        {
+          "itemtext": null,
+          "functions": [],
+          "graph_id": "95931699-957d-11e6-b664-024f9e178154",
+          "description": "Describes the type of resource.",
+          "name": "Resource Type Classification",
+          "nodegroup_id": "95931698-957d-11e6-b664-024f9e178154",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "9593169b-957d-11e6-b664-024f9e178154",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
         }
       ],
       "root": {

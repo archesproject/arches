@@ -4,6 +4,8 @@
       "subtitle": "",
       "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
       "isresource": false,
+      "forms_x_cards": [],
+      "reports": [],
       "iconclass": "fa fa-info",
       "domain_connections": [
         {
@@ -1614,6 +1616,7 @@
       ],
       "author": " GCI",
       "deploymentfile": null,
+      "forms": [],
       "version": "",
       "nodes": [
         {
@@ -1623,7 +1626,7 @@
           "istopnode": true,
           "ontologyclass": "E42_Identifier",
           "nodeid": "8eb94348-97c5-11e6-84a5-026d961c88e6",
-          "datatype": "semantic",
+          "datatype": "string",
           "nodegroup_id": "8eb94348-97c5-11e6-84a5-026d961c88e6",
           "config": null,
           "parentproperty": "",
@@ -1663,8 +1666,6 @@
       "graphid": "8eb94349-97c5-11e6-84a5-026d961c88e6",
       "name": "Identifier",
       "cards_x_nodes_x_widgets": [],
-      "forms": [],
-      "forms_x_cards": [],
       "cards": [
         {
           "itemtext": null,
@@ -1690,7 +1691,7 @@
         "istopnode": true,
         "ontologyclass": "E42_Identifier",
         "nodeid": "8eb94348-97c5-11e6-84a5-026d961c88e6",
-        "datatype": "semantic",
+        "datatype": "string",
         "nodegroup_id": "8eb94348-97c5-11e6-84a5-026d961c88e6",
         "config": null,
         "name": "Identifier"
