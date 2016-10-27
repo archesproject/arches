@@ -470,3 +470,17 @@ class ReportEditorView(GraphBaseView):
         report = models.Report.objects.get(reportid=reportid)
         report.delete()
         return JSONResponse({'succces':True})
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class FunctionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/function-manager',
+        )
+
+        return render(request, 'views/graph/function-manager.htm', context)

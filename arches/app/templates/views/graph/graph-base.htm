@@ -124,6 +124,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     {% endif %}
 
                     <!-- Menu Item -->
+                    <li class="edit-menu-item">
+                        <a href="#" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Functions" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
                     <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph' graphid %}') }">
                             <div class="media-body">

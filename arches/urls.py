@@ -21,7 +21,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
-from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView
+from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
 from arches.app.views.tile import TileData
 
@@ -82,6 +82,7 @@ urlpatterns = [
     url(r'^graph/(?P<graphid>%s)/report_manager$' % uuid_regex, ReportManagerView.as_view(), name='report_manager'),
     url(r'^graph/(?P<graphid>%s)/add_report$' % uuid_regex, ReportManagerView.as_view(), name='add_report'),
     url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceEditorView.as_view(), name='add_resource'),
+    url(r'^graph/(?P<graphid>%s)/function_manager$' % uuid_regex, FunctionManagerView.as_view(), name='function_manager'),
     url(r'^resource$', ResourceListView.as_view(), name='resource'),
     url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
     url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
