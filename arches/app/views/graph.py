@@ -481,6 +481,7 @@ class FunctionManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script='views/graph/function-manager',
+            functions=JSONSerializer().serialize(models.Function.objects.all())
         )
 
         return render(request, 'views/graph/function-manager.htm', context)

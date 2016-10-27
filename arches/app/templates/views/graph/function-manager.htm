@@ -87,35 +87,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="page-content">
 
                     <!-- Function Grid -->
-                    <div id="function-list" class="report-image-grid" style="margin-top: 5px;">
-
-                        <!-- Function -->
-                        <div class="card-grid-item">
-                            <div class="panel mar-no">
-                                <!-- Function Name -->
-                                <div class="panel-heading">
-                                    <h3 id="f1-name" class="panel-title library-card-panel-title"><i class="text-center fa fa-university"></i> Resource Identifier</h3>
-                                </div>
-
-                                <!-- Abstract -->
-                                <div class="panel-body library-card-body">
-                                    <p class="">A function that configures how Arches labels your resource for search and map display</p>
-                                </div>
-
-                                <!-- Selectable -->
-                                <div class="selectable" style="display: none;">
-                                    <i class="ion-ios-checkmark"></i>
-                                </div>
-
-                                <!-- card Tools -->
-                                <div class="panel-footer" style="height: 53px;">
-                                    <div class="pull-right">
-                                        <button id="f1" class="add-function-button btn btn-primary btn-labeled fa fa-plus ">Select Function</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div id="function-list" class="report-image-grid" style="margin-top: 5px;" data-bind="with: functionList">
+                        {% include 'views/graph/function-manager/function-list.htm' %}
                     </div>   
                 </div>   
             </div>
@@ -180,7 +153,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% autoescape off %}
     define('graph-functions-data', [], function () {
         return {
-            // forms: {{forms}},
+            functions: {{functions}},
             // form: {{form}},
             // datatypes: {{ datatypes_json }},
             // widgets: {{ widgets_json }},
