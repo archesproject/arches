@@ -19,26 +19,27 @@ function (ko, koMapping, FunctionViewModel, CardModel, data) {
                 }
             }, this);
 
-            this.primaryNameTemplate = ko.observable();
-            this.selectedNodegroup = ko.observable();
-            this.selectedNodegroup.subscribe(function(nodegroup_id){
-                this.primaryNameTemplate(nodegroup_id);
+            this.string_template = params.primaryNameConfig.string_template || ko.observable();
+            this.nodegroup_id = params.primaryNameConfig.nodegroup_id || ko.observable();
+            this.nodegroup_id.subscribe(function(nodegroup_id){
+                this.string_template(nodegroup_id);
                 var nodes = _.filter(this.graph.nodes, function(node){
                     return node.nodegroup_id === nodegroup_id;
                 }, this);
                 var templateFragments = [];
                 _.each(nodes, function(node){
-                    templateFragments.push('<' + node.name + '{' + node.nodeid + '}>');
+                    templateFragments.push('<' + node.name + '>');
                 }, this);
 
 
                 var template = templateFragments.join(', ');
-                this.primaryNameTemplate(template);
+                this.string_template(template);
 
             }, this);
+
             koMapping.fromJS({
-                string_template: this.primaryNameTemplate,
-                nodegroup_id: this.selectedNodegroup
+                string_template: this.string_template,
+                nodegroup_id: this.nodegroup_id
             },params.primaryNameConfig);
         },
         template: {

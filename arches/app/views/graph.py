@@ -96,8 +96,8 @@ class GraphSettingsView(GraphBaseView):
         if data['primaryNameViewModel']:
             functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
                 function_id = '60000000-0000-0000-0000-000000000010', 
+                graph_id = graphid, 
                 defaults = {
-                    'graph_id': graphid, 
                     'config': data['primaryNameViewModel']
                 }
             )

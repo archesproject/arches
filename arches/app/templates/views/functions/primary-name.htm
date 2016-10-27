@@ -7,7 +7,7 @@
             </div>
 
             <div class="col-xs-12">
-                <select placeholder="{% trans "Select a nodegroup" %}" data-bind="chosen: {width: '100%'}, value: selectedNodegroup, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+                <select placeholder="{% trans "Select a nodegroup" %}" data-bind="chosen: {width: '100%'}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
             </div>
         </div>
     </div>
@@ -18,7 +18,7 @@
             </div>
 
             <div class="col-xs-12">
-                <input placeholder="{% trans "put something here..." %}" class="form-control input-lg widget-input" data-bind="textInput: primaryNameTemplate">
+                <input placeholder="{% trans "put something here..." %}" class="form-control input-lg widget-input" data-bind="textInput: string_template">
             </div>
         </div>
     </div>

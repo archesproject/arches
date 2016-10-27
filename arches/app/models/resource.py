@@ -42,10 +42,13 @@ class Resource(models.ResourceInstance):
         # config['nodegroup_id'] = '7a7dfaf5-971e-11e6-aec3-14109fd34195'
         # config['string_template'] = '{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})'
 
-        try:
-            functionConfig = models.FunctionXGraph.objects.get(graph=self.graph, function__functiontype='primaryname')
-            return get_primary_name(self, functionConfig.config)
-        except:
+        #try:
+        functionConfig = models.FunctionXGraph.objects.filter(graph=self.graph, function__functiontype='primaryname')
+        if len(functionConfig) == 1:
+            return get_primary_name(self, functionConfig[0].config)
+        else:
             return 'undefined'
+        # except:
+        #     return 'undefined'
         #{"6eeeb00f-9a32-11e6-a0c9-14109fd34195": "Alexei", "6eeeb9ca-9a32-11e6-ad09-14109fd34195": ""}
         #{"nodegroup_id": "6eeeb00f-9a32-11e6-a0c9-14109fd34195", "string_template": "{6eeeb00f-9a32-11e6-a0c9-14109fd34195} Type({6eeeb9ca-9a32-11e6-ad09-14109fd34195})"}
