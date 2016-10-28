@@ -23,7 +23,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Function Manager" %}
 {% endblock graph_header_title %}
 
-
+{% block graph_header_buttons %}
+<span data-bind="if: dirty">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
 
 {% block content %}
 <div class="flex">
@@ -104,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
         <!-- Right Panel: Config Form -->
-        <div style="display: none;" class="card-form-preview-container" data-bind="visible: !!selectedFunction()">
+        <div style="display: none;" class="card-form-preview-container" data-bind="visible: !!selectedFunction(), with: selectedFunction">
 
             <div id="card-preview" class="pad-all" style="">
 
@@ -136,7 +142,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div id="summary-card" class="tab-pane fade active in" style=""> 
                                     <div class="panel-body card-panel-body" style="">
 
-                                        Function Configuration Bits Go Here
+                                        <div data-bind='component: {
+                                            name: $data.get("function").component(),
+                                            params: $data
+                                        }'></div>
 
                                     </div>  
                                 </div>    

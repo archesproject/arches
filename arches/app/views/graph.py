@@ -93,14 +93,6 @@ class GraphSettingsView(GraphBaseView):
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
                 'ontology_id', 'version',  'subtitle', 'isactive', 'mapfeaturecolor', 'mappointsize', 'maplinewidth']:
                 setattr(graph, key, value)
-        if data['primaryNameViewModel']:
-            functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
-                function_id = '60000000-0000-0000-0000-000000000010', 
-                graph_id = graphid, 
-                defaults = {
-                    'config': data['primaryNameViewModel']
-                }
-            )
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         node.set_relatable_resources(data.get('relatable_resource_ids'))
@@ -482,7 +474,21 @@ class FunctionManagerView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph/function-manager',
             functions=JSONSerializer().serialize(models.Function.objects.all()),
-            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
+            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
+            function_templates=models.Function.objects.exclude(component__isnull=True),
         )
 
         return render(request, 'views/graph/function-manager.htm', context)
+
+    def post(self, request, graphid):
+        graph = Graph.objects.get(graphid=graphid)
+        data = JSONDeserializer().deserialize(request.body)
+        
+        if data['primaryNameViewModel']:
+            functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                function_id = '60000000-0000-0000-0000-000000000010', 
+                graph_id = graphid, 
+                defaults = {
+                    'config': data['primaryNameViewModel']
+                }
+            )

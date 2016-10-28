@@ -4,7 +4,7 @@ define(['knockout',
         'models/card',
         'chosen'], 
 function (ko, koMapping, FunctionViewModel, CardModel, data) {
-    return ko.components.register('primary-name', {
+    return ko.components.register('views/functions/primary-name', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, params);
             this.cards = ko.observableArray();
@@ -19,8 +19,8 @@ function (ko, koMapping, FunctionViewModel, CardModel, data) {
                 }
             }, this);
 
-            this.string_template = params.primaryNameConfig.string_template || ko.observable();
-            this.nodegroup_id = params.primaryNameConfig.nodegroup_id || ko.observable();
+            this.string_template = params.config.string_template;
+            this.nodegroup_id = params.config.nodegroup_id;
             this.nodegroup_id.subscribe(function(nodegroup_id){
                 this.string_template(nodegroup_id);
                 var nodes = _.filter(this.graph.nodes, function(node){
@@ -37,10 +37,10 @@ function (ko, koMapping, FunctionViewModel, CardModel, data) {
 
             }, this);
 
-            koMapping.fromJS({
-                string_template: this.string_template,
-                nodegroup_id: this.nodegroup_id
-            },params.primaryNameConfig);
+            // koMapping.fromJS({
+            //     string_template: this.string_template,
+            //     nodegroup_id: this.nodegroup_id
+            // },params);
         },
         template: {
             require: 'text!function-templates/primary-name'

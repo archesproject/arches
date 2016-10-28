@@ -25,14 +25,14 @@ define([
             this._json = ko.observable('');
             this.function = options.function;
             this.graphid = ko.observable();
-            this.config = ko.observable();
+            this.config = koMapping.fromJS({});
 
             this.parse(options);
 
             this.json = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._json()), {
                     graphid: self.graphid(),
-                    config: self.config(),
+                    config: koMapping.toJS(self.config),
                 }))
             });
 
@@ -47,7 +47,7 @@ define([
             this._json(JSON.stringify(data));
             this.function = data.function;
             this.graphid(data.graphid);
-            this.config(data.config);
+            koMapping.fromJS(data.config, this.config)
 
             this.set('id', data.function)
         },
