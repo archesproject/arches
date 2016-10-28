@@ -90,6 +90,7 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
+            this.anchorLayerId = this.resourceEditor ? 'gl-draw-point.cold' : '';
             this.layers = _.clone(arches.mapLayers);
 
             this.geocoderOptions = ko.observableArray([{
@@ -378,7 +379,7 @@ define([
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
-                    map.addLayer(cacheLayer, 'gl-draw-point.cold');
+                    map.addLayer(cacheLayer, this.anchorLayerId);
                 }
 
                 this.map.on('load', function() {
@@ -400,6 +401,12 @@ define([
                             }, self)
                             data = result;
                             source.setData(data)
+                            _.each(['resource-poly', 'resource-line', 'resource-point'], function(layerId) { //clear and add resource layers so that they are on top of map
+                                    var cacheLayer = self.map.getLayer(layerId);
+                                    self.map.removeLayer(layerId);
+                                    self.map.addLayer(cacheLayer, self.anchorLayerId)
+                                }, self)
+
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
                             self.loadGeometriesIntoDrawLayer()
@@ -638,7 +645,6 @@ define([
                 this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
-                    var anchorLayer = 'gl-draw-point.cold';
                     for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
                         overlays[i].layer_definitions.forEach(function(layer) {
                             map.removeLayer(layer.id)
@@ -646,7 +652,7 @@ define([
                     }
                     for (var i = overlays.length; i-- > 0;) {
                         overlays[i].layer_definitions.forEach(function(layer) {
-                            map.addLayer(layer, anchorLayer);
+                            map.addLayer(layer, this.anchorLayerId);
                             map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity() / 100.0);
                         })
                     }
