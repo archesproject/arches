@@ -107,10 +107,37 @@ require([
         });
     }
 
+    viewModel.delete = function(functionToDelete){
+        if(!functionToDelete.id){
+            viewModel.appliedFunctionList.items.remove(functionToDelete);
+            viewModel.toggleFunctionLibrary();
+        }else{
+            $.ajax({
+                type: "DELETE",
+                url: arches.urls.remove_functions.replace('//', '/' + baseData.graphid + '/'),
+                data: JSON.stringify([functionToDelete]),
+                success: function(response) {
+                    viewModel.appliedFunctionList.items.remove(functionToDelete);
+                    viewModel.toggleFunctionLibrary();
+                    viewModel.loading(false);
+                },
+                failure: function(response) {
+                    viewModel.loading(false);
+                }
+            });
+        }
+    }
+
     viewModel.cancel = function(){
         viewModel.appliedFunctionList.items().forEach(function(fn){
             if(fn.dirty()){
                 fn.reset();
+            }
+            if(!fn.id){
+                viewModel.appliedFunctionList.items.remove(fn);
+                if(viewModel.selectedFunction === fn){
+                    viewModel.toggleFunctionLibrary();
+                }
             }
         });
     }

@@ -494,5 +494,15 @@ class FunctionManagerView(GraphBaseView):
                     }
                 )
                 item['id'] = functionXgraph.pk
+
+        return JSONResponse(data)
+
+    def delete(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
+                functionXgraph.delete()
                 
         return JSONResponse(data)
