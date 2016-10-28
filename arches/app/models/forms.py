@@ -49,8 +49,7 @@ class Form(object):
                 card_obj = JSONSerializer().serializeToPython(Card.objects.get(cardid=formxcard.card_id))
                 form_obj['cardgroups'].append(card_obj)
             self.forms = [form_obj]
-        else:
-            pass
+
 
         # get the actual tile data
         for form in self.forms:
@@ -61,38 +60,10 @@ class Form(object):
                     for parentTile in self.tiles[cardgroup['nodegroup_id']]:
                         parentTile['tiles'] = {}
                         for card in cardgroup['cards']:
-                            print card['nodegroup_id']
                             parentTile['tiles'][card['nodegroup_id']] = []
                         for tile in JSONSerializer().serializeToPython(tiles.filter(parenttile_id=parentTile['tileid'])):
                             parentTile['tiles'][str(tile['nodegroup_id'])].append(tile)
 
-                if len(self.tiles[cardgroup['nodegroup_id']]) == 0 and cardgroup['cardinality'] == '1':
-                    # add blank parent tile
-                    parentTile = JSONSerializer().serializeToPython(models.Tile())
-                    parentTile['tileid'] = ''
-                    parentTile['parenttile_id'] = None
-                    parentTile['resourceinstance_id'] = resourceid
-                    parentTile['nodegroup_id'] = cardgroup['nodegroup_id']
-                    parentTile['tiles'] = {}
-                    parentTile['data'] = {}
-                    self.tiles[cardgroup['nodegroup_id']] = [parentTile]
-
-                    for card in cardgroup['cards']:
-                        #print card
-                        # make a blank tile
-                        tile = JSONSerializer().serializeToPython(models.Tile())
-                        tile['tileid'] = ''
-                        tile['parenttile_id'] = None # parentTile
-                        tile['resourceinstance_id'] = resourceid
-                        tile['nodegroup_id'] = card['nodegroup_id']
-                        tile['data'] = {}
-                        for widget in card['widgets']:
-                            tile['data'][widget['node_id']] = ''
-
-                        parentTile['tiles'][card['nodegroup_id']] = JSONSerializer().serializeToPython(tiles.filter(nodegroup_id=card['nodegroup_id']))
-
-                        if len(parentTile['tiles'][card['nodegroup_id']]) == 0 and card['cardinality'] == '1':
-                            parentTile['tiles'][card['nodegroup_id']] = [copy.deepcopy(tile)]
 
         # get the blank tile data
         for form in self.forms:
@@ -109,7 +80,7 @@ class Form(object):
                     parentTile['data'][widget['node_id']] = ''
 
                 # add a blank tile for the cardgroup
-                self.blanks[parentTile['nodegroup_id']] = parentTile
+                self.blanks[parentTile['nodegroup_id']] = [parentTile]
 
                 for card in cardgroup['cards']:
                     # make a blank tile
@@ -129,4 +100,4 @@ class Form(object):
                         parentTile['tiles'][card['nodegroup_id']] = []
                     
                     # add a blank tile for each card 
-                    self.blanks[tile['nodegroup_id']] = tile
+                    self.blanks[tile['nodegroup_id']] = [tile]

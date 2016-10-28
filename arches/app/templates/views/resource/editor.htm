@@ -32,14 +32,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="flex">
 
     <!--Form Listing -->
-    <div class="left-column-container form-list" data-bind="with: formList">
+    <div class="left-column-crud-container form-list" data-bind="with: formList">
         {% include 'views/resource/editor/form-list.htm' %}
     </div>
 
 
     <!-- Card Container -->
     <div class="card-form-preview-container" data-bind="let: {'form': formView}">
-        
+
         {% include 'views/resource/editor/form.htm' %}
 
     </div>
@@ -48,15 +48,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock content %}
 
 {% block pre_require_js %}
-<script>{% autoescape off %}
-define('resource-editor-data', [], function () {
-    return {
-        forms: {{forms}},
-        form: {{form}},
-        datatypes: {{ datatypes_json }},
-        widgets: {{ widgets_json }},
-        resourceid: '{{resourceid}}'
-    };
-});
-{% endautoescape %}</script>
+{{block.super}}
+<script>
+    {% autoescape off %}
+    define('resource-editor-data', [], function () {
+        return {
+            forms: {{forms}},
+            form: {{form}},
+            datatypes: {{ datatypes_json }},
+            widgets: {{ widgets_json }},
+            resourceid: '{{resourceid}}',
+            graph: {{graph_json}},
+        };
+    });
+    {% endautoescape %}
+</script>
 {% endblock pre_require_js %}

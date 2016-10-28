@@ -29,6 +29,7 @@ define([
 
             $element.on('change', function(val) {
                 value(val.currentTarget.value);
+                console.log(val.currentTarget.value);
             });
 
             ['value'].forEach(function(propName){

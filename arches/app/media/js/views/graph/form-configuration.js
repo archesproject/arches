@@ -36,10 +36,7 @@ require([
 
     var viewModel = {
         dirty: formModel.dirty,
-        formOptions: ko.computed(function() {
-            formModel.title();
-            return options.concat(data.forms);
-        }),
+        formOptions: ko.observableArray(options.concat(data.forms)),
         formSettings: new FormSettingsView({
             formModel: formModel,
             icons: data.icons
@@ -94,6 +91,7 @@ require([
                     pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
                 } else {
                     formModel.parse(JSON.parse(request.responseText));
+                    viewModel.formOptions(options.concat(data.forms));
                 }
             });
         },

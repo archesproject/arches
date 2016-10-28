@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -24,7 +24,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Graph Manager" %}
 {% endblock title %}
 
-{% block body %}
+{% block login_header %}{% endblock login_header %}
+
+{% block main_content %}
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Page Header -->
@@ -87,16 +89,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </li>
 
-                    <!-- Menu Item -->
-                    <li id="card-manager" class="edit-menu-item {% if main_script == "views/graph/card-manager" %} selected{% endif %}">
-                        <a href="#" data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }">
+                    {% block card_manager_menu_item %}
+                    <li id="card-manager" class="edit-menu-item{% if main_script == "views/graph/card-manager" %} selected{% endif %}{% if not graph.isresource and not root_node.is_collector %} disabled{% endif %}">
+                        <a href="#" {% if graph.isresource or root_node.is_collector %}data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
 
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %} </div>
+                                <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
                             </div>
                         </a>
                     </li>
+                    {% endblock card_manager_menu_item %}
 
                     {% if graph.isresource %}
                     <!-- Menu Item -->
@@ -134,8 +137,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="edit-menu-item">
                         <a href="#" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Resource Designer" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resources" %} </span>
+                                <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
                             </div>
                         </a>
                     </li>
@@ -225,17 +228,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-{% endblock body %}
+{% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
-<script>{% autoescape off %}
-define('graph-base-data', [], function () {
-    return {
-        graphs: {{graphs}},
-        graphid: '{{graphid}}'
-    };
-});
-{% endautoescape %}</script>
+    {{block.super}}
+    <script>
+        {% autoescape off %}
+        define('graph-base-data', [], function () {
+            return {
+                graphid: '{{graphid}}',
+                graph: {{graph_json}}
+            };
+        });
+        {% endautoescape %}
+    </script>
 {% endblock pre_require_js %}

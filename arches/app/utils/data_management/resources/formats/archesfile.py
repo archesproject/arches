@@ -359,3 +359,9 @@ class ArchesReader():
                 sys.exit(101)
 
         return resource_list
+
+    def load_file_new(self, arches_file):
+        '''Reads an arches4json file and creates resource instances'''
+        archesfile = JSONDeserializer().deserialize(open(arches_file, 'r'))
+        resources = archesfile['business_data']['resources']
+        relations = archesfile['business_data']['relations']

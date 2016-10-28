@@ -1,9 +1,11 @@
-define(['knockout', 'viewmodels/report'], function (ko, ReportViewModel) {
+define(['knockout', 'viewmodels/report', 'widgets/map'], function (ko, ReportViewModel) {
     return ko.components.register('map-report', {
         viewModel: function(params) {
-            params.configKeys = [];
+            params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];
 
             ReportViewModel.apply(this, [params]);
+
+            // this.configObservable = ko.observable()
         },
         template: { require: 'text!report-templates/map' }
     });

@@ -46,6 +46,8 @@ class conceptImportTests(ArchesTestCase):
 		se = SearchEngineFactory().create()
 		se.delete_index(index='concept_labels')
 		se.delete_index(index='term')
+		se.create_index(index='concept_labels')
+		se.create_index(index='term')
 
 
 	def test_hierarchical_relationships(self):
@@ -65,4 +67,4 @@ class conceptImportTests(ArchesTestCase):
 		path_to_files = os.path.join(test_settings.PACKAGE_ROOT, 'fixtures', 'authority_files')
 		authority_files.load_authority_files(path_to_files, break_on_error=True)
 		new_concept_count = len(django_concept_model.objects.all())
-		self.assertEqual(new_concept_count - og_concept_count, 13)
+		self.assertEqual(new_concept_count - og_concept_count, 43)

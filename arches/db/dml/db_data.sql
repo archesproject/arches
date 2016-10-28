@@ -102,8 +102,11 @@ INSERT INTO d_node_types VALUES ('EntityType', 'arches');
 INSERT INTO d_data_types VALUES ('string', 'fa fa-file-code-o', null, null, null, '10000000-0000-0000-0000-000000000001');
 INSERT INTO d_data_types VALUES ('number', 'fa fa-hashtag', null, null, null, '10000000-0000-0000-0000-000000000008');
 INSERT INTO d_data_types VALUES ('date', 'fa fa-calendar', null, null, null, '10000000-0000-0000-0000-000000000004');
-INSERT INTO d_data_types VALUES ('geometry', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
+INSERT INTO d_data_types VALUES ('geojson-feature-collection', 'fa fa-globe', null, null, null, '10000000-0000-0000-0000-000000000007');
 INSERT INTO d_data_types VALUES ('concept', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000002');
+INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', '{"topConcept": null}', 'views/graph/datatypes/concept', 'concept-datatype-config', '10000000-0000-0000-0000-000000000012');
+INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
+INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
 INSERT INTO d_data_types VALUES ('filearray', 'fa fa-file-image-o', null, null, null, '10000000-0000-0000-0000-000000000009');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
@@ -112,8 +115,8 @@ INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
-INSERT INTO functions_x_datatypes VALUES (4, 'filearray', '60000000-0000-0000-0000-000000000000');
-INSERT INTO functions_x_datatypes VALUES (5, 'geometry', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (5, 'geojson-feature-collection', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
 
@@ -151,13 +154,30 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000001', 'text-widget', 'widgets/text', 'string', '{ "placeholder": "Enter text", "width": "100%"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000002', 'select-widget', 'widgets/select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
+    VALUES ('10000000-0000-0000-0000-000000000002', 'concept-select-widget', 'widgets/concept-select', 'concept', '{ "placeholder": "Select an option", "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000012', 'concept-multiselect-widget', 'widgets/concept-multiselect', 'concept-list', '{ "placeholder": "Select an option", "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000015', 'domain-select-widget', 'widgets/domain-select', 'domain-value', '{ "placeholder": "Select an option" }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000016', 'domain-multiselect-widget', 'widgets/domain-multiselect', 'domain-value-list', '{ "placeholder": "Select an option" }');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000003', 'switch-widget', 'widgets/switch', 'boolean', '{ "subtitle": "Click to switch"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date', '{ "placeholder": "Enter date"}');
+    VALUES ('10000000-0000-0000-0000-000000000004', 'datepicker-widget', 'widgets/datepicker', 'date',
+    '{
+        "placeholder": "Enter date",
+        "viewMode": "days",
+        "dateFormat": "YYYY-MM-DD",
+        "minDate": false,
+        "maxDate": false
+    }'
+);
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000005', 'rich-text-widget', 'widgets/rich-text', 'string', '{}');
@@ -166,23 +186,23 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000006', 'radio-boolean-widget', 'widgets/radio-boolean', 'boolean', '{"trueLabel": "Yes", "falseLabel": "No"}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000007', 'geometry-widget', 'widgets/geometry', 'geometry',
+    VALUES ('10000000-0000-0000-0000-000000000007', 'map-widget', 'widgets/map', 'geojson-feature-collection',
     '{
-        "geometrytypes": {"point": true, "line": true, "poly": true},
-        "bounds": "(-122.409693, 37.786236), (-122.394748, 37.798745)",
-        "baseMaps": [{"name":"satellite"},{"name":"streets"},{"name":"mapzen"}],
         "basemap": "streets",
-        "geometryTypes": ["Point","Line","Polygon"],
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
         "geocoder": "MapzenGeocoder",
-        "geolocate": true,
-        "measurements": true,
         "zoom": 10,
-        "maxZoom": 19,
+        "maxZoom": 20,
         "minZoom": 0,
         "centerX": -122.3979693,
         "centerY": 37.79,
         "pitch": 0.0,
-        "bearing": 0.0
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search",
+        "geocoderVisible": true,
+        "resourceColor": null,
+        "resourceLineWidth": null,
+        "resourcePointSize": null
     }'
 );
 
@@ -190,11 +210,20 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000008', 'number-widget', 'widgets/number', 'number', '{ "placeholder": "Enter number", "width": "100%", "min":"", "max":""}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000009', 'file-widget', 'widgets/file', 'filearray', '{"accept": "*","maxfilesize": "*"}');
+    VALUES ('10000000-0000-0000-0000-000000000009', 'concept-radio-widget', 'widgets/concept-radio', 'concept', '{ "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000013', 'concept-checkbox-widget', 'widgets/concept-checkbox', 'concept-list', '{ "options": [] }');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000017', 'domain-radio-widget', 'widgets/domain-radio', 'domain-value', '{}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'widgets/domain-checkbox', 'domain-value-list', '{}');
 
 -- Node graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000000', 'Node', 'Arches', 'v1', 'Represents a single node in a graph', 'f', 't', 'fa fa-circle', 'Represents a single node in a graph.', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype, graphid)
     VALUES ('20000000-0000-0000-0000-100000000000', 'Node', 'Represents a single node in a graph', 't', 'E1_CRM_Entity', 'semantic', '22000000-0000-0000-0000-000000000000');
@@ -204,8 +233,8 @@ INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
 -- End Node graph
 
 -- Node/NodeType graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, ontologyid)
-    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  't', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
+    VALUES ('22000000-0000-0000-0000-000000000001', 'Node/Node Type', 'Arches', 'v1', 'Represents a node and node type pairing', 'f',  't', 'fa fa-angle-double-down','Represents a node and node type pairing', 'e6e8db47-2ccf-11e6-927e-b8f6b115d7dd');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid)
@@ -231,8 +260,8 @@ INSERT INTO cards(cardid, name, description, instructions,
 
 
 -- Arches Configuration graph
-INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive)
-    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't');
+INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass)
+    VALUES ('22000000-0000-0000-0000-000000000002', 'Arches configuration', 'Arches', 'v1', 'Used for storing Arches configuration data', 't',  't', 'fa fa-cogs');
 
 INSERT INTO nodes(nodeid, name, description, istopnode, ontologyclass, datatype,
             graphid, nodegroupid, config)
@@ -3459,10 +3488,27 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
      ', FALSE, 1, '');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000002', 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
+        "basemap": "streets",
+        "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+        "geocoder": "MapzenGeocoder",
+        "zoom": 10,
+        "maxZoom": 20,
+        "minZoom": 0,
+        "centerX": -122.3979693,
+        "centerY": 37.79,
+        "pitch": 0.0,
+        "bearing": 0.0,
+        "geocodePlaceholder": "Search",
+        "geocoderVisible": true,
+        "resourceColor": null,
+        "resourceLineWidth": null,
+        "resourcePointSize": null,
+        "featureEditingDisabled": true
+    }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES (public.uuid_generate_v1mc(), 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');

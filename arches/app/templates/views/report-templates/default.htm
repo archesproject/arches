@@ -13,6 +13,7 @@
             <!-- Tools -->
             <div class="ep-form-toolbar-tools mar-no flex">
                 <p class="report-print-date">Report Date: <span data-bind="text: reportDate"></span></p>
+                <button class="btn btn-primary print-btn mar-rgt" data-bind="click: function() { window.print() }"><i class="fa fa-print"></i> Print</button>
             </div>
         </div>
     </div>
@@ -70,6 +71,7 @@
                                 params: {
                                     config: configJSON,
                                     label: widget.get("label")(),
+                                    node: widget.node,
                                     value: tile.data[widget.node.nodeid],
                                     state: "report"
                                 }

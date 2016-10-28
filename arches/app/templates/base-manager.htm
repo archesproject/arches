@@ -23,21 +23,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
 
     <div class="wrapper">
-        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'aside-in': tabsActive() && showTabs()}">
+        <div id="container" class="effect mainnav-sm aside-left aside-bright navbar-fixed" data-bind="css: {'mainnav-in': tabsActive() && showTabs()}">
 
-            <header id="navbar" style="z-index: 1000; opacity: .9;">
-                {% block header %}
-                <div id="navbar-container" class="boxed">
+            <header id="navbar">
+
+                <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
                         <a href="{% url 'home' %}" class="navbar-brand">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon" style="height: 20px; width: 20px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
+                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
                             <div class="brand-title">
                                 <span class="brand-text">Arches</span>
                             </div>
                         </a>
                     </div>
+                </div>
 
-                    <div class="navbar-content clearfix">
+            </header>
+
+
+            <div class="boxed">
+                <div id="content-container" style="padding-bottom: 20px; padding-top: 0px;">
+                    {% block login_header %}
+                    <div class="navbar-content arches-navbar clearfix" style="padding-right: 0px; z-index: 1000;">
                         <ul class="nav navbar-top-links pull-left">
                             <li class="tgl-menu-btn hidden-sm hidden-md hidden-lg">
                                 <a class="mainnav-toggle" href="#">
@@ -49,8 +56,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <i id="toggle-aside-icon" class="fa fa-lg" data-bind="css: { 'fa-toggle-on': tabsActive(), 'fa-toggle-off': !tabsActive() }, click: function () { tabsActive(!tabsActive()) }"></i>
                                 </a>
                             </li>
-
-
                         </ul>
                         <ul class="nav navbar-top-links pull-right">
                             <li class="dropdown">
@@ -103,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="text-right">
                                 <span class="pull-right">
-                                    <img class="img-circle img-user media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
+                                    <img class="img-circle img-user arches-user-img media-object" src="{{ STATIC_URL }}img/icons/people/av1.png" alt="Profile Picture">
                                 </span>
                                 <div class="username hidden-xs">
                                 {% if user.username == 'anonymous' %}{% trans "Login" %}{% else %}{% trans "Welcome" %} {{ user.username }} - {% trans "Logout" %}{% endif %}
@@ -160,14 +165,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         </ul>
                     </div>
-                </div>
-                {% endblock header %}
-            </header>
-            <div class="boxed">
+                    {% endblock login_header %}
 
-                <div id="content-container" style="padding-bottom: 20px;">
-                    {% block content %}
-                    {% endblock content %}
+                    {% block header %}
+                    {% endblock header %}
+
+                    {% block main_content %}
+                    {% endblock main_content %}
                 </div>
 
                 <nav id="mainnav-container">
@@ -192,8 +196,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li>
-                                            <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '/resource') ">
+                                        <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '/resource') ">
                                                 <i class="fa fa-building-o"></i>
                                                 <span class="menu-title">
                                                     <strong>Add New Resource</strong>
@@ -203,7 +207,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 <!-- ko foreach: allGraphs -->
                                                 <!-- ko if: isresource -->
                                                 <li class="link-submenu-item">
-                                                    <a class="link-submenu" data-bind="attr: { href: '/graph/' + graphid + '/add_resource'}">
+                                                    <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/add_resource') ">
                                                         <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
                                                 </li>
                                                 <!-- /ko -->
@@ -212,24 +216,56 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        <li>
-                                            <a href="{% url 'config' %}">
+                                        <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
+                                                <i class="fa fa-bookmark"></i>
+                                                <span class="menu-title">
+                                                    <strong>{% trans "Arches Designer" %}</strong>
+                                                </span>
+                                            </a>
+                                            <ul class="collapse" aria-expanded="false">
+                                                <li class="">
+                                                    <a class="branch-item"  href="#" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}<i class="arrow"></i></a>
+
+                                                    <!--Submenu-->
+                                                    <ul class="collapse pop-in in pad-btm" aria-expanded="false">
+                                                        <!-- ko foreach: allGraphs -->
+                                                            <!-- ko if: isresource -->
+                                                            <li class="link-submenu-item">
+                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                            </li>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    </ul>
+                                                </li>
+                                                <li class="">
+                                                    <a class="branch-item" href="#" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}<i class="arrow"></i></a>
+
+                                                    <!--Submenu-->
+                                                    <ul class="collapse pop-in in pad-btm">
+                                                        <!-- ko foreach: allGraphs -->
+                                                            <!-- ko if: !isresource -->
+                                                            <li class="link-submenu-item">
+                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
+                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
+                                                            </li>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+
+
+                                        <!--Menu list item-->
+                                        <li{% if main_script == "config-manager" %} class="active-sub"{% endif %}>
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
                                                 <i class="ti-alarm-clock"></i>
                                                 <span class="menu-title">
                                                     <strong>System Settings</strong>
                                                 </span>
                                             </a>
-                                        </li>
-
-                                        <!--Menu list item-->
-                                        <li{% if main_script == "graph-list" %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'graph' '' %}">
-                                                <i class="fa fa-bookmark"></i>
-                                                <span class="menu-title">
-                                                    <strong>Resource Designer</strong>
-                                                </span>
-                                            </a>
-
                                         </li>
 
                                         <!--Menu list item-->
@@ -279,7 +315,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!--Menu list item-->
                                         <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
-                                            <a href="{% url 'rdm' '' %}">
+                                            <a href="#" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                                                 <i class="fa fa-align-left"></i>
                                                 <span class="menu-title">
                                                     RDM
@@ -303,12 +339,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </aside>
             </div>
-            <footer id="footer">
-                {% block footer %}
-                    <div class="hide-fixed pull-right pad-rgt">Arches v4.0.0</div>
-                    <p class="pad-lft">&#0169; Getty, WMF, Farallon Geographics</p>
-                {% endblock footer %}
-            </footer>
+
             <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
         </div>
 
@@ -328,4 +359,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% endautoescape %}
     </script>
 {% endblock pre_require_js %}
-

@@ -34,6 +34,7 @@ from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
+from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
@@ -46,6 +47,7 @@ class GraphBaseView(BaseManagerView):
             context['graphid'] = self.graph.graphid
             context['graph'] = JSONSerializer().serializeToPython(self.graph)
             context['graph_json'] = JSONSerializer().serialize(self.graph)
+            context['root_node'] = self.graph.node_set.get(istopnode=True)
         except:
             pass
         return context
@@ -87,7 +89,7 @@ class GraphSettingsView(GraphBaseView):
         data = JSONDeserializer().deserialize(request.body)
         for key, value in data.get('graph').iteritems():
             if key in ['iconclass', 'name', 'author', 'description', 'isresource',
-                'ontology_id', 'version',  'subtitle', 'isactive']:
+                'ontology_id', 'version',  'subtitle', 'isactive', 'mapfeaturecolor', 'mappointsize', 'maplinewidth']:
                 setattr(graph, key, value)
 
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
@@ -111,8 +113,10 @@ class GraphSettingsView(GraphBaseView):
 class GraphManagerView(GraphBaseView):
     def get(self, request, graphid):
         if graphid is None or graphid == '':
+            root_nodes = models.Node.objects.filter(istopnode=True)
             context = self.get_context_data(
                 main_script='views/graph',
+                root_nodes=JSONSerializer().serialize(root_nodes),
             )
             return render(request, 'views/graph.htm', context)
 
@@ -121,6 +125,11 @@ class GraphManagerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True).exclude(isactive=False)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+        lang = request.GET.get('lang', app_settings.LANGUAGE_CODE)
+        top_concepts = Concept().concept_tree(top_concept = '00000000-0000-0000-0000-000000000003', lang=lang)
+        for concept in top_concepts:
+            if concept.label == 'Dropdown Lists':
+                concept_collections = concept.children
 
         context = self.get_context_data(
             main_script='views/graph/graph-manager',
@@ -128,6 +137,7 @@ class GraphManagerView(GraphBaseView):
             branches=JSONSerializer().serialize(branch_graphs),
             datatypes_json=JSONSerializer().serialize(datatypes),
             datatypes=datatypes,
+            concept_collections=concept_collections,
             node_list={
                 'title': _('Node List'),
                 'search_placeholder': _('Find a node...')
@@ -181,10 +191,9 @@ class GraphDataView(View):
         if self.action == 'import_graph':
             graph_file = request.FILES.get('importedGraph').read()
             graphs = JSONDeserializer().deserialize(graph_file)['graph']
+            GraphImporter.import_graph(graphs)
             for graph in graphs:
-                new_graph = Graph(graph)
-                new_graph.save()
-                ret = new_graph
+                ret = graph
         else:
             if graphid is not None:
                 graph = Graph.objects.get(graphid=graphid)
@@ -192,7 +201,7 @@ class GraphDataView(View):
 
             if self.action == 'new_graph':
                 isresource = data['isresource'] if 'isresource' in data else False
-                name = _('New Resource') if isresource else _('New Graph')
+                name = _('New Resource Model') if isresource else _('New Branch')
                 author = request.user.first_name + ' ' + request.user.last_name
                 ret = Graph.new(name=name,is_resource=isresource,author=author)
 
@@ -374,11 +383,21 @@ class DatatypeTemplateView(TemplateView):
 class ReportManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
+        forms = models.Form.objects.filter(graph=self.graph, status=True)
+        forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
+        cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=self.graph)
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-manager',
             reports=JSONSerializer().serialize(self.graph.report_set.all()),
             templates_json=JSONSerializer().serialize(models.ReportTemplate.objects.all()),
+            forms=JSONSerializer().serialize(forms),
+            forms_x_cards=JSONSerializer().serialize(forms_x_cards),
+            cards=JSONSerializer().serialize(cards),
+            datatypes_json=JSONSerializer().serialize(datatypes),
+            widgets=widgets,
          )
 
         return render(request, 'views/graph/report-manager.htm', context)
@@ -402,6 +421,8 @@ class ReportEditorView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
 
         context = self.get_context_data(
             main_script='views/graph/report-editor',
@@ -415,6 +436,8 @@ class ReportEditorView(GraphBaseView):
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
             graph_id=self.graph.pk,
+            map_layers=map_layers,
+            map_sources=map_sources,
          )
 
         return render(request, 'views/graph/report-editor.htm', context)

@@ -19,18 +19,11 @@ define([
         */
         initialize: function(options) {
             this.items = options.forms
+            this.items.sort(function (w, ww) {
+                return w.sortorder > ww.sortorder;
+            });
             ListView.prototype.initialize.apply(this, arguments);
-        },
-
-        /**
-        * Selects the passed in node
-        * @memberof FormList.prototype
-        * @param {object} item - the node to be selected via {@link GraphModel#selectNode}
-        * @param {object} evt - click event object
-        */
-        selectItem: function(item, evt){
-            this.trigger('select', item);
-        },
+        }
 
     });
     return FormList;

@@ -24,6 +24,7 @@ from django.views.generic import TemplateView
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
+from arches.app.models.graph import Graph
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -52,7 +53,7 @@ class ResourceListView(BaseManagerView):
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceEditorView(TemplateView):
+class ResourceEditorView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         if graphid is not None:
             # self.graph = Graph.objects.get(graphid=graphid)
@@ -60,9 +61,12 @@ class ResourceEditorView(TemplateView):
             return redirect('resource_editor', resourceid=resource_instance.pk)
         if resourceid is not None:
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            graph = Graph.objects.get(graphid=resource_instance.graph.pk)
             form = Form(resource_instance.pk)
             datatypes = models.DDataType.objects.all()
             widgets = models.Widget.objects.all()
+            map_layers = models.MapLayers.objects.all()
+            map_sources = models.MapSources.objects.all()
             context = self.get_context_data(
                 main_script='views/resource/editor',
                 resource_type=resource_instance.graph.name,
@@ -71,8 +75,11 @@ class ResourceEditorView(TemplateView):
                 forms=JSONSerializer().serialize(resource_instance.graph.form_set.all()),
                 datatypes_json=JSONSerializer().serialize(datatypes),
                 widgets=widgets,
+                map_layers=map_layers,
+                map_sources=map_sources,
                 widgets_json=JSONSerializer().serialize(widgets),
-                resourceid=resourceid
+                resourceid=resourceid,
+                graph_json=JSONSerializer().serialize(graph),
             )
             return render(request, 'views/resource/editor.htm', context)
 
@@ -98,15 +105,17 @@ class ResourceReportView(BaseManagerView):
            report = models.Report.objects.get(graph=resource_instance.graph, active=True)
         except models.Report.DoesNotExist:
            report = None
+        graph = Graph.objects.get(graphid=resource_instance.graph.pk)
         forms = resource_instance.graph.form_set.filter(status=True)
         forms_x_cards = models.FormXCard.objects.filter(form__in=forms).order_by('sortorder')
         cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
+        map_layers = models.MapLayers.objects.all()
+        map_sources = models.MapSources.objects.all()
         templates = models.ReportTemplate.objects.all()
-
         context = self.get_context_data(
-            main_script='resource-report',
+            main_script='views/resource/report',
             report=JSONSerializer().serialize(report),
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates),
@@ -116,8 +125,11 @@ class ResourceReportView(BaseManagerView):
             cards=JSONSerializer().serialize(cards),
             datatypes_json=JSONSerializer().serialize(datatypes),
             widgets=widgets,
+            map_layers = map_layers,
+            map_sources = map_sources,
             graph_id=resource_instance.graph.pk,
-            graph_name=resource_instance.graph.name
+            graph_name=resource_instance.graph.name,
+            graph_json = JSONSerializer().serialize(graph)
          )
 
-        return render(request, 'resource-report.htm', context)
+        return render(request, 'views/resource/report.htm', context)

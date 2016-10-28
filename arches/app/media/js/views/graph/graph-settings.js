@@ -4,7 +4,8 @@ require([
     'knockout',
     'knockout-mapping',
     'views/graph/graph-page-view',
-    'graph-settings-data'
+    'graph-settings-data',
+    'bindings/color-picker'
 ], function($, _, ko, koMapping, PageView, data) {
     /**
     * prep data for models
@@ -49,7 +50,7 @@ require([
             });
         }),
         graph: graph,
-        resources: data.resources,
+        relatable_resources: data.resources,
         ontologies: data.ontologies,
         ontologyClass: ontologyClass,
         ontologyClasses: ko.computed(function () {

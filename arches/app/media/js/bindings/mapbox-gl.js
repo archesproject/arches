@@ -4,10 +4,9 @@ define([
     'knockout',
     'mapbox-gl',
     'arches',
-    'map/mapbox-style',
     'bindings/nouislider',
     'bindings/sortable'
-], function($, _, ko, mapboxgl, arches, mapStyle) {
+], function($, _, ko, mapboxgl, arches) {
     ko.bindingHandlers.mapboxgl = {
         init: function(element, valueAccessor, allBindings, viewModel) {
             var defaults = {

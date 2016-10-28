@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
@@ -24,43 +24,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% trans "Resource Manager" %}
 {% endblock title %}
 
-{% block body %}
-<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+{% block login_header %}{% endblock login_header %}
 
-    <!-- Page Header -->
-    <div class="ep-toolbar">
+<!-- Page Header -->
+{% block header %}
+<div class="ep-toolbar">
 
-        <!-- Tools Menu -->
-        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-            <div class="">{% trans "Manage" %}
-                <i class="ion-more"></i>
-            </div>
-        </a>
-
-        <!-- Title Bar -->
-        <div class="ep-tools-title">
-            <h1 class="page-header text-overflow ep-graph-title">
-                <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-                <span>
-                    {{resource_type}}
-                </span>
-            </h1>
+    <!-- Tools Menu -->
+    <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+        <div class="">{% trans "Manage" %}
+            <i class="ion-more"></i>
         </div>
+    </a>
 
-        <!-- Search Bar -->
-        <a href="" class="ep-tools ep-tools-right">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
-              <i class="ion-search"></i>
-            </div>
-        </a>
-
-        <!-- Help Bar -->
-        <a href="" class="ep-tools ep-tools-right">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
-              <i class="ion-information-circled"></i>
-            </div>
-        </a>
+    <!-- Title Bar -->
+    <div class="ep-tools-title">
+        <h1 class="page-header text-overflow ep-graph-title">
+            <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+            <span>
+                {{resource_type}}
+            </span>
+        </h1>
     </div>
+
+    <!-- Search Bar -->
+    <a href="" class="ep-tools ep-tools-right">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+          <i class="ion-search"></i>
+        </div>
+    </a>
+
+    <!-- Help Bar -->
+    <a href="" class="ep-tools ep-tools-right">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+          <i class="ion-information-circled"></i>
+        </div>
+    </a>
+</div>
+{% endblock header %}
+
+
+{% block main_content %}
+
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
 
     <!-- Menu -->
     <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
@@ -68,8 +74,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Menu List -->
             <div class="panel-body">
-                <ul class="list-group ep-menu-list">
-                    
+                <ul class="list-group ep-menu-list editor-tools">
+
                     <!-- Menu Item -->
                     <li id="settings-manager" class="edit-menu-item">
                         <a href="" target="" class="">
@@ -102,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Menu Item -->
                     <li id="report-manager" class="edit-menu-item">
-                        <a href="" target="" class="">
+                        <a href="#" data-bind="click: function () {window.open('{% url 'resource_report' resourceid %}')}">
                             <div class="media-body">
                                 <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
@@ -110,18 +116,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                     </li>
 
-                    <!-- Menu Item -->
-                    <li class="edit-menu-item">
-                        <a id="" href="" target="" class="">
-                            <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-mail-reply"></i> {% trans "Return to Resource Manager" %}</div>
-                                <span class="text-muted menu-item-subtitle">{% trans "Create a new Arches resource" %} </span>
-                            </div>
-                        </a>
-                    </li>
                 </ul>
             </div>
-            
+
         </div>
     </div>
 
@@ -162,7 +159,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
             {% block graph_header_buttons %}
-            <button class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="click:function () { navigate('{% url 'resource' %}') }">{% trans "Exit" %}</button>
             {% endblock graph_header_buttons %}
         </div>
     </div>
@@ -198,4 +194,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 </div>
-{% endblock body %}
+{% endblock main_content %}

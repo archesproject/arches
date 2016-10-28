@@ -2,11 +2,30 @@
 {% load i18n %}
 
 {% block header %}
-<div class="rp-report-header relative">
-    <!-- Map here... -->
+<div>
+  <!-- ko component: {
+      name: 'map-widget',
+      params: {
+          config: report.configJSON,
+          node: null,
+          value: report.get('tiles'),
+          type: 'report-header',
+          graph: report.graph
+      }
+  } --><!-- /ko -->
 </div>
 {% endblock header %}
 
 {% block header_form %}
-<!-- config form here... -->
+<!-- ko component: {
+    name: 'map-widget',
+    params: {
+        config: report.configJSON,
+        node: null,
+        value: null,
+        configForm: true,
+        type: "report-header",
+        graph: report.graph
+    }
+} --><!-- /ko -->
 {% endblock header_form %}
