@@ -54,6 +54,7 @@ class Graph(models.GraphModel):
         self.nodes = {}
         self.edges = {}
         self.cards = {}
+        self.widgets = {}
         self._nodegroups_to_delete = []
 
         if args:
@@ -229,6 +230,11 @@ class Graph(models.GraphModel):
             card.pk = uuid.uuid1()
 
         self.cards[card.pk] = card
+
+        widgets = list(card.cardxnodexwidget_set.all())
+        for widget in widgets:
+            self.widgets[widget.pk] = widget
+
         return card
 
     def save(self):
@@ -255,6 +261,9 @@ class Graph(models.GraphModel):
             for card in self.cards.itervalues():
                 card.save()
 
+            for widget in self.widgets.itervalues():
+                widget.save()
+
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
@@ -274,6 +283,9 @@ class Graph(models.GraphModel):
 
             for card in self.cards.itervalues():
                 card.delete()
+
+            for widget in self.widgets.itervalues():
+                widget.delete()
 
             super(Graph, self).delete()
 
@@ -367,6 +379,8 @@ class Graph(models.GraphModel):
                 self.add_card(card)
             for edge in branch_copy.edges.itervalues():
                 self.add_edge(edge)
+            for widget in branch_copy.widgets.itervalues():
+                self.widgets[widget.pk] = widget
 
             self.populate_null_nodegroups()
 
@@ -402,6 +416,8 @@ class Graph(models.GraphModel):
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
         copy_of_self.pk = uuid.uuid1()
+        node_map = {}
+        card_map = {}
         for node_id in node_ids:
             node = copy_of_self.nodes[node_id]
             if node == self.root:
@@ -409,16 +425,24 @@ class Graph(models.GraphModel):
             node.graph = copy_of_self
             is_collector = node.is_collector
             node.pk = uuid.uuid1()
+            node_map[node_id] = node.pk
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk)
                 for card in copy_of_self.cards.itervalues():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
-                        card.pk = uuid.uuid1()
+                        new_id = uuid.uuid1()
+                        card_map[card.pk] = new_id
+                        card.pk = new_id
                         card.nodegroup = node.nodegroup
                         card.graph = copy_of_self
             else:
                 node.nodegroup = None
+
+        for widget in copy_of_self.widgets.itervalues():
+            widget.pk = uuid.uuid1()
+            widget.node_id = node_map[widget.node_id]
+            widget.card_id = card_map[widget.card_id]
 
         copy_of_self.populate_null_nodegroups()
 

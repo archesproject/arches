@@ -57,7 +57,8 @@ define([
                 'maxZoom',
                 'resourceColor',
                 'resourcePointSize',
-                'resourceLineWidth'
+                'resourceLineWidth',
+                'featureEditingDisabled'
             ];
 
             WidgetViewModel.apply(this, [params]);
@@ -71,22 +72,25 @@ define([
                 if (this.resourcePointSize() === null) {
                     this.resourcePointSize(params.graph.get('mappointsize'));
                 } else {
-                  this.resourcePointSize(Number(this.resourcePointSize()))
+                    this.resourcePointSize(Number(this.resourcePointSize()))
                 }
                 if (this.resourceLineWidth() === null) {
                     this.resourceLineWidth(params.graph.get('maplinewidth'));
                 } else {
-                  this.resourceLineWidth(Number(this.resourceLineWidth()))
+                    this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
 
             this.selectedBasemap = this.basemap;
-
+            this.drawMode = ko.observable();
+            this.selectedFeatureType = ko.observable();
             this.mapToolsExpanded = ko.observable(false);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
+
+            this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
             this.layers = _.clone(arches.mapLayers);
 
             this.geocoderOptions = ko.observableArray([{
@@ -171,8 +175,10 @@ define([
             }
 
             this.addInitialLayers = function() {
-                this.layers.push(this.defineResourceLayer());
                 var initialLayers = [];
+                if (this.reportHeader) {
+                  this.layers.unshift(this.defineResourceLayer());
+                }
                 var overlayLayers = _.sortBy(_.where(this.layers, {
                     isoverlay: true
                 }), 'sortorder').reverse();
@@ -216,7 +222,16 @@ define([
                 minimumInputLength: 0,
                 multiple: true,
                 placeholder: "Available Geometry Types",
-                data: [{text:'Point', id:'Point'}, {text:'Line', id:'Line'}, {text:'Polygon', id:'Polygon'}]
+                data: [{
+                    text: 'Point',
+                    id: 'Point'
+                }, {
+                    text: 'Line',
+                    id: 'Line'
+                }, {
+                    text: 'Polygon',
+                    id: 'Polygon'
+                }]
             };
 
             this.setupMap = function(map) {
@@ -362,12 +377,11 @@ define([
 
                 this.map = map;
                 this.draw = draw;
-                this.drawMode;
                 this.map.addControl(draw);
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
-                    map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
+                    map.addLayer(cacheLayer, this.anchorLayerId);
                 }
 
                 this.map.on('load', function() {
@@ -388,15 +402,22 @@ define([
                                 }, self);
                             }, self)
                             data = result;
+                            source.setData(data)
+                            _.each(['resource-poly', 'resource-line', 'resource-point'], function(layerId) { //clear and add resource layers so that they are on top of map
+                                    var cacheLayer = self.map.getLayer(layerId);
+                                    self.map.removeLayer(layerId);
+                                    self.map.addLayer(cacheLayer, self.anchorLayerId)
+                                }, self)
+
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
+                            self.loadGeometriesIntoDrawLayer()
                         } else { //if values are for a form widget...
                             if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
                                 data = koMapping.toJS(self.value);
                             }
                         };
                         if (data) {
-                            source.setData(data)
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
                             var tr = this.transform;
                             var nw = tr.project(bounds.getNorthWest());
@@ -413,6 +434,10 @@ define([
                         }
                     }
                 });
+
+                this.loadGeometriesIntoDrawLayer = function() {
+                    this.draw.add(koMapping.toJS(self.value));
+                };
 
                 this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
                     var val = isNumber ? Number(val) : val; //point size and line width must be number types
@@ -461,17 +486,17 @@ define([
 
                     if (self.geometryTypeDetails[val] === undefined) { //it has no geom type, so must be trash
                         self.draw.trash();
-                        self.drawMode = null;
+                        self.drawMode(null);
                     } else {
-                        if (!self.drawMode) {
+                        if (!self.drawMode()) {
                             self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode = self.geometryTypeDetails[val].drawMode;
-                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode) {
+                            self.drawMode(self.geometryTypeDetails[val].drawMode);
+                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
-                            self.drawMode = undefined;
+                            self.drawMode(undefined);
                         } else {
                             self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode = self.geometryTypeDetails[val].drawMode;
+                            self.drawMode(self.geometryTypeDetails[val].drawMode);
                         }
                     }
 
@@ -583,6 +608,9 @@ define([
                     return function() {
                         var currentDrawing = self.draw.getAll()
                         if (self.value.features !== undefined) {
+                            _.each(self.value.features(), function(feature) {
+                                self.value.features.pop()
+                            });
                             currentDrawing.features.forEach(function(feature) {
                                 self.value.features.push(feature)
                             })
@@ -594,30 +622,41 @@ define([
 
                 this.updateDrawMode = function(e) {
                     var self = this;
-                    return function() {
-                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode) && self.drawMode !== self.draw.getMode()) {
-                            self.draw.changeMode(self.drawMode)
+                    return function(e) {
+                        var selectedFeatureType;
+                        if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
+                            self.draw.changeMode(self.drawMode())
+                        } else {
+                            self.drawMode(self.draw.getMode());
+                            if (self.draw.getSelectedIds().length > 0) {
+                                selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                            } else {
+                                if (self.draw.getMode().endsWith("select")) {
+                                    self.drawMode(undefined);
+                                };
+                            }
                         }
                     }
                 }
 
                 this.map.on('moveend', this.updateConfigs());
                 this.map.on('draw.create', this.saveGeometries())
+                this.map.on('draw.update', this.saveGeometries())
                 this.map.on('draw.delete', this.saveGeometries())
                 this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
-                    var anchorLayer = 'gl-draw-active-line.hot';
-                    for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array without creating a copy
+                    for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
                         overlays[i].layer_definitions.forEach(function(layer) {
                             map.removeLayer(layer.id)
                         })
                     }
                     for (var i = overlays.length; i-- > 0;) {
                         overlays[i].layer_definitions.forEach(function(layer) {
-                            map.addLayer(layer, anchorLayer);
+                            map.addLayer(layer, this.anchorLayerId);
                             map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity() / 100.0);
-                        })
+                        }, this)
                     }
                     this.redrawGeocodeLayer();
                 }, this)

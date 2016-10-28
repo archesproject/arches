@@ -40,11 +40,7 @@ define([
                     var datatypeRecord = self.datatypelookup[value];
                     if (datatypeRecord) {
                         var defaultConfig = datatypeRecord.defaultconfig;
-                        self.configKeys.removeAll();
-                        _.each(defaultConfig, function(configVal, configKey) {
-                            self.config[configKey] = ko.observable(configVal);
-                            self.configKeys.push(configKey);
-                        });
+                        self.setupConfig(defaultConfig);
                     }
                     datatype(value);
                 },
@@ -181,17 +177,24 @@ define([
             });
 
             if (source.config) {
-                self.configKeys.removeAll();
-                _.each(source.config, function(configVal, configKey) {
-                    self.config[configKey] = (Array.isArray(configVal) ? ko.observableArray(configVal): ko.observable(configVal));
-                    self.configKeys.push(configKey);
-                });
+                self.setupConfig(source.config);
             }
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
 
             self.set('id', self.nodeid);
+        },
+
+        setupConfig: function (config) {
+            var self = this;
+            self.configKeys.removeAll();
+            _.each(config, function(configVal, configKey) {
+                self.config[configKey] = Array.isArray(configVal) ?
+                    ko.observableArray(configVal):
+                    ko.observable(configVal);
+                self.configKeys.push(configKey);
+            });
         },
 
         /**

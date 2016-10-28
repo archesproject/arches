@@ -60,10 +60,10 @@ REMOTE_BROWSERS = [
      "version": "11"},
     {"platform": "Mac OS X 10.9",
      "browserName": "chrome",
-     "version": "44"},
+     "version": "53"},
     {"platform": "Linux",
      "browserName": "firefox",
-     "version": "43"}
+     "version": "45"}
 ]
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps

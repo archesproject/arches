@@ -22,26 +22,61 @@ import json
 from os.path import isfile, join
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.conf import settings
-from arches.app.utils.data_management.resource_graphs.exporter import write_graph as resourceGraphExporter
+from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export as resourceGraphExporter
+from arches.app.utils.data_management.concepts.exporter import get_reference_data_for_export as referenceDataExporter
+from arches.app.utils.data_management.resources.exporter import ResourceExporter as resourceDataExporter
 
 class ArchesFileExporter(object):
 
 	def __init__(self, file=None):
 		pass
 
-	def export_graphs(self, data_dir, resource_list):
+	def export_graphs(self, data_dir, graphids):
 		"""
 		Wrapper around arches.app.utils.data_management.resource_graphs.exporter method
 		"""
-		resourceGraphExporter(data_dir, resource_list)
+		graph_data = resourceGraphExporter(graphids)
+		self.write_to_file(graph_data, data_dir)
 
-	def export_concepts(self):
-		pass
+	def export_concepts(self, data_dir, conceptids):
+		"""
+		Wrapper around arches.app.utils.data_management.concepts.exporter method
+		"""
+		reference_data = referenceDataExporter(conceptids)
+		self.write_to_file(reference_data, data_dir)
 
 	def export_business_data(self):
+		# resource_exporter = ResourceExporter('json')
+        # resourece_data = resource_exporter.export(resources=resources)
+		# self.write_to_file(resource_data, data_dir)
 		pass
 
-	def export_all(self):
-		pass
+	def export_all(self, data_dir, graphids, resourceids, conceptids):
+		"""
+		Creates arches json export of resource graphs, concepts, and business data.
+		"""
+		data = {}
+		data['graph'] = []
+		data['reference_data'] = []
+		data['business_data'] = []
+
+		if graphids != False:
+			graphs_for_export = resourceGraphExporter(graphids)['graph']
+			data['graph'] = graphs_for_export
+
+		if conceptids != False:
+			reference_data_for_export = referenceDataExporter(conceptids)['reference_data']
+			data['reference_data'] = reference_data_for_export
+
+		if resourceids != False:
+			resource_data_for_export = resourceDataExporter(resourceids)['business_data']
+			data['business_data'] = resource_data_for_export
+
+		self.write_to_file(data, data_dir)
+
+	def write_to_file(self, data, data_dir):
+		with open(os.path.join(data_dir), 'w') as export_json:
+			export_json.write(JSONSerializer().serialize(data))
+
 
 # ArchesFile(path).import_graph

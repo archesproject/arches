@@ -28,6 +28,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Match, Query
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.utils.translation import ugettext as _
+from django.db import IntegrityError
 import logging
 
 
@@ -855,7 +856,17 @@ class ConceptValue(object):
                 value.language_id = self.language # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
-            value.save()
+            try:
+                value.save()
+            except IntegrityError as e:
+                valuetype = models.DValueType()
+                valuetype.valuetype = value.valuetype_id
+                valuetype.category = 'undefined'
+                valuetype.namespace = 'arches'
+                valuetype.save()
+
+                value.save()
+
             self.category = value.valuetype.category
 
     def delete(self):
