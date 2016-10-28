@@ -38,8 +38,9 @@ require([
             function: func,
             function_id: func.functionid,
             config: func.defaultconfig
-        })
+        });
         viewModel.appliedFunctionList.items.push(newAppliedFunction);
+        viewModel.appliedFunctionList.selectItem(newAppliedFunction);
     });
 
 
