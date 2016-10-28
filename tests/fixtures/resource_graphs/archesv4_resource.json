@@ -5897,7 +5897,7 @@
           "ontologyclass": "E62_String",
           "nodeid": "3dbf24ea-be9d-43ab-97b5-848068807990",
           "nodegroup_id": null,
-          "datatype": "file",
+          "datatype": "filearray",
           "cardinality": ""
         },
         {
@@ -5909,7 +5909,7 @@
           "ontologyclass": "E62_String",
           "nodeid": "c591f44c-4f55-492d-a609-7f6d09fd0ead",
           "nodegroup_id": null,
-          "datatype": "file",
+          "datatype": "filearray",
           "cardinality": ""
         },
         {
