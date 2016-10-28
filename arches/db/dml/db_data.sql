@@ -2268,50 +2268,58 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         }]', TRUE, 2, 'fa fa-flag');
 
 INSERT INTO map_sources(name, source)
-  VALUES ('golden-gate-park', '{
-              "type": "geojson",
-              "data":
-              {
-                "type": "FeatureCollection",
-                "features": [
-                  {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            -122.51060485839844,
-                            37.77125750792944
-                          ],
-                          [
-                            -122.47163772583008,
-                            37.77288579232439
-                          ],
-                          [
-                            -122.45412826538086,
-                            37.77505678240509
-                          ],
-                          [
-                            -122.45292663574217,
-                            37.766643840752764
-                          ],
-                          [
-                            -122.51043319702148,
-                            37.76365837331252
-                          ],
-                          [
-                            -122.51060485839844,
-                            37.77125750792944
-                          ]
-                        ]
-                      ]
-                    }
-                  }
+  VALUES ('sf-national-cemetery',
+    '{
+        "type": "geojson",
+        "data":
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -118.828125,
+                  37.996162679728116
                 ]
               }
-              }');
+            },
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ],
+                    [
+                      -122.4621319770813,
+                      37.800459411713945
+                    ],
+                    [
+                      -122.46494293212889,
+                      37.79742444343689
+                    ],
+                    [
+                      -122.46711015701293,
+                      37.79861131738665
+                    ],
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+    }');
 
 INSERT INTO map_sources(name, source)
   VALUES ('stamen-terrain', '{
@@ -2331,16 +2339,16 @@ INSERT INTO map_sources(name, source)
 
 
 INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('golden-gate-park', '[{
-        "id":"golden-gate-park",
-        "source":"golden-gate-park",
+    VALUES ('sf-national-cemetery', '[{
+        "id":"sf-national-cemetery",
+        "source":"sf-national-cemetery",
         "type":"fill",
         "layout": {},
         "paint": {
             "fill-color": "#088",
             "fill-opacity": 0.8
         }
-      }]', TRUE, 3, 'ion-leaf');
+      }]', TRUE, 3, 'ion-ios-flag');
 
 INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
     VALUES ('stamen-terrain', '[{
@@ -3506,7 +3514,8 @@ INSERT INTO report_templates(templateid, name, description, component, component
         "geocoderVisible": true,
         "resourceColor": null,
         "resourceLineWidth": null,
-        "resourcePointSize": null
+        "resourcePointSize": null,
+        "featureEditingDisabled": true
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)

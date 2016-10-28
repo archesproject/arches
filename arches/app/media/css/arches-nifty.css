@@ -4314,6 +4314,14 @@ div.row.widget-wrapper.report-header:hover {
     visibility: hidden;
 }
 
+.geometry-editing-notifications {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    width: 40%;
+}
+
 .geocode-container.hide-geocoder {
   visibility: visible;
 }
@@ -4376,7 +4384,7 @@ div.row.widget-wrapper.report-header:hover {
     color: #fff;
 }
 
-.map-widget-tool {
+/*.map-widget-tool {
     padding-top: 5px;
     font-size: 17px;
     height: 50px;
@@ -4385,7 +4393,7 @@ div.row.widget-wrapper.report-header:hover {
     vertical-align: middle;
     display: table-cell;
     border-right: 1px solid rgba(0, 0, 0, 1);
-}
+}*/
 
 .map-widget-icon {
     color: rgba(255, 255, 255, 1);
@@ -4394,6 +4402,51 @@ div.row.widget-wrapper.report-header:hover {
 
 .map-widget-overlay-item.map-draw-tools-active {
   background-color: #f3f3f3;
+}
+
+.map-widget-toolbar-list {
+    list-style: none;
+    padding-left: 0px;
+    display: inline-block;
+    width: 250px;
+}
+
+.map-widget-toolbar-item {
+   padding-top: 5px;
+   font-size: 17px;
+   height: 50px;
+   width: 50px;
+   color: #fff;
+   vertical-align: middle;
+   text-align: center;
+   display: table-cell;
+   border-right: 1px solid rgba(0, 0, 0, 1);
+}
+
+.map-widget-toolbar-item:hover{
+    background: steelblue;
+    cursor: pointer;
+}
+
+.map-widget-toolbar-item.active{
+    background: steelblue;
+}
+
+.map-widget-icon {
+    color: #fff;
+}
+a.map-widget-icon:hover {
+    color: #fff;
+}
+
+
+
+
+
+
+
+.basemap-icon-unselected {
+  color: #ddd;
 }
 
 .map-widget-overlay-item {
