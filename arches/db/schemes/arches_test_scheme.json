@@ -1,0 +1,868 @@
+{
+    "business_data": [],
+    "graph": [],
+    "reference_data": [
+        {
+            "nodetype": "ConceptScheme",
+            "legacyoid": "ARCHES",
+            "relatedconcepts": [],
+            "id": "00000000-0000-0000-0000-000000000001",
+            "parentconcepts": [],
+            "values": [
+                {
+                    "category": "label",
+                    "conceptid": "00000000-0000-0000-0000-000000000001",
+                    "language": "en-US",
+                    "value": "Arches",
+                    "type": "prefLabel",
+                    "id": "31c318e2-9d5d-11e6-aec8-07a5497500f7"
+                }
+            ],
+            "hassubconcepts": true,
+            "relationshiptype": "",
+            "subconcepts": [
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "CITY_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "7d903d91-96ba-4937-8625-6e32bd6dedd7",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "7d903d91-96ba-4937-8625-6e32bd6dedd7",
+                            "language": "en-US",
+                            "value": "City",
+                            "type": "prefLabel",
+                            "id": "bd9aa157-4a5b-4575-aed8-46d74de180b0"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "20000001-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "20000001-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "20000001-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "Portland",
+                                    "type": "prefLabel",
+                                    "id": "5f25a608-64ba-4ee8-b98f-8450ea8fa9be"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "20000002-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "20000002-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "20000002-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "San Francisco",
+                                    "type": "prefLabel",
+                                    "id": "fec363b7-b7ad-48a9-b90b-a8b66f220b91"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "20000002-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "The Bay Area",
+                                    "type": "altLabel",
+                                    "id": "cb7de09a-c207-4e47-9683-8c58bed10687"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "20000003-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "20000003-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "20000003-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "San Jose",
+                                    "type": "prefLabel",
+                                    "id": "ff76244b-1a7e-4323-831a-47679cd2ebb6"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "20000003-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "San José",
+                                    "type": "altLabel",
+                                    "id": "893d1852-6326-4f81-85c2-fc15b519e3f9"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "NAME_TYPE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "7f2db2d1-dcd7-4cf7-832f-6dde32cd224e",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "7f2db2d1-dcd7-4cf7-832f-6dde32cd224e",
+                            "language": "en-US",
+                            "value": "Name Type",
+                            "type": "prefLabel",
+                            "id": "1cc9d196-13be-4a22-9121-31211a53f213"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "10000001-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "10000001-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "10000001-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "Legal",
+                                    "type": "prefLabel",
+                                    "id": "023c701c-aede-4528-aded-ecaa5da6835c"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "10000002-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "10000002-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "10000002-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "Nickname",
+                                    "type": "prefLabel",
+                                    "id": "182fd9e9-9425-4c3d-82bd-4d1f34630e47"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "ARCHES RESOURCE CROSS-REFERENCE RELATIONSHIP TYPES.E32.csv",
+                    "relatedconcepts": [],
+                    "id": "00000000-0000-0000-0000-000000000005",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "00000000-0000-0000-0000-000000000005",
+                            "language": "en-US",
+                            "value": "Resource To Resource Relationship Types",
+                            "type": "prefLabel",
+                            "id": "31c320e4-9d5d-11e6-aec8-3fa423a5d4f8"
+                        }
+                    ],
+                    "hassubconcepts": false,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": []
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "STATE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "9ea16cb4-e435-4d06-9418-fdf85af34918",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "9ea16cb4-e435-4d06-9418-fdf85af34918",
+                            "language": "en-US",
+                            "value": "State",
+                            "type": "prefLabel",
+                            "id": "b589d28e-7421-4590-994e-11ef5cb84ca2"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "30000002-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "30000002-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "30000002-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "California",
+                                    "type": "prefLabel",
+                                    "id": "7523a3e8-83b2-40e1-a18d-fea2b74a26b5"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "30000002-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "CA",
+                                    "type": "altLabel",
+                                    "id": "1aa537b3-9a66-4ca6-a1c6-639d435d40fd"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "30000001-0000-0000-0000-000000000000",
+                            "relatedconcepts": [],
+                            "id": "30000001-0000-0000-0000-000000000000",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "30000001-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "Oregon",
+                                    "type": "prefLabel",
+                                    "id": "f7e7ac95-6e53-4acc-a027-23726d4d729b"
+                                },
+                                {
+                                    "category": "label",
+                                    "conceptid": "30000001-0000-0000-0000-000000000000",
+                                    "language": "en-US",
+                                    "value": "OR",
+                                    "type": "altLabel",
+                                    "id": "88d3e082-292a-44c6-98e2-e99c0ed62413"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        }
+                    ]
+                },
+                {
+                    "nodetype": "Collection",
+                    "legacyoid": "THREAT_TYPE_AUTHORITY_DOCUMENT.csv",
+                    "relatedconcepts": [],
+                    "id": "f23ae1a9-6de3-47a4-b8a7-12c58b52846f",
+                    "parentconcepts": [],
+                    "values": [
+                        {
+                            "category": "label",
+                            "conceptid": "f23ae1a9-6de3-47a4-b8a7-12c58b52846f",
+                            "language": "en-US",
+                            "value": "Threat Type",
+                            "type": "prefLabel",
+                            "id": "a7ba922d-83fb-4ac7-919f-f2026209af00"
+                        }
+                    ],
+                    "hassubconcepts": true,
+                    "relationshiptype": "hasTopConcept",
+                    "subconcepts": [
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:12",
+                            "relatedconcepts": [],
+                            "id": "02857978-8e43-4c8f-a31b-40a34af1edc8",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "02857978-8e43-4c8f-a31b-40a34af1edc8",
+                                    "language": "en-US",
+                                    "value": "biological",
+                                    "type": "prefLabel",
+                                    "id": "1d109c03-4120-4983-acf1-90f912a68f6c"
+                                }
+                            ],
+                            "hassubconcepts": true,
+                            "relationshiptype": "narrower",
+                            "subconcepts": [
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:13",
+                                    "relatedconcepts": [],
+                                    "id": "616f076a-7af3-4e52-a023-e7bd83a2c586",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "616f076a-7af3-4e52-a023-e7bd83a2c586",
+                                            "language": "en-US",
+                                            "value": "pest infestation",
+                                            "type": "prefLabel",
+                                            "id": "86089f36-777a-412c-9c94-b8139ab17ed6"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:14",
+                                    "relatedconcepts": [],
+                                    "id": "120e3ea0-daf5-4224-9282-f22164ff881d",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "120e3ea0-daf5-4224-9282-f22164ff881d",
+                                            "language": "en-US",
+                                            "value": "plant growth",
+                                            "type": "prefLabel",
+                                            "id": "8d911a8d-341d-4410-8261-ffdb9f82b302"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                }
+                            ]
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:28",
+                            "relatedconcepts": [],
+                            "id": "5c85a258-c102-42e5-aa90-0ee61a0c7a35",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "5c85a258-c102-42e5-aa90-0ee61a0c7a35",
+                                    "language": "en-US",
+                                    "value": "climate change",
+                                    "type": "prefLabel",
+                                    "id": "41142663-524a-4eda-a1c6-2c246c783610"
+                                }
+                            ],
+                            "hassubconcepts": false,
+                            "relationshiptype": "narrower",
+                            "subconcepts": []
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:7",
+                            "relatedconcepts": [],
+                            "id": "5a9b8833-8e6c-446d-b587-0bef92635d64",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "5a9b8833-8e6c-446d-b587-0bef92635d64",
+                                    "language": "en-US",
+                                    "value": "geological",
+                                    "type": "prefLabel",
+                                    "id": "4e97daf3-3098-4d0b-bc7d-5660bfdc9302"
+                                }
+                            ],
+                            "hassubconcepts": true,
+                            "relationshiptype": "narrower",
+                            "subconcepts": [
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:11",
+                                    "relatedconcepts": [],
+                                    "id": "61d2acc1-1e11-4249-84ed-6694b53f841c",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "61d2acc1-1e11-4249-84ed-6694b53f841c",
+                                            "language": "en-US",
+                                            "value": "erosion",
+                                            "type": "prefLabel",
+                                            "id": "8d8a031b-b885-4d95-a4f6-516f91b67c68"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:10",
+                                    "relatedconcepts": [],
+                                    "id": "6eec46da-4711-4729-b539-4daab62aa89d",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "6eec46da-4711-4729-b539-4daab62aa89d",
+                                            "language": "en-US",
+                                            "value": "mass movement",
+                                            "type": "prefLabel",
+                                            "id": "a2ffdd92-9745-4367-8418-87795e54ff20"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:9",
+                                    "relatedconcepts": [],
+                                    "id": "dbb8755b-47ac-4700-846b-11689bcf92a9",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "dbb8755b-47ac-4700-846b-11689bcf92a9",
+                                            "language": "en-US",
+                                            "value": "seismic",
+                                            "type": "prefLabel",
+                                            "id": "291a9b3b-3476-472f-9625-f85733255bf5"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:8",
+                                    "relatedconcepts": [],
+                                    "id": "c2185846-47f5-41f5-b021-b503f538fd47",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "c2185846-47f5-41f5-b021-b503f538fd47",
+                                            "language": "en-US",
+                                            "value": "volcanic",
+                                            "type": "prefLabel",
+                                            "id": "cb1d047d-5625-471e-9774-37ccf4273e3f"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                }
+                            ]
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:15",
+                            "relatedconcepts": [],
+                            "id": "f6667047-3749-4851-991f-cf538d5c934f",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "f6667047-3749-4851-991f-cf538d5c934f",
+                                    "language": "en-US",
+                                    "value": "human-induced",
+                                    "type": "prefLabel",
+                                    "id": "e11835cb-b9dc-4da4-ae5b-9a7a3659259e"
+                                }
+                            ],
+                            "hassubconcepts": true,
+                            "relationshiptype": "narrower",
+                            "subconcepts": [
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:23",
+                                    "relatedconcepts": [],
+                                    "id": "a3495d71-89f4-4942-8b49-db2989c9b895",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "a3495d71-89f4-4942-8b49-db2989c9b895",
+                                            "language": "en-US",
+                                            "value": "agriculture",
+                                            "type": "prefLabel",
+                                            "id": "e9750c51-a03a-4f8d-81da-3f232fcbae4e"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:25",
+                                    "relatedconcepts": [],
+                                    "id": "b42f870a-96c8-42f7-aa82-ef1dfac21db4",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "b42f870a-96c8-42f7-aa82-ef1dfac21db4",
+                                            "language": "en-US",
+                                            "value": "construction",
+                                            "type": "prefLabel",
+                                            "id": "66f2c872-94ed-4eb6-b3dd-6d4953b4cdd6"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:17",
+                                    "relatedconcepts": [],
+                                    "id": "2d556cb9-d7d3-429b-b534-530f62100cd1",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "2d556cb9-d7d3-429b-b534-530f62100cd1",
+                                            "language": "en-US",
+                                            "value": "explosion",
+                                            "type": "prefLabel",
+                                            "id": "aaec9a8d-60d0-46c7-9f7e-d62dcb530b70"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:16",
+                                    "relatedconcepts": [],
+                                    "id": "484579ed-735f-4c06-957a-9a8a65ec5d5e",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "484579ed-735f-4c06-957a-9a8a65ec5d5e",
+                                            "language": "en-US",
+                                            "value": "fire",
+                                            "type": "prefLabel",
+                                            "id": "dfdfb628-bc89-4bda-b99c-14cd778387ff"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:26",
+                                    "relatedconcepts": [],
+                                    "id": "ecab0cf1-91d2-4ca7-9b64-9df9d3a53b59",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "ecab0cf1-91d2-4ca7-9b64-9df9d3a53b59",
+                                            "language": "en-US",
+                                            "value": "inappropriate use",
+                                            "type": "prefLabel",
+                                            "id": "32270420-7127-4fb5-b8b6-4fc3faf32b98"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:22",
+                                    "relatedconcepts": [],
+                                    "id": "c56d6276-543c-47ce-9cad-106959a309fd",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "c56d6276-543c-47ce-9cad-106959a309fd",
+                                            "language": "en-US",
+                                            "value": "infrastructure failure",
+                                            "type": "prefLabel",
+                                            "id": "eb08bdeb-0be7-4008-a764-71524ab82d64"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:27",
+                                    "relatedconcepts": [],
+                                    "id": "1f0fff24-010e-4772-9226-3bfe82a991f3",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "1f0fff24-010e-4772-9226-3bfe82a991f3",
+                                            "language": "en-US",
+                                            "value": "lack of maintenance",
+                                            "type": "prefLabel",
+                                            "id": "9ba84653-69c6-4c26-a26a-7060d67a1a0b"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:20",
+                                    "relatedconcepts": [],
+                                    "id": "afc5fcf2-cba3-49f6-92af-80b44edfbcee",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "afc5fcf2-cba3-49f6-92af-80b44edfbcee",
+                                            "language": "en-US",
+                                            "value": "looting/theft",
+                                            "type": "prefLabel",
+                                            "id": "2dbc8ade-5d20-4db3-a472-8a19a0daf30a"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:24",
+                                    "relatedconcepts": [],
+                                    "id": "388f4da2-1113-4ee2-86e5-8abc92d9962a",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "388f4da2-1113-4ee2-86e5-8abc92d9962a",
+                                            "language": "en-US",
+                                            "value": "mining",
+                                            "type": "prefLabel",
+                                            "id": "4548defa-7a5e-4925-b4e9-d0800c19a9c5"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:18",
+                                    "relatedconcepts": [],
+                                    "id": "32d25687-9387-4973-bccb-ecf13320a3d1",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "32d25687-9387-4973-bccb-ecf13320a3d1",
+                                            "language": "en-US",
+                                            "value": "pollution",
+                                            "type": "prefLabel",
+                                            "id": "cd985e99-1740-47e8-bed0-3254f58b8978"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:21",
+                                    "relatedconcepts": [],
+                                    "id": "f2e79278-4441-4a59-8711-3439a6a1cf86",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "f2e79278-4441-4a59-8711-3439a6a1cf86",
+                                            "language": "en-US",
+                                            "value": "vandalism",
+                                            "type": "prefLabel",
+                                            "id": "145eedb6-216a-4e72-b766-a749dad9b57a"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:19",
+                                    "relatedconcepts": [],
+                                    "id": "4c419156-106a-4761-8ced-cf4fe2cc18f3",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "4c419156-106a-4761-8ced-cf4fe2cc18f3",
+                                            "language": "en-US",
+                                            "value": "violence and conflict",
+                                            "type": "prefLabel",
+                                            "id": "75d5aead-3d5a-4340-8793-e8e640663294"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                }
+                            ]
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:4",
+                            "relatedconcepts": [],
+                            "id": "75bd3861-aaf4-4599-9698-5fc9d2750abd",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "75bd3861-aaf4-4599-9698-5fc9d2750abd",
+                                    "language": "en-US",
+                                    "value": "hydrological",
+                                    "type": "prefLabel",
+                                    "id": "b6a57bfc-9013-4e7a-af9e-c7d2bc3b032e"
+                                }
+                            ],
+                            "hassubconcepts": true,
+                            "relationshiptype": "narrower",
+                            "subconcepts": [
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:5",
+                                    "relatedconcepts": [],
+                                    "id": "abfd0324-c7fa-4044-bd7c-781ab78071d2",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "abfd0324-c7fa-4044-bd7c-781ab78071d2",
+                                            "language": "en-US",
+                                            "value": "flood",
+                                            "type": "prefLabel",
+                                            "id": "d8701652-edfe-4b93-ad69-969a35e8fd4a"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:6",
+                                    "relatedconcepts": [],
+                                    "id": "f0d14172-6cc1-4283-982f-c5ebc9b03659",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "f0d14172-6cc1-4283-982f-c5ebc9b03659",
+                                            "language": "en-US",
+                                            "value": "tsunami",
+                                            "type": "prefLabel",
+                                            "id": "e9dbcc26-d2cb-4dde-93b4-64a66bee5688"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                }
+                            ]
+                        },
+                        {
+                            "nodetype": "Concept",
+                            "legacyoid": "THREAT_TYPE:1",
+                            "relatedconcepts": [],
+                            "id": "c3fa725d-0565-4779-bb62-5f366cdc2748",
+                            "parentconcepts": [],
+                            "values": [
+                                {
+                                    "category": "label",
+                                    "conceptid": "c3fa725d-0565-4779-bb62-5f366cdc2748",
+                                    "language": "en-US",
+                                    "value": "meteorological",
+                                    "type": "prefLabel",
+                                    "id": "5d8a66ae-022b-47a9-8a88-b79bb0ab1494"
+                                }
+                            ],
+                            "hassubconcepts": true,
+                            "relationshiptype": "narrower",
+                            "subconcepts": [
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:3",
+                                    "relatedconcepts": [],
+                                    "id": "fcbeca4f-8afd-407c-8c2a-4412e9931e26",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "fcbeca4f-8afd-407c-8c2a-4412e9931e26",
+                                            "language": "en-US",
+                                            "value": "fire induced by lightning",
+                                            "type": "prefLabel",
+                                            "id": "a440610a-b2d7-479b-844c-c2b5f3da0fb6"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                },
+                                {
+                                    "nodetype": "Concept",
+                                    "legacyoid": "THREAT_TYPE:2",
+                                    "relatedconcepts": [],
+                                    "id": "97ddf387-91db-473b-874a-a4d0e71b840d",
+                                    "parentconcepts": [],
+                                    "values": [
+                                        {
+                                            "category": "label",
+                                            "conceptid": "97ddf387-91db-473b-874a-a4d0e71b840d",
+                                            "language": "en-US",
+                                            "value": "storm",
+                                            "type": "prefLabel",
+                                            "id": "fd3f3e19-75c7-4084-95b2-5ebf08365df6"
+                                        }
+                                    ],
+                                    "hassubconcepts": false,
+                                    "relationshiptype": "narrower",
+                                    "subconcepts": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
