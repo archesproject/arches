@@ -90,7 +90,7 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.anchorLayerId = this.resourceEditor ? 'gl-draw-point.cold' : '';
+            this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
             this.layers = _.clone(arches.mapLayers);
 
             this.geocoderOptions = ko.observableArray([{
@@ -176,7 +176,9 @@ define([
 
             this.addInitialLayers = function() {
                 var initialLayers = [];
-                this.layers.unshift(this.defineResourceLayer());
+                if (this.reportHeader) {
+                  this.layers.unshift(this.defineResourceLayer());
+                }
                 var overlayLayers = _.sortBy(_.where(this.layers, {
                     isoverlay: true
                 }), 'sortorder').reverse();
@@ -654,7 +656,7 @@ define([
                         overlays[i].layer_definitions.forEach(function(layer) {
                             map.addLayer(layer, this.anchorLayerId);
                             map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity() / 100.0);
-                        })
+                        }, this)
                     }
                     this.redrawGeocodeLayer();
                 }, this)

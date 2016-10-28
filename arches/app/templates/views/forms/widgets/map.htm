@@ -2,9 +2,6 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-
-
-
     <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
           zoom: zoom,
@@ -67,28 +64,25 @@
             </div>
 
             <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapToolsExpanded, delay:200, fade:400">
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
+              <ul class="map-widget-toolbar-list" style="">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
+                </li>
+                <li id="btn-overlays" class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <!-- ko if: featureEditingDisabled -->
-                <div class="map-widget-tool text-center" data-bind="css : {'disabled': featureEditingDisabled}">
-                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <!-- /ko -->
+                </li>
                 <!-- ko ifnot: featureEditingDisabled -->
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
-                </div>
+                </li>
                 <!-- /ko -->
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                </li>
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
                     <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
-                </div>
+                </li>
+              </ul>
             </div>
 
             <!-- Basemaps -->
@@ -107,7 +101,7 @@
                         <i class="ion-checkmark-circled"></i>
                         <!-- /ko -->
                         <!-- ko if: name !== self.basemap() -->
-                        <i class="ion-checkmark-circled fade"></i>
+                        <i class="ion-checkmark-circled basemap-icon-unselected"></i>
                         <!-- /ko -->
                     </div>
                     <div class="map-overlay-name">
