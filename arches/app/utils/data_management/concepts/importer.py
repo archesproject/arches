@@ -58,24 +58,20 @@ from django.db import transaction
 
 def import_reference_data(reference_data):
     # with transaction.atomic():
-    if reference_data != '':
-        print '\nLOADING REFERENCE DATA FROM ARCHES JSON'
-        print '-----------------------'
+    # if reference_data != '':
     for data in reference_data:
-        print data['legacyoid']
+        print '\nLOADING {0} CONCEPT SCHEME FROM ARCHES JSON'.format(data['legacyoid'])
+        print '---------------------------------------------'
+
         def create_collections(concept):
-            relations = {'':'hasCollection', 'hasTopConcept':'member', 'narrower':'member'}
+            relations = {'':'hasCollection', 'hasTopConcept':'member', 'narrower':'member', 'narrowerTransitive':'member'}
             for subconcept in concept.subconcepts:
                 if concept.relationshiptype in relations.keys():
                     if concept.id == '00000000-0000-0000-0000-000000000001':
                         concept.id = '00000000-0000-0000-0000-000000000003'
-                    relation = models.Relation()
-                    relation.conceptfrom_id = concept.id
-                    relation.conceptto_id = subconcept.id
-                    relation.relationtype_id = relations[concept.relationshiptype]
-                    relation.save()
+                    models.Relation.objects.get_or_create(conceptfrom_id=concept.id, conceptto_id=subconcept.id, relationtype_id=relations[concept.relationshiptype])
 
         concept = Concept(data)
         concept.save()
         concept.traverse(create_collections, 'down')
-        # concept.index(scheme=concept)
+        concept.index(scheme=concept)
