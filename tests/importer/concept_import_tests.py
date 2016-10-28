@@ -34,12 +34,12 @@ from arches.management.commands.package_utils import authority_files
 class conceptImportTests(ArchesTestCase):
 	@classmethod
 	def setUpClass(cls):
-		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 		se = SearchEngineFactory().create()
 		se.delete_index(index='concept_labels')
 		se.delete_index(index='term')
 		se.create_index(index='concept_labels')
 		se.create_index(index='term')
+		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
 	@classmethod
 	def tearDownClass(cls):
