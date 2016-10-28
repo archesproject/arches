@@ -4319,6 +4319,7 @@ div.row.widget-wrapper.report-header:hover {
     top: 0px;
     left: 0px;
     z-index: 1;
+    width: 50%;
 }
 
 .geocode-container.hide-geocoder {

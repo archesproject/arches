@@ -72,12 +72,12 @@ define([
                 if (this.resourcePointSize() === null) {
                     this.resourcePointSize(params.graph.get('mappointsize'));
                 } else {
-                  this.resourcePointSize(Number(this.resourcePointSize()))
+                    this.resourcePointSize(Number(this.resourcePointSize()))
                 }
                 if (this.resourceLineWidth() === null) {
                     this.resourceLineWidth(params.graph.get('maplinewidth'));
                 } else {
-                  this.resourceLineWidth(Number(this.resourceLineWidth()))
+                    this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
 
@@ -219,7 +219,16 @@ define([
                 minimumInputLength: 0,
                 multiple: true,
                 placeholder: "Available Geometry Types",
-                data: [{text:'Point', id:'Point'}, {text:'Line', id:'Line'}, {text:'Polygon', id:'Polygon'}]
+                data: [{
+                    text: 'Point',
+                    id: 'Point'
+                }, {
+                    text: 'Line',
+                    id: 'Line'
+                }, {
+                    text: 'Polygon',
+                    id: 'Polygon'
+                }]
             };
 
             this.setupMap = function(map) {
@@ -369,8 +378,7 @@ define([
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
-                    console.log(map.getLayer('gl-draw-active-line.hot'))
-                    map.addLayer(cacheLayer, 'gl-draw-active-line.hot');
+                    map.addLayer(cacheLayer, 'gl-draw-point.cold');
                 }
 
                 this.map.on('load', function() {
@@ -391,15 +399,16 @@ define([
                                 }, self);
                             }, self)
                             data = result;
+                            source.setData(data)
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
+                            self.loadGeometriesIntoDrawLayer()
                         } else { //if values are for a form widget...
                             if (_.isObject(self.value())) { //confirm value is not "", null, or undefined
                                 data = koMapping.toJS(self.value);
                             }
                         };
                         if (data) {
-                            source.setData(data)
                             var bounds = new mapboxgl.LngLatBounds(geojsonExtent(data));
                             var tr = this.transform;
                             var nw = tr.project(bounds.getNorthWest());
@@ -416,6 +425,10 @@ define([
                         }
                     }
                 });
+
+                this.loadGeometriesIntoDrawLayer = function() {
+                    this.draw.add(koMapping.toJS(self.value));
+                };
 
                 this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
                     var val = isNumber ? Number(val) : val; //point size and line width must be number types
@@ -586,6 +599,9 @@ define([
                     return function() {
                         var currentDrawing = self.draw.getAll()
                         if (self.value.features !== undefined) {
+                            _.each(self.value.features(), function(feature) {
+                                self.value.features.pop()
+                            });
                             currentDrawing.features.forEach(function(feature) {
                                 self.value.features.push(feature)
                             })
@@ -602,22 +618,22 @@ define([
                         if (_.contains(['draw_point', 'draw_line_string', 'draw_polygon'], self.drawMode()) && self.drawMode() !== self.draw.getMode()) {
                             self.draw.changeMode(self.drawMode())
                         } else {
-                          self.drawMode(self.draw.getMode());
-                          if (self.draw.getSelectedIds().length > 0) {
-                              selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
-                              self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
-                          }
-                          else {
-                            if (self.draw.getMode().endsWith("select")) {
-                                self.drawMode(undefined);
-                            };
-                          }
+                            self.drawMode(self.draw.getMode());
+                            if (self.draw.getSelectedIds().length > 0) {
+                                selectedFeatureType = self.draw.get(self.draw.getSelectedIds()[0]).geometry.type;
+                                self.selectedFeatureType(selectedFeatureType === 'LineString' ? 'line' : selectedFeatureType.toLowerCase());
+                            } else {
+                                if (self.draw.getMode().endsWith("select")) {
+                                    self.drawMode(undefined);
+                                };
+                            }
                         }
                     }
                 }
 
                 this.map.on('moveend', this.updateConfigs());
                 this.map.on('draw.create', this.saveGeometries())
+                this.map.on('draw.update', this.saveGeometries())
                 this.map.on('draw.delete', this.saveGeometries())
                 this.map.on('click', this.updateDrawMode())
 

@@ -16,41 +16,39 @@
           bearing: bearing
        }, afterRender: function(){setupMap(map)} }">
 
-       <!--ko if: drawMode -->
-       <div class="geometry-editing-notifications">
-           <div class="alert-wrap in animated jellyIn">
-               <div class="alert alert-warning" role="alert">
-                   <button class="close" type="button">
+        <!--ko if: drawMode -->
+        <div class="geometry-editing-notifications">
+            <div class="alert-wrap in animated jellyIn">
+                <div class="alert alert-warning" role="alert">
+                    <button class="close" type="button">
                    </button>
-                     <!-- ko if: drawMode() === 'draw_point'  -->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating points.  Click the Point tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'draw_polygon'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating polygons.  Click the Polygon tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'draw_line_string'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating lines.  Click the Line tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'simple_select'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>. Drag to move <!-- ko if: selectedFeatureType() !== 'Point'--> or click it again to edit verticies <!-- /ko -->
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'direct_select'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
-                   </div>
-                   <!-- /ko -->
-               </div>
-           </div>
-       </div>
-       <!-- /ko -->
+                    <div class="media">
+                        <!-- ko if: drawMode() === 'draw_point'  -->
+                        <strong>Edit Mode</strong> You are creating points. Click the Point tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_polygon'-->
+                        <strong>Edit Mode</strong> You are creating polygons. Click the Polygon tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_line_string'-->
+                        <strong>Edit Mode</strong> You are creating lines. Click the Line tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'simple_select'-->
+                        <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>.
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>Click and drag to move.</span>
+                        <!-- /ko -->
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>Click and drag to move, or click it again to edit verticies.</span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'direct_select'-->
+                        <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
 
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
@@ -390,8 +388,7 @@
                 <div class="col-xs-12 pad-no crud-widget-container">
                     <input id="select2Input2" data-bind="
                       select2v4Data: geometryTypes,
-                      select2v4: geomTypeSelectSetup"
-                      style="width: 100%">
+                      select2v4: geomTypeSelectSetup" style="width: 100%">
                     </input>
                 </div>
             </div>
