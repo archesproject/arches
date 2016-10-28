@@ -24,20 +24,20 @@ define([
             var self = this;
             this._json = ko.observable('');
             this.functionid = options.functionid;
-            this.defaultConfig = ko.observable();
+            this.defaultconfig = koMapping.fromJS({});
             this.name = ko.observable();
             this.description = ko.observable();
-            this.functionType = ko.observable();
+            this.functiontype = ko.observable();
             this.component = ko.observable();
 
             this.parse(options);
 
             this.json = ko.computed(function() {
                 return JSON.stringify(_.extend(JSON.parse(self._json()), {
-                    defaultConfig: self.defaultConfig(),
+                    defaultconfig: koMapping.toJS(self.defaultconfig),
                     name: self.name(),
                     description: self.description(),
-                    functionType: self.functionType(),
+                    functiontype: self.functiontype(),
                     component: self.component(),
                 }))
             });
@@ -50,10 +50,10 @@ define([
         parse: function(data) {
             this._json(JSON.stringify(data));
             this.functionid = data.functionid;
-            this.defaultConfig(data.defaultConfig);
+            koMapping.fromJS(data.defaultconfig,this.defaultconfig);
             this.name(data.name);
             this.description(data.description);
-            this.functionType(data.functiontype);
+            this.functiontype(data.functiontype);
             this.component(data.component);
 
             this.set('id', data.functionid)

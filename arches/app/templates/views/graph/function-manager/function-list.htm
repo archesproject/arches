@@ -9,7 +9,7 @@
 
     <!-- Card -->
     <!-- ko foreach: $data.items -->
-    <div data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+    <div data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent)">
     
     {% block listitem %}
 

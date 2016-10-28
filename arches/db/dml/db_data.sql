@@ -2145,7 +2145,7 @@ INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000003', 'Card Function 3', 'nodegroup', 'Card Function 3', 'A dummy function for testing');
 
 INSERT INTO functions(functionid, function, functiontype, name, description, defaultconfig, component)
-    VALUES ('60000000-0000-0000-0000-000000000010', 'primarynamelookup', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"template":""}', 'views/functions/primary-name');
+    VALUES ('60000000-0000-0000-0000-000000000010', 'primarynamelookup', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"nodegroup_id": "", "string_template": ""}', 'views/functions/primary-name');
 
 INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000004', 'String Function 1', 'user_selectable', 'String Function 1', 'A dummy function for testing');

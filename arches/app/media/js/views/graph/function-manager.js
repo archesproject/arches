@@ -32,10 +32,14 @@ require([
     })
 
     viewModel.functionList.on('item-clicked', function(func){
-        // pageView.viewModel.loading(true);
-        // formView.loadForm(form.formid, function(){
-        //     pageView.viewModel.loading(false);
-        // });
+        var newAppliedFunction = new FunctionXGraphModel({
+            id: null,
+            graphid: baseData.graphid,
+            function: func,
+            function_id: func.functionid,
+            config: func.defaultconfig
+        })
+        viewModel.appliedFunctionList.items.push(newAppliedFunction);
     });
 
 
@@ -56,10 +60,6 @@ require([
         }else{
             viewModel.selectedFunction(undefined);
         }
-        // pageView.viewModel.loading(true);
-        // formView.loadForm(form.formid, function(){
-        //     pageView.viewModel.loading(false);
-        // });
     });
 
     viewModel.toggleFunctionLibrary = function(){
@@ -93,7 +93,12 @@ require([
             url: arches.urls.apply_functions.replace('//', '/' + baseData.graphid + '/'),
             data: JSON.stringify(functionsToSave),
             success: function(response) {
-                //jsonCache(jsonData());
+                response.forEach(function(fn){
+                    functionToUpdate = _.find(viewModel.appliedFunctionList.items(), function(func){
+                        return fn._id === func.toJSON()._id;
+                    });
+                    functionToUpdate.parse(fn);
+                })
                 viewModel.loading(false);
             },
             failure: function(response) {
@@ -116,11 +121,5 @@ require([
     var graphPageView = new GraphPageView({
         viewModel: viewModel
     });
-
-    // graphPageView.viewModel.dirty = ko.computed(function(){
-    //     return !!(_.find(viewModel.appliedFunctionList.items(), function(fn){
-    //         return fn.dirty();
-    //     }));
-    // });
 
 });

@@ -1,10 +1,11 @@
 define([
+    'underscore',
     'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function (arches, AbstractModel, ko, koMapping, _) {
+], function (_, arches, AbstractModel, ko, koMapping, _) {
 
     var FunctionXGraphModel = AbstractModel.extend({
         /**
@@ -22,17 +23,20 @@ define([
         */
         initialize: function(options) {
             var self = this;
+            this._id = options._id = _.uniqueId();
             this._json = ko.observable('');
-            this.function = options.function;
-            this.graphid = ko.observable();
+            this.id = null;
+            this.function = '';
+            this.graphid = '';
             this.config = koMapping.fromJS({});
 
             this.parse(options);
 
             this.json = ko.computed(function() {
+                var config = koMapping.toJS(self.config);
+                delete config['__ko_mapping__'];
                 return JSON.stringify(_.extend(JSON.parse(self._json()), {
-                    graphid: self.graphid(),
-                    config: koMapping.toJS(self.config),
+                    config: config,
                 }))
             });
 
@@ -43,11 +47,12 @@ define([
 
         parse: function(data) {
             this._json(JSON.stringify(data));
+            this.id = data.id;
             this.function = data.function;
-            this.graphid(data.graphid);
+            this.graphid = data.graphid;
             koMapping.fromJS(data.config, this.config)
 
-            this.set('id', data.function)
+            this.set('id', data.id)
         },
 
         /**
