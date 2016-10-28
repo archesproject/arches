@@ -117,7 +117,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="permissions-form" class="panel">
                     <div class="panel-heading">
                         <div class="">
-                            <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: $data.get('function').name">Function Name</h3>
+                            <h3 class="panel-title card-main-title" data-bind="text: $data.get('function').name">Function Name</h3>
                         </div>
                     </div>
 
@@ -137,18 +137,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!--Tabs Content-->
                             <div class="tab-content card-content-tab" style="margin-left: 0px;">
-
-                                <!-- Card -->
-                                <div id="summary-card" class="tab-pane fade active in" style=""> 
+                                
+                                <div data-bind="if: !!($data.get('function').component())"> 
                                     <div class="panel-body card-panel-body" style="">
 
-                                        <div data-bind='component: {
-                                            name: $data.get("function").component(),
+                                        <div data-bind="component: {
+                                            name: $data.get('function').component(),
                                             params: $data
-                                        }'></div>
+                                        }"></div>
 
                                     </div>  
-                                </div>    
+                                </div> 
+
+                                <div data-bind="if: !($data.get('function').component())"> 
+                                    <h3 class="panel-title card-main-title">
+
+                                        {% trans "This Function doesn't require any configuration." %}
+
+                                    </h3>  
+                                </div>  
+
                             </div>
                         </div> 
                     </div>
