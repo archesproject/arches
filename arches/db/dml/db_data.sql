@@ -115,7 +115,7 @@ INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
-INSERT INTO functions_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'filearray', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (5, 'geojson-feature-collection', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
