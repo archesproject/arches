@@ -481,14 +481,18 @@ class FunctionManagerView(GraphBaseView):
         return render(request, 'views/graph/function-manager.htm', context)
 
     def post(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
-        
-        if data['primaryNameViewModel']:
-            functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
-                function_id = '60000000-0000-0000-0000-000000000010', 
-                graph_id = graphid, 
-                defaults = {
-                    'config': data['primaryNameViewModel']
-                }
-            )
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                    pk=item['id'],
+                    defaults = {
+                        'function_id': item['function_id'], 
+                        'graph_id': graphid, 
+                        'config': item['config']
+                    }
+                )
+                item['id'] = functionXgraph.pk
+                
+        return JSONResponse(data)

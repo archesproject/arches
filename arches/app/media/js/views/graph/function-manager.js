@@ -2,39 +2,25 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'views/graph/graph-page-view',
     'views/graph/function-manager/function-list',
     'views/graph/function-manager/applied-function-list',
     'models/function',
     'models/function-x-graph',
+    'graph-base-data',
     'graph-functions-data',
     'function-templates',
-], function($, _, ko, GraphPageView, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, data) {
+], function($, _, ko, arches, GraphPageView, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
     var functionModels = [];
     var functionXGraphModels = [];
-    var loading = ko.observable(false);
     var viewModel = {
-        loading: loading,
+        loading: ko.observable(false),
         selectedFunction: ko.observable()
     };
-
-    var applyFunction = function(functionToAdd){
-        //functionToAdd.
-        viewModel.appliedFunctionList.items.push(functionToAdd);
-    }
-
-
-
-    // viewModel.selectedFunction.subscribe(function(functionXGraph){
-    //     if(!!functionXGraph){
-    //         functionXGraph.dirty.subscribe(function(dirty){
-    //             graphPageView.viewModel.dirty(dirty);
-    //         })
-    //     }
-    // })
 
 
     data.functions.forEach(function(func){
@@ -60,7 +46,6 @@ require([
         func.function = _.find(functionModels, function(fn){
             return fn.functionid === func.function_id;
         });
-        //applyFunction(new FunctionXGraphModel(func));
         viewModel.appliedFunctionList.items.push(new FunctionXGraphModel(func));
     }, this);
 
@@ -95,11 +80,34 @@ require([
     });
 
     viewModel.save = function(){
+        var functionsToSave = [];
+        viewModel.loading(true);
+        viewModel.appliedFunctionList.items().forEach(function(fn){
+            if(fn.dirty()){
+                functionsToSave.push(fn.toJSON());
+            }
+        });
 
+        $.ajax({
+            type: "POST",
+            url: arches.urls.apply_functions.replace('//', '/' + baseData.graphid + '/'),
+            data: JSON.stringify(functionsToSave),
+            success: function(response) {
+                //jsonCache(jsonData());
+                viewModel.loading(false);
+            },
+            failure: function(response) {
+                viewModel.loading(false);
+            }
+        });
     }
 
     viewModel.cancel = function(){
-        
+        viewModel.appliedFunctionList.items().forEach(function(fn){
+            if(fn.dirty()){
+                fn.reset();
+            }
+        });
     }
 
     /**

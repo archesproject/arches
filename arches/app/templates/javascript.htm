@@ -133,7 +133,8 @@
                 tile: "{% url 'tile' %}",
                 geocoder: "{% url 'geocoder' %}",
                 report_editor: "{% url 'report_editor' '' %}",
-                reorder_tiles: "{% url 'reorder_tiles' %}"
+                reorder_tiles: "{% url 'reorder_tiles' %}",
+                apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
             },
             resourceMarker: {
                 font: '{{ map_info.resource_marker_font }}',

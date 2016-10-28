@@ -48,8 +48,6 @@ define([
         },
 
         parse: function(data) {
-            var self = this;
-
             this._json(JSON.stringify(data));
             this.functionid = data.functionid;
             this.defaultConfig(data.defaultConfig);
@@ -66,7 +64,7 @@ define([
         * @memberof FunctionModel.prototype
         */
         reset: function () {
-            this.parse(JSON.parse(this._json()), self);
+            this.parse(JSON.parse(this._json()));
         },
 
         /**

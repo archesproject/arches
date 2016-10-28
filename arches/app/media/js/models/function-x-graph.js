@@ -42,8 +42,6 @@ define([
         },
 
         parse: function(data) {
-            var self = this;
-
             this._json(JSON.stringify(data));
             this.function = data.function;
             this.graphid(data.graphid);
@@ -57,7 +55,7 @@ define([
         * @memberof FunctionXGraphModel.prototype
         */
         reset: function () {
-            this.parse(JSON.parse(this._json()), self);
+            this.parse(JSON.parse(this._json()));
         },
 
         /**
