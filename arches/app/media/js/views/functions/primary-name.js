@@ -2,8 +2,8 @@ define(['knockout',
         'knockout-mapping',
         'viewmodels/function', 
         'models/card',
-        'chosen'], 
-function (ko, koMapping, FunctionViewModel, CardModel, data) {
+        'bindings/chosen'], 
+function (ko, koMapping, FunctionViewModel, CardModel, chosen) {
     return ko.components.register('views/functions/primary-name', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, params);
@@ -37,10 +37,7 @@ function (ko, koMapping, FunctionViewModel, CardModel, data) {
 
             }, this);
 
-            // koMapping.fromJS({
-            //     string_template: this.string_template,
-            //     nodegroup_id: this.nodegroup_id
-            // },params);
+            window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
             require: 'text!function-templates/primary-name'
