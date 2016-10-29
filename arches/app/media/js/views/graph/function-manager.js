@@ -136,7 +136,7 @@ require([
             }
             if(!fn.id){
                 viewModel.appliedFunctionList.items.remove(fn);
-                if(viewModel.selectedFunction === fn){
+                if(viewModel.selectedFunction() === fn){
                     viewModel.toggleFunctionLibrary();
                 }
             }
