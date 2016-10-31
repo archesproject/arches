@@ -1,18 +1,18 @@
 define([
-  'knockout',
-  'underscore',
-  'dropzone',
-  'viewmodels/widget',
-  'bindings/dropzone'
-], function (ko, _, Dropzone, WidgetViewModel) {
+    'knockout',
+    'underscore',
+    'dropzone',
+    'viewmodels/widget',
+    'bindings/dropzone'
+], function(ko, _, Dropzone, WidgetViewModel) {
     /**
-    * registers a text-widget component for use in forms
-    * @function external:"ko.components".text-widget
-    * @param {object} params
-    * @param {string} params.value - the value being managed
-    * @param {function} params.config - observable containing config object
-    * @param {string} params.config().instructions - label to use alongside the text input
-    */
+     * registers a text-widget component for use in forms
+     * @function external:"ko.components".text-widget
+     * @param {object} params
+     * @param {string} params.value - the value being managed
+     * @param {function} params.config - observable containing config object
+     * @param {string} params.config().instructions - label to use alongside the text input
+     */
     return ko.components.register('file-widget', {
         viewModel: function(params) {
 
@@ -45,12 +45,14 @@ define([
                 this.dropzoneButtonsDisabled = ko.observable(true);
 
                 dropzone.on("addedfile", function(file) {
-                  self.dropzoneButtonsDisabled(false);
+                    self.dropzoneButtonsDisabled(false);
                 });
 
                 // Update the total progress bar
                 dropzone.on("totaluploadprogress", function(progress) {
-                    $("#dz-total-progress .progress-bar").css({'width' : progress + "%"});
+                    $("#dz-total-progress .progress-bar").css({
+                        'width': progress + "%"
+                    });
                 });
 
                 dropzone.on("sending", function(file) {
@@ -63,18 +65,20 @@ define([
                     document.querySelector("#dz-total-progress").style.opacity = "0";
                 });
 
-                this.uploadFiles = function(){
-                  console.log('upload files')
-                  //dropzone.enqueueFiles(dropzone.getFilesWithStatus(Dropzone.ADDED));
+                this.uploadFiles = function() {
+                    console.log('upload files');
+                    //dropzone.enqueueFiles(dropzone.getFilesWithStatus(Dropzone.ADDED));
                 }
 
                 this.removeAllFiles = function() {
-                  dropzone.removeAllFiles(true);
-                  self.dropzoneButtonsDisabled(true);
+                    dropzone.removeAllFiles(true);
+                    self.dropzoneButtonsDisabled(true);
                 }
 
-              }
+            }
         },
-        template: { require: 'text!widget-templates/file' }
+        template: {
+            require: 'text!widget-templates/file'
+        }
     });
 });
