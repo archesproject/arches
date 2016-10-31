@@ -32,7 +32,7 @@
     "chosen": "1.4.2",
     "nouislider": "8.5.1",
     "blueimp-gallery": "2.15.2",
-    "mapbox-gl-plugins": "mapbox/mapbox-gl-plugins",
+    "mapbox-gl-plugins": "mapbox/mapbox-gl-js#0.26.0",
     "bower-knockout-mapping": "~2.6.0",
     "font-awesome": "~4.6.3",
     "ionicons": "~2.0.1",
