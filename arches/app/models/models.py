@@ -431,6 +431,7 @@ class Relation(models.Model):
     class Meta:
         managed = True
         db_table = 'relations'
+        unique_together = (('conceptfrom', 'conceptto', 'relationtype'),)
 
 
 class ReportTemplate(models.Model):
