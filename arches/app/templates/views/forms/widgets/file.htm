@@ -1,9 +1,11 @@
+{% extends "views/forms/widgets/base.htm" %}
 {% load i18n %}
-<!-- ko if: !configForm  && state === 'form' -->
+
+{% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-                                <!-- Form -->
+        <!-- Form -->
         <div class="col-lg-12" style="padding-bottom: 10px;">
             <form class="widgets" style="margin-bottom: 20px;">
                 <div class="row widget-container">
@@ -14,7 +16,7 @@
                             </label></div>
 
                             <div class="col-xs-12 dropzone" data-bind="dropzone: { value: images, url: '/img/upload' }">
-                                 <div class="bord-top pad-ver">
+                                <div class="bord-top pad-ver">
                                     <!-- The fileinput-button span is used to style the file input field as button -->
                                     <span class="btn btn-success fileinput-button dz-clickable">
                                         <i class="fa fa-plus"></i>
@@ -32,47 +34,48 @@
                                 </div>
                                 <div id="dz-previews">
                                 </div>
-                                </div>
-                               </div>
-                            </div>
-                        </div>
-              </form>
-
-              </div>
-          </div>
-  </div>
-
-  <div id="dz-template" class="pad-top bord-top">
-        <div class="media">
-            <div class="media-body">
-                 <!--This is used as the file preview template-->
-                <div class="media-block">
-                    <div class="media-left">
-                        <img class="dz-img" data-dz-thumbnail="">
-                    </div>
-                    <div class="media-body">
-                        <p class="text-main text-bold mar-no text-overflow" data-dz-name=""></p>
-                        <span class="dz-error text-danger text-sm" data-dz-errormessage=""></span>
-                        <p class="text-sm" data-dz-size=""></p>
-                        <div id="dz-total-progress" style="opacity:0">
-                             <div class="progress progress-xs active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="media-right">
-                <button data-dz-remove="" class="btn btn-xs btn-danger dz-cancel"><i class="ion ion-close"></i></button>
-            </div>
+            </form>
+
         </div>
     </div>
-<!-- /ko -->
+</div>
 
-<!-- ko if: !configForm  && state === 'report' -->
-<dt data-bind="text: label"></dt>
-<dd data-bind="text: value() || '{% trans "None" %}'"></dd>
-<!-- /ko -->
+<div id="dz-template" class="pad-top bord-top">
+    <div class="media">
+        <div class="media-body">
+            <!--This is used as the file preview template-->
+            <div class="media-block">
+                <div class="media-left">
+                    <img class="dz-img" data-dz-thumbnail="">
+                </div>
+                <div class="media-body">
+                    <p class="text-main text-bold mar-no text-overflow" data-dz-name=""></p>
+                    <span class="dz-error text-danger text-sm" data-dz-errormessage=""></span>
+                    <p class="text-sm" data-dz-size=""></p>
+                    <div id="dz-total-progress" style="opacity:0">
+                        <div class="progress progress-xs active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="media-right">
+            <button data-dz-remove="" class="btn btn-xs btn-danger dz-cancel"><i class="ion ion-close"></i></button>
+        </div>
+    </div>
+</div>
+{% endblock form %}
 
-<!-- ko if: configForm -->
-<!-- /ko -->
+{% block config_form %}
+<div class="control-label">
+    {% trans "Placeholder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans " Placeholder " %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+</div>
+{% endblock config_form %}

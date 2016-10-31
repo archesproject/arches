@@ -4636,6 +4636,13 @@ a.map-widget-icon:hover {
 .added-domain-option {
     padding-bottom: 4px;
 }
+.content-instructions {
+    font-size: 13px;
+    color: #8d8d8d;
+    margin-top: -30px;
+    line-height: 1.25;
+    margin-bottom: 20px;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }
