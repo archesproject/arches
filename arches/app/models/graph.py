@@ -932,8 +932,10 @@ class Graph(models.GraphModel):
                     card.name = self.name
                     card.description = self.description
                 else:
-                    card.name = self.nodes[card.nodegroup.pk].name
-                    card.description = self.nodes[card.nodegroup.pk].description
+                    if not card.name:
+                        card.name = self.nodes[card.nodegroup.pk].name
+                    if not card.description:
+                        card.description = self.nodes[card.nodegroup.pk].description
 
             cards.append(card)
 
