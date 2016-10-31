@@ -428,7 +428,7 @@ class Graph(models.GraphModel):
             node_map[node_id] = node.pk
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
-                node.nodegroup = models.NodeGroup(pk=node.pk)
+                node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
                 for card in copy_of_self.cards.itervalues():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()

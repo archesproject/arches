@@ -793,6 +793,10 @@ class Migration(migrations.Migration):
             name='ontologyclass',
             unique_together=set([('source', 'ontology')]),
         ),
+        migrations.AlterUniqueTogether(
+            name='relation',
+            unique_together=set([('conceptfrom', 'conceptto', 'relationtype')]),
+        ),
 
         CreateAutoPopulateUUIDField('graphs', ['graphid']),
         CreateAutoPopulateUUIDField('cards', ['cardid']),
