@@ -22,7 +22,10 @@ define([
                     })
             };
 
+            var optionsInit = options.init;
             var dropzoneInit = function() {
+                console.log(this)
+
                 this.on('success', function(file, resp) {
                     if (Array.isArray(options.value())) // check observableArray
                         options.value.push(resp.url);
@@ -48,7 +51,11 @@ define([
                                 options.value('');
                             })
                     }
-                })
+                });
+
+                if (typeof optionsInit === 'function') {
+                    optionsInit.apply(this);
+                }
             };
 
             $.extend(options, {

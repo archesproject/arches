@@ -15,7 +15,7 @@
                                 <label class="col-xs-12 control-label widget-input-label" for=""> File Upload
                             </label></div>
 
-                            <div class="col-xs-12 dropzone" data-bind="dropzone: { value: images, url: '/img/upload' }">
+                            <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
                                 <div class="bord-top pad-ver">
                                     <!-- The fileinput-button span is used to style the file input field as button -->
                                     <span class="btn btn-success fileinput-button dz-clickable">
@@ -24,10 +24,10 @@
                                     </span>
 
                                     <div class="btn-group pull-right">
-                                        <button id="dz-upload-btn" class="btn btn-primary" type="submit" data-bind="disable: dropzoneButtonsDisabled, click: uploadFiles">
+                                        <button id="dz-upload-btn" class="btn btn-primary" type="submit">
                                             <i class="fa fa-upload-cloud"></i> Upload
                                         </button>
-                                        <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="disable: dropzoneButtonsDisabled, click: removeAllFiles">
+                                        <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset">
                                             <i class="ion ion-close"></i>
                                         </button>
                                     </div>
@@ -43,8 +43,8 @@
     </div>
 </div>
 
-<div id="dz-template" class="pad-top bord-top">
-    <div class="media">
+<template id="file-widget-dz-preview">
+    <div class="media pad-top bord-top">
         <div class="media-body">
             <!--This is used as the file preview template-->
             <div class="media-block">
@@ -67,14 +67,8 @@
             <button data-dz-remove="" class="btn btn-xs btn-danger dz-cancel"><i class="ion ion-close"></i></button>
         </div>
     </div>
-</div>
+</template>
 {% endblock form %}
 
 {% block config_form %}
-<div class="control-label">
-    {% trans "Placeholder" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans " Placeholder " %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
-</div>
 {% endblock config_form %}
