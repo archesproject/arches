@@ -32,15 +32,23 @@ class NodePage(BasePage):
             EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loading-mask"))
         )
 
-        self.driver.find_element_by_xpath("//*[@id='node-crud']/ul/li[2]/a").click()
+        xpaths = {
+            'new_node_button': "//*[@id='node-crud']/ul/li[2]/a",
+            'first_in_branch_list': "//div[@id='branch-library']//div//div[@class='library-card']",
+            'append_button': "//*[@id='branch-append']",
+            'selected_node_in_left_container': "//*[@id='node-form']/div[1]/div/div[2]/div[2]/div/a",
+            'save_edits_button': "//*[@id='content-container']/div/div[4]/div[3]/span/button[2]"
+        }
 
-        xpaths = [
-            "//div[@id='branch-library']//div//div[@class='library-card']", #first branch in branch list
-            "//*[@id='branch-append']", #branch append button
-            "//*[@id='node-form']/div[1]/div/div[2]/div[2]/div/a" #selected node in left container
+        self.driver.find_element_by_xpath(xpaths['new_node_button']).click()
+
+        xpaths_to_wait_on = [
+            xpaths['first_in_branch_list'],
+            xpaths['append_button'],
+            xpaths['selected_node_in_left_container']
         ]
 
-        for xpath in xpaths:
+        for xpath in xpaths_to_wait_on:
             wait.until(
                 EC.element_to_be_clickable((By.XPATH, xpath))
             ).click()
@@ -52,5 +60,5 @@ class NodePage(BasePage):
 
         selected_data_type.click()
 
-        save_edits = self.driver.find_element_by_xpath("//*[@id='content-container']/div/div[4]/div[3]/span/button[2]")
+        save_edits = self.driver.find_element_by_xpath(xpaths['save_edits_button'])
         save_edits.click()
