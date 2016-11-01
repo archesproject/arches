@@ -20,11 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.forms import Form
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -35,10 +36,10 @@ from arches.app.utils.JSONResponse import JSONResponse
 class ResourceListView(BaseManagerView):
     def get(self, request, graphid=None, resourceid=None):
         instance_summaries = []
-        for resource_instance in models.ResourceInstance.objects.all():
+        for resource_instance in Resource.objects.all():
             instance_summaries.append({
                 'id': resource_instance.pk,
-                'name': '',
+                'name': resource_instance.primary_name,
                 'type': resource_instance.graph.name,
                 'last_edited': '',
                 'qc': '',
@@ -87,7 +88,7 @@ class ResourceEditorView(BaseManagerView):
 
 
 @method_decorator(group_required('edit'), name='dispatch')
-class ResourceData(TemplateView):
+class ResourceData(View):
     def get(self, request, resourceid=None, formid=None):
         if formid is not None:
             form = Form(resourceid=resourceid, formid=formid)
