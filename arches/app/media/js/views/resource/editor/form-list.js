@@ -18,7 +18,7 @@ define([
         * @param {boolean} options.graphModel - a reference to the selected {@link GraphModel}
         */
         initialize: function(options) {
-            this.items = options.forms
+            this.items = options.forms;
             this.items.sort(function (w, ww) {
                 return w.sortorder > ww.sortorder;
             });

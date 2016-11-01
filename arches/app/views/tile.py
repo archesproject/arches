@@ -23,40 +23,51 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import View
 
 @method_decorator(group_required('edit'), name='dispatch')
-class TileData(TemplateView):
+class TileData(View):
+    action = 'update_tile'
     def post(self, request):
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
-            #print data
 
-            def saveTile(data, parenttile_id=None):
-                data['tileid'], created = uuid.get_or_create(data['tileid'])
-                tile, created = models.Tile.objects.update_or_create(
-                    tileid = data['tileid'], 
-                    defaults = {
-                        'nodegroup_id': data['nodegroup_id'], 
-                        'data': data['data'],
-                        'resourceinstance_id': data['resourceinstance_id'],
-                        'parenttile_id': data['parenttile_id']
-                    }
-                )
-                return data
+            if self.action == 'update_tile':
+                def saveTile(data, parenttile_id=None):
+                    data['tileid'], created = uuid.get_or_create(data['tileid'])
+                    tile, created = models.Tile.objects.update_or_create(
+                        tileid = data['tileid'], 
+                        defaults = {
+                            'nodegroup_id': data['nodegroup_id'], 
+                            'data': data['data'],
+                            'resourceinstance_id': data['resourceinstance_id'],
+                            'parenttile_id': data['parenttile_id']
+                        }
+                    )
+                    return data
 
-            if 'tiles' in data and len(data['tiles']) > 0:                
-                parenttile = saveTile(data)
+                if 'tiles' in data and len(data['tiles']) > 0:                
+                    parenttile = saveTile(data)
 
-                for key, tiles in data['tiles'].iteritems():
-                    for tile in tiles:
-                        tile['parenttile_id'] = parenttile['tileid']
-                        saveTile(tile)
-            else:
-                saveTile(data)
+                    for tiles in data['tiles'].itervalues():
+                        for tile in tiles:
+                            tile['parenttile_id'] = parenttile['tileid']
+                            saveTile(tile)
+                else:
+                    saveTile(data)
 
-            return JSONResponse(data)
+                return JSONResponse(data)
+
+            if self.action == 'reorder_tiles':
+                if 'tiles' in data and len(data['tiles']) > 0:                
+                    sortorder = 0
+                    for tile in data['tiles']:
+                        t = models.Tile(tileid=tile['tileid'], sortorder=sortorder)
+                        sortorder = sortorder + 1
+                        t.save(update_fields=['sortorder'])
+
+                    return JSONResponse(data)
         
         return HttpResponseNotFound()
 
