@@ -1,4 +1,4 @@
-# initially from 
+# initially from
 # https://github.com/Victory/django-travis-saucelabs/blob/master/mysite/saucetests/tests.py
 import os
 import sys
@@ -9,7 +9,7 @@ from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.graph_page import GraphPage
-
+from tests.ui.pages.node_page import NodePage
 
 if test_settings.RUN_LOCAL:
     browsers = test_settings.LOCAL_BROWSERS
@@ -109,5 +109,14 @@ class UITest(StaticLiveServerTestCase):
 
         page = GraphPage(self.driver, self.live_server_url)
         graph_id = page.add_new_graph()
-        
+
         self.assertEqual(self.driver.current_url, '%s/graph/%s/settings' % (self.live_server_url, graph_id))
+
+    def test_make_node(self):
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
+        graph_page = GraphPage(self.driver, self.live_server_url)
+        graph_id = graph_page.add_new_graph()
+        page = NodePage(self.driver, self.live_server_url, graph_id)
+        page.add_new_node('geojson-feature-collection')
+        self.assertEqual('cat', 'cat')
