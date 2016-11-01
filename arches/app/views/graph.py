@@ -76,13 +76,11 @@ class GraphSettingsView(GraphBaseView):
         context = self.get_context_data(
             main_script='views/graph/graph-settings',
             icons=JSONSerializer().serialize(icons),
-            function_templates=models.Function.objects.exclude(component__isnull=True),
             node_json=JSONSerializer().serialize(node),
             ontologies=JSONSerializer().serialize(ontologies),
             ontology_classes=JSONSerializer().serialize(ontology_classes),
             resource_data=JSONSerializer().serialize(resource_data),
-            node_count=models.Node.objects.filter(graph=self.graph).count(),
-            functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
+            node_count=models.Node.objects.filter(graph=self.graph).count()
         )
         return render(request, 'views/graph/graph-settings.htm', context)
 
