@@ -34,12 +34,12 @@ from arches.management.commands.package_utils import authority_files
 class conceptImportTests(ArchesTestCase):
 	@classmethod
 	def setUpClass(cls):
-		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 		se = SearchEngineFactory().create()
 		se.delete_index(index='concept_labels')
 		se.delete_index(index='term')
 		se.create_index(index='concept_labels')
 		se.create_index(index='term')
+		management.call_command('packages', operation='import_json', source='tests/fixtures/resource_graphs/archesv4_resource.json')
 
 	@classmethod
 	def tearDownClass(cls):
@@ -51,13 +51,13 @@ class conceptImportTests(ArchesTestCase):
 
 
 	def test_hierarchical_relationships(self):
-		result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='708e87fd-35bc-3270-b322-b551cd63c589', include_subconcepts=True, depth_limit=1)))
+		result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='09bf4b42-51a8-4ff2-9210-c4e4ae0e6755', include_subconcepts=True, depth_limit=1)))
 		children = len(result['subconcepts'])
 		self.assertEqual(children, 3)
 
 
 	def test_value_import(self):
-		result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='32d8ca56-2aa1-3890-b95b-3fbb119460ad', include_subconcepts=True, depth_limit=1)))
+		result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='f2bb7a67-d3b3-488f-af39-e0773585c23a', include_subconcepts=True, depth_limit=1)))
 		values = len(result['values'])
 		self.assertEqual(values, 5)
 

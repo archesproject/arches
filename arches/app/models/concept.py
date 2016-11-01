@@ -275,12 +275,13 @@ class Concept(object):
 
         """
 
-        relation = models.Relation()
-        relation.pk = str(uuid.uuid4())
-        relation.conceptfrom_id = self.id
-        relation.conceptto_id = concepttorelate.id
-        relation.relationtype_id = relationtype
-        relation.save()
+        # relation = models.Relation()
+        # relation.pk = str(uuid.uuid4())
+        # relation.conceptfrom_id = self.id
+        # relation.conceptto_id = concepttorelate.id
+        # relation.relationtype_id = relationtype
+        # relation.save()
+        relation, created = models.Relation.objects.get_or_create(conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype)
         return relation
 
     @staticmethod
@@ -857,7 +858,8 @@ class ConceptValue(object):
             else:
                 value.language_id = settings.LANGUAGE_CODE
             try:
-                value.save()
+                if value.value != 'Resource To Resource Relationship Types':
+                    value.save()
             except IntegrityError as e:
                 valuetype = models.DValueType()
                 valuetype.valuetype = value.valuetype_id
