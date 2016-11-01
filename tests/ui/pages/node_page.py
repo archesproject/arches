@@ -23,7 +23,7 @@ class NodePage(BasePage):
         print graph_id
         return graph_id
 
-    def add_new_node(self, data_type_name):
+    def add_new_node(self, data_type_name, node_id=None):
         self.driver.get(self.live_server_url + '/' + self.base_url)
 
         wait = WebDriverWait(self.driver, 20)
