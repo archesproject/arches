@@ -32,7 +32,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div id="dz-previews">
+                                <div class="dz-previews">
                                 </div>
                             </div>
                         </div>
@@ -55,9 +55,9 @@
                     <p class="text-main text-bold mar-no text-overflow" data-dz-name=""></p>
                     <span class="dz-error text-danger text-sm" data-dz-errormessage=""></span>
                     <p class="text-sm" data-dz-size=""></p>
-                    <div id="dz-total-progress" style="opacity:0">
+                    <div style="display: none;" data-bind="visible: showProgressBar()">
                         <div class="progress progress-xs active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
+                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress="" data-bind="style: { width: progress() + '%' }"></div>
                         </div>
                     </div>
                 </div>

@@ -12,6 +12,12 @@ define([
             window.test = element;
             options = valueAccessor() || {};
 
+            _.each(_.filter(options, function (value, key) {
+                    return _.contains(['previewsContainer', 'clickable'], key)
+                }),function(value, key) {
+                    options[key] = $(element).find(value)[0];
+                });
+
             var removeImage = function(imageUrl) {
                 return $.ajax({
                         url: imageUrl,
@@ -24,8 +30,6 @@ define([
 
             var optionsInit = options.init;
             var dropzoneInit = function() {
-                console.log(this)
-
                 this.on('success', function(file, resp) {
                     if (Array.isArray(options.value())) // check observableArray
                         options.value.push(resp.url);
