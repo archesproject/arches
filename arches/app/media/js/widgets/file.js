@@ -17,7 +17,7 @@ define([
     return ko.components.register('file-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['acceptedFiles'];
+            params.configKeys = ['acceptedFiles', 'maxFilesize'];
 
             WidgetViewModel.apply(this, [params]);
 
@@ -27,6 +27,11 @@ define([
             this.acceptedFiles.subscribe(function (val) {
                 if (self.dropzone) {
                     self.dropzone.hiddenFileInput.setAttribute("accept", val);
+                }
+            });
+            this.maxFilesize.subscribe(function (val) {
+                if (self.dropzone) {
+                    self.dropzone.options.maxFilesize = val;
                 }
             });
 
@@ -42,9 +47,9 @@ define([
                 previewsContainer: ".dz-previews",
                 clickable: ".fileinput-button",
                 acceptedFiles: this.acceptedFiles(),
+                maxFilesize: this.maxFilesize(),
                 init: function () {
                     self.dropzone = this;
-                    window.dz3 = self.dropzone;
 
                     this.on("addedfile", function(file) {
                         self.dropzoneButtonsDisabled(false);

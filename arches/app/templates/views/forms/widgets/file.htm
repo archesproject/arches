@@ -72,4 +72,11 @@
 <div class="col-xs-12 pad-no crud-widget-container">
     <input type="" placeholder="{% trans "Accepted Files" %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
 </div>
+
+<div class="control-label">
+    {% trans "Max File Size (mb)" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Max File Size (mb)" %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+</div>
 {% endblock config_form %}

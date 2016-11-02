@@ -47,6 +47,8 @@ define([
             $.extend(options, {
                 init: dropzoneInit
             });
+
+            $(element).dropzone(options);
         }
     }
     return ko.bindingHandlers.dropzone;
