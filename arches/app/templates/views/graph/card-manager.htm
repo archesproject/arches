@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- card -->
                 <!-- ko foreach: graphModel.graphCards -->
-                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }">
+                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }, attr:{'data-arches-nodegroupid': nodegroup_id, 'data-arches-cardid': cardid}">
                     <div class="panel mar-no">
 
                         <!-- card Name -->

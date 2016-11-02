@@ -10,6 +10,9 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.graph_page import GraphPage
 from tests.ui.pages.node_page import NodePage
+from tests.ui.pages.card_page import CardPage
+from tests.ui.pages.map_widget_page import MapWidgetPage
+import uuid
 
 if test_settings.RUN_LOCAL:
     browsers = test_settings.LOCAL_BROWSERS
@@ -118,5 +121,33 @@ class UITest(StaticLiveServerTestCase):
         graph_page = GraphPage(self.driver, self.live_server_url)
         graph_id = graph_page.add_new_graph()
         page = NodePage(self.driver, self.live_server_url, graph_id)
-        page.add_new_node('geojson-feature-collection')
-        self.assertEqual('cat', 'cat')
+        node_ids = page.add_new_node('22000000-0000-0000-0000-000000000000', 'geojson-feature-collection')
+        try:
+            uuid.UUID(node_ids['node_id'])
+            uuid.UUID(node_ids['nodegroup_id'])
+            node_ids_are_valid = True
+        except:
+            node_id_is_valid = False
+        self.assertTrue(node_ids_are_valid)
+
+    def test_make_map_widget(self):
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
+        #Create a new branch model
+        graph_page = GraphPage(self.driver, self.live_server_url)
+        graph_id = graph_page.add_new_graph()
+        #Add a node to it of type geojson
+        branch_node_page = NodePage(self.driver, self.live_server_url, graph_id)
+        node_ids = branch_node_page.add_new_node('22000000-0000-0000-0000-000000000000', 'geojson-feature-collection')
+        #Create a resource model
+        resource_graph_page = GraphPage(self.driver, self.live_server_url)
+        resource_graph_id = resource_graph_page.add_new_graph("New Resource Model")
+        #Add a the branch model created above to the
+        resource_node_page = NodePage(self.driver, self.live_server_url, resource_graph_id)
+        resource_node_page.add_new_node(graph_id, '', True)
+        #Navigate to the card manager and click on the correspoding card for the node created above
+        card_page = CardPage(self.driver, self.live_server_url, graph_id)
+        card_id = card_page.select_card(node_ids)
+        map_widget_page = MapWidgetPage(self.driver, self.live_server_url, 'card', card_id)
+        tools_opened = map_widget_page.open_tools()
+        self.assertTrue(tools_opened)

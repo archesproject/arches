@@ -51,6 +51,7 @@ require([
         items: viewModel.availableGraphs
     });
 
+
     var alertFailure = function () {
         pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, arches.requestFailed.text));
     };
