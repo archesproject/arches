@@ -28,7 +28,7 @@ class NodePage(BasePage):
 
         """
         self.driver.get(self.live_server_url + '/' + self.base_url)
-        # self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(10)
         wait = WebDriverWait(self.driver, 20)
         wait.until(
             EC.invisibility_of_element_located(locators.LOADING_MASK)
@@ -49,9 +49,6 @@ class NodePage(BasePage):
             wait.until(
                 EC.element_to_be_clickable(locator)
             ).click()
-            wait.until(
-                EC.invisibility_of_element_located(locators.LOADING_MASK)
-            )
 
         if is_resource == False:
             selected_data_type = ''

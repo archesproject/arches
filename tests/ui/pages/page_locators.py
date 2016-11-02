@@ -26,7 +26,6 @@ class GraphPageLocators(BasePageLocators):
         super(BasePageLocators, self).__init__()
 
     ADD_BUTTON = (By.XPATH, "//button[@type='button']")
-    LOADING_MASK = (By.CSS_SELECTOR, ".loading-mask")
     STATUS_TAB = (By.XPATH, "//*[@id='xx-meta-tab']")
     ACTIVE_STATUS_BUTTON = (By.XPATH, "//*[@id='meta-card']/div/div/div[2]/div[1]/div/div[2]/div/label[1]")
     SAVE_EDITS_BUTTON = (By.XPATH, "//*[@id='content-container']/div/div[4]/div[3]/button[2]")
