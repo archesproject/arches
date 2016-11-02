@@ -55,15 +55,15 @@ if SAUCE_USERNAME and SAUCE_ACCESS_KEY:
 
 # browser/os combinations to use with saucelabs
 REMOTE_BROWSERS = [
-    # {"platform": "Windows 8.1",
-    #  "browserName": "internet explorer",
-    #  "version": "11"},
-    # {"platform": "Mac OS X 10.9",
-    #  "browserName": "chrome",
-    #  "version": "53"},
-    # {"platform": "Linux",
-    #  "browserName": "firefox",
-    #  "version": "45"}
+    {"platform": "Windows 8.1",
+     "browserName": "internet explorer",
+     "version": "11"},
+    {"platform": "Mac OS X 10.9",
+     "browserName": "chrome",
+     "version": "53"},
+    {"platform": "Linux",
+     "browserName": "firefox",
+     "version": "45"}
 ]
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
