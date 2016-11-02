@@ -460,3 +460,47 @@ class ReportEditorView(GraphBaseView):
         report = models.Report.objects.get(reportid=reportid)
         report.delete()
         return JSONResponse({'succces':True})
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class FunctionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/function-manager',
+            functions=JSONSerializer().serialize(models.Function.objects.all()),
+            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
+            function_templates=models.Function.objects.exclude(component__isnull=True),
+        )
+
+        return render(request, 'views/graph/function-manager.htm', context)
+
+    def post(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                    pk=item['id'],
+                    defaults = {
+                        'function_id': item['function_id'], 
+                        'graph_id': graphid, 
+                        'config': item['config']
+                    }
+                )
+                item['id'] = functionXgraph.pk
+
+        return JSONResponse(data)
+
+    def delete(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
+                functionXgraph.delete()
+                
+        return JSONResponse(data)

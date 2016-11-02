@@ -3322,6 +3322,9 @@ li.card-tree-list:last-of-type {
     background: #fcfcfc;
     cursor: pointer;
 }
+.sortable-placeholder{
+    border: dotted 2px #d4d4d4;
+}
 .card-pre-drop {
     position: absolute;
     top: 99px;
@@ -3697,6 +3700,7 @@ a.list-group-item:not(.active):hover, .clear-find:hover, div .switch label:hover
 .alert-active .ep-form-alert {
     display: block;
     height: 90px;
+    top: 0px;
 }
 .graph-base-content .alert-active .ep-form-alert {
     top: 0;
@@ -4636,6 +4640,68 @@ a.map-widget-icon:hover {
 .added-domain-option {
     padding-bottom: 4px;
 }
+
+
+/* Function Manager Page */
+.href-toolbar {
+    text-align: center;
+    padding-top: 5px;
+}
+
+.href-button {
+    color: #f4f4f4;
+    font-size: 11px;
+    padding: 5px 0px;
+    margin: 5px 0px 5px 0px;
+    background: #5393C8;
+    display: inline-block;
+    width: 100%;
+}
+
+.left-column-message {
+    padding: 10px 15px;
+    color: #777;
+    font-size: 15px;
+}
+
+.library-container {
+    padding: 0px;
+    border-left: 1px solid #e8e8e8;
+}
+
+.library-header {
+    display: flex;
+    align-items: center;
+    height: 40px; 
+    font-size: 15px;
+    background: #f4f4f4; 
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.library-find {
+    margin-right: 25px;
+    font-size: 15px;
+    color: #999;
+    width: 80px;
+    border-right: 1px solid #ccc;
+    display: block;
+    text-align: center;
+}
+
+.library-grid-title {
+    font-weight: normal;
+    font-size: 15px;
+    display: inline-block;
+}
+
+.library-card-entry {
+    background: #f8f8f8;
+}
+
+/* End Function Manager Page */
+
+
+
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

@@ -49,6 +49,7 @@ class Graph(models.GraphModel):
         # self.iconclass = ''
         # self.subtitle = ''
         # self.ontology = None
+        # self.functions = []
         # end from models.GraphModel
         self.root = None
         self.nodes = {}
@@ -61,7 +62,7 @@ class Graph(models.GraphModel):
             if isinstance(args[0], dict):
 
                 for key, value in args[0].iteritems():
-                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards'):
+                    if not (key == 'root' or key == 'nodes' or key == 'edges' or key == 'cards' or key == 'functions'):
                         setattr(self, key, value)
 
                 for node in args[0]["nodes"]:
@@ -72,6 +73,10 @@ class Graph(models.GraphModel):
 
                 for card in args[0]["cards"]:
                     self.add_card(card)
+
+                if 'functions' in args[0]:
+                    for function in args[0]["functions"]:
+                        self.add_function(function)
 
                 self.populate_null_nodegroups()
 
@@ -236,6 +241,25 @@ class Graph(models.GraphModel):
             self.widgets[widget.pk] = widget
 
         return card
+
+    def add_function(self, function):
+        """
+        Adds a card to this graph
+
+        Arguments:
+        node -- a dictionary representing a Card instance or an actual models.CardModel instance
+
+        """
+
+        if not isinstance(function, models.FunctionXGraph):
+            functionobj = function.copy()
+            function = models.FunctionXGraph()
+            function.fuction_id = functionobj.functionid
+            function.config = functionobj.config
+
+        function.graph = self
+
+        return function
 
     def save(self):
         """
@@ -428,7 +452,7 @@ class Graph(models.GraphModel):
             node_map[node_id] = node.pk
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
-                node.nodegroup = models.NodeGroup(pk=node.pk)
+                node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
                 for card in copy_of_self.cards.itervalues():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()
@@ -932,8 +956,10 @@ class Graph(models.GraphModel):
                     card.name = self.name
                     card.description = self.description
                 else:
-                    card.name = self.nodes[card.nodegroup.pk].name
-                    card.description = self.nodes[card.nodegroup.pk].description
+                    if not card.name:
+                        card.name = self.nodes[card.nodegroup.pk].name
+                    if not card.description:
+                        card.description = self.nodes[card.nodegroup.pk].description
 
             cards.append(card)
 

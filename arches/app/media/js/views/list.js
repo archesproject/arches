@@ -86,13 +86,12 @@ define([
         * @param {object} evt - click event object
         */
         selectItem: function(item, evt){
-            if(this.trigger('item-selected', item, evt)){
-                var selectedStatus = item.selected();
-                if(this.single_select){
-                    this.clearSelection();
-                }
-                item.selected(!selectedStatus);
+            var selectedStatus = item.selected();
+            if(this.single_select){
+                this.clearSelection();
             }
+            item.selected(!selectedStatus);
+            this.trigger('item-clicked', item, evt);
         },
 
         /**

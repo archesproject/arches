@@ -259,7 +259,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('card', models.ForeignKey(to='models.CardModel', db_column='cardid')),
                 ('id', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('config', JSONField(blank=True, db_column='config', null=True)),
                 ('label', models.TextField(blank=True, null=True)),
                 ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
@@ -284,7 +284,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('datatype', models.TextField(primary_key=True, serialize=False)),
                 ('iconclass', models.TextField()),
-                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+                ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('configcomponent', models.TextField(blank=True, null=True)),
                 ('configname', models.TextField(blank=True, null=True)),
             ],
@@ -416,10 +416,23 @@ class Migration(migrations.Migration):
                 ('functiontype', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-
-                ],
+                ('defaultconfig', JSONField(blank=True, null=True, db_column='defaultconfig')),
+                ('component', models.TextField(blank=True, null=True)),
+            ],
             options={
                 'db_table': 'functions',
+                'managed': True,
+            },
+        ),
+        migrations.CreateModel(
+            name='FunctionXGraph',
+            fields=[
+                ('function', models.ForeignKey(to='models.Function', db_column='functionid')),
+                ('graph', models.ForeignKey(to='models.GraphModel', db_column='graphid')),
+                ('config', JSONField(blank=True, null=True, db_column='config')),
+            ],
+            options={
+                'db_table': 'functions_x_graphs',
                 'managed': True,
             },
         ),
@@ -445,7 +458,7 @@ class Migration(migrations.Migration):
                 ('ontologyclass', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
                 ('graph', models.ForeignKey(blank=False, db_column='graphid', null=False, to='models.GraphModel')),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
+                ('config', JSONField(blank=True, db_column='config', null=True)),
             ],
             options={
                 'db_table': 'nodes',
@@ -546,7 +559,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(null=True, blank=True)),
                 ('component', models.TextField()),
                 ('componentname', models.TextField()),
-                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+                ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
             ],
             options={
                 'db_table': 'report_templates',
@@ -560,8 +573,8 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(null=True, blank=True)),
                 ('template', models.ForeignKey(db_column='templateid', to='models.ReportTemplate')),
                 ('graph', models.ForeignKey(db_column='graphid', to='models.GraphModel')),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
-                ('formsconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='formsconfig', null=True)),
+                ('config', JSONField(blank=True, db_column='config', null=True)),
+                ('formsconfig', JSONField(blank=True, db_column='formsconfig', null=True)),
                 ('active', models.BooleanField(default=False)),
             ],
             options={
@@ -610,10 +623,11 @@ class Migration(migrations.Migration):
             name='Tile',
             fields=[
                 ('tileid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='tiledata', null=True)),
+                ('data', JSONField(blank=True, db_column='tiledata', null=True)),
                 ('nodegroup', models.ForeignKey(db_column='nodegroupid', to='models.NodeGroup')),
                 ('parenttile', models.ForeignKey(blank=True, db_column='parenttileid', null=True, to='models.Tile')),
                 ('resourceinstance', models.ForeignKey(db_column='resourceinstanceid', to='models.ResourceInstance')),
+                ('sortorder', models.IntegerField(blank=True, null=True, default=None)),
             ],
             options={
                 'db_table': 'tiles',
@@ -640,7 +654,7 @@ class Migration(migrations.Migration):
                 ('widgetid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('component', models.TextField()),
-                ('defaultconfig', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='defaultconfig', null=True)),
+                ('defaultconfig', JSONField(blank=True, db_column='defaultconfig', null=True)),
                 ('helptext', models.TextField(blank=True, null=True)),
                 ('datatype', models.TextField()),
             ],
@@ -654,7 +668,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
-                ('layerdefinitions', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='layerdefinitions', null=True)),
+                ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
                 ('sortorder', models.IntegerField(default=1)),
                 ('icon', models.TextField(default=None)),
@@ -669,7 +683,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.TextField()),
-                ('source', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='source', null=True)),
+                ('source', JSONField(blank=True, db_column='source', null=True)),
             ],
             options={
                 'db_table': 'map_sources',
@@ -775,6 +789,11 @@ class Migration(migrations.Migration):
             model_name='form',
             name='graph',
             field=models.ForeignKey(to='models.GraphModel', db_column='graphid', related_name='forms', null=False, blank=False),
+        ),
+        migrations.AddField(
+            model_name='graphmodel',
+            name='functions',
+            field=models.ManyToManyField(to='models.Function', through='FunctionXGraph'),
         ),
         migrations.AddField(
             model_name='graphmodel',
