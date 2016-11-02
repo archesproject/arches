@@ -5,8 +5,7 @@ require([
     'knockout-mapping',
     'views/graph/graph-page-view',
     'graph-settings-data',
-    'bindings/color-picker',
-    'function-templates',
+    'bindings/color-picker'
 ], function($, _, ko, koMapping, PageView, data) {
     /**
     * prep data for models
@@ -23,10 +22,6 @@ require([
     var graph = koMapping.fromJS(data.graph);
     var iconFilter = ko.observable('');
     var ontologyClass = ko.observable(data.node.ontologyclass);
-    var primaryNameConfig = koMapping.fromJS({
-        string_template: '',
-        nodegroup_id: ''
-    });
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
             return resource.isRelatable();
@@ -36,12 +31,10 @@ require([
         if (graph.ontology_id() === undefined) {
             graph.ontology_id(null);
         }
-        var x = primaryNameConfig;
         return JSON.stringify({
             graph: koMapping.toJS(graph),
             relatable_resource_ids: relatableResourceIds,
-            ontology_class: ontologyClass(),
-            primaryNameViewModel: koMapping.toJS(primaryNameConfig)
+            ontology_class: ontologyClass()
         });
     });
     var jsonCache = ko.observable(jsonData());
@@ -49,7 +42,6 @@ require([
         return jsonData() !== jsonCache();
     });
     var viewModel = {
-        primaryNameConfig: primaryNameConfig,
         dirty: dirty,
         iconFilter: iconFilter,
         icons: ko.computed(function () {

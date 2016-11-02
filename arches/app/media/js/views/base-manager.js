@@ -23,6 +23,9 @@ define([
             options = options ? options : {};
             options.viewModel = (options && options.viewModel) ? options.viewModel : {};
 
+            data.graphs.sort(function (left, right) {
+                return left.name.toLowerCase() == right.name.toLowerCase() ? 0 : (left.name.toLowerCase() < right.name.toLowerCase() ? -1 : 1);
+            });
             options.viewModel.allGraphs = ko.observableArray(data.graphs);
             options.viewModel.graphs = ko.computed(function() {
                 return ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
