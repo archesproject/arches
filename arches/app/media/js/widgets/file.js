@@ -17,15 +17,20 @@ define([
     return ko.components.register('file-widget', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = [];
+            params.configKeys = ['acceptedFiles'];
 
             WidgetViewModel.apply(this, [params]);
-            
+
             this.dropzoneButtonsDisabled = ko.observable(true);
             this.showProgressBar = ko.observable(false);
             this.progress = ko.observable(0);
-            
-            this.dropzoneOptions = { 
+            this.acceptedFiles.subscribe(function (val) {
+                if (self.dropzone) {
+                    self.dropzone.hiddenFileInput.setAttribute("accept", val);
+                }
+            });
+
+            this.dropzoneOptions = {
                 value: this.value,
                 url: "/target-url",
                 autoProcessQueue: false,
@@ -36,34 +41,30 @@ define([
                 autoQueue: false,
                 previewsContainer: ".dz-previews",
                 clickable: ".fileinput-button",
+                acceptedFiles: this.acceptedFiles(),
                 init: function () {
                     self.dropzone = this;
-                    
+                    window.dz3 = self.dropzone;
+
                     this.on("addedfile", function(file) {
                         self.dropzoneButtonsDisabled(false);
                     });
-                    
+
                     this.on("totaluploadprogress", function(progress) {
                         self.progress(progress);
                     });
-                    
+
                     this.on("sending", function(file) {
                         self.showProgressBar(true);
                     });
-                    
+
                     this.on("queuecomplete", function(progress) {
                         self.progress(0);
                         self.showProgressBar(false);
                     });
                 }
             };
-            
-            this.uploadFiles = function() {
-                if (self.dropzone) {
-                    self.dropzone.enqueueFiles(self.dropzone.getQueuedFiles());
-                }
-            };
-            
+
             this.reset = function() {
                 if (self.dropzone) {
                     self.dropzone.removeAllFiles(true);

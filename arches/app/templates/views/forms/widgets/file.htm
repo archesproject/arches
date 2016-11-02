@@ -23,9 +23,6 @@
                                     </span>
 
                                     <div class="btn-group pull-right">
-                                        <button id="dz-upload-btn" class="btn btn-primary" type="submit" data-bind="click: uploadFiles">
-                                            <i class="fa fa-upload-cloud"></i> Upload
-                                        </button>
                                         <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">
                                             <i class="ion ion-close"></i>
                                         </button>
@@ -69,4 +66,10 @@
 {% endblock form %}
 
 {% block config_form %}
+<div class="control-label">
+    {% trans "Accepted Files" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Accepted Files" %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+</div>
 {% endblock config_form %}

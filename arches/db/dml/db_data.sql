@@ -222,7 +222,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'widgets/domain-checkbox', 'domain-value-list', '{}');
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
-    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'widgets/file', 'file-list', '{}');
+    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'widgets/file', 'file-list', '{"acceptedFiles": ""}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
