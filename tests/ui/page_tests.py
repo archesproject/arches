@@ -148,6 +148,8 @@ class UITest(StaticLiveServerTestCase):
         #Navigate to the card manager and click on the correspoding card for the node created above
         card_page = CardPage(self.driver, self.live_server_url, graph_id)
         card_id = card_page.select_card(node_ids)
+
         map_widget_page = MapWidgetPage(self.driver, self.live_server_url, 'card', card_id)
         tools_opened = map_widget_page.open_tools()
+
         self.assertTrue(tools_opened)

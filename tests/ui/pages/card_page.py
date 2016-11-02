@@ -23,7 +23,10 @@ class CardPage(BasePage):
         Clicks on the card in the card-manager with a specified nodegroup_id
 
         """
-
+        wait = WebDriverWait(self.driver, 20)
+        wait.until(
+            EC.invisibility_of_element_located(locators.LOADING_MASK)
+        )
         self.driver.get(self.live_server_url + self.base_url)
         self.driver.implicitly_wait(10)
         wait = WebDriverWait(self.driver, 20)

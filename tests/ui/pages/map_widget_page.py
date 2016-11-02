@@ -28,8 +28,7 @@ class MapWidgetPage(BasePage):
         try:
             map_tools_button = wait.until(
                 EC.element_to_be_clickable(locators.MAP_TOOLS_BUTTON)
-            )
-            map_tools_button.click()
+            ).click()
             result = True
         except:
             result = False
