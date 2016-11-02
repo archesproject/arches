@@ -34,7 +34,6 @@ define([
                 branch.graphModel = new GraphModel({
                     data: branch
                 })
-                console.log(branch)
                 this.items.push(branch);
             }, this);
             this.selectedBranch = ko.observable(null);
