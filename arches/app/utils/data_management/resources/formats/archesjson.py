@@ -69,8 +69,6 @@ class JsonWriter(Writer):
         export['business_data']['resources'] = resources
         export['business_data']['relations'] = relations
 
-
-
         with open(dest_dir, 'w') as f:
             f.write(JSONSerializer().serialize(export))
 
