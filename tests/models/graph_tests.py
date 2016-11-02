@@ -133,7 +133,8 @@ class GraphTests(ArchesTestCase):
                 "helptext": "",
                 "cardinality": "n",
                 "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c"
-            }]
+            }],
+            'functions':[]
         }
 
         nodes_count_before = models.Node.objects.count()

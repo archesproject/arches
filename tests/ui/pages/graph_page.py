@@ -41,10 +41,14 @@ class GraphPage(BasePage):
         try:
             graph_id = wait.until(
                 script_returns_true('''
-                    var matches = window.location.pathname.match(/(''' + uuid_regex + ''')/i);
-                    if (matches && matches.length === 2){
-                        return matches[1];
-                    }else{
+                    try{
+                        var matches = window.location.pathname.match(/(''' + uuid_regex + ''')/i);
+                        if (matches && matches.length === 2){
+                            return matches[1];
+                        }else{
+                            return false;
+                        }
+                    }catch(err){
                         return false;
                     }
                 ''')
