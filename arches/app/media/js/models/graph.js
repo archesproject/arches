@@ -433,7 +433,10 @@ define(['arches',
                 return selectedNode;
             }));
 
-            this.get('root').selected(true);
+            var root = this.get('root');
+            if(!!root){
+                root.selected(true);
+            }
 
             this.graphCards = ko.computed(function(){
                 var parentCards = [];
