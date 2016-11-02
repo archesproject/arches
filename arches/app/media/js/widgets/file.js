@@ -19,8 +19,6 @@ define([
             var self = this;
             params.configKeys = [];
 
-            this.images = ko.observableArray([]); // Multiple images.
-
             WidgetViewModel.apply(this, [params]);
             
             this.dropzoneButtonsDisabled = ko.observable(true);
@@ -28,7 +26,7 @@ define([
             this.progress = ko.observable(0);
             
             this.dropzoneOptions = { 
-                value: this.images,
+                value: this.value,
                 url: "/target-url",
                 autoProcessQueue: false,
                 thumbnailWidth: 50,
@@ -62,11 +60,11 @@ define([
             
             this.uploadFiles = function() {
                 if (self.dropzone) {
-                    self.dropzone.enqueueFiles(self.dropzone.getFilesWithStatus(Dropzone.ADDED));
+                    self.dropzone.enqueueFiles(self.dropzone.getQueuedFiles());
                 }
             };
             
-            this.removeAllFiles = function() {
+            this.reset = function() {
                 if (self.dropzone) {
                     self.dropzone.removeAllFiles(true);
                     self.dropzoneButtonsDisabled(true);
