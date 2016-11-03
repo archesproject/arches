@@ -78,6 +78,7 @@
                                                     name: form.widgetLookup[widget.get("widget_id")()].name,
                                                     params: {
                                                         formData: tile.formData,
+                                                        tile: tile,
                                                         form: form,
                                                         config: configJSON,
                                                         label: widget.get("label")(),
@@ -144,6 +145,7 @@
                                                         name: form.widgetLookup[card.get('widgets')()[0].get("widget_id")()].name,
                                                         params: {
                                                             formData: innerTile.formData,
+                                                            tile: innerTile,
                                                             form: form,
                                                             config: card.get('widgets')()[0].configJSON,
                                                             label: card.get('widgets')()[0].get("label")(),
@@ -187,6 +189,7 @@
                                                         name: form.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
                                                             formData: innerTile.formData,
+                                                            tile: innerTile,
                                                             form: form,
                                                             config: configJSON,
                                                             label: widget.get("label")(),

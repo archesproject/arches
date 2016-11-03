@@ -22,9 +22,10 @@ define([
             WidgetViewModel.apply(this, [params]);
 
             if (this.form) {
-                this.form.on('after-update', function (res) {
+                this.form.on('after-update', function (res, tile) {
                     // TODO: detect if this widget was part of save, update value accordingly
-                    // to reflect the uploaded state of files...
+                    // to reflect the uploaded state of files... maybe this:
+                    console.log(self.tile === tile || _.contains(tile.tiles, self.tile))
                 });
             }
 
@@ -44,11 +45,11 @@ define([
             this.filesForUpload = ko.observableArray();
 
             this.filesForUpload.subscribe(function () {
-                if (_.contains(self.formData.keys(), self.node.nodeid)) {
-                    self.formData.delete(self.node.nodeid);
+                if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
+                    self.formData.delete('file-list_' + self.node.nodeid);
                 }
                 _.each(self.filesForUpload(), function (file) {
-                    self.formData.append(self.node.nodeid, file, file.name);
+                    self.formData.append('file-list_' + self.node.nodeid, file, file.name);
                 });
             });
 

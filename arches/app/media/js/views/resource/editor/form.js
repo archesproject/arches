@@ -213,7 +213,7 @@ define([
                             this.clearTileValues(tile);
                         }
                     }
-                    this.trigger('after-update', response);
+                    this.trigger('after-update', response, tile);
                 }, this, tile.formData);
             }
         },
@@ -227,13 +227,20 @@ define([
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
             this.trigger('before-update');
+            parentTile.tiles.forEach(function (tile) {
+                tile.formData.keys().forEach(function (key) {
+                    tile.formData.getAll(key).forEach(function (value) {
+                        parentTile.formData.append(key, value);
+                    });
+                });
+            });
             model.save(function(response, status, model){
                 if(response.status === 200){
                     this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
                     this.clearTile(parentTile);
                 }
-                this.trigger('after-update', response);
-            }, this, tile.formData);
+                this.trigger('after-update', response, parentTile);
+            }, this, parentTile.formData);
         },
 
         /**
@@ -259,7 +266,7 @@ define([
                         tile._data(JSON.stringify(response.responseJSON.data));
                     }
                 }
-                this.trigger('after-update', response);
+                this.trigger('after-update', response, tile);
             }, this, tile.formData);
         },
 
@@ -379,15 +386,6 @@ define([
             e.stopPropagation();
         },
 
-        clearFormData: function (tile) {
-            var self = this;
-            if (tile.formData) {
-                tile.formData.getKeys().forEach(function (key) {
-                    self.formData.delete(key);
-                });
-            }
-        },
-
         /**
          * removes any existing values set on the tile as well as removing any child tile instances
          * @memberof Form.prototype
@@ -419,7 +417,6 @@ define([
                     }
                 }, this);
             }
-            this.clearFormData(tile);
             tile.dirty(false);
         },
 
@@ -433,7 +430,6 @@ define([
             _.each(tile.data, function(value, key, list){
                 value("");
             }, this);
-            this.clearFormData(tile);
             //tile.dirty(false);
         }
 
