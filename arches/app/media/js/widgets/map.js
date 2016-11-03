@@ -573,11 +573,12 @@ define([
 
                 this.overlayLibrary = ko.observableArray(this.createOverlays())
                 this.overlays = ko.observableArray()
+
                 this.exchangeOverlay = function(e) {
                   if (this.checkedOutOfLibrary() === true) {
                     self.overlays.remove(this)
                   } else {
-                    self.overlays.push(this);                    
+                    self.overlays.push(this);
                   }
                   this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
                 }
