@@ -31,6 +31,27 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_string
+from arches.app.views.base import BaseManagerView
+
+
+class RDMView(BaseManagerView):
+    def get(self, request, conceptid):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        languages = models.DLanguage.objects.all()
+
+        concept_schemes = []
+        for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
+            concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
+        context = self.get_context_data(
+            main_script='rdm',
+            active_page='RDM',
+            languages=languages,
+            conceptid=conceptid,
+            concept_schemes=concept_schemes,
+            CORE_CONCEPTS=CORE_CONCEPTS
+        )
+        return render(request, 'rdm.htm', context)
 
 
 def get_sparql_providers(endpoint=None):

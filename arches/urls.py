@@ -23,6 +23,7 @@ from django.conf.urls.i18n import patterns
 from arches.app.views import concept, entity, main, map, resources, search, config, graph
 from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
 from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
+from arches.app.views.concept import RDMView
 from arches.app.views.tile import TileData
 
 # Uncomment the next two lines to enable the admin:
@@ -35,7 +36,7 @@ urlpatterns = [
     url(r'^$', main.index),
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
-    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , concept.rdm, name='rdm'),
+    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^map', map.get_page, name="map"),
     url(r'^geocoder', search.geocode, name="geocoder"),
 
