@@ -4298,6 +4298,109 @@ div.row.widget-wrapper.report-header:hover {
     border: 1px solid #999;
 }
 
+.overlay-selection-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 10px 20px;
+    width: calc(100% - 250px);
+    background: #fff;
+    height: 500px;
+    border: 1px solid #ddd;
+    border-right-width: 0px;
+    z-index: 10;
+}
+
+.overlay-selection-container.selector-closed {
+    visibility: hidden;
+}
+
+.overlay-close {
+    font-size: 19px;
+    color: #888;
+}
+.overlay-close:hover {
+    cursor: pointer;
+    color: #555;
+}
+.overlay-title {
+    font-size: 16px;
+}
+.overlay-filter-container {
+    position: relative;
+    padding-top: 5px;
+}
+.overlay-list-container {
+    padding-top: 20px;
+    padding-left: 0px;
+}
+
+.overlay-card {
+   float: left;
+   width: calc(100% - 50px);
+   height: 50px;
+   margin: 0px;
+   position: relative;
+   padding: 0px;
+   border: 1px solid #ddd;
+   border-top-width: 0px;
+   background: #fcfcfc ;
+}
+
+.overlay-card:hover {
+    background: #fff;
+    cursor: pointer;
+}
+
+.overlay-card:first-of-type {
+    border-top: 1px solid #ddd;
+}
+
+.overlay-card.selected {
+    background: #fff;
+}
+
+.overlay-card-item {
+    position: relative;
+}
+
+.overlay-card-main {
+   position: absolute;
+   left: 67px;
+   top: 15px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   font-size: 14px;
+}
+
+.overlay-card-vis-toggle {
+    position: absolute;
+   top: 0px;
+   left: 0px;
+   text-align: center;
+   width: 50px;
+   height: 50px;
+   padding-top: 12px;
+   font-size: 17px;
+   border-right: 1px solid #ddd;
+   color: #999;
+   vertical-align: middle;
+   display: table-cell;
+}
+
+.overlay-card-main a {
+    color: #999;
+}
+
+.overlay-card.selected div div a {
+    color: #555;
+}
+
+.overlay-card.selected div div i {
+    color: #666;
+}
+
 .geocode-container-shim {
     margin-right: 210px;
 }
@@ -4672,9 +4775,9 @@ a.map-widget-icon:hover {
 .library-header {
     display: flex;
     align-items: center;
-    height: 40px; 
+    height: 40px;
     font-size: 15px;
-    background: #f4f4f4; 
+    background: #f4f4f4;
     border-bottom: 1px solid #e4e4e4;
 }
 
