@@ -58,29 +58,15 @@
            </div>
            <!-- Overlay List -->
            <div class="overlay-list-container">
-               <div id="overlay-grid" class="grid" style="position: relative;">
+               <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: overlayLibrary">
                        <!-- Overlay Item -->
-                       <div class="overlay-card selected" style="">
+                       <div class="overlay-card selected" style="" data-bind="click: $parent.exchangeOverlay">
                            <div class="overlay-card-item">
                                <div class="overlay-card-vis-toggle">
                                    <i class="ion-checkmark-circled"></i>
                                </div>
                                <div class="overlay-card-main" style="">
-                                   <a id="" class="" style="" href="#">
-                                       Overlay Name
-                                   </a>
-                               </div>
-                           </div>
-                       </div>
-                       <!-- Overlay Item -->
-                       <div class="overlay-card" style="">
-                           <div class="overlay-card-item">
-                               <div class="overlay-card-vis-toggle">
-                                   <i class="ion-checkmark-circled"></i>
-                               </div>
-                               <div class="overlay-card-main" style="">
-                                  <a id="" class="" style="" href="#">
-                                       Overlay Name
+                                   <a id="" class="" style="" href="#"><span data-bind="text: name"></span>
                                    </a>
                                </div>
                            </div>

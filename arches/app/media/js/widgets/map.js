@@ -58,7 +58,8 @@ define([
                 'resourceColor',
                 'resourcePointSize',
                 'resourceLineWidth',
-                'featureEditingDisabled'
+                'featureEditingDisabled',
+                'overlayList'
             ];
 
             WidgetViewModel.apply(this, [params]);
@@ -548,6 +549,7 @@ define([
                                 })[0],
                                 showingTools: ko.observable(false),
                                 invisible: ko.observable(false),
+                                checkedOutOfLibrary: ko.observable(false),
                                 toggleOverlayTools: function(e) {
                                     this.showingTools(!this.showingTools());
                                 },
@@ -569,7 +571,16 @@ define([
                     return overlays;
                 }
 
-                this.overlays = ko.observableArray(this.createOverlays())
+                this.overlayLibrary = ko.observableArray(this.createOverlays())
+                this.overlays = ko.observableArray()
+                this.exchangeOverlay = function(e) {
+                  if (this.checkedOutOfLibrary() === true) {
+                    self.overlays.remove(this)
+                  } else {
+                    self.overlays.push(this);                    
+                  }
+                  this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
+                }
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
                     return baselayer.isoverlay === false
