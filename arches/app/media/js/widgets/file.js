@@ -24,7 +24,8 @@ define([
             if (this.form) {
                 this.form.on('after-update', function (res, tile) {
                     // TODO: detect if this widget was part of save, update value accordingly
-                    // to reflect the uploaded state of files... maybe this:
+                    // to reflect the uploaded state of files and clear the formData of files...
+                    // maybe this:
                     console.log(self.tile === tile || _.contains(tile.tiles, self.tile))
                 });
             }
@@ -43,6 +44,7 @@ define([
                 }
             });
             this.filesForUpload = ko.observableArray();
+            this.uploadedFiles = ko.observableArray();
 
             this.filesForUpload.subscribe(function () {
                 if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
@@ -53,8 +55,32 @@ define([
                 });
             });
 
+            var filesJSON = ko.computed(function () {
+                var filesForUpload = self.filesForUpload();
+                var uploadedFiles = self.uploadedFiles();
+                filesForUpload = _.map(filesForUpload, function(file) {
+                    return {
+                        name: file.name,
+                        accepted: file.accepted,
+                        height: file.height,
+                        lastModified: file.lastModified,
+                        size: file.size,
+                        status: file.status,
+                        type: file.type,
+                        width: file.width,
+                        url: null
+                    };
+                });
+                return filesForUpload;
+            });
+
+            console.log(ko.toJS(self.value));
+            filesJSON.subscribe(function (value) {
+                console.log(value);
+                self.value(value);
+            });
+
             this.dropzoneOptions = {
-                value: this.value,
                 url: "/target-url",
                 autoProcessQueue: false,
                 thumbnailWidth: 50,

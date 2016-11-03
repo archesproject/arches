@@ -36,10 +36,19 @@ class TileData(View):
             if self.action == 'update_tile':
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
+                    nodegroup = models.NodeGroup.objects.get(pk=data['nodegroup_id'])
+                    for node in nodegroup.node_set.all():
+                        if node.datatype == 'file-list':
+                            files = request.FILES.get('file-list_' + str(node.pk), None)
+                            if files:
+                                # TODO: save files and update tile data...
+                                print files
+
+
                     tile, created = models.Tile.objects.update_or_create(
-                        tileid = data['tileid'], 
+                        tileid = data['tileid'],
                         defaults = {
-                            'nodegroup_id': data['nodegroup_id'], 
+                            'nodegroup_id': data['nodegroup_id'],
                             'data': data['data'],
                             'resourceinstance_id': data['resourceinstance_id'],
                             'parenttile_id': data['parenttile_id']
@@ -47,7 +56,7 @@ class TileData(View):
                     )
                     return data
 
-                if 'tiles' in data and len(data['tiles']) > 0:                
+                if 'tiles' in data and len(data['tiles']) > 0:
                     parenttile = saveTile(data)
 
                     for tiles in data['tiles'].itervalues():
@@ -60,7 +69,7 @@ class TileData(View):
                 return JSONResponse(data)
 
             if self.action == 'reorder_tiles':
-                if 'tiles' in data and len(data['tiles']) > 0:                
+                if 'tiles' in data and len(data['tiles']) > 0:
                     sortorder = 0
                     for tile in data['tiles']:
                         t = models.Tile(tileid=tile['tileid'], sortorder=sortorder)
@@ -68,7 +77,7 @@ class TileData(View):
                         t.save(update_fields=['sortorder'])
 
                     return JSONResponse(data)
-        
+
         return HttpResponseNotFound()
 
     def delete(self, request):
