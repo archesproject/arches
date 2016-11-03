@@ -465,6 +465,11 @@ class Concept(object):
                 concepts_to_delete = Concept.gather_concepts_to_delete(subconcept)
                 deleteconcepts(concepts_to_delete)
 
+            for value in self.values:
+                if not isinstance(value, ConceptValue):
+                    value = ConceptValue(value)
+                value.delete_index()
+
     def concept_tree(self, top_concept='00000000-0000-0000-0000-000000000001', lang=settings.LANGUAGE_CODE):
         class concept(object):
             def __init__(self, *args, **kwargs):
@@ -825,7 +830,7 @@ class ConceptValue(object):
     def delete_index(self):   
         se = SearchEngineFactory().create() 
         query = Query(se, start=0, limit=10000)
-        phrase = Match(field='conceptid', query=self.conceptid, type='phrase')
+        phrase = Match(field='id', query=self.id, type='phrase')
         query.add_query(phrase)
         query.delete(index='concept_labels')  
         se.delete_terms(self.id)
