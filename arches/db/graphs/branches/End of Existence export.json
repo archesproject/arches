@@ -1,10 +1,13 @@
 {
   "graph": [
     {
-      "iconclass": "fa fa-long-arrow-up",
+      "subtitle": "",
+      "mapfeaturecolor": "rgba(255,0.0,0.0,1.0)",
+      "isresource": false,
+      "iconclass": "fa fa-arrow-down",
       "domain_connections": [
         {
-          "ontology_property": "P92i_was_brought_into_existence_by",
+          "ontology_property": "P93i_was_taken_out_of_existence_by",
           "ontology_classes": [
             "E75_Conceptual_Object_Appellation",
             "E22_Man-Made_Object",
@@ -2382,124 +2385,141 @@
           ]
         }
       ],
-      "graphid": "da8cf543-957e-11e6-b664-024f9e178154",
-      "name": "Beginning of Existence",
       "nodegroups": [
         {
           "cardinality": "1",
           "legacygroupid": null,
-          "nodegroupid": "da8cf542-957e-11e6-b664-024f9e178154",
+          "nodegroupid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
           "parentnodegroup_id": null
         }
       ],
       "author": " GCI",
-      "description": "Describes the type and time span of the beginning of a resource's existence.",
       "deploymentfile": null,
-      "isresource": false,
+      "version": "",
+      "nodes": [
+        {
+          "functions": [],
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E55_Type",
+          "nodeid": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
+          "datatype": "concept",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": {
+            "topConcept": null
+          },
+          "parentproperty": "P2_has_type",
+          "name": "End of Existence Type"
+        },
+        {
+          "functions": [],
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E49_Time_Appellation",
+          "nodeid": "158c01fb-97d3-11e6-84a5-026d961c88e6",
+          "datatype": "date",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P78_is_identified_by",
+          "name": "End Date of Existence"
+        },
+        {
+          "functions": [],
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Represents a single node in a graph",
+          "istopnode": false,
+          "ontologyclass": "E52_Time-Span",
+          "nodeid": "ff813525-97d2-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "P4_has_time-span",
+          "name": "End of Existence Time Span"
+        },
+        {
+          "functions": [],
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "",
+          "istopnode": true,
+          "ontologyclass": "E64_End_of_Existence",
+          "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "datatype": "semantic",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "config": null,
+          "parentproperty": "",
+          "name": "End of Existence"
+        }
+      ],
+      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "description": "Describes the type and time span of the end of a resource's existence.",
       "edges": [
         {
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "741f5d78-957f-11e6-b664-024f9e178154",
-          "domainnode_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "rangenode_id": "741f5d77-957f-11e6-b664-024f9e178154",
-          "ontologyproperty": "P4_has_time-span",
+          "edgeid": "158c01fc-97d3-11e6-84a5-026d961c88e6",
+          "domainnode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
+          "rangenode_id": "158c01fb-97d3-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P78_is_identified_by",
           "description": null
         },
         {
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "36229b3e-957f-11e6-b664-024f9e178154",
-          "domainnode_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "rangenode_id": "36229b3d-957f-11e6-b664-024f9e178154",
+          "edgeid": "eff93ff4-97d2-11e6-84a5-026d961c88e6",
+          "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "rangenode_id": "eff93ff3-97d2-11e6-84a5-026d961c88e6",
           "ontologyproperty": "P2_has_type",
           "description": null
         },
         {
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
           "name": null,
-          "edgeid": "860c246c-957f-11e6-b664-024f9e178154",
-          "domainnode_id": "741f5d77-957f-11e6-b664-024f9e178154",
-          "rangenode_id": "860c246b-957f-11e6-b664-024f9e178154",
-          "ontologyproperty": "P78_is_identified_by",
+          "edgeid": "ff813526-97d2-11e6-84a5-026d961c88e6",
+          "domainnode_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "rangenode_id": "ff813525-97d2-11e6-84a5-026d961c88e6",
+          "ontologyproperty": "P4_has_time-span",
           "description": null
         }
       ],
-      "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
-      "version": "",
-      "cards": [],
+      "maplinewidth": 1,
+      "mappointsize": 4,
+      "graphid": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+      "name": "End of Existence",
       "cards_x_nodes_x_widgets": [],
       "forms": [],
       "forms_x_cards": [],
       "reports": [],
-      "subtitle": "",
-      "nodes": [
+      "cards": [
         {
+          "itemtext": null,
           "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E52_Time-Span",
-          "nodeid": "741f5d77-957f-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P4_has_time-span",
-          "name": "Beginning of Existence Time Span"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E55_Type",
-          "nodeid": "36229b3d-957f-11e6-b664-024f9e178154",
-          "datatype": "concept",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": {
-            "topConcept": "0e7f2299-2824-4c12-b9fb-eebc05cbff06"
-          },
-          "parentproperty": "P2_has_type",
-          "name": "Beginning of Existence Type"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "Represents a single node in a graph",
-          "istopnode": false,
-          "ontologyclass": "E49_Time_Appellation",
-          "nodeid": "860c246b-957f-11e6-b664-024f9e178154",
-          "datatype": "date",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "P78_is_identified_by",
-          "name": "Start Date of Existence"
-        },
-        {
-          "functions": [],
-          "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
-          "description": "",
-          "istopnode": true,
-          "ontologyclass": "E63_Beginning_of_Existence",
-          "nodeid": "da8cf542-957e-11e6-b664-024f9e178154",
-          "datatype": "semantic",
-          "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
-          "config": null,
-          "parentproperty": "",
-          "name": "Beginning of Existence"
+          "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
+          "description": "Describes the type and time span of the end of a resource's existence.",
+          "name": "End of Existence",
+          "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "b3993f5b-97d2-11e6-84a5-026d961c88e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
         }
       ],
       "root": {
         "functions": [],
-        "graph_id": "da8cf543-957e-11e6-b664-024f9e178154",
+        "graph_id": "b3993f59-97d2-11e6-84a5-026d961c88e6",
         "description": "",
         "istopnode": true,
-        "ontologyclass": "E63_Beginning_of_Existence",
-        "nodeid": "da8cf542-957e-11e6-b664-024f9e178154",
+        "ontologyclass": "E64_End_of_Existence",
+        "nodeid": "b3993f58-97d2-11e6-84a5-026d961c88e6",
         "datatype": "semantic",
-        "nodegroup_id": "da8cf542-957e-11e6-b664-024f9e178154",
+        "nodegroup_id": "b3993f58-97d2-11e6-84a5-026d961c88e6",
         "config": null,
-        "name": "Beginning of Existence"
+        "name": "End of Existence"
       },
       "isactive": true,
       "deploymentdate": null
