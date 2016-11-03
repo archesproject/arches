@@ -85,10 +85,15 @@ define([
             this.drawMode = ko.observable();
             this.selectedFeatureType = ko.observable();
             this.mapToolsExpanded = ko.observable(false);
+            this.overlaySelectorClosed = ko.observable(true);
             this.geocodeShimAdded = ko.observable(false);
             this.mapToolsExpanded.subscribe(function(expanded) {
                 self.geocodeShimAdded(expanded);
             });
+
+            this.toggleOverlaySelector = function(e){
+              this.overlaySelectorClosed(!this.overlaySelectorClosed());
+            };
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
             this.layers = _.clone(arches.mapLayers);
