@@ -46,6 +46,34 @@
             </div>
         </div>
         <!-- /ko -->
+        <div class="overlay-selection-container" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+           <!-- Title -->
+           <div class="overlay-title">
+               Map Overlays
+               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: toggleOverlaySelector"></i></span>
+           </div>
+           <!-- Filter -->
+           <div class="overlay-filter-container">
+               <input type="text" placeholder="filter overlays..." class="form-control grid-filter input-lg">
+           </div>
+           <!-- Overlay List -->
+           <div class="overlay-list-container">
+               <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: overlayLibrary">
+                       <!-- Overlay Item -->
+                     <div class="overlay-card" style="" data-bind="click: $parent.exchangeOverlay, css: {'selected': checkedOutOfLibrary}">
+                         <div class="overlay-card-item">
+                             <div class="overlay-card-vis-toggle">
+                                 <i class="ion-checkmark-circled"></i>
+                             </div>
+                             <div class="overlay-card-main" style="">
+                                 <a id="" class="" style="" href="#"><span data-bind="text: name"></span>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+               </div>
+           </div>
+        </div>
 
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
@@ -117,7 +145,13 @@
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.overlays}">
             <!-- Panel Title -->
             <div class="map-widget-panel-title">
-                <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
+                <h4 class=""> Overlays
+                  <i class="ion-ios-plus pull-right add-tooltip"
+                    data-placement="left"
+                    data-toggle="tooltip"
+                    data-original-title="add overlay"
+                    data-bind="click: toggleOverlaySelector"
+                    ></i></h4>
             </div>
 
             <div data-bind="sortable: overlays">
