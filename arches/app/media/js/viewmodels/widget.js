@@ -11,6 +11,8 @@ define(['knockout', 'underscore'], function (ko, _) {
         var self = this;
         this.state = params.state || 'form';
         this.value = params.value || ko.observable(null);
+        this.formData = params.formData || new FormData();
+        this.form = params.form || null;
         this.displayValue = ko.computed(function() {
             var val = ko.isObservable() ? self.value() : self.value;
             return val;

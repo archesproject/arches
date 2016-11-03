@@ -21,6 +21,13 @@ define([
 
             WidgetViewModel.apply(this, [params]);
 
+            if (this.form) {
+                this.form.on('after-update', function (res) {
+                    // TODO: detect if this widget was part of save, update value accordingly
+                    // to reflect the uploaded state of files...
+                });
+            }
+
             this.dropzoneButtonsDisabled = ko.observable(true);
             this.showProgressBar = ko.observable(false);
             this.progress = ko.observable(0);
@@ -35,6 +42,15 @@ define([
                 }
             });
             this.filesForUpload = ko.observableArray();
+
+            this.filesForUpload.subscribe(function () {
+                if (_.contains(self.formData.keys(), self.node.nodeid)) {
+                    self.formData.delete(self.node.nodeid);
+                }
+                _.each(self.filesForUpload(), function (file) {
+                    self.formData.append(self.node.nodeid, file, file.name);
+                });
+            });
 
             this.dropzoneOptions = {
                 value: this.value,

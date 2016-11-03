@@ -29,7 +29,7 @@ from django.views.generic import View
 class TileData(View):
     action = 'update_tile'
     def post(self, request):
-        json = request.body
+        json = request.POST.get('data', None)
         if json != None:
             data = JSONDeserializer().deserialize(json)
 
