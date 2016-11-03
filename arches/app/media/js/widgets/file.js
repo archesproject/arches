@@ -34,6 +34,7 @@ define([
                     self.dropzone.options.maxFilesize = val;
                 }
             });
+            this.filesForUpload = ko.observableArray();
 
             this.dropzoneOptions = {
                 value: this.value,
@@ -53,6 +54,11 @@ define([
 
                     this.on("addedfile", function(file) {
                         self.dropzoneButtonsDisabled(false);
+                        self.filesForUpload.push(file);
+                    });
+
+                    this.on("removedfile", function(file) {
+                        self.filesForUpload.remove(file);
                     });
 
                     this.on("totaluploadprogress", function(progress) {

@@ -17,37 +17,6 @@ define([
                     options[key] = $(element).find(value)[0];
                 });
 
-            var optionsInit = options.init;
-            var dropzoneInit = function() {
-                this.on('success', function(file, resp) {
-                    if (Array.isArray(options.value()))
-                        options.value.push(resp.url);
-                    else
-                        options.value(resp.url);
-                });
-
-                this.on('error', function(file, err) {
-                    console.error('dropzone@err:', err);
-                });
-
-                this.on('removedfile', function(file) {
-                    var imageUrl = JSON.parse(file.xhr.response).url;
-                    if (Array.isArray(options.value())) {
-                        options.value.remove(imageUrl);
-                    } else {
-                        options.value(null);
-                    }
-                });
-
-                if (typeof optionsInit === 'function') {
-                    optionsInit.apply(this);
-                }
-            };
-
-            $.extend(options, {
-                init: dropzoneInit
-            });
-
             $(element).dropzone(options);
         }
     }
