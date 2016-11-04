@@ -159,10 +159,10 @@
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% endautoescape %}},
             mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
+                'maplayerid': '{{ map_layer.maplayerid }}',
                 'name': '{{ map_layer.name }}',
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
-                'sortorder': {{ map_layer.sortorder }},
                 'icon': '{{ map_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{

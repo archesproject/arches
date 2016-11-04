@@ -677,11 +677,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MapLayers',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('maplayerid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('name', models.TextField()),
                 ('layerdefinitions', JSONField(blank=True, db_column='layerdefinitions', null=True)),
                 ('isoverlay', models.BooleanField(default=False)),
-                ('sortorder', models.IntegerField(default=1)),
                 ('icon', models.TextField(default=None)),
             ],
             options={
