@@ -59,7 +59,7 @@ define([
                 'resourcePointSize',
                 'resourceLineWidth',
                 'featureEditingDisabled',
-                'overlayList'
+                'overlayConfigs'
             ];
 
             WidgetViewModel.apply(this, [params]);
@@ -81,7 +81,6 @@ define([
                     this.resourceLineWidth(Number(this.resourceLineWidth()))
                 }
             }
-
             this.selectedBasemap = this.basemap;
             this.drawMode = ko.observable();
             this.selectedFeatureType = ko.observable();
@@ -535,11 +534,35 @@ define([
                     placeholder: this.geocodePlaceholder()
                 };
 
+                this.removeMaplayer = function(maplayer){
+                  maplayer.layer_definitions.forEach(function(layer){
+                    map.removeLayer(layer.id)
+                  })
+                }
+
+                this.addMaplayer = function(maplayer){
+                  maplayer.layer_definitions.forEach(function(layer) {
+                      map.addLayer(layer, this.anchorLayerId);
+                      map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
+                  }, this)
+                }
+
+                this.overlays = ko.observableArray();
+                this.overlayLibrary = ko.observableArray();
+                this.overlayLibrary.subscribe(function(overlays){
+                  _.each(overlays, function(overlay){
+                      if (overlay.checkedOutOfLibrary() === true) {
+                        self.overlays.push(overlay)
+                      }
+                  })
+                });
+
                 this.createOverlays = function() {
                     var overlays =
                         _.each(_.where(this.layers, {
                             isoverlay: true
                         }), function(overlay) {
+                            var self = this;
                             _.extend(overlay, {
                                 opacity: ko.observable(100),
                                 color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
@@ -563,21 +586,23 @@ define([
                                     }, map)
                                 }
                             });
+                            overlay.checkedOutOfLibrary(this.overlayConfigs()[overlay.maplayerid] !== undefined)
                             overlay.opacity.subscribe(function(value) {
                                 overlay.updateOpacity(value);
-                            });
-                        });
+                            }, self);
+                        }, self);
 
                     return overlays;
                 }
 
-                this.overlayLibrary = ko.observableArray(this.createOverlays())
-                this.overlays = ko.observableArray()
+                this.overlayLibrary(this.createOverlays())
 
                 this.exchangeOverlay = function(e) {
                   if (this.checkedOutOfLibrary() === true) {
                     self.overlays.remove(this)
+                    self.removeMaplayer(this)
                   } else {
+                    self.addMaplayer(this)
                     self.overlays.push(this);
                   }
                   this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
@@ -664,16 +689,13 @@ define([
                 this.map.on('click', this.updateDrawMode())
 
                 this.overlays.subscribe(function(overlays) {
+                    this.overlayConfigs({});
                     for (var i = overlays.length; i-- > 0;) { //Using a conventional loop because we want to go backwards over the array
-                        overlays[i].layer_definitions.forEach(function(layer) {
-                            map.removeLayer(layer.id)
-                        })
+                        this.removeMaplayer(overlays[i])
                     }
                     for (var i = overlays.length; i-- > 0;) {
-                        overlays[i].layer_definitions.forEach(function(layer) {
-                            map.addLayer(layer, this.anchorLayerId);
-                            map.setPaintProperty(layer.id, layer.type + '-opacity', overlays[i].opacity() / 100.0);
-                        }, this)
+                        this.overlayConfigs()[overlays[i].maplayerid] = {'name':overlays[i].name, 'opacity':overlays[i].opacity(), 'sortorder':i}
+                        this.addMaplayer(overlays[i])
                     }
                     this.redrawGeocodeLayer();
                 }, this)

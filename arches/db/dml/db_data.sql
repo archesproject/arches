@@ -190,7 +190,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     '{
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
-        "overlays": [],
+        "overlayConfigs": {},
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
@@ -2248,8 +2248,8 @@ INSERT INTO map_sources(name, source)
                        }
               }');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('presidio', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES (public.uuid_generate_v1mc(), 'presidio', '[{
         "id":"presidio-poly",
         "source":"presidio",
         "type":"fill",
@@ -2342,8 +2342,8 @@ INSERT INTO map_sources(name, source)
   }');
 
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('sf-national-cemetery', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES (public.uuid_generate_v1mc(), 'sf-national-cemetery', '[{
         "id":"sf-national-cemetery",
         "source":"sf-national-cemetery",
         "type":"fill",
@@ -2354,8 +2354,8 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         }
       }]', TRUE, 3, 'ion-ios-flag');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('stamen-terrain', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
         "source": "stamen-terrain",
@@ -2363,16 +2363,16 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         "maxzoom": 22
     }]', FALSE, 4, 'fa fa-road');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('satellite', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
     }]', FALSE, 1, '');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('streets', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+    VALUES (public.uuid_generate_v1mc(), 'streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -3196,8 +3196,8 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
         "source-layer": "country_label"
     }]', FALSE, 1, '');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-   VALUES ('mapzen', '
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, sortorder, icon)
+   VALUES (public.uuid_generate_v1mc(), 'mapzen', '
      [
      {
          "id": "background",
