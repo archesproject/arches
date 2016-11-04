@@ -24,10 +24,13 @@ from arches.app.utils.decorators import group_required
 from django.http import HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from django.db import transaction
+
 
 @method_decorator(group_required('edit'), name='dispatch')
 class TileData(View):
     action = 'update_tile'
+
     def post(self, request):
         json = request.POST.get('data', None)
         if json != None:
@@ -36,14 +39,37 @@ class TileData(View):
             if self.action == 'update_tile':
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
+
+                    # TODO: move this datatype ('file-list') specific code into
+                    # a function meant to handle this datatype during tile save
+                    try:
+                        tile_model = models.Tile.objects.get(pk=data['tileid'])
+                    except models.Tile.DoesNotExist:
+                        tile_model = None
+
                     nodegroup = models.NodeGroup.objects.get(pk=data['nodegroup_id'])
                     for node in nodegroup.node_set.all():
                         if node.datatype == 'file-list':
-                            files = request.FILES.get('file-list_' + str(node.pk), None)
-                            if files:
-                                # TODO: save files and update tile data...
-                                print files
-
+                            if tile_model is not None:
+                                model_files = tile_model.data[str(node.pk)]
+                                for model_file in model_files:
+                                    incoming_file = None
+                                    for file_json in data['data'][str(node.pk)]:
+                                        if file_json["file_id"] == model_file["file_id"]:
+                                            incoming_file = file_json
+                                    if incoming_file == None:
+                                        deleted_file = models.File.objects.get(pk=model_file["file_id"])
+                                        deleted_file.delete()
+                            files = request.FILES.getlist('file-list_' + str(node.pk), [])
+                            for file_data in files:
+                                file_model = models.File()
+                                file_model.path = file_data
+                                file_model.save()
+                                for file_json in data['data'][str(node.pk)]:
+                                    if file_json["name"] == file_data.name and file_json["url"] is None:
+                                        file_json["file_id"] = str(file_model.pk)
+                                        file_json["url"] = str(file_model.path.url)
+                    # END 'file-list' SPECIFIC CODE
 
                     tile, created = models.Tile.objects.update_or_create(
                         tileid = data['tileid'],
@@ -56,15 +82,16 @@ class TileData(View):
                     )
                     return data
 
-                if 'tiles' in data and len(data['tiles']) > 0:
-                    parenttile = saveTile(data)
+                with transaction.atomic():
+                    if 'tiles' in data and len(data['tiles']) > 0:
+                        parenttile = saveTile(data)
 
-                    for tiles in data['tiles'].itervalues():
-                        for tile in tiles:
-                            tile['parenttile_id'] = parenttile['tileid']
-                            saveTile(tile)
-                else:
-                    saveTile(data)
+                        for tiles in data['tiles'].itervalues():
+                            for tile in tiles:
+                                tile['parenttile_id'] = parenttile['tileid']
+                                saveTile(tile)
+                    else:
+                        saveTile(data)
 
                 return JSONResponse(data)
 

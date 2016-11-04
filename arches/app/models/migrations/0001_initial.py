@@ -383,7 +383,7 @@ class Migration(migrations.Migration):
             name='File',
             fields=[
                 ('fileid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('path', models.FileField(upload_to='files')),
+                ('path', models.FileField(upload_to='uploadedfiles')),
             ],
             options={
                 'db_table': 'files',

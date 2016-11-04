@@ -29,6 +29,29 @@
                                     </div>
                                 </div>
                                 <div class="dz-previews">
+                                    <!-- ko foreach: uploadedFiles -->
+                                        <div class="media pad-top bord-top">
+                                            <div class="media-body">
+                                                <div class="media-block">
+                                                    <div class="media-left">
+                                                        <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 -->
+                                                            <img class="dz-img" width="50" height="50" data-bind="attr: {src: url}">
+                                                        <!-- /ko -->
+                                                        <!-- ko if: ko.unwrap(type).indexOf('image') < 0 -->
+                                                            <img class="dz-img">
+                                                        <!-- /ko -->
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
+                                                        <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="media-right">
+                                                <button class="btn btn-xs btn-danger dz-cancel" data-bind="click: $parent.removeUploadedFile"><i class="ion ion-close"></i></button>
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
                                 </div>
                             </div>
                         </div>
@@ -50,11 +73,6 @@
                     <p class="text-main text-bold mar-no text-overflow" data-dz-name=""></p>
                     <span class="dz-error text-danger text-sm" data-dz-errormessage=""></span>
                     <p class="text-sm" data-dz-size=""></p>
-                    <div style="display: none;" data-bind="visible: showProgressBar()">
-                        <div class="progress progress-xs active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress="" data-bind="style: { width: progress() + '%' }"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -80,3 +98,31 @@
     <input type="number" placeholder="{% trans "Max File Size (mb)" %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
 </div>
 {% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <!-- ko if: uploadedFiles().length === 0 -->
+        {% trans "None" %}
+    <!-- /ko -->
+    <div data-bind="foreach: uploadedFiles">
+        <div class="media pad-top bord-top">
+            <div class="media-body">
+                <div class="media-block">
+                    <div class="media-left" data-bind="if: ko.unwrap(type).indexOf('image') >= 0">
+                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: url}">
+                    </div>
+                    <div class="media-body">
+                        <a class="text-main text-bold mar-no text-overflow" target="_blank" data-bind="text: name, attr: {href: url}"></a>
+                        <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dd>
+{% endblock report %}
+
+{% block display_value %}
+<span data-bind="text: displayValue() + {% trans "files uploaded" %} || '{% trans "None" %}'"></span>
+{% endblock display_value %}

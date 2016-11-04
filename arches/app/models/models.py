@@ -175,7 +175,7 @@ class EditLog(models.Model):
 
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    path = models.FileField(upload_to='files')
+    path = models.FileField(upload_to='uploadedfiles')
 
     class Meta:
         managed = True
