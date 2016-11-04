@@ -91,8 +91,8 @@ define([
                 self.geocodeShimAdded(expanded);
             });
 
-            this.toggleOverlaySelector = function(e){
-              this.overlaySelectorClosed(!this.overlaySelectorClosed());
+            this.toggleOverlaySelector = function(e) {
+                this.overlaySelectorClosed(!this.overlaySelectorClosed());
             };
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
@@ -173,7 +173,6 @@ define([
                         }
                     }],
                     isoverlay: true,
-                    sortorder: 4,
                     icon: this.resourceIcon
                 };
                 return resourceLayer;
@@ -182,7 +181,7 @@ define([
             this.addInitialLayers = function() {
                 var initialLayers = [];
                 if (this.reportHeader) {
-                  this.layers.unshift(this.defineResourceLayer());
+                    this.layers.unshift(this.defineResourceLayer());
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -401,10 +400,10 @@ define([
                             data = result;
                             source.setData(data)
                             _.each(['resource-poly', 'resource-line', 'resource-point'], function(layerId) { //clear and add resource layers so that they are on top of map
-                                    var cacheLayer = self.map.getLayer(layerId);
-                                    self.map.removeLayer(layerId);
-                                    self.map.addLayer(cacheLayer, self.anchorLayerId)
-                                }, self)
+                                var cacheLayer = self.map.getLayer(layerId);
+                                self.map.removeLayer(layerId);
+                                self.map.addLayer(cacheLayer, self.anchorLayerId)
+                            }, self)
 
                         } else if (self.reportHeader === false && !ko.isObservable(self.value)) {
                             data = koMapping.toJS(self.value);
@@ -526,32 +525,34 @@ define([
                     placeholder: this.geocodePlaceholder()
                 };
 
-                this.removeMaplayer = function(maplayer){
-                  maplayer.layer_definitions.forEach(function(layer){
-                    if (map.getLayer(layer.id) !== undefined) {
-                      map.removeLayer(layer.id)
-                    }
-                  })
+                this.removeMaplayer = function(maplayer) {
+                    maplayer.layer_definitions.forEach(function(layer) {
+                        if (map.getLayer(layer.id) !== undefined) {
+                            map.removeLayer(layer.id)
+                        }
+                    })
                 }
 
-                this.addMaplayer = function(maplayer){
-                  maplayer.layer_definitions.forEach(function(layer) {
-                    if (map.getLayer(layer.id) === undefined) {
-                      map.addLayer(layer, this.anchorLayerId);
-                      map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
-                    }
-                  }, this)
+                this.addMaplayer = function(maplayer) {
+                    maplayer.layer_definitions.forEach(function(layer) {
+                        if (map.getLayer(layer.id) === undefined) {
+                            map.addLayer(layer, this.anchorLayerId);
+                            map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
+                        }
+                    }, this)
                 }
 
                 this.overlays = ko.observableArray();
                 this.overlayLibrary = ko.observableArray();
-                this.overlayLibrary.subscribe(function(overlays){
-                  var initialConfigs = self.overlayConfigs();
-                  for (var i = initialConfigs.length; i-- > 0;) {
-                    var overlay = _.findWhere(overlays, {"maplayerid": initialConfigs[i].maplayerid});
-                    self.addMaplayer(overlay)
-                    self.overlays.push(overlay)
-                  }
+                this.overlayLibrary.subscribe(function(overlays) {
+                    var initialConfigs = self.overlayConfigs();
+                    for (var i = initialConfigs.length; i-- > 0;) {
+                        var overlay = _.findWhere(overlays, {
+                            "maplayerid": initialConfigs[i].maplayerid
+                        });
+                        self.addMaplayer(overlay)
+                        self.overlays.push(overlay)
+                    }
                 });
 
                 this.createOverlays = function() {
@@ -583,7 +584,9 @@ define([
                                     }, map)
                                 }
                             });
-                            overlay.checkedOutOfLibrary(_.findWhere(this.overlayConfigs(), {"maplayerid": overlay.maplayerid}) !== undefined)
+                            overlay.checkedOutOfLibrary(_.findWhere(this.overlayConfigs(), {
+                                "maplayerid": overlay.maplayerid
+                            }) !== undefined)
                             overlay.opacity.subscribe(function(value) {
                                 overlay.updateOpacity(value);
                             }, self);
@@ -593,13 +596,13 @@ define([
                 }
 
                 this.exchangeOverlay = function(e) {
-                  if (this.checkedOutOfLibrary() === true) {
-                    self.overlays.remove(this)
-                    self.removeMaplayer(this)
-                  } else {
-                    self.overlays.push(this);
-                  }
-                  this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
+                    if (this.checkedOutOfLibrary() === true) {
+                        self.overlays.remove(this)
+                        self.removeMaplayer(this)
+                    } else {
+                        self.overlays.push(this);
+                    }
+                    this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
                 }
 
                 this.basemaps = _.filter(arches.mapLayers, function(baselayer) {
@@ -689,10 +692,9 @@ define([
                     }
                     for (var i = overlays.length; i-- > 0;) {
                         this.overlayConfigs().push({
-                          'maplayerid':overlays[i].maplayerid,
-                          'name':overlays[i].name,
-                          'opacity':overlays[i].opacity(),
-                          'sortorder':i
+                            'maplayerid': overlays[i].maplayerid,
+                            'name': overlays[i].name,
+                            'opacity': overlays[i].opacity()
                         });
                         this.addMaplayer(overlays[i])
                     }

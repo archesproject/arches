@@ -43,10 +43,6 @@ define(['knockout', 'underscore'], function (ko, _) {
         };
         _.each(this.configObservables, subscribeConfigObservable);
         _.each(this.configKeys, function(key) {
-            // if (_.isArray(self.config()[key])) {
-            //   obs = ko.observableArray(self.config()[key])
-            // } else {
-            // }
             var obs = ko.observable(self.config()[key]);
             subscribeConfigObservable(obs, key);
         });
