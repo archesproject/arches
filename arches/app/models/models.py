@@ -173,6 +173,15 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class File(models.Model):
+    fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    path = models.FileField(upload_to='uploadedfiles')
+
+    class Meta:
+        managed = True
+        db_table = 'files'
+
+
 class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     title = models.TextField(blank=True, null=True)

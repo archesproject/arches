@@ -112,6 +112,7 @@ define([
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+            tile.formData = new FormData();
             return tile;
         },
 
@@ -212,8 +213,8 @@ define([
                             this.clearTileValues(tile);
                         }
                     }
-                    this.trigger('after-update', response);
-                }, this);
+                    this.trigger('after-update', response, tile);
+                }, this, tile.formData);
             }
         },
 
@@ -226,13 +227,20 @@ define([
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
             this.trigger('before-update');
+            parentTile.tiles.forEach(function (tile) {
+                tile.formData.keys().forEach(function (key) {
+                    tile.formData.getAll(key).forEach(function (value) {
+                        parentTile.formData.append(key, value);
+                    });
+                });
+            });
             model.save(function(response, status, model){
                 if(response.status === 200){
                     this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
                     this.clearTile(parentTile);
                 }
-                this.trigger('after-update', response);
-            }, this);
+                this.trigger('after-update', response, parentTile);
+            }, this, parentTile.formData);
         },
 
         /**
@@ -258,8 +266,8 @@ define([
                         tile._data(JSON.stringify(response.responseJSON.data));
                     }
                 }
-                this.trigger('after-update', response);
-            }, this);
+                this.trigger('after-update', response, tile);
+            }, this, tile.formData);
         },
 
         /**

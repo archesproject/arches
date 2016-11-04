@@ -77,6 +77,9 @@
                                                 <div class='widget-preview' data-bind='component: {
                                                     name: form.widgetLookup[widget.get("widget_id")()].name,
                                                     params: {
+                                                        formData: tile.formData,
+                                                        tile: tile,
+                                                        form: form,
                                                         config: configJSON,
                                                         label: widget.get("label")(),
                                                         value: tile.data[widget.get("node_id")()],
@@ -141,6 +144,9 @@
                                                     <!-- ko component: {
                                                         name: form.widgetLookup[card.get('widgets')()[0].get("widget_id")()].name,
                                                         params: {
+                                                            formData: innerTile.formData,
+                                                            tile: innerTile,
+                                                            form: form,
                                                             config: card.get('widgets')()[0].configJSON,
                                                             label: card.get('widgets')()[0].get("label")(),
                                                             value: innerTile.data[card.get('widgets')()[0].get("node_id")()],
@@ -182,6 +188,9 @@
                                                     <div class='widget-preview' data-bind='component: {
                                                         name: form.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
+                                                            formData: innerTile.formData,
+                                                            tile: innerTile,
+                                                            form: form,
                                                             config: configJSON,
                                                             label: widget.get("label")(),
                                                             value: innerTile.data[widget.get("node_id")()],
