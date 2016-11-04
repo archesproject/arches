@@ -528,32 +528,30 @@ define([
 
                 this.removeMaplayer = function(maplayer){
                   maplayer.layer_definitions.forEach(function(layer){
-                    map.removeLayer(layer.id)
+                    if (map.getLayer(layer.id) !== undefined) {
+                      map.removeLayer(layer.id)
+                    }
                   })
                 }
 
                 this.addMaplayer = function(maplayer){
                   maplayer.layer_definitions.forEach(function(layer) {
+                    if (map.getLayer(layer.id) === undefined) {
                       map.addLayer(layer, this.anchorLayerId);
                       map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
+                    }
                   }, this)
                 }
 
                 this.overlays = ko.observableArray();
                 this.overlayLibrary = ko.observableArray();
                 this.overlayLibrary.subscribe(function(overlays){
-                  for (var i = overlays.length; i-- > 0;) {
-                    if (overlays[i].checkedOutOfLibrary() === true) {
-                      self.addMaplayer(overlays[i])
-                      self.overlays.push(overlays[i])
-                    }
+                  var initialConfigs = self.overlayConfigs();
+                  for (var i = initialConfigs.length; i-- > 0;) {
+                    var overlay = _.findWhere(overlays, {"maplayerid": initialConfigs[i].maplayerid});
+                    self.addMaplayer(overlay)
+                    self.overlays.push(overlay)
                   }
-                  // _.each(overlays, function(overlay){
-                  //     if (overlay.checkedOutOfLibrary() === true) {
-                  //       self.addMaplayer(overlay)
-                  //       self.overlays.push(overlay)
-                  //     }
-                  // })
                 });
 
                 this.createOverlays = function() {
@@ -599,7 +597,6 @@ define([
                     self.overlays.remove(this)
                     self.removeMaplayer(this)
                   } else {
-                    self.addMaplayer(this)
                     self.overlays.push(this);
                   }
                   this.checkedOutOfLibrary(!this.checkedOutOfLibrary())
