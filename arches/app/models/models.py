@@ -532,7 +532,7 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
-        
+
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None):
@@ -586,10 +586,10 @@ class MapSources(models.Model):
 
 
 class MapLayers(models.Model):
+    maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
-    sortorder = models.IntegerField(default=1)
     icon = models.TextField(default=None)
 
     @property
