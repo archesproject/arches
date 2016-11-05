@@ -48,7 +48,6 @@ define([
                     }
                 });
             }
-            this.maxFilesize(1);
             this.acceptedFiles.subscribe(function(val) {
                 if (self.dropzone) {
                     self.dropzone.hiddenFileInput.setAttribute("accept", val);
