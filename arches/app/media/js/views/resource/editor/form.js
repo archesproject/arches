@@ -336,9 +336,11 @@ define([
          */
         cancelEdit: function(tile, e){
             var oldData = JSON.parse(tile._data());
+            var self = this;
             _.keys(tile.data).forEach(function(nodegroup_id){
                 if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
                     tile.data[nodegroup_id](oldData[nodegroup_id]);
+                    self.trigger('tile-reset', tile);
                 }
             }, this);
         },
