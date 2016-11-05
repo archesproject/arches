@@ -35,8 +35,19 @@ define([
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 });
+                this.form.on('tile-reset', function(tile) {
+                    if ((self.tile === tile || _.contains(tile.tiles, self.tile))) {
+                        if (self.filesForUpload().length > 0) {
+                            self.filesForUpload.removeAll();
+                        }
+                        if (Array.isArray(self.value())) {
+                            self.uploadedFiles(self.value())
+                        }
+                        self.dropzone.removeAllFiles(true);
+                        self.formData.delete('file-list_' + self.node.nodeid);
+                    }
+                });
             }
-
             this.acceptedFiles.subscribe(function(val) {
                 if (self.dropzone) {
                     self.dropzone.hiddenFileInput.setAttribute("accept", val);
@@ -53,8 +64,18 @@ define([
             if (Array.isArray(self.value())) {
                 this.uploadedFiles(self.value());
             }
-            this.removeUploadedFile = function(file) {
-                self.uploadedFiles.remove(file);
+            this.removeFile = function(file) {
+                var filesForUpload = self.filesForUpload();
+                var uploadedFiles = self.uploadedFiles();
+                if (file.file_id) {
+                    file = _.find(uploadedFiles, function (uploadedFile) {
+                        return file.file_id ===  ko.unwrap(uploadedFile.file_id);
+                    });
+                    self.uploadedFiles.remove(file);
+                } else {
+                    file = filesForUpload[file.index];
+                    self.filesForUpload.remove(file);
+                }
             }
 
             this.formatSize = function (file) {
@@ -67,21 +88,11 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
-            var filesJSON = ko.computed(function() {
+            this.filesJSON = ko.computed(function() {
                 var filesForUpload = self.filesForUpload();
                 var uploadedFiles = self.uploadedFiles();
-                if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
-                    self.formData.delete('file-list_' + self.node.nodeid);
-                }
-                var filesForUpload = self.filesForUpload()
-                    .filter(function(file) {
-                        return file.accepted;
-                    });
-                _.each(filesForUpload, function(file) {
-                    self.formData.append('file-list_' + self.node.nodeid, file, file.name);
-                });
-                return uploadedFiles.concat(
-                    _.map(filesForUpload, function(file) {
+                return ko.toJS(uploadedFiles.concat(
+                    _.map(filesForUpload, function(file, i) {
                         return {
                             name: file.name,
                             accepted: file.accepted,
@@ -92,18 +103,34 @@ define([
                             type: file.type,
                             width: file.width,
                             url: null,
-                            file_id: null
+                            file_id: null,
+                            index: i,
+                            content: URL.createObjectURL(file),
+                            error: file.error
                         };
                     })
-                );
+                ));
             }).extend({throttle: 100});
 
-            filesJSON.subscribe(function(value) {
-                self.value(value);
+            this.filesJSON.subscribe(function(value) {
+                if (_.contains(self.formData.keys(), 'file-list_' + self.node.nodeid)) {
+                    self.formData.delete('file-list_' + self.node.nodeid);
+                }
+                _.each(self.filesForUpload(), function(file) {
+                    if (file.accepted) {
+                        self.formData.append('file-list_' + self.node.nodeid, file, file.name);
+                    }
+                });
+                self.value(
+                    value.filter(function(file) {
+                        return file.accepted;
+                    })
+                );
             });
 
             this.dropzoneOptions = {
                 url: "/target-url",
+                dictDefaultMessage: '',
                 autoProcessQueue: false,
                 thumbnailWidth: 50,
                 thumbnailHeight: 50,
@@ -121,6 +148,11 @@ define([
                         self.filesForUpload.push(file);
                     });
 
+                    this.on("error", function(file, error) {
+                        file.error = error;
+                        self.filesForUpload.valueHasMutated()
+                    });
+
                     this.on("removedfile", function(file) {
                         self.filesForUpload.remove(file);
                     });
@@ -130,6 +162,8 @@ define([
             this.reset = function() {
                 if (self.dropzone) {
                     self.dropzone.removeAllFiles(true);
+                    self.uploadedFiles.removeAll();
+                    self.filesForUpload.removeAll();
                 }
             };
 

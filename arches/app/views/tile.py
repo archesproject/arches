@@ -69,6 +69,7 @@ class TileData(View):
                                     if file_json["name"] == file_data.name and file_json["url"] is None:
                                         file_json["file_id"] = str(file_model.pk)
                                         file_json["url"] = str(file_model.path.url)
+                                        file_json["status"] = 'uploaded'
                     # END 'file-list' SPECIFIC CODE
 
                     tile, created = models.Tile.objects.update_or_create(
