@@ -165,7 +165,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Edit Content -->
-    <div style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
+    <div class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
         <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
             <!-- ko if: alert() -->
             <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
