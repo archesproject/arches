@@ -4546,23 +4546,22 @@ a.map-widget-icon:hover {
     color: #fff;
 }
 
-
-
-
-
-
-
-.basemap-icon-unselected {
-  color: #ddd;
+.basemap-unselected {
+  color: #999;
 }
 
 .map-widget-overlay-item {
     width: 248px;
     height: 50px;
     padding: 7px;
-    background: #fff;
+    background: #fcfcfc;
     border-bottom: 1px solid #ddd;
 }
+
+.map-widget-overlay-item:hover {
+    background: #fff;
+}
+
 
 .map-overlay-item-tools {
     position: absolute;
