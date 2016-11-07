@@ -129,11 +129,11 @@
                         <i class="ion-checkmark-circled"></i>
                         <!-- /ko -->
                         <!-- ko if: name !== self.basemap() -->
-                        <i class="ion-checkmark-circled basemap-icon-unselected"></i>
+                        <i class="ion-checkmark-circled basemap-unselected"></i>
                         <!-- /ko -->
                     </div>
                     <div class="map-overlay-name">
-                        <a id="" class="" href=""><span data-bind='text: name'><span></a>
+                        <a id="" class="" href=""><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
                     </div>
                 </div>
                 <!-- /ko -->
