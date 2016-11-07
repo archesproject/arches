@@ -29,15 +29,15 @@ def import_graph(graphs):
 			graph = Graph(resource)
 
 			if not hasattr(graph, 'cards'):
-				errors.append('This graph has no attribute cards')
+				errors.append('{0} graph has no attribute cards'.format(graph.name))
 			else:
 				if graph.cards == [] or graph.cards == {}:
-					errors.append('This graph has no cards')
+					errors.append('{0} graph has no cards'.format(graph.name))
 				else:
 					graph.save()
 
 			if not hasattr(graph, 'cards_x_nodes_x_widgets'):
-				errors.append('This graph has no attribute cards_x_nodes_x_widgets')
+				errors.append('{0} graph has no attribute cards_x_nodes_x_widgets'.format(graph.name))
 			else:
 				for	card_x_node_x_widget in graph.cards_x_nodes_x_widgets:
 					functions = card_x_node_x_widget['functions']
@@ -47,21 +47,21 @@ def import_graph(graphs):
 					cardxnodexwidget.functions.set(functions)
 
 			if not hasattr(graph, 'forms'):
-				errors.append('This graph has no attribute forms')
+				errors.append('{0} graph has no attribute forms'.format)
 			else:
 				for form in graph.forms:
 					form = Form.objects.create(**form)
 					form.save()
 
 			if not hasattr(graph, 'forms_x_cards'):
-				errors.append('This graph has no attribute forms_x_cards')
+				errors.append('{0} graph has no attribute forms_x_cards'.format(graph.name))
 			else:
 				for form_x_card in graph.forms_x_cards:
 					formxcard = FormXCard.objects.create(**form_x_card)
 					formxcard.save()
 
 			if not hasattr(graph, 'reports'):
-				errors.append('This graph has no attribute reports')
+				errors.append('{0} graph has no attribute reports'.format(graph.name))
 			else:
 				for report in graph.reports:
 					report = Report.objects.create(**report)

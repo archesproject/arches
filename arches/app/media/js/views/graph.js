@@ -122,6 +122,9 @@ require([
                         contentType: false,
                         success: function(response) {
                           if (response.length != 0) {
+                            if (typeof(response)) {
+                              response = response.join('<br />')
+                            }
                               self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
                             }
                             else {
