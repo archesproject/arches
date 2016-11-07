@@ -6,7 +6,7 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
 
-        this.config = params.report.config || ko.observable({});
+        this.config = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
         if (typeof this.config !== 'function') {
@@ -30,7 +30,12 @@ define(['knockout', 'underscore', 'moment', 'bindings/let'], function (ko, _, mo
         };
         _.each(this.configObservables, subscribeConfigObservable);
         _.each(this.configKeys, function(key) {
-            var obs = ko.observable(self.config()[key]);
+            var obs;
+            if (Array.isArray(self.config()[key])) {
+                obs = ko.observableArray(self.config()[key]);
+            } else {
+                obs = ko.observable(self.config()[key]);
+            }
             subscribeConfigObservable(obs, key);
         });
     };

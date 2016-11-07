@@ -4810,7 +4810,25 @@ a.map-widget-icon:hover {
 
 /* End Function Manager Page */
 
-
+.carousel, .carousel .item {
+  height: 500px;
+  text-align: center;
+}
+.carousel-caption {
+  z-index: 10;
+}
+.carousel .container {
+  width: auto;
+}
+.carousel-inner > .item > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  height: inherit;
+  max-width: 100%;
+  object-fit: contain;
+}
 
 @keyframes loader {
 	0% { background: #ddd; }

@@ -1,2 +1,18 @@
 {% extends "views/report-templates/default.htm" %}
 {% load i18n %}
+
+{% block header %}
+<div data-bind="carousel: { content: { name: 'carouselItemTemplate', data: imgs } }"></div>
+
+<template id="carouselItemTemplate">
+</template>
+{% endblock header %}
+
+{% block header_form %}
+<!-- <div class="control-label">
+    {% trans "Carousel Height" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Carousel Height" %}" id="" class="form-control input-md widget-input" data-bind="value: height, valueUpdate: 'keyup'">
+</div> -->
+{% endblock header_form %}

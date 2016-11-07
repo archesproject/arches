@@ -1,10 +1,53 @@
-define(['knockout', 'viewmodels/report'], function (ko, ReportViewModel) {
+define([
+    'knockout',
+    'viewmodels/report',
+    'plugins/knockstrap'
+], function(ko, ReportViewModel) {
     return ko.components.register('image-report', {
         viewModel: function(params) {
-            params.configKeys = [];
+            var self = this;
+            params.configKeys = ['height', 'nodes'];
 
             ReportViewModel.apply(this, [params]);
+            self.imgs = ko.observableArray([{
+                src: '/media/img/photo_missing.png',
+                alt: ''
+            }]);
+            console.log(this.config());
+
+            if (self.report.get('tiles')) {
+                var imgs = [];
+                self.report.get('tiles').forEach(function(tile) {
+                    _.each(tile.data, function(val, key) {
+                        if (Array.isArray(val)) {
+                            val.forEach(function(item) {
+                                if (item.status && item.type && item.status === 'uploaded' && item.type.indexOf('image') > -1) {
+                                    imgs.push({
+                                        src: item.url,
+                                        alt: item.name
+                                    });
+                                }
+                            });
+                        }
+                    }, self);
+                }, self);
+                if (imgs.length > 0) {
+                    self.imgs(imgs);
+                }
+            }
+            var widgets = [];
+            self.report.forms().forEach(function (form) {
+                form.cards.forEach(function(card) {
+                    widgets = widgets.concat(card.get('widgets')());
+                    card.get('cards')().forEach(function(card) {
+                        widgets = widgets.concat(card.get('widgets')());
+                    })
+                })
+            });
+            console.log(widgets);
         },
-        template: { require: 'text!report-templates/image' }
+        template: {
+            require: 'text!report-templates/image'
+        }
     });
 });
