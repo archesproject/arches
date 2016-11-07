@@ -7,17 +7,20 @@ function (ko, koMapping, FunctionViewModel, CardModel, chosen) {
     return ko.components.register('views/functions/primary-name', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, params);
+            var nodegroups = {};
             this.cards = ko.observableArray();
+
             this.graph.cards.forEach(function(card){
-                var c = new CardModel({'data':card});
-                if(c.isContainer()){
-                    c.get('cards').forEach(function(innercard){
-                        this.cards.push(innercard);
-                    }, this);
-                }else{
+                var found = !!_.find(this.graph.nodegroups, function(nodegroup){
+                    return nodegroup.parentnodegroup_id === card.nodegroup_id
+                }, this);
+                if(!found && !(card.nodegroup_id in nodegroups)){
                     this.cards.push(card);
+                    nodegroups[card.nodegroup_id] = true;
                 }
             }, this);
+
+            this.cards.push({});
 
             this.string_template = params.config.string_template;
             this.nodegroup_id = params.config.nodegroup_id;
