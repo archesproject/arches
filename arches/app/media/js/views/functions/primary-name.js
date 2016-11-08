@@ -1,9 +1,8 @@
 define(['knockout', 
         'knockout-mapping',
         'viewmodels/function', 
-        'models/card',
         'bindings/chosen'], 
-function (ko, koMapping, FunctionViewModel, CardModel, chosen) {
+function (ko, koMapping, FunctionViewModel, chosen) {
     return ko.components.register('views/functions/primary-name', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, params);
