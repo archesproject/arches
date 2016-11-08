@@ -8,7 +8,7 @@ define([
     return ko.components.register('image-report', {
         viewModel: function(params) {
             var self = this;
-            params.configKeys = ['height', 'nodes'];
+            params.configKeys = ['nodes'];
 
             ReportViewModel.apply(this, [params]);
             self.imgs = ko.observableArray([{

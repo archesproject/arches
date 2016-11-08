@@ -4810,25 +4810,27 @@ a.map-widget-icon:hover {
 /* End Function Manager Page */
 
 .carousel, .carousel .item {
-  height: 500px;
-  text-align: center;
+    height: 500px;
+    text-align: center;
 }
 .carousel-caption {
-  z-index: 10;
+    z-index: 10;
 }
 .carousel .container {
-  width: auto;
+    width: auto;
 }
 .carousel-inner > .item > img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  min-width: 100%;
-  height: inherit;
-  max-width: 100%;
-  object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    height: inherit;
+    max-width: 100%;
+    object-fit: contain;
 }
-
+.dz-img {
+    object-fit: contain;
+}
 @keyframes loader {
 	0% { background: #ddd; }
 	33% { background: #ccc; box-shadow: 0 0 1px #ccc, 15px 30px 1px #ccc, -15px 30px 1px #ddd; }

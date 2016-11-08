@@ -3526,4 +3526,4 @@ INSERT INTO report_templates(templateid, name, description, component, component
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"height": 500, "nodes": []}');
+    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
