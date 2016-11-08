@@ -81,9 +81,9 @@ define([
             this.formatSize = function (file) {
                 var bytes = ko.unwrap(file.size);
                 if(bytes == 0) return '0 Byte';
-                var k = 1000; // or 1024 for binary
+                var k = 1024;
                 var dm = 2;
-                var sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PB', 'EB', 'ZB', 'YB'];
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
                 var i = Math.floor(Math.log(bytes) / Math.log(k));
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };

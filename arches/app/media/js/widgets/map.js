@@ -67,6 +67,7 @@ define([
             if (params.graph !== undefined) {
                 this.resourceIcon = params.graph.get('iconclass');
                 this.resourceName = params.graph.get('name');
+                this.graphId = params.graph.get('graphid')
                 if (this.resourceColor() === null) {
                     this.resourceColor(params.graph.get('mapfeaturecolor'));
                 }
@@ -140,6 +141,8 @@ define([
             this.defineResourceLayer = function() {
                 var resourceLayer = {
                     name: this.resourceName,
+                    maplayerid: this.graphId,
+                    isResource: true,
                     layer_definitions: [{
                         "id": "resource-poly",
                         "source": "resource",
@@ -526,20 +529,24 @@ define([
                 };
 
                 this.removeMaplayer = function(maplayer) {
+                  if (maplayer !== undefined) {
                     maplayer.layer_definitions.forEach(function(layer) {
                         if (map.getLayer(layer.id) !== undefined) {
                             map.removeLayer(layer.id)
                         }
                     })
+                  }
                 }
 
                 this.addMaplayer = function(maplayer) {
-                    maplayer.layer_definitions.forEach(function(layer) {
-                        if (map.getLayer(layer.id) === undefined) {
-                            map.addLayer(layer, this.anchorLayerId);
-                            map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
-                        }
-                    }, this)
+                    if (maplayer !== undefined) {
+                      maplayer.layer_definitions.forEach(function(layer) {
+                          if (map.getLayer(layer.id) === undefined) {
+                              map.addLayer(layer, this.anchorLayerId);
+                              map.setPaintProperty(layer.id, layer.type + '-opacity', maplayer.opacity() / 100.0);
+                          }
+                      }, this)
+                    }
                 }
 
                 this.overlays = ko.observableArray();
@@ -550,8 +557,15 @@ define([
                         var overlay = _.findWhere(overlays, {
                             "maplayerid": initialConfigs[i].maplayerid
                         });
-                        self.addMaplayer(overlay)
-                        self.overlays.push(overlay)
+                        if (overlay === undefined) {
+                          var overlay = _.findWhere(overlays, {
+                              "maplayerid": self.graphId
+                          });
+                        };
+                        if (overlay !== undefined) {
+                            self.addMaplayer(overlay)
+                            self.overlays.push(overlay)
+                        }
                     }
                 });
 
@@ -610,12 +624,15 @@ define([
                 });
 
                 this.setBasemap = function(basemapType) {
-                    var lowestOverlay = _.first(_.last(this.overlays()).layer_definitions);
+                    var lowestOverlay = this.anchorLayerId;
+                    if (this.overlays().length > 0) {
+                      var lowestOverlay = _.first(_.last(this.overlays()).layer_definitions).id;
+                    };
                     this.basemaps.forEach(function(basemap) {
                         var self = this;
                         if (basemap.name === basemapType.name) {
                             basemap.layer_definitions.forEach(function(layer) {
-                                self.map.addLayer(layer, lowestOverlay.id)
+                                self.map.addLayer(layer, lowestOverlay)
                             })
                         } else {
                             basemap.layer_definitions.forEach(function(layer) {
