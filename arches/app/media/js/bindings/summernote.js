@@ -19,7 +19,7 @@ define([
             var options = ko.unwrap(valueAccessor());
             options = (typeof options === 'object') ? options : {};
             options = _.defaults(options, {
-                height: 250,
+                height: 150,
                 value: ko.observable('')
             });
 
