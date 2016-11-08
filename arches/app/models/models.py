@@ -210,11 +210,12 @@ class FormXCard(models.Model):
 
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    function = models.TextField(blank=True, null=True)
-    functiontype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
+    functiontype = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     defaultconfig = JSONField(blank=True, null=True)
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
     component = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -541,7 +542,6 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
-
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None):
