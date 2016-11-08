@@ -24,6 +24,7 @@ cp /home/ubuntu/settings_local.py /home/ubuntu/arches/arches
 sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log
 
 python manage.py packages -o setup_db
+python manage.py packages -o import_json -s 'arches/db/schemes/arches_test_scheme.json'
 
 python manage.py collectstatic --noinput
 sudo chown www-data:www-data /home/ubuntu/arches/arches/arches.log

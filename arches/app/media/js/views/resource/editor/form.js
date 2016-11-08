@@ -10,7 +10,8 @@ define([
     'models/graph',
     'resource-editor-data',
     'select2',
-    'bindings/let'
+    'bindings/let',
+    'bindings/sortable'
 ], function($, Backbone, ko, koMapping, arches, widgets, CardModel, TileModel, GraphModel, data) {
     var FormView = Backbone.View.extend({
         /**
@@ -111,6 +112,7 @@ define([
             if(!!tile.tiles){
                 this.initTiles(tile.tiles);
             }
+            tile.formData = new FormData();
             return tile;
         },
 
@@ -184,11 +186,12 @@ define([
             }
             if(justadd){
                 parentTile.dirty(true);
-                tiles.unshift(this.initTile(koMapping.fromJS(ko.toJS(tile))));
+                tiles.push(this.initTile(koMapping.fromJS(ko.toJS(tile))));
                 this.clearTileValues(tile);
             }else{
                 var model;
                 var savingParentTile = tiles().length === 0 && !parentTile.formid;
+                this.trigger('before-update');
                 // if the parentTile has never been saved then we need to save it instead, else just save the inner tile
                 if(savingParentTile){
                     model = new TileModel(koMapping.toJS(parentTile));
@@ -196,23 +199,22 @@ define([
                 }else{
                     model = new TileModel(koMapping.toJS(tile))
                 }
-                model.save(function(request, status, model){
-                    if(request.status === 200){
+                model.save(function(response, status, model){
+                    if(response.status === 200){
                         // if we had to save an parentTile
                         if(savingParentTile){
-                            parentTile.tileid(request.responseJSON.tileid);
-                            request.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
-                                parentTile.tiles[tile.nodegroup_id].unshift(this.initTile(koMapping.fromJS(tile)));
+                            parentTile.tileid(response.responseJSON.tileid);
+                            response.responseJSON.tiles[tile.nodegroup_id()].forEach(function(tile){
+                                parentTile.tiles[tile.nodegroup_id].push(this.initTile(koMapping.fromJS(tile)));
                             }, this)
                             this.clearTile(tile);
                         }else{
-                            tiles.unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
+                            tiles.push(this.initTile(koMapping.fromJS(response.responseJSON)));
                             this.clearTileValues(tile);
                         }
-                    }else{
-                        // inform the user
                     }
-                }, this);
+                    this.trigger('after-update', response, tile);
+                }, this, tile.formData);
             }
         },
 
@@ -224,14 +226,21 @@ define([
          */
         saveTileGroup: function(parentTile, e){
             var model = new TileModel(koMapping.toJS(parentTile));
-            model.save(function(request, status, model){
-                if(request.status === 200){
-                    this.tiles[parentTile.nodegroup_id()].unshift(this.initTile(koMapping.fromJS(request.responseJSON)));
+            this.trigger('before-update');
+            parentTile.tiles.forEach(function (tile) {
+                tile.formData.keys().forEach(function (key) {
+                    tile.formData.getAll(key).forEach(function (value) {
+                        parentTile.formData.append(key, value);
+                    });
+                });
+            });
+            model.save(function(response, status, model){
+                if(response.status === 200){
+                    this.tiles[parentTile.nodegroup_id()].push(this.initTile(koMapping.fromJS(response.responseJSON)));
                     this.clearTile(parentTile);
-                }else{
-                    // inform the user
                 }
-            }, this);
+                this.trigger('after-update', response, parentTile);
+            }, this, parentTile.formData);
         },
 
         /**
@@ -243,22 +252,22 @@ define([
          */
         updateTile: function(tile, e){
             var model = new TileModel(ko.toJS(tile));
-            model.save(function(request, status, model){
-                if(request.status === 200){
+            this.trigger('before-update');
+            model.save(function(response, status, model){
+                if(response.status === 200){
                     _.each(tile.tiles, function(tile){
-                        _.each(request.responseJSON.tiles, function(savedtile){
+                        _.each(response.responseJSON.tiles, function(savedtile){
                             if(tile()[0].tileid() === savedtile[0].tileid){
                                 tile()[0]._data(JSON.stringify(savedtile[0].data));
                             }
                         }, this);
                     }, this);
                     if(!!tile._data){
-                        tile._data(JSON.stringify(request.responseJSON.data));
+                        tile._data(JSON.stringify(response.responseJSON.data));
                     }
-                }else{
-                    // inform the user
                 }
-            }, this);
+                this.trigger('after-update', response, tile);
+            }, this, tile.formData);
         },
 
         /**
@@ -271,6 +280,7 @@ define([
          */
         deleteTile: function(parentTile, tile, justremove){
             var tiles = parentTile.tiles[tile.nodegroup_id()];
+            this.trigger('before-update');
             if(justremove){
                 tiles.remove(tile);
                 if(tiles().length === 0){
@@ -284,22 +294,41 @@ define([
                 }else{
                     model = new TileModel(ko.toJS(tile));
                 }
-                model.delete(function(request, status, model){
-                    if(request.status === 200){
+                model.delete(function(response, status, model){
+                    if(response.status === 200){
                         if(deletingParentTile){
                             this.tiles[parentTile.nodegroup_id()].remove(parentTile);
                         }else{
                             tiles.remove(tile);
                         }
-                    }else{
-                        // inform the user
                     }
+                    this.trigger('after-update', response);
                 }, this);
             }
         },
 
         /**
-         * currently unused
+         * updates the sort order of tiles
+         * @memberof Form.prototype
+         * @return {null}
+         */
+        reorderTiles: function (tiles) {
+            var self = this;
+            this.trigger('before-update');
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify({
+                    tiles: koMapping.toJS(tiles)
+                }),
+                url: arches.urls.reorder_tiles,
+                complete: function(response) {
+                    self.trigger('after-update', response);
+                }
+            });
+        },
+
+        /**
+         * undo unsaved edits and return tile data to it's previous state
          * @memberof Form.prototype
          * @param  {object} tile a knockout reference to the tile object
          * @param  {object} e event object
@@ -307,9 +336,11 @@ define([
          */
         cancelEdit: function(tile, e){
             var oldData = JSON.parse(tile._data());
+            var self = this;
             _.keys(tile.data).forEach(function(nodegroup_id){
                 if(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(nodegroup_id)){
                     tile.data[nodegroup_id](oldData[nodegroup_id]);
+                    self.trigger('tile-reset', tile);
                 }
             }, this);
         },

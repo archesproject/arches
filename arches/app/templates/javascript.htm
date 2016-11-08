@@ -8,6 +8,7 @@
             'plugins': '{{ STATIC_URL }}plugins',
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
             'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
+            'function-templates': '{% url "function-templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
@@ -40,7 +41,7 @@
             'datatables.net-responsive-bs': '{{ STATIC_URL }}bower_components/datatables.net-responsive-bs/js/responsive.bootstrap',
             'chosen': '{{ STATIC_URL }}bower_components/chosen/chosen.jquery.min',
             'mapbox-gl': '{{ STATIC_URL }}bower_components/mapbox-gl/mapbox-gl',
-            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-plugins/plugins/mapbox-gl-draw/v0.11.15/mapbox-gl-draw',
+            'mapbox-gl-draw': '{{ STATIC_URL }}bower_components/mapbox-gl-plugins/plugins/src/mapbox-gl-draw/v0.12.1/mapbox-gl-draw',
             'noUiSlider': '{{ STATIC_URL }}bower_components/nouislider/distribute/nouislider.min',
             'geojson-extent': '{{ STATIC_URL }}bower_components/geojson-extent/geojson-extent',
             'bootstrap-colorpicker': '{{ STATIC_URL }}bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
@@ -127,12 +128,14 @@
                 graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 card: "{% url 'card' '' %}",
                 form: "{% url 'form' '' %}",
-                report_editor: "{% url 'report_editor' '' %}",
                 resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
                 tile: "{% url 'tile' %}",
                 geocoder: "{% url 'geocoder' %}",
-                report_editor: "{% url 'report_editor' '' %}"
+                report_editor: "{% url 'report_editor' '' %}",
+                reorder_tiles: "{% url 'reorder_tiles' %}",
+                apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
+                remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
             },
             resourceMarker: {
                 font: '{{ map_info.resource_marker_font }}',
@@ -156,10 +159,10 @@
                 '{{ map_source.name }}': {{ map_source.source_json }},
             {% endfor %}{% endautoescape %}},
             mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
+                'maplayerid': '{{ map_layer.maplayerid }}',
                 'name': '{{ map_layer.name }}',
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
-                'sortorder': {{ map_layer.sortorder }},
                 'icon': '{{ map_layer.icon }}'
             },{% endfor %}{% endautoescape %}],
             conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
@@ -214,6 +217,15 @@
         {% endfor %}{% endautoescape %}};
     });
 
+    define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
+        return {{% autoescape off %}{% for template in function_templates %}
+            '{{ template.pk }}': {
+                'componentname': '{{ template.name }}',
+                'component': '{{ template.component }}',
+                'defaultconfig': '{{ template.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+    });
 
     define('datatype-config-components',
         [{% for datatype in datatypes %}{% if datatype.configcomponent != None %}'{{ datatype.configcomponent }}',{% endif %}{% endfor %}],

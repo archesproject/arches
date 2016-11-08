@@ -1,0 +1,28 @@
+conceptid,PrefLabel,AltLabels,ParentConceptid,ConceptType,Provider 
+ACTIVITY_TYPE:25,Investigation,,ACTIVITY_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI
+ACTIVITY_TYPE:1,archaeological intervention,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:2,archaeological survey,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:3,excavation,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:4,salvage recording,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:5,field survey,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:6,architectural survey,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:7,measured survey,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:8,photographic recording,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:9,topographic survey,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:10,heritage assessment,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:11,aerial photograph interpretation,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:12,desk based assessment,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:13,environmental impact assessment,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:14,historic landscape characterisation,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:15,in-depth condition assessment,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:16,remote sensing,,ACTIVITY_TYPE:25,Index,GCI
+ACTIVITY_TYPE:26,Management,,ACTIVITY_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI
+ACTIVITY_TYPE:17,management intervention,,ACTIVITY_TYPE:26,Index,GCI
+ACTIVITY_TYPE:18,conservation intervention,,ACTIVITY_TYPE:26,Index,GCI
+ACTIVITY_TYPE:19,reburial,,ACTIVITY_TYPE:26,Index,GCI
+ACTIVITY_TYPE:20,fencing,,ACTIVITY_TYPE:26,Index,GCI
+ACTIVITY_TYPE:21,fire mitigation,,ACTIVITY_TYPE:26,Index,GCI
+ACTIVITY_TYPE:27,Designation or Protection,,ACTIVITY_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI
+ACTIVITY_TYPE:22,designation,,ACTIVITY_TYPE:27,Index,GCI
+ACTIVITY_TYPE:24,mills act ,,ACTIVITY_TYPE:27,Index,GCI
+ACTIVITY_TYPE:23,building permit,,ACTIVITY_TYPE_AUTHORITY_DOCUMENT.csv,Index,GCI

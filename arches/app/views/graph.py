@@ -35,6 +35,7 @@ from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
+from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
 from arches.app.views.base import BaseManagerView
 from tempfile import NamedTemporaryFile
 from guardian.shortcuts import get_perms_for_model
@@ -168,11 +169,12 @@ class GraphDataView(View):
     def get(self, request, graphid, nodeid=None):
         if self.action == 'export_graph':
             graph = get_graphs_for_export([graphid])
+            graph['metadata'] = ArchesFileExporter().export_metadata()
             f = JSONSerializer().serialize(graph)
             graph_name = JSONDeserializer().deserialize(f)['graph'][0]['name']
 
             response = HttpResponse(f, content_type='json/plain')
-            response['Content-Disposition'] = 'attachment; filename="%s export.json"' %(graph_name)
+            response['Content-Disposition'] = 'attachment; filename="%s.json"' %(graph_name)
             return response
         else:
             graph = Graph.objects.get(graphid=graphid)
@@ -460,3 +462,47 @@ class ReportEditorView(GraphBaseView):
         report = models.Report.objects.get(reportid=reportid)
         report.delete()
         return JSONResponse({'succces':True})
+
+
+@method_decorator(group_required('edit'), name='dispatch')
+class FunctionManagerView(GraphBaseView):
+    action = ''
+
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script='views/graph/function-manager',
+            functions=JSONSerializer().serialize(models.Function.objects.all()),
+            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph)),
+            function_templates=models.Function.objects.exclude(component__isnull=True),
+        )
+
+        return render(request, 'views/graph/function-manager.htm', context)
+
+    def post(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph, created = models.FunctionXGraph.objects.update_or_create(
+                    pk=item['id'],
+                    defaults = {
+                        'function_id': item['function_id'],
+                        'graph_id': graphid,
+                        'config': item['config']
+                    }
+                )
+                item['id'] = functionXgraph.pk
+
+        return JSONResponse(data)
+
+    def delete(self, request, graphid):
+        data = JSONDeserializer().deserialize(request.body)
+
+        with transaction.atomic():
+            for item in data:
+                functionXgraph = models.FunctionXGraph.objects.get(pk=item['id'])
+                functionXgraph.delete()
+
+        return JSONResponse(data)

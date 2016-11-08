@@ -15,7 +15,7 @@ import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
 import json
 
@@ -173,6 +173,15 @@ class EditLog(models.Model):
         db_table = 'edit_log'
 
 
+class File(models.Model):
+    fileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
+    path = models.FileField(upload_to='uploadedfiles')
+
+    class Meta:
+        managed = True
+        db_table = 'files'
+
+
 class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     title = models.TextField(blank=True, null=True)
@@ -205,11 +214,27 @@ class Function(models.Model):
     functiontype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    defaultconfig = JSONField(blank=True, null=True)
+    component = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'functions'
 
+    @property
+    def defaultconfig_json(self):
+        json_string = json.dumps(self.defaultconfig)
+        return json_string
+
+class FunctionXGraph(models.Model):
+    id = models.AutoField(primary_key=True)
+    function = models.ForeignKey('Function', on_delete=models.CASCADE, db_column='functionid')
+    graph = models.ForeignKey('GraphModel', on_delete=models.CASCADE, db_column='graphid')
+    config = JSONField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'functions_x_graphs'
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -227,6 +252,7 @@ class GraphModel(models.Model):
     maplinewidth = models.IntegerField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
     ontology = models.ForeignKey('Ontology', db_column='ontologyid', related_name='graphs', null=True, blank=True)
+    functions = models.ManyToManyField(to='Function', through='FunctionXGraph')
 
     class Meta:
         managed = True
@@ -414,6 +440,7 @@ class Relation(models.Model):
     class Meta:
         managed = True
         db_table = 'relations'
+        unique_together = (('conceptfrom', 'conceptto', 'relationtype'),)
 
 
 class ReportTemplate(models.Model):
@@ -509,10 +536,18 @@ class Tile(models.Model): #Tile
     parenttile = models.ForeignKey('self', db_column='parenttileid', blank=True, null=True)
     data = JSONField(blank=True, null=True, db_column='tiledata')  # This field type is a guess.
     nodegroup = models.ForeignKey(NodeGroup, db_column='nodegroupid')
+    sortorder = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         managed = True
         db_table = 'tiles'
+
+
+    def save(self, *args, **kwargs):
+        if(self.sortorder is None):
+            sortorder_max = Tile.objects.filter(nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id).aggregate(Max('sortorder'))['sortorder__max']
+            self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
 class Value(models.Model):
@@ -560,10 +595,10 @@ class MapSources(models.Model):
 
 
 class MapLayers(models.Model):
+    maplayerid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     layerdefinitions = JSONField(blank=True, null=True, db_column='layerdefinitions')
     isoverlay = models.BooleanField(default=False)
-    sortorder = models.IntegerField(default=1)
     icon = models.TextField(default=None)
 
     @property

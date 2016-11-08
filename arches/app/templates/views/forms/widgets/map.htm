@@ -2,10 +2,7 @@
 <div class="row widget-wrapper" data-bind="css: {'report-header': reportHeader}">
     <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
-
-
-
-    <div id='map' class="map-crud-container relative" data-bind="mapboxgl: { mapOptions: {
+    <div id='map' class="map-crud-container expanded-map relative" data-bind="mapboxgl: { mapOptions: {
           style: mapStyle,
           zoom: zoom,
           minZoom: minZoom,
@@ -16,41 +13,67 @@
           bearing: bearing
        }, afterRender: function(){setupMap(map)} }">
 
-       <!--ko if: drawMode -->
-       <div class="geometry-editing-notifications">
-           <div class="alert-wrap in animated jellyIn">
-               <div class="alert alert-warning" role="alert">
-                   <button class="close" type="button">
+        <!--ko if: drawMode -->
+        <div class="geometry-editing-notifications">
+            <div class="alert-wrap in animated jellyIn">
+                <div class="alert alert-warning" role="alert">
+                    <button class="close" type="button">
                    </button>
-                     <!-- ko if: drawMode() === 'draw_point'  -->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating points.  Click the Point tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'draw_polygon'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating polygons.  Click the Polygon tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'draw_line_string'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are creating lines.  Click the Line tool to exit.
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'simple_select'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>. Drag to move <!-- ko if: selectedFeatureType() !== 'Point'--> or click it again to edit verticies <!-- /ko -->
-                   </div>
-                   <!-- /ko -->
-                   <!-- ko if: drawMode() === 'direct_select'-->
-                   <div class="media">
-                     <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
-                   </div>
-                   <!-- /ko -->
-               </div>
+                    <div class="media">
+                        <!-- ko if: drawMode() === 'draw_point'  -->
+                        <strong>Edit Mode</strong> You are creating points. Click the Point tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_polygon'-->
+                        <strong>Edit Mode</strong> You are creating polygons. Click the Polygon tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'draw_line_string'-->
+                        <strong>Edit Mode</strong> You are creating lines. Click the Line tool to exit.
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'simple_select'-->
+                        <strong>Edit Mode</strong> You are editing a <span data-bind="text: selectedFeatureType"></span>.
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>Click and drag to move.</span>
+                        <!-- /ko -->
+                        <!-- ko if: selectedFeatureType() !== 'point'-->
+                        <span>Click and drag to move, or click it again to edit verticies.</span>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: drawMode() === 'direct_select'-->
+                        <strong>Edit Mode</strong> You are editing <span data-bind="text: selectedFeatureType"></span> verticies. Click outside the feature to exit.
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <div class="overlay-selection-container" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+           <!-- Title -->
+           <div class="overlay-title">
+               Map Overlay Library
+               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: toggleOverlaySelector"></i></span>
            </div>
-       </div>
-       <!-- /ko -->
+           <!-- Filter -->
+           <div class="overlay-filter-container">
+               <input type="text" placeholder="filter overlays..." class="form-control grid-filter input-lg">
+           </div>
+           <!-- Overlay List -->
+           <div class="overlay-list-container">
+                <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: overlayLibrary">
+                       <!-- Overlay Item -->
+                     <div class="overlay-card" style="" data-bind="click: $parent.exchangeOverlay, css: {'selected': checkedOutOfLibrary}">
+                         <div class="overlay-card-item">
+                             <div class="overlay-card-vis-toggle">
+                                 <i class="ion-checkmark-circled"></i>
+                             </div>
+                             <div class="overlay-card-main" style="">
+                                 <a id="" class="" style="" href="#"><span data-bind="text: name"></span>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+           </div>
+        </div>
 
         <!-- Geocode Panel -->
         <div class="geocode-container" data-bind="css : {'geocode-container-shim' : mapToolsExpanded, 'hide-geocoder': geocoderVisible}">
@@ -69,28 +92,25 @@
             </div>
 
             <div id="map-widget-toolbar" class="map-widget-toolbar relative" data-bind="fadeVisible: mapToolsExpanded, delay:200, fade:400">
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
+              <ul class="map-widget-toolbar-list" style="">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'active': !mapControlPanels.basemaps()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-map add-tooltip" data-bind="tooltip: { title: '{% trans "Basemaps" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <div id="btn-overlays" class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
+                </li>
+                <li id="btn-overlays" class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('overlays')}, css : { 'active': !mapControlPanels.overlays()}">
                     <a id="overlays" href="" class="map-widget-icon"><i class="ion-navicon add-tooltip" data-bind="tooltip: { title: '{% trans "Overlays" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <!-- ko if: featureEditingDisabled -->
-                <div class="map-widget-tool text-center" data-bind="css : {'disabled': featureEditingDisabled}">
-                    <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <!-- /ko -->
+                </li>
                 <!-- ko ifnot: featureEditingDisabled -->
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('maptools')}, css : {'active': !mapControlPanels.maptools() }">
                     <a id="" href="" class="map-widget-icon"><i class="ion-crop add-tooltip" data-bind="tooltip: { title: '{% trans "Map Tools" %}', placement: 'bottom' }"></i></a>
-                </div>
+                </li>
                 <!-- /ko -->
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('legend')}, css : {'active': !mapControlPanels.legend()}">
                     <a id="" href="" class="map-widget-icon"><i class="ion-ios-list add-tooltip" data-bind="tooltip: { title: '{% trans "Legend" %}', placement: 'bottom' }"></i></a>
-                </div>
-                <div class="map-widget-tool text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
+                </li>
+                <li class="map-widget-toolbar-item text-center" data-bind="click: function(){toggleMapControlPanels('basemaps')}, css : {'map-widget-tool-expanded' : mapToolsExpanded}">
                     <a id="close-map-tools" href="#" class="map-widget-icon" data-bind="click: toggleMapTools"><i class="ion-ios-close add-tooltip" data-bind="tooltip: { title: '{% trans "Close" %}', placement: 'bottom' }"></i></a>
-                </div>
+                </li>
+              </ul>
             </div>
 
             <!-- Basemaps -->
@@ -109,11 +129,11 @@
                         <i class="ion-checkmark-circled"></i>
                         <!-- /ko -->
                         <!-- ko if: name !== self.basemap() -->
-                        <i class="ion-checkmark-circled fade"></i>
+                        <i class="ion-checkmark-circled basemap-unselected"></i>
                         <!-- /ko -->
                     </div>
                     <div class="map-overlay-name">
-                        <a id="" class="" href=""><span data-bind='text: name'><span></a>
+                        <a id="" class="" href=""><span data-bind="text: name, css: {'basemap-unselected': name !== self.basemap()}"><span></a>
                     </div>
                 </div>
                 <!-- /ko -->
@@ -125,7 +145,13 @@
         <div id="overlays-panel" class="panel map-widget-panel" data-bind="css: {'map-panel-inactive': mapControlPanels.overlays}">
             <!-- Panel Title -->
             <div class="map-widget-panel-title">
-                <h4 class=""> Overlays <i class="ion-ios-plus pull-right add-tooltip" data-placement="left" data-toggle="tooltip" data-original-title="add overlay"></i></h4>
+                <h4 class=""> Overlays
+                  <i class="ion-ios-plus pull-right add-tooltip"
+                    data-placement="left"
+                    data-toggle="tooltip"
+                    data-original-title="add overlay"
+                    data-bind="click: toggleOverlaySelector"
+                    ></i></h4>
             </div>
 
             <div data-bind="sortable: overlays">
@@ -390,8 +416,7 @@
                 <div class="col-xs-12 pad-no crud-widget-container">
                     <input id="select2Input2" data-bind="
                       select2v4Data: geometryTypes,
-                      select2v4: geomTypeSelectSetup"
-                      style="width: 100%">
+                      select2v4: geomTypeSelectSetup" style="width: 100%">
                     </input>
                 </div>
             </div>

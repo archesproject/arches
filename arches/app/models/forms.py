@@ -33,7 +33,7 @@ class Form(object):
             self.load(resourceid, formid=formid)
 
     def load(self, resourceid, formid=None):
-        tiles = models.Tile.objects.filter(resourceinstance_id=resourceid)
+        tiles = models.Tile.objects.filter(resourceinstance_id=resourceid).order_by('sortorder')
 
         # get the form and card data
         if formid is not None:

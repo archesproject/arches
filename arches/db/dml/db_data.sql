@@ -108,14 +108,14 @@ INSERT INTO d_data_types VALUES ('concept-list', 'fa fa-list-ul', '{"topConcept"
 INSERT INTO d_data_types VALUES ('domain-value', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000015');
 INSERT INTO d_data_types VALUES ('domain-value-list', 'fa fa-list-ul', '{"options": []}', 'views/graph/datatypes/domain-value', 'domain-value-datatype-config', '10000000-0000-0000-0000-000000000016');
 INSERT INTO d_data_types VALUES ('boolean', 'fa fa-toggle-on', null, null, null, '10000000-0000-0000-0000-000000000006');
-INSERT INTO d_data_types VALUES ('file', 'fa fa-file-image-o');
+INSERT INTO d_data_types VALUES ('file-list', 'fa fa-file-image-o', null, null, null, '10000000-0000-0000-0000-000000000019');
 INSERT INTO d_data_types VALUES ('semantic', 'fa fa-link');
 
 -- data type functions
 INSERT INTO functions_x_datatypes VALUES (1, 'boolean', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (2, 'date', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (3, 'concept', '60000000-0000-0000-0000-000000000000');
-INSERT INTO functions_x_datatypes VALUES (4, 'file', '60000000-0000-0000-0000-000000000000');
+INSERT INTO functions_x_datatypes VALUES (4, 'file-list', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (5, 'geojson-feature-collection', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (6, 'number', '60000000-0000-0000-0000-000000000000');
 INSERT INTO functions_x_datatypes VALUES (7, 'string', '60000000-0000-0000-0000-000000000000');
@@ -190,6 +190,7 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     '{
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+        "overlayConfigs": [],
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
@@ -220,6 +221,9 @@ INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
 
 INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
     VALUES ('10000000-0000-0000-0000-000000000018', 'domain-checkbox-widget', 'widgets/domain-checkbox', 'domain-value-list', '{}');
+
+INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
+    VALUES ('10000000-0000-0000-0000-000000000019', 'file-widget', 'widgets/file', 'file-list', '{"acceptedFiles": "", "maxFilesize": "200"}');
 
 -- Node graph
 INSERT INTO graphs(graphid, name, author, version, description, isresource, isactive, iconclass, subtitle, ontologyid)
@@ -2144,6 +2148,9 @@ INSERT INTO functions(functionid, function, functiontype, name, description)
 INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000003', 'Card Function 3', 'nodegroup', 'Card Function 3', 'A dummy function for testing');
 
+INSERT INTO functions(functionid, function, functiontype, name, description, defaultconfig, component)
+    VALUES ('60000000-0000-0000-0000-000000000010', 'primarynamelookup', 'primaryname', 'Primary Name Lookup', 'A function to calculate the primary name from a nodegroup', '{"nodegroup_id": "", "string_template": ""}', 'views/functions/primary-name');
+
 INSERT INTO functions(functionid, function, functiontype, name, description)
     VALUES ('60000000-0000-0000-0000-000000000004', 'String Function 1', 'user_selectable', 'String Function 1', 'A dummy function for testing');
 INSERT INTO functions(functionid, function, functiontype, name, description)
@@ -2244,8 +2251,8 @@ INSERT INTO map_sources(name, source)
                        }
               }');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('presidio', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'presidio', '[{
         "id":"presidio-poly",
         "source":"presidio",
         "type":"fill",
@@ -2265,53 +2272,61 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
               "circle-radius": 5,
               "circle-color": "#fb6017"
           }
-        }]', TRUE, 2, 'fa fa-flag');
+        }]', TRUE, 'fa fa-flag');
 
 INSERT INTO map_sources(name, source)
-  VALUES ('golden-gate-park', '{
-              "type": "geojson",
-              "data":
-              {
-                "type": "FeatureCollection",
-                "features": [
-                  {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            -122.51060485839844,
-                            37.77125750792944
-                          ],
-                          [
-                            -122.47163772583008,
-                            37.77288579232439
-                          ],
-                          [
-                            -122.45412826538086,
-                            37.77505678240509
-                          ],
-                          [
-                            -122.45292663574217,
-                            37.766643840752764
-                          ],
-                          [
-                            -122.51043319702148,
-                            37.76365837331252
-                          ],
-                          [
-                            -122.51060485839844,
-                            37.77125750792944
-                          ]
-                        ]
-                      ]
-                    }
-                  }
+  VALUES ('sf-national-cemetery',
+    '{
+        "type": "geojson",
+        "data":
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -118.828125,
+                  37.996162679728116
                 ]
               }
-              }');
+            },
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ],
+                    [
+                      -122.4621319770813,
+                      37.800459411713945
+                    ],
+                    [
+                      -122.46494293212889,
+                      37.79742444343689
+                    ],
+                    [
+                      -122.46711015701293,
+                      37.79861131738665
+                    ],
+                    [
+                      -122.46423482894897,
+                      37.80166319140713
+                    ]
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+    }');
 
 INSERT INTO map_sources(name, source)
   VALUES ('stamen-terrain', '{
@@ -2330,37 +2345,37 @@ INSERT INTO map_sources(name, source)
   }');
 
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('golden-gate-park', '[{
-        "id":"golden-gate-park",
-        "source":"golden-gate-park",
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'sf-national-cemetery', '[{
+        "id":"sf-national-cemetery",
+        "source":"sf-national-cemetery",
         "type":"fill",
         "layout": {},
         "paint": {
             "fill-color": "#088",
             "fill-opacity": 0.8
         }
-      }]', TRUE, 3, 'ion-leaf');
+      }]', TRUE, 'ion-ios-flag');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('stamen-terrain', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
         "id": "stamen-terrain",
         "type": "raster",
         "source": "stamen-terrain",
         "minzoom": 0,
         "maxzoom": 22
-    }]', FALSE, 4, 'fa fa-road');
+    }]', FALSE, 'fa fa-road');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('satellite', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
         "id": "satellite",
         "type": "raster",
         "source": "mapbox-satellite",
         "source-layer": "mapbox_satellite_full"
-    }]', FALSE, 1, '');
+    }]', FALSE, '');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-    VALUES ('streets', '[{
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+    VALUES (public.uuid_generate_v1mc(), 'streets', '[{
         "id": "landuse_overlay_national_park",
         "type": "fill",
         "source": "mapbox-streets",
@@ -3182,10 +3197,10 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
             "text-halo-blur": 1
         },
         "source-layer": "country_label"
-    }]', FALSE, 1, '');
+    }]', FALSE, '');
 
-INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
-   VALUES ('mapzen', '
+INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon)
+   VALUES (public.uuid_generate_v1mc(), 'mapzen', '
      [
      {
          "id": "background",
@@ -3485,7 +3500,7 @@ INSERT INTO map_layers(name, layerdefinitions, isoverlay, sortorder, icon)
          }
        ]
 
-     ', FALSE, 1, '');
+     ', FALSE, '');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
     VALUES ('50000000-0000-0000-0000-000000000001', 'No Header Template', 'Default Template', 'reports/default', 'default-report', '{}');

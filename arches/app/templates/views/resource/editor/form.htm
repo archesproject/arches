@@ -77,6 +77,9 @@
                                                 <div class='widget-preview' data-bind='component: {
                                                     name: form.widgetLookup[widget.get("widget_id")()].name,
                                                     params: {
+                                                        formData: tile.formData,
+                                                        tile: tile,
+                                                        form: form,
                                                         config: configJSON,
                                                         label: widget.get("label")(),
                                                         value: tile.data[widget.get("node_id")()],
@@ -129,7 +132,7 @@
                                     Saved <span data-bind="text: card.get('name')"/>
                                 </div>
 
-                                <div class="list-group" style="margin-top: 20px;" data-bind="foreach: {data: parentTile.tiles[card.get('nodegroup_id')], as: 'innerTile'}">
+                                <div class="list-group" style="margin-top: 20px;" data-bind="sortable: {data: parentTile.tiles[card.get('nodegroup_id')], afterMove: form.reorderTiles.bind(form, parentTile.tiles[card.get('nodegroup_id')]), as: 'innerTile', connectClass: 'list-group', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
 
                                     <div class="list-group-item crud-record-item" style="">
 
@@ -141,6 +144,9 @@
                                                     <!-- ko component: {
                                                         name: form.widgetLookup[card.get('widgets')()[0].get("widget_id")()].name,
                                                         params: {
+                                                            formData: innerTile.formData,
+                                                            tile: innerTile,
+                                                            form: form,
                                                             config: card.get('widgets')()[0].configJSON,
                                                             label: card.get('widgets')()[0].get("label")(),
                                                             value: innerTile.data[card.get('widgets')()[0].get("node_id")()],
@@ -151,6 +157,7 @@
                                                             state: "display_value"
                                                         }
                                                     } --><!-- /ko -->
+
                                                 <!-- /ko -->
                                             </span>
                                         </h5>
@@ -181,6 +188,9 @@
                                                     <div class='widget-preview' data-bind='component: {
                                                         name: form.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
+                                                            formData: innerTile.formData,
+                                                            tile: innerTile,
+                                                            form: form,
                                                             config: configJSON,
                                                             label: widget.get("label")(),
                                                             value: innerTile.data[widget.get("node_id")()],
@@ -280,13 +290,12 @@
                     </div>
 
                     <!-- Wizard Tile -->
-                    <div id="wizard-tile-card" class="tab-base" style="margin-bottom: 20px; margin-top: -2px;" data-bind="foreach: {data: form.tiles[outerCard.get('nodegroup_id')](), as: 'tile'}">
-
-                        <!-- ko let: {'forceBlank': false} -->
+                    <!-- ko let: {'forceBlank': false} -->
+                    <div class="tab-base wizard-tile-card" style="margin-bottom: 20px; margin-top: -2px;" data-bind="sortable: {data: form.tiles[outerCard.get('nodegroup_id')](), afterMove: form.reorderTiles.bind(form, form.tiles[outerCard.get('nodegroup_id')]()), as: 'tile', connectClass: 'wizard-tile-card', options: {'placeholder': 'ui-sortable-placeholder sortable-placeholder', forcePlaceholderSize: true}}">
                         <!-- Data Entry -->
                         <div class="fade in" style="padding-top: 0px;" data-bind="template: { name: 'card-template' }"></div>
-                        <!-- /ko -->
                     </div>
+                    <!-- /ko -->
 
                 </div>
 
