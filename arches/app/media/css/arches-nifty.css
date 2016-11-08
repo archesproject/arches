@@ -4504,6 +4504,18 @@ div.row.widget-wrapper.report-header:hover {
     margin-right: -33px;
 }
 
+.report-header .expanded-map {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.ui-sortable div div .expanded-map {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
 .map-widget-toolbar {
     position: absolute;
     background: #123;
