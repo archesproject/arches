@@ -170,6 +170,18 @@ define([
             this.displayValue = ko.computed(function() {
                 return self.uploadedFiles().length;
             });
+
+            this.reportFiles = ko.computed(function() {
+                return self.uploadedFiles().filter(function(file) {
+                    return ko.unwrap(file.type).indexOf('image') < 0;
+                });
+            });
+
+            this.reportImages = ko.computed(function() {
+                return self.uploadedFiles().filter(function(file) {
+                    return ko.unwrap(file.type).indexOf('image') >= 0;
+                });
+            });
         },
         template: {
             require: 'text!widget-templates/file'
