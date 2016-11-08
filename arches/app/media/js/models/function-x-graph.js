@@ -27,32 +27,42 @@ define([
             this._json = ko.observable('');
             this.id = null;
             this.function = '';
+            this.function_id = '';
             this.graphid = '';
             this.config = koMapping.fromJS({});
 
+
+            // this.json = ko.computed(function() {
+            //     var config = koMapping.toJS(this.config);
+            //     delete config['__ko_mapping__'];
+            //     return JSON.stringify(_.extend(JSON.parse(this._json()), {
+            //         config: config,
+            //     }))
+            // }, this);
+
+            // this.dirty = ko.computed(function() {
+            //     var _json = JSON.parse(self._json())
+            //     delete _json.config['__ko_mapping__'];
+            //     return JSON.stringify(this.toJSON()) !== JSON.stringify(_json);
+            // }, this);
+
             this.parse(options);
 
-            this.json = ko.computed(function() {
-                var config = koMapping.toJS(self.config);
-                delete config['__ko_mapping__'];
-                return JSON.stringify(_.extend(JSON.parse(self._json()), {
-                    config: config,
-                }))
-            });
-
-            self.dirty = ko.computed(function() {
-                return self.json() !== self._json();
-            });
+            this.dirty = ko.computed(function(){
+                return JSON.stringify(_.extend(JSON.parse(self._json()),self.toJSON())) !== self._json();
+            })
         },
 
         parse: function(data) {
-            this._json(JSON.stringify(data));
+            //this._json(JSON.stringify(koMapping.toJS(data)));
             this.id = data.id;
             this.function = data.function;
+            this.function_id = data.function_id;
             this.graphid = data.graphid;
             koMapping.fromJS(data.config, this.config)
 
             this.set('id', data.id)
+            this._json(JSON.stringify(this.toJSON()));
         },
 
         /**
@@ -69,7 +79,20 @@ define([
         * @return {object} a JSON object containing model data
         */
         toJSON: function () {
-            return JSON.parse(this.json());
+            //return JSON.parse(this.json());
+            var ret = {};
+            for(var key in this.attributes){
+                if(key === 'id' || key === 'function_id' || key === 'graphid'|| key === 'config'){
+                     if(key === 'config'){
+                        ret[key] = koMapping.toJS(this[key]);
+                    }else{
+                        ret[key] = this[key];
+                    }
+                   
+                }
+            }
+            return ret;
+            return koMapping.toJS(this.attributes);
         },
     });
     return FunctionXGraphModel;

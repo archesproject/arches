@@ -24,7 +24,7 @@ define([
             var self = this;
             this._json = ko.observable('');
             this.functionid = options.functionid;
-            this.defaultconfig = koMapping.fromJS({});
+            this.defaultconfig = koMapping.fromJS({'triggering_nodegroups': []});
             this.name = ko.observable();
             this.description = ko.observable();
             this.functiontype = ko.observable();

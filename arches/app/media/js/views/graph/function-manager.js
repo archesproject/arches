@@ -11,6 +11,7 @@ require([
     'graph-base-data',
     'graph-functions-data',
     'function-templates',
+    'component-templates'
 ], function($, _, ko, arches, GraphPageView, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
     /**
     * set up the page view model with the graph model and related sub views

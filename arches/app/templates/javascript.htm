@@ -9,6 +9,7 @@
             'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
             'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
             'function-templates': '{% url "function-templates" ""%}'.replace(/\/$/, ""),
+            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
             'nifty': '{{ STATIC_URL }}plugins/nifty',
             'async': '{{ STATIC_URL }}bower_components/requirejs-plugins/src/async',
@@ -218,13 +219,11 @@
     });
 
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for template in function_templates %}
-            '{{ template.pk }}': {
-                'componentname': '{{ template.name }}',
-                'component': '{{ template.component }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
+         return;
+    });
+
+    define('component-templates', ['views/components/nodegroup-selector'], function () {
+         return;
     });
 
     define('datatype-config-components',
