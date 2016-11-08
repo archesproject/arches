@@ -101,12 +101,14 @@ class UITest(StaticLiveServerTestCase):
             self.driver.quit()
 
     def test_login(self):
+        print "Testing login"
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
 
         self.assertEqual(self.driver.current_url, self.live_server_url + '/index.htm')
 
     def test_make_graph(self):
+        print "Testing graph creation"
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
 
@@ -116,6 +118,7 @@ class UITest(StaticLiveServerTestCase):
         self.assertEqual(self.driver.current_url, '%s/graph/%s/settings' % (self.live_server_url, graph_id))
 
     def test_make_node(self):
+        print "Testing node creation and appendment to a graph"
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         graph_page = GraphPage(self.driver, self.live_server_url)
@@ -131,6 +134,7 @@ class UITest(StaticLiveServerTestCase):
         self.assertTrue(node_ids_are_valid)
 
     def test_make_map_widget(self):
+        print "Testing creation and function of the map widget in a card"
         page = LoginPage(self.driver, self.live_server_url)
         page.login('admin', 'admin')
         #Create a new branch model
@@ -150,6 +154,14 @@ class UITest(StaticLiveServerTestCase):
         card_id = card_page.select_card(node_ids)
 
         map_widget_page = MapWidgetPage(self.driver, self.live_server_url, 'card', card_id)
-        tools_opened = map_widget_page.open_tools()
+        results = {}
+        results['opened maptools'] = map_widget_page.open_tools()
+        results['added basemap'] = map_widget_page.add_basemap()
+        results['added overlay'] = map_widget_page.add_overlay()
+        map_tools_working = True
+        for k, v in results.iteritems():
+            if v != True:
+                map_tools_working = False
+        print 'map tools results', results
 
-        self.assertTrue(tools_opened)
+        self.assertTrue(map_tools_working)
