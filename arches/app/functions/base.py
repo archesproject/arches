@@ -1,9 +1,9 @@
 class BaseFunction(object):
-    def get():
+    def get(self, *args, **kwargs):
         pass
 
-    def save():
+    def save(self, *args, **kwargs):
         pass
 
-    def delete():
+    def delete(self, *args, **kwargs):
         pass

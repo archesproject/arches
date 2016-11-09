@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import uuid
+import uuid, importlib
 from arches.app.models import models
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -40,38 +40,7 @@ class TileData(View):
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
 
-                    # TODO: move this datatype ('file-list') specific code into
-                    # a function meant to handle this datatype during tile save
-                    try:
-                        tile_model = models.Tile.objects.get(pk=data['tileid'])
-                    except models.Tile.DoesNotExist:
-                        tile_model = None
-
-                    nodegroup = models.NodeGroup.objects.get(pk=data['nodegroup_id'])
-                    for node in nodegroup.node_set.all():
-                        if node.datatype == 'file-list':
-                            if tile_model is not None:
-                                model_files = tile_model.data[str(node.pk)]
-                                for model_file in model_files:
-                                    incoming_file = None
-                                    for file_json in data['data'][str(node.pk)]:
-                                        if file_json["file_id"] == model_file["file_id"]:
-                                            incoming_file = file_json
-                                    if incoming_file == None:
-                                        deleted_file = models.File.objects.get(pk=model_file["file_id"])
-                                        deleted_file.delete()
-                            files = request.FILES.getlist('file-list_' + str(node.pk), [])
-                            for file_data in files:
-                                file_model = models.File()
-                                file_model.path = file_data
-                                file_model.save()
-                                for file_json in data['data'][str(node.pk)]:
-                                    if file_json["name"] == file_data.name and file_json["url"] is None:
-                                        file_json["file_id"] = str(file_model.pk)
-                                        file_json["url"] = str(file_model.path.url)
-                                        file_json["status"] = 'uploaded'
-                    # END 'file-list' SPECIFIC CODE
-
+                    data = preSave(data)
                     tile, created = models.Tile.objects.update_or_create(
                         tileid = data['tileid'],
                         defaults = {
@@ -118,6 +87,17 @@ class TileData(View):
             return JSONResponse(tile)
 
         return HttpResponseNotFound()
+
+
+def preSave(tile):
+    resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
+    functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
+    for function in functions:
+        module = importlib.import_module('arches.app.functions.%s' % function.function.modulename)
+        func = getattr(module, function.function.classname)()
+        print 'run function'
+        func.save(tile)
+    return tile
 
 # Move to util function
 def get(id):
