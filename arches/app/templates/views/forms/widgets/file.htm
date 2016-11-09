@@ -98,5 +98,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: displayValue() + {% trans "files uploaded" %} || '{% trans "None" %}'"></span>
+<span data-bind="text: displayValue() + ' {% trans "files uploaded" %}' || '{% trans "None" %}'"></span>
 {% endblock display_value %}
