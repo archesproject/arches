@@ -3,11 +3,10 @@ define(['knockout',
         'viewmodels/function', 
         'bindings/chosen'], 
 function (ko, koMapping, FunctionViewModel, chosen) {
-    return ko.components.register('views/functions/primary-name', {
+    return ko.components.register('views/components/functions/primary-name', {
         viewModel: function(params) {
-            FunctionViewModel.apply(this, params);
+            FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
-            this.config = params.config;
             this.cards = ko.observableArray();
             
             this.graph.cards.forEach(function(card){
@@ -43,7 +42,7 @@ function (ko, koMapping, FunctionViewModel, chosen) {
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
-            require: 'text!function-templates/primary-name'
+            require: 'text!templates/views/components/functions/primary-name.htm'
         }
     });
 })

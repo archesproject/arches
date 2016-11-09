@@ -5,7 +5,7 @@ define(['knockout',
 function (ko, koMapping, FunctionViewModel, chosen) {
     return ko.components.register('views/components/functions/required-nodes', {
         viewModel: function(params) {
-            FunctionViewModel.apply(this, params);
+            FunctionViewModel.apply(this, arguments);
             
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },

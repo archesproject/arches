@@ -6,7 +6,7 @@ define(['knockout',
 function (ko, koMapping, FunctionViewModel, GraphModel, chosen) {
     return ko.components.register('views/components/nodegroup-selector', {
         viewModel: function(params) {
-            FunctionViewModel.apply(this, params);
+            FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
             this.cards = ko.observableArray();
 
