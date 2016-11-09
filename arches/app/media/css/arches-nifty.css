@@ -122,7 +122,7 @@
 }
 
 #card-preview {
-    margin-bottom: 100px;
+    margin-bottom: 10px;
 }
 
 .card-main-title {
@@ -151,7 +151,7 @@
     margin-bottom: 5px;
 }
 .card-content-tab {
-    min-height: 350px;
+    min-height: 300px;
     margin-top: 15px;
     margin-left: -15px;
     box-shadow: none;
@@ -3244,6 +3244,10 @@ li.card-tree-list:last-of-type {
     margin: 10px;
 }
 
+.ep-card-crud-container:last-of-type {
+    margin-bottom: 100px;
+}
+
 .left-column-crud-container{
     -ms-flex: 0 0 275px;
     -webkit-flex: 0 0 275px;
@@ -3857,6 +3861,7 @@ div.row.widget-wrapper {
 div.row.widget-wrapper:hover {
     background: #fafafa;
 }
+
 .widget-preview {
     border: 1px solid transparent;
 }
@@ -4302,13 +4307,19 @@ div.row.widget-wrapper.report-header:hover {
     position: absolute;
     top: 0px;
     left: 0px;
-    padding: 10px 20px;
+    padding: 10px 25px;
     width: calc(100% - 250px);
-    background: #fff;
+    background: #fdfdfd;
     height: 500px;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
     border-right-width: 0px;
     z-index: 10;
+}
+
+#overlay-grid {
+    margin-left: 10px;
+    margin-right: 0px;
+    border-top-width: 0px;
 }
 
 .overlay-selection-container.selector-closed {
@@ -4325,10 +4336,13 @@ div.row.widget-wrapper.report-header:hover {
 }
 .overlay-title {
     font-size: 16px;
+    padding: 10px;
 }
 .overlay-filter-container {
     position: relative;
     padding-top: 5px;
+    padding-left: 10px;
+    padding-bottom: 10px;
 }
 .overlay-list-container {
     padding-top: 20px;
@@ -4337,7 +4351,7 @@ div.row.widget-wrapper.report-header:hover {
 
 .overlay-card {
    float: left;
-   width: calc(100% - 50px);
+   width: 100%;
    height: 50px;
    margin: 0px;
    position: relative;
@@ -4381,7 +4395,7 @@ div.row.widget-wrapper.report-header:hover {
    text-align: center;
    width: 50px;
    height: 50px;
-   padding-top: 12px;
+   padding-top: 15px;
    font-size: 17px;
    border-right: 1px solid #ddd;
    color: #999;
@@ -4466,6 +4480,11 @@ div.row.widget-wrapper.report-header:hover {
     border-bottom: 1px solid #ddd;
 }
 
+.map-widget-panel-title h4 {
+    font-weight: 400;
+    color: #444;
+}
+
 /*.visible {
   opacity: 1.0;
   visibility: visible;
@@ -4477,6 +4496,24 @@ div.row.widget-wrapper.report-header:hover {
     /*left: 0px;
     right: 0px;*/
     height: 500px;
+}
+
+.expanded-map {
+    margin-top: -50px;
+    margin-left: -18px;
+    margin-right: -33px;
+}
+
+.report-header .expanded-map {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.ui-sortable div div .expanded-map {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .map-widget-toolbar {

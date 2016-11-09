@@ -121,10 +121,18 @@ require([
                         cache: false,
                         contentType: false,
                         success: function(response) {
-                            window.location.reload(true);
+                          if (response.length != 0) {
+                            if (typeof(response)) {
+                              response = response.join('<br />')
+                            }
+                              self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                            }
+                            else {
+                              window.location.reload(true);
+                            }
                         },
                         error: function(response) {
-                            alert('Something went wrong. Make sure your file is properly formatted arches json. \n\n For more details please contact your system administrator.');
+                            self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Something went wrong. Please contact your system administrator for more details.'));
                             self.viewModel.loading(false);
                         },
                     });

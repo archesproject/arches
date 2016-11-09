@@ -5351,6 +5351,14 @@
       "isactive": false,
       "iconclass": "fa fa-building",
       "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+      "nodegroups": [
+        {
+          "cardinality": "1",
+          "legacygroupid": null,
+          "nodegroupid": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
+          "parentnodegroup_id": null
+        }
+      ],
       "nodes": [
         {
           "status": null,
@@ -7700,7 +7708,24 @@
           "description": ""
         }
       ],
-      "cards": [],
+      "cards": [
+        {
+          "itemtext": null,
+          "functions": [],
+          "graph_id": "11111111-0000-0000-0000-191919191919",
+          "description": "Name and name type.",
+          "name": "Name and name type",
+          "nodegroup_id": "1ed98853-24c9-4226-bde2-2c40ee60a26c",
+          "visible": true,
+          "helpenabled": false,
+          "helptext": null,
+          "sortorder": null,
+          "cardid": "4ff978bb-9bd4-11e6-84a5-026d961c78e6",
+          "helptitle": null,
+          "active": true,
+          "instructions": null
+        }
+      ],
       "cards_x_nodes_x_widgets": [],
       "forms": [],
       "forms_x_cards": [],
