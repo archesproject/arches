@@ -74,35 +74,36 @@
 {% endblock config_form %}
 
 {% block report %}
-<!-- ko if: uploadedFiles().length === 0 -->
 <dt data-bind="text: label"></dt>
+
+<!-- ko if: uploadedFiles().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+
+<!-- ko foreach: reportFiles() -->
 <dd>
-    {% trans "None" %}
+    <a class="" data-bind="attr: {href: url}">
+        <i class="ion ion-forward"></i>
+        <span data-bind="text: name"></span>
+    </a>
 </dd>
 <!-- /ko -->
 
-<!-- ko if: uploadedFiles().length > 0 -->
-<dl class="dl-horizontal">
-    <dt data-bind="text: label"></dt>
-    <!-- ko if: reportImages().length > 0 -->
-    <dd>
-        <div id="report-image-grid" class="report-image-grid">
-            <!-- ko foreach: reportImages() -->
-            <div class="rp-image-grid-item">
-                <a id="" class="" target="_blank" data-bind="attr: {href: url}"> <img class="img-responsive" data-bind="attr: {src: url, alt: name}"></a>
-            </div>
-            <!-- /ko -->
+<!-- ko if: reportImages().length > 0 -->
+<dd>
+    <div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: reportImages() -->
+        <div class="rp-image-grid-item">
+            <a id="" class="" target="_blank" data-bind="attr: {href: url}">
+                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
+            </a>
         </div>
-    </dd>
-    <!-- /ko -->
-
-    <!-- ko foreach: reportFiles() -->
-    <dd><i class="ion ion-forward"></i><a class="" data-bind="attr: {href: url}"> <span data-bind="text: name"></span></a></dd>
-    <!-- /ko -->
-</dl>
+        <!-- /ko -->
+    </div>
+</dd>
 <!-- /ko -->
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: displayValue() + {% trans "files uploaded" %} || '{% trans "None" %}'"></span>
+<span data-bind="text: displayValue() + {% trans "file(s) uploaded" %}'"></span>
 {% endblock display_value %}
