@@ -32,11 +32,11 @@ class TileData(View):
     action = 'update_tile'
 
     def post(self, request):
-        json = request.POST.get('data', None)
-        if json != None:
-            data = JSONDeserializer().deserialize(json)
+        if self.action == 'update_tile':
+            json = request.POST.get('data', None)
+            if json != None:
+                data = JSONDeserializer().deserialize(json)
 
-            if self.action == 'update_tile':
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
 
@@ -65,7 +65,11 @@ class TileData(View):
 
                 return JSONResponse(data)
 
-            if self.action == 'reorder_tiles':
+        if self.action == 'reorder_tiles':
+            json = request.body
+            if json != None:
+                data = JSONDeserializer().deserialize(json)
+                
                 if 'tiles' in data and len(data['tiles']) > 0:
                     sortorder = 0
                     for tile in data['tiles']:
@@ -95,7 +99,6 @@ def preSave(tile, request):
     for function in functions:
         module = importlib.import_module('arches.app.functions.%s' % function.function.modulename)
         func = getattr(module, function.function.classname)()
-        print 'run function'
         func.save(tile, request)
     return tile
 
