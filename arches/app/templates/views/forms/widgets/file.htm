@@ -75,28 +75,35 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
+
+<!-- ko if: uploadedFiles().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+
+<!-- ko foreach: reportFiles() -->
 <dd>
-    <!-- ko if: uploadedFiles().length === 0 -->
-        {% trans "None" %}
-    <!-- /ko -->
-    <div data-bind="foreach: uploadedFiles">
-        <div class="media pad-top bord-top">
-            <div class="media-body">
-                <div class="media-block">
-                    <div class="media-left" data-bind="if: ko.unwrap(type).indexOf('image') >= 0">
-                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: url}">
-                    </div>
-                    <div class="media-body">
-                        <a class="text-main text-bold mar-no text-overflow" target="_blank" data-bind="text: name, attr: {href: url}"></a>
-                        <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
-                    </div>
-                </div>
-            </div>
+    <a class="" data-bind="attr: {href: url}">
+        <i class="ion ion-forward"></i>
+        <span data-bind="text: name"></span>
+    </a>
+</dd>
+<!-- /ko -->
+
+<!-- ko if: reportImages().length > 0 -->
+<dd>
+    <div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: reportImages() -->
+        <div class="rp-image-grid-item">
+            <a id="" class="" target="_blank" data-bind="attr: {href: url}">
+                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
+            </a>
         </div>
+        <!-- /ko -->
     </div>
 </dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: displayValue() + {% trans "files uploaded" %} || '{% trans "None" %}'"></span>
+<span data-bind="text: displayValue() + {% trans "file(s) uploaded" %}'"></span>
 {% endblock display_value %}
