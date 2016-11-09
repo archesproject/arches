@@ -40,7 +40,7 @@ class TileData(View):
                 def saveTile(data, parenttile_id=None):
                     data['tileid'], created = uuid.get_or_create(data['tileid'])
 
-                    data = preSave(data)
+                    data = preSave(data, request)
                     tile, created = models.Tile.objects.update_or_create(
                         tileid = data['tileid'],
                         defaults = {
@@ -89,14 +89,14 @@ class TileData(View):
         return HttpResponseNotFound()
 
 
-def preSave(tile):
+def preSave(tile, request):
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
     for function in functions:
         module = importlib.import_module('arches.app.functions.%s' % function.function.modulename)
         func = getattr(module, function.function.classname)()
         print 'run function'
-        func.save(tile)
+        func.save(tile, request)
     return tile
 
 # Move to util function

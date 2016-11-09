@@ -2,12 +2,8 @@ from arches.app.models import models
 from arches.app.functions.base import BaseFunction
 
 class LocalFileStorageFunction(BaseFunction):
-    def run(self, *args, **kwargs):
-        self.save(None, None)
 
-    def save(self, tile):
-        print 'save file'
-        # TODO: move this datatype ('file-list') specific code into
+    def save(self, tile, request):
         # a function meant to handle this datatype during tile save
         try:
             tile_model = models.Tile.objects.get(pk=tile['tileid'])
@@ -39,4 +35,3 @@ class LocalFileStorageFunction(BaseFunction):
                             file_json["status"] = 'uploaded'
 
         return tile
-        # END 'file-list' SPECIFIC CODE

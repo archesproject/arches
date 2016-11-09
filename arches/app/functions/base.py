@@ -1,9 +1,9 @@
 class BaseFunction(object):
     def get(self, *args, **kwargs):
-        pass
+        raise NotImplementedError
 
     def save(self, *args, **kwargs):
-        pass
+        raise NotImplementedError
 
     def delete(self, *args, **kwargs):
-        pass
+        raise NotImplementedError
