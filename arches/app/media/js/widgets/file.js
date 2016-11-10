@@ -3,9 +3,10 @@ define([
     'knockout',
     'underscore',
     'dropzone',
+    'uuid',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, ko, _, Dropzone, WidgetViewModel) {
+], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
     /**
      * registers a text-widget component for use in forms
      * @function external:"ko.components".text-widget
@@ -81,9 +82,9 @@ define([
             this.formatSize = function (file) {
                 var bytes = ko.unwrap(file.size);
                 if(bytes == 0) return '0 Byte';
-                var k = 1000; // or 1024 for binary
+                var k = 1024;
                 var dm = 2;
-                var sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PB', 'EB', 'ZB', 'YB'];
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
                 var i = Math.floor(Math.log(bytes) / Math.log(k));
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
@@ -128,6 +129,8 @@ define([
                 );
             });
 
+            this.unique_id = uuid.generate();
+
             this.dropzoneOptions = {
                 url: "/target-url",
                 dictDefaultMessage: '',
@@ -137,8 +140,8 @@ define([
                 parallelUploads: 20,
                 previewTemplate: $("template#file-widget-dz-preview").html(),
                 autoQueue: false,
-                previewsContainer: ".dz-previews",
-                clickable: ".fileinput-button",
+                previewsContainer: ".dz-previews.unique_id_" + this.unique_id,
+                clickable: ".fileinput-button.unique_id_" + this.unique_id,
                 acceptedFiles: this.acceptedFiles(),
                 maxFilesize: this.maxFilesize(),
                 init: function() {
@@ -169,6 +172,22 @@ define([
 
             this.displayValue = ko.computed(function() {
                 return self.uploadedFiles().length;
+            });
+
+            this.reportFiles = ko.computed(function() {
+                return self.uploadedFiles().filter(function(file) {
+                    return ko.unwrap(file.type).indexOf('image') < 0;
+                });
+            });
+
+            this.reportImages = ko.computed(function() {
+                return self.uploadedFiles().filter(function(file) {
+                    return ko.unwrap(file.type).indexOf('image') >= 0;
+                });
+            });
+
+            this.uniqueidClass = ko.computed(function () {
+                return "unique_id_" + self.unique_id;
             });
         },
         template: {

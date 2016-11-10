@@ -127,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <li class="edit-menu-item">
                         <a href="#" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
                             <div class="media-body">
-                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Functions" %}</div>
+                                <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
                                 <span class="text-muted menu-item-subtitle">{% trans "Configure functions" %} </span>
                             </div>
                         </a>
@@ -209,7 +209,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
             <!-- ko if: alert() -->
             <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-            <p class="ep-form-alert-text" data-bind="text: alert().text"></p>
+            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
 
             <div class="ep-form-alert-default-dismiss">
                 <i class="fa fa-times-circle" data-bind="click: alert().close"></i>

@@ -3485,6 +3485,7 @@ INSERT INTO report_templates(templateid, name, description, component, component
     VALUES ('50000000-0000-0000-0000-000000000002', 'Map Header Template', 'Map Widget', 'reports/map', 'map-report', '{
         "basemap": "streets",
         "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
+        "overlayConfigs": [],
         "geocoder": "MapzenGeocoder",
         "zoom": 10,
         "maxZoom": 20,
@@ -3502,4 +3503,4 @@ INSERT INTO report_templates(templateid, name, description, component, component
     }');
 
 INSERT INTO report_templates(templateid, name, description, component, componentname, defaultconfig)
-    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{}');
+    VALUES ('50000000-0000-0000-0000-000000000003', 'Image Header Template', 'Image Header', 'reports/image', 'image-report', '{"nodes": []}');
