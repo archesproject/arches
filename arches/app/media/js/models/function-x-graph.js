@@ -17,42 +17,47 @@ define([
         url: arches.urls.functionXGraph,
 
         /**
-        * parse - parses the passed in attributes into a {@link FunctionXGraphModel}
+        * Initializes the model with optional parameters
         * @memberof FunctionXGraphModel.prototype
-        * @param  {object} attributes - the properties to seed a {@link FunctionXGraphModel} with
+        * @param {object} options
+        * @param {object} options.id - the id of the {@link FunctionXGraphModel}
+        * @param {object} options.function - a reference to the parent {@link FunctionModel}
+        * @param {object} options.function_id - a reference to the parent {@link FunctionModel} id
+        * @param {object} options.graph_id - a reference to the parent {@link GraphModel} id
+        * @param {object} options.config - the properties requiring user configuration 
         */
         initialize: function(options) {
             var self = this;
-            this._id = options._id = _.uniqueId();
+            // _id is needed because we can apply more then
+            // one function at a time in the function-manager
+            this._id = _.uniqueId();  
             this._json = ko.observable('');
-            this.id = null;
-            this.function = '';
-            this.graphid = '';
+            this.id = options.id;
+            this.function = options.function;
+            this.function_id = options.function_id;
+            this.graph_id = options.graph_id;
             this.config = koMapping.fromJS({});
 
             this.parse(options);
+            
+            this.dirty = ko.computed(function(){
+                return JSON.stringify(_.extend(JSON.parse(this._json()),this.toJSON())) !== this._json();
+            }, this)
 
-            this.json = ko.computed(function() {
-                var config = koMapping.toJS(self.config);
-                delete config['__ko_mapping__'];
-                return JSON.stringify(_.extend(JSON.parse(self._json()), {
-                    config: config,
-                }))
-            });
-
-            self.dirty = ko.computed(function() {
-                return self.json() !== self._json();
-            });
         },
 
+        /**
+        * parse - parses any passed in data to observable attributes 
+        * @memberof FunctionXGraphModel.prototype
+        * @param {object} data - the observable properties to seed a {@link FunctionXGraphModel} with
+        * @param {object} data.id - the id of the {@link FunctionXGraphModel}
+        * @param {object} data.config - the properties requiring user configuration 
+        */
         parse: function(data) {
-            this._json(JSON.stringify(data));
-            this.id = data.id;
-            this.function = data.function;
-            this.graphid = data.graphid;
             koMapping.fromJS(data.config, this.config)
 
             this.set('id', data.id)
+            this._json(JSON.stringify(this.toJSON()));
         },
 
         /**
@@ -69,7 +74,20 @@ define([
         * @return {object} a JSON object containing model data
         */
         toJSON: function () {
-            return JSON.parse(this.json());
+            var ret = {};
+            var trackedProperties = ['_id', 'id', 'function_id', 'graph_id', 'config'];
+            for(var key in this){
+                if(trackedProperties.indexOf(key) !== -1){
+                    if(key === 'config'){
+                        ret[key] = koMapping.toJS(this[key]);
+                        delete ret[key]['__ko_mapping__'];
+                    }else{
+                        ret[key] = this[key];
+                    }
+                   
+                }
+            }
+            return ret;
         },
     });
     return FunctionXGraphModel;

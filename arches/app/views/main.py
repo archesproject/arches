@@ -67,3 +67,6 @@ def report_templates(request, template="text"):
 
 def function_templates(request, template):
     return render(request, 'views/functions/%s.htm' % template)
+
+def templates(request, template):
+    return render(request, template)

@@ -101,6 +101,7 @@ urlpatterns = [
     url(r'^function-templates/(?P<template>[a-zA-Z_-]*)', main.function_templates, name="function-templates"),
     url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
     url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
+    url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

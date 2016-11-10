@@ -16,15 +16,21 @@ define([
         url: arches.urls.function,
 
         /**
-        * parse - parses the passed in attributes into a {@link FunctionModel}
-        * @memberof FunctionModel.prototype
-        * @param  {object} attributes - the properties to seed a {@link FunctionModel} with
+        * Initializes the model with optional parameters
+        * @memberof FunctionXGraphModel.prototype
+        * @param {object} options
+        * @param {object} options.functionid - the id of the function
+        * @param {object} options.name - the name of the function
+        * @param {object} options.description - the description of the function
+        * @param {object} options.functiontype - the function type
+        * @param {object} options.component - a reference to the knockout component
+        * @param {object} options.defaultconfig - the default properties requiring user configuration 
         */
         initialize: function(options) {
             var self = this;
             this._json = ko.observable('');
             this.functionid = options.functionid;
-            this.defaultconfig = koMapping.fromJS({});
+            this.defaultconfig = koMapping.fromJS({'triggering_nodegroups': []});
             this.name = ko.observable();
             this.description = ko.observable();
             this.functiontype = ko.observable();
@@ -47,6 +53,17 @@ define([
             });
         },
 
+        /**
+        * parse - parses the passed in data into a {@link FunctionModel}
+        * @memberof FunctionModel.prototype
+        * @param  {object} data - the observable properties to seed a {@link FunctionModel} with
+        * @param {object} data.functionid - the id of the function
+        * @param {object} data.name - the name of the function
+        * @param {object} data.description - the description of the function
+        * @param {object} data.functiontype - the function type
+        * @param {object} data.component - a reference to the knockout component
+        * @param {object} data.defaultconfig - the default properties requiring user configuration 
+        */
         parse: function(data) {
             this._json(JSON.stringify(data));
             this.functionid = data.functionid;

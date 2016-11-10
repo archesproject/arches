@@ -3,7 +3,7 @@ from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
 
-class PrimaryNameFunction(BaseFunction):
+class AllNodesRequiredFunction(BaseFunction):
     def get(self, resource, config):
         return self.get_primary_name_from_nodes(resource, config)
 

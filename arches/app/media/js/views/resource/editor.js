@@ -13,14 +13,16 @@ require([
     'bindings/let'
 ], function($, _, ko, arches, BaseManagerView, FormList, FormView, CardModel, AlertViewModel, data) {
     var self = this;
+    var formList = new FormList({
+        forms: ko.observableArray(data.forms)
+    })
+    formList.selectItem(formList.items()[0]);
+    
     var formView = new FormView({
-        formid: data.forms[0].formid,
+        formid: formList.items()[0].formid,
         resourceid: data.resourceid,
         tiles: data.tiles,
         blanks: data.blanks
-    })
-    var formList = new FormList({
-        forms: ko.observableArray(data.forms)
     })
 
     formList.on('item-clicked', function(form){
