@@ -8,12 +8,13 @@ define([
     'bindings/dropzone'
 ], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
     /**
-     * registers a text-widget component for use in forms
-     * @function external:"ko.components".text-widget
+     * registers a file-widget component for use in forms
+     * @function external:"ko.components".file-widget
      * @param {object} params
      * @param {string} params.value - the value being managed
      * @param {function} params.config - observable containing config object
-     * @param {string} params.config().instructions - label to use alongside the text input
+     * @param {string} params.config().acceptedFiles - accept attribute value for file input
+     * @param {string} params.config().maxFilesize - maximum allowed file size in MB
      */
     return ko.components.register('file-widget', {
         viewModel: function(params) {
@@ -130,18 +131,18 @@ define([
             });
 
             this.unique_id = uuid.generate();
+            this.uniqueidClass = ko.computed(function () {
+                return "unique_id_" + self.unique_id;
+            });
 
             this.dropzoneOptions = {
-                url: "/target-url",
+                url: "/",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
-                thumbnailWidth: 50,
-                thumbnailHeight: 50,
-                parallelUploads: 20,
                 previewTemplate: $("template#file-widget-dz-preview").html(),
                 autoQueue: false,
-                previewsContainer: ".dz-previews.unique_id_" + this.unique_id,
-                clickable: ".fileinput-button.unique_id_" + this.unique_id,
+                previewsContainer: ".dz-previews." + this.uniqueidClass(),
+                clickable: ".fileinput-button." + this.uniqueidClass(),
                 acceptedFiles: this.acceptedFiles(),
                 maxFilesize: this.maxFilesize(),
                 init: function() {
@@ -186,9 +187,6 @@ define([
                 });
             });
 
-            this.uniqueidClass = ko.computed(function () {
-                return "unique_id_" + self.unique_id;
-            });
         },
         template: {
             require: 'text!widget-templates/file'
