@@ -25,14 +25,8 @@
                         <div class="media-body">
                             <div class="media-block">
                                 <div class="media-left">
-                                    <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 && ko.unwrap(url) !== null -->
-                                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: url}">
-                                    <!-- /ko -->
-                                    <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 && ko.unwrap(url) === null -->
-                                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: content}">
-                                    <!-- /ko -->
-                                    <!-- ko if: ko.unwrap(type).indexOf('image') < 0 -->
-                                        <img class="dz-img">
+                                    <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 -->
+                                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: ko.unwrap(url) ? url : content }">
                                     <!-- /ko -->
                                 </div>
                                 <div class="media-body">
