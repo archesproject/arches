@@ -13,6 +13,8 @@ from tests.ui.pages.node_page import NodePage
 from tests.ui.pages.card_page import CardPage
 from tests.ui.pages.map_widget_page import MapWidgetPage
 from tests.ui.pages.form_page import FormPage
+from tests.ui.pages.report_manager_page import ReportManagerPage
+from tests.ui.pages.report_editor_page import ReportEditorPage
 import uuid
 
 if test_settings.RUN_LOCAL:
@@ -191,6 +193,48 @@ class UITest(StaticLiveServerTestCase):
             uuid.UUID(form_id)
         except:
             form_id_is_valid = False
-        form_page.configure_form()
+        form_page.configure_form("Form A")
 
         self.assertTrue(form_id_is_valid)
+
+    def test_make_report(self):
+        print "Testing report creation"
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
+        #Create a new branch model
+        graph_page = GraphPage(self.driver, self.live_server_url)
+        graph_id = graph_page.add_new_graph()
+        #Add a node to it of type geojson
+        branch_node_page = NodePage(self.driver, self.live_server_url, graph_id)
+        node_ids = branch_node_page.add_new_node('22000000-0000-0000-0000-000000000000', 'geojson-feature-collection')
+        #Create a resource model
+        resource_graph_page = GraphPage(self.driver, self.live_server_url)
+        resource_graph_id = resource_graph_page.add_new_graph("New Resource Model")
+        #Add a the branch model created above to the
+        resource_node_page = NodePage(self.driver, self.live_server_url, resource_graph_id)
+        resource_node_page.add_new_node(graph_id, '', True)
+        #Navigate to the report manager and click on the correspoding card for the node created above
+        report_manager_page = ReportManagerPage(self.driver, self.live_server_url, graph_id)
+        report_id = report_manager_page.add_new_report()
+        report_id_is_valid = True
+
+        try:
+            uuid.UUID(report_id)
+        except:
+            report_id_is_valid = False
+
+        #Navigate to the report editor page click around to verify things are working, activate and save the report
+        report_editor_page = ReportEditorPage(self.driver, self.live_server_url, 'report_editor', report_id)
+
+        results = {}
+        results['opened maptools'] = report_editor_page.open_tools()
+        results['added basemap'] = report_editor_page.add_basemap()
+        results['added overlay'] = report_editor_page.add_overlay()
+        map_tools_working = True
+        for k, v in results.iteritems():
+            if v != True:
+                map_tools_working = False
+        print 'map tools results in report manager', results
+        report_editor_page.save_report("Report A")
+
+        self.assertTrue(map_tools_working)

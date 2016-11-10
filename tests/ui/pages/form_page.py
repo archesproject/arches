@@ -55,12 +55,13 @@ class FormPage(BasePage):
 
         return form_id
 
-    def configure_form(self):
+    def configure_form(self, form_name):
         self.wait.until(
             EC.element_to_be_clickable(locators.ADD_FORM_CARD_BUTTON)
         ).click()
         form_name_input = self.driver.find_element(*locators.FORM_NAME_INPUT)
-        form_name_input.send_keys('FormA')
+        form_name_input.send_keys(form_name)
         self.wait.until(
             EC.element_to_be_clickable(locators.SAVE_EDITS_BUTTON)
         ).click()
+        print form_name, 'created'

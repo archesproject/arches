@@ -4,7 +4,6 @@ from page_locators import MapWidgetPageLocators as locators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from arches.urls import uuid_regex
 
 class MapWidgetPage(BasePage):
     """
@@ -29,20 +28,6 @@ class MapWidgetPage(BasePage):
             map_tools_button = self.wait.until(
                 EC.element_to_be_clickable(locators.MAP_TOOLS_BUTTON)
             ).click()
-            result = True
-        except:
-            result = False
-        return result
-
-    def add_basemap(self):
-        try:
-            for element in (
-                locators.MAP_TOOLS_BASEMAPS,
-                locators.SATELLITE_BASE_MAP
-                ):
-                map_tools_button = self.wait.until(
-                    EC.element_to_be_clickable(element)
-                ).click()
             result = True
         except:
             result = False

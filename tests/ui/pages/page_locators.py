@@ -44,6 +44,24 @@ class MapWidgetPageLocators(BasePageLocators):
     ADDED_OVERLAYS = (By.CSS_SELECTOR, "#overlays-panel .map-widget-overlay-item .map-overlay-name")
 
 class FormPageLocators(BasePageLocators):
+    def __init__(self):
+        super(BasePageLocators, self).__init__()
+
     ADD_FORM_BUTTON = (By.XPATH, "//*[@id='report-image-grid']/div[1]")
     ADD_FORM_CARD_BUTTON = (By.XPATH, "//*[@id='report-image-grid']/div/div/div[4]/a")
     FORM_NAME_INPUT = (By.XPATH, "//*[@id='form-id-card']/div/div/div[2]/form/div[1]/div/div[2]/input")
+
+class ReportManagerPageLocators(BasePageLocators):
+    def __init__(self):
+        super(BasePageLocators, self).__init__()
+
+    ADD_REPORT_BUTTON = (By.ID, "add-card")
+    ADD_REPORT_MAP_HEADER_TEMPLATE = (By.XPATH, "//*[@id='report-image-grid']/div[2]/div/div[3]/a")
+    SELECT_REPORT_CARD_BUTTON = (By.CSS_SELECTOR, "#report-image-grid > div.card-grid-item")
+
+class ReportEditorPageLocators(MapWidgetPageLocators):
+    def __init__(self):
+        super(MapWidgetPageLocators, self).__init__()
+
+    REPORT_NAME_INPUT = (By.XPATH, "//*[@id='ep-card-container-crud']/div[2]/div[2]/input")
+    ACTIVATE_REPORT_BUTTON = (By.XPATH, "//*[@id='ep-card-container-crud']/div[1]/div/div/span[1]")
