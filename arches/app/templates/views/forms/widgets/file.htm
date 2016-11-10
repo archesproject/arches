@@ -8,7 +8,7 @@
 
         <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
             <div class="bord-top pad-ver">
-                <span class="btn btn-success fileinput-button dz-clickable">
+                <span class="btn btn-success fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                     <i class="fa fa-plus"></i>
                     <span>Add files...</span>
                 </span>
@@ -19,7 +19,7 @@
                     </button>
                 </div>
             </div>
-            <div class="dz-previews">
+            <div class="dz-previews" data-bind="css: uniqueidClass">
                 <!-- ko foreach: filesJSON -->
                     <div class="media pad-top bord-top">
                         <div class="media-body">
