@@ -12,6 +12,7 @@ from tests.ui.pages.graph_page import GraphPage
 from tests.ui.pages.node_page import NodePage
 from tests.ui.pages.card_page import CardPage
 from tests.ui.pages.map_widget_page import MapWidgetPage
+from tests.ui.pages.form_page import FormPage
 import uuid
 
 if test_settings.RUN_LOCAL:
@@ -165,3 +166,31 @@ class UITest(StaticLiveServerTestCase):
         print 'map tools results', results
 
         self.assertTrue(map_tools_working)
+
+    def test_make_form(self):
+        print "Testing form creation"
+        page = LoginPage(self.driver, self.live_server_url)
+        page.login('admin', 'admin')
+        #Create a new branch model
+        graph_page = GraphPage(self.driver, self.live_server_url)
+        graph_id = graph_page.add_new_graph()
+        #Add a node to it of type geojson
+        branch_node_page = NodePage(self.driver, self.live_server_url, graph_id)
+        node_ids = branch_node_page.add_new_node('22000000-0000-0000-0000-000000000000', 'geojson-feature-collection')
+        #Create a resource model
+        resource_graph_page = GraphPage(self.driver, self.live_server_url)
+        resource_graph_id = resource_graph_page.add_new_graph("New Resource Model")
+        #Add a the branch model created above to the
+        resource_node_page = NodePage(self.driver, self.live_server_url, resource_graph_id)
+        resource_node_page.add_new_node(graph_id, '', True)
+        #Navigate to the card manager and click on the correspoding card for the node created above
+        form_page = FormPage(self.driver, self.live_server_url, graph_id)
+        form_id = form_page.add_new_form()
+        form_id_is_valid = True
+        try:
+            uuid.UUID(form_id)
+        except:
+            form_id_is_valid = False
+        form_page.configure_form()
+
+        self.assertTrue(form_id_is_valid)
