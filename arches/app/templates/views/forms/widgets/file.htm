@@ -26,13 +26,13 @@
                             <div class="media-block">
                                 <div class="media-left">
                                     <!-- ko if: ko.unwrap(type).indexOf('image') >= 0 -->
-                                        <img class="dz-img" width="50" height="50" data-bind="attr: {src: ko.unwrap(url) ? url : content }">
+                                    <img class="dz-img" width="50" height="50" data-bind="attr: {src: ko.unwrap(url) ? url : content }">
                                     <!-- /ko -->
                                 </div>
                                 <div class="media-body">
                                     <p class="text-main text-bold mar-no text-overflow" data-bind="text: name"></p>
                                     <!-- ko if: $data.error -->
-                                        <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: error"></span>
                                     <!-- /ko -->
                                     <p class="text-sm" data-bind="html: $parent.formatSize($data)"></p>
                                 </div>
