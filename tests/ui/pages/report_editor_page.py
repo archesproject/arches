@@ -1,4 +1,3 @@
-import re
 from map_widget_page import MapWidgetPage
 from page_locators import ReportEditorPageLocators as locators
 from selenium.webdriver.common.by import By
@@ -19,11 +18,12 @@ class ReportEditorPage(MapWidgetPage):
         self.page_id = page_id
         self.base_url = '/' + target_page + '/' + self.page_id
         self.wait = WebDriverWait(self.driver, 20)
-        self.driver.maximize_window()
+        self.driver.set_window_size(1400, 800)
 
     def save_report(self, report_name):
         self.driver.find_element(*locators.ACTIVATE_REPORT_BUTTON).click()
         report_name_input = self.driver.find_element(*locators.REPORT_NAME_INPUT)
         report_name_input.send_keys(report_name)
         self.driver.find_element(*locators.SAVE_EDITS_BUTTON).click()
+        self.driver.find_element(*locators.ADD_NEW_RESOURCE_NAVBAR_BUTTON).click()
         print report_name, 'created'

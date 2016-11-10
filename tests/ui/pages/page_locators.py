@@ -4,6 +4,7 @@ class BasePageLocators(object):
     LOADING_MASK = (By.CSS_SELECTOR, ".loading-mask")
     MANAGE_MENU = (By.ID, "menu-control")
     SAVE_EDITS_BUTTON = (By.XPATH, "//*[@id='content-container']/div/div[4]/div[3]/span/button[2]")
+    ADD_NEW_RESOURCE_NAVBAR_BUTTON = (By.XPATH, "//*[@id='mainnav-menu']/li[3]/a")
 
 class CardPageLocators(BasePageLocators):
     def __init__(self):
@@ -65,3 +66,11 @@ class ReportEditorPageLocators(MapWidgetPageLocators):
 
     REPORT_NAME_INPUT = (By.XPATH, "//*[@id='ep-card-container-crud']/div[2]/div[2]/input")
     ACTIVATE_REPORT_BUTTON = (By.XPATH, "//*[@id='ep-card-container-crud']/div[1]/div/div/span[1]")
+
+class ResourceManagerPageLocators(BasePageLocators):
+    def __init__(self):
+        super(BasePageLocators, self).__init__()
+
+class ResourceEditorPageLocators(BasePageLocators):
+    def __init__(self):
+        super(BasePageLocators, self).__init__()
