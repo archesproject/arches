@@ -85,6 +85,7 @@ class TileData(View):
         json = request.body
         if json != None:
             data = JSONDeserializer().deserialize(json)
+            data = preDelete(data, request)
             tile = models.Tile.objects.get(tileid = data['tileid'])
             tile.delete()
             tile.tileid = data['tileid']
@@ -94,13 +95,32 @@ class TileData(View):
 
 
 def preSave(tile, request):
+    for function in getFunctionClassInstances(tile):
+        try:
+            function.save(tile, request)
+        except NotImplementedError:
+            pass
+    return tile
+
+
+def preDelete(tile, request):
+    for function in getFunctionClassInstances(tile):
+        try:
+            function.delete(tile, request)
+            print 'deleting'
+        except NotImplementedError:
+            pass
+    return tile
+
+def getFunctionClassInstances(tile):
+    ret = []
     resource = models.ResourceInstance.objects.get(pk=tile['resourceinstance_id'])
     functions = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, config__triggering_nodegroups__contains=[tile['nodegroup_id']])
     for function in functions:
         module = importlib.import_module('arches.app.functions.%s' % function.function.modulename)
         func = getattr(module, function.function.classname)()
-        func.save(tile, request)
-    return tile
+        ret.append(func)
+    return ret
 
 # Move to util function
 def get(id):
