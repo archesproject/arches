@@ -8,12 +8,13 @@ define([
     'bindings/dropzone'
 ], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
     /**
-     * registers a text-widget component for use in forms
-     * @function external:"ko.components".text-widget
+     * registers a file-widget component for use in forms
+     * @function external:"ko.components".file-widget
      * @param {object} params
      * @param {string} params.value - the value being managed
      * @param {function} params.config - observable containing config object
-     * @param {string} params.config().instructions - label to use alongside the text input
+     * @param {string} params.config().acceptedFiles - accept attribute value for file input
+     * @param {string} params.config().maxFilesize - maximum allowed file size in MB
      */
     return ko.components.register('file-widget', {
         viewModel: function(params) {
