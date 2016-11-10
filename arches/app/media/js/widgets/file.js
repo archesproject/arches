@@ -3,9 +3,10 @@ define([
     'knockout',
     'underscore',
     'dropzone',
+    'uuid',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, ko, _, Dropzone, WidgetViewModel) {
+], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
     /**
      * registers a text-widget component for use in forms
      * @function external:"ko.components".text-widget
@@ -128,6 +129,8 @@ define([
                 );
             });
 
+            this.unique_id = uuid.generate();
+
             this.dropzoneOptions = {
                 url: "/target-url",
                 dictDefaultMessage: '',
@@ -137,8 +140,8 @@ define([
                 parallelUploads: 20,
                 previewTemplate: $("template#file-widget-dz-preview").html(),
                 autoQueue: false,
-                previewsContainer: ".dz-previews",
-                clickable: ".fileinput-button",
+                previewsContainer: ".dz-previews.unique_id_" + this.unique_id,
+                clickable: ".fileinput-button.unique_id_" + this.unique_id,
                 acceptedFiles: this.acceptedFiles(),
                 maxFilesize: this.maxFilesize(),
                 init: function() {
@@ -181,6 +184,10 @@ define([
                 return self.uploadedFiles().filter(function(file) {
                     return ko.unwrap(file.type).indexOf('image') >= 0;
                 });
+            });
+
+            this.uniqueidClass = ko.computed(function () {
+                return "unique_id_" + self.unique_id;
             });
         },
         template: {

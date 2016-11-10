@@ -8,7 +8,10 @@ define([
      * @name dropzone
      */
     ko.bindingHandlers.dropzone = {
-        init: function(element, valueAccessor, allBindings, viewModel) {
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var innerBindingContext = bindingContext.extend(valueAccessor);
+            ko.applyBindingsToDescendants(innerBindingContext, element);
+
             options = valueAccessor() || {};
 
             _.each(_.filter(options, function (value, key) {
@@ -18,6 +21,7 @@ define([
                 });
 
             $(element).dropzone(options);
+            return { controlsDescendantBindings: true };
         }
     }
     return ko.bindingHandlers.dropzone;
