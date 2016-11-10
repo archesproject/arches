@@ -596,7 +596,9 @@ class Concept(object):
                 return concept.traverse(get_scheme_id, direction='up')
             else:
                 return self
-
+        elif self.nodetype == 'EntityType':
+            concept = Concept().get(id = '00000000-0000-0000-0000-000000000004')
+            return concept
         else: # like ConceptScheme or EntityType
             return self
 
@@ -826,7 +828,7 @@ class ConceptValue(object):
             # don't create terms for entity type concepts
             if not(scheme.id == '00000000-0000-0000-0000-000000000003' or scheme.id == '00000000-0000-0000-0000-000000000004'):
                 se.index_term(self.value, self.id, scheme.id, {'conceptid': self.conceptid})
-    
+  
     def delete_index(self):   
         se = SearchEngineFactory().create() 
         query = Query(se, start=0, limit=10000)
