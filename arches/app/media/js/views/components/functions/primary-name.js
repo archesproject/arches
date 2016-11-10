@@ -19,8 +19,6 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                 }
             }, this);
 
-            this.cards.push({});
-
             this.string_template = params.config.string_template;
             this.nodegroup_id = params.config.nodegroup_id;
             this.nodegroup_id.subscribe(function(nodegroup_id){
@@ -32,7 +30,6 @@ function (ko, koMapping, FunctionViewModel, chosen) {
                 _.each(nodes, function(node){
                     templateFragments.push('<' + node.name + '>');
                 }, this);
-
 
                 var template = templateFragments.join(', ');
                 this.string_template(template);
