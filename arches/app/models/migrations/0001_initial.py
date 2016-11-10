@@ -423,11 +423,12 @@ class Migration(migrations.Migration):
             name='Function',
             fields=[
                 ('functionid', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('function', models.TextField(blank=True, null=True)),
                 ('functiontype', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('defaultconfig', JSONField(blank=True, null=True, db_column='defaultconfig')),
+                ('modulename', models.TextField(blank=True, null=True)),
+                ('classname', models.TextField(blank=True, null=True)),
                 ('component', models.TextField(blank=True, null=True)),
             ],
             options={

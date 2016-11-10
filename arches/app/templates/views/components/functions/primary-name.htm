@@ -7,7 +7,7 @@
             </div>
 
             <div class="col-xs-12">
-                <select data-placeholder="{% trans "Select a card from which to choose nodes to power your identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+                <select data-placeholder="{% trans "Select a card from which to choose nodes to power your identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
             </div>
         </div>
     </div>

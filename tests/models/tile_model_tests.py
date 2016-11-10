@@ -208,27 +208,27 @@ class TileTests(ArchesTestCase):
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["20000000-0000-0000-0000-000000000004"], "TEST 1")
 
-    def test_validation(self):
-        """
-        Test that we can get a Tile object
+    # def test_validation(self):
+    #     """
+    #     Test that we can get a Tile object
 
-        """
+    #     """
 
-        json = {
-            "tiles": {},
-            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
-            "parenttile_id": '',
-            "nodegroup_id": "20000000-0000-0000-0000-000000000001",
-            "tileid": "",
-            "data": {
-              "20000000-0000-0000-0000-000000000004": "TEST 1"
-            }
-        }
+    #     json = {
+    #         "tiles": {},
+    #         "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+    #         "parenttile_id": '',
+    #         "nodegroup_id": "20000000-0000-0000-0000-000000000001",
+    #         "tileid": "",
+    #         "data": {
+    #           "20000000-0000-0000-0000-000000000004": "TEST 1"
+    #         }
+    #     }
 
-        t = Tile(json)
-        self.assertTrue(t.validate()['is_valid'])
+    #     t = Tile(json)
+    #     self.assertTrue(t.validate()['is_valid'])
 
-        json['data']['20000000-0000-0000-0000-000000000004'] = ''
+    #     json['data']['20000000-0000-0000-0000-000000000004'] = ''
 
-        t2 = Tile(json)
-        self.assertFalse(t2.validate()['is_valid'])
+    #     t2 = Tile(json)
+    #     self.assertFalse(t2.validate()['is_valid'])

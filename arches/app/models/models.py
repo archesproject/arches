@@ -11,13 +11,14 @@
 from __future__ import unicode_literals
 
 import os
+import json
 import uuid
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Q, Max
 from django.core.files.storage import FileSystemStorage
-import json
+from django.dispatch import receiver
 
 def get_ontology_storage_system():
     return FileSystemStorage(location=os.path.join(settings.ROOT_DIR, 'db', 'ontologies'))
@@ -182,6 +183,47 @@ class File(models.Model):
         db_table = 'files'
 
 
+# These two event listeners auto-delete files from filesystem when they are unneeded:
+# from http://stackoverflow.com/questions/16041232/django-delete-filefield
+@receiver(models.signals.post_delete, sender=File)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `File` object is deleted.
+    """
+    if instance.path:
+        try:
+            if os.path.isfile(instance.path.path):
+                os.remove(instance.path.path)
+        ## except block added to deal with S3 file deletion
+        ## see comments on 2nd answer below
+        ## http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
+        except:
+            storage, name = instance.path.storage, instance.path.name
+            storage.delete(name)
+
+@receiver(models.signals.pre_save, sender=File)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """Deletes file from filesystem
+    when corresponding `File` object is changed.
+    """
+
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = File.objects.get(pk=instance.pk).path
+    except File.DoesNotExist:
+        return False
+
+    new_file = instance.path
+    if not old_file == new_file:
+        try:
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+        except Exception:
+            return False
+
+
 class Form(models.Model):
     formid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     title = models.TextField(blank=True, null=True)
@@ -210,11 +252,12 @@ class FormXCard(models.Model):
 
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    function = models.TextField(blank=True, null=True)
-    functiontype = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
+    functiontype = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     defaultconfig = JSONField(blank=True, null=True)
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
     component = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -541,7 +584,6 @@ class Tile(models.Model): #Tile
     class Meta:
         managed = True
         db_table = 'tiles'
-
 
     def save(self, *args, **kwargs):
         if(self.sortorder is None):

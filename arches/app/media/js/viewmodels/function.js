@@ -10,6 +10,7 @@ define(['graph-base-data'], function (data) {
     var FunctionViewModel = function(params) {
         this.graphid = data.graphid;
         this.graph = data.graph;
+        this.config = params.config;
     };
     return FunctionViewModel;
 });
