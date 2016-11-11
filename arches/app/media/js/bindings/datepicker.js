@@ -78,7 +78,6 @@ define([
             if (picker) {
                 var val = ko.utils.unwrapObservable(valueAccessor());
                 if (koDate) {
-                  koDate =
                   picker.date(moment(val););
                 }
             }
