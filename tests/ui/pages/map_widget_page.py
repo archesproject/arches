@@ -4,7 +4,6 @@ from page_locators import MapWidgetPageLocators as locators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from arches.urls import uuid_regex
 
 class MapWidgetPage(BasePage):
     """
@@ -19,12 +18,14 @@ class MapWidgetPage(BasePage):
         self.base_url = '/' + target_page + '/' + self.page_id
         self.wait = WebDriverWait(self.driver, 20)
 
-    def open_tools(self):
+    def navigate_to_page(self):
         self.driver.get(self.live_server_url + self.base_url)
         self.driver.implicitly_wait(10)
         self.wait.until(
             EC.invisibility_of_element_located(locators.LOADING_MASK)
         )
+
+    def open_tools(self):
         try:
             map_tools_button = self.wait.until(
                 EC.element_to_be_clickable(locators.MAP_TOOLS_BUTTON)
@@ -34,15 +35,11 @@ class MapWidgetPage(BasePage):
             result = False
         return result
 
-    def add_basemap(self):
+    def open_draw_tools(self):
         try:
-            for element in (
-                locators.MAP_TOOLS_BASEMAPS,
-                locators.SATELLITE_BASE_MAP
-                ):
-                map_tools_button = self.wait.until(
-                    EC.element_to_be_clickable(element)
-                ).click()
+            map_tools_button = self.wait.until(
+                EC.element_to_be_clickable(locators.MAP_DRAW_TOOLS)
+            ).click()
             result = True
         except:
             result = False

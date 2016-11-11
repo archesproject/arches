@@ -4,7 +4,6 @@ from page_locators import CardPageLocators as locators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from arches.urls import uuid_regex
 
 class CardPage(BasePage):
     """
