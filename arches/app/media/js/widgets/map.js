@@ -106,7 +106,8 @@ define([
             };
 
             this.anchorLayerId = 'gl-draw-point.cold'; //Layers are added below this drawing layer
-            this.layers = _.clone(arches.mapLayers);
+            // this.layers = _.clone(arches.mapLayers);
+            this.layers = $.extend(true, [], arches.mapLayers);
 
             this.geocoderOptions = ko.observableArray([{
                 'id': 'BingGeocoder',
@@ -798,7 +799,8 @@ define([
                 }
             };
 
-            this.sources = _.clone(arches.mapSources);
+            // this.sources = _.clone(arches.mapSources);
+            this.sources = $.extend(true, {}, arches.mapSources);
             this.sources["resource"] = {
                 "type": "geojson",
                 "data": {
