@@ -31,6 +31,8 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'resource_gra
 
 CONCEPT_SCHEME_LOCATIONS = (os.path.join(PACKAGE_ROOT, 'fixtures', 'authority_files'),)
 
+ONTOLOGY_FIXTURES = os.path.join(PACKAGE_ROOT, 'fixtures', 'ontologies')
+
 BUSISNESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -40,18 +42,45 @@ BUSISNESS_DATA_FILES = (
 # Use nose to run all tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+# could add Chrome, PhantomJS etc... here
+LOCAL_BROWSERS = [] #['Firefox']
+
+# these are set in Travis CI
+SAUCE_USERNAME = os.environ.get('SAUCE_USERNAME')
+SAUCE_ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
+
+RUN_LOCAL = True
+if SAUCE_USERNAME and SAUCE_ACCESS_KEY:
+    RUN_LOCAL = False
+
+# browser/os combinations to use with saucelabs
+REMOTE_BROWSERS = [
+    # {"platform": "Windows 8.1",
+    #  "browserName": "internet explorer",
+    #  "version": "11"},
+    # {"platform": "Mac OS X 10.9",
+    #  "browserName": "chrome",
+    #  "version": "53"},
+    # {"platform": "Linux",
+    #  "browserName": "firefox",
+    #  "version": "45"}
+]
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
-    '--nocapture', 
+    '--nocapture',
     '--cover-package=arches',
     '--verbosity=1',
+    '--cover-erase',
 ]
+
+INSTALLED_APPS = INSTALLED_APPS + (
+    'django_nose',
+)
 
 
 try:
     from settings_local import *
 except ImportError:
     pass
-
-

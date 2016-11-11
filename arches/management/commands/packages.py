@@ -29,11 +29,16 @@ from arches.app.utils.data_management.resources.importer import ResourceLoader
 import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
+import arches.management.commands.package_utils.resource_graphs as resource_graphs
 import arches.app.utils.index_database as index_database
 from arches.management.commands import utils
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.mappings import prepare_term_index
 from arches.app.models import models
 import csv
+from arches.app.utils.data_management.arches_file_importer import ArchesFileImporter
+from arches.app.utils.data_management.arches_file_exporter import ArchesFileExporter
+
 
 class Command(BaseCommand):
     """
@@ -43,10 +48,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-o', '--operation', action='store', dest='operation', default='setup',
-            choices=['setup', 'install', 'setup_db', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resource_graphs','export_resources'],
+            choices=['setup', 'install', 'setup_db', 'setup_indexes', 'start_elasticsearch', 'setup_elasticsearch', 'build_permissions', 'livereload', 'load_resources', 'remove_resources', 'load_concept_scheme', 'index_database','export_resources', 'import_json', 'export_json'],
             help='Operation Type; ' +
             '\'setup\'=Sets up Elasticsearch and core database schema and code' +
             '\'setup_db\'=Truncate the entire arches based db and re-installs the base schema' +
+            '\'setup_indexes\'=Creates the indexes in Elastic Search needed by the system' +
             '\'install\'=Runs the setup file defined in your package root' +
             '\'start_elasticsearch\'=Runs the setup file defined in your package root' +
             '\'build_permissions\'=generates "add,update,read,delete" permissions for each entity mapping'+
@@ -61,8 +67,19 @@ class Command(BaseCommand):
         parser.add_argument('-l', '--load_id', action='store', dest='load_id',
             help='Text string identifying the resources in the data load you want to delete.')
 
-        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir',
+        parser.add_argument('-d', '--dest_dir', action='store', dest='dest_dir', default='',
             help='Directory where you want to save exported files.')
+
+        parser.add_argument('-r', '--resources', action='store', dest='resources', default=False,
+            help='A comma separated list of the resourceids of the resources you would like to import/export.')
+
+        parser.add_argument('-g', '--graphs', action='store', dest='graphs', default=False,
+            help='A comma separated list of the graphids of the resources you would like to import/export.')
+
+        parser.add_argument('-c', '--concepts', action='store', dest='concepts', default=False,
+            help='A comma separated list of the conceptids of the concepts you would like to import/export.')
+
+
 
 
     def handle(self, *args, **options):
@@ -78,6 +95,10 @@ class Command(BaseCommand):
 
         if options['operation'] == 'setup_db':
             self.setup_db(package_name)
+            self.setup_indexes(package_name)
+
+        if options['operation'] == 'setup_indexes':
+            self.setup_indexes(package_name)
 
         if options['operation'] == 'start_elasticsearch':
             self.start_elasticsearch(package_name)
@@ -103,11 +124,14 @@ class Command(BaseCommand):
         if options['operation'] == 'index_database':
             self.index_database(package_name)
 
-        if options['operation'] == 'export_resource_graphs':
-            self.export_resource_graphs(package_name, options['dest_dir'])
-
         if options['operation'] == 'export_resources':
-            self.export_resources(package_name, options['dest_dir'])
+            self.export_resources(package_name, options['dest_dir'], options['resources'])
+
+        if options['operation'] == 'import_json':
+            self.import_json(options['source'], options['graphs'], options['resources'], options['concepts'])
+
+        if options['operation'] == 'export_json':
+            self.export(options['dest_dir'], options['graphs'], options['resources'], options['concepts'])
 
     def setup(self, package_name):
         """
@@ -208,6 +232,9 @@ class Command(BaseCommand):
 
         management.call_command('migrate')
 
+    def setup_indexes(self, package_name):
+        prepare_term_index(create=True)
+
     def generate_procfile(self, package_name):
         """
         Generate a procfile for use with Honcho (https://honcho.readthedocs.org/en/latest/)
@@ -272,9 +299,11 @@ class Command(BaseCommand):
         Runs the setup.py file found in the package root
 
         """
-        data_source = None if data_source == '' else data_source
-        load = import_string('%s.setup.load_resources' % package_name)
-        load(data_source)
+        # data_source = None if data_source == '' else data_source
+        # load = import_string('%s.setup.load_resources' % package_name)
+        # load(data_source)
+        ArchesFileImporter(data_source).import_business_data()
+
 
     def remove_resources(self, load_id):
         """
@@ -289,7 +318,7 @@ class Command(BaseCommand):
 
         """
         data_source = None if data_source == '' else data_source
-        load = import_string('%s.setup.load_authority_files' % package_name)
+        load = import_string('%s.management.commands.package_utils.authority_files.load_authority_files' % package_name)
         load(data_source)
 
     def index_database(self, package_name):
@@ -299,25 +328,34 @@ class Command(BaseCommand):
         # self.setup_indexes(package_name)
         index_database.index_db()
 
-    def export_resource_graphs(self, package_name, data_dest=None):
-        """
-        Exports resource graphs to csv files
-        """
-        graph_exporter.export(data_dest)
 
-    def export_resources(self, package_name, data_dest=None):
+    def export_resources(self, package_name, data_dest=None, resources=''):
         """
         Exports resources to archesjson
         """
+    #     resource_exporter = ResourceExporter('json')
+    #     resource_exporter.export(search_results=False, dest_dir=data_dest)
+    #     related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
+    #     relations_file = os.path.splitext(data_dest)[0] + '.relations'
+    #     with open(relations_file, 'w') as f:
+    #         csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
+    #         csvwriter.writeheader()
+    #         for csv_record in related_resources:
+    #             csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
+
         resource_exporter = ResourceExporter('json')
-        resource_exporter.export(search_results=False, dest_dir=data_dest)
-        related_resources = [{'RESOURCEID_FROM':rr.entityid1, 'RESOURCEID_TO':rr.entityid2,'RELATION_TYPE':rr.relationshiptype,'START_DATE':rr.datestarted,'END_DATE':rr.dateended,'NOTES':rr.notes} for rr in models.RelatedResource.objects.all()]
-        relations_file = os.path.splitext(data_dest)[0] + '.relations'
-        with open(relations_file, 'w') as f:
-            csvwriter = csv.DictWriter(f, delimiter='|', fieldnames=['RESOURCEID_FROM','RESOURCEID_TO','START_DATE','END_DATE','RELATION_TYPE','NOTES'])
-            csvwriter.writeheader()
-            for csv_record in related_resources:
-                csvwriter.writerow({k: str(v).encode('utf8') for k, v in csv_record.items()})
+        resource_exporter.export(resources=resources, dest_dir=data_dest)
+
+
+    def import_json(self, data_source=None, graphs=None, resources=None, concepts=None):
+        """
+        Imports objects from arches.json.
+
+        """
+
+        data_source = None if data_source == '' else data_source
+        ArchesFileImporter(data_source).import_all()
+
 
     def start_livereload(self):
         from livereload import Server
@@ -327,3 +365,17 @@ class Command(BaseCommand):
         for path in settings.TEMPLATES[0]['DIRS']:
             server.watch(path)
         server.serve(port=settings.LIVERELOAD_PORT)
+
+    def export(self, data_dest=None, graphs=None, resources=None, concepts=None):
+        """
+        Export objects to arches.json.
+        """
+
+        if graphs != False:
+            graphs = [x.strip(' ') for x in graphs.split(",")]
+        if concepts != False:
+            concepts = [x.strip(' ') for x in concepts.split(",")]
+        if resources != False:
+            resources = [x.strip(' ') for x in resources.split(",")]
+
+        ArchesFileExporter().export_all(data_dest, graphs, resources, concepts)

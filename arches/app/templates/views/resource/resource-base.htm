@@ -1,0 +1,197 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resource Manager" %}
+{% endblock title %}
+
+{% block login_header %}{% endblock login_header %}
+
+<!-- Page Header -->
+{% block header %}
+<div class="ep-toolbar">
+
+    <!-- Tools Menu -->
+    <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+        <div class="">{% trans "Manage" %}
+            <i class="ion-more"></i>
+        </div>
+    </a>
+
+    <!-- Title Bar -->
+    <div class="ep-tools-title">
+        <h1 class="page-header text-overflow ep-graph-title">
+            <i class="{{iconclass|default:'fa fa-question'}}  text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+            <span>
+                {{resource_type}}
+            </span>
+        </h1>
+    </div>
+
+    <!-- Search Bar -->
+    <a href="" class="ep-tools ep-tools-right">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Search">
+          <i class="ion-search"></i>
+        </div>
+    </a>
+
+    <!-- Help Bar -->
+    <a href="" class="ep-tools ep-tools-right">
+        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Help">
+          <i class="ion-information-circled"></i>
+        </div>
+    </a>
+</div>
+{% endblock header %}
+
+
+{% block main_content %}
+
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+
+    <!-- Menu -->
+    <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+        <div class="panel ep-menu-panel relative" style="">
+
+            <!-- Menu List -->
+            <div class="panel-body">
+                <ul class="list-group ep-menu-list editor-tools">
+
+                    <!-- Menu Item -->
+                    <li id="settings-manager" class="edit-menu-item">
+                        <a href="" target="" class="">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Make a copy and start editing" %}</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="card-manager" class="edit-menu-item">
+                        <a href="" target="" class="">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
+                                <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="history-manager" class="edit-menu-item">
+                        <a id="edit-history-btn" href="" target="" class="">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-step-backward"></i> {% trans "Review Edit History" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "View changes to this resource record" %}</span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- Menu Item -->
+                    <li id="report-manager" class="edit-menu-item">
+                        <a href="#" data-bind="click: function () {window.open('{% url 'resource_report' resourceid %}')}">
+                            <div class="media-body">
+                                <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
+                                <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
+                            </div>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Help Panel -->
+    <div class="ep-help" style="display: none;">
+        <div class="panel ep-help-panel relative" style="">
+
+            <!-- Help Item List -->
+            <div class="panel-body">
+                <p class="ep-tool-title">Help Topics Go Here</p>
+
+            </div>
+
+            <div class="panel-footer ep-menu-footer">
+                <div class="footer-tools">
+                    <button id="close-help" class="btn btn-sm btn-primary btn-labeled fa fa-times">{% trans "Close" %}</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Title Block -->
+    <div class="ep-form-toolbar">
+        <div>
+            <h4 class="ep-form-toolbar-title">
+            {% block graph_header_title %}
+            {% endblock graph_header_title %}
+            </h4>
+        </div>
+
+        <div>
+            {% block graph_header_tools %}
+            {% endblock graph_header_tools %}
+        </div>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools">
+            {% block graph_header_buttons %}
+            {% endblock graph_header_buttons %}
+        </div>
+    </div>
+
+
+    <!-- Edit Content -->
+    <div class="flex" style="" data-bind="css: {'alert-active': (alert() && alert().active())}">
+        <div id="card-alert-panel" data-bind="css: 'relative ep-form-alert ' + (alert() ? alert().type() : '')">
+            <!-- ko if: alert() -->
+            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+
+            <div class="ep-form-alert-default-dismiss">
+                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+            </div>
+
+            <div class="ep-form-alert-buttons">
+                <!-- ko if: alert().cancel -->
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                <!-- /ko -->
+                <!-- ko if: alert().ok -->
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </div>
+
+
+        <!-- Page Content -->
+        {% block content %}
+        {% endblock content %}
+
+
+    </div>
+</div>
+{% endblock main_content %}

@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from django.shortcuts import render, redirect
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
@@ -28,9 +27,7 @@ def index(request):
         'active_page': 'Home',
     })
 
-
 @never_cache
-@csrf_exempt
 def auth(request):
     auth_attempt_success = None
     # POST request is taken to mean user is logging in
@@ -44,7 +41,7 @@ def auth(request):
             auth_attempt_success = True
         else:
             auth_attempt_success = False
-    
+
     next = request.GET.get('next', reverse('home'))
     if auth_attempt_success:
         return redirect(next)
@@ -55,11 +52,21 @@ def auth(request):
             return redirect('auth')
         else:
             return render(request, 'login.htm', {
-                'main_script': 'login',
                 'auth_failed': (auth_attempt_success is not None),
                 'next': next
             })
 
-
 def search(request):
     return render(request, 'search.htm')
+
+def widget(request, template="text"):
+    return render(request, 'views/forms/widgets/%s.htm' % template)
+
+def report_templates(request, template="text"):
+    return render(request, 'views/report-templates/%s.htm' % template)
+
+def function_templates(request, template):
+    return render(request, 'views/functions/%s.htm' % template)
+
+def templates(request, template):
+    return render(request, template)

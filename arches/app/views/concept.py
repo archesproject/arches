@@ -21,9 +21,8 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
-from django.contrib.auth.decorators import permission_required
+from arches.app.utils.decorators import group_required
 from arches.app.models import models
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -32,6 +31,27 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.JSONResponse import JSONResponse
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 from django.utils.module_loading import import_string
+from arches.app.views.base import BaseManagerView
+
+
+class RDMView(BaseManagerView):
+    def get(self, request, conceptid):
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        languages = models.DLanguage.objects.all()
+
+        concept_schemes = []
+        for concept in models.Concept.objects.filter(nodetype = 'ConceptScheme'):
+            concept_schemes.append(Concept().get(id=concept.pk, include=['label']).get_preflabel(lang=lang))
+
+        context = self.get_context_data(
+            main_script='rdm',
+            active_page='RDM',
+            languages=languages,
+            conceptid=conceptid,
+            concept_schemes=concept_schemes,
+            CORE_CONCEPTS=CORE_CONCEPTS
+        )
+        return render(request, 'rdm.htm', context)
 
 
 def get_sparql_providers(endpoint=None):
@@ -45,7 +65,7 @@ def get_sparql_providers(endpoint=None):
     else:
         return sparql_providers
 
-@permission_required('edit')
+@group_required('edit')
 def rdm(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     languages = models.DLanguage.objects.all()
@@ -65,8 +85,7 @@ def rdm(request, conceptid):
 
 
 
-@permission_required('edit')
-@csrf_exempt
+@group_required('edit')
 def concept(request, conceptid):
     f = request.GET.get('f', 'json')
     mode = request.GET.get('mode', '')
@@ -234,7 +253,6 @@ def concept(request, conceptid):
 
     return HttpResponseNotFound
 
-@csrf_exempt
 def manage_parents(request, conceptid):
     #  need to check user credentials here
 
@@ -265,7 +283,6 @@ def manage_parents(request, conceptid):
 
     return HttpResponseNotFound()
 
-@csrf_exempt
 def confirm_delete(request, conceptid):
     lang = request.GET.get('lang', settings.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
@@ -273,7 +290,17 @@ def confirm_delete(request, conceptid):
     #return HttpResponse('<div>Showing only 50 of %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
     return HttpResponse('<ul><li>%s</ul>' % ('<li>'.join(concepts_to_delete) + ''))
 
-@csrf_exempt
+def dropdown(request):
+    conceptid = request.GET.get('conceptid')
+    results = Concept().get_e55_domain(conceptid)
+    return JSONResponse(results)
+
+def get_pref_label(request):
+    valueid = request.GET.get('valueid')
+    label = get_preflabel_from_valueid(valueid, settings.LANGUAGE_CODE)
+    print label
+    return JSONResponse(label)
+
 def search(request):
     se = SearchEngineFactory().create()
     searchString = request.GET['q']
@@ -348,7 +375,6 @@ def search(request):
     results['hits']['hits'] = newresults
     return JSONResponse(results)
 
-@csrf_exempt
 def add_concepts_from_sparql_endpoint(request, conceptid):
     if request.method == 'POST':
         json = request.body

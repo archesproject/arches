@@ -1,0 +1,38 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="ltr" data-bind="with: selectedBranch">
+    <!-- Title -->
+    <h4><i class="ion-arrow-right-b"></i><span class="node-title" data-bind="text: name"></span></h4>
+    <div class="relative">
+        <a id="branch-close" href="javascript:void(0)" class="library-close-btn" data-bind="click: $parent.closeForm.bind($parent)"><i class="ion-ios-close"></i></a>
+    </div>
+    <div style="padding: 5px;">
+        <p class="library-instructions" data-bind="text: description"></p>
+    </div>
+
+    <!-- Alert -->
+    <div id="branch-alert" class="panel install-card-alert" style="margin-bottom: 10px;"></div>
+
+    <!-- Add Button -->
+    <button id="branch-append" class="btn btn-primary btn btn-block btn-labeled fa fa-check" style="margin-bottom: 5px; width: 280px;" data-bind="click: $parent.appendBranch.bind($parent), disable: $parent.disableAppendButton()">{% trans "Append to current node" %}</button>
+
+    <!-- Preview -->
+    <div id="branch-preview" class="branch-preview">
+    </div>
+
+    <!-- Branch Metadata -->
+    <div class="">
+        <dl>
+            <dt class="branch-metadata">{% trans "Top Node Class" %}</dt>
+            <dd data-bind="text: root.ontologyclass"></dd>
+            <dt class="branch-metadata">{% trans "Author" %}</dt>
+            <dd data-bind="text: author"></dd>
+            <dt class="branch-metadata">{% trans "Version" %}</dt>
+            <dd data-bind="text: version"></dd>
+        </dl>
+
+    </div>
+
+    <!-- Close Panel -->
+    <button id="branch-close" class="btn btn-mint btn pull-right btn-labeled fa fa-times" style="margin-bottom: 45px;" data-bind="click: $parent.closeForm.bind($parent)">{% trans "Close" %}</button>
+</div>

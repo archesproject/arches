@@ -20,7 +20,11 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.i18n import patterns
-from arches.app.views import concept, entity, main, map, resources, search, config
+from arches.app.views import concept, entity, main, map, resources, search, config, graph
+from arches.app.views.graph import GraphManagerView, GraphSettingsView, GraphDataView, DatatypeTemplateView, CardManagerView, CardView, FormManagerView, FormView, ReportManagerView, ReportEditorView, FunctionManagerView
+from arches.app.views.resource import ResourceEditorView, ResourceListView, ResourceData, ResourceReportView
+from arches.app.views.concept import RDMView
+from arches.app.views.tile import TileData
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -32,7 +36,7 @@ urlpatterns = [
     url(r'^$', main.index),
     url(r'^index.htm', main.index, name='home'),
     url(r'^auth/', main.auth, name='auth'),
-    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , concept.rdm, name='rdm'),
+    url(r'^rdm/(?P<conceptid>%s|())$' % uuid_regex , RDMView.as_view(), name='rdm'),
     url(r'^map', map.get_page, name="map"),
     url(r'^geocoder', search.geocode, name="geocoder"),
 
@@ -44,6 +48,8 @@ urlpatterns = [
     url(r'^concepts/search$', concept.search, name="concept_search"),
     url(r'^concepts/(?P<conceptid>%s)/from_sparql_endpoint$' % uuid_regex, concept.add_concepts_from_sparql_endpoint, name="from_sparql_endpoint"),
     url(r'^concepts/search_sparql_endpoint$', concept.search_sparql_endpoint_for_concepts, name="search_sparql_endpoint"),
+    url(r'^concepts/dropdown', concept.dropdown, name="dropdown"),
+    url(r'^concepts/get_pref_label', concept.get_pref_label, name="get_pref_label"),
     url(r'^search$', search.home_page, name="search_home"),
     url(r'^search/terms$', search.search_terms, name="search_terms"),
     url(r'^search/resources$', search.search_results, name="search_results"),
@@ -57,6 +63,45 @@ urlpatterns = [
     url(r'^reports/(?P<resourceid>%s)$' % uuid_regex , resources.report, name='report'),
     url(r'^get_admin_areas', resources.get_admin_areas, name='get_admin_areas'),
     url(r'^config/', config.manager, name='config'),
+    url(r'^graph/(?P<graphid>%s|())$' % uuid_regex, GraphManagerView.as_view(), name='graph'),
+    url(r'^graph/(?P<graphid>%s)/settings$' % uuid_regex, GraphSettingsView.as_view(), name='graph_settings'),
+    url(r'^graph/(?P<graphid>%s)/card_manager$' % uuid_regex, CardManagerView.as_view(), name='card_manager'),
+    url(r'^graph/(?P<graphid>%s)/append_branch$' % uuid_regex, GraphDataView.as_view(action='append_branch'), name='append_branch'),
+    url(r'^graph/(?P<graphid>%s)/move_node$' % uuid_regex, GraphDataView.as_view(action='move_node'), name='move_node'),
+    url(r'^graph/(?P<graphid>%s)/update_node$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='update_node'),
+    url(r'^graph/(?P<graphid>%s)/delete_node$' % uuid_regex, GraphDataView.as_view(action='delete_node'), name='delete_node'),
+    url(r'^graph/(?P<graphid>%s)/clone$' % uuid_regex, GraphDataView.as_view(action='clone_graph'), name='clone_graph'),
+    url(r'^graph/(?P<graphid>%s)/export$' % uuid_regex, GraphDataView.as_view(action='export_graph'), name='export_graph'),
+    url(r'^graph/import/', GraphDataView.as_view(action='import_graph'), name='import_graph'),
+    url(r'^graph/datatypes/(?P<template>[a-zA-Z_-]*)', DatatypeTemplateView.as_view(), name='datatype_template'),
+    url(r'^graph/new$', GraphDataView.as_view(action='new_graph'), name='new_graph'),
+    url(r'^graph/(?P<graphid>%s)/get_related_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_related_nodes'), name='get_related_nodes'),
+    url(r'^graph/(?P<graphid>%s)/get_valid_domain_nodes/(?P<nodeid>%s)$' % (uuid_regex, uuid_regex), GraphDataView.as_view(action='get_valid_domain_nodes'), name='get_valid_domain_nodes'),
+    url(r'^graph/(?P<graphid>%s)/form_manager$' % uuid_regex, FormManagerView.as_view(), name='form_manager'),
+    url(r'^graph/(?P<graphid>%s)/add_form$' % uuid_regex, FormManagerView.as_view(action='add_form'), name='add_form'),
+    url(r'^graph/(?P<graphid>%s)/reorder_forms$' % uuid_regex, FormManagerView.as_view(action='reorder_forms'), name='reorder_forms'),
+    url(r'^graph/(?P<graphid>%s)/report_manager$' % uuid_regex, ReportManagerView.as_view(), name='report_manager'),
+    url(r'^graph/(?P<graphid>%s)/add_report$' % uuid_regex, ReportManagerView.as_view(), name='add_report'),
+    url(r'^graph/(?P<graphid>%s)/add_resource$' % uuid_regex, ResourceEditorView.as_view(), name='add_resource'),
+    url(r'^graph/(?P<graphid>%s)/function_manager$' % uuid_regex, FunctionManagerView.as_view(), name='function_manager'),
+    url(r'^graph/(?P<graphid>%s)/apply_functions$' % uuid_regex, FunctionManagerView.as_view(), name='apply_functions'),
+    url(r'^graph/(?P<graphid>%s)/remove_functions$' % uuid_regex, FunctionManagerView.as_view(), name='remove_functions'),
+    url(r'^resource$', ResourceListView.as_view(), name='resource'),
+    url(r'^resource/(?P<resourceid>%s)$' % uuid_regex, ResourceEditorView.as_view(), name='resource_editor'),
+    url(r'^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$' % (uuid_regex, uuid_regex), ResourceData.as_view(), name='resource_data'),
+    url(r'^report/(?P<resourceid>%s)$' % uuid_regex, ResourceReportView.as_view(), name='resource_report'),
+    url(r'^card/(?P<cardid>%s|())$' % uuid_regex, CardView.as_view(), name='card'),
+    url(r'^form/(?P<formid>%s|())$' % uuid_regex, FormView.as_view(), name='form'),
+    url(r'^form/(?P<formid>%s)/delete$' % uuid_regex, FormView.as_view(), name='delete_form'),
+    url(r'^report_editor/(?P<reportid>%s|())$' % uuid_regex, ReportEditorView.as_view(), name='report_editor'),
+    url(r'^report_editor/(?P<reportid>%s)/delete$' % uuid_regex, ReportEditorView.as_view(), name='delete_report'),
+    url(r'^node/(?P<graphid>%s)$' % uuid_regex, GraphDataView.as_view(action='update_node'), name='node'),
+    url(r'^widgets/(?P<template>[a-zA-Z_-]*)', main.widget, name="widgets"),
+    url(r'^report-templates/(?P<template>[a-zA-Z_-]*)', main.report_templates, name="report-templates"),
+    url(r'^function-templates/(?P<template>[a-zA-Z_-]*)', main.function_templates, name="function-templates"),
+    url(r'^tile$', TileData.as_view(action='update_tile'), name="tile"),
+    url(r'^tiles/reorder_tiles$', TileData.as_view(action='reorder_tiles'), name='reorder_tiles'),
+    url(r'^templates/(?P<template>[a-zA-Z_\-./]*)', main.templates, name="templates"),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

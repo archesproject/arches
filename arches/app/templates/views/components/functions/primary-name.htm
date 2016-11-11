@@ -1,0 +1,25 @@
+{% load i18n %}
+<div>
+    <div class="row widget-container">
+        <div class="form-group">
+            <div class="relative">
+                <label class="col-xs-12 control-label widget-input-label"> {% trans "Card Name" %}</label>
+            </div>
+
+            <div class="col-xs-12">
+                <select data-placeholder="{% trans "Select a card from which to choose nodes to power your identifier." %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: nodegroup_id, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row widget-container">
+        <div class="form-group">
+            <div class="relative">
+                <label class="col-xs-12 control-label widget-input-label"> {% trans "Primary Name Template" %}</label>
+            </div>
+
+            <div class="col-xs-12">
+                <input placeholder="{% trans 'Use bracketed node names like this: <node name>' %}" class="form-control input-lg widget-input" data-bind="textInput: string_template">
+            </div>
+        </div>
+    </div>
+</div>

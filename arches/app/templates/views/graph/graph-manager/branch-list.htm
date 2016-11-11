@@ -1,0 +1,25 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block header %}
+<div class="alert alert-danger install-card-alert" style="margin-bottom: 10px;" data-bind="visible: failed()">
+    <span>{% trans "We're sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}</span>
+</div>
+{% endblock %}
+
+{% block search_placeholder %}{{branch_list.search_placeholder}}{% endblock %}
+
+{% block listitem %}
+    <div class="library-icon" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-dark" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
+            <i class="fa fa-hand-o-left"></i>
+        </span>
+    </div>
+    <div class="library-card-main" , data-bind="attr: {'data-arches-graphid': $data.graphid}">
+        <a class="listitem_name" data-bind="text: $data.name">
+        </a>
+    </div>
+    <div class="library-card-subtitle" data-bind="text: $data.description">
+    </div>
+{% endblock %}

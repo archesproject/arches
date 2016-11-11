@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import decimal
 import types
 import json
@@ -48,18 +48,13 @@ class JSONSerializer(object):
         return self.handle_object(obj)
 
     def serialize(self, obj, **options):
-        self.options = options.copy()
-
-        self.stream = options.pop("stream", StringIO())
-        self.selected_fields = options.pop("fields", None)
-        self.use_natural_keys = options.pop("use_natural_keys", False)
-        self.geom_format = options.pop("geom_format", "wkt")
+        obj = self.serializeToPython(obj, **options)
 
         # prevent raw strings from begin re-encoded
         # this is especially important when doing bulk operations in elasticsearch
         if (isinstance(obj, basestring)):
             return obj
-        
+            
         ret = self.handle_object(obj)
 
         return json.dumps(ret, cls=DjangoJSONEncoder, **options.copy())
@@ -86,7 +81,10 @@ class JSONSerializer(object):
               isinstance(object, tuple)):
             return self.handle_list(object)
         elif isinstance(object, Model):
-            return self.handle_model(object)
+            if hasattr(object, 'serialize'):
+                return self.handle_object(getattr(object, 'serialize')())
+            else:
+                return self.handle_model(object)
             #return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             #return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
@@ -113,7 +111,11 @@ class JSONSerializer(object):
         elif isinstance(object, uuid.UUID):
             return str(object)
         elif hasattr(object, '__dict__'):
-            return self.handle_dictionary(object.__dict__)
+            # call an objects serialize method if it exists
+            if hasattr(object, 'serialize'):
+                return getattr(object, 'serialize')()  
+            else:
+                return self.handle_dictionary(object.__dict__)
         else:
             raise UnableToSerializeError(type(object))
 
@@ -167,7 +169,9 @@ class JSONSerializer(object):
             if isinstance(f, ForeignKey):
                 # Emulate the naming convention used by django when accessing the 
                 # related model's id field
-                data[f.name+'_id'] = self.handle_object(f.value_from_object(instance))
+                # see https://github.com/django/django/blob/master/django/db/models/fields/__init__.py
+                val = getattr(instance, f.name, None)
+                data[f.attname] = val.pk if val else val
             elif isinstance(f, ManyToManyField):
                 # If the object doesn't have a primary key yet, just use an empty
                 # list for its m2m fields. Calling f.value_from_object will raise

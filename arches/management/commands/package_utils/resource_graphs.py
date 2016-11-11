@@ -1,16 +1,19 @@
 import os
 import sys 
+import codecs
 import traceback
 import unicodecsv
 from os import listdir
 from os.path import isfile, join
 from django.core import management
 from django.db import connection, transaction
-import concepts
+# import concepts
 from .. import utils
-from arches.app.models.resource_graphs import ResourceGraph
+from arches.app.models.graph import Graph
 import json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+
+suffix = 'json'
 
 def load_graphs(break_on_error=True, settings=None, path=None):
     """
@@ -22,31 +25,21 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     if not settings:
         from django.conf import settings        
   
-    suffix = 'json'
     errors = []
-    file_list = []
     graph_location = settings.RESOURCE_GRAPH_LOCATIONS
         
     if path:
         graph_location = [path]
 
     for path in graph_location:
-        print os.path.exists(path)
         if os.path.exists(path):
             print '\nLOADING GRAPHS (%s)' % (path)
             print '---------------'
-            for f in listdir(path):
-                if isfile(join(path,f)) and f.endswith(suffix):
-                    file_list.append(join(path,f))
-                    path_to_file = join(path,f)
-                    basepath = path_to_file
-                    name = basepath.split(os.sep)[-1]
-
-                    with open(basepath, 'rU') as f:
-                        file = json.load(f)
-
-                        resource_graph = ResourceGraph(file['graph'][0])
-                        resource_graph._save()
+            if isfile(join(path)) and path.endswith(suffix):
+                load_resource_graph_file(path)
+            else:
+                for f in listdir(path):
+                    load_resource_graph_file(join(path,f))
         else:
             errors.append('\n\nPath in settings.RESOURCE_GRAPH_LOCATIONS doesn\'t exist (%s)' % (path))                 
 
@@ -65,6 +58,16 @@ def load_graphs(break_on_error=True, settings=None, path=None):
     # print '\nADDING NODE LEVEL PERMISSIONS'
     # print '-----------------------------'
     # management.call_command('packages', operation='build_permissions') 
+
+def load_resource_graph_file(path_to_file):
+    if isfile(path_to_file) and path_to_file.endswith(suffix):
+        basepath = path_to_file
+        name = basepath.split(os.sep)[-1]
+        
+        with codecs.open(basepath, 'rU', encoding='utf-8') as f:
+            file = json.load(f)
+            resource_graph = Graph(file['graph'][0])
+            resource_graph.save()
 
 def append_branch(path_to_branch, node_list, edge_list):
     """
@@ -210,25 +213,25 @@ def get_root_node_id(edge_list):
         if edge['SOURCE'] not in target_nodes:
             return edge['SOURCE']
 
-def link_entitytypes_to_concepts(nodes):
-    """
-    Links entitytypes to their associated concepts
+# def link_entitytypes_to_concepts(nodes):
+#     """
+#     Links entitytypes to their associated concepts
 
-    """
+#     """
 
-    cursor = connection.cursor()
-    cursor.execute("""SELECT legacyoid FROM concepts.concepts 
-        WHERE conceptid = '00000000-0000-0000-0000-000000000003'
-        """)
-    domainlegacyid = cursor.fetchone()[0]
+#     cursor = connection.cursor()
+#     cursor.execute("""SELECT legacyoid FROM concepts.concepts 
+#         WHERE conceptid = '00000000-0000-0000-0000-000000000003'
+#         """)
+#     domainlegacyid = cursor.fetchone()[0]
 
-    cursor.execute("""SELECT legacyoid FROM concepts.concepts 
-        WHERE conceptid = '00000000-0000-0000-0000-000000000004'
-        """)
-    otherlegacyid = cursor.fetchone()[0]
+#     cursor.execute("""SELECT legacyoid FROM concepts.concepts 
+#         WHERE conceptid = '00000000-0000-0000-0000-000000000004'
+#         """)
+#     otherlegacyid = cursor.fetchone()[0]
 
-    for node in nodes:
-        if node['BUSINESSTABLE'] == 'domains':
-            concepts.insert_concept_relations(str(domainlegacyid), 'hasCollection', node["LABEL"])
-        else:
-            concepts.insert_concept_relations(str(otherlegacyid), 'hasEntity', node["LABEL"])
+#     for node in nodes:
+#         if node['BUSINESSTABLE'] == 'domains':
+#             concepts.insert_concept_relations(str(domainlegacyid), 'hasCollection', node["LABEL"])
+#         else:
+#             concepts.insert_concept_relations(str(otherlegacyid), 'hasEntity', node["LABEL"])

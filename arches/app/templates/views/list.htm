@@ -1,0 +1,36 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<h4 class="title-block-title">{% block title %}{% endblock %}</h4>
+{% endblock %}
+
+<!-- ko if: $data.filter_function -->
+<div class="list-filter" style="display:none" data-bind="visible: $data.filter_function">
+    <input type="text" class="form-control" style="" placeholder="{% block search_placeholder %}{% endblock %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+    <!-- Clear Search -->
+    <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+    
+    <!-- ko if: $data.single_select == false -->
+    <div class="pad-rgt pad-btm clear-selection" style="">
+        <a class="clear-selection-link" style="" data-bind="click: clearSelection">clear selection</a>
+    </div>
+    <!-- /ko -->
+</div>
+
+<!-- /ko -->
+
+{% block list_wrapper %}
+<div class="grid" style="position: relative; height: 0px;">
+
+    <!-- Card -->
+    <!-- ko foreach: $data.items -->
+        <div class="library-card" data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected }">
+            {% block listitem %}{% endblock %}
+        </div>
+    <!-- /ko -->
+
+</div>
+{% endblock list_wrapper %}

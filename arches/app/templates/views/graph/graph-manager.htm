@@ -1,0 +1,84 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block body_attributes %}style="overflow:hidden;"{% endblock %}
+
+{% block graph_header_title %}
+{% trans "Graph Designer" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+<span data-bind="if: nodeForm.node() && nodeForm.node().dirty()">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click:function () { nodeForm.cancel() }">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click:function () { nodeForm.save() }">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
+{% block card_manager_menu_item %}
+<li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !graphModel.get('isresource') && !graphModel.get('root').isCollector()}">
+    <a href="#" {% if root_node.is_collector or graph.isresource %} data-bind="click:function () { navigate('{% if graph.isresource %}{% url 'card_manager' graphid %}{% else %}{% url 'card' graphid %}{% endif %}'); }"{% endif %}>
+
+        <div class="media-body">
+            <!-- <p>is resource {{graph.isresource}}<span>is collector {{root_node.is_collector}}</span></p> -->
+            <div class="menu-item-title"><i class="fa fa-file-o"></i> {% trans "Data Widgets and Cards" %}</div>
+            <span class="text-muted menu-item-subtitle">{% trans "Configure data entry cards" %}</span>
+        </div>
+    </a>
+</li>
+{% endblock card_manager_menu_item %}
+
+{% block content %}
+<div class="flex">
+	<!--Node Listing -->
+	<div class="left-column-container" id="node-listing" data-bind="with: nodeList">
+        {% include 'views/graph/graph-manager/node-list.htm' %}
+	</div>
+
+	<!-- Node Editor -->
+	<div id="node-crud" class="middle-column-container" data-bind="visible: graphModel.get('selectedNode'), with: nodeForm" style="display: none;" class="ep-node-card">
+        {% include 'views/graph/graph-manager/node-form.htm' %}
+	</div>
+
+    <div class="ep-card-crud-panel branch-panel" style="display: none;" data-bind="visible: nodeForm.branchListView.viewMetadata, with: nodeForm.branchListView">
+        {% include 'views/graph/graph-manager/branch-info.htm' %}
+    </div>
+
+	<!-- Graph -->
+	<div id="graph" class="flex"></div>
+
+
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-manager-data', [], function () {
+    return {
+        graph: {{graph_json}},
+        functions: {{functions}},
+        datatypes: {{datatypes_json}},
+        branches: {{branches}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

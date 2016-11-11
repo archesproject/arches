@@ -1,0 +1,27 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{{node_list.title}}{% endblock %}
+
+{% block search_placeholder %}{{node_list.search_placeholder}}{% endblock %}
+
+{% block listitem %}
+    <div class="library-icon" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle bg-info">
+            <i data-bind="attr: {class: $data.iconclass()}"></i>
+        </span>
+    </div>
+    <div class="library-card-main" style="">
+        <a class="name" data-bind="text: $data.name, attr: {'data-arches-nodeid': $data.id, 'data-arches-nodegroupid': $data.nodeGroupId()}">
+        </a>
+    </div>
+
+    <!-- ko if: $data.ontologyclass() !== null -->
+    <div class="library-card-subtitle" data-bind="text: $data.datatype().toLowerCase() + '; ' + $data.ontologyclass()"></div>
+    <!-- /ko -->
+
+    <!-- ko if: $data.ontologyclass() === null -->
+    <div class="library-card-subtitle" data-bind="text: $data.datatype().toLowerCase()"></div>
+    <!-- /ko -->
+{% endblock %}

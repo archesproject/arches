@@ -1,0 +1,115 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Data Entry Cards" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_tools %}
+<!-- Card Filter Widget -->
+<div id="card-grid-tools" style="display: none;" data-bind="visible: graphModel.graphCards">
+    <div class="ep-card-search">
+        <select data-placeholder="{% trans "Select a card..." %}" class="design" data-bind="value: selectedCardId, options: graphCardOptions, optionsText: 'name', optionsValue: 'cardid', chosen: {width: '100%'}">
+
+        </select>
+    </div>
+</div>
+{% endblock graph_header_tools %}
+
+
+{% block content %}
+<div class="card-library relative fade in" style="">
+
+    <!-- Card (Tile) Listing -->
+    <div class="crud-menu relative hide-card-library" data-bind="css: cardLibraryStatus">
+        <div class="panel crud-menu-panel data-widget-library relative" id="node-listing" data-bind="with: cardList">
+            {% include 'views/graph/card-manager/card-list.htm' %}
+        </div>
+    </div>
+
+    <!-- Card Grid -->
+    <div class="card-grid relative ep-form-content new-card-indent" data-bind="drop: {value: newCard}">
+        <div data-bind="visible: graphModel.graphCards" style="display:none;">
+            <!-- Isotope Layout -->
+            <div id="report-image-grid" class="report-image-grid">
+
+                <div class="box-vmiddle bg-primary pad-all text-center card-wz-add-record project-grid-item form-item new-card" data-bind="click: toggleCardLibrary">
+                    <a id="add-card" href="" data-toggle="modal" class="" style="">
+                        <h3 class="text-thin" style="margin-top: 10px;"> Add Card</h3>
+
+                        <span class="icon-wrap icon-wrap-lg icon-circle bg-trans-light">
+                            <i class="fa fa-plus fa-2x" style="color: #fff;"></i>
+                        </span>
+
+                        <h5 class="" style="font-weight: 200;"> Drag and drop a data widget onto your resource </h5>
+                    </a>
+                </div>
+
+                <!-- card -->
+                <!-- ko foreach: graphModel.graphCards -->
+                <div class="card-grid-item" data-bind="click: function () { $parent.openCard(cardid) }, attr:{'data-arches-nodegroupid': nodegroup_id, 'data-arches-cardid': cardid}">
+                    <div class="panel mar-no">
+
+                        <!-- card Name -->
+                        <div class="panel-heading">
+                            <h3 class="panel-title library-card-panel-title" data-bind="text:name"></h3>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="panel-body library-card-body">
+                            <p class="library-item-subtitle" data-bind="text:description"></p>
+                        </div>
+
+                        <!-- Selectable -->
+                        <div class="selectable" style="display: none;">
+                            <i class="ion-ios-checkmark"></i>
+                        </div>
+
+                        <!-- card Tools -->
+                        <div class="panel-footer" style="height: 40px;">
+                            <a href="#" class="pull-right" data-bind="click: function () { $parent.deleteCard($data) }, clickBubble: false"><i class="ion-minus-circled"></i> Remove Card</a>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /ko -->
+
+            </div>
+        </div>
+    </div>
+    <!-- End Card Grid -->
+
+</div>
+
+
+{% endblock content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-cards-data', [], function () {
+    return {
+        branches: {{branches}},
+        graph: {{graph_json}}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}
