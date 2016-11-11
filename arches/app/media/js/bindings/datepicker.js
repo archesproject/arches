@@ -77,7 +77,6 @@ define([
             var picker = $(element).data("DateTimePicker");
             if (picker) {
                 var koDate = ko.utils.unwrapObservable(valueAccessor());
-                console.log('update', koDate);
                 if (koDate) {
                   koDate = moment(koDate);
                   picker.date(koDate);
