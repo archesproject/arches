@@ -428,6 +428,7 @@ define([
                         self.overlayLibrary(self.createOverlays())
                         if (self.resourceLayer !== undefined) {
                           self.overlays.unshift(self.createOverlay(self.resourceLayer));
+                          self.addMaplayer(self.resourceLayer);
                         }
                         if (self.reportHeader === true && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
@@ -761,8 +762,8 @@ define([
                             'name': overlays[i].name,
                             'opacity': overlays[i].opacity()
                         });
-                        this.addMaplayer(overlays[i])
                       }
+                        this.addMaplayer(overlays[i])
                     }
                     this.redrawGeocodeLayer();
                 }, this)
