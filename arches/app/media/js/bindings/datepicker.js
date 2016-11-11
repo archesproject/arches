@@ -6,14 +6,14 @@ define([
     'bootstrap-datetimepicker',
 ], function ($, _, ko, moment) {
     /**
-    * A knockout.js binding for the jQuery UI datepicker, passes datepickerOptions
-    * data-bind property to the datepicker on init
+    * A knockout.js binding for the jQuery UI datepicker
     * @constructor
     * @name datepicker
     */
     ko.bindingHandlers.datepicker = {
         init: function (element, valueAccessor, allBindingsAccessor) {
-            var options = allBindingsAccessor().datepickerOptions || {};
+            //initialize datepicker with some optional options
+            var options = valueAccessor() || {};
             var minDate;
             var maxDate;
 
@@ -56,12 +56,11 @@ define([
             $(element).datetimepicker(options);
 
             ko.utils.registerEventHandler(element, "dp.change", function (event) {
-                var value = valueAccessor();
+                var value = allBindingsAccessor().value;
+                var picker = $(element).data("DateTimePicker");
                 if (ko.isObservable(value)) {
                     if (event.date != null && !(event.date instanceof Date)) {
-                        value(event.date.toDate());
-                    } else {
-                        value(event.date);
+                        value(event.date.format(picker.format()));
                     }
                 }
             });
@@ -73,12 +72,13 @@ define([
                 }
             });
         },
-        update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+        update: function (element, valueAccessor, allBindingsAccessor) {
             var picker = $(element).data("DateTimePicker");
             if (picker) {
-                var val = ko.utils.unwrapObservable(valueAccessor());
-                if (koDate) {
-                  picker.date(moment(val););
+                var val = ko.unwrap(allBindingsAccessor().value);
+                if (val) {
+                  val = moment(val).format(picker.format());
+                  picker.date(val);
                 }
             }
         }
