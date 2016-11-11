@@ -72,7 +72,7 @@
                                         <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                 data:card.get('widgets'), as: 'widget'
                                             }">
-                                            <div class='widget-preview' data-bind='component: {
+                                            <div class='' data-bind='component: {
                                                 name: form.widgetLookup[widget.get("widget_id")()].name,
                                                 params: {
                                                     formData: tile.formData,
@@ -138,7 +138,7 @@
                                         <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
                                         <span style="position: relative; top: -2px;">
                                             <!-- ko if: card.get('widgets')().length > 0 -->
-                                                <span data-bind="text: card.get('widgets')()[0].configJSON().label"></span>:
+                                                <span class="text-semibold" data-bind="text: card.get('widgets')()[0].configJSON().label"></span>:
                                                 <!-- ko component: {
                                                     name: form.widgetLookup[card.get('widgets')()[0].get("widget_id")()].name,
                                                     params: {
@@ -183,7 +183,7 @@
                                             <form class="widgets" style="margin-bottom: 20px;" data-bind="foreach: {
                                                     data:card.get('widgets'), as: 'widget'
                                                 }">
-                                                <div class='widget-preview' data-bind='component: {
+                                                <div class='' data-bind='component: {
                                                     name: form.widgetLookup[widget.get("widget_id")()].name,
                                                     params: {
                                                         formData: innerTile.formData,
