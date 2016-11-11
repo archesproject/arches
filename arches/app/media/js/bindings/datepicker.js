@@ -71,16 +71,6 @@ define([
                     picker.destroy();
                 }
             });
-        },
-        update: function (element, valueAccessor, allBindingsAccessor) {
-            var picker = $(element).data("DateTimePicker");
-            if (picker) {
-                var val = ko.unwrap(allBindingsAccessor().value);
-                if (val) {
-                  val = moment(val).format(picker.format());
-                  picker.date(val);
-                }
-            }
         }
     };
 
