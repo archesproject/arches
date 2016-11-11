@@ -163,7 +163,7 @@ class UITest(StaticLiveServerTestCase):
         map_widget_page.navigate_to_page()
         results['opened maptools'] = map_widget_page.open_tools()
         results['added basemap'] = map_widget_page.add_basemap()
-        results['added overlay'] = map_widget_page.add_overlay()
+        results['added overlay'] = map_widget_page.add_overlay(1)
         map_tools_working = True
         for k, v in results.iteritems():
             if v != True:
@@ -233,7 +233,7 @@ class UITest(StaticLiveServerTestCase):
         report_editor_page.navigate_to_page()
         results['opened maptools'] = report_editor_page.open_tools()
         results['added basemap'] = report_editor_page.add_basemap()
-        results['added overlay'] = report_editor_page.add_overlay()
+        results['added overlay'] = report_editor_page.add_overlay(2)
         map_tools_working = True
         for k, v in results.iteritems():
             if v != True:
@@ -270,7 +270,7 @@ class UITest(StaticLiveServerTestCase):
         report_editor_page = ReportEditorPage(self.driver, self.live_server_url, 'report_editor', report_id)
         report_editor_page.navigate_to_page()
         report_editor_page.open_tools()
-        report_editor_page.add_overlay()
+        report_editor_page.add_overlay(2)
         report_editor_page.save_report("Report B")
 
         resource_manager_page = ResourceManagerPage(self.driver, self.live_server_url, resource_graph_id)
