@@ -27,14 +27,23 @@ define([
      * @param {object} params
      * @param {boolean} params.value - the value being managed
      * @param {object} params.config -
-     * @param {string} params.config.zoom - map zoom level
-     * @param {string} params.config.centerX - map center longitude
-     * @param {string} params.config.centerY - map center latitude
+     * @param {number} params.config.zoom - map zoom level
+     * @param {number} params.config.centerX - map center longitude
+     * @param {number} params.config.centerY - map center latitude
      * @param {string} params.config.geocoder - the text string id of the geocoder api (currently MapzenGeocoder or BingGeocoder).
      * @param {string} params.config.basemap - the layer name of the selected basemap to be shown in the map
-     * @param {string} params.config.geometryTypes - the geometry types available for a user to edit
-     * @param {string} params.config.pitch - the pitch of the map in degrees
-     * @param {string} params.config.bearing - the bearing of the map in degrees with north at 0
+     * @param {object} params.config.geometryTypes - the geometry types available for a user to edit
+     * @param {number} params.config.pitch - the pitch of the map in degrees
+     * @param {number} params.config.bearing - the bearing of the map in degrees with north at 0
+     * @param {string} params.config.geocodePlaceholder - the placehoder of the geocoder input
+     * @param {boolean} params.config.geocoderVisible - whether the geocoder is available on the map
+     * @param {number} params.config.minZoom - the min zoom of the map
+     * @param {number} params.config.maxZoom - the max zoom of the map
+     * @param {string} params.config.resourceColor - the color of resource geometries
+     * @param {number} params.config.resourcePointSize - the point size of resource geometries
+     * @param {number} params.config.resourceLineWidth - the line width of resource geometries
+     * @param {boolean} params.config.featureEditingDisabled - a config for reports that hides the draw tools
+     * @param {object} params.config.overlayConfigs - an array of overlays saved to the widget
      */
     return ko.components.register('map-widget', {
         viewModel: function(params) {
@@ -138,6 +147,10 @@ define([
                 legend: ko.observable(true)
             };
 
+            /**
+             * Creates the map layer for the resource with widget configs
+             * @return {object}
+             */
             this.defineResourceLayer = function() {
                 var resourceLayer = {
                     name: this.resourceName,
@@ -175,16 +188,21 @@ define([
                             "line-width": this.resourceLineWidth()
                         }
                     }],
-                    isoverlay: true,
+                    isoverlay: false,
                     icon: this.resourceIcon
                 };
                 return resourceLayer;
             }
 
+            /**
+             * creates an array of map layers available to the map when the map object is instantiated
+             * @return {object}
+             */
             this.addInitialLayers = function() {
                 var initialLayers = [];
                 if (this.reportHeader) {
-                    this.layers.unshift(this.defineResourceLayer());
+                    this.resourceLayer = this.defineResourceLayer();
+                    this.layers.unshift(this.resourceLayer);
                 }
 
                 this.layers.forEach(function(mapLayer) {
@@ -208,6 +226,11 @@ define([
                 return initialLayers;
             }
 
+            /**
+             * toggles the visibility of the geocoder input in the map widget
+             * @param  {object} e event object
+             * @return {null}
+             */
             this.toggleGeocoder = function(self, evt) {
                 if (self.geocoderVisible() === true) {
                     self.geocoderVisible(false)
@@ -232,6 +255,11 @@ define([
                 }]
             };
 
+            /**
+             * prepares the map for the widget after the mapbox bindingHandler has instantiated a map object
+             * @param  {object} map map object created in ko.bindingHandler
+             * @return {null}
+             */
             this.setupMap = function(map) {
                 var self = this;
                 var draw = Draw({
@@ -376,6 +404,11 @@ define([
                 this.map = map;
                 this.draw = draw;
                 this.map.addControl(draw);
+
+                /**
+                * Reloads the geocode layer when a new geocode request is made
+                * @return {null}
+                */
                 this.redrawGeocodeLayer = function() {
                     var cacheLayer = map.getLayer('geocode-point');
                     map.removeLayer('geocode-point');
@@ -392,6 +425,9 @@ define([
                         };
                         var data = null;
                         self.overlayLibrary(self.createOverlays())
+                        if (self.resourceLayer !== undefined) {
+                          self.overlays.unshift(self.createOverlay(self.resourceLayer));
+                        }
                         if (self.reportHeader === true && !ko.isObservable(self.value)) {
                             self.value.forEach(function(tile) {
                                 _.each(tile.data, function(val, key) {
@@ -438,6 +474,10 @@ define([
                     this.draw.add(koMapping.toJS(self.value));
                 };
 
+                /**
+                * Updates the appearance of the draw layer when feature appearance configs change
+                * @return {null}
+                */
                 this.updateDrawLayerPaintProperties = function(paintProperties, val, isNumber) {
                     var val = isNumber ? Number(val) : val; //point size and line width must be number types
                     _.each(this.draw.options.styles, function(style) {
@@ -473,29 +513,33 @@ define([
                     });
                 }, this);
 
-                this.selectEditingTool = function(self, val) {
-
+                /**
+                * Updates the draw mode of the draw layer when a user selects a draw tool in the map controls
+                * @param  {string} selectedDrawTool the draw tool name selected in the map controls
+                * @return {null}
+                */
+                this.selectEditingTool = function(self, selectedDrawTool) {
                     _.each(self.geometryTypeDetails, function(geomtype) {
-                        if (geomtype.name === val) {
-                            self.geometryTypeDetails[val].active(!self.geometryTypeDetails[val].active())
+                        if (geomtype.name === selectedDrawTool) {
+                            self.geometryTypeDetails[selectedDrawTool].active(!self.geometryTypeDetails[selectedDrawTool].active())
                         } else {
                             self.geometryTypeDetails[geomtype.name].active(false)
                         }
                     });
 
-                    if (self.geometryTypeDetails[val] === undefined) { //it has no geom type, so must be trash
+                    if (self.geometryTypeDetails[selectedDrawTool] === undefined) { //it has no geom type, so must be trash
                         self.draw.trash();
                         self.drawMode(null);
                     } else {
                         if (!self.drawMode()) {
-                            self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode(self.geometryTypeDetails[val].drawMode);
-                        } else if (self.geometryTypeDetails[val].drawMode === self.drawMode()) {
+                            self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
+                            self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
+                        } else if (self.geometryTypeDetails[selectedDrawTool].drawMode === self.drawMode()) {
                             self.draw.changeMode('simple_select')
                             self.drawMode(undefined);
                         } else {
-                            self.draw.changeMode(self.geometryTypeDetails[val].drawMode);
-                            self.drawMode(self.geometryTypeDetails[val].drawMode);
+                            self.draw.changeMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
+                            self.drawMode(self.geometryTypeDetails[selectedDrawTool].drawMode);
                         }
                     }
 
@@ -569,43 +613,45 @@ define([
                     }
                 });
 
+                this.createOverlay = function(maplayer) {
+                    var self = this;
+                    _.extend(maplayer, {
+                        opacity: ko.observable(100),
+                        color: _.filter(maplayer.layer_definitions[0].paint, function(prop, key) {
+                            if (key.includes('-color')) {
+                                return prop
+                            };
+                        })[0],
+                        showingTools: ko.observable(false),
+                        invisible: ko.observable(false),
+                        checkedOutOfLibrary: ko.observable(false),
+                        toggleOverlayTools: function(e) {
+                            this.showingTools(!this.showingTools());
+                        },
+                        toggleOverlayVisibility: function(e) {
+                            this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
+                        },
+                        updateOpacity: function(val) {
+                            val > 0.0 ? this.invisible(false) : this.invisible(true);
+                            this.layer_definitions.forEach(function(layer) {
+                                this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
+                            }, map)
+                        }
+                    });
+                    maplayer.checkedOutOfLibrary(_.findWhere(this.overlayConfigs(), {
+                        "maplayerid": maplayer.maplayerid
+                    }) !== undefined)
+                    maplayer.opacity.subscribe(function(value) {
+                        maplayer.updateOpacity(value);
+                    }, self);
+                    return maplayer
+                };
+
                 this.createOverlays = function() {
                     var overlays =
                         _.each(_.where(this.layers, {
                             isoverlay: true
-                        }), function(overlay) {
-                            var self = this;
-                            _.extend(overlay, {
-                                opacity: ko.observable(100),
-                                color: _.filter(overlay.layer_definitions[0].paint, function(prop, key) {
-                                    if (key.includes('-color')) {
-                                        return prop
-                                    };
-                                })[0],
-                                showingTools: ko.observable(false),
-                                invisible: ko.observable(false),
-                                checkedOutOfLibrary: ko.observable(false),
-                                toggleOverlayTools: function(e) {
-                                    this.showingTools(!this.showingTools());
-                                },
-                                toggleOverlayVisibility: function(e) {
-                                    this.opacity() > 0.0 ? this.opacity(0.0) : this.opacity(100.0);
-                                },
-                                updateOpacity: function(val) {
-                                    val > 0.0 ? this.invisible(false) : this.invisible(true);
-                                    this.layer_definitions.forEach(function(layer) {
-                                        this.setPaintProperty(layer.id, layer.type + '-opacity', Number(val) / 100.0);
-                                    }, map)
-                                }
-                            });
-                            overlay.checkedOutOfLibrary(_.findWhere(this.overlayConfigs(), {
-                                "maplayerid": overlay.maplayerid
-                            }) !== undefined)
-                            overlay.opacity.subscribe(function(value) {
-                                overlay.updateOpacity(value);
-                            }, self);
-                        }, self);
-
+                        }), self.createOverlay, self);
                     return overlays;
                 }
 
@@ -708,16 +754,18 @@ define([
                         this.removeMaplayer(overlays[i])
                     }
                     for (var i = overlays.length; i-- > 0;) {
+                      if (overlays[i].isResource !== true) {
                         this.overlayConfigs().push({
                             'maplayerid': overlays[i].maplayerid,
                             'name': overlays[i].name,
                             'opacity': overlays[i].opacity()
                         });
                         this.addMaplayer(overlays[i])
+                      }
                     }
                     this.redrawGeocodeLayer();
                 }, this)
-            }
+            } //end setup map
 
             this.onGeocodeSelection = function(val, e) {
                 this.geocoder(e.currentTarget.value)
