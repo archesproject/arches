@@ -76,10 +76,10 @@ define([
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var picker = $(element).data("DateTimePicker");
             if (picker) {
-                var koDate = ko.utils.unwrapObservable(valueAccessor());
+                var val = ko.utils.unwrapObservable(valueAccessor());
                 if (koDate) {
-                  koDate = moment(koDate);
-                  picker.date(koDate);
+                  koDate =
+                  picker.date(moment(val););
                 }
             }
         }
