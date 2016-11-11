@@ -18,7 +18,7 @@ class ReportEditorPage(MapWidgetPage):
         self.page_id = page_id
         self.base_url = '/' + target_page + '/' + self.page_id
         self.wait = WebDriverWait(self.driver, 20)
-        self.driver.set_window_size(1400, 800)
+        self.driver.set_window_size(1400, 900)
 
     def save_report(self, report_name):
         self.driver.find_element(*locators.ACTIVATE_REPORT_BUTTON).click()

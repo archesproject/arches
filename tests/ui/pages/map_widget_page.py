@@ -18,15 +18,27 @@ class MapWidgetPage(BasePage):
         self.base_url = '/' + target_page + '/' + self.page_id
         self.wait = WebDriverWait(self.driver, 20)
 
-    def open_tools(self):
+    def navigate_to_page(self):
         self.driver.get(self.live_server_url + self.base_url)
         self.driver.implicitly_wait(10)
         self.wait.until(
             EC.invisibility_of_element_located(locators.LOADING_MASK)
         )
+
+    def open_tools(self):
         try:
             map_tools_button = self.wait.until(
                 EC.element_to_be_clickable(locators.MAP_TOOLS_BUTTON)
+            ).click()
+            result = True
+        except:
+            result = False
+        return result
+
+    def open_draw_tools(self):
+        try:
+            map_tools_button = self.wait.until(
+                EC.element_to_be_clickable(locators.MAP_DRAW_TOOLS)
             ).click()
             result = True
         except:
