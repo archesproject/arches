@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import decimal
 import types
 import json
@@ -186,7 +186,7 @@ class JSONSerializer(object):
                     else:
                         data[f.name] = list(qs.values_list('pk', flat=True))
             else:
-                data[f.name] = f.value_from_object(instance)
+                data[f.name] = self.handle_object(f.value_from_object(instance))
         return data
 
 

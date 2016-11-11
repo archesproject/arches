@@ -129,18 +129,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="btn-group">
                         <button class="btn btn-sm btn-mint dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }">{% trans "Settings" %}</a>
+                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid + '/settings') }"><i class="fa fa-wrench"></i> {% trans "Settings" %}</a>
                             </li>
-                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid) }">{% trans "Manage Graph" %}</a>
+                            <li><a href="#" data-bind="click:function() { $parent.navigate(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
                             </li>
                             <!-- ko if: isresource || isCard -->
-                            <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate(graphid + '/card_manager') : $parent.navigate('../card/' + graphid); }">{% trans "Manage Cards" %}</a>
+                            <li><a href="#" data-bind="click:function() { isresource ? $parent.navigate(graphid + '/card_manager') : $parent.navigate('../card/' + graphid); }"><i class="fa fa-file-o"></i> {% trans "Manage Cards" %}</a>
                             </li>
                             <!-- /ko -->
                             <!-- ko if: $parent.showResources() -->
-                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/form_manager') }">{% trans "Manage Forms" %}</a>
+                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/form_manager') }"><i class="fa fa-files-o"></i> {% trans "Manage Forms" %}</a>
                             </li>
-                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/report_manager') }">{% trans "Manage Reports" %}</a>
+                            <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/report_manager') }"><i class="fa fa-book"></i> {% trans "Manage Reports" %}</a>
+                            </li>
+                             <li><a href="#" data-bind="click:function () { $parent.navigate(graphid + '/function_manager') }"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
                             </li>
                             <!-- /ko -->
                             <li class="divider"></li>

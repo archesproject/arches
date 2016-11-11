@@ -14,6 +14,16 @@
 @import url(../bower_components/nouislider/distribute/nouislider.min.css);
 @import url(../plugins/openlayers/ol.css);
 
+
+/*  Summernote Overrides */
+.note-editor.note-frame {
+    border: 1px solid #ddd;
+}
+
+.note-editor.note-frame:hover {
+    cursor: text;
+}
+
 .regular-link{
     color: #337ab7;
     text-decoration: none;
@@ -179,12 +189,12 @@
 }
 
 .crud-record-item {
-    background: rgb(250, 250, 250);
+    background: #fbfbfb;
     padding: 0px;
 }
 
 .crud-record-item:nth-child(even) {
-    background: #fdfdfd;
+    background: #fefefe;
 }
 
 .data-card-alert {
@@ -2044,9 +2054,13 @@ ul .collapse li:last-of-type {
     border-left: 1px solid #000;
 }
 .list-group-item:hover {
-    background: #f8f8f8;
     cursor: pointer;
 }
+
+.effect:hover {
+    cursor: default;
+}
+
 .results-counter:hover {
     background: #fff;
     cursor: default;
@@ -2181,14 +2195,15 @@ input.cmn-toggle-yes-no:checked + label:after {
 .library-item-subtitle {
     margin-top: 0;
     margin-bottom: 0;
-    font-size: 11px;
-    color: #999;
+    font-size: 12px;
+    color: #888;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .library-card-body {
     height: 106px;
     padding: 5px 20px 25px;
+    color: #888;
 }
 .library-card-panel-title {
     font-size: 1.2em;
@@ -3275,6 +3290,7 @@ li.card-tree-list:last-of-type {
 }
 .form-list{
     padding-top: 0px;
+    background: #f0f0f0;
 }
 .form-list .grid{
     border-top: none;
@@ -3858,7 +3874,8 @@ div.row.widget-wrapper {
     margin-right: 10px;
     padding: 5px 5px 15px 5px;
 }
-div.row.widget-wrapper:hover {
+
+.widget-preview div.row.widget-wrapper:hover {
     background: #fafafa;
 }
 
@@ -4789,6 +4806,10 @@ a.map-widget-icon:hover {
 
 
 /* Function Manager Page */
+.function-settings{
+    margin: -40px 0px 0px -15px;
+}
+
 .href-toolbar {
     text-align: center;
     padding-top: 5px;
@@ -4798,10 +4819,20 @@ a.map-widget-icon:hover {
     color: #f4f4f4;
     font-size: 11px;
     padding: 5px 0px;
-    margin: 5px 0px 5px 0px;
+    margin: -5px 0px 15px 0px;
     background: #5393C8;
     display: inline-block;
     width: 100%;
+}
+
+.href-button:hover {
+    color: #fff;
+    background: #1266AB;
+}
+
+.href-button:focus {
+    color: #fff;
+    background: #1266AB;
 }
 
 .left-column-message {
