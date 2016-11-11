@@ -779,6 +779,7 @@ define([
                 var panel = data;
                 _.each(self.mapControlPanels, function(panelValue, panelName) {
                     panelName === panel ? panelValue(false) : panelValue(true);
+                    panel === 'overlays' || self.overlaySelectorClosed(true);
                 });
             }
 
