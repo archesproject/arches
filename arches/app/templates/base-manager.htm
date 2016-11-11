@@ -224,35 +224,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse" aria-expanded="false">
-                                                <li class="">
-                                                    <a class="branch-item"  href="#" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}<i class="arrow"></i></a>
-
-                                                    <!--Submenu-->
-                                                    <ul class="collapse pop-in in pad-btm" aria-expanded="false">
-                                                        <!-- ko foreach: allGraphs -->
-                                                            <!-- ko if: isresource -->
-                                                            <li class="link-submenu-item">
-                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
-                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
-                                                            </li>
-                                                            <!-- /ko -->
-                                                        <!-- /ko -->
-                                                    </ul>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu"  href="#" data-bind="click: navigate.bind(this, '/graph')">{% trans "Resource Models" %}</a>
                                                 </li>
-                                                <li class="">
-                                                    <a class="branch-item" href="#" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}<i class="arrow"></i></a>
-
-                                                    <!--Submenu-->
-                                                    <ul class="collapse pop-in in pad-btm">
-                                                        <!-- ko foreach: allGraphs -->
-                                                            <!-- ko if: !isresource -->
-                                                            <li class="link-submenu-item">
-                                                                <a class="link-submenu" href="#" data-bind="click: $parent.navigate.bind(this, '/graph/' + graphid + '/settings') ">
-                                                                    <i class="fa arches-menu-icon" data-bind="css: iconclass"></i> <span data-bind="text:name"></span></a>
-                                                            </li>
-                                                            <!-- /ko -->
-                                                        <!-- /ko -->
-                                                    </ul>
+                                                <li class="link-submenu-item">
+                                                    <a class="link-submenu" href="#" data-bind="click: navigate.bind(this, '/graph#branches')">{% trans "Branches" %}</a>
                                                 </li>
                                             </ul>
                                         </li>

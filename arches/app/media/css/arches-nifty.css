@@ -646,6 +646,9 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-left: 5px solid #fdfdfd;
     opacity: .825;
 }
+.library-card:first-of-type {
+    border-top: 1px solid #ddd;
+}
 .selected-card {
     opacity: 1.0;
     color: #fff;
@@ -4128,7 +4131,6 @@ div.row.widget-wrapper {
 .rp-report-section {
 	padding: 0px 0px 35px 0px;
 	background: #fff;
-	border-bottom: 1px solid #fafafa;
 }
 .rp-report-section:nth-child(even) {
 	background: #fff;
@@ -4136,7 +4138,7 @@ div.row.widget-wrapper {
 .rp-report-section-title {
 	font-size: 14px;
     font-weight: 400;
-    margin-top: 2px;
+    margin-top: -1px;
     margin-bottom: 5px;
     color: #666;
     padding-bottom: 10px;
@@ -4619,8 +4621,8 @@ a.map-widget-icon:hover {
 
 .map-widget-overlay-item:hover {
     background: #fff;
+    cursor: pointer;
 }
-
 
 .map-overlay-item-tools {
     position: absolute;
