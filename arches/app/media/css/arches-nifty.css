@@ -4126,12 +4126,12 @@ div.row.widget-wrapper {
 	border-bottom: 1px solid #ddd;
 }
 .rp-report-section {
-	padding: 15px 50px 35px 50px;
-	background: #f4f4f4;
-	border-bottom: 1px solid #e9e9e9;
+	padding: 0px 0px 35px 0px;
+	background: #fff;
+	border-bottom: 1px solid #fafafa;
 }
 .rp-report-section:nth-child(even) {
-	background: #fafafa;
+	background: #fff;
 }
 .rp-report-section-title {
 	font-size: 14px;
@@ -4139,6 +4139,9 @@ div.row.widget-wrapper {
     margin-top: 2px;
     margin-bottom: 5px;
     color: #666;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    background: #fafafa;
 }
 .rp-section-title {
 	font-size: 17px;
@@ -4147,15 +4150,16 @@ div.row.widget-wrapper {
     margin-bottom: 5px;
     padding: 14px 0 5px 5px;
     color: #666;
-    width: 300px;
 }
 .rp-card-section {
 	padding-bottom: 10px;
+    padding-top: 15px;
 	position: relative;
 }
 .rp-tile-title {
 	position: absolute;
 	top: 0px;
+    left: 25px;
 	width: 250px;
 	font-size: 15px;
     font-weight: 500;
@@ -4168,7 +4172,7 @@ div.row.widget-wrapper {
     text-overflow: ellipsis;
 }
 .rp-tile-title-float {
-	float: right;
+	float: left;
 }
 .rp-report-tile {
 	padding-bottom: 15px;
@@ -4185,6 +4189,7 @@ div.row.widget-wrapper {
 }
 .rp-report-container-tile {
 	padding-bottom: 15px;
+    padding-top: 15px;
 }
 .rp-report-tile-left-panel {
 	padding: 0px 15px 0px 0px;

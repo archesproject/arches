@@ -2665,6 +2665,9 @@ ul.labels-demo li {
 
 .arches-forms-container {
     padding-top: 10px;
+    height: 100vh;
+    overflow-y: scroll;
+    margin-bottom: 40px;
 }
 
 /*Counter
@@ -2798,6 +2801,7 @@ ul.labels-demo li {
 
 .arches-box-grey-border {
     position: relative;
+    margin-bottom: 150px;
     border-color: #dcdcdc; 
     border: 1px solid rgba(0,0,0,.1);
     padding-left: 20px;

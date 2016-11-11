@@ -8,7 +8,7 @@
         <div class="col-xs-12">
             <div style="pad-hor">
                 <div class="input-group date">
-                    <input type="text" data-bind="datepicker: value, placeholder: placeholder, datepickerOptions: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                    <input type="text" data-bind="value: value, placeholder: placeholder, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
                 </div>
             </div>
             <!-- <input type="text" data-bind="datepicker: value, placeholder: placeholder" class="form-control input-lg widget-input"> -->
@@ -27,13 +27,13 @@
         {% trans "Minimum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: minDate, datepickerOptions: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
+    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="value: minDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
 </div>
 <div class="control-label">
         {% trans "Maximum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="datepicker: maxDate, datepickerOptions: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
+    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="value: maxDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
 </div>
 <div class="control-label">
         {% trans "View Mode" %}
