@@ -122,10 +122,10 @@ define(['arches',
                             nodes.push(nodeModel);
                         }, this);
                         this.get('nodes')(nodes);
-                        this.get('widgets')(widgets);
-                        this.get('widgets').sort(function (w, ww) {
+                        widgets.sort(function (w, ww) {
                             return w.get('sortorder')() > ww.get('sortorder')();
                         });
+                        this.get('widgets')(widgets);
                         break;
                     case 'widgets':
                         break;
