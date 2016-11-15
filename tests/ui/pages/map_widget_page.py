@@ -59,7 +59,7 @@ class MapWidgetPage(BasePage):
             result = False
         return result
 
-    def add_overlay(self):
+    def add_overlay(self, number_of_added_overlays):
         try:
             for element in (
                 locators.MAP_TOOLS_OVERLAYS,
@@ -69,7 +69,7 @@ class MapWidgetPage(BasePage):
                 map_tools_button = self.wait.until(
                     EC.element_to_be_clickable(element)
                 ).click()
-            result = True if len(self.driver.find_elements(*locators.ADDED_OVERLAYS)) == 1 else False
+            result = True if len(self.driver.find_elements(*locators.ADDED_OVERLAYS)) == number_of_added_overlays else False
         except:
             result = False
         return result
