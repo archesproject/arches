@@ -4373,6 +4373,10 @@ div.row.widget-wrapper.report-header:hover {
     padding-left: 0px;
 }
 
+.overlay-filter {
+  height:34px
+}
+
 .overlay-card {
    float: left;
    width: 100%;
