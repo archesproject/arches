@@ -47,20 +47,26 @@
         </div>
         <!-- /ko -->
         <div class="overlay-selection-container" data-bind="css : {'selector-closed': overlaySelectorClosed}">
+          <div data-bind="with: overlayLibraryList">
            <!-- Title -->
            <div class="overlay-title">
                Map Overlay Library
-               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: toggleOverlaySelector"></i></span>
+               <span class="pull-right"><i class="overlay-close ion-ios-close" data-bind="click: $parent.toggleOverlaySelector.bind($parent)"></i></span>
            </div>
            <!-- Filter -->
            <div class="overlay-filter-container">
-               <input type="text" placeholder="filter overlays..." class="form-control grid-filter input-lg">
+               <div class="list-filter">
+                   <input type="text" class="form-control" style="" placeholder="{% trans "Find an Overlay" %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
+
+                   <!-- Remove Search -->
+                   <span class="clear-node-search" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
+               </div>
            </div>
-           <!-- Overlay List -->
+
            <div class="overlay-list-container">
-                <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: overlayLibrary">
-                       <!-- Overlay Item -->
-                     <div class="overlay-card" style="" data-bind="click: $parent.exchangeOverlay, css: {'selected': checkedOutOfLibrary}">
+                <div id="overlay-grid" class="grid" style="position: relative;" data-bind="foreach: {data: items}">
+
+                     <div class="overlay-card" style="" data-bind="click: $parents[1].exchangeOverlay, css: {'selected': checkedOutOfLibrary}, visible: $data.filtered() == false">
                          <div class="overlay-card-item">
                              <div class="overlay-card-vis-toggle">
                                  <i class="ion-checkmark-circled"></i>
@@ -73,6 +79,8 @@
                      </div>
                 </div>
            </div>
+
+         </div>
         </div>
 
         <!-- Geocode Panel -->

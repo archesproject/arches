@@ -4377,12 +4377,12 @@ div.row.widget-wrapper.report-header:hover {
    float: left;
    width: 100%;
    height: 50px;
-   margin: 0px;
+   margin-bottom: -2px;
    position: relative;
    padding: 0px;
    border: 1px solid #ddd;
-   border-top-width: 0px;
-   background: #fcfcfc ;
+   border-top-width: 1px;
+   background: #fcfcfc;
 }
 
 .overlay-card:hover {

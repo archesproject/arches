@@ -8,13 +8,14 @@ define([
     'mapbox-gl-draw',
     'knockout-mapping',
     'geojson-extent',
+    'views/list',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
     'bindings/color-picker'
-], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent) {
+], function($, ko, _, WidgetViewModel, arches, mapboxgl, Draw, koMapping, geojsonExtent, ListView) {
     /**
      * knockout components namespace used in arches
      * @external "ko.components"
@@ -614,6 +615,10 @@ define([
                         }
                     }
                 });
+
+                this.overlayLibraryList = new ListView({
+                    items: self.overlayLibrary
+                })
 
                 this.createOverlay = function(maplayer) {
                     var self = this;
